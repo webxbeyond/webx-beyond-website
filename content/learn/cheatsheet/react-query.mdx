@@ -1,0 +1,511 @@
+---
+title: ট্যানস্ট্যাক রিঅ্যাক্ট কোয়েরি চিটশিট
+description: ট্যানস্ট্যাক রিঅ্যাক্ট কোয়েরি (TanStack React Query) হলো রিঅ্যাক্ট অ্যাপ্লিকেশনে সার্ভার-স্টেট (server-state) পরিচালনার জন্য একটি শক্তিশালী লাইব্রেরি। এটি ডেটা ফেচিং, ক্যাশিং, সিঙ্ক্রোনাইজেশন, এবং আপডেটিং সহজ করে। এই চিটশিটে React Query-এর সব মৌলিক থেকে উন্নত ধারণা বিস্তারিতভাবে কভার করা হয়েছে।
+icon: simple-icons:reactquery
+---
+
+## ১. রিঅ্যাক্ট কোয়েরি পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **কোয়েরি**: সার্ভার থেকে ডেটা ফেচ করা।
+- **মিউটেশন**: সার্ভারে ডেটা আপডেট করা।
+- **ক্যাশিং**: ডেটা স্থানীয়ভাবে সংরক্ষণ।
+- **অটো-রিফেচ**: উইন্ডো ফোকাস, নেটওয়ার্ক পুনঃসংযোগে স্বয়ংক্রিয় ফেচ।
+
+### ১.২ ইনস্টলেশন
+- **NPM**:
+  ```bash
+  npm install @tanstack/react-query
+  ```
+- **Yarn**:
+  ```bash
+  yarn add @tanstack/react-query
+  ```
+
+---
+
+## ২. সেটআপ
+
+### ২.১ QueryClient এবং Provider
+`src/index.js` বা `src/App.js`:
+```javascript
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <YourComponent />
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+```
+
+- **QueryClient**: কোয়েরি এবং মিউটেশন পরিচালনা করে।
+- **QueryClientProvider**: অ্যাপে কোয়েরি কনটেক্সট প্রদান করে।
+
+---
+
+### ২.২ ডিভ টুল (ঐচ্ছিক)
+```bash
+npm install @tanstack/react-query-devtools
+```
+`src/App.js`:
+```javascript
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <YourComponent />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+}
+```
+
+---
+
+## ৩. মৌলিক কোয়েরি
+
+### ৩.১ useQuery হুক
+```javascript
+import { useQuery } from '@tanstack/react-query';
+
+function Posts() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['posts'],
+    queryFn: async () => {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      return response.json();
+    },
+  });
+
+  if (isLoading) return <p>লোড হচ্ছে...</p>;
+  if (error) return <p>এরর: {error.message}</p>;
+
+  return (
+    <ul>
+      {data.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+- **`queryKey`**: কোয়েরির ইউনিক আইডি।
+- **`queryFn`**: ডেটা ফেচ করার ফাংশন।
+- **রিটার্ন**: `data`, `isLoading`, `error`, `isFetching`, ইত্যাদি।
+
+---
+
+### ৩.২ স্ট্যাটাস হ্যান্ডলিং
+| প্রোপার্টি      | বর্ণনা                                      |
+|----------------|---------------------------------------------|
+| `isLoading`    | প্রথমবার ডেটা লোড হচ্ছে।                   |
+| `isFetching`   | ব্যাকগ্রাউন্ডে ডেটা ফেচ হচ্ছে।             |
+| `isError`      | এরর হয়েছে।                                |
+| `isSuccess`    | ডেটা সফলভাবে ফেচ হয়েছে।                   |
+
+---
+
+## ৪. কোয়েরি কনফিগারেশন
+
+### ৪.১ ক্যাশিং এবং রিফেচিং
+```javascript
+useQuery({
+  queryKey: ['posts'],
+  queryFn: fetchPosts,
+  staleTime: 5 * 60 * 1000, // ৫ মিনিট ক্যাশ ফ্রেশ
+  cacheTime: 10 * 60 * 1000, // ১০ মিনিট ক্যাশে থাকবে
+  refetchOnWindowFocus: true, // উইন্ডো ফোকাসে রিফেচ
+});
+```
+
+- **`staleTime`**: কতক্ষণ ডেটা "তাজা" থাকবে।
+- **`cacheTime`**: কতক্ষণ ক্যাশে থাকবে।
+- **`refetchOnWindowFocus`**: ফোকাসে রিফেচ।
+
+---
+
+### ৪.২ ডিফল্ট কনফিগারেশন
+`src/index.js`:
+```javascript
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // ১ মিনিট
+      cacheTime: 1000 * 60 * 5, // ৫ মিনিট
+      retry: 3, // ৩ বার রিট্রাই
+    },
+  },
+});
+```
+
+---
+
+## ৫. মিউটেশন
+
+### ৫.১ useMutation হুক
+```javascript
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+function AddPost() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (newPost) => {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify(newPost),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['posts']); // কোয়েরি রিফ্রেশ
+    },
+  });
+
+  const handleSubmit = () => {
+    mutation.mutate({ title: 'নতুন পোস্ট', body: 'বিস্তারিত', userId: 1 });
+  };
+
+  return (
+    <div>
+      <button onClick={handleSubmit} disabled={mutation.isLoading}>
+        {mutation.isLoading ? 'যোগ হচ্ছে...' : 'পোস্ট যোগ করুন'}
+      </button>
+      {mutation.isError && <p>এরর: {mutation.error.message}</p>}
+      {mutation.isSuccess && <p>পোস্ট যোগ হয়েছে!</p>}
+    </div>
+  );
+}
+```
+
+- **`mutationFn`**: মিউটেশন ফাংশন।
+- **`onSuccess`**: সফল হলে কলব্যাক।
+- **`mutate`**: মিউটেশন ট্রিগার।
+
+---
+
+### ৫.২ মিউটেশন স্ট্যাটাস
+| প্রোপার্টি      | বর্ণনা                                      |
+|----------------|---------------------------------------------|
+| `isLoading`    | মিউটেশন চলছে।                              |
+| `isError`      | এরর হয়েছে।                                |
+| `isSuccess`    | মিউটেশন সফল।                               |
+
+---
+
+## ৬. ডায়নামিক কোয়েরি
+
+### ৬.১ প্যারামিটার সহ কোয়েরি
+```javascript
+function Post({ id }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['post', id],
+    queryFn: async () => {
+      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      return response.json();
+    },
+    enabled: !!id, // id থাকলেই ফেচ হবে
+  });
+
+  if (isLoading) return <p>লোড হচ্ছে...</p>;
+  return <h1>{data.title}</h1>;
+}
+```
+
+- **`enabled`**: কোয়েরি চালানোর শর্ত।
+
+---
+
+## ৭. ক্যাশ ম্যানেজমেন্ট
+
+### ৭.১ QueryClient ব্যবহার
+```javascript
+import { useQueryClient } from '@tanstack/react-query';
+
+function PostList() {
+  const queryClient = useQueryClient();
+
+  const invalidate = () => {
+    queryClient.invalidateQueries(['posts']); // কোয়েরি রিফ্রেশ
+  };
+
+  const prefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['posts'],
+      queryFn: fetchPosts,
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={invalidate}>রিফ্রেশ</button>
+      <button onClick={prefetch}>প্রিফেচ</button>
+    </div>
+  );
+}
+```
+
+- **`invalidateQueries`**: ক্যাশ অবৈধ করে রিফেচ।
+- **`prefetchQuery`**: আগে থেকে ডেটা ফেচ।
+
+---
+
+### ৭.২ ক্যাশ আপডেট
+```javascript
+mutation.onSuccess = (newPost) => {
+  queryClient.setQueryData(['posts'], (oldData) => [...oldData, newPost]);
+};
+```
+
+---
+
+## ৮. অপটিমিস্টিক আপডেট
+
+```javascript
+function UpdatePost() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (updatedPost) => {
+      await fetch(`https://jsonplaceholder.typicode.com/posts/${updatedPost.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedPost),
+      });
+    },
+    onMutate: async (updatedPost) => {
+      await queryClient.cancelQueries(['posts']);
+      const previousPosts = queryClient.getQueryData(['posts']);
+      queryClient.setQueryData(['posts'], (old) =>
+        old.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+      );
+      return { previousPosts };
+    },
+    onError: (err, updatedPost, context) => {
+      queryClient.setQueryData(['posts'], context.previousPosts);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['posts']);
+    },
+  });
+
+  return (
+    <button onClick={() => mutation.mutate({ id: 1, title: 'আপডেটেড' })}>
+      আপডেট
+    </button>
+  );
+}
+```
+
+- **`onMutate`**: আপডেটের আগে অপটিমিস্টিক আপডেট।
+- **`onError`**: এরর হলে রোলব্যাক।
+- **`onSettled`**: শেষে রিফ্রেশ।
+
+---
+
+## ৯. প্যাজিনেশন
+
+### ৯.১ useInfiniteQuery
+```javascript
+import { useInfiniteQuery } from '@tanstack/react-query';
+
+function InfinitePosts() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ['posts', 'infinite'],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts?_page=${pageParam}&_limit=10`
+      );
+      return response.json();
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length ? allPages.length + 1 : undefined;
+    },
+  });
+
+  return (
+    <div>
+      {data?.pages.map((page, i) => (
+        <div key={i}>
+          {page.map((post) => (
+            <p key={post.id}>{post.title}</p>
+          ))}
+        </div>
+      ))}
+      <button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+      >
+        {isFetchingNextPage ? 'লোড হচ্ছে...' : hasNextPage ? 'পরবর্তী' : 'শেষ'}
+      </button>
+    </div>
+  );
+}
+```
+
+- **`getNextPageParam`**: পরবর্তী পেজ নির্ধারণ।
+
+---
+
+## ১০. এরর হ্যান্ডলিং
+```javascript
+useQuery({
+  queryKey: ['posts'],
+  queryFn: fetchPosts,
+  retry: 3, // ৩ বার রিট্রাই
+  retryDelay: (attempt) => attempt * 1000, // প্রতি রিট্রাইতে দেরি
+  onError: (error) => console.error('ফেচ এরর:', error),
+});
+```
+
+---
+
+## ১১. কাস্টম হুক
+```javascript
+function usePosts() {
+  return useQuery({
+    queryKey: ['posts'],
+    queryFn: async () => {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      return response.json();
+    },
+  });
+}
+
+function PostList() {
+  const { data, isLoading } = usePosts();
+  if (isLoading) return <p>লোড হচ্ছে...</p>;
+  return (
+    <ul>
+      {data.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+## ১২. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+
+### ১২.১ অ্যাপ সেটআপ
+`src/App.js`:
+```javascript
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import PostList from './PostList';
+import AddPost from './AddPost';
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <h1 className="text-2xl">রিঅ্যাক্ট কোয়েরি অ্যাপ</h1>
+      <AddPost />
+      <PostList />
+      <ReactQueryDevtools />
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+```
+
+---
+
+### ১২.২ পোস্ট লিস্ট
+`src/PostList.js`:
+```javascript
+import { useQuery } from '@tanstack/react-query';
+
+async function fetchPosts() {
+  const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+  return response.json();
+}
+
+export default function PostList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+  });
+
+  if (isLoading) return <p>লোড হচ্ছে...</p>;
+  if (error) return <p>এরর: {error.message}</p>;
+
+  return (
+    <ul className="mt-4">
+      {data.slice(0, 5).map((post) => (
+        <li key={post.id} className="border p-2 mb-2">
+          {post.title}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+### ১২.৩ পোস্ট যোগ
+`src/AddPost.js`:
+```javascript
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export default function AddPost() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (newPost) => {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify(newPost),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.json();
+    },
+    onSuccess: (newPost) => {
+      queryClient.setQueryData(['posts'], (old) => [newPost, ...old]);
+    },
+  });
+
+  const handleSubmit = () => {
+    mutation.mutate({
+      title: 'নতুন পোস্ট',
+      body: 'এটি একটি নতুন পোস্ট',
+      userId: 1,
+    });
+  };
+
+  return (
+    <div className="mb-4">
+      <button
+        onClick={handleSubmit}
+        disabled={mutation.isLoading}
+        className="bg-blue-500 text-white p-2 rounded"
+      >
+        {mutation.isLoading ? 'যোগ হচ্ছে...' : 'নতুন পোস্ট যোগ করুন'}
+      </button>
+      {mutation.isSuccess && <p className="text-green-500">পোস্ট যোগ হয়েছে!</p>}
+      {mutation.isError && <p className="text-red-500">এরর: {mutation.error.message}</p>}
+    </div>
+  );
+}
+```
+
+---
+
+## ১৩. টিপস এবং সেরা অভ্যাস
+- **কোয়েরি কী**: সবসময় ইউনিক এবং ডিস্ক্রিপটিভ কী ব্যবহার করুন।
+- **কাস্টম হুক**: পুনঃব্যবহারযোগ্য লজিকের জন্য।
+- **অপটিমিস্টিক আপডেট**: UX উন্নত করতে ব্যবহার করুন।
+- **ডিভ টুল**: ডেভেলপমেন্টে সমস্যা খুঁজতে।

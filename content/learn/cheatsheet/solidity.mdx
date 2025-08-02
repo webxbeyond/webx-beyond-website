@@ -1,0 +1,490 @@
+---
+title: সলিডিটি চিটশিট
+description: সলিডিটি (Solidity) হলো একটি উচ্চ-স্তরের প্রোগ্রামিং ভাষা যা ইথেরিয়াম ব্লকচেইনে স্মার্ট কন্ট্রাক্ট তৈরির জন্য ব্যবহৃত হয়। এই চিটশিটে সলিডিটির সব মৌলিক থেকে উন্নত ধারণা, সিনট্যাক্স, এবং ব্যবহার বিস্তারিতভাবে কভার করা হয়েছে।
+icon: file-icons:solidity
+---
+
+## ১. সলিডিটি পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **স্মার্ট কন্ট্রাক্ট**: ব্লকচেইনে স্বয়ংক্রিয়ভাবে চালিত প্রোগ্রাম।
+- **EVM**: Ethereum Virtual Machine-এ সলিডিটি কোড কম্পাইল হয়।
+- **গ্যাস**: কন্ট্রাক্ট এক্সিকিউশনের জন্য খরচ।
+
+### ১.২ ইনস্টলেশন ও সেটআপ
+- **Remix IDE**: অনলাইন টুল (`remix.ethereum.org`)।
+- **Hardhat/Truffle**: লোকাল ডেভেলপমেন্ট।
+  ```bash
+  npm install -g hardhat
+  npx hardhat init
+  ```
+
+---
+
+## ২. সলিডিটি সিনট্যাক্স
+
+### ২.১ ফাইল স্ট্রাকচার
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MyContract {
+    // কোড এখানে
+}
+```
+- **`SPDX-License`**: লাইসেন্স স্পেসিফিকেশন।
+- **`pragma`**: সলিডিটি সংস্করণ (যেমন, `^0.8.0` মানে 0.8.x)।
+
+---
+
+### ২.২ ডেটা টাইপ
+| টাইপ          | বর্ণনা                                      | উদাহরণ                          |
+|---------------|---------------------------------------------|---------------------------------|
+| `uint`        | অ-ঋণাত্মক পূর্ণসংখ্যা।                      | `uint256 x = 10;`              |
+| `int`         | পূর্ণসংখ্যা।                                | `int256 y = -5;`               |
+| `address`     | ইথেরিয়াম ঠিকানা।                           | `address owner;`              ISTORY
+| `bool`        | সত্য/মিথ্যা।                               | `bool isActive = true;`        |
+| `string`      | টেক্সট।                                     | `string name = "রহিম";`        |
+| `bytes`       | বাইট ডেটা।                                 | `bytes32 data;`                |
+| `array`       | অ্যারে (নির্দিষ্ট/ডায়নামিক)।               | `uint[] numbers;`              |
+| `mapping`     | কী-ভ্যালু জোড়া।                            | `mapping(address => uint) balances;` |
+
+**উদাহরণ:**
+```solidity
+uint256 public count = 100;
+address public owner = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+string public greeting = "হ্যালো!";
+```
+
+---
+
+### ২.৩ ভেরিয়েবল স্কোপ
+| মডিফায়ার    | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `public`     | সবাই অ্যাক্সেস করতে পারে।                   | `uint public x;`               |
+| `private`    | শুধু কন্ট্রাক্টের মধ্যে।                    | `uint private y;`              |
+| `internal`   | কন্ট্রাক্ট এবং উত্তরাধিকারী কন্ট্রাক্ট।      | `uint internal z;`             |
+| `external`   | শুধু বাইরে থেকে কল করা যায়।                | `function ext() external;`     |
+
+---
+
+## ৩. ফাংশন
+
+### ৩.১ ফাংশন সিনট্যাক্স
+```solidity
+function functionName(uint param) public returns (uint) {
+    return param * 2;
+}
+```
+
+- **মডিফায়ার**: `public`, `private`, `internal`, `external`।
+- **রিটার্ন**: `returns (type)`।
+
+---
+
+### ৩.২ বিশেষ ফাংশন
+| ফাংশন        | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `constructor`| কন্ট্রাক্ট ডিপ্লয়মেন্টে একবার চলে।          | `constructor() { owner = msg.sender; }` |
+| `receive`    | ইথার রিসিভ করার জন্য।                       | `receive() external payable {}` |
+| `fallback`   | অজানা ফাংশন কলের জন্য।                      | `fallback() external payable {}` |
+
+**উদাহরণ:**
+```solidity
+contract Example {
+    address public owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    receive() external payable {}
+}
+```
+
+---
+
+### ৩.৩ মডিফায়ার
+```solidity
+modifier onlyOwner() {
+    require(msg.sender == owner, "শুধু মালিক!");
+    _;
+}
+
+function restricted() public onlyOwner {
+    // কোড
+}
+```
+
+---
+
+## ৪. ডেটা স্ট্রাকচার
+
+### ৪.১ অ্যারে
+```solidity
+uint[] public numbers;
+
+function addNumber(uint _num) public {
+    numbers.push(_num);
+}
+
+function getNumber(uint index) public view returns (uint) {
+    return numbers[index];
+}
+```
+
+---
+
+### ৪.২ ম্যাপিং
+```solidity
+mapping(address => uint) public balances;
+
+function updateBalance(uint _amount) public {
+    balances[msg.sender] = _amount;
+}
+
+function getBalance(address _addr) public view returns (uint) {
+    return balances[_addr];
+}
+```
+
+---
+
+### ৪.৩ স্ট্রাক্ট
+```solidity
+struct User {
+    string name;
+    uint age;
+    address addr;
+}
+
+User[] public users;
+
+function addUser(string memory _name, uint _age) public {
+    users.push(User(_name, _age, msg.sender));
+}
+```
+
+---
+
+### ৪.৪ এনাম
+```solidity
+enum Status { Pending, Approved, Rejected }
+
+Status public currentStatus;
+
+function setStatus(Status _status) public {
+    currentStatus = _status;
+}
+```
+
+---
+
+## ৫. ইভেন্ট এবং লগিং
+```solidity
+event Transfer(address indexed from, address indexed to, uint amount);
+
+function transfer(address _to, uint _amount) public {
+    emit Transfer(msg.sender, _to, _amount);
+}
+```
+
+- **`indexed`**: ফিল্টার করার জন্য (সর্বোচ্চ ৩টি)।
+
+---
+
+## ৬. ইথার এবং গ্যাস
+
+### ৬.১ ইথার হ্যান্ডলিং
+- **ইউনিট**: `wei`, `gwei`, `ether`।
+```solidity
+uint public price = 1 ether; // 10^18 wei
+
+function sendEther() public payable {
+    require(msg.value >= price, "অপর্যাপ্ত ইথার!");
+}
+```
+
+---
+
+### ৬.২ গ্যাস অপটিমাইজেশন
+- `uint256` ব্যবহার করুন `uint8` এর পরিবর্তে।
+- লুপ এড়িয়ে চলুন।
+- `view`/`pure` ফাংশন ব্যবহার করুন।
+
+---
+
+## ৭. কন্ট্রাক্ট ইন্টারঅ্যাকশন
+
+### ৭.১ ইনহেরিটেন্স
+```solidity
+contract Parent {
+    uint public value = 10;
+
+    function getValue() public virtual returns (uint) {
+        return value;
+    }
+}
+
+contract Child is Parent {
+    function getValue() public override returns (uint) {
+        return value * 2;
+    }
+}
+```
+
+---
+
+### ৭.২ অন্য কন্ট্রাক্ট কল
+```solidity
+interface IExternal {
+    function getData() external returns (uint);
+}
+
+contract Caller {
+    function callExternal(address _contract) public returns (uint) {
+        IExternal ext = IExternal(_contract);
+        return ext.getData();
+    }
+}
+```
+
+---
+
+## ৮. সিকিউরিটি
+
+### ৮.১ সাধারণ দুর্বলতা
+| সমস্যা           | সমাধান                                      |
+|------------------|---------------------------------------------|
+| Reentrancy       | `nonReentrant` মডিফায়ার বা লক।             |
+| Overflow         | `SafeMath` বা `^0.8.0` (বিল্ট-ইন চেক)।      |
+| Access Control   | `onlyOwner` মডিফায়ার।                      |
+| Gas Limit        | লুপ এড়ানো।                                 |
+
+**Reentrancy প্রতিরোধ:**
+```solidity
+bool private locked;
+
+modifier nonReentrant() {
+    require(!locked, "Reentrancy নিষিদ্ধ!");
+    locked = true;
+    _;
+    locked = false;
+}
+
+function withdraw() public nonReentrant {
+    payable(msg.sender).transfer(address(this).balance);
+}
+```
+
+---
+
+### ৮.২ চেক-ইফেক্ট-ইন্টারঅ্যাকশন
+```solidity
+function safeWithdraw(uint _amount) public {
+    require(balances[msg.sender] >= _amount, "অপর্যাপ্ত ব্যালেন্স!");
+    balances[msg.sender] -= _amount; // ইফেক্ট
+    payable(msg.sender).transfer(_amount); // ইন্টারঅ্যাকশন
+}
+```
+
+---
+
+## ৯. গ্লোবাল ভেরিয়েবল
+| ভেরিয়েবল     | বর্ণনা                                      | উদাহরণ                          |
+|---------------|---------------------------------------------|---------------------------------|
+| `msg.sender`  | কলারের ঠিকানা।                             | `address owner = msg.sender;`  |
+| `msg.value`   | পাঠানো ইথার (wei-তে)।                       | `uint amount = msg.value;`     |
+| `block.number`| বর্তমান ব্লক নম্বর।                         | `uint blockNum = block.number;`|
+| `block.timestamp` | বর্তমান সময় (সেকেন্ডে)।                 | `uint time = block.timestamp;` |
+| `address(this)` | কন্ট্রাক্টের ঠিকানা।                      | `address self = address(this);`|
+
+---
+
+## ১০. লাইব্রেরি
+```solidity
+library Math {
+    function add(uint a, uint b) internal pure returns (uint) {
+        return a + b;
+    }
+}
+
+contract MyContract {
+    using Math for uint;
+
+    function sum(uint x, uint y) public pure returns (uint) {
+        return x.add(y);
+    }
+}
+```
+
+---
+
+## ১১. টেস্টিং এবং ডিবাগিং
+
+### ১১.১ Hardhat-এ টেস্ট
+`test/MyContract.js`:
+```javascript
+const { expect } = require("chai");
+
+describe("MyContract", function () {
+  it("should set owner", async function () {
+    const MyContract = await ethers.getContractFactory("MyContract");
+    const contract = await MyContract.deploy();
+    await contract.deployed();
+    expect(await contract.owner()).to.equal(await ethers.provider.getSigner(0).getAddress());
+  });
+});
+```
+
+- চালানো: `npx hardhat test`
+
+---
+
+### ১১.২ Remix-এ ডিবাগিং
+- Remix-এ "Debug" ট্যাব ব্যবহার করুন।
+- `assert`/`require` দিয়ে চেক:
+```solidity
+require(x > 0, "শূন্যের বেশি হতে হবে!");
+```
+
+---
+
+## ১২. উদাহরণ: একটি সম্পূর্ণ কন্ট্রাক্ট
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CrowdFunding {
+    address public owner;
+    uint public goal;
+    uint public totalRaised;
+    mapping(address => uint) public contributions;
+    bool public fundingActive;
+
+    event Contribution(address indexed contributor, uint amount);
+    event GoalReached(uint totalRaised);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "শুধু মালিক!");
+        _;
+    }
+
+    constructor(uint _goal) {
+        owner = msg.sender;
+        goal = _goal;
+        fundingActive = true;
+    }
+
+    function contribute() public payable {
+        require(fundingActive, "ফান্ডিং বন্ধ!");
+        require(msg.value > 0, "অপর্যাপ্ত ইথার!");
+
+        contributions[msg.sender] += msg.value;
+        totalRaised += msg.value;
+
+        emit Contribution(msg.sender, msg.value);
+
+        if (totalRaised >= goal) {
+            fundingActive = false;
+            emit GoalReached(totalRaised);
+        }
+    }
+
+    function withdraw() public onlyOwner {
+        require(!fundingActive, "ফান্ডিং চলছে!");
+        payable(owner).transfer(address(this).balance);
+    }
+
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
+    receive() external payable {
+        contribute();
+    }
+}
+```
+
+---
+
+## ১৩. উন্নত ফিচার
+
+### ১৩.১ মাল্টি-সিগনেচার ওয়ালেট
+```solidity
+contract MultiSigWallet {
+    address[] public owners;
+    uint public required;
+    mapping(address => bool) public isOwner;
+
+    constructor(address[] memory _owners, uint _required) {
+        require(_owners.length >= _required, "অপর্যাপ্ত মালিক!");
+        owners = _owners;
+        required = _required;
+        for (uint i = 0; i < _owners.length; i++) {
+            isOwner[_owners[i]] = true;
+        }
+    }
+}
+```
+
+---
+
+### ১৩.২ ERC-20 টোকেন
+```solidity
+contract MyToken {
+    string public name = "MyToken";
+    string public symbol = "MTK";
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    constructor(uint256 _initialSupply) {
+        totalSupply = _initialSupply * 10 ** decimals;
+        balanceOf[msg.sender] = totalSupply;
+    }
+
+    function transfer(address _to, uint256 _value) public returns (bool) {
+        require(balanceOf[msg.sender] >= _value, "অপর্যাপ্ত ব্যালেন্স!");
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+
+    function approve(address _spender, uint256 _value) public returns (bool) {
+        allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+        require(balanceOf[_from] >= _value, "অপর্যাপ্ত ব্যালেন্স!");
+        require(allowance[_from][msg.sender] >= _value, "অনুমতি নেই!");
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
+        allowance[_from][msg.sender] -= _value;
+        emit Transfer(_from, _to, _value);
+        return true;
+    }
+}
+```
+
+---
+
+## ১৪. টিপস এবং সেরা অভ্যাস
+- **গ্যাস অপটিমাইজেশন**: অপ্রয়োজনীয় স্টোরেজ এড়ান।
+- **সিকিউরিটি**: OpenZeppelin লাইব্রেরি ব্যবহার করুন।
+- **ডকুমেন্টেশন**: NatSpec কমেন্ট।
+```solidity
+/// @notice এই ফাংশন ব্যালেন্স চেক করে
+/// @param _addr ইউজারের ঠিকানা
+/// @return ব্যালেন্স
+function getBalance(address _addr) public view returns (uint) {
+    return balances[_addr];
+}
+```

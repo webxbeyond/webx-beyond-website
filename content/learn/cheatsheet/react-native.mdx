@@ -1,0 +1,437 @@
+---
+title: রিঅ্যাক্ট নেটিভ চিটশিট
+description: CSS হলো HTML এলিমেন্টের Design এবং Layout নিয়ন্ত্রণ করার জন্য ব্যবহৃত একটি স্টাইলিং ভাষা। এই চিটশিটে CSS-এর গুরুত্বপূর্ণ প্রোপার্টি এবং তাদের ব্যবহার ব্যাখ্যা করা হয়েছে।
+icon: tabler:brand-react-native
+---
+
+## ১. রিঅ্যাক্ট নেটিভ শুরু করা
+
+### ১.১ পরিবেশ সেটআপ
+- **প্রয়োজনীয়তা**: Node.js, npm/yarn, JDK (Android), Xcode (iOS)।
+- **ইনস্টলেশন**: 
+  ```bash
+  npm install -g expo-cli
+  expo init MyApp
+  cd MyApp
+  npm start
+  ```
+- **Android Emulator**: Android Studio থেকে AVD সেটআপ।
+- **iOS Simulator**: Xcode ইনস্টল করুন।
+
+### ১.২ প্রথম অ্যাপ
+```javascript
+import React from 'react';
+import { Text, View } from 'react-native';
+
+const App = () => {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>হ্যালো, রিঅ্যাক্ট নেটিভ!</Text>
+    </View>
+  );
+};
+
+export default App;
+```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ কম্পোনেন্ট
+- **ফাংশনাল কম্পোনেন্ট**:
+```javascript
+import React from 'react';
+import { Text, View } from 'react-native';
+
+const MyComponent = () => (
+  <View>
+    <Text>এটি একটি কম্পোনেন্ট</Text>
+  </View>
+);
+```
+
+- **প্রপস (Props)**:
+```javascript
+const Greeting = ({ name }) => (
+  <Text>হ্যালো, {name}!</Text>
+);
+
+<Greeting name="রহিম" />
+```
+
+---
+
+### ২.২ স্টাইলিং
+- **ইনলাইন স্টাইল**:
+```javascript
+<Text style={{ color: 'blue', fontSize: 20 }}>নীল টেক্সট</Text>
+```
+
+- **StyleSheet**:
+```javascript
+import { StyleSheet, Text, View } from 'react-native';
+
+const App = () => (
+  <View style={styles.container}>
+    <Text style={styles.text}>স্টাইল করা টেক্সট</Text>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20 },
+  text: { fontSize: 18, color: 'green' },
+});
+```
+
+---
+
+## ৩. কোর কম্পোনেন্ট
+
+### ৩.১ লেআউট কম্পোনেন্ট
+| কম্পোনেন্ট  | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `View`      | বক্স বা কনটেইনার।                          | `<View style={{ flex: 1 }} />`  |
+| `ScrollView`| স্ক্রলযোগ্য কনটেন্ট।                       | `<ScrollView><Text>...</Text></ScrollView>` |
+| `SafeAreaView` | নচ/স্ট্যাটাস বার এড়ানো।                 | `<SafeAreaView>...</SafeAreaView>` |
+
+---
+
+### ৩.২ টেক্সট এবং ইনপুট
+| কম্পোনেন্ট  | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `Text`      | টেক্সট প্রদর্শন।                            | `<Text>হ্যালো</Text>`           |
+| `TextInput` | ইউজার ইনপুট।                               | `<TextInput placeholder="নাম" />` |
+| `Button`    | বাটন।                                      | `<Button title="ক্লিক" onPress={() => {}} />` |
+
+**উদাহরণ:**
+```javascript
+import { TextInput, Button } from 'react-native';
+
+const Form = () => {
+  const [text, setText] = React.useState('');
+  return (
+    <>
+      <TextInput value={text} onChangeText={setText} placeholder="টাইপ করুন" />
+      <Button title="জমা দিন" onPress={() => alert(text)} />
+    </>
+  );
+};
+```
+
+---
+
+### ৩.৩ ইমেজ এবং মিডিয়া
+| কম্পোনেন্ট  | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `Image`     | ছবি প্রদর্শন।                               | `<Image source={{ uri: 'url' }} />` |
+| `ImageBackground` | ব্যাকগ্রাউন্ড ছবি।                    | `<ImageBackground>...</ImageBackground>` |
+
+**উদাহরণ:**
+```javascript
+import { Image } from 'react-native';
+
+const MyImage = () => (
+  <Image
+    source={{ uri: 'https://example.com/image.jpg' }}
+    style={{ width: 200, height: 200 }}
+  />
+);
+```
+
+---
+
+## ৪. স্টেট এবং হুক
+
+### ৪.১ useState
+```javascript
+import React, { useState } from 'react';
+import { Text, Button } from 'react-native';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <Text>গণনা: {count}</Text>
+      <Button title="বাড়ান" onPress={() => setCount(count + 1)} />
+    </>
+  );
+};
+```
+
+---
+
+### ৪.২ useEffect
+```javascript
+import React, { useEffect } from 'react';
+import { Text } from 'react-native';
+
+const Timer = () => {
+  const [time, setTime] = React.useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(t => t + 1), 1000);
+    return () => clearInterval(timer); // ক্লিনআপ
+  }, []);
+
+  return <Text>সময়: {time} সেকেন্ড</Text>;
+};
+```
+
+---
+
+### ৪.৩ অন্যান্য হুক
+| হুক         | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `useContext`| কনটেক্সট থেকে ডেটা।                        | `useContext(MyContext)`         |
+| `useReducer`| জটিল স্টেট ম্যানেজমেন্ট।                    | `useReducer(reducer, initialState)` |
+| `useRef`    | রেফারেন্স তৈরি।                             | `const inputRef = useRef()`     |
+
+**উদাহরণ:**
+```javascript
+const inputRef = useRef();
+<TextInput ref={inputRef} />;
+inputRef.current.focus();
+```
+
+---
+
+## ৫. নেভিগেশন
+- **ইনস্টলেশন**: 
+  ```bash
+  npm install @react-navigation/native @react-navigation/stack
+  npm install react-native-screens react-native-safe-area-context
+  ```
+
+### ৫.১ Stack Navigator
+```javascript
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
+
+const HomeScreen = () => <Text>হোম</Text>;
+const DetailsScreen = () => <Text>বিস্তারিত</Text>;
+
+const App = () => (
+  <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
+    </Stack.Navigator>
+  </NavigationContainer>
+);
+```
+
+### ৫.২ নেভিগেশন প্রপস
+```javascript
+const HomeScreen = ({ navigation }) => (
+  <Button title="বিস্তারিত দেখুন" onPress={() => navigation.navigate('Details')} />
+);
+```
+
+---
+
+## ৬. ফ্লেক্সবক্স এবং লেআউট
+| প্রোপার্টি   | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `flex`       | ফ্লেক্সিবল স্পেস।                           | `flex: 1`                      |
+| `flexDirection` | দিক (row/column)।                        | `flexDirection: 'row'`         |
+| `justifyContent` | অনুভূমিক অ্যালাইনমেন্ট।                  | `justifyContent: 'center'`     |
+| `alignItems` | উল্লম্ব অ্যালাইনমেন্ট।                      | `alignItems: 'center'`         |
+
+**উদাহরণ:**
+```javascript
+<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+  <Text>১</Text>
+  <Text>২</Text>
+</View>
+```
+
+---
+
+## ৭. API এবং নেটওয়ার্কিং
+```javascript
+import { useEffect, useState } from 'react';
+import { Text } from 'react-native';
+
+const DataFetcher = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch('https://api.example.com/data')
+      .then(response => response.json())
+      .then(json => setData(json))
+      .catch(error => console.error(error));
+  }, []);
+
+  return <Text>{data ? data.message : 'লোড হচ্ছে...'}</Text>;
+};
+```
+
+---
+
+## ৮. রিঅ্যাক্ট নেটিভ API
+| API          | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `Alert`      | পপআপ সতর্কতা।                              | `Alert.alert('হ্যালো!')`        |
+| `Dimensions` | স্ক্রিন সাইজ।                               | `Dimensions.get('window')`      |
+| `Platform`   | প্ল্যাটফর্ম চেক।                            | `Platform.OS === 'ios'`         |
+| `AsyncStorage` | লোকাল স্টোরেজ।                            | `AsyncStorage.setItem('key', 'value')` |
+
+**উদাহরণ:**
+```javascript
+import { Alert } from 'react-native';
+
+Alert.alert('শিরোনাম', 'বার্তা', [
+  { text: 'ঠিক আছে', onPress: () => console.log('OK') },
+]);
+```
+
+---
+
+## ৯. অ্যানিমেশন
+- **ইনস্টলেশন**: 
+  ```bash
+  npm install react-native-reanimated react-native-gesture-handler
+  ```
+
+### ৯.১ Animated API
+```javascript
+import { Animated, Button } from 'react-native';
+
+const FadeInView = () => {
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+
+  const fadeIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <>
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Text>ফেইড ইন</Text>
+      </Animated.View>
+      <Button title="শুরু" onPress={fadeIn} />
+    </>
+  );
+};
+```
+
+---
+
+## ১০. তৃতীয় পক্ষের লাইব্রেরি
+| লাইব্রেরি      | বর্ণনা                                      | ইনস্টলেশন                      |
+|----------------|---------------------------------------------|---------------------------------|
+| `react-native-vector-icons` | আইকন।                           | `npm i react-native-vector-icons` |
+| `axios`        | HTTP রিকোয়েস্ট।                            | `npm i axios`                   |
+| `redux`        | স্টেট ম্যানেজমেন্ট।                         | `npm i redux react-redux`       |
+
+**উদাহরণ (আইকন):**
+```javascript
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+<Icon name="star" size={30} color="gold" />;
+```
+
+---
+
+## ১১. রিডাক্স স্টেট ম্যানেজমেন্ট
+```javascript
+import { createStore } from 'redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+
+// রিডিউসার
+const counterReducer = (state = { count: 0 }, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    default:
+      return state;
+  }
+};
+
+// স্টোর
+const store = createStore(counterReducer);
+
+// কম্পোনেন্ট
+const Counter = () => {
+  const count = useSelector(state => state.count);
+  const dispatch = useDispatch();
+
+  return (
+    <>
+      <Text>গণনা: {count}</Text>
+      <Button title="বাড়ান" onPress={() => dispatch({ type: 'INCREMENT' })} />
+    </>
+  );
+};
+
+// অ্যাপ
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+```
+
+---
+
+## ১২. ডিবাগিং এবং টেস্টিং
+- **কনসোল**: `console.log('ডেটা:', data);`
+- **React Native Debugger**: Chrome DevTools।
+- **টেস্টিং**: 
+  ```bash
+  npm install --save-dev jest
+  ```
+
+---
+
+## ১৩. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+```javascript
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+
+const TodoApp = () => {
+  const [task, setTask] = useState('');
+  const [tasks, setTasks] = useState([]);
+
+  const addTask = () => {
+    if (task) {
+      setTasks([...tasks, { id: Date.now(), text: task }]);
+      setTask('');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>টুডু লিস্ট</Text>
+      <TextInput
+        style={styles.input}
+        value={task}
+        onChangeText={setTask}
+        placeholder="নতুন কাজ লিখুন"
+      />
+      <Button title="যোগ করুন" onPress={addTask} />
+      <FlatList
+        data={tasks}
+        renderItem={({ item }) => <Text style={styles.task}>{item.text}</Text>}
+        keyExtractor={item => item.id.toString()}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  input: { borderWidth: 1, padding: 10, marginBottom: 10 },
+  task: { padding: 10, backgroundColor: 'white', marginVertical: 5 },
+});
+
+export default TodoApp;
+```

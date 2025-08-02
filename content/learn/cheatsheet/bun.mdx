@@ -1,0 +1,355 @@
+---
+title: বান (Bun) চিটশিট
+description: বান (Bun) হলো একটি দ্রুতগতির জাভাস্ক্রিপ্ট রানটাইম, বান্ডলার, প্যাকেজ ম্যানেজার, এবং টেস্ট রানার যা Node.js এবং npm-এর বিকল্প হিসেবে তৈরি করা হয়েছে। এটি Zig প্রোগ্রামিং ভাষায় লেখা এবং Webkit-এর JavaScriptCore ইঞ্জিন ব্যবহার করে, যা এটিকে অত্যন্ত দ্রুত এবং দক্ষ করে। এই চিটশিটে Bun-এর সব মৌলিক থেকে উন্নত ধারণা, কমান্ড, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: material-icon-theme:bun-light
+---
+
+## ১. বান (Bun) পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **রানটাইম**: Node.js-এর মতো জাভাস্ক্রিপ্ট ফাইল রান করে।
+- **প্যাকেজ ম্যানেজার**: npm-এর বিকল্প, দ্রুত ডিপেন্ডেন্সি ইনস্টল।
+- **বান্ডলার**: Webpack/Rollup-এর মতো কোড বান্ডল করে।
+- **টেস্ট রানার**: Jest-এর বিকল্প, দ্রুত টেস্টিং।
+- **ফাইল সিস্টেম**: দ্রুত I/O অপারেশন।
+
+### ১.২ ইনস্টলেশন
+- **Linux/macOS**:
+  ```bash
+  curl -fsSL https://bun.sh/install | bash
+  ```
+- **Windows (WSL)**:
+  ```bash
+  curl -fsSL https://bun.sh/install | bash
+  ```
+- **চেক করুন**:
+  ```bash
+  bun --version
+  ```
+- **আপগ্রেড**:
+  ```bash
+  bun upgrade
+  ```
+
+---
+
+## ২. রানটাইম ব্যবহার
+
+### ২.১ জাভাস্ক্রিপ্ট ফাইল রান
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun run`        | ফাইল রান।                                   | `bun run index.js`             |
+| `bun`            | সরাসরি ফাইল রান (run ঐচ্ছিক)।               | `bun index.js`                 |
+| `bun repl`       | REPL চালু।                                  | `bun repl`                     |
+
+**উদাহরণ**: `index.js`
+```javascript
+console.log("হ্যালো, Bun!");
+```
+```bash
+bun index.js
+```
+
+---
+
+### ২.২ TypeScript সমর্থন
+- **সরাসরি রান**: কম্পাইল ছাড়াই TS ফাইল রান।
+  ```bash
+  bun index.ts
+  ```
+- **উদাহরণ**: `index.ts`
+```typescript
+const greet = (name: string) => `হ্যালো, ${name}!`;
+console.log(greet("Bun"));
+```
+
+---
+
+## ৩. প্যাকেজ ম্যানেজমেন্ট
+
+### ৩.১ প্যাকেজ ইনস্টল
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun install`    | package.json থেকে ইনস্টল।                   | `bun install`                  |
+| `bun add`        | নতুন প্যাকেজ যোগ।                           | `bun add express`              |
+| `bun add -D`     | ডেভ ডিপেন্ডেন্সি যোগ।                       | `bun add -D typescript`        |
+| `bun install -g` | গ্লোবাল ইনস্টল।                             | `bun install -g cowsay`        |
+
+**উদাহরণ**:
+```bash
+bun add zod
+bun install
+```
+
+---
+
+### ৩.২ প্যাকেজ মুছে ফেলা
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun remove`     | প্যাকেজ মুছে ফেলা।                          | `bun remove express`           |
+
+---
+
+### ৩.৩ bun.lockb
+- **লক ফাইল**: `bun install` চালালে স্বয়ংক্রিয়ভাবে তৈরি হয়।
+- **ব্যবহার**: সুনির্দিষ্ট ভার্সন লক করা।
+
+---
+
+## ৪. বান্ডলিং
+
+### ৪.১ কোড বান্ডল
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun build`      | ফাইল বান্ডল।                                | `bun build index.js --outfile dist/app.js` |
+| `bun build --minify` | মিনিফাই করা।                          | `bun build index.js --minify --outfile dist/app.js` |
+| `bun build --target` | টার্গেট পরিবেশ।                       | `bun build index.js --target browser --outfile dist/app.js` |
+
+**উদাহরণ**: `index.js`
+```javascript
+import { z } from "zod";
+console.log(z.string().parse("Bun"));
+```
+```bash
+bun build index.js --outfile dist/app.js
+bun dist/app.js
+```
+
+---
+
+### ৪.২ মাল্টি-ফাইল বান্ডল
+```bash
+bun build ./src/*.js --outdir dist
+```
+
+---
+
+## ৫. স্ক্রিপ্ট রান
+
+### ৫.১ package.json স্ক্রিপ্ট
+```json
+{
+  "scripts": {
+    "start": "bun index.js",
+    "dev": "bun --watch index.js",
+    "build": "bun build index.js --outfile dist/app.js"
+  }
+}
+```
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun run`        | স্ক্রিপ্ট রান।                               | `bun run start`                |
+
+---
+
+### ৫.২ হট রিলোডিং
+```bash
+bun --watch index.js
+```
+
+---
+
+## ৬. টেস্টিং
+
+### ৬.১ টেস্ট রান
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun test`       | সব টেস্ট রান।                               | `bun test`                     |
+| `bun test <file>`| নির্দিষ্ট ফাইল।                             | `bun test test/example.test.js` |
+| `bun test --watch` | টেস্ট হট রিলোড।                         | `bun test --watch`             |
+
+**উদাহরণ**: `example.test.js`
+```javascript
+import { expect, test } from "bun:test";
+
+test("2 + 2", () => {
+  expect(2 + 2).toBe(4);
+});
+```
+```bash
+bun test
+```
+
+---
+
+### ৬.২ অ্যাসারশন
+- `expect().toBe()`
+- `expect().toEqual()`
+- `expect().toContain()`
+
+---
+
+## ৭. বিল্ট-ইন API
+
+### ৭.১ HTTP সার্ভার
+- **উদাহরণ**: `server.js`
+```javascript
+Bun.serve({
+  port: 3000,
+  fetch(req) {
+    return new Response("হ্যালো, Bun HTTP!");
+  },
+});
+```
+```bash
+bun server.js
+```
+
+---
+
+### ৭.২ ফাইল I/O
+- **লেখা**:
+```javascript
+await Bun.write("output.txt", "হ্যালো, Bun!");
+```
+- **পড়া**:
+```javascript
+const text = await Bun.file("output.txt").text();
+console.log(text);
+```
+
+---
+
+### ৭.৩ WebSocket
+- **উদাহরণ**: `ws.js`
+```javascript
+Bun.serve({
+  port: 3000,
+  fetch(req, server) {
+    if (server.upgrade(req)) return;
+    return new Response("HTTP only", { status: 400 });
+  },
+  websocket: {
+    message(ws, msg) {
+      ws.send(`প্রাপ্ত: ${msg}`);
+    },
+    open(ws) {
+      ws.send("সংযোগ স্থাপিত!");
+    },
+  },
+});
+```
+```bash
+bun ws.js
+```
+
+---
+
+## ৮. প্রজেক্ট তৈরি
+
+### ৮.১ নতুন প্রজেক্ট
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun init`       | প্রজেক্ট সেটআপ।                             | `bun init`                     |
+
+- **ফলাফল**:
+```
+myproject/
+├── bun.lockb
+├── index.ts
+├── package.json
+```
+
+---
+
+## ৯. উন্নত ফিচার
+
+### ৯.১ Bun Shell
+- **কমান্ড রান**:
+```javascript
+import { $ } from "bun";
+
+const output = await $`ls -la`.text();
+console.log(output);
+```
+
+---
+
+### ৯.২ প্লাগিন
+- **উদাহরণ**: `bunfig.toml`
+```toml
+[build]
+plugins = ["myplugin"]
+
+[myplugin]
+path = "plugin.js"
+```
+- **plugin.js**:
+```javascript
+export default {
+  name: "myplugin",
+  setup(build) {
+    build.onLoad({ filter: /\.txt$/ }, () => ({
+      contents: "প্লাগিন থেকে!",
+      loader: "text",
+    }));
+  },
+};
+```
+
+---
+
+## ১০. ডিবাগিং এবং হেল্প
+
+### ১০.১ ডিবাগিং
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun --inspect`  | ডিবাগ মোড।                                  | `bun --inspect index.js`       |
+
+---
+
+### ১০.২ হেল্প
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `bun --help`     | সাধারণ হেল্প।                               | `bun --help`                   |
+| `bun <command> --help` | নির্দিষ্ট হেল্প।                      | `bun test --help`              |
+
+---
+
+## ১১. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+
+### ১১.১ HTTP সার্ভার
+- **server.ts**:
+```typescript
+import { serve } from "bun";
+
+serve({
+  port: 3000,
+  fetch(req) {
+    const url = new URL(req.url);
+    if (url.pathname === "/") return new Response("হোমপেজ!");
+    if (url.pathname === "/api") return new Response(JSON.stringify({ msg: "API" }), { headers: { "Content-Type": "application/json" } });
+    return new Response("404!", { status: 404 });
+  },
+});
+```
+```bash
+bun server.ts
+```
+
+---
+
+### ১১.২ টেস্ট এবং বান্ডল
+- **test/api.test.ts**:
+```typescript
+import { expect, test } from "bun:test";
+
+test("API works", async () => {
+  const res = await fetch("http://localhost:3000/api");
+  const data = await res.json();
+  expect(data.msg).toBe("API");
+});
+```
+- **বিল্ড**:
+```bash
+bun build server.ts --outfile dist/server.js --minify
+bun dist/server.js
+```
+
+---
+
+## ১২. টিপস এবং সেরা অভ্যাস
+- **TypeScript**: সরাসরি TS ব্যবহার করুন, কম্পাইলের প্রয়োজন নেই।
+- **--watch**: ডেভেলপমেন্টে হট রিলোডিং চালু করুন।
+- **bun.lockb**: গিটে কমিট করুন।
+- **প্লাগিন**: কাস্টম লোডারের জন্য ব্যবহার করুন।

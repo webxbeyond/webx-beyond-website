@@ -1,0 +1,459 @@
+---
+title: রিঅ্যাক্ট জেএস চিটশিট
+description: রিঅ্যাক্ট জেএস (React.js) হলো ওয়েব অ্যাপ্লিকেশনের জন্য একটি জনপ্রিয় জাভাস্ক্রিপ্ট লাইব্রেরি, যা কম্পোনেন্ট-ভিত্তিক ইউজার ইন্টারফেস তৈরি করে। এই চিটশিটে রিঅ্যাক্টের সব মৌলিক থেকে উন্নত ধারণা বিস্তারিতভাবে কভার করা হয়েছে।
+icon: ri:reactjs-line
+---
+
+
+
+---
+
+## ১. রিঅ্যাক্ট জেএস শুরু করা
+
+### ১.১ পরিবেশ সেটআপ
+- **প্রয়োজনীয়তা**: Node.js, npm/yarn।
+- **নতুন প্রজেক্ট তৈরি**:
+  ```bash
+  npx create-react-app my-app
+  cd my-app
+  npm start
+  ```
+- **ব্রাউজারে দেখা**: `http://localhost:3000`
+
+### ১.২ প্রথম কম্পোনেন্ট
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const App = () => {
+  return <h1>হ্যালো, রিঅ্যাক্ট জেএস!</h1>;
+};
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ কম্পোনেন্ট
+- **ফাংশনাল কম্পোনেন্ট**:
+```javascript
+const Welcome = () => {
+  return <p>স্বাগতম!</p>;
+};
+```
+
+- **প্রপস (Props)**:
+```javascript
+const Greeting = ({ name }) => {
+  return <h2>হ্যালো, {name}!</h2>;
+};
+
+<Greeting name="রহিম" />;
+```
+
+- **ক্লাস কম্পোনেন্ট** (পুরানো স্টাইল):
+```javascript
+import React, { Component } from 'react';
+
+class MyComponent extends Component {
+  render() {
+    return <p>এটি ক্লাস কম্পোনেন্ট</p>;
+  }
+}
+```
+
+---
+
+### ২.২ JSX
+- JSX হলো জাভাস্ক্রিপ্টের মধ্যে HTML-এর মতো সিনট্যাক্স।
+```javascript
+const element = (
+  <div>
+    <h1>শিরোনাম</h1>
+    <p>এটি JSX</p>
+  </div>
+);
+```
+
+- **জাভাস্ক্রিপ্ট এক্সপ্রেশন**:
+```javascript
+const name = "করিম";
+const greeting = <p>হ্যালো, {name}!</p>;
+```
+
+---
+
+## ৩. স্টেট এবং হুক
+
+### ৩.১ useState
+```javascript
+import React, { useState } from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>গণনা: {count}</p>
+      <button onClick={() => setCount(count + 1)}>বাড়ান</button>
+    </div>
+  );
+};
+```
+
+---
+
+### ৩.২ useEffect
+```javascript
+import React, { useEffect, useState } from 'react';
+
+const Timer = () => {
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(t => t + 1), 1000);
+    return () => clearInterval(interval); // ক্লিনআপ
+  }, []);
+
+  return <p>সময়: {time} সেকেন্ড</p>;
+};
+```
+
+---
+
+### ৩.৩ অন্যান্য হুক
+| হুক          | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `useContext` | কনটেক্সট থেকে ডেটা।                        | `useContext(MyContext)`         |
+| `useReducer` | জটিল স্টেট ম্যানেজমেন্ট।                    | `useReducer(reducer, initialState)` |
+| `useRef`     | রেফারেন্স তৈরি।                             | `const ref = useRef()`          |
+| `useMemo`    | মেমোরাইজড মান।                             | `useMemo(() => compute(), [deps])` |
+| `useCallback`| মেমোরাইজড ফাংশন।                          | `useCallback(() => {}, [deps])` |
+
+**উদাহরণ (useRef):**
+```javascript
+const inputRef = useRef();
+<input ref={inputRef} />;
+inputRef.current.focus();
+```
+
+---
+
+## ৪. কোর কম্পোনেন্ট এবং JSX এলিমেন্ট
+
+### ৪.১ HTML-এর মতো এলিমেন্ট
+- `<div>`, `<p>`, `<h1>`-`<h6>`, `<span>`, `<button>`, `<input>`, ইত্যাদি।
+```javascript
+<div>
+  <h1>শিরোনাম</h1>
+  <p>বিবরণ</p>
+</div>
+```
+
+---
+
+### ৪.২ ফ্র্যাগমেন্ট
+- একাধিক এলিমেন্ট র‌্যাপ করতে:
+```javascript
+import React, { Fragment } from 'react';
+
+const List = () => (
+  <>
+    <li>আইটেম ১</li>
+    <li>আইটেম ২</li>
+  </>
+);
+```
+
+---
+
+## ৫. ইভেন্ট হ্যান্ডলিং
+```javascript
+const ButtonClick = () => {
+  const handleClick = () => alert('ক্লিক করা হয়েছে!');
+  return <button onClick={handleClick}>ক্লিক করুন</button>;
+};
+```
+
+- **ইভেন্টের তালিকা**: `onClick`, `onChange`, `onSubmit`, `onMouseOver`, ইত্যাদি।
+
+---
+
+## ৬. রাউটিং
+- **ইনস্টলেশন**: 
+  ```bash
+  npm install react-router-dom
+  ```
+
+### ৬.১ বেসিক রাউটিং
+```javascript
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+
+const Home = () => <h2>হোম</h2>;
+const About = () => <h2>আমাদের সম্পর্কে</h2>;
+
+const App = () => (
+  <Router>
+    <nav>
+      <Link to="/">হোম</Link> | <Link to="/about">আমাদের সম্পর্কে</Link>
+    </nav>
+    <Switch>
+      <Route exact path="/" component={Home} />
+      <Route path="/about" component={About} />
+    </Switch>
+  </Router>
+);
+```
+
+---
+
+## ৭. স্টাইলিং
+### ৭.১ ইনলাইন স্টাইল
+```javascript
+const style = { color: 'blue', fontSize: '20px' };
+<p style={style}>নীল টেক্সট</p>;
+```
+
+### ৭.২ CSS ফাইল
+```css
+/* styles.css */
+.title {
+  color: green;
+  font-size: 24px;
+}
+```
+```javascript
+import './styles.css';
+
+<h1 className="title">শিরোনাম</h1>;
+```
+
+### ৭.৩ CSS মডিউল
+```css
+/* styles.module.css */
+.title {
+  color: red;
+}
+```
+```javascript
+import styles from './styles.module.css';
+
+<h1 className={styles.title}>মডিউল শিরোনাম</h1>;
+```
+
+---
+
+## ৮. ফর্ম হ্যান্ডলিং
+```javascript
+const Form = () => {
+  const [formData, setFormData] = useState({ name: '', email: '' });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="name" value={formData.name} onChange={handleChange} placeholder="নাম" />
+      <input name="email" value={formData.email} onChange={handleChange} placeholder="ইমেইল" />
+      <button type="submit">জমা দিন</button>
+    </form>
+  );
+};
+```
+
+---
+
+## ৯. API এবং নেটওয়ার্কিং
+```javascript
+const DataFetcher = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch('https://api.example.com/data')
+      .then(response => response.json())
+      .then(json => setData(json))
+      .catch(error => console.error(error));
+  }, []);
+
+  return <p>{data ? data.message : 'লোড হচ্ছে...'}</p>;
+};
+```
+
+---
+
+## ১০. কনটেক্সট API
+```javascript
+const MyContext = React.createContext();
+
+const App = () => {
+  const [value, setValue] = useState('হ্যালো');
+
+  return (
+    <MyContext.Provider value={value}>
+      <Child />
+    </MyContext.Provider>
+  );
+};
+
+const Child = () => {
+  const contextValue = useContext(MyContext);
+  return <p>{contextValue}</p>;
+};
+```
+
+---
+
+## ১১. রিডাক্স স্টেট ম্যানেজমেন্ট
+- **ইনস্টলেশন**:
+  ```bash
+  npm install redux react-redux
+  ```
+
+### ১১.১ বেসিক রিডাক্স
+```javascript
+import { createStore } from 'redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+
+// রিডিউসার
+const counterReducer = (state = { count: 0 }, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    default:
+      return state;
+  }
+};
+
+// স্টোর
+const store = createStore(counterReducer);
+
+// কম্পোনেন্ট
+const Counter = () => {
+  const count = useSelector(state => state.count);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <p>গণনা: {count}</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>বাড়ান</button>
+    </div>
+  );
+};
+
+// অ্যাপ
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+```
+
+---
+
+## ১২. অ্যানিমেশন
+- **react-spring** ইনস্টলেশন:
+  ```bash
+  npm install react-spring
+  ```
+
+### ১২.১ বেসিক অ্যানিমেশন
+```javascript
+import { useSpring, animated } from 'react-spring';
+
+const FadeIn = () => {
+  const props = useSpring({ opacity: 1, from: { opacity: 0 } });
+
+  return <animated.div style={props}>ফেইড ইন</animated.div>;
+};
+```
+
+---
+
+## ১৩. টেস্টিং
+- **ইনস্টলেশন**:
+  ```bash
+  npm install --save-dev jest @testing-library/react
+  ```
+
+### ১৩.১ টেস্ট কেস
+```javascript
+import { render, screen } from '@testing-library/react';
+
+test('রেন্ডার টেক্সট', () => {
+  render(<p>হ্যালো</p>);
+  expect(screen.getByText('হ্যালো')).toBeInTheDocument();
+});
+```
+
+---
+
+## ১৪. পারফরম্যান্স অপটিমাইজেশন
+| টেকনিক      | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `React.memo` | কম্পোনেন্ট মেমোরাইজ।                       | `React.memo(MyComponent)`       |
+| `useMemo`   | মেমোরাইজড মান।                             | `useMemo(() => compute(), [deps])` |
+| `useCallback` | মেমোরাইজড ফাংশন।                         | `useCallback(() => {}, [deps])` |
+
+**উদাহরণ:**
+```javascript
+const ExpensiveComponent = React.memo(({ value }) => {
+  return <p>মান: {value}</p>;
+});
+```
+
+---
+
+## ১৫. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+```javascript
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+
+const TodoApp = () => {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
+
+  const addTodo = () => {
+    if (input) {
+      setTodos([...todos, { id: Date.now(), text: input }]);
+      setInput('');
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>টুডু লিস্ট</h1>
+      <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="নতুন কাজ" />
+      <button onClick={addTodo}>যোগ করুন</button>
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}>{todo.text}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const Home = () => <h2>হোম</h2>;
+
+const App = () => (
+  <Router>
+    <nav>
+      <Link to="/">হোম</Link> | <Link to="/todos">টুডু</Link>
+    </nav>
+    <Switch>
+      <Route exact path="/" component={Home} />
+      <Route path="/todos" component={TodoApp} />
+    </Switch>
+  </Router>
+);
+
+export default App;
+```

@@ -1,0 +1,393 @@
+---
+title: গিট চিটশিট
+description: গিট (Git) হলো একটি বিতরণকৃত ভার্সন কন্ট্রোল সিস্টেম যা সফটওয়্যার ডেভেলপমেন্টে কোডের পরিবর্তন ট্র্যাক করার জন্য ব্যবহৃত হয়। এই চিটশিটে গিটের সব মৌলিক থেকে উন্নত কমান্ড, ধারণা, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: humbleicons:git
+---
+
+## ১. গিট পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **রিপোজিটরি**: কোড এবং এর ইতিহাস সংরক্ষণের জায়গা।
+- **কমিট**: পরিবর্তনের একটি স্ন্যাপশট।
+- **ব্রাঞ্চ**: কোডের একটি স্বাধীন লাইন।
+- **মার্জ**: একাধিক ব্রাঞ্চ একত্রিত করা।
+- **রিমোট**: ক্লাউডে রিপোজিটরি (GitHub, GitLab)।
+
+### ১.২ ইনস্টলেশন
+- **Ubuntu/Debian**:
+  ```bash
+  sudo apt update
+  sudo apt install git
+  ```
+- **CentOS/RHEL**:
+  ```bash
+  sudo yum install git
+  ```
+- **চেক করুন**:
+  ```bash
+  git --version
+  ```
+
+---
+
+## ২. গিট কনফিগারেশন
+
+### ২.১ ইউজার সেটআপ
+```bash
+git config --global user.name "আপনার নাম"
+git config --global user.email "আপনার@ইমেইল.com"
+git config --global core.editor nano # ডিফল্ট এডিটর
+```
+
+- **চেক করুন**:
+  ```bash
+  git config --list
+  ```
+
+---
+
+### ২.২ গ্লোবাল .gitignore
+```bash
+echo "*.log" >> ~/.gitignore_global
+git config --global core.excludesfile ~/.gitignore_global
+```
+
+---
+
+## ৩. মৌলিক গিট কমান্ড
+
+### ৩.১ রিপোজিটরি তৈরি
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git init`       | নতুন রিপোজিটরি তৈরি।                        | `git init`                     |
+| `git clone`      | রিমোট রিপোজিটরি ক্লোন।                       | `git clone https://github.com/user/repo.git` |
+
+---
+
+### ৩.২ ফাইল ট্র্যাকিং
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git add`        | ফাইল স্টেজিং-এ যোগ।                         | `git add file.txt`             |
+| `git add .`      | সব ফাইল স্টেজ।                               | `git add .`                    |
+| `git status`     | বর্তমান স্ট্যাটাস।                           | `git status`                   |
+| `git commit`     | স্টেজড পরিবর্তন কমিট।                        | `git commit -m "প্রথম কমিট"`  |
+| `git commit -a`  | ট্র্যাকড ফাইল সরাসরি কমিট।                  | `git commit -am "আপডেট"`      |
+
+**উদাহরণ:**
+```bash
+touch file.txt
+echo "হ্যালো" > file.txt
+git add file.txt
+git commit -m "file.txt যোগ করা হয়েছে"
+```
+
+---
+
+### ৩.৩ ইতিহাস দেখা
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git log`        | কমিট ইতিহাস।                                | `git log --oneline`            |
+| `git diff`       | পরিবর্তনের পার্থক্য।                         | `git diff`                     |
+| `git show`       | নির্দিষ্ট কমিটের বিস্তারিত।                  | `git show abc123`              |
+
+---
+
+## ৪. ব্রাঞ্চিং এবং মার্জিং
+
+### ৪.১ ব্রাঞ্চ ম্যানেজমেন্ট
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git branch`     | ব্রাঞ্চ তালিকা।                              | `git branch`                   |
+| `git branch <name>` | নতুন ব্রাঞ্চ তৈরি।                        | `git branch feature`           |
+| `git checkout`   | ব্রাঞ্চে সুইচ।                               | `git checkout feature`         |
+| `git checkout -b` | ব্রাঞ্চ তৈরি ও সুইচ।                        | `git checkout -b feature`      |
+| `git branch -d`  | ব্রাঞ্চ মুছে ফেলা।                           | `git branch -d feature`        |
+
+---
+
+### ৪.২ মার্জ
+```bash
+git checkout main
+git merge feature
+```
+
+- **কনফ্লিক্ট হলে**:
+  1. ফাইল এডিট করে কনফ্লিক্ট সমাধান করুন।
+  2. `git add <file>`।
+  3. `git commit`।
+
+---
+
+## ৫. রিমোট রিপোজিটরি
+
+### ৫.১ রিমোট যোগ এবং ম্যানেজ
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git remote add` | রিমোট যোগ।                                  | `git remote add origin <url>`  |
+| `git remote -v`  | রিমোট তালিকা।                               | `git remote -v`                |
+| `git push`       | রিমোটে পুশ।                                 | `git push origin main`         |
+| `git pull`       | রিমোট থেকে টানা।                            | `git pull origin main`         |
+| `git fetch`      | রিমোট ডেটা ফেচ।                             | `git fetch origin`             |
+
+**উদাহরণ:**
+```bash
+git remote add origin https://github.com/user/repo.git
+git push -u origin main
+```
+
+---
+
+### ৫.২ পুল রিকোয়েস্ট (PR)
+- GitHub/GitLab-এ:
+  1. ব্রাঞ্চে পরিবর্তন পুশ করুন।
+  2. ওয়েব ইন্টারফেসে PR তৈরি করুন।
+  3. রিভিউ এবং মার্জ।
+
+---
+
+## ৬. পরিবর্তন পূর্বাবস্থায় ফিরানো
+
+### ৬.১ স্টেজড ফাইল আনস্টেজ
+```bash
+git restore --staged file.txt
+```
+
+---
+
+### ৬.২ কমিট পূর্বাবস্থায়
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git reset`      | কমিট আনডু (সফট/হার্ড)।                     | `git reset HEAD^`              |
+| `git revert`     | নতুন কমিট দিয়ে পূর্বাবস্থা।                 | `git revert abc123`            |
+
+- **সফট রিসেট**: `git reset --soft HEAD^` (কমিট সরায়, ফাইল রাখে)।
+- **হার্ড রিসেট**: `git reset --hard HEAD^` (সব মুছে দেয়)।
+
+---
+
+### ৬.৩ ফাইল পূর্বাবস্থায়
+```bash
+git restore file.txt # পরিবর্তন বাতিল
+git checkout -- file.txt # পুরানো সিনট্যাক্স
+```
+
+---
+
+## ৭. স্ট্যাশিং
+
+### ৭.১ পরিবর্তন সংরক্ষণ
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git stash`      | পরিবর্তন স্ট্যাশ।                            | `git stash push -m "WIP"`      |
+| `git stash list` | স্ট্যাশ তালিকা।                              | `git stash list`               |
+| `git stash apply`| স্ট্যাশ প্রয়োগ।                             | `git stash apply stash{0}`     |
+| `git stash drop` | স্ট্যাশ মুছে ফেলা।                           | `git stash drop stash{0}`      |
+| `git stash pop`  | প্রয়োগ এবং মুছে ফেলা।                       | `git stash pop`                |
+
+**উদাহরণ:**
+```bash
+git stash
+git checkout main
+git stash pop
+```
+
+---
+
+## ৮. রিবেসিং
+
+### ৮.১ ব্রাঞ্চ রিবেস
+```bash
+git checkout feature
+git rebase main
+```
+
+- **কনফ্লিক্ট হলে**:
+  1. ফাইল এডিট করুন।
+  2. `git add <file>`।
+  3. `git rebase --continue`।
+
+---
+
+### ৮.২ ইন্টারেক্টিভ রিবেস
+```bash
+git rebase -i HEAD~3
+```
+
+- **বিকল্প**:
+  - `pick`: কমিট রাখা।
+  - `squash`: কমিট একত্রিত।
+  - `edit`: কমিট এডিট।
+
+---
+
+## ৯. গিট লগ এবং ডিবাগিং
+
+### ৯.১ উন্নত লগ
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git log --graph`| গ্রাফ আকারে ইতিহাস।                         | `git log --graph --oneline`    |
+| `git log --author`| নির্দিষ্ট লেখকের কমিট।                      | `git log --author="নাম"`       |
+| `git blame`      | ফাইলের লাইন-ভিত্তিক ইতিহাস।                  | `git blame file.txt`           |
+
+---
+
+### ৯.২ পরিবর্তন খোঁজা
+```bash
+git bisect start
+git bisect bad # বর্তমান ভার্সন খারাপ
+git bisect good abc123 # পুরানো ভালো কমিট
+# Git স্বয়ংক্রিয়ভাবে চেকআউট করবে
+git bisect reset # শেষ
+```
+
+---
+
+## ১০. সাবমডিউল
+
+### ১০.১ সাবমডিউল যোগ
+```bash
+git submodule add https://github.com/user/subrepo.git
+git commit -m "সাবমডিউল যোগ করা হয়েছে"
+```
+
+---
+
+### ১০.২ সাবমডিউল আপডেট
+```bash
+git submodule update --init --recursive
+```
+
+---
+
+## ১১. গিট হুক
+
+### ১১.১ প্রি-কমিট হুক
+`.git/hooks/pre-commit`:
+```bash
+#!/bin/bash
+echo "কমিটের আগে চেকিং..."
+exit 0
+```
+
+- **চালানোর অনুমতি**:
+  ```bash
+  chmod +x .git/hooks/pre-commit
+  ```
+
+---
+
+## ১২. ট্যাগিং
+
+### ১২.১ ট্যাগ তৈরি
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `git tag`        | লাইটওয়েট ট্যাগ।                            | `git tag v1.0`                 |
+| `git tag -a`     | অ্যানোটেটেড ট্যাগ।                          | `git tag -a v1.0 -m "রিলিজ ১"`|
+| `git push --tags`| রিমোটে ট্যাগ পুশ।                           | `git push origin --tags`       |
+
+---
+
+## ১৩. গিট ওয়ার্কফ্লো
+
+### ১৩.১ Git Flow
+- **মেইন ব্রাঞ্চ**: `main`, `develop`।
+- **ফিচার ব্রাঞ্চ**: `feature/নতুন-ফিচার`।
+- **রিলিজ**: `release/v1.0`।
+- **হটফিক্স**: `hotfix/বাগ-ফিক্স`।
+
+**উদাহরণ:**
+```bash
+git checkout -b feature/new-ui
+# কাজ শেষ
+git checkout develop
+git merge feature/new-ui
+git branch -d feature/new-ui
+```
+
+---
+
+### ১৩.২ ফর্কিং ওয়ার্কফ্লো
+1. রিপোজিটরি ফর্ক করুন।
+2. ক্লোন করুন:
+   ```bash
+   git clone https://github.com/your-user/forked-repo.git
+   ```
+3. পরিবর্তন করুন এবং পুশ করুন।
+4. পুল রিকোয়েস্ট তৈরি করুন।
+
+---
+
+## ১৪. গিট সহযোগিতা
+
+### ১৪.১ রিমোটে কনফ্লিক্ট সমাধান
+```bash
+git pull origin main
+# কনফ্লিক্ট সমাধান
+git add .
+git commit
+git push origin main
+```
+
+---
+
+### ১৪.২ চেরি-পিক
+```bash
+git cherry-pick abc123 # নির্দিষ্ট কমিট অন্য ব্রাঞ্চে
+```
+
+---
+
+## ১৫. উদাহরণ: একটি সম্পূর্ণ ওয়ার্কফ্লো
+
+### ১৫.১ রিপোজিটরি তৈরি ও কাজ
+```bash
+# নতুন রিপোজিটরি
+git init myproject
+cd myproject
+echo "# আমার প্রজেক্ট" > README.md
+git add README.md
+git commit -m "প্রাথমিক কমিট"
+
+# রিমোট যোগ
+git remote add origin https://github.com/user/myproject.git
+git push -u origin main
+
+# নতুন ব্রাঞ্চ
+git checkout -b feature/add-login
+echo "লগইন ফাংশন" > login.js
+git add login.js
+git commit -m "লগইন ফিচার যোগ করা হয়েছে"
+
+# মার্জ
+git checkout main
+git merge feature/add-login
+git push origin main
+
+# ট্যাগ
+git tag -a v1.0 -m "প্রথম রিলিজ"
+git push origin v1.0
+```
+
+---
+
+### ১৫.২ পরিবর্তন পূর্বাবস্থায়
+```bash
+# ভুল কমিট আনডু
+git reset --soft HEAD^
+
+# ফাইল পূর্বাবস্থায়
+git restore login.js
+
+# স্ট্যাশ
+git stash push -m "অসম্পূর্ণ কাজ"
+git checkout main
+git stash pop
+```
+
+---
+
+## ১৬. গিট টিপস এবং সেরা অভ্যাস
+- **কমিট মেসেজ**: সংক্ষিপ্ত এবং বর্ণনামূলক।
+- **ব্রাঞ্চিং**: প্রতিটি ফিচারের জন্য আলাদা ব্রাঞ্চ।
+- **পুল আগে পুশ**: `git pull` করে কনফ্লিক্ট এড়ান।
+- **.gitignore**: অপ্রয়োজনীয় ফাইল বাদ দিন।

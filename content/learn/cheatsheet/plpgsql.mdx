@@ -1,0 +1,350 @@
+---
+title: PL/pgSQL চিটশিট
+description: PL/pgSQL হলো PostgreSQL-এর একটি প্রসিডিউরাল প্রোগ্রামিং ভাষা, যা SQL-এর সাথে ফাংশন, ট্রিগার, এবং লজিক যোগ করতে ব্যবহৃত হয়। এই চিটশিটে PL/pgSQL-এর সব গুরুত্বপূর্ণ ধারণা ও সিনট্যাক্স বিস্তারিতভাবে কভার করা হয়েছে।
+icon: lineicons:postgresql
+---
+
+## ১. PL/pgSQL পরিচিতি
+
+### ১.১ বৈশিষ্ট্য
+- ভেরিয়েবল, লুপ, শর্ত।
+- SQL কোয়েরির সাথে একীভূত।
+- ফাংশন ও ট্রিগার তৈরি।
+
+### ১.২ বেসিক স্ট্রাকচার
+```sql
+DO $$
+BEGIN
+    -- কোড এখানে
+    RAISE NOTICE 'হ্যালো, PL/pgSQL!';
+END;
+$$;
+```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ ভেরিয়েবল ডিক্লারেশন
+```sql
+DO $$
+DECLARE
+    my_var INTEGER := 10; -- ডিফল্ট মান সহ
+    name TEXT; -- শুধু ডিক্লেয়ার
+BEGIN
+    name := 'রহিম';
+    RAISE NOTICE 'মান: %, নাম: %', my_var, name;
+END;
+$$;
+```
+
+- **ডেটা টাইপ**: `INTEGER`, `TEXT`, `VARCHAR`, `BOOLEAN`, `DATE`, `NUMERIC`, ইত্যাদি।
+- **রেকর্ড টাইপ**: `RECORD`, `%ROWTYPE`।
+
+---
+
+### ২.২ কনস্ট্যান্ট
+```sql
+DO $$
+DECLARE
+    PI CONSTANT NUMERIC := 3.14159;
+BEGIN
+    RAISE NOTICE 'PI: %', PI;
+END;
+$$;
+```
+
+---
+
+## ৩. কন্ট্রোল স্ট্রাকচার
+
+### ৩.১ শর্ত (IF)
+```sql
+DO $$
+DECLARE
+    age INTEGER := 20;
+BEGIN
+    IF age >= 18 THEN
+        RAISE NOTICE 'প্রাপ্তবয়স্ক';
+    ELSIF age > 0 THEN
+        RAISE NOTICE 'শিশু';
+    ELSE
+        RAISE NOTICE 'অবৈধ বয়স';
+    END IF;
+END;
+$$;
+```
+
+- **CASE**:
+```sql
+DO $$
+DECLARE
+    grade CHAR := 'A';
+BEGIN
+    CASE grade
+        WHEN 'A' THEN RAISE NOTICE 'উৎকৃষ্ট';
+        WHEN 'B' THEN RAISE NOTICE 'ভালো';
+        ELSE RAISE NOTICE 'অজানা';
+    END CASE;
+END;
+$$;
+```
+
+---
+
+### ৩.২ লুপ (Loops)
+| ধরন        | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `FOR`      | নির্দিষ্ট রেঞ্জে।                           | `FOR i IN 1..5 LOOP ... END LOOP;` |
+| `WHILE`    | শর্ত সত্য হলে।                             | `WHILE x > 0 LOOP ... END LOOP;` |
+| `LOOP`     | অসীম লুপ (EXIT দিয়ে বের হতে হয়)।          | `LOOP ... EXIT WHEN ... END LOOP;` |
+
+**উদাহরণ:**
+```sql
+DO $$
+DECLARE
+    i INTEGER := 0;
+BEGIN
+    FOR i IN 1..3 LOOP
+        RAISE NOTICE 'গণনা: %', i;
+    END LOOP;
+END;
+$$;
+```
+
+---
+
+## ৪. ফাংশন
+
+### ৪.১ ফাংশন তৈরি
+```sql
+CREATE FUNCTION add_numbers(a INTEGER, b INTEGER)
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN a + b;
+END;
+$$ LANGUAGE plpgsql;
+
+-- কল করা
+SELECT add_numbers(5, 3); -- ফলাফল: 8
+```
+
+- **প্যারামিটার মোড**: `IN` (ডিফল্ট), `OUT`, `INOUT`।
+```sql
+CREATE FUNCTION get_info(IN id INTEGER, OUT name TEXT, OUT age INTEGER) AS $$
+BEGIN
+    SELECT s.name, s.age INTO name, age
+    FROM students s WHERE s.id = get_info.id;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_info(1);
+```
+
+---
+
+### ৪.২ ড্রপ ফাংশন
+```sql
+DROP FUNCTION add_numbers;
+```
+
+---
+
+## ৫. ট্রিগার
+
+### ৫.১ ট্রিগার ফাংশন
+```sql
+CREATE FUNCTION log_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE NOTICE 'আপডেট হয়েছে: %', NEW.name;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### ৫.২ ট্রিগার তৈরি
+```sql
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    age INTEGER
+);
+
+CREATE TRIGGER update_log
+BEFORE UPDATE ON students
+FOR EACH ROW
+EXECUTE FUNCTION log_update();
+```
+
+- **ইভেন্ট**: `INSERT`, `UPDATE`, `DELETE`।
+- **টাইমিং**: `BEFORE`, `AFTER`।
+
+---
+
+## ৬. কার্সর
+```sql
+DO $$
+DECLARE
+    student_cursor CURSOR FOR SELECT name, age FROM students;
+    student_record RECORD;
+BEGIN
+    OPEN student_cursor;
+    LOOP
+        FETCH student_cursor INTO student_record;
+        EXIT WHEN NOT FOUND;
+        RAISE NOTICE 'নাম: %, বয়স: %', student_record.name, student_record.age;
+    END LOOP;
+    CLOSE student_cursor;
+END;
+$$;
+```
+
+---
+
+## ৭. এক্সেপশন হ্যান্ডলিং
+```sql
+DO $$
+BEGIN
+    RAISE NOTICE 'শুরু';
+    PERFORM 1 / 0; -- এরর ঘটবে
+EXCEPTION
+    WHEN division_by_zero THEN
+        RAISE NOTICE 'শূন্য দিয়ে ভাগ করা যায় না!';
+    WHEN OTHERS THEN
+        RAISE NOTICE 'অজানা এরর: %', SQLERRM;
+END;
+$$;
+```
+
+- **কমন এক্সেপশন**: `division_by_zero`, `unique_violation`, `no_data_found`।
+
+---
+
+## ৮. ডায়নামিক SQL
+```sql
+DO $$
+DECLARE
+    table_name TEXT := 'students';
+BEGIN
+    EXECUTE 'SELECT * FROM ' || table_name || ' WHERE age > 20';
+END;
+$$;
+```
+
+- **INTO দিয়ে**:
+```sql
+DO $$
+DECLARE
+    result_name TEXT;
+BEGIN
+    EXECUTE 'SELECT name FROM students WHERE id = $1' INTO result_name USING 1;
+    RAISE NOTICE 'নাম: %', result_name;
+END;
+$$;
+```
+
+---
+
+## ৯. রেকর্ড এবং ROWTYPE
+```sql
+DO $$
+DECLARE
+    student_row students%ROWTYPE;
+BEGIN
+    SELECT * INTO student_row FROM students WHERE id = 1;
+    RAISE NOTICE 'নাম: %, বয়স: %', student_row.name, student_row.age;
+END;
+$$;
+```
+
+---
+
+## ১০. লুপের সাথে SQL
+```sql
+DO $$
+BEGIN
+    FOR rec IN SELECT name, age FROM students LOOP
+        RAISE NOTICE 'নাম: %, বয়স: %', rec.name, rec.age;
+    END LOOP;
+END;
+$$;
+```
+
+---
+
+## ১১. অ্যারে
+```sql
+DO $$
+DECLARE
+    numbers INTEGER[] := ARRAY[1, 2, 3];
+BEGIN
+    RAISE NOTICE 'প্রথম সংখ্যা: %', numbers[1];
+    numbers := numbers || 4; -- যোগ করা
+    RAISE NOTICE 'নতুন অ্যারে: %', numbers;
+END;
+$$;
+```
+
+---
+
+## ১২. ট্রানজাকশন ম্যানেজমেন্ট
+```sql
+DO $$
+BEGIN
+    INSERT INTO students (name, age) VALUES ('আলী', 25);
+    RAISE NOTICE 'ডেটা যোগ হয়েছে';
+    -- COMMIT; -- স্থায়ী করতে (DO ব্লকে কাজ করে না)
+    -- ROLLBACK; -- বাতিল করতে
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'এরর: %', SQLERRM;
+END;
+$$;
+```
+
+---
+
+## ১৩. উদাহরণ: একটি সম্পূর্ণ ফাংশন
+```sql
+CREATE FUNCTION calculate_total_students(min_age INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO total
+    FROM students
+    WHERE age >= min_age;
+
+    IF total IS NULL THEN
+        total := 0;
+    END IF;
+
+    RAISE NOTICE 'মোট ছাত্র (বয়স >= %): %', min_age, total;
+    RETURN total;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'এরর: %', SQLERRM;
+        RETURN -1;
+END;
+$$ LANGUAGE plpgsql;
+
+-- কল করা
+SELECT calculate_total_students(20);
+```
+
+---
+
+## ১৪. টিপস এবং ট্রিকস
+- **RAISE**: ডিবাগিং-এর জন্য (`NOTICE`, `INFO`, `WARNING`, `EXCEPTION`)।
+- **PERFORM**: ফলাফল সংরক্ষণ না করে SQL কোয়েরি চালানো।
+```sql
+PERFORM insert_log('আপডেট হয়েছে');
+```
+
+- **FOUND**: শেষ কোয়েরির সফলতা চেক।
+```sql
+IF FOUND THEN
+    RAISE NOTICE 'ডেটা পাওয়া গেছে';
+END IF;
+```

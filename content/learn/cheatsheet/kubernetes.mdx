@@ -1,0 +1,649 @@
+---
+title: কুবারনেটিস (K8s)
+description: কুবারনেটিস (Kubernetes, সংক্ষেপে K8s) হলো একটি ওপেন-সোর্স প্ল্যাটফর্ম যা কনটেইনারাইজড অ্যাপ্লিকেশনের স্বয়ংক্রিয় ডিপ্লয়মেন্ট, স্কেলিং এবং ম্যানেজমেন্টের জন্য ব্যবহৃত হয়। এই চিটশিটে K8s-এর সব মৌলিক থেকে উন্নত ধারণা, কমান্ড, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: ant-design:kubernetes-outlined
+---
+
+## ১. কুবারনেটিস পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **কনটেইনার**: অ্যাপ্লিকেশন এবং এর ডিপেন্ডেন্সি প্যাকেজ।
+- **পড**: K8s-এর ক্ষুদ্রতম ইউনিট, এক বা একাধিক কনটেইনার।
+- **ক্লাস্টার**: মাস্টার এবং ওয়ার্কার নোডের সমষ্টি।
+- **কন্ট্রোল প্লেন**: ক্লাস্টার পরিচালনার জন্য মাস্টার নোড।
+- **কুবেক্টল (kubectl)**: K8s কমান্ড-লাইন টুল।
+
+### ১.২ ইনস্টলেশন ও সেটআপ
+- **Minikube** (লোকাল টেস্টিং):
+  ```bash
+  curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+  sudo install minikube-linux-amd64 /usr/local/bin/minikube
+  minikube start
+  ```
+- **kubectl**:
+  ```bash
+  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  sudo install kubectl /usr/local/bin/kubectl
+  kubectl version --client
+  ```
+- **চেক করুন**:
+  ```bash
+  kubectl cluster-info
+  ```
+
+---
+
+## ২. কুবারনেটিস কম্পোনেন্ট
+
+### ২.১ মাস্টার নোড (কন্ট্রোল প্লেন)
+| কম্পোনেন্ট     | বর্ণনা                                      |
+|---------------|---------------------------------------------|
+| API Server    | K8s-এর ফ্রন্ট-এন্ড, সব কমান্ড এখানে যায়।   |
+| etcd          | ক্লাস্টারের ডেটা স্টোর (key-value)।         |
+| Scheduler     | পডগুলোকে নোডে বরাদ্দ করে।                  |
+| Controller Manager | ক্লাস্টারের অবস্থা নিয়ন্ত্রণ করে।          |
+
+---
+
+### ২.২ ওয়ার্কার নোড
+| কম্পোনেন্ট     | বর্ণনা                                      |
+|---------------|---------------------------------------------|
+| Kubelet       | নোডে পড চালায় এবং মনিটর করে।              |
+| Kube-Proxy    | নেটওয়ার্ক প্রক্সি, সার্ভিস রাউটিং করে।      |
+| Container Runtime | কনটেইনার চালানোর জন্য (Docker, containerd)। |
+
+---
+
+## ৩. মৌলিক কমান্ড (kubectl)
+
+### ৩.১ ক্লাস্টার তথ্য
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl cluster-info` | ক্লাস্টারের তথ্য।                        | `kubectl cluster-info`         |
+| `kubectl get nodes` | নোডের তালিকা।                             | `kubectl get nodes -o wide`    |
+| `kubectl version`  | K8s সংস্করণ।                               | `kubectl version`              |
+
+---
+
+### ৩.২ পড ম্যানেজমেন্ট
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl get pods` | পডের তালিকা।                               | `kubectl get pods -n my-ns`    |
+| `kubectl create`   | পড তৈরি।                                   | `kubectl create pod mypod --image=nginx` |
+| `kubectl describe pod` | পডের বিস্তারিত।                         | `kubectl describe pod mypod`   |
+| `kubectl delete pod` | পড মুছে ফেলা।                            | `kubectl delete pod mypod`     |
+| `kubectl logs`     | পডের লগ।                                   | `kubectl logs mypod`           |
+| `kubectl exec`     | পডে কমান্ড চালানো।                          | `kubectl exec -it mypod -- bash` |
+
+**উদাহরণ:**
+```bash
+kubectl run nginx-pod --image=nginx --restart=Never
+kubectl get pods
+```
+
+---
+
+### ৩.৩ ডিপ্লয়মেন্ট
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl get deployments` | ডিপ্লয়মেন্ট তালিকা।                     | `kubectl get deployments`      |
+| `kubectl create deployment` | ডিপ্লয়মেন্ট তৈরি।                     | `kubectl create deployment myapp --image=nginx` |
+| `kubectl scale`    | পড সংখ্যা বাড়ানো/কমানো।                    | `kubectl scale deployment myapp --replicas=3` |
+| `kubectl rollout`  | রোলআউট স্ট্যাটাস/আপডেট।                    | `kubectl rollout status deployment/myapp` |
+
+---
+
+### ৩.৪ সার্ভিস
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl get services` | সার্ভিস তালিকা।                          | `kubectl get svc`             |
+| `kubectl expose`   | সার্ভিস তৈরি।                               | `kubectl expose deployment myapp --port=80 --type=LoadBalancer` |
+| `kubectl delete service` | সার্ভিস মুছে ফেলা।                       | `kubectl delete svc myapp`    |
+
+---
+
+## ৪. YAML ফাইল (ম্যানিফেস্ট)
+
+### ৪.১ পড YAML
+`pod.yaml`:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f pod.yaml
+  ```
+
+---
+
+### ৪.২ ডিপ্লয়মেন্ট YAML
+`deployment.yaml`:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f deployment.yaml
+  ```
+
+---
+
+### ৪.৩ সার্ভিস YAML
+`service.yaml`:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f service.yaml
+  ```
+
+---
+
+## ৫. নেমস্পেস
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl get namespaces` | নেমস্পেস তালিকা।                       | `kubectl get ns`              |
+| `kubectl create namespace` | নতুন নেমস্পেস।                        | `kubectl create ns my-ns`     |
+| `kubectl config set-context` | নেমস্পেস সেট।                       | `kubectl config set-context --current --namespace=my-ns` |
+
+**উদাহরণ:**
+```bash
+kubectl get pods -n kube-system
+```
+
+---
+
+## ৬. স্টোরেজ
+
+### ৬.১ পার্সিস্টেন্ট ভলিউম (PV)
+`pv.yaml`:
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+```
+
+---
+
+### ৬.২ পার্সিস্টেন্ট ভলিউম ক্লেইম (PVC)
+`pvc.yaml`:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+---
+
+### ৬.৩ পডে PVC ব্যবহার
+`pod-with-pvc.yaml`:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: "/usr/share/nginx/html"
+      name: my-storage
+  volumes:
+  - name: my-storage
+    persistentVolumeClaim:
+      claimName: my-pvc
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f pv.yaml
+  kubectl apply -f pvc.yaml
+  kubectl apply -f pod-with-pvc.yaml
+  ```
+
+---
+
+## ৭. নেটওয়ার্কিং
+
+### ৭.১ সার্ভিস টাইপ
+| টাইপ           | বর্ণনা                                      |
+|---------------|---------------------------------------------|
+| `ClusterIP`   | ডিফল্ট, ক্লাস্টার-অভ্যন্তরীণ অ্যাক্সেস।     |
+| `NodePort`    | নোডের পোর্টে অ্যাক্সেস।                     |
+| `LoadBalancer`| ক্লাউডে এক্সটার্নাল IP।                     |
+| `ExternalName`| বাইরের সার্ভিসের ম্যাপিং।                   |
+
+---
+
+### ৭.২ ইনগ্রেস
+`ingress.yaml`:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+  - host: "example.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-service
+            port:
+              number: 80
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f ingress.yaml
+  ```
+
+---
+
+## ৮. কনফিগারেশন এবং সিক্রেট
+
+### ৮.১ ConfigMap
+`configmap.yaml`:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  database_url: "mysql://localhost:3306"
+  log_level: "debug"
+```
+
+- **পডে ব্যবহার**:
+```yaml
+spec:
+  containers:
+  - name: myapp
+    image: myapp
+    env:
+    - name: DB_URL
+      valueFrom:
+        configMapKeyRef:
+          name: my-config
+          key: database_url
+```
+
+---
+
+### ৮.২ Secret
+`secret.yaml`:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+type: Opaque
+data:
+  password: cGFzc3dvcmQ= # base64 এনকোডেড "password"
+```
+
+- **পডে ব্যবহার**:
+```yaml
+spec:
+  containers:
+  - name: myapp
+    image: myapp
+    env:
+    - name: PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: my-secret
+          key: password
+```
+
+- **তৈরি**:
+  ```bash
+  kubectl apply -f secret.yaml
+  ```
+
+---
+
+## ৯. রিসোর্স ম্যানেজমেন্ট
+
+### ৯.১ রিসোর্স লিমিট এবং রিকোয়েস্ট
+`resource.yaml`:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m" # 0.25 CPU
+      limits:
+        memory: "128Mi"
+        cpu: "500m" # 0.5 CPU
+```
+
+---
+
+### ৯.২ Horizontal Pod Autoscaler (HPA)
+`hpa.yaml`:
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f hpa.yaml
+  ```
+
+---
+
+## ১০. মনিটরিং এবং লগিং
+
+### ১০.১ মেট্রিক্স
+- **Metrics Server**:
+  ```bash
+  minikube addons enable metrics-server
+  kubectl top pods
+  ```
+
+---
+
+### ১০.২ লগিং
+```bash
+kubectl logs mypod -f # রিয়েল-টাইম লগ
+kubectl logs -l app=myapp # লেবেল দিয়ে
+```
+
+---
+
+## ১১. সিকিউরিটি
+
+### ১১.১ Role-Based Access Control (RBAC)
+`role.yaml`:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: my-ns
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+```
+
+`rolebinding.yaml`:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: my-ns
+subjects:
+- kind: User
+  name: "user1"
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+- **প্রয়োগ**:
+  ```bash
+  kubectl apply -f role.yaml
+  kubectl apply -f rolebinding.yaml
+  ```
+
+---
+
+### ১১.২ Network Policy
+`network-policy.yaml`:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-app
+  namespace: my-ns
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+```
+
+---
+
+## ১২. ক্লাস্টার ম্যানেজমেন্ট
+
+### ১২.১ নোড ম্যানেজমেন্ট
+| কমান্ড              | বর্ণনা                                      | উদাহরণ                          |
+|--------------------|---------------------------------------------|---------------------------------|
+| `kubectl cordon`   | নোডে নতুন পড বরাদ্দ বন্ধ।                  | `kubectl cordon node1`        |
+| `kubectl uncordon` | নোডে পড বরাদ্দ চালু।                        | `kubectl uncordon node1`      |
+| `kubectl drain`    | নোড থেকে পড সরানো।                         | `kubectl drain node1 --ignore-daemonsets` |
+
+---
+
+### ১২.২ ক্লাস্টার আপগ্রেড
+```bash
+kubectl get nodes
+kubeadm upgrade plan
+sudo kubeadm upgrade apply v1.XX.X
+```
+
+---
+
+## ১৩. CI/CD ইন্টিগ্রেশন
+
+### ১৩.১ GitHub Actions
+`.github/workflows/deploy.yaml`:
+```yaml
+name: Deploy to K8s
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+    - name: Deploy
+      run: |
+        kubectl apply -f deployment.yaml
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+```
+
+---
+
+## ১৪. উদাহরণ: একটি সম্পূর্ণ অ্যাপ্লিকেশন
+
+### ১৪.১ ডিপ্লয়মেন্ট
+`app-deployment.yaml`:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+```
+
+---
+
+### ১৪.২ সার্ভিস
+`app-service.yaml`:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: webapp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+```
+
+---
+
+### ১৪.৩ ইনগ্রেস
+`app-ingress.yaml`:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+spec:
+  rules:
+  - host: "myapp.local"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: webapp-service
+            port:
+              number: 80
+```
+
+---
+
+### ১৪.৪ প্রয়োগ
+```bash
+kubectl apply -f app-deployment.yaml
+kubectl apply -f app-service.yaml
+kubectl apply -f app-ingress.yaml
+kubectl get all
+```
+
+---
+
+## ১৫. টিপস এবং সেরা অভ্যাস
+- **লেবেল ব্যবহার**: সব রিসোর্সে লেবেল যোগ করুন।
+- **নেমস্পেস**: প্রজেক্ট আলাদা করতে নেমস্পেস ব্যবহার করুন।
+- **রিসোর্স লিমিট**: ওভারলোডিং প্রতিরোধে লিমিট সেট করুন।
+- **লগিং/মনিটরিং**: Prometheus এবং Grafana ইন্টিগ্রেট করুন।

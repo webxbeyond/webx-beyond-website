@@ -1,0 +1,232 @@
+---
+title: কন্টাবো CLI (cntb) চিটশিট
+description: কন্টাবো CLI (`cntb`) হলো একটি ওপেন-সোর্স কমান্ড-লাইন ইন্টারফেস যা কন্টাবোর ক্লাউড রিসোর্স (যেমন VPS, VDS, এবং S3-কম্প্যাটিবল অবজেক্ট স্টোরেজ) পরিচালনার জন্য ব্যবহৃত হয়। এই চিটশিটে `cntb`-এর সব মৌলিক থেকে উন্নত কমান্ড, কনফিগারেশন, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: simple-icons:contabo
+---
+
+## ১. কন্টাবো CLI পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **cntb**: কন্টাবো API-এর CLI র‍্যাপার।
+- **রিসোর্স**: VPS, VDS, স্ন্যাপশট, কাস্টম ইমেজ, অবজেক্ট স্টোরেজ।
+- **আউটপুট ফরম্যাট**: ডিফল্ট টেবুলার, JSON, YAML, CSV।
+- **ক্লাউড-ইনিট**: ইন্সট্যান্স তৈরির সময় কাস্টমাইজেশন।
+
+### ১.২ ইনস্টলেশন
+- **ডাউনলোড**: [GitHub Releases](https://github.com/contabo/cntb/releases) থেকে।
+- **Linux**:
+  ```bash
+  wget https://github.com/contabo/cntb/releases/download/v1.4.8/cntb_1.4.8_Linux_x86_64.tar.gz
+  tar -xzf cntb_1.4.8_Linux_x86_64.tar.gz
+  sudo mv cntb /usr/local/bin/
+  ```
+- **Windows**: ZIP ডাউনলোড করে PATH-এ যোগ করুন।
+- **macOS**:
+  ```bash
+  brew install contabo/tap/cntb
+  ```
+- **চেক করুন**:
+  ```bash
+  cntb --version
+  ```
+
+---
+
+## ২. কনফিগারেশন
+
+### ২.১ ক্রেডেনশিয়াল সেটআপ
+- **ক্রেডেনশিয়াল পান**: Contabo Customer Control Panel থেকে।
+- **কমান্ড**:
+  ```bash
+  cntb config set-credentials \
+    --oauth2-clientid=<ClientId> \
+    --oauth2-client-secret=<ClientSecret> \
+    --oauth2-user=<API_User> \
+    --oauth2-password=<API_Password>
+  ```
+
+---
+
+### ২.২ আউটপুট ফরম্যাট
+| ফরম্যাট     | কমান্ড                       |
+|-------------|-----------------------------|
+| JSON        | `cntb --output json`        |
+| YAML        | `cntb --output yaml`        |
+| CSV         | `cntb --output csv`         |
+| ডিফল্ট      | `cntb` (টেবুলার)           |
+
+---
+
+## ৩. কম্পিউট রিসোর্স ম্যানেজমেন্ট
+
+### ৩.১ ইন্সট্যান্স
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create instance` | নতুন ইন্সট্যান্স তৈরি।                    | `cntb create instance --imageId ae423751-50fa-4bf6-9978-015673bf51c4 --productId V76 --region EU` |
+| `cntb get instances`  | ইন্সট্যান্স তালিকা।                         | `cntb get instances`           |
+| `cntb start instance` | ইন্সট্যান্স চালু।                           | `cntb start instance 12345`    |
+| `cntb stop instance`  | ইন্সট্যান্স বন্ধ।                           | `cntb stop instance 12345`     |
+| `cntb delete instance`| ইন্সট্যান্স মুছে ফেলা।                      | `cntb delete instance 12345`   |
+
+**ক্লাউড-ইনিট উদাহরণ**:
+```bash
+cntb create instance \
+  --imageId ae423751-50fa-4bf6-9978-015673bf51c4 \
+  --productId V76 \
+  --region EU \
+  --userData 'ssh_authorized_keys: - ssh-rsa AAAAB3NzaC1yc2E...'
+```
+
+---
+
+### ৩.২ কাস্টম ইমেজ
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create image`  | নতুন ইমেজ আপলোড।                           | `cntb create image --name "CentOS" --url "https://cloud.centos.org/..." --osType Linux --version 7` |
+| `cntb get images`    | ইমেজ তালিকা।                               | `cntb get images`              |
+| `cntb delete image`  | ইমেজ মুছে ফেলা।                            | `cntb delete image img-123`    |
+
+---
+
+### ৩.৩ স্ন্যাপশট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create snapshot` | স্ন্যাপশট তৈরি।                           | `cntb create snapshot 12345 --name "backup"` |
+| `cntb get snapshots`  | স্ন্যাপশট তালিকা।                          | `cntb get snapshots 12345`     |
+| `cntb rollback snapshot` | স্ন্যাপশটে ফিরে যাওয়া।                 | `cntb rollback snapshot 12345 snap-123` |
+| `cntb delete snapshot`| স্ন্যাপশট মুছে ফেলা।                      | `cntb delete snapshot 12345 snap-123` |
+
+---
+
+## ৪. অবজেক্ট স্টোরেজ
+
+### ৪.১ স্টোরেজ ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create objectStorage` | নতুন স্টোরেজ।                        | `cntb create objectStorage --region EU --totalPurchasedSpaceTB 1` |
+| `cntb get objectStorages` | স্টোরেজ তালিকা।                        | `cntb get objectStorages`      |
+| `cntb upgrade objectStorage` | স্টোরেজ আপগ্রেড।                    | `cntb upgrade objectStorage obj-123 --totalPurchasedSpaceTB 2` |
+| `cntb cancel objectStorage` | স্টোরেজ বাতিল।                      | `cntb cancel objectStorage obj-123` |
+
+---
+
+### ৪.২ অটো-স্কেলিং
+```bash
+cntb update objectStorage obj-123 --autoScaling true --maxSpaceTB 5
+```
+
+---
+
+## ৫. সিক্রেটস ম্যানেজমেন্ট
+
+### ৫.১ SSH কী এবং পাসওয়ার্ড
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create secret` | নতুন সিক্রেট।                              | `cntb create secret --type ssh --name "mykey" --value "ssh-rsa AAAAB3Nza..."` |
+| `cntb get secrets`   | সিক্রেট তালিকা।                            | `cntb get secrets`             |
+| `cntb delete secret` | সিক্রেট মুছে ফেলা।                         | `cntb delete secret sec-123`   |
+
+**ইন্সট্যান্সে SSH কী ব্যবহার**:
+```bash
+cntb create instance --imageId ae423751-50fa-4bf6-9978-015673bf51c4 --productId V76 --region EU --sshKeys "sec-123"
+```
+
+---
+
+## ৬. ট্যাগ ম্যানেজমেন্ট
+
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `cntb create tag`    | নতুন ট্যাগ।                                | `cntb create tag --name "prod"` |
+| `cntb get tags`      | ট্যাগ তালিকা।                              | `cntb get tags`                |
+| `cntb assign tag`    | রিসোর্সে ট্যাগ যোগ।                        | `cntb assign tag tag-123 instance 12345` |
+| `cntb delete tag`    | ট্যাগ মুছে ফেলা।                           | `cntb delete tag tag-123`      |
+
+---
+
+## ৭. প্রাইভেট নেটওয়ার্ক
+
+### ৭.১ নেটওয়ার্ক তৈরি
+```bash
+cntb create privateNetwork --name "mynet" --region EU
+```
+
+### ৭.২ ইন্সট্যান্স যোগ
+```bash
+cntb update instance 12345 --privateNetworkIds "net-123"
+```
+
+---
+
+## ৮. ডিবাগিং এবং হেল্প
+
+### ৮.১ হেল্প
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `cntb --help`    | সাধারণ হেল্প।                               | `cntb --help`                  |
+| `cntb <command> --help` | নির্দিষ্ট কমান্ডের হেল্প।             | `cntb create instance --help`  |
+
+---
+
+### ৮.২ কমপ্লিশন
+- **Bash**:
+  ```bash
+  source <(cntb completion bash)
+  cntb completion bash > /etc/bash_completion.d/cntb
+  ```
+- **Zsh**:
+  ```bash
+  source <(cntb completion zsh)
+  cntb completion zsh > /usr/local/share/zsh/site-functions/_cntb
+  ```
+
+---
+
+## ৯. উদাহরণ: একটি সম্পূর্ণ ওয়ার্কফ্লো
+
+### ৯.১ VPS তৈরি এবং ম্যানেজ
+```bash
+# ক্রেডেনশিয়াল সেট
+cntb config set-credentials --oauth2-clientid=xxx --oauth2-client-secret=yyy --oauth2-user=zzz --oauth2-password=www
+
+# কাস্টম ইমেজ আপলোড
+cntb create image --name "Ubuntu 20.04" --url "https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso" --osType Linux --version 20.04
+
+# ইন্সট্যান্স তৈরি
+cntb create instance \
+  --imageId img-123 \
+  --productId V76 \
+  --region EU \
+  --userData 'package_update: true packages: - nginx'
+
+# ইন্সট্যান্স স্ট্যাটাস
+cntb get instances
+
+# স্ন্যাপশট
+cntb create snapshot 12345 --name "initial-backup"
+
+# ইন্সট্যান্স বন্ধ
+cntb stop instance 12345
+```
+
+---
+
+### ৯.২ অবজেক্ট স্টোরেজ
+```bash
+# স্টোরেজ তৈরি
+cntb create objectStorage --region EU --totalPurchasedSpaceTB 1
+
+# তালিকা
+cntb get objectStorages
+
+# আপগ্রেড
+cntb upgrade objectStorage obj-123 --totalPurchasedSpaceTB 2
+```
+
+---
+
+## ১০. টিপস এবং সেরা অভ্যাস
+- **ক্রেডেনশিয়াল সুরক্ষিত রাখুন**: `.cntb` ফাইল অন্যদের কাছে শেয়ার করবেন না।
+- **ট্যাগ ব্যবহার**: রিসোর্স সংগঠিত করতে ট্যাগ ব্যবহার করুন।
+- **ক্লাউড-ইনিট**: স্বয়ংক্রিয় সেটআপের জন্য `userData` ব্যবহার করুন।
+- **আউটপুট**: স্ক্রিপ্টে JSON/YAML ব্যবহার করুন।

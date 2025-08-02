@@ -1,0 +1,12 @@
+{
+  "title": "নোড জেএস",
+  "description": "সহজে শিখুন নোড জেএস",
+  "icon": "famicons:logo-nodejs",
+  "root": true,
+  "pages": [
+    "---টিউটোরিয়াল---",
+    "index",
+    "make-npm-package",
+    "..."
+  ]
+}

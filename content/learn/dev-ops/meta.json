@@ -1,0 +1,17 @@
+{
+  "title": "ডেভঅপস",
+  "description": "ডেভওপসের সহজ পাঠ",
+  "icon": "gravity-ui:terminal",
+  "root": true,
+  "pages": [
+    "---ওভারভিউ---",
+    "index",
+    "roadmaps",
+    "syllabus",
+    "...",
+    "---অপারেটিং সিস্টেম---",
+    "manual-installation",
+    "---কমান্ড লাইন ইন্টারফেস---",
+    "comparisons"
+  ]
+}

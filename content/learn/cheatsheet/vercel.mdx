@@ -1,0 +1,371 @@
+---
+title: ভার্সেল (Vercel) চিটশিট
+description: ভার্সেল (Vercel) হলো একটি ডেভেলপার-কেন্দ্রিক প্ল্যাটফর্ম যা ওয়েব অ্যাপ্লিকেশন তৈরি, ডিপ্লয়, এবং পরিচালনার জন্য ব্যবহৃত হয়। এটি স্বয়ংক্রিয় স্কেলিং, সার্ভারলেস ফাংশন, এবং গিট-ভিত্তিক ওয়ার্কফ্লো সরবরাহ করে। এই চিটশিটে Vercel-এর সব মৌলিক থেকে উন্নত ধারণা এবং কমান্ড বিস্তারিতভাবে কভার করা হয়েছে।
+icon: tabler:brand-vercel
+---
+
+## ১. ভার্সেল পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **প্রজেক্ট**: একটি অ্যাপ্লিকেশন যা Vercel-এ ডিপ্লয় করা হয়।
+- **ডিপ্লয়মেন্ট**: প্রজেক্টের একটি বিল্ড এবং লাইভ সংস্করণ।
+- **প্রিভিউ URL**: প্রতিটি ডিপ্লয়মেন্টের জন্য স্বয়ংক্রিয়ভাবে তৈরি URL।
+- **সার্ভারলেস ফাংশন**: কোড যা সার্ভার ছাড়াই রান করে।
+- **এজ নেটওয়ার্ক**: বিশ্বব্যাপী CDN-এর মাধ্যমে দ্রুত লোড।
+
+### ১.২ ইনস্টলেশন (CLI)
+- **npm দিয়ে**:
+  ```bash
+  npm install -g vercel
+  ```
+- **Yarn দিয়ে**:
+  ```bash
+  yarn global add vercel
+  ```
+- **চেক করুন**:
+  ```bash
+  vercel --version
+  ```
+
+---
+
+## ২. ভার্সেলে প্রজেক্ট সেটআপ
+
+### ২.১ নতুন প্রজেক্ট তৈরি
+- **CLI দিয়ে**:
+  ```bash
+  vercel
+  ```
+  - প্রশ্নের উত্তর দিন (নাম, ফ্রেমওয়ার্ক, ইত্যাদি)।
+- **গিট দিয়ে**:
+  1. GitHub/GitLab/Bitbucket-এ রিপোজিটরি তৈরি করুন।
+  2. Vercel ড্যাশবোর্ডে "New Project" ক্লিক করুন।
+  3. রিপোজিটরি ইমপোর্ট করুন।
+
+---
+
+### ২.২ প্রজেক্ট স্ট্রাকচার
+- **স্ট্যাটিক সাইট**:
+  ```
+  myproject/
+  ├── index.html
+  ├── package.json
+  ```
+- **Next.js**:
+  ```
+  myproject/
+  ├── pages/
+  │   ├── index.js
+  ├── package.json
+  ```
+
+---
+
+## ৩. ডিপ্লয়মেন্ট
+
+### ৩.১ গিট-ভিত্তিক ডিপ্লয়
+- **প্রক্রিয়া**:
+  1. গিট রিপোজিটরি Vercel-এ লিঙ্ক করুন।
+  2. কোড পুশ করুন:
+     ```bash
+     git add .
+     git commit -m "প্রথম ডিপ্লয়"
+     git push origin main
+     ```
+  3. Vercel স্বয়ংক্রিয়ভাবে বিল্ড এবং ডিপ্লয় করবে।
+
+- **প্রিভিউ URL**: প্রতিটি ব্রাঞ্চের জন্য (যেমন `myproject-git-feature-branch.vercel.app`)।
+- **প্রোডাকশন URL**: `main` ব্রাঞ্চের জন্য।
+
+---
+
+### ৩.২ CLI দিয়ে ডিপ্লয়
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `vercel`         | ডিপ্লয় শুরু।                                | `vercel`                       |
+| `vercel --prod`  | প্রোডাকশনে ডিপ্লয়।                          | `vercel --prod`                |
+| `vercel build`   | লোকালি বিল্ড।                                | `vercel build`                 |
+| `vercel deploy --prebuilt` | প্রি-বিল্ট ডিপ্লয়।                   | `vercel deploy --prebuilt`     |
+
+**উদাহরণ:**
+```bash
+vercel login
+cd myproject
+vercel
+```
+
+---
+
+### ৩.৩ ডিপ্লয় হুক
+- **সেটআপ**:
+  1. ড্যাশবোর্ডে "Settings" > "Deploy Hooks"।
+  2. হুক তৈরি করুন (নাম এবং ব্রাঞ্চ দিন)।
+  3. URL কপি করুন (যেমন `https://api.vercel.com/v1/integrations/deploy/xxx`)।
+- **ট্রিগার**:
+  ```bash
+  curl -X POST "https://api.vercel.com/v1/integrations/deploy/xxx"
+  ```
+
+---
+
+## ৪. কনফিগারেশন
+
+### ৪.১ vercel.json
+- **উদাহরণ**:
+```json
+{
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/about", "dest": "/about.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1" }
+  ]
+}
+```
+
+- **ফিল্ড**:
+  - `builds`: বিল্ড প্রক্রিয়া নির্দিষ্ট করে।
+  - `routes`: URL রাউটিং নিয়ন্ত্রণ।
+
+---
+
+### ৪.২ এনভায়রনমেন্ট ভ্যারিয়েবল
+- **লোকাল**:
+  `.env` ফাইল:
+  ```
+  API_KEY=xyz123
+  ```
+- **Vercel-এ সেট**:
+  1. ড্যাশবোর্ডে "Settings" > "Environment Variables"।
+  2. নাম এবং মান যোগ করুন।
+- **CLI দিয়ে**:
+  ```bash
+  vercel env add API_KEY
+  ```
+
+---
+
+## ৫. ডোমেইন ম্যানেজমেন্ট
+
+### ৫.১ কাস্টম ডোমেইন
+- **সেটআপ**:
+  1. ড্যাশবোর্ডে "Domains"।
+  2. ডোমেইন যোগ করুন (যেমন `example.com`)।
+  3. DNS সেটিংস আপডেট করুন:
+     - `A` রেকর্ড: `76.76.21.21`
+     - `CNAME`: `cname.vercel-dns.com`
+- **CLI দিয়ে**:
+  ```bash
+  vercel domains add example.com
+  ```
+
+---
+
+### ৫.২ সাবডোমেইন এবং ওয়াইল্ডকার্ড
+- **vercel.json-এ**:
+```json
+{
+  "wildcard": "*.example.com",
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
+```
+
+---
+
+## ৬. সার্ভারলেস ফাংশন
+
+### ৬.১ ফাংশন তৈরি
+- **উদাহরণ**: `api/hello.js`
+```javascript
+export default function handler(req, res) {
+  res.status(200).json({ message: "হ্যালো, Vercel!" });
+}
+```
+
+- **ডিপ্লয়**:
+  ```bash
+  vercel
+  ```
+- **URL**: `https://myproject.vercel.app/api/hello`
+
+---
+
+### ৬.২ ফাংশন কনফিগারেশন
+- **vercel.json-এ**:
+```json
+{
+  "functions": {
+    "api/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
+```
+
+---
+
+## ৭. এজ মিডলওয়্যার (Next.js)
+
+### ৭.১ মিডলওয়্যার তৈরি
+- **`middleware.js`**:
+```javascript
+export function middleware(request) {
+  if (request.nextUrl.pathname === "/private") {
+    return Response.redirect(new URL("/", request.url));
+  }
+}
+```
+
+- **ডিপ্লয়**:
+  ```bash
+  vercel
+  ```
+
+---
+
+## ৮. মনোরিপো (Monorepo)
+
+### ৮.১ সেটআপ
+- **প্রজেক্ট স্ট্রাকচার**:
+```
+monorepo/
+├── apps/
+│   ├── web/
+│   │   ├── package.json
+│   ├── api/
+│   │   ├── package.json
+├── package.json
+```
+
+- **vercel.json**:
+```json
+{
+  "builds": [
+    { "src": "apps/web/**/*", "use": "@vercel/next" },
+    { "src": "apps/api/**/*", "use": "@vercel/node" }
+  ]
+}
+```
+
+- **CLI দিয়ে**:
+  ```bash
+  vercel --scope monorepo
+  ```
+
+---
+
+## ৯. CLI কমান্ড
+
+### ৯.১ প্রজেক্ট ম্যানেজমেন্ট
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `vercel ls`      | ডিপ্লয়মেন্ট তালিকা।                         | `vercel ls`                    |
+| `vercel rm`      | প্রজেক্ট মুছে ফেলা।                          | `vercel rm myproject`          |
+| `vercel link`    | লোকাল প্রজেক্ট লিঙ্ক।                         | `vercel link`                  |
+
+---
+
+### ৯.২ লগ এবং ডিবাগ
+| কমান্ড            | বর্ণনা                                      | উদাহরণ                          |
+|------------------|---------------------------------------------|---------------------------------|
+| `vercel logs`    | ডিপ্লয়মেন্ট লগ।                             | `vercel logs myproject.vercel.app` |
+| `vercel inspect` | ডিপ্লয়মেন্ট বিস্তারিত।                       | `vercel inspect <url>`         |
+
+---
+
+## ১০. সিকিউরিটি
+
+### ১০.১ ডিপ্লয়মেন্ট প্রোটেকশন
+- **সেটআপ**:
+  1. ড্যাশবোর্ডে "Settings" > "Deployment Protection"।
+  2. "Vercel Authentication" বা "Password Protection" চালু করুন।
+
+---
+
+### ১০.২ ফায়ারওয়াল
+- **কনফিগারেশন**: "Settings" > "Firewall" (Enterprise-এর জন্য)।
+- **IP ব্লকিং**: কাস্টম রুল যোগ করুন।
+
+---
+
+## ১১. মনিটরিং এবং অ্যানালিটিক্স
+
+### ১১.১ Vercel Analytics
+- **চালু করুন**: ড্যাশবোর্ডে "Analytics" ট্যাব থেকে।
+- **Next.js-এ**:
+  ```javascript
+  import { Analytics } from '@vercel/analytics/react';
+
+  function MyApp({ Component, pageProps }) {
+    return (
+      <>
+        <Component {...pageProps} />
+        <Analytics />
+      </>
+    );
+  }
+  ```
+
+---
+
+### ১১.২ লগ ড্রেন
+- **সেটআপ**: "Settings" > "Log Drains" > তৃতীয় পক্ষের সার্ভিস যোগ করুন (যেমন Datadog)।
+
+---
+
+## ১২. উদাহরণ: একটি সম্পূর্ণ প্রজেক্ট
+
+### ১২.১ Next.js প্রজেক্ট
+- **সেটআপ**:
+  ```bash
+  npx create-next-app@latest myapp
+  cd myapp
+  ```
+- **ডিপ্লয়**:
+  ```bash
+  vercel
+  ```
+- **কাস্টম ডোমেইন**:
+  1. ড্যাশবোর্ডে `example.com` যোগ করুন।
+  2. DNS সেট করুন।
+
+---
+
+### ১২.২ API এবং স্ট্যাটিক
+- **স্ট্রাকচার**:
+```
+myproject/
+├── api/
+│   ├── hello.js
+├── public/
+│   ├── index.html
+├── package.json
+├── vercel.json
+```
+- **vercel.json**:
+```json
+{
+  "builds": [
+    { "src": "public/**", "use": "@vercel/static" },
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ]
+}
+```
+- **ডিপ্লয়**:
+  ```bash
+  vercel
+  ```
+
+---
+
+## ১৩. টিপস এবং সেরা অভ্যাস
+- **গিট ইন্টিগ্রেশন**: সবসময় গিট ব্যবহার করুন স্বয়ংক্রিয় ডিপ্লয়ের জন্য।
+- **এনভায়রনমেন্ট**: প্রিভিউ এবং প্রোডাকশনের জন্য আলাদা ভ্যারিয়েবল সেট করুন।
+- **ক্যাশিং**: বিল্ড ক্যাশ ব্যবহার করে ডিপ্লয় দ্রুত করুন।
+- **অ্যানালিটিক্স**: UX উন্নত করতে Vercel Analytics চালু করুন।

@@ -1,0 +1,308 @@
+---
+title: জাভাস্ক্রিপ্ট চিটশিট
+description: জাভাস্ক্রিপ্ট (JS) একটি প্রোগ্রামিং ভাষা যা ওয়েব পেজকে ইন্টারেক্টিভ করে। এই চিটশিটে জাভাস্ক্রিপ্টের সব গুরুত্বপূর্ণ ধারণা অন্তর্ভুক্ত করা হয়েছে।
+icon: fluent:javascript-16-regular
+---
+
+## ১. জাভাস্ক্রিপ্ট কীভাবে যোগ করবেন
+HTML-এ JS তিনভাবে যোগ করা যায়:
+1. **ইনলাইন**: `<script>` ট্যাগে।
+2. **ইন্টারনাল**: HTML-এর মধ্যে।
+3. **এক্সটারনাল**: `.js` ফাইলে।
+
+### উদাহরণ:
+#### ইনলাইন
+```html
+<script>
+    console.log("হ্যালো, জাভাস্ক্রিপ্ট!");
+</script>
+```
+
+#### এক্সটারনাল
+```html
+<script src="script.js"></script>
+```
+```javascript
+// script.js
+console.log("এটি এক্সটারনাল JS");
+```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ ভেরিয়েবল
+| কীওয়ার্ড | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| `var`     | পুরানো স্টাইল, ফাংশন স্কোপ।                | `var x = 10;`                  |
+| `let`     | ব্লক স্কোপ, পরিবর্তনযোগ্য।                 | `let y = 20;`                  |
+| `const`   | ব্লক স্কোপ, অপরিবর্তনীয় (মান নয়, রেফারেন্স)| `const z = 30;`                |
+
+**উদাহরণ:**
+```javascript
+let name = "আনিস";
+const age = 25;
+console.log(name, age); // আনিস 25
+```
+
+---
+
+### ২.২ ডেটা টাইপ
+| টাইপ      | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| Number    | সংখ্যা।                                    | `let num = 42;`                |
+| String    | টেক্সট।                                    | `let str = "হ্যালো";`          |
+| Boolean   | সত্য/মিথ্যা।                               | `let bool = true;`             |
+| Object    | কী-ভ্যালু জোড়া।                           | `let obj = {name: "করিম"};`    |
+| Array     | তালিকা।                                    | `let arr = [1, 2, 3];`         |
+| Null      | শূন্য মান।                                 | `let n = null;`                |
+| Undefined | সংজ্ঞায়িত নয়।                            | `let u;`                       |
+| Symbol    | অনন্য মান।                                 | `let sym = Symbol("id");`      |
+
+**উদাহরণ:**
+```javascript
+let x = 10; // Number
+let y = "টেক্সট"; // String
+let z = [1, "দুই", 3]; // Array
+```
+
+---
+
+### ২.৩ অপারেটর
+| ধরন       | উদাহরণ                                      |
+|-----------|---------------------------------------------|
+| গাণিতিক   | `+`, `-`, `*`, `/`, `%`, `**` (ঘাত)         |
+| তুলনা     | `==`, `===`, `!=`, `!==`, `>`, `<`, `>=`    |
+| লজিক্যাল  | `&&` (এবং), `||` (বা), `!` (না)            |
+| অ্যাসাইনমেন্ট | `=`, `+=`, `-=`, `*=`, `/=`             |
+
+**উদাহরণ:**
+```javascript
+let a = 5 + 3; // 8
+let b = a === 8; // true
+let c = (a > 0 && b); // true
+```
+
+---
+
+## ৩. কন্ট্রোল স্ট্রাকচার
+
+### ৩.১ শর্ত (Conditionals)
+| ধরন       | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| `if`      | শর্ত সত্য হলে কোড চলে।                    | `if (x > 0) { console.log("ধনাত্মক"); }` |
+| `else if` | একাধিক শর্ত।                                | `else if (x < 0) { console.log("ঋণাত্মক"); }` |
+| `else`    | শর্ত মিথ্যা হলে।                           | `else { console.log("শূন্য"); }` |
+| `switch`  | একাধিক কেস।                                | `switch (day) { case 1: ... }` |
+
+**উদাহরণ:**
+```javascript
+let num = 10;
+if (num > 0) {
+    console.log("ধনাত্মক");
+} else {
+    console.log("ঋণাত্মক বা শূন্য");
+}
+```
+
+---
+
+### ৩.২ লুপ (Loops)
+| ধরন       | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| `for`     | নির্দিষ্ট সংখ্যকবার চলে।                   | `for (let i = 0; i < 5; i++) { ... }` |
+| `while`   | শর্ত সত্য হলে চলে।                         | `while (x > 0) { x--; }`       |
+| `do...while` | কমপক্ষে একবার চলে।                      | `do { x++; } while (x < 5);`   |
+| `for...of`| অ্যারে বা ইটারেবলের জন্য।                  | `for (let val of arr) { ... }` |
+| `for...in`| অবজেক্টের প্রোপার্টির জন্য।                | `for (let key in obj) { ... }` |
+
+**উদাহরণ:**
+```javascript
+for (let i = 1; i <= 3; i++) {
+    console.log(i); // 1, 2, 3
+}
+```
+
+---
+
+## ৪. ফাংশন
+| ধরন       | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| Declaration | নামসহ ফাংশন।                              | `function add(a, b) { return a + b; }` |
+| Expression | ভেরিয়েবলে ফাংশন।                          | `const add = function(a, b) { return a + b; };` |
+| Arrow      | সংক্ষিপ্ত সিনট্যাক্স।                       | `const add = (a, b) => a + b;` |
+
+**উদাহরণ:**
+```javascript
+function greet(name) {
+    return `হ্যালো, ${name}!`;
+}
+console.log(greet("আনিস")); // হ্যালো, আনিস!
+```
+
+---
+
+## ৫. অবজেক্ট এবং অ্যারে
+
+### ৫.১ অবজেক্ট
+```javascript
+let person = {
+    name: "করিম",
+    age: 30,
+    greet: function() {
+        return `হ্যালো, আমি ${this.name}`;
+    }
+};
+console.log(person.name); // করিম
+console.log(person.greet()); // হ্যালো, আমি করিম
+```
+
+### ৫.২ অ্যারে
+| মেথড       | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `push`     | শেষে যোগ।                                  | `arr.push(4);`                 |
+| `pop`      | শেষ থেকে সরানো।                            | `arr.pop();`                   |
+| `shift`    | প্রথম থেকে সরানো।                           | `arr.shift();`                 |
+| `unshift`  | প্রথমে যোগ।                                 | `arr.unshift(0);`              |
+| `map`      | প্রতিটি আইটেমে ফাংশন।                       | `arr.map(x => x * 2);`         |
+| `filter`   | শর্ত মেনে আইটেম।                            | `arr.filter(x => x > 2);`      |
+| `reduce`   | একটি মানে রূপান্তর।                         | `arr.reduce((a, b) => a + b);` |
+
+**উদাহরণ:**
+```javascript
+let numbers = [1, 2, 3];
+let doubled = numbers.map(num => num * 2); // [2, 4, 6]
+```
+
+---
+
+## ৬. ইভেন্ট হ্যান্ডলিং
+| ধরন       | বর্ণনা                                      | উদাহরণ                          |
+|-----------|---------------------------------------------|---------------------------------|
+| `onclick`  | ক্লিক ইভেন্ট।                               | `button.onclick = () => alert("ক্লিক!");` |
+| `addEventListener` | ইভেন্ট লিসেনার।                     | `button.addEventListener("click", fn);` |
+
+**উদাহরণ:**
+```html
+<button id="btn">ক্লিক করুন</button>
+<script>
+    document.getElementById("btn").addEventListener("click", () => {
+        alert("হ্যালো!");
+    });
+</script>
+```
+
+---
+
+## ৭. DOM ম্যানিপুলেশন
+| মেথড       | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `getElementById` | আইডি দিয়ে এলিমেন্ট।                  | `document.getElementById("id");` |
+| `querySelector` | CSS সিলেক্টর।                         | `document.querySelector(".class");` |
+| `innerHTML` | HTML কনটেন্ট।                            | `element.innerHTML = "<p>নতুন</p>";` |
+| `style`    | স্টাইল পরিবর্তন।                           | `element.style.color = "red";` |
+
+**উদাহরণ:**
+```javascript
+document.querySelector("p").innerHTML = "নতুন টেক্সট";
+```
+
+---
+
+## ৮. উন্নত ধারণা
+
+### ৮.১ ক্লোজার (Closure)
+```javascript
+function outer() {
+    let count = 0;
+    return function inner() {
+        count++;
+        return count;
+    };
+}
+const counter = outer();
+console.log(counter()); // 1
+console.log(counter()); // 2
+```
+
+---
+
+### ৮.২ প্রমিস (Promise)
+```javascript
+const myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve("সফল!"), 1000);
+});
+myPromise.then(result => console.log(result)); // সফল!
+```
+
+---
+
+### ৮.৩ অ্যাসিঙ্ক/অ্যাওয়েট (Async/Await)
+```javascript
+async function fetchData() {
+    let response = await fetch("https://api.example.com");
+    let data = await response.json();
+    console.log(data);
+}
+fetchData();
+```
+
+---
+
+### ৮.৪ ক্লাস (Class)
+```javascript
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+    greet() {
+        return `হ্যালো, ${this.name}`;
+    }
+}
+const p = new Person("আনিস");
+console.log(p.greet()); // হ্যালো, আনিস
+```
+
+---
+
+### ৮.৫ মডিউল
+```javascript
+// math.js
+export function add(a, b) {
+    return a + b;
+}
+// main.js
+import { add } from './math.js';
+console.log(add(2, 3)); // 5
+```
+
+---
+
+## ৯. এরর হ্যান্ডলিং
+```javascript
+try {
+    let x = undefinedVar;
+} catch (error) {
+    console.log("এরর:", error.message);
+} finally {
+    console.log("শেষ");
+}
+```
+
+---
+
+## ১০. উদাহরণ: একটি সম্পূর্ণ প্রোগ্রাম
+```html
+<div id="output"></div>
+<button id="btn">ক্লিক</button>
+<script>
+    const output = document.getElementById("output");
+    const btn = document.getElementById("btn");
+
+    let count = 0;
+    btn.addEventListener("click", () => {
+        count++;
+        output.innerHTML = `ক্লিক সংখ্যা: ${count}`;
+    });
+</script>
+```

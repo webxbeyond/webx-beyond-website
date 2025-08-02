@@ -1,0 +1,470 @@
+---
+title: জ্যাঙ্গো চিটশিট
+description: জ্যাঙ্গো (Django) হলো একটি উচ্চ-স্তরের পাইথন ওয়েব ফ্রেমওয়ার্ক যা দ্রুত ওয়েব অ্যাপ্লিকেশন ডেভেলপমেন্ট এবং পরিচ্ছন্ন ডিজাইনের জন্য ব্যবহৃত হয়। এই চিটশিটে জ্যাঙ্গোর সব মৌলিক থেকে উন্নত ধারণা বিস্তারিতভাবে কভার করা হয়েছে।
+icon: simple-icons:django
+---
+
+## ১. জ্যাঙ্গো শুরু করা
+
+### ১.১ পরিবেশ সেটআপ
+- **প্রয়োজনীয়তা**: Python 3.x।
+- **ইনস্টলেশন**:
+  ```bash
+  pip install django
+  ```
+- **প্রজেক্ট তৈরি**:
+  ```bash
+  django-admin startproject myproject
+  cd myproject
+  ```
+- **অ্যাপ তৈরি**:
+  ```bash
+  python manage.py startapp myapp
+  ```
+
+### ১.২ প্রজেক্ট চালানো
+```bash
+python manage.py runserver
+```
+- ব্রাউজারে: `http://127.0.0.1:8000`
+
+---
+
+## ২. জ্যাঙ্গোর মৌলিক ধারণা
+
+### ২.১ প্রজেক্ট স্ট্রাকচার
+```
+myproject/
+├── manage.py
+├── myproject/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── myapp/
+    ├── migrations/
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── tests.py
+    └── views.py
+```
+
+- **`settings.py`**: প্রজেক্ট কনফিগারেশন।
+- **`urls.py`**: URL রাউটিং।
+- **`models.py`**: ডাটাবেস মডেল।
+- **`views.py`**: রিকোয়েস্ট হ্যান্ডলিং।
+
+---
+
+### ২.২ অ্যাপ যোগ করা
+`settings.py`-তে:
+```python
+INSTALLED_APPS = [
+    ...
+    'myapp',
+]
+```
+
+---
+
+## ৩. মডেল এবং ডাটাবেস
+
+### ৩.১ মডেল তৈরি
+`myapp/models.py`:
+```python
+from django.db import models
+
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.name
+```
+
+- **ফিল্ড টাইপ**: `CharField`, `IntegerField`, `TextField`, `BooleanField`, `DateTimeField`, ইত্যাদি।
+- **অপশন**: `max_length`, `unique`, `null`, `blank`।
+
+---
+
+### ৩.২ মাইগ্রেশন
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+---
+
+### ৩.৩ ডাটা যোগ/পড়া (Django Shell)
+```bash
+python manage.py shell
+```
+```python
+from myapp.models import Student
+
+# যোগ করা
+s = Student(name="রহিম", age=20, email="rahim@example.com")
+s.save()
+
+# পড়া
+Student.objects.all()  # সব
+Student.objects.get(id=1)  # নির্দিষ্ট
+Student.objects.filter(age__gt=18)  # ফিল্টার
+```
+
+---
+
+## ৪. ভিউ (Views)
+
+### ৪.১ ফাংশন-ভিত্তিক ভিউ
+`myapp/views.py`:
+```python
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("হ্যালো, জ্যাঙ্গো!")
+```
+
+---
+
+### ৪.২ ক্লাস-ভিত্তিক ভিউ
+```python
+from django.views import View
+from django.http import HttpResponse
+
+class HomeView(View):
+    def get(self, request):
+        return HttpResponse("হোম পেজ")
+```
+
+---
+
+## ৫. URL রাউটিং
+`myproject/urls.py`:
+```python
+from django.urls import path
+from myapp.views import home, HomeView
+
+urlpatterns = [
+    path('', home, name='home'),
+    path('class/', HomeView.as_view(), name='home_class'),
+]
+```
+
+- **অ্যাপ-স্পেসিফিক URL**:
+`myapp/urls.py`:
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+]
+```
+`myproject/urls.py`:
+```python
+from django.urls import include, path
+
+urlpatterns = [
+    path('myapp/', include('myapp.urls')),
+]
+```
+
+---
+
+## ৬. টেমপ্লেট
+### ৬.১ টেমপ্লেট সেটআপ
+`settings.py`:
+```python
+TEMPLATES = [
+    {
+        'DIRS': [BASE_DIR / 'templates'],
+        ...
+    }
+]
+```
+
+### ৬.২ টেমপ্লেট তৈরি
+`templates/index.html`:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>হোম</title>
+</head>
+<body>
+    <h1>স্বাগতম, {{ name }}!</h1>
+</body>
+</html>
+```
+
+### ৬.৩ ভিউ থেকে রেন্ডার
+```python
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'index.html', {'name': 'রহিম'})
+```
+
+---
+
+### ৬.৪ টেমপ্লেট সিনট্যাক্স
+| সিনট্যাক্স    | বর্ণনা                                      | উদাহরণ                          |
+|--------------|---------------------------------------------|---------------------------------|
+| `{{ var }}`  | ভেরিয়েবল প্রদর্শন।                         | `{{ name }}`                   |
+| `{% if %}`   | শর্ত।                                      | `{% if age > 18 %}...{% endif %}` |
+| `{% for %}`  | লুপ।                                       | `{% for s in students %}...{% endfor %}` |
+| `{% block %}`| ব্লক ওভাররাইড।                             | `{% block content %}...{% endblock %}` |
+
+---
+
+## ৭. ফর্ম
+### ৭.১ ফর্ম তৈরি
+`myapp/forms.py`:
+```python
+from django import forms
+
+class StudentForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    age = forms.IntegerField()
+    email = forms.EmailField()
+```
+
+### ৭.২ ফর্ম হ্যান্ডলিং
+`myapp/views.py`:
+```python
+from django.shortcuts import render
+from .forms import StudentForm
+
+def add_student(request):
+    if request.method == 'POST':
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            age = form.cleaned_data['age']
+            email = form.cleaned_data['email']
+            return HttpResponse(f"যোগ হয়েছে: {name}")
+    else:
+        form = StudentForm()
+    return render(request, 'form.html', {'form': form})
+```
+
+`templates/form.html`:
+```html
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">জমা দিন</button>
+</form>
+```
+
+---
+
+## ৮. অ্যাডমিন প্যানেল
+### ৮.১ সেটআপ
+```bash
+python manage.py createsuperuser
+```
+
+`myapp/admin.py`:
+```python
+from django.contrib import admin
+from .models import Student
+
+admin.site.register(Student)
+```
+
+- **কাস্টমাইজ**:
+```python
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age', 'email')
+    search_fields = ('name',)
+```
+
+---
+
+## ৯. অথেনটিকেশন
+### ৯.১ বিল্ট-ইন অথেনটিকেশন
+`myproject/urls.py`:
+```python
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]
+```
+
+`templates/login.html`:
+```html
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">লগইন</button>
+</form>
+```
+
+### ৯.২ কাস্টম ইউজার
+`myapp/models.py`:
+```python
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    age = models.IntegerField(null=True)
+```
+
+`settings.py`:
+```python
+AUTH_USER_MODEL = 'myapp.CustomUser'
+```
+
+---
+
+## ১০. API (Django REST Framework)
+- **ইনস্টলেশন**:
+  ```bash
+  pip install djangorestframework
+  ```
+  `settings.py`:
+  ```python
+  INSTALLED_APPS = [
+      ...
+      'rest_framework',
+  ]
+  ```
+
+### ১০.১ সিরিয়ালাইজার
+`myapp/serializers.py`:
+```python
+from rest_framework import serializers
+from .models import Student
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+```
+
+### ১০.২ API ভিউ
+`myapp/views.py`:
+```python
+from rest_framework import generics
+from .models import Student
+from .serializers import StudentSerializer
+
+class StudentList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+`myapp/urls.py`:
+```python
+from django.urls import path
+from .views import StudentList
+
+urlpatterns = [
+    path('api/students/', StudentList.as_view(), name='student_list'),
+]
+```
+
+---
+
+## ১১. মিডলওয়্যার এবং স্ট্যাটিক ফাইল
+### ১১.১ মিডলওয়্যার
+`myapp/middleware.py`:
+```python
+def simple_middleware(get_response):
+    def middleware(request):
+        print("রিকোয়েস্ট প্রসেসিং")
+        response = get_response(request)
+        return response
+    return middleware
+```
+
+`settings.py`:
+```python
+MIDDLEWARE = [
+    ...
+    'myapp.middleware.simple_middleware',
+]
+```
+
+### ১১.২ স্ট্যাটিক ফাইল
+`settings.py`:
+```python
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+```
+
+`templates/index.html`:
+```html
+{% load static %}
+<img src="{% static 'images/logo.png' %}" alt="লোগো">
+```
+
+---
+
+## ১২. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+`myapp/models.py`:
+```python
+from django.db import models
+
+class Task(models.Model):
+    title = models.CharField(max_length=200)
+    completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+```
+
+`myapp/views.py`:
+```python
+from django.shortcuts import render, redirect
+from .models import Task
+
+def task_list(request):
+    tasks = Task.objects.all()
+    if request.method == 'POST':
+        title = request.POST['title']
+        Task.objects.create(title=title)
+        return redirect('task_list')
+    return render(request, 'task_list.html', {'tasks': tasks})
+```
+
+`myapp/urls.py`:
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.task_list, name='task_list'),
+]
+```
+
+`templates/task_list.html`:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>টাস্ক লিস্ট</title>
+</head>
+<body>
+    <h1>টাস্ক লিস্ট</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="নতুন টাস্ক">
+        <button type="submit">যোগ করুন</button>
+    </form>
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task.title }} - {% if task.completed %}সম্পন্ন{% else %}অসম্পন্ন{% endif %}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```

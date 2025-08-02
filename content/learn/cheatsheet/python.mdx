@@ -1,0 +1,324 @@
+---
+title: পাইথন চিটশিট
+description: পাইথন একটি শক্তিশালী এবং সহজে শেখার প্রোগ্রামিং ভাষা। এই চিটশিটে পাইথনের সব মৌলিক থেকে উন্নত ধারণা অন্তর্ভুক্ত করা হয়েছে, যাতে আপনি শুরু থেকে দক্ষতা অর্জন করতে পারেন।
+icon: proicons:python
+---
+
+## ১. পাইথন শুরু করা
+
+### ১.১ ইনস্টলেশন
+- পাইথন ডাউনলোড করুন: [python.org](https://www.python.org/)
+- কমান্ড লাইনে চেক করুন: `python --version`
+
+### ১.২ প্রথম প্রোগ্রাম
+```python
+print("হ্যালো, পাইথন!")
+```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ ভেরিয়েবল এবং ডেটা টাইপ
+| টাইপ       | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `int`      | পূর্ণসংখ্যা।                               | `x = 10`                       |
+| `float`    | দশমিক সংখ্যা।                              | `y = 3.14`                     |
+| `str`      | টেক্সট।                                    | `name = "রহিম"`                |
+| `bool`     | সত্য/মিথ্যা।                               | `is_true = True`               |
+| `list`     | পরিবর্তনযোগ্য তালিকা।                      | `numbers = [1, 2, 3]`          |
+| `tuple`    | অপরিবর্তনীয় তালিকা।                        | `coords = (10, 20)`            |
+| `dict`     | কী-ভ্যালু জোড়া।                           | `person = {"name": "করিম"}`    |
+| `set`      | অনন্য আইটেমের সংগ্রহ।                      | `unique = {1, 2, 3}`           |
+
+**উদাহরণ:**
+```python
+x = 5
+name = "পাইথন"
+items = [1, "দুই", 3]
+print(x, name, items)  # 5 পাইথন [1, 'দুই', 3]
+```
+
+---
+
+### ২.২ অপারেটর
+| ধরন        | উদাহরণ                                      |
+|------------|---------------------------------------------|
+| গাণিতিক   | `+`, `-`, `*`, `/`, `//` (ভাগফল), `%`, `**` |
+| তুলনা     | `==`, `!=`, `>`, `<`, `>=`, `<=`            |
+| লজিক্যাল  | `and`, `or`, `not`                          |
+| অ্যাসাইনমেন্ট | `=`, `+=`, `-=`, `*=`, `/=`             |
+
+**উদাহরণ:**
+```python
+a = 10
+b = 3
+print(a + b)  # 13
+print(a // b)  # 3 (ভাগফল)
+print(a > b and b > 0)  # True
+```
+
+---
+
+## ৩. কন্ট্রোল স্ট্রাকচার
+
+### ৩.১ শর্ত (Conditionals)
+```python
+x = 10
+if x > 0:
+    print("ধনাত্মক")
+elif x == 0:
+    print("শূন্য")
+else:
+    print("ঋণাত্মক")
+```
+
+### ৩.২ লুপ (Loops)
+| ধরন        | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `for`      | তালিকা বা রেঞ্জে লুপ।                       | `for i in range(3): print(i)`  |
+| `while`    | শর্ত সত্য হলে চলে।                         | `while x > 0: x -= 1`          |
+
+**উদাহরণ:**
+```python
+for i in range(1, 4):
+    print(i)  # 1, 2, 3
+
+x = 5
+while x > 0:
+    print(x)
+    x -= 1  # 5, 4, 3, 2, 1
+```
+
+---
+
+## ৪. ফাংশন
+```python
+def greet(name):
+    return f"হ্যালো, {name}!"
+print(greet("রহিম"))  # হ্যালো, রহিম!
+
+# ডিফল্ট প্যারামিটার
+def add(a, b=5):
+    return a + b
+print(add(3))  # 8
+```
+
+### ল্যামডা ফাংশন
+```python
+double = lambda x: x * 2
+print(double(4))  # 8
+```
+
+---
+
+## ৫. ডেটা স্ট্রাকচার
+
+### ৫.১ লিস্ট (List)
+| মেথড       | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `append`   | শেষে যোগ।                                  | `lst.append(4)`                |
+| `pop`      | শেষ থেকে সরানো।                            | `lst.pop()`                    |
+| `remove`   | নির্দিষ্ট মান সরানো।                        | `lst.remove(2)`                |
+| `sort`     | সাজানো।                                    | `lst.sort()`                   |
+| `len`      | দৈর্ঘ্য।                                    | `len(lst)`                     |
+
+**উদাহরণ:**
+```python
+numbers = [3, 1, 4]
+numbers.append(2)
+numbers.sort()
+print(numbers)  # [1, 2, 3, 4]
+```
+
+---
+
+### ৫.২ ডিকশনারি (Dictionary)
+```python
+person = {"name": "করিম", "age": 30}
+print(person["name"])  # করিম
+person["city"] = "ঢাকা"
+print(person)  # {'name': 'করিম', 'age': 30, 'city': 'ঢাকা'}
+```
+
+---
+
+### ৫.৩ সেট (Set)
+```python
+unique = {1, 2, 2, 3}
+print(unique)  # {1, 2, 3}
+unique.add(4)
+print(unique)  # {1, 2, 3, 4}
+```
+
+---
+
+## ৬. স্ট্রিং ম্যানিপুলেশন
+| মেথড       | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `upper`    | বড় হাতের অক্ষর।                            | `"hello".upper()`  # HELLO     |
+| `lower`    | ছোট হাতের অক্ষর।                            | `"HELLO".lower()`  # hello     |
+| `split`    | তালিকায় ভাগ।                               | `"a,b".split(",")`  # ['a', 'b'] |
+| `join`     | তালিকা থেকে স্ট্রিং।                        | `",".join(["a", "b"])`  # a,b  |
+| `strip`    | ফাঁকা জায়গা সরানো।                         | `"  hi  ".strip()`  # hi       |
+
+**উদাহরণ:**
+```python
+text = "পাইথন শিখছি"
+print(text.split())  # ['পাইথন', 'শিখছি']
+```
+
+---
+
+## ৭. ফাইল হ্যান্ডলিং
+```python
+# লেখা
+with open("file.txt", "w") as f:
+    f.write("হ্যালো, পাইথন!")
+
+# পড়া
+with open("file.txt", "r") as f:
+    content = f.read()
+    print(content)  # হ্যালো, পাইথন!
+```
+
+---
+
+## ৮. উন্নত ধারণা
+
+### ৮.১ ক্লাস এবং অবজেক্ট
+```python
+class Person:
+    def __init__(self, name):
+        self.name = name
+    
+    def greet(self):
+        return f"হ্যালো, আমি {self.name}"
+
+p = Person("রহিম")
+print(p.greet())  # হ্যালো, আমি রহিম
+```
+
+---
+
+### ৮.২ ইনহেরিটেন্স (Inheritance)
+```python
+class Student(Person):
+    def study(self):
+        return f"{self.name} পড়ছে"
+
+s = Student("করিম")
+print(s.greet())  # হ্যালো, আমি করিম
+print(s.study())  # করিম পড়ছে
+```
+
+---
+
+### ৮.৩ এরর হ্যান্ডলিং
+```python
+try:
+    x = 10 / 0
+except ZeroDivisionError:
+    print("শূন্য দিয়ে ভাগ করা যায় না!")
+finally:
+    print("শেষ")
+```
+
+---
+
+### ৮.৪ লিস্ট কম্প্রিহেনশন
+```python
+squares = [x**2 for x in range(5)]
+print(squares)  # [0, 1, 4, 9, 16]
+```
+
+---
+
+### ৮.৫ মডিউল এবং প্যাকেজ
+```python
+# math মডিউল
+import math
+print(math.sqrt(16))  # 4.0
+
+# কাস্টম মডিউল
+# mymodule.py
+def say_hi():
+    return "হাই!"
+# main.py
+from mymodule import say_hi
+print(say_hi())  # হাই!
+```
+
+---
+
+## ৯. ডেটা সায়েন্স এবং লাইব্রেরি
+
+### ৯.১ NumPy
+```python
+import numpy as np
+arr = np.array([1, 2, 3])
+print(arr * 2)  # [2 4 6]
+```
+
+### ৯.২ Pandas
+```python
+import pandas as pd
+data = {"name": ["রহিম", "করিম"], "age": [25, 30]}
+df = pd.DataFrame(data)
+print(df)
+#    name  age
+# 0  রহিম   25
+# 1  করিম   30
+```
+
+---
+
+## ১০. ফাংশনাল প্রোগ্রামিং
+| ফাংশন      | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `map`      | প্রতিটি আইটেমে ফাংশন।                       | `map(lambda x: x*2, [1, 2])`  |
+| `filter`   | শর্ত মেনে আইটেম।                            | `filter(lambda x: x>0, [-1, 1])` |
+| `reduce`   | একটি মানে রূপান্তর।                         | `from functools import reduce; reduce(lambda x, y: x+y, [1, 2, 3])` |
+
+**উদাহরণ:**
+```python
+nums = [1, 2, 3]
+doubled = list(map(lambda x: x*2, nums))
+print(doubled)  # [2, 4, 6]
+```
+
+---
+
+## ১১. অ্যাসিঙ্ক্রোনাস প্রোগ্রামিং
+```python
+import asyncio
+
+async def say_hello():
+    await asyncio.sleep(1)
+    print("হ্যালো!")
+
+asyncio.run(say_hello())
+```
+
+---
+
+## ১২. উদাহরণ: একটি সম্পূর্ণ প্রোগ্রাম
+```python
+class Calculator:
+    def add(self, a, b):
+        return a + b
+
+calc = Calculator()
+numbers = [1, 2, 3, 4, 5]
+
+try:
+    total = sum(numbers)
+    result = calc.add(total, 10)
+    print(f"মোট: {result}")
+except Exception as e:
+    print(f"এরর: {e}")
+finally:
+    print("কাজ শেষ!")
+# মোট: 25
+# কাজ শেষ!
+```

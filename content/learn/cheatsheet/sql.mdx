@@ -1,0 +1,309 @@
+---
+title: SQL চিটশিট
+description: SQL হলো রিলেশনাল ডাটাবেস ম্যানেজমেন্ট সিস্টেমে ডেটা সংরক্ষণ, পুনরুদ্ধার এবং পরিচালনার জন্য একটি ভাষা। এই চিটশিটে SQL-এর সব গুরুত্বপূর্ণ কমান্ড এবং ধারণা অন্তর্ভুক্ত করা হয়েছে।
+icon: hugeicons:sql
+---
+
+## ১. SQL-এর মৌলিক ধারণা
+
+### ১.১ ডাটাবেস এবং টেবিল
+- **ডাটাবেস**: ডেটার সংগঠিত সংগ্রহ।
+- **টেবিল**: সারি (Rows) এবং কলাম (Columns) দিয়ে ডেটা সংরক্ষণ।
+
+### ১.২ SQL-এর প্রকারভেদ
+| প্রকার      | বর্ণনা                                      |
+|------------|---------------------------------------------|
+| DDL        | ডাটাবেস স্ট্রাকচার সংজ্ঞায়িত (CREATE, ALTER) |
+| DML        | ডেটা ম্যানিপুলেশন (INSERT, SELECT, UPDATE) |
+| DCL        | নিয়ন্ত্রণ (GRANT, REVOKE)                   |
+| TCL        | ট্রানজাকশন নিয়ন্ত্রণ (COMMIT, ROLLBACK)    |
+
+---
+
+## ২. মৌলিক SQL কমান্ড
+
+### ২.১ ডাটাবেস তৈরি
+```sql
+CREATE DATABASE my_database;
+USE my_database;
+```
+
+---
+
+### ২.২ টেবিল তৈরি (CREATE TABLE)
+```sql
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    city VARCHAR(50)
+);
+```
+
+- **ডেটা টাইপ**: `INT`, `VARCHAR(n)`, `TEXT`, `DATE`, `FLOAT`, ইত্যাদি।
+- **কনস্ট্রেইন্ট**: `PRIMARY KEY`, `FOREIGN KEY`, `NOT NULL`, `UNIQUE`।
+
+---
+
+### ২.৩ ডেটা যোগ করা (INSERT)
+```sql
+INSERT INTO students (id, name, age, city)
+VALUES (1, 'আনিস', 20, 'ঢাকা');
+```
+
+- **একাধিক সারি**:
+```sql
+INSERT INTO students VALUES 
+(2, 'করিম', 22, 'চট্টগ্রাম'),
+(3, 'সেলিম', 19, 'সিলেট');
+```
+
+---
+
+### ২.৪ ডেটা পড়া (SELECT)
+```sql
+SELECT * FROM students; -- সব কলাম
+SELECT name, age FROM students; -- নির্দিষ্ট কলাম
+```
+
+- **শর্ত সহ**:
+```sql
+SELECT * FROM students WHERE age > 20;
+```
+
+- **অর্ডার করা**:
+```sql
+SELECT * FROM students ORDER BY age ASC; -- ক্রমবর্ধমান
+```
+
+---
+
+### ২.৫ ডেটা আপডেট (UPDATE)
+```sql
+UPDATE students
+SET age = 21
+WHERE name = 'আনিস';
+```
+
+---
+
+### ২.৬ ডেটা মুছে ফেলা (DELETE)
+```sql
+DELETE FROM students WHERE id = 2;
+```
+
+---
+
+### ২.৭ টেবিল মুছে ফেলা (DROP)
+```sql
+DROP TABLE students;
+```
+
+---
+
+## ৩. কোয়েরি ফিল্টারিং এবং অপারেটর
+
+### ৩.১ WHERE ক্লজ
+| অপারেটর     | বর্ণনা                                      | উদাহরণ                          |
+|-------------|---------------------------------------------|---------------------------------|
+| `=`         | সমান।                                      | `WHERE age = 20`               |
+| `>`         | বড়।                                       | `WHERE age > 20`               |
+| `<`         | ছোট।                                       | `WHERE age < 20`               |
+| `!=` বা `<>`| সমান নয়।                                  | `WHERE age != 20`              |
+| `LIKE`      | প্যাটার্ন ম্যাচ।                           | `WHERE name LIKE 'র%'`         |
+| `IN`        | তালিকার মধ্যে।                              | `WHERE city IN ('ঢাকা', 'সিলেট')` |
+| `BETWEEN`   | পরিসরের মধ্যে।                             | `WHERE age BETWEEN 18 AND 25`  |
+
+**উদাহরণ:**
+```sql
+SELECT * FROM students WHERE age BETWEEN 18 AND 22 AND city = 'ঢাকা';
+```
+
+---
+
+### ৩.২ লজিক্যাল অপারেটর
+- `AND`, `OR`, `NOT`:
+```sql
+SELECT * FROM students WHERE age > 18 AND city != 'ঢাকা';
+```
+
+---
+
+## ৪. এগ্রিগেট ফাংশন
+| ফাংশন      | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `COUNT`    | সংখ্যা গণনা।                               | `SELECT COUNT(*) FROM students;` |
+| `SUM`      | যোগফল।                                     | `SELECT SUM(age) FROM students;` |
+| `AVG`      | গড়।                                       | `SELECT AVG(age) FROM students;` |
+| `MIN`      | সর্বনিম্ন।                                  | `SELECT MIN(age) FROM students;` |
+| `MAX`      | সর্বোচ্চ।                                   | `SELECT MAX(age) FROM students;` |
+
+**উদাহরণ:**
+```sql
+SELECT AVG(age) AS avg_age FROM students WHERE city = 'ঢাকা';
+```
+
+---
+
+## ৫. গ্রুপিং এবং জয়েন
+
+### ৫.১ GROUP BY
+```sql
+SELECT city, COUNT(*) AS total_students
+FROM students
+GROUP BY city;
+```
+
+- **HAVING** (গ্রুপ ফিল্টার):
+```sql
+SELECT city, COUNT(*) AS total
+FROM students
+GROUP BY city
+HAVING COUNT(*) > 1;
+```
+
+---
+
+### ৫.২ JOIN
+| ধরন        | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `INNER JOIN`| শুধু ম্যাচিং রেকর্ড।                        | `INNER JOIN grades ON students.id = grades.student_id` |
+| `LEFT JOIN` | বাম টেবিলের সব + ম্যাচিং।                   | `LEFT JOIN grades ON students.id = grades.student_id` |
+| `RIGHT JOIN`| ডান টেবিলের সব + ম্যাচিং।                   | `RIGHT JOIN grades ON students.id = grades.student_id` |
+| `FULL JOIN`| সব রেকর্ড।                                  | `FULL JOIN grades ON students.id = grades.student_id` |
+
+**উদাহরণ:**
+```sql
+CREATE TABLE grades (
+    student_id INT,
+    grade VARCHAR(2)
+);
+
+INSERT INTO grades VALUES (1, 'A'), (2, 'B');
+
+SELECT students.name, grades.grade
+FROM students
+INNER JOIN grades ON students.id = grades.student_id;
+```
+
+---
+
+## ৬. উন্নত SQL
+
+### ৬.১ সাবকোয়েরি
+```sql
+SELECT name
+FROM students
+WHERE id IN (SELECT student_id FROM grades WHERE grade = 'A');
+```
+
+---
+
+### ৬.২ ইউনিয়ন (UNION)
+```sql
+SELECT name FROM students
+UNION
+SELECT name FROM teachers;
+```
+
+---
+
+### ৬.৩ ইনডেক্স (INDEX)
+```sql
+CREATE INDEX idx_name ON students(name);
+```
+
+---
+
+### ৬.৪ ভিউ (VIEW)
+```sql
+CREATE VIEW dhaka_students AS
+SELECT * FROM students WHERE city = 'ঢাকা';
+
+SELECT * FROM dhaka_students;
+```
+
+---
+
+## ৭. ডেটা পরিবর্তন
+
+### ৭.১ টেবিল পরিবর্তন (ALTER)
+```sql
+ALTER TABLE students
+ADD COLUMN email VARCHAR(100);
+
+ALTER TABLE students
+DROP COLUMN email;
+```
+
+---
+
+### ৭.২ কনস্ট্রেইন্ট যোগ
+```sql
+ALTER TABLE students
+ADD CONSTRAINT unique_name UNIQUE (name);
+```
+
+---
+
+## ৮. ট্রানজাকশন
+```sql
+START TRANSACTION;
+
+INSERT INTO students VALUES (4, 'আলী', 23, 'রাজশাহী');
+UPDATE students SET age = 24 WHERE id = 4;
+
+COMMIT; -- স্থায়ী করা
+-- ROLLBACK; -- বাতিল করা
+```
+
+---
+
+## ৯. স্ট্রিং এবং ডেট ফাংশন
+| ফাংশন      | বর্ণনা                                      | উদাহরণ                          |
+|------------|---------------------------------------------|---------------------------------|
+| `CONCAT`   | স্ট্রিং যোগ।                                | `SELECT CONCAT(name, ' ', city) FROM students;` |
+| `UPPER`    | বড় হাতের অক্ষর।                            | `SELECT UPPER(name) FROM students;` |
+| `LOWER`    | ছোট হাতের অক্ষর।                            | `SELECT LOWER(city) FROM students;` |
+| `LENGTH`   | দৈর্ঘ্য।                                    | `SELECT LENGTH(name) FROM students;` |
+| `NOW`      | বর্তমান সময়।                               | `SELECT NOW();`                 |
+| `DATE`     | তারিখ।                                      | `SELECT DATE(NOW());`           |
+
+---
+
+## ১০. উদাহরণ: একটি সম্পূর্ণ ডাটাবেস
+```sql
+-- ডাটাবেস তৈরি
+CREATE DATABASE school;
+USE school;
+
+-- টেবিল তৈরি
+CREATE TABLE students (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    age INT,
+    city VARCHAR(50)
+);
+
+CREATE TABLE courses (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    student_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+-- ডেটা যোগ
+INSERT INTO students (name, age, city) VALUES
+('আনিস', 20, 'ঢাকা'),
+('করিম', 22, 'চট্টগ্রাম');
+
+INSERT INTO courses VALUES
+(1, 'গণিত', 1),
+(2, 'বিজ্ঞান', 2);
+
+-- কোয়েরি
+SELECT s.name, c.course_name
+FROM students s
+INNER JOIN courses c ON s.id = c.student_id
+WHERE s.city = 'ঢাকা';
+```

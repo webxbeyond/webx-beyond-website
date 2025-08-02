@@ -1,0 +1,25 @@
+---
+title: রোডম্যাপ
+description: এই পূর্ণ কোর্স জুড়ে আমরা এই টপিকগুলো শিখবো
+icon: solar:branching-paths-down-bold-duotone
+---
+export const nodes = [
+        { id: "1", type: "input", position: { x: 250, y: 0 }, data: { label: "DevOps Roadmap" }, draggable: false, connectable: false },
+        { id: "2", position: { x: 100, y: 100 }, data: { label: "Linux & OS Basics" }, draggable: false, connectable: false },
+        { id: "3", position: { x: 400, y: 100 }, data: { label: "Networking" }, draggable: false, connectable: false },
+        { id: "4", position: { x: 100, y: 200 }, data: { label: "Programming (Python, Shell Scripting)" }, draggable: false, connectable: false },
+        { id: "5", position: { x: 400, y: 200 }, data: { label: "Version Control (Git & GitHub)" }, draggable: false, connectable: false },
+        { id: "6", position: { x: 100, y: 300 }, data: { label: "CI/CD (Jenkins, GitHub Actions)" }, draggable: false, connectable: false },
+        { id: "7", position: { x: 400, y: 300 }, data: { label: "Containers (Docker, Kubernetes)" }, draggable: false, connectable: false },
+    ];
+
+export const edges = [
+        { id: "e1-2", source: "1", target: "2", animated: true },
+        { id: "e1-3", source: "1", target: "3", animated: true },
+        { id: "e2-4", source: "2", target: "4", animated: true },
+        { id: "e3-5", source: "3", target: "5", animated: true },
+        { id: "e4-6", source: "4", target: "6", animated: true },
+        { id: "e5-7", source: "5", target: "7", animated: true },
+    ];
+
+<Roadmaps nodes={nodes} edges={edges} />

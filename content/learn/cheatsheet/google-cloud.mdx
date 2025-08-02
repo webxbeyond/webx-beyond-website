@@ -1,0 +1,317 @@
+---
+title: গুগল ক্লাউড (GCP) চিটশিট
+description: গুগল ক্লাউড প্ল্যাটফর্ম (Google Cloud Platform, GCP) হলো একটি শীর্ষস্থানীয় ক্লাউড কম্পিউটিং প্ল্যাটফর্ম যা কম্পিউট, স্টোরেজ, নেটওয়ার্কিং, ডাটাবেস, সার্ভারলেস, এবং AI/ML সার্ভিস সহ বিস্তৃত সমাধান প্রদান করে। এই চিটশিটে GCP-এর সব মৌলিক থেকে উন্নত ধারণা, `gcloud` CLI কমান্ড, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: mdi:google-cloud
+---
+
+## ১. গুগল ক্লাউড পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **প্রজেক্ট**: GCP-এর সমস্ত রিসোর্সের কন্টেইনার।
+- **রিজিয়ন**: ভৌগলিক অবস্থান (যেমন, `us-central1`)।
+- **জোন**: রিজিয়নের মধ্যে আলাদা ডাটা সেন্টার (যেমন, `us-central1-a`)।
+- **IAM**: পরিচয় এবং অ্যাক্সেস ম্যানেজমেন্ট।
+- **gcloud**: GCP-এর CLI টুল।
+
+### ১.২ ইনস্টলেশন (gcloud SDK)
+- **Linux/macOS**:
+  ```bash
+  curl https://sdk.cloud.google.com | bash
+  exec -l $SHELL
+  gcloud init
+  ```
+- **Windows**: [ডাউনলোড](https://cloud.google.com/sdk/docs/install) করে ইনস্টল করুন।
+- **চেক করুন**:
+  ```bash
+  gcloud --version
+  ```
+
+### ১.৩ কনফিগারেশন
+```bash
+gcloud init
+```
+- প্রক্রিয়া:
+  1. ব্রাউজারে লগইন করুন।
+  2. প্রজেক্ট নির্বাচন করুন।
+  3. ডিফল্ট রিজিয়ন এবং জোন সেট করুন।
+
+---
+
+## ২. IAM (Identity and Access Management)
+
+### ২.১ ব্যবহারকারী এবং রোল
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud iam roles create` | কাস্টম রোল তৈরি।                      | `gcloud iam roles create myrole --project myproject --file role.yaml` |
+| `gcloud projects add-iam-policy-binding` | রোল সংযুক্তি।          | `gcloud projects add-iam-policy-binding myproject --member user:user@example.com --role roles/editor` |
+
+- **role.yaml**:
+```yaml
+title: "My Role"
+description: "Custom role"
+stage: "GA"
+includedPermissions:
+- storage.buckets.list
+```
+
+---
+
+### ২.২ সার্ভিস অ্যাকাউন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud iam service-accounts create` | সার্ভিস অ্যাকাউন্ট।           | `gcloud iam service-accounts create mysa --display-name "My SA"` |
+| `gcloud iam service-accounts keys create` | কী তৈরি।                | `gcloud iam service-accounts keys create key.json --iam-account mysa@myproject.iam.gserviceaccount.com` |
+
+---
+
+## ৩. Compute Engine (VMs)
+
+### ৩.১ ইন্সট্যান্স ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud compute instances create` | ইন্সট্যান্স তৈরি।               | `gcloud compute instances create myvm --machine-type e2-micro --zone us-central1-a` |
+| `gcloud compute instances list` | ইন্সট্যান্স তালিকা।                | `gcloud compute instances list` |
+| `gcloud compute instances start` | ইন্সট্যান্স চালু।                | `gcloud compute instances start myvm --zone us-central1-a` |
+| `gcloud compute instances stop` | ইন্সট্যান্স বন্ধ।                 | `gcloud compute instances stop myvm --zone us-central1-a` |
+| `gcloud compute instances delete` | ইন্সট্যান্স মুছে ফেলা।          | `gcloud compute instances delete myvm --zone us-central1-a` |
+
+**SSH সংযোগ**:
+```bash
+gcloud compute ssh myvm --zone us-central1-a
+```
+
+---
+
+### ৩.২ ফায়ারওয়াল রুল
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud compute firewall-rules create` | ফায়ারওয়াল রুল।           | `gcloud compute firewall-rules create allow-ssh --direction INGRESS --action ALLOW --rules tcp:22 --source-ranges 0.0.0.0/0` |
+
+---
+
+## ৪. Cloud Storage
+
+### ৪.১ বাকেট ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gsutil mb`          | বাকেট তৈরি।                                 | `gsutil mb gs://mybucket`      |
+| `gsutil ls`          | বাকেট তালিকা।                               | `gsutil ls`                    |
+| `gsutil rb`          | বাকেট মুছে ফেলা।                            | `gsutil rb gs://mybucket`      |
+
+---
+
+### ৪.২ ফাইল ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gsutil cp`          | ফাইল আপলোড/ডাউনলোড।                         | `gsutil cp file.txt gs://mybucket/` |
+| `gsutil sync`        | ফোল্ডার সিঙ্ক।                               | `gsutil sync . gs://mybucket/` |
+| `gsutil rm`          | ফাইল মুছে ফেলা।                             | `gsutil rm gs://mybucket/file.txt` |
+
+**পাবলিক অ্যাক্সেস**:
+```bash
+gsutil iam ch allUsers:objectViewer gs://mybucket
+```
+
+---
+
+## ৫. VPC (Virtual Private Cloud)
+
+### ৫.১ VPC তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud compute networks create` | VPC তৈরি।                        | `gcloud compute networks create myvpc --subnet-mode custom` |
+| `gcloud compute networks subnets create` | সাবনেট তৈরি।             | `gcloud compute networks subnets create mysubnet --network myvpc --range 10.0.0.0/24 --region us-central1` |
+
+---
+
+### ৫.২ NAT এবং ফায়ারওয়াল
+- **NAT গেটওয়ে**:
+  ```bash
+  gcloud compute routers create myrouter --network myvpc --region us-central1
+  gcloud compute routers nats create mynat --router myrouter --region us-central1 --auto-allocate-nat-external-ips --nat-all-subnet-ip-ranges
+  ```
+
+---
+
+## ৬. Cloud SQL
+
+### ৬.১ ডাটাবেস তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud sql instances create` | DB ইন্সট্যান্স তৈরি।              | `gcloud sql instances create mydb --database-version MYSQL_8_0 --tier db-f1-micro --region us-central1` |
+| `gcloud sql databases create` | ডাটাবেস তৈরি।                    | `gcloud sql databases create mydb --instance mydb` |
+
+**সংযোগ**:
+```bash
+gcloud sql connect mydb --user root
+```
+
+---
+
+## ৭. Cloud Functions (Serverless)
+
+### ৭.১ ফাংশন তৈরি
+- **কোড**: `index.js`
+```javascript
+exports.helloWorld = (req, res) => {
+  res.send("হ্যালো, GCP!");
+};
+```
+- **ডিপ্লয়**:
+  ```bash
+  gcloud functions deploy helloWorld --runtime nodejs18 --trigger-http --region us-central1 --allow-unauthenticated
+  ```
+
+---
+
+### ৭.২ ইনভোক
+```bash
+curl $(gcloud functions describe helloWorld --region us-central1 --format 'value(httpsTrigger.url)')
+```
+
+---
+
+## ৮. Kubernetes Engine (GKE)
+
+### ৮.১ ক্লাস্টার তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud container clusters create` | ক্লাস্টার তৈরি।                | `gcloud container clusters create mycluster --machine-type e2-medium --num-nodes 3 --region us-central1` |
+| `gcloud container clusters get-credentials` | ক্রেডেনশিয়াল।        | `gcloud container clusters get-credentials mycluster --region us-central1` |
+
+**kubectl**:
+```bash
+kubectl get nodes
+```
+
+---
+
+## ৯. Cloud Run
+
+### ৯.১ সার্ভিস ডিপ্লয়
+- **Dockerfile**:
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["node", "index.js"]
+```
+- **ডিপ্লয়**:
+  ```bash
+  gcloud run deploy myservice --source . --region us-central1 --platform managed --allow-unauthenticated
+  ```
+
+---
+
+## ১০. নেটওয়ার্কিং
+
+### ১০.১ Load Balancer
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud compute forwarding-rules create` | ফরওয়ার্ডিং রুল।         | `gcloud compute forwarding-rules create mylb --region us-central1 --ports 80 --target-http-proxy myproxy` |
+
+---
+
+### ১০.২ Cloud DNS
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud dns managed-zones create` | DNS জোন তৈরি।                | `gcloud dns managed-zones create myzone --dns-name example.com --description "My Zone"` |
+| `gcloud dns record-sets transaction start` | রেকর্ড যোগ।         | `gcloud dns record-sets transaction start --zone myzone` |
+
+**A রেকর্ড**:
+```bash
+gcloud dns record-sets transaction add 1.2.3.4 --name www.example.com. --ttl 300 --type A --zone myzone
+gcloud dns record-sets transaction execute --zone myzone
+```
+
+---
+
+## ১১. মনিটরিং এবং লগিং
+
+### ১১.১ Cloud Monitoring
+- **মেট্রিক্স**:
+  ```bash
+  gcloud monitoring dashboards create --config-from-file dashboard.yaml
+  ```
+
+---
+
+### ১১.২ Cloud Logging
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud logging read` | লগ পড়া।                                 | `gcloud logging read "resource.type=gce_instance"` |
+
+---
+
+## ১২. AI/ML সার্ভিস
+
+### ১২.১ Vertex AI
+- **মডেল ডিপ্লয়**:
+  ```bash
+  gcloud ai endpoints create --display-name myendpoint --region us-central1
+  ```
+
+---
+
+### ১২.২ BigQuery
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `bq mk`              | ডাটাসেট তৈরি।                               | `bq mk mydataset`              |
+| `bq query`           | SQL কোয়েরি।                                | `bq query "SELECT * FROM mydataset.mytable"` |
+
+---
+
+## ১৩. DevOps এবং CI/CD
+
+### ১৩.১ Cloud Build
+- **build.yaml**:
+```yaml
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/myapp', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/myapp']
+```
+- **বিল্ড**:
+  ```bash
+  gcloud builds submit --config build.yaml .
+  ```
+
+---
+
+### ১৩.২ Artifact Registry
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `gcloud artifacts repositories create` | রিপোজিটরি তৈরি।          | `gcloud artifacts repositories create myrepo --repository-format docker --location us-central1` |
+
+---
+
+## ১৪. উদাহরণ: একটি সম্পূর্ণ অ্যাপ্লিকেশন
+
+### ১৪.১ VM + Storage + Function
+- **VM**:
+  ```bash
+  gcloud compute instances create myvm --machine-type e2-micro --zone us-central1-a --metadata startup-script='#!/bin/bash
+  apt update && apt install -y nginx'
+  ```
+- **Storage**:
+  ```bash
+  gsutil mb gs://myappbucket
+  gsutil cp index.html gs://myappbucket/
+  ```
+- **Cloud Function**:
+  ```javascript
+  exports.hello = (req, res) => res.send("হ্যালো, GCP!");
+  ```
+  ```bash
+  gcloud functions deploy hello --runtime nodejs18 --trigger-http --region us-central1
+  ```
+
+---
+
+## ১৫. টিপস এবং সেরা অভ্যাস
+- **প্রজেক্ট**: প্রতিটি অ্যাপের জন্য আলাদা প্রজেক্ট তৈরি করুন।
+- **IAM**: Least Privilege নীতি অনুসরণ করুন।
+- **কস্ট**: Budget Alerts সেট করুন।
+- **লেবেল**: রিসোর্সে লেবেল যোগ করুন।

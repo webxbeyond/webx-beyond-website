@@ -1,0 +1,327 @@
+---
+title: টেন্সরফ্লো চিটশিট
+description: টেন্সরফ্লো (TensorFlow) হলো একটি ওপেন-সোর্স মেশিন লার্নিং ফ্রেমওয়ার্ক যা নিউরাল নেটওয়ার্ক এবং ডেটা-চালিত মডেল তৈরি ও প্রশিক্ষণের জন্য ব্যবহৃত হয়। এই চিটশিটে টেন্সরফ্লোর সব মৌলিক থেকে উন্নত ধারণা বিস্তারিতভাবে কভার করা হয়েছে।
+icon: cib:tensorflow
+---
+
+## ১. টেন্সরফ্লো শুরু করা
+
+### ১.১ পরিবেশ সেটআপ
+- **প্রয়োজনীয়তা**: Python 3.x।
+- **ইনস্টলেশন**:
+  ```bash
+  pip install tensorflow
+  ```
+- **GPU সমর্থন** (ঐচ্ছিক):
+  ```bash
+  pip install tensorflow-gpu
+  ```
+- **চেক করুন**:
+  ```python
+  import tensorflow as tf
+  print(tf.__version__)
+  ```
+
+---
+
+## ২. মৌলিক ধারণা
+
+### ২.১ টেন্সর (Tensors)
+- টেন্সর হলো টেন্সরফ্লোর প্রাথমিক ডেটা স্ট্রাকচার।
+```python
+import tensorflow as tf
+
+# কনস্ট্যান্ট টেন্সর
+a = tf.constant([[1, 2], [3, 4]])
+print(a)
+
+# ভেরিয়েবল টেন্সর
+b = tf.Variable([1.0, 2.0])
+print(b)
+```
+
+- **টেন্সর অপারেশন**:
+```python
+c = tf.add(a, a)  # যোগ
+d = tf.matmul(a, a)  # ম্যাট্রিক্স গুণ
+print(c, d)
+```
+
+---
+
+### ২.২ ডেটা টাইপ এবং শেপ
+| ফাংশন         | বর্ণনা                                      | উদাহরণ                          |
+|---------------|---------------------------------------------|---------------------------------|
+| `tf.constant` | ধ্রুব টেন্সর।                               | `tf.constant(5)`               |
+| `tf.Variable` | পরিবর্তনযোগ্য টেন্সর।                       | `tf.Variable([1, 2])`          |
+| `.shape`      | টেন্সরের আকার।                              | `a.shape`                      |
+| `.dtype`      | ডেটা টাইপ।                                 | `a.dtype`                      |
+
+---
+
+## ৩. মডেল তৈরি
+
+### ৩.১ Sequential API
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.summary()
+```
+
+---
+
+### ৩.২ Functional API
+```python
+inputs = tf.keras.Input(shape=(10,))
+x = tf.keras.layers.Dense(64, activation='relu')(inputs)
+x = tf.keras.layers.Dense(32, activation='relu')(x)
+outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+
+model = tf.keras.Model(inputs=inputs, outputs=outputs)
+model.summary()
+```
+
+---
+
+### ৩.৩ লেয়ার (Layers)
+| লেয়ার         | বর্ণনা                                      | উদাহরণ                          |
+|---------------|---------------------------------------------|---------------------------------|
+| `Dense`       | ফুলি কানেক্টেড লেয়ার।                      | `Dense(64, activation='relu')` |
+| `Conv2D`      | 2D কনভলিউশন।                               | `Conv2D(32, (3, 3))`           |
+| `MaxPooling2D`| পুলিং।                                     | `MaxPooling2D((2, 2))`         |
+| `LSTM`        | রিকারেন্ট নিউরাল নেটওয়ার্ক।                 | `LSTM(50)`                     |
+| `Dropout`     | ওভারফিটিং কমানো।                            | `Dropout(0.2)`                 |
+
+---
+
+## ৪. ডেটা প্রিপ্রসেসিং
+### ৪.১ ডেটাসেট লোড
+```python
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+# নরমালাইজেশন
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+```
+
+---
+
+### ৪.২ ডেটা পাইপলাইন
+```python
+dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+dataset = dataset.shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
+```
+
+---
+
+## ৫. মডেল প্রশিক্ষণ
+
+### ৫.১ কম্পাইল
+```python
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+```
+
+- **অপটিমাইজার**: `adam`, `sgd`, `rmsprop`।
+- **লস ফাংশন**: `binary_crossentropy`, `categorical_crossentropy`, `mse`।
+
+---
+
+### ৫.২ ট্রেনিং
+```python
+history = model.fit(
+    x_train, y_train,
+    epochs=10,
+    batch_size=32,
+    validation_data=(x_test, y_test)
+)
+```
+
+---
+
+### ৫.৩ ইভালুয়েশন
+```python
+loss, accuracy = model.evaluate(x_test, y_test)
+print(f"টেস্ট নির্ভুলতা: {accuracy}")
+```
+
+---
+
+## ৬. উন্নত মডেল
+
+### ৬.১ কাস্টম লেয়ার
+```python
+class MyLayer(tf.keras.layers.Layer):
+    def __init__(self, units):
+        super(MyLayer, self).__init__()
+        self.units = units
+
+    def build(self, input_shape):
+        self.kernel = self.add_weight("kernel", shape=[input_shape[-1], self.units])
+
+    def call(self, inputs):
+        return tf.matmul(inputs, self.kernel)
+
+model = tf.keras.Sequential([MyLayer(64)])
+```
+
+---
+
+### ৬.২ কাস্টম ট্রেনিং লুপ
+```python
+optimizer = tf.keras.optimizers.Adam()
+loss_fn = tf.keras.losses.SparseCategoricalCrossentropy()
+
+@tf.function
+def train_step(x, y):
+    with tf.GradientTape() as tape:
+        predictions = model(x, training=True)
+        loss = loss_fn(y, predictions)
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss
+
+for epoch in range(5):
+    for x_batch, y_batch in dataset:
+        loss = train_step(x_batch, y_batch)
+    print(f"ইপক {epoch}: লস = {loss}")
+```
+
+---
+
+## ৭. টেন্সরফ্লো ফাংশন
+| ফাংশন         | বর্ণনা                                      | উদাহরণ                          |
+|---------------|---------------------------------------------|---------------------------------|
+| `tf.reduce_sum` | টেন্সরের যোগফল।                          | `tf.reduce_sum(a)`             |
+| `tf.argmax`   | সর্বোচ্চ মানের ইনডেক্স।                     | `tf.argmax(a, axis=1)`         |
+| `tf.reshape`  | টেন্সরের আকার পরিবর্তন।                     | `tf.reshape(a, [-1, 4])`       |
+| `tf.one_hot`  | ওয়ান-হট এনকোডিং।                           | `tf.one_hot(labels, depth=10)` |
+
+---
+
+## ৮. মডেল সেভ এবং লোড
+```python
+# সেভ
+model.save('my_model')
+
+# লোড
+loaded_model = tf.keras.models.load_model('my_model')
+
+# প্রেডিকশন
+predictions = loaded_model.predict(x_test)
+```
+
+---
+
+## ৯. টেন্সরবোর্ড (TensorBoard)
+```python
+from tensorflow.keras.callbacks import TensorBoard
+
+tensorboard = TensorBoard(log_dir='logs')
+model.fit(x_train, y_train, epochs=10, callbacks=[tensorboard])
+
+# TensorBoard চালানো
+# tensorboard --logdir logs
+```
+
+---
+
+## ১০. ডিপ লার্নিং উদাহরণ
+
+### ১০.১ CNN (Convolutional Neural Network)
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.fit(x_train.reshape(-1, 28, 28, 1), y_train, epochs=5)
+```
+
+---
+
+### ১০.২ RNN (Recurrent Neural Network)
+```python
+model = tf.keras.Sequential([
+    tf.keras.layers.LSTM(50, input_shape=(10, 1), return_sequences=True),
+    tf.keras.layers.LSTM(50),
+    tf.keras.layers.Dense(1)
+])
+
+model.compile(optimizer='adam', loss='mse')
+```
+
+---
+
+## ১১. টেন্সরফ্লো ডেটা (TF.Data)
+```python
+import numpy as np
+
+data = np.random.random((100, 10))
+labels = np.random.randint(0, 2, (100,))
+
+dataset = tf.data.Dataset.from_tensor_slices((data, labels))
+dataset = dataset.batch(32).shuffle(100).repeat()
+
+model.fit(dataset, epochs=10, steps_per_epoch=3)
+```
+
+---
+
+## ১২. টেন্সরফ্লো লাইট (TensorFlow Lite)
+```python
+# মডেল কনভার্ট
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+# ফাইলে সেভ
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+```
+
+---
+
+## ১৩. উদাহরণ: একটি সম্পূর্ণ মডেল
+```python
+import tensorflow as tf
+from tensorflow.keras import layers
+
+# ডেটা লোড
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+# মডেল তৈরি
+model = tf.keras.Sequential([
+    layers.Flatten(input_shape=(28, 28)),
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(0.2),
+    layers.Dense(10, activation='softmax')
+])
+
+# কম্পাইল
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# ট্রেনিং
+model.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
+
+# ইভালুয়েশন
+loss, acc = model.evaluate(x_test, y_test)
+print(f"টেস্ট নির্ভুলতা: {acc}")
+
+# প্রেডিকশন
+predictions = model.predict(x_test[:5])
+print("প্রথম ৫টি প্রেডিকশন:", tf.argmax(predictions, axis=1))
+```

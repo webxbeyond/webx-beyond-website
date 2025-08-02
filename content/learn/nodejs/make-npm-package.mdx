@@ -1,0 +1,122 @@
+---
+title: নিজেই তৈরি করুন NPM প্যাকেজ
+description: _
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+এনপিএম প্যাকেজ হলো জাভাস্ক্রিপ্ট কোডের রিইউজঅ্যাবল কালেকশান। যা সহজেই অন্যদের সঙ্গে শেয়ার করা যায় এবং প্যাকেজ ম্যানেজার যেমন NPM, Yarn কিংবা PNPM এর মাধ্যমে ইন্সটল করা যায়। প্যাকেজের কোনো Predefine structure নাই, যে আপনার প্যাকেজ এই কাজের জন্য ব্যাবহার হতে হবে। এটা সিম্পল একটা ফাংশন থেকে শুরু করে, লাইব্রেরি কিংবা ফুল ফিচারড ফ্রেমওয়ার্কও হতে পারে। মোটকথা জাভাস্কিপ্ট দিয়ে যা কিছু করা যায় সেটাই প্যাকেজ হতে পারে।
+
+আমরা যারা জাভা স্ক্রিপ্ট নিয়ে কাজ করি তারা প্রায়ই বিভিন্ন প্যাকেজ নিয়েই কাজ করি। কারণ একটা ফুল ফিচারড এপ্লিকেশন তৈরি করার জন্য যা কিছু প্রয়োজন হয় সবকিছুই একেবারে স্টার টু ফিনিশ একজন ডেভেলপারের পক্ষে কোডিং করা অলমস্ট ইমপোসিবল।
+
+কথা হলো এই প্যাকেজগুলো কিন্তু আপনার আমার মত মানুষেরাই লিখছেন এবং সেটাকে পাবলিকলি অ্যাভেলেবেল করে দিয়েছেন যার কারণে আমরা এটাকে নিজেদের প্রজেক্টে ইচ্ছামত ব্যবহার করতে পারছি। এবং আমরা চাইলে এটাকে মডিফাইও করতে পারি। 
+
+তো আজকের ভিডিওতে আমরা দেখব কিভাবে আমরা নিজেরাই প্যাকেজ তৈরি করতে পারি এবং সেটাকে npmjs.com -এ পাবলিশ করতে পারি। চলুন তাহলে শুরু করা যাক।
+
+## Github রিপোজিটরি লিঙ্ক
+
+https://anis.cc/bsoyjf
+
+
+## ভিডিয়ো টিউটোরিয়াল
+
+<YouTube videoId="ktNfo02-kbs"/>
+
+
+## tsconfig.json -এর কনফিগারেশন
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+        "strict": true,
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "strictNullChecks": true,
+        "target": "ES2024",
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "declaration": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "outDir": "dist",
+        "resolveJsonModule": true,
+    
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}
+```
+
+## tsup.config.ts -এর কনফিগারেশন
+
+```ts title="tsup.config.ts"
+
+import {defineConfig} from 'tsup'
+
+// ----------------------------------
+
+export default defineConfig({
+    format: ['cjs', 'esm'],
+    entryPoints: ['src/index.ts'],
+    dts: true,
+    shims: true,
+    skipNodeModulesBundle: true,
+    clean: true,
+    minify: "terser",
+    terserOptions: {
+        mangle: {
+            toplevel: true
+        },
+        compress:{
+            drop_console: true,
+            drop_debugger: true,
+            passes: 2,
+        },
+        output: {
+            beautify: false,
+            comments: false
+        }
+    }
+})
+
+```
+
+### Github -এ অটোমেটিক পাবলিশ করা
+
+```yml title=".github/workflows/publish.yml"
+name: Publish to npm repogitory
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Authenticate with npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN}}" > ~/.npmrc
+
+      - name: Publish package
+        run: npm publish --access public
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```

@@ -1,0 +1,402 @@
+---
+title: এডব্লিউএস (AWS) চিটশিট
+description: এডব্লিউএস (Amazon Web Services) হলো একটি শীর্ষস্থানীয় ক্লাউড কম্পিউটিং প্ল্যাটফর্ম যা কম্পিউট, স্টোরেজ, নেটওয়ার্কিং, ডাটাবেস, এবং সার্ভারলেস সলিউশন সহ বিস্তৃত সার্ভিস প্রদান করে। এই চিটশিটে AWS-এর সব মৌলিক থেকে উন্নত ধারণা, CLI কমান্ড, এবং ব্যবহারিক উদাহরণ বিস্তারিতভাবে কভার করা হয়েছে।
+icon: tabler:brand-vercel
+---
+
+## ১. এডব্লিউএস পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **রিজিয়ন**: ভৌগলিক অবস্থান (যেমন, `us-east-1`)।
+- **অ্যাভেলেবিলিটি জোন (AZ)**: রিজিয়নের মধ্যে আলাদা ডাটা সেন্টার।
+- **IAM**: পরিচয় এবং অ্যাক্সেস ম্যানেজমেন্ট।
+- **CLI**: AWS কমান্ড-লাইন ইন্টারফেস।
+- **পে-অ্যাজ-ইউ-গো**: ব্যবহারের ভিত্তিতে খরচ।
+
+### ১.২ ইনস্টলেশন (AWS CLI)
+- **ইনস্টল**:
+  ```bash
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+  ```
+- **চেক করুন**:
+  ```bash
+  aws --version
+  ```
+
+### ১.৩ কনফিগারেশন
+```bash
+aws configure
+```
+- প্রশ্নের উত্তর দিন:
+  - Access Key ID
+  - Secret Access Key
+  - Default region (যেমন, `us-east-1`)
+  - Output format (যেমন, `json`)
+
+---
+
+## ২. IAM (Identity and Access Management)
+
+### ২.১ ব্যবহারকারী এবং গ্রুপ
+| কমান্ড/কাজ           | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| Create User          | নতুন ব্যবহারকারী।                           | `aws iam create-user --user-name myuser` |
+| Create Group         | গ্রুপ তৈরি।                                 | `aws iam create-group --group-name mygroup` |
+| Add User to Group    | গ্রুপে ব্যবহারকারী যোগ।                     | `aws iam add-user-to-group --user-name myuser --group-name mygroup` |
+
+---
+
+### ২.২ পলিসি
+- **JSON পলিসি উদাহরণ**:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::mybucket"
+    }
+  ]
+}
+```
+- **পলিসি সংযুক্তি**:
+  ```bash
+  aws iam attach-user-policy --user-name myuser --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+  ```
+
+---
+
+## ৩. EC2 (Elastic Compute Cloud)
+
+### ৩.১ ইন্সট্যান্স তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws ec2 run-instances` | নতুন ইন্সট্যান্স।                        | `aws ec2 run-instances --image-id ami-123 --instance-type t2.micro --key-name mykey` |
+| `aws ec2 describe-instances` | ইন্সট্যান্স তালিকা।                   | `aws ec2 describe-instances`   |
+| `aws ec2 start-instances` | ইন্সট্যান্স চালু।                       | `aws ec2 start-instances --instance-ids i-123` |
+| `aws ec2 stop-instances` | ইন্সট্যান্স বন্ধ।                        | `aws ec2 stop-instances --instance-ids i-123` |
+
+**SSH দিয়ে সংযোগ**:
+```bash
+ssh -i mykey.pem ec2-user@<public-ip>
+```
+
+---
+
+### ৩.২ সিকিউরিটি গ্রুপ
+- **তৈরি**:
+  ```bash
+  aws ec2 create-security-group --group-name my-sg --description "My SG"
+  ```
+- **রুল যোগ**:
+  ```bash
+  aws ec2 authorize-security-group-ingress --group-id sg-123 --protocol tcp --port 22 --cidr 0.0.0.0/0
+  ```
+
+---
+
+## ৪. S3 (Simple Storage Service)
+
+### ৪.১ বাকেট ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws s3 mb`          | বাকেট তৈরি।                                 | `aws s3 mb s3://mybucket`      |
+| `aws s3 ls`          | বাকেট তালিকা।                               | `aws s3 ls`                    |
+| `aws s3 rb`          | বাকেট মুছে ফেলা।                            | `aws s3 rb s3://mybucket`      |
+
+---
+
+### ৪.২ ফাইল ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws s3 cp`          | ফাইল আপলোড/ডাউনলোড।                         | `aws s3 cp file.txt s3://mybucket/` |
+| `aws s3 sync`        | ফোল্ডার সিঙ্ক।                               | `aws s3 sync . s3://mybucket/` |
+| `aws s3 rm`          | ফাইল মুছে ফেলা।                             | `aws s3 rm s3://mybucket/file.txt` |
+
+**পাবলিক অ্যাক্সেস**:
+```bash
+aws s3api put-object-acl --bucket mybucket --key file.txt --acl public-read
+```
+
+---
+
+## ৫. VPC (Virtual Private Cloud)
+
+### ৫.১ VPC তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws ec2 create-vpc` | VPC তৈরি।                                   | `aws ec2 create-vpc --cidr-block 10.0.0.0/16` |
+| `aws ec2 create-subnet` | সাবনেট তৈরি।                             | `aws ec2 create-subnet --vpc-id vpc-123 --cidr-block 10.0.1.0/24` |
+
+---
+
+### ৫.২ ইন্টারনেট গেটওয়ে
+- **তৈরি**:
+  ```bash
+  aws ec2 create-internet-gateway
+  ```
+- **VPC-তে সংযুক্তি**:
+  ```bash
+  aws ec2 attach-internet-gateway --internet-gateway-id igw-123 --vpc-id vpc-123
+  ```
+
+---
+
+## ৬. RDS (Relational Database Service)
+
+### ৬.১ ডাটাবেস তৈরি
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws rds create-db-instance` | DB তৈরি।                            | `aws rds create-db-instance --db-instance-identifier mydb --db-instance-class db.t2.micro --engine mysql --master-username admin --master-user-password mypass` |
+| `aws rds describe-db-instances` | DB তালিকা।                        | `aws rds describe-db-instances` |
+
+---
+
+### ৬.২ সংযোগ
+- **MySQL ক্লায়েন্ট**:
+  ```bash
+  mysql -h mydb.xxx.us-east-1.rds.amazonaws.com -u admin -p
+  ```
+
+---
+
+## ৭. Lambda (Serverless Compute)
+
+### ৭.১ ফাংশন তৈরি
+- **কোড**: `index.js`
+```javascript
+exports.handler = async (event) => {
+  return { statusCode: 200, body: "হ্যালো, AWS!" };
+};
+```
+- **CLI দিয়ে**:
+  ```bash
+  zip function.zip index.js
+  aws lambda create-function --function-name myFunction --runtime nodejs18.x --role arn:aws:iam::123:role/lambda-role --handler index.handler --zip-file fileb://function.zip
+  ```
+
+---
+
+### ৭.২ ইনভোক
+```bash
+aws lambda invoke --function-name myFunction output.json
+```
+
+---
+
+## ৮. CloudFormation
+
+### ৮.১ টেমপ্লেট
+- **উদাহরণ**: `template.yaml`
+```yaml
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: mybucket
+```
+- **ডিপ্লয়**:
+  ```bash
+  aws cloudformation create-stack --stack-name mystack --template-body file://template.yaml
+  ```
+
+---
+
+### ৮.২ স্ট্যাক ম্যানেজমেন্ট
+| কমান্ড                | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `aws cloudformation describe-stacks` | স্ট্যাক তালিকা।                   | `aws cloudformation describe-stacks` |
+| `aws cloudformation delete-stack` | স্ট্যাক মুছে ফেলা।                   | `aws cloudformation delete-stack --stack-name mystack` |
+
+---
+
+## ৯. ECS/EKS (Container Services)
+
+### ৯.১ ECS (Elastic Container Service)
+- **ক্লাস্টার তৈরি**:
+  ```bash
+  aws ecs create-cluster --cluster-name mycluster
+  ```
+- **টাস্ক ডেফিনিশন**:
+```json
+{
+  "family": "myapp",
+  "containerDefinitions": [
+    {
+      "name": "myapp",
+      "image": "nginx",
+      "portMappings": [{ "containerPort": 80 }]
+    }
+  ]
+}
+```
+  ```bash
+  aws ecs register-task-definition --cli-input-json file://task.json
+  ```
+
+---
+
+### ৯.২ EKS (Elastic Kubernetes Service)
+- **ক্লাস্টার তৈরি**:
+  ```bash
+  aws eks create-cluster --name myeks --role-arn arn:aws:iam::123:role/eks-role --resources-vpc-config subnetIds=subnet-123,subnet-456
+  ```
+- **kubectl কনফিগ**:
+  ```bash
+  aws eks update-kubeconfig --name myeks
+  ```
+
+---
+
+## ১০. নেটওয়ার্কিং
+
+### ১০.১ ELB (Elastic Load Balancer)
+- **তৈরি**:
+  ```bash
+  aws elbv2 create-load-balancer --name mylb --subnets subnet-123 subnet-456 --security-groups sg-123
+  ```
+
+---
+
+### ১০.২ Route 53 (DNS)
+- **হোস্টেড জোন**:
+  ```bash
+  aws route53 create-hosted-zone --name example.com --caller-reference $(date +%s)
+  ```
+- **A রেকর্ড**:
+```json
+{
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "www.example.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [{ "Value": "1.2.3.4" }]
+      }
+    }
+  ]
+}
+```
+  ```bash
+  aws route53 change-resource-record-sets --hosted-zone-id Z123 --change-batch file://record.json
+  ```
+
+---
+
+## ১১. মনিটরিং এবং লগিং
+
+### ১১.১ CloudWatch
+- **লগ গ্রুপ**:
+  ```bash
+  aws logs create-log-group --log-group-name mylogs
+  ```
+- **মেট্রিক্স**:
+  ```bash
+  aws cloudwatch put-metric-data --metric-name MyMetric --namespace MyApp --value 42
+  ```
+
+---
+
+### ১১.২ CloudTrail
+- **ট্রেইল তৈরি**:
+  ```bash
+  aws cloudtrail create-trail --name mytrail --s3-bucket-name mybucket
+  ```
+
+---
+
+## ১২. সার্ভারলেস আর্কিটেকচার
+
+### ১২.১ API Gateway
+- **API তৈরি**:
+  ```bash
+  aws apigateway create-rest-api --name myapi
+  ```
+
+---
+
+### ১২.২ DynamoDB
+- **টেবিল তৈরি**:
+  ```bash
+  aws dynamodb create-table --table-name mytable --attribute-definitions AttributeName=ID,AttributeType=S --key-schema AttributeName=ID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+  ```
+
+---
+
+## ১৩. DevOps এবং CI/CD
+
+### ১৩.১ CodePipeline
+- **পাইপলাইন তৈরি**:
+```json
+{
+  "pipeline": {
+    "name": "mypipeline",
+    "roleArn": "arn:aws:iam::123:role/pipeline-role",
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "Source",
+            "actionTypeId": { "category": "Source", "owner": "AWS", "provider": "S3", "version": "1" },
+            "configuration": { "S3Bucket": "mybucket", "S3ObjectKey": "source.zip" }
+          }
+        ]
+      },
+      {
+        "name": "Deploy",
+        "actions": [
+          {
+            "name": "Deploy",
+            "actionTypeId": { "category": "Deploy", "owner": "AWS", "provider": "ECS", "version": "1" }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+  ```bash
+  aws codepipeline create-pipeline --cli-input-json file://pipeline.json
+  ```
+
+---
+
+### ১৩.২ CodeBuild
+- **বিল্ড প্রজেক্ট**:
+  ```bash
+  aws codebuild create-project --name mybuild --source "{\"type\":\"S3\",\"location\":\"mybucket/buildspec.yml\"}" --artifacts "{\"type\":\"S3\",\"location\":\"mybucket\"}" --environment "{\"type\":\"LINUX_CONTAINER\",\"image\":\"aws/codebuild/standard:5.0\"}"
+  ```
+
+---
+
+## ১৪. উদাহরণ: একটি সম্পূর্ণ অ্যাপ্লিকেশন
+
+### ১৪.১ EC2 + S3 + Lambda
+- **EC2**: ওয়েব সার্ভার।
+  ```bash
+  aws ec2 run-instances --image-id ami-123 --instance-type t2.micro --key-name mykey --security-group-ids sg-123 --subnet-id subnet-123
+  ```
+- **S3**: স্ট্যাটিক ফাইল।
+  ```bash
+  aws s3 mb s3://myappbucket
+  aws s3 cp index.html s3://myappbucket/
+  ```
+- **Lambda**: API।
+  ```bash
+  zip function.zip index.js
+  aws lambda create-function --function-name myApi --runtime nodejs18.x --role arn:aws:iam::123:role/lambda-role --handler index.handler --zip-file fileb://function.zip
+  ```
+
+---
+
+## ১৫. টিপস এবং সেরা অভ্যাস
+- **IAM**: কম অনুমতি (Least Privilege) নীতি অনুসরণ করুন।
+- **ট্যাগিং**: সব রিসোর্সে ট্যাগ যোগ করুন।
+- **কস্ট মনিটরিং**: AWS Budgets ব্যবহার করুন।
+- **ব্যাকআপ**: S3 এবং EBS স্ন্যাপশট নিয়মিত নিন।

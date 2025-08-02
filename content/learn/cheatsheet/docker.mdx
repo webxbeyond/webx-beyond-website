@@ -1,0 +1,272 @@
+---
+title: ডকার (Docker) চিটশিট
+description: ডকার (Docker) হলো একটি ওপেন-সোর্স প্ল্যাটফর্ম যা অ্যাপ্লিকেশনকে কনটেইনারে প্যাকেজ করে এবং সেগুলোকে সহজে ডিপ্লয়, রান এবং ম্যানেজ করতে ব্যবহৃত হয়। এই চিটশিটে ডকারের সব গুরুত্বপূর্ণ কমান্ড এবং ধারণা বিস্তারিতভাবে কভার করা হয়েছে।
+icon: teenyicons:docker-outline
+---
+
+
+## ১. ডকার পরিচিতি
+
+### ১.১ মৌলিক ধারণা
+- **কনটেইনার**: একটি হালকা, স্বতন্ত্র রানটাইম পরিবেশ।
+- **ইমেজ**: কনটেইনারের জন্য ব্লুপ্রিন্ট।
+- **ডকারফাইল**: ইমেজ তৈরির নির্দেশনা।
+- **ডকার হাব**: ইমেজ রিপোজিটরি।
+
+### ১.২ ইনস্টলেশন
+- **Linux**: `sudo apt install docker.io`
+- **Mac/Windows**: [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- **চেক করুন**: `docker --version`
+
+---
+
+## ২. মৌলিক ডকার কমান্ড
+
+### ২.১ ইমেজ ম্যানেজমেন্ট
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker pull`        | ডকার হাব থেকে ইমেজ ডাউনলোড।                | `docker pull ubuntu:20.04`     |
+| `docker images`      | স্থানীয় ইমেজের তালিকা।                     | `docker images`                |
+| `docker rmi`         | ইমেজ মুছে ফেলা।                            | `docker rmi ubuntu:20.04`      |
+| `docker build`       | ডকারফাইল থেকে ইমেজ তৈরি।                   | `docker build -t myapp .`      |
+
+**উদাহরণ:**
+```bash
+docker pull nginx:latest
+docker images
+```
+
+---
+
+### ২.২ কনটেইনার ম্যানেজমেন্ট
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker run`         | কনটেইনার চালু।                              | `docker run -d nginx`          |
+| `docker ps`          | চলমান কনটেইনারের তালিকা।                   | `docker ps`                    |
+| `docker ps -a`       | সব কনটেইনারের তালিকা।                      | `docker ps -a`                 |
+| `docker stop`        | কনটেইনার বন্ধ।                              | `docker stop mycontainer`      |
+| `docker start`       | কনটেইনার শুরু।                              | `docker start mycontainer`     |
+| `docker restart`     | কনটেইনার রিস্টার্ট।                         | `docker restart mycontainer`   |
+| `docker rm`          | কনটেইনার মুছে ফেলা।                         | `docker rm mycontainer`        |
+| `docker exec`        | কনটেইনারে কমান্ড চালানো।                    | `docker exec -it mycontainer bash` |
+
+**উদাহরণ:**
+```bash
+docker run -d --name mynginx nginx
+docker ps
+docker stop mynginx
+```
+
+---
+
+### ২.৩ ডকারফাইল
+**উদাহরণ:**
+```dockerfile
+# Dockerfile
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y python3
+COPY . /app
+WORKDIR /app
+CMD ["python3", "app.py"]
+```
+
+- **কমান্ড**: 
+  - `FROM`: বেস ইমেজ।
+  - `RUN`: কমান্ড চালানো।
+  - `COPY`: ফাইল কপি।
+  - `WORKDIR`: কার্যকরী ডিরেক্টরি।
+  - `CMD`: ডিফল্ট কমান্ড।
+
+**বিল্ড ও রান:**
+```bash
+docker build -t mypythonapp .
+docker run mypythonapp
+```
+
+---
+
+## ৩. কনটেইনার কনফিগারেশন
+
+### ৩.১ পোর্ট ম্যাপিং
+```bash
+docker run -d -p 8080:80 nginx
+```
+- `-p host_port:container_port`: হোস্ট এবং কনটেইনার পোর্ট ম্যাপ।
+
+---
+
+### ৩.২ ভলিউম মাউন্ট
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `-v`                 | হোস্ট থেকে কনটেইনারে ডেটা মাউন্ট।          | `docker run -v /data:/app/data myapp` |
+| `docker volume create` | নামযুক্ত ভলিউম তৈরি।                      | `docker volume create mydata`  |
+
+**উদাহরণ:**
+```bash
+docker run -d -v mydata:/var/www/html nginx
+```
+
+---
+
+### ৩.৩ এনভায়রনমেন্ট ভেরিয়েবল
+```bash
+docker run -e MY_VAR="hello" myapp
+```
+- **ডকারফাইলে**:
+```dockerfile
+ENV MY_VAR="hello"
+```
+
+---
+
+## ৪. নেটওয়ার্কিং
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker network ls`  | নেটওয়ার্ক তালিকা।                          | `docker network ls`            |
+| `docker network create` | নতুন নেটওয়ার্ক তৈরি।                     | `docker network create mynet`  |
+| `docker network connect` | কনটেইনারকে নেটওয়ার্কে যোগ।              | `docker network connect mynet mycontainer` |
+
+**উদাহরণ:**
+```bash
+docker network create mynetwork
+docker run --network mynetwork --name app1 myapp
+```
+
+---
+
+## ৫. ডকার কম্পোজ
+- **ইনস্টলেশন**: `sudo apt install docker-compose`
+- **docker-compose.yml**:
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+```
+
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker-compose up`  | সার্ভিস চালু।                               | `docker-compose up -d`         |
+| `docker-compose down`| সার্ভিস বন্ধ।                               | `docker-compose down`          |
+| `docker-compose ps`  | চলমান সার্ভিস তালিকা।                      | `docker-compose ps`            |
+
+**উদাহরণ:**
+```bash
+docker-compose up -d
+```
+
+---
+
+## ৬. ডকার ইনফরমেশন এবং ডিবাগিং
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker info`        | ডকার সিস্টেম তথ্য।                          | `docker info`                  |
+| `docker logs`        | কনটেইনার লগ।                               | `docker logs mycontainer`      |
+| `docker inspect`     | বিস্তারিত তথ্য।                             | `docker inspect mycontainer`   |
+| `docker stats`       | রিসোর্স ব্যবহার।                            | `docker stats`                 |
+
+**উদাহরণ:**
+```bash
+docker logs mynginx
+```
+
+---
+
+## ৭. ইমেজ এবং রিপোজিটরি
+### ৭.১ ডকার হাবে পুশ
+```bash
+docker tag myapp myusername/myapp:1.0
+docker login
+docker push myusername/myapp:1.0
+```
+
+---
+
+### ৭.২ ইমেজ সেভ/লোড
+```bash
+docker save -o myapp.tar myapp
+docker load -i myapp.tar
+```
+
+---
+
+## ৮. উন্নত কমান্ড
+| কমান্ড               | বর্ণনা                                      | উদাহরণ                          |
+|----------------------|---------------------------------------------|---------------------------------|
+| `docker system prune`| অব্যবহৃত ডেটা পরিষ্কার।                    | `docker system prune -a`       |
+| `docker cp`          | হোস্ট ও কনটেইনারে ফাইল কপি।                 | `docker cp myfile mycontainer:/app` |
+| `docker commit`      | কনটেইনার থেকে ইমেজ তৈরি।                   | `docker commit mycontainer mynewimage` |
+
+**উদাহরণ:**
+```bash
+docker system prune
+```
+
+---
+
+## ৯. ডকার সিকিউরিটি
+- **ইউজার নেমস্পেস**: `docker run --userns=host`
+- **রুটলেস মোড**: ডকার ডেমন রুট ছাড়া চালানো।
+- **রিসোর্স লিমিট**:
+```bash
+docker run --memory="512m" --cpus="1" myapp
+```
+
+---
+
+## ১০. উদাহরণ: একটি সম্পূর্ণ অ্যাপ
+### ডকারফাইল
+```dockerfile
+FROM node:16
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### docker-compose.yml
+```yaml
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+```
+
+### চালানো
+```bash
+docker-compose up -d
+docker ps
+```
+
+---
+
+## ১১. টিপস এবং ট্রিকস
+- **ইন্টারেক্টিভ শেল**: `docker run -it ubuntu bash`
+- **ব্যাকগ্রাউন্ডে চালানো**: `-d` ফ্ল্যাগ।
+- **কনটেইনার নামকরণ**: `--name mycontainer`।
+- **রিস্টার্ট পলিসি**: `--restart always`।
