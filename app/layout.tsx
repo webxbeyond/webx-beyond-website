@@ -1,5 +1,4 @@
 import './global.css';
-
 import { Tiro_Bangla } from 'next/font/google';
 import type { ReactNode } from 'react';
 import {Viewport} from "next";
@@ -10,7 +9,7 @@ import OfflineProvider from "@/components/offline-provider";
 
 const tiroBangla = Tiro_Bangla({
     subsets: ["bengali", "latin", "latin-ext"],
-    weight: ["300", "400" , "500" , "600" , "700" ]
+    weight: ["400"]
 });
 
 export const metadata = createMetadata({
