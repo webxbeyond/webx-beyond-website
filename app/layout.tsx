@@ -1,4 +1,5 @@
 import './global.css';
+
 import { Tiro_Bangla } from 'next/font/google';
 import type { ReactNode } from 'react';
 import {Viewport} from "next";
