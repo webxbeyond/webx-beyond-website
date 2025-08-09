@@ -52,14 +52,14 @@ function Highlight({
   href?: string;
 }) {
   const content = (
-    <div className="rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-6 transition-colors hover:bg-fd-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-primary/40">
+    <div className="h-full flex flex-col rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-6 transition-colors hover:bg-fd-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-primary/40">
       <div className="mb-3 flex items-center gap-2">
         <span className="inline-flex size-8 items-center justify-center rounded-full border bg-fd-background/60">
           <Iconify icon={icon} width={18} />
         </span>
         <h2 className="text-base font-semibold leading-tight">{heading}</h2>
       </div>
-      <p className="text-sm text-fd-muted-foreground leading-relaxed">{children}</p>
+      <p className="text-sm text-fd-muted-foreground leading-relaxed mt-auto">{children}</p>
     </div>
   );
   return href ? (
@@ -240,7 +240,7 @@ function FreeCTA() {
     <section className="relative overflow-hidden px-8 py-16 sm:py-20 rounded-3xl border border-fd-foreground/10 bg-fd-muted/20">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom,var(--color-fd-secondary)/25,transparent_70%)]" />
       <h2 className="relative bg-gradient-to-b from-fd-primary to-fd-foreground/60 bg-clip-text text-center text-2xl font-semibold text-transparent sm:text-3xl mb-4">
-        একেবারেই ফ্রি & ওপেন
+        একেবারেই ফ্রি ও ওপেন
       </h2>
       <p className="relative mx-auto mb-8 max-w-2xl text-center text-fd-muted-foreground text-sm md:text-base">
         এখনই একটি টপিক বেছে নিয়ে শুরু করুন—কোনো সাইনআপ বা পেমেন্ট ছাড়াই। ভবিষ্যতে আরও প্র্যাকটিস, কমিউনিটি ও প্রজেক্ট যুক্ত হবে।

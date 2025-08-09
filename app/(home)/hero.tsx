@@ -11,26 +11,11 @@ export default function Hero() {
   const tags = ['ওয়েব ডেভেলপমেন্ট', 'ওয়েব৩', 'এআই', 'ক্লাউড', 'ডেভঅপস'];
 
   return (
-  <div className="relative z-[2] flex flex-col overflow-hidden bg-fd-background px-6 pt-16 md:px-12 md:pt-24 max-md:text-center rounded-3xl border border-fd-foreground/5 backdrop-blur [.uwu_&]:hidden">
-      {/* Decorative background layers */}
-      <Parallax offset={55}>
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <Float amplitude={14} duration={10}>
-            <div className="absolute -top-32 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-fd-primary/30 blur-3xl opacity-40 mix-blend-screen" />
-          </Float>
-            <Float amplitude={18} duration={12} delay={1.2}>
-              <div className="absolute top-10 -right-20 h-64 w-64 rounded-full bg-fd-secondary/30 blur-3xl opacity-40 mix-blend-screen" />
-            </Float>
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fd-primary/40 to-transparent" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.04),transparent_70%)]" />
-            <div className="absolute inset-0 [mask-image:radial-gradient(circle_at_center,black,transparent_75%)] bg-[linear-gradient(120deg,rgba(255,255,255,0.05)_0%,transparent_60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_3px)] opacity-30" />
-        </div>
-      </Parallax>
-
+    <div className="relative z-[2] flex flex-col overflow-hidden bg-fd-background px-6 pt-16 md:px-12 md:pt-24 max-md:text-center rounded-3xl border border-fd-foreground/5 backdrop-blur [.uwu_&]:hidden">
       <div className="relative">
         <div className="flex flex-col md:flex-row md:items-start md:gap-10">
           <div className="md:flex-1">
-            <h1 className="font-semibold tracking-tight text-3xl sm:text-4xl lg:text-5xl bg-clip-text text-transparent bg-[linear-gradient(90deg,var(--color-fd-primary),var(--color-fd-secondary))] mb-6">
+            <h1 className="font-semibold tracking-tight text-3xl sm:text-4xl lg:text-5xl  mb-6">
               আগামী প্রজন্মের ওয়েব প্রযুক্তি শেখা এখন বাংলায়
             </h1>
             <p className="text-fd-muted-foreground md:text-lg leading-relaxed mb-5">
@@ -43,7 +28,7 @@ export default function Hero() {
               {tags.map((t) => (
                 <StaggerItem key={t}>
                   <span className="group relative inline-flex items-center gap-1 rounded-full border border-fd-foreground/20 bg-fd-muted/30 px-3 py-1 text-xs text-fd-muted-foreground overflow-hidden">
-                    <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[radial-gradient(circle_at_center,var(--color-fd-primary)_0%,transparent_70%)]" />
+                    <span className="absolute inset-0 opacity-0 transition-opacity bg-[radial-gradient(circle_at_center,var(--color-fd-primary)_0%,transparent_70%)]" />
                     <span className="relative">{t}</span>
                   </span>
                 </StaggerItem>
