@@ -4,8 +4,8 @@ export const metadata = {
     robots: { index: false },
 };
 
+import { OfflineClient } from './offline-client';
+
 export default function OfflinePage() {
-    // Importing a client component keeps this file server-only so metadata is allowed.
-    const OfflineClient = require('./offline-client').OfflineClient;
     return <OfflineClient />;
 }

@@ -3,7 +3,7 @@ import { baseUrl } from '@/lib/metadata';
 import type { MetadataRoute } from 'next';
 
 // Dynamic sitemap with real lastModified per page
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   // Homepage
@@ -18,11 +18,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const { slug } of source.generateParams()) {
     const page = source.getPage(slug);
     if (!page) continue;
-    // page.data.lastModified may be Date or string depending on loader; fallback to now
-    const lastMod = (page as any).data?.lastModified || new Date().toISOString();
+    let lastModified: string | undefined;
+    try {
+      const data: unknown = await page.data; // data may or may not include lastModified
+      if (data && typeof data === 'object' && 'lastModified' in data) {
+        const value = (data as { lastModified?: string | Date }).lastModified;
+        if (value instanceof Date) lastModified = value.toISOString();
+        else if (typeof value === 'string') lastModified = value;
+      }
+    } catch {
+      // ignore data errors
+    }
+    if (!lastModified) lastModified = new Date().toISOString();
     entries.push({
       url: new URL('/' + slug.join('/'), baseUrl).toString(),
-      lastModified: typeof lastMod === 'string' ? lastMod : new Date(lastMod).toISOString(),
+      lastModified,
       changeFrequency: 'weekly',
       priority: slug.length === 1 ? 0.8 : 0.6,
     });

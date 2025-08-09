@@ -2,10 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Iconify } from "@/components/iconify";
 import { HighlightCard } from '@/components/highlight-card';
-import { WebX } from "./svg";
 import { FadeIn, SlideUp } from '@/components/motion';
-// @ts-ignore - local client component
-import Hero from './hero';
+import dynamic from 'next/dynamic';
+// @ts-expect-error: tooling cannot resolve hero path inside (home) segment but runtime is fine
+const Hero = dynamic(() => import('./hero'), { ssr: false });
 import fs from 'node:fs';
 import path from 'node:path';
 import { source } from '@/lib/source';
@@ -33,10 +33,7 @@ export default function Page() {
           <LearningPath />
           {/* Curated starting points */}
           <SelectTopics />
-          {/* Full topic catalogue */}
-          {/* <Topics /> */}
-          {/* Recently curated / featured docs */}
-          {/* <FeaturedLessons /> */}
+          {/* Full topic catalogue & featured lessons temporarily hidden to reduce visual load */}
           {/* Why WebX Beyond (benefits) */}
           <WhyWebX />
           {/* Free CTA */}
@@ -270,7 +267,8 @@ function FreeCTA() {
 
 // Hero moved to client component ./hero.tsx
 
-function Topics() {
+// Deprecated (hidden) Topics section retained for future use
+/* function Topics() {
   // helper moved here for clarity; could be hoisted if reused elsewhere
   type Topic = {
     slug: string;
@@ -396,7 +394,7 @@ function Topics() {
       </div>
     </section>
   );
-}
+} */
 
 // curated manual selection section (migrated from former select-topic page)
 function SelectTopics() {
@@ -428,7 +426,7 @@ function SelectTopics() {
   );
 }
 
-async function FeaturedLessons() {
+/* async function FeaturedLessons() {
   type LessonLink = { href: string; title: string; category: string };
   const loadFeatured = async (): Promise<LessonLink[]> => {
     const bucket: LessonLink[] = [];
@@ -487,4 +485,4 @@ async function FeaturedLessons() {
       </div>
     </section>
   );
-}
+} */

@@ -1,7 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from "next/image";
 import {LinkItemType} from "fumadocs-ui/layouts/links";
-import { X } from './(home)/svg';
 import { Book, ComponentIcon, Layout, Pencil, Server,} from "lucide-react";
 import Img from "./(home)/img.png";
 
