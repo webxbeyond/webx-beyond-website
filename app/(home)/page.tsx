@@ -3,9 +3,8 @@ import type { ReactNode } from "react";
 import { Iconify } from "@/components/iconify";
 import { HighlightCard } from '@/components/highlight-card';
 import { FadeIn, SlideUp } from '@/components/motion';
-import dynamic from 'next/dynamic';
 // @ts-expect-error: tooling cannot resolve hero path inside (home) segment but runtime is fine
-const Hero = dynamic(() => import('./hero'), { ssr: false });
+import Hero from './hero';
 import fs from 'node:fs';
 import path from 'node:path';
 import { source } from '@/lib/source';
