@@ -88,8 +88,8 @@ export default function Hero() {
           </div>
           <div className="md:flex-1 flex items-start justify-center md:justify-end relative mt-10 md:mt-0">
             <div className="relative">
-              <div className="absolute -inset-4 rounded-2xl bg-gradient-to-tr from-fd-primary/30 via-fd-secondary/20 to-transparent blur-2xl" aria-hidden />
-              <WebX className="relative mx-auto md:mx-0 w-[260px] md:w-[380px] drop-shadow-[0_0_10px_rgba(255,255,255,0.05)]" />
+              <div className="absolute -inset-4 rounded-2xl" aria-hidden />
+              <WebX width={260} height={380} className="relative mx-auto my-auto md:mx-0 w-[260px] md:w-[380px] drop-shadow-[0_0_10px_rgba(255,255,255,0.05)]" />
             </div>
           </div>
         </div>

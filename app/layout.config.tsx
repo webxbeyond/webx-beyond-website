@@ -30,7 +30,7 @@ export const logo = (
     <>
         <Image
             alt="WebX"
-            src="/logo.png"
+            src="/logo.svg"
             sizes="100px"
             width={35}
             height={35}
