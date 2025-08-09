@@ -104,9 +104,9 @@ function WhyWebX() {
     },
   ];
   return (
-    <section className="px-6 py-12 md:px-12 md:py-16 ">
+    <section className=" py-12 md:py-16 ">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">কেন ওয়েব বিওয়ান্ড?</h2>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {items.map((it, i) => (
           <SlideUp key={it.title} delay={i * 0.05}>
             <Highlight icon={it.icon} heading={it.title}>{it.body}</Highlight>
@@ -127,10 +127,10 @@ function WhatWeTeach() {
     { icon: 'ph:notebook-duotone', title: 'চিটশিট ও রেফারেন্স', body: 'দ্রুত পুনরায় দেখার জন্য সংক্ষিপ্ত নোট।' },
   ];
   return (
-    <section className="px-6 pt-10 md:px-12 md:pt-4">
+    <section className="pt-10 md:pt-4">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">আমরা কী শেখাই</h2>
       <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8">মূল প্ল্যাটফর্মিং স্কিল থেকে শুরু করে আধুনিক ডিপ্লয়মেন্ট ও এআই ব্যবহারের বাস্তব কৌশল—এক জায়গায়।</p>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {domains.map((d, i) => (
           <SlideUp key={d.title} delay={i * 0.04}>
             <Highlight icon={d.icon} heading={d.title}>{d.body}</Highlight>
@@ -274,12 +274,12 @@ function SelectTopics() {
   const current = cards.filter(c => !c.badge || c.badge.variant === 'progress');
   const upcoming = cards.filter(c => c.badge?.variant === 'soon');
   return (
-    <section id="select-topics" className="px-6 pt-12 md:px-12 md:pt-16">
+    <section id="select-topics" className=" pt-12  md:pt-16">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">শুরু করার জন্য বেছে নিন</h2>
       <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন।</p>
       {/* Current / Active topics */}
       <div className="mb-12">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {current.map((c, i) => (
             <SlideUp key={c.title} delay={i * 0.05}>
               <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
@@ -292,7 +292,8 @@ function SelectTopics() {
       {upcoming.length > 0 && (
         <div>
           <h3 className="text-center font-semibold mb-4">শীঘ্রই আসছে</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 opacity-80">
+          {/* grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 opacity-80">
             {upcoming.map((c, i) => (
               <SlideUp key={c.title} delay={i * 0.05}>
                 <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
