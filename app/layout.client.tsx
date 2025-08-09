@@ -1,7 +1,8 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { type ReactNode, useId } from 'react';
+import { type ReactNode, useId, useEffect, useState } from 'react';
+import { useScroll, useSpring, motion } from 'framer-motion';
 import { cn } from '@/lib/cn';
 
 export function Body({
@@ -10,9 +11,22 @@ export function Body({
   children: ReactNode;
 }): React.ReactElement {
   const mode = useMode();
+  // global scroll progress (top bar)
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 });
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <body className={cn(mode, 'relative flex min-h-screen flex-col')}>
+      {mounted && (
+        <motion.div
+          className="pointer-events-none fixed left-0 right-0 top-0 z-[999] h-[3px]"
+          style={{ scaleX: progress, transformOrigin: 'left' }}
+        >
+          <div className="h-full w-full bg-gradient-to-r from-fd-primary via-fd-secondary to-fd-primary" />
+        </motion.div>
+      )}
       {children}
     </body>
   );

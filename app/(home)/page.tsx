@@ -1,50 +1,33 @@
-import { cva } from "class-variance-authority";
-
-import { File, Files, Folder } from "fumadocs-ui/components/files";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import Image from "next/image";
-import { cn } from "@/lib/cn";
-import { buttonVariants } from "@/components/ui/button";
-import { CodeBlock } from "@/components/code-block";
-import { UwuHero } from "@/app/(home)/uwu";
-import { CreateAppAnimation, WhyInteractive } from "./page.client";
-// import Img from "./img.png";
-import ArchImg from "./arch.png";
-import { TypeTable } from "fumadocs-ui/components/type-table";
 import { Iconify } from "@/components/iconify";
+import { HighlightCard } from '@/components/highlight-card';
 import { WebX } from "./svg";
-
-const badgeVariants = cva(
-  "inline-flex size-7 items-center justify-center rounded-full bg-fd-primary font-medium text-fd-primary-foreground"
-);
+import { FadeIn, SlideUp } from '@/components/motion';
+import Hero from './hero';
+import fs from 'node:fs';
+import path from 'node:path';
+import { source } from '@/lib/source';
+import { cn } from '@/lib/cn';
+import { buttonVariants } from '@/components/ui/button';
+import { UwuHero } from './uwu';
 
 export default function Page() {
-  const gridColor =
-    "color-mix(in oklab, var(--color-fd-primary) 10%, transparent)";
-
   return (
     <>
-      <div
-        className="absolute inset-x-0 top-[200px] h-[250px] max-md:hidden"
-        // style={{
-        //   background: `repeating-linear-gradient(to right, ${gridColor}, ${gridColor} 1px,transparent 1px,transparent 50px), repeating-linear-gradient(to bottom, ${gridColor}, ${gridColor} 1px,transparent 1px,transparent 50px)`,
-        // }}
-      />
-      <main className="container relative max-w-[1100px] px-2 py-4 z-[2] lg:py-16">
-        <div
-          style={{
-            background:
-              "repeating-linear-gradient(to bottom, transparent, color-mix(in oklab, var(--color-fd-primary) 1%, transparent) 500px, transparent 1000px)",
-          }}
-        >
+      <main className="container relative max-w-[1200px] px-2 py-4 z-[2] lg:py-16">
+        <div>
           <div className="relative">
-            <Hero />
+            <FadeIn>
+              <Hero />
+            </FadeIn>
             <UwuHero />
           </div>
-          <Introduction />
+          <SelectTopics />
+          <Topics />
+          <FeaturedLessons />
           <div
-            className="relative overflow-hidden  px-8 py-16 sm:py-24"
+            className="relative overflow-hidden px-8 py-16 sm:py-24"
             style={{
               backgroundImage:
                 "radial-gradient(circle at bottom center, var(--color-fd-secondary), var(--color-fd-background))",
@@ -54,7 +37,6 @@ export default function Page() {
               একেবারেই ফ্রিতে শিখুন
             </h2>
           </div>
-
           <Highlights />
         </div>
       </main>
@@ -62,257 +44,293 @@ export default function Page() {
   );
 }
 
-function Architecture() {
-  return (
-    <div className="flex flex-col gap-4  px-8 py-16 md:py-24 lg:flex-row md:px-16">
-      <div className="shrink-0 flex-1 font-mono text-start">
-        <p className="px-2 py-1 text-sm bg-fd-primary text-fd-primary-foreground font-medium w-fit mb-4">
-          Designed with Love
-        </p>
-        <h2 className="text-xl font-medium mb-4 sm:text-2xl">
-          One framework to solve three problems.
-        </h2>
-        <p className="text-sm text-fd-muted-foreground mb-6">
-          Fumadocs makes it easy to build beautiful docs, and bring the power to
-          transform content into data, on Next.js.
-          <br />
-          Every part is handled with love - incredibly flexible and
-          customisable.
-        </p>
-      </div>
-      <Image
-        src={ArchImg}
-        alt="Architecture"
-        className="md:-mt-20 ms-auto w-full max-w-[450px] invert dark:invert-0"
-      />
-    </div>
-  );
-}
-
-async function Why() {
-  return (
-    <div className="relative overflow-hidden px-8 py-12 md:p-16 md:min-h-[700px]">
-      <p className="text-center font-medium text-fd-muted-foreground">
-        Fumadocs offers a complete toolchain to build and maintain your docs.
-      </p>
-      <WhyInteractive
-        typeTable={
-          <TypeTable
-            type={{
-              name: {
-                type: "string",
-                description: "The name of player",
-                default: "hello",
-              },
-              code: {
-                type: "string",
-                description: (
-                  <CodeBlock lang="ts" code='console.log("Hello World")' />
-                ),
-              },
-            }}
-          />
-        }
-        codeblockSearchRouter={
-          <CodeBlock
-            lang="ts"
-            code={`import { source } from '@/lib/source';
-import { createFromSource } from 'fumadocs-core/search/server';
- 
-export const { GET } = createFromSource(source);`}
-          />
-        }
-        codeblockTheme={
-          <CodeBlock
-            lang="css"
-            code={`@import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
-@import 'fumadocs-ui/css/preset.css';
-
-@source '../node_modules/fumadocs-ui/dist/**/*.js';`}
-          />
-        }
-        codeblockInteractive={
-          <CodeBlock
-            lang="tsx"
-            code={`import { File, Folder, Files } from 'fumadocs-ui/components/files';
- 
-<Files>
-  <Folder name="app" defaultOpen>
-    <File name="layout.tsx" />
-    <File name="page.tsx" />
-    <File name="global.css" />
-  </Folder>
-  <File name="package.json" />
-</Files>`}
-          />
-        }
-        codeblockMdx={
-          <CodeBlock
-            lang="tsx"
-            code={`import { db } from '@/server/db';
-
-export function ProductTable() {
-  const products = db.getProducts()
-    
-  return (
-    <ul>
-      {products.map(product => <li key={product.key}>{product.name}</li>)}
-    </ul>
-  );
-}
-
-## Products
-
-<ProductTable />`}
-          />
-        }
-      />
-    </div>
-  );
-}
-
-function Highlights(): React.ReactElement {
-  return (
-    <div className="grid grid-cols-1 border-r md:grid-cols-2 lg:grid-cols-3">
-      <Highlight icon="solar:rocket-2-bold-duotone" heading="Light and Fast.">
-        Powerful documentation site with Next.js App Router.
-      </Highlight>
-      <Highlight icon="fluent:rocket-24-filled" heading="Performance.">
-        Less client components, less Javascript, optimized images.
-      </Highlight>
-      <Highlight icon="solar:rocket-2-bold-duotone" heading="Accessibility & UX first.">
-        Focus on user experience and accessibility.
-      </Highlight>
-      <Highlight icon="solar:rocket-2-bold-duotone" heading="Syntax Highlighting.">
-        Beautiful syntax highlighter, powered by{" "}
-        <a href="https://shiki.style" rel="noreferrer noopener">
-          Shiki
-        </a>
-        .
-      </Highlight>
-      <Highlight icon="solar:rocket-2-bold-duotone" heading="Automation.">
-        Useful remark/rehype plugins. Typescript Twoslash, OpenAPI docs
-        generation, and more.
-      </Highlight>
-      <Highlight icon="solar:rocket-2-bold-duotone" heading="Personalized.">
-        Advanced options for customising your theme in a comfortable way.
-      </Highlight>
-    </div>
-  );
-}
-
+// highlight card (clickable via optional href)
 function Highlight({
   icon,
   heading,
   children,
+  href,
 }: {
   icon: string;
   heading: ReactNode;
   children: ReactNode;
-}): React.ReactElement {
-  return (
-    <div className="border-l border-t px-6 py-12">
-      <div className="mb-4 flex flex-row items-center gap-2 text-fd-muted-foreground">
-        <Iconify icon={icon} width={22} />
-        <h2 className="text-sm font-medium">{heading}</h2>
+  href?: string;
+}) {
+  const content = (
+    <div className="rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-6 transition-colors hover:bg-fd-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-primary/40">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="inline-flex size-8 items-center justify-center rounded-full border bg-fd-background/60">
+          <Iconify icon={icon} width={18} />
+        </span>
+        <h2 className="text-base font-semibold leading-tight">{heading}</h2>
       </div>
-      <span className="font-medium">{children}</span>
+      <p className="text-sm text-fd-muted-foreground leading-relaxed">{children}</p>
     </div>
+  );
+  return href ? (
+    <Link href={href} aria-label={typeof heading === 'string' ? heading : undefined} className="group block focus:outline-none">
+      {content}
+    </Link>
+  ) : content;
+}
+
+// highlights grid section (static marketing points)
+function Highlights() {
+  return (
+    <section className="px-6 py-12 md:px-12 md:py-16">
+      <h2 className="sr-only">Highlights</h2>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <SlideUp delay={0.0}>
+          <Highlight icon="ph:rocket-launch-duotone" heading="আধুনিক ওয়েব ডেভেলপমেন্ট">
+            Next.js, React, Tailwind—বাস্তব উদাহরণ আর প্রজেক্ট-কেন্দ্রিক শেখা。
+          </Highlight>
+        </SlideUp>
+        <SlideUp delay={0.05}>
+          <Highlight icon="ph:cube-duotone" heading="ওয়েব৩ প্রস্তুতি">
+            ব্লকচেইন কনসেপ্ট, স্মার্ট কন্ট্রাক্ট ও ডিস্ট্রিবিউটেড ওয়েবের বেসিক。
+          </Highlight>
+        </SlideUp>
+        <SlideUp delay={0.1}>
+          <Highlight icon="ph:brain-duotone" heading="এআই-ফার্স্ট লার্নিং">
+            মডেল, এআই টুলিং, এবং ডেভেলপার ওয়ার্কফ্লোতে এআই ইন্টিগ্রেশন。
+          </Highlight>
+        </SlideUp>
+        <SlideUp delay={0.15}>
+          <Highlight icon="ph:cloud-duotone" heading="ক্লাউড ও ডেভঅপস">
+            AWS/Google Cloud, CI/CD, কন্টেইনার, কুবেরনেটিস—ডিপ্লয়মেন্ট প্র্যাকটিস。
+          </Highlight>
+        </SlideUp>
+        <SlideUp delay={0.2}>
+          <Highlight icon="ph:sparkle-duotone" heading="পারফরম্যান্স ও অ্যাক্সেসিবিলিটি">
+            দ্রুত, হালকা ও ব্যবহারবান্ধব অভিজ্ঞতার উপর বিশেষ জোর。
+          </Highlight>
+        </SlideUp>
+        <SlideUp delay={0.25}>
+          <Highlight icon="ph:book-open-text-duotone" heading="ফ্রি ও ওপেন কনটেন্ট">
+            বাংলায় বিজ্ঞানের মতো সাজানো শেখার রিসোর্স—সবাইয়ের জন্য উন্মুক্ত。
+          </Highlight>
+        </SlideUp>
+      </div>
+    </section>
   );
 }
 
-function Hero() {
+// Hero moved to client component ./hero.tsx
+
+function Topics() {
+  // helper moved here for clarity; could be hoisted if reused elsewhere
+  type Topic = {
+    slug: string;
+    title: string;
+    description?: string;
+    icon: string;
+    href: string;
+    count?: number;
+  };
+
+  const loadTopics = (): Topic[] => {
+    const rootDir = path.join(process.cwd(), 'content', 'learn');
+    let list: Topic[] = [];
+    try {
+      const topMeta = JSON.parse(
+        fs.readFileSync(path.join(rootDir, 'meta.json'), 'utf8'),
+      ) as { pages: string[] };
+
+      list = topMeta.pages
+        .filter((slug) => typeof slug === 'string')
+        .map((slug) => {
+          try {
+            const metaPath = path.join(rootDir, slug, 'meta.json');
+            const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')) as {
+              title?: string;
+              description?: string;
+              icon?: string;
+              pages?: string[];
+            };
+            const count = (meta.pages ?? []).filter(
+              (p) =>
+                typeof p === 'string' &&
+                p !== 'index' &&
+                !p.startsWith('---') &&
+                p !== '...' &&
+                p.trim().length > 0,
+            ).length;
+            return {
+              slug,
+              title: meta.title ?? slug,
+              description: meta.description,
+              icon: meta.icon ?? 'ph:bookmark-duotone',
+              href: `/${slug}`,
+              count,
+            } satisfies Topic;
+          } catch {
+            return {
+              slug,
+              title: slug,
+              href: `/${slug}`,
+              icon: 'ph:bookmark-duotone',
+            } as Topic;
+          }
+        });
+
+      // Enrich with selected cheatsheet subtopics
+      const cheatsheetMetaPath = path.join(rootDir, 'cheatsheet', 'meta.json');
+      if (fs.existsSync(cheatsheetMetaPath)) {
+        const cmeta = JSON.parse(fs.readFileSync(cheatsheetMetaPath, 'utf8')) as {
+          pages?: string[];
+        };
+        const picks = (cmeta.pages ?? []).filter((p) =>
+          ['aws', 'google-cloud', 'docker', 'kubernetes', 'git', 'linux'].includes(p),
+        );
+        for (const p of picks) {
+          list.push({
+            slug: `cheatsheet/${p}`,
+            title:
+              p === 'aws' ? 'AWS' :
+                p === 'google-cloud' ? 'Google Cloud' :
+                  p === 'docker' ? 'Docker' :
+                    p === 'kubernetes' ? 'Kubernetes' :
+                      p === 'git' ? 'Git' :
+                        p === 'linux' ? 'Linux' : p,
+            description: 'চিটশিট দিয়ে দ্রুত শিখুন।',
+            href: `/cheatsheet/${p}`,
+            icon:
+              p === 'aws' ? 'mdi:aws' :
+                p === 'google-cloud' ? 'logos:google-cloud' :
+                  p === 'docker' ? 'mdi:docker' :
+                    p === 'kubernetes' ? 'mdi:kubernetes' :
+                      p === 'git' ? 'mdi:git' :
+                        p === 'linux' ? 'mdi:linux' : 'ph:bookmark-duotone',
+          });
+        }
+      }
+    } catch {
+      // fallback minimal set
+      list = [
+        {
+          slug: 'html-css',
+          title: 'ওয়েব ডেভেলপমেন্ট',
+          href: '/html-css',
+          icon: 'ph:code-bold',
+          description: 'HTML এবং CSS দিয়ে শুরু করুন।',
+        },
+        {
+          slug: 'javascript',
+          title: 'জাভাস্ক্রিপ্ট',
+          href: '/javascript',
+          icon: 'mdi:language-javascript',
+          description: 'জাভাস্ক্রিপ্ট দিয়ে ইন্টারেক্টিভ ওয়েবসাইট তৈরি করুন।',
+        },
+      ];
+    }
+    return list;
+  };
+
+  const topics = loadTopics();
+
   return (
-    <div className="relative z-[2] flex flex-col overflow-hidden  bg-fd-background px-6 pt-12 max-md:text-center md:px-12 md:pt-16 [.uwu_&]:hidden">
-
-        <WebX className="mb-8 mx-auto md:mx-0 md:max-w-[600px]"/>
-
-      <p className="mb-8 text-fd-muted-foreground md:max-w-[80%] md:text-lg">
-        আধুনিক ওয়েব ডেভেলপমেন্ট, ওয়েব৩, এআই, ক্লাউড কম্পিউটিং, ডেভঅপস এবং ভবিষ্যতের প্রযুক্তির দুনিয়ায় আপনাকে স্বাগত!
-      </p>
-        <p className="mb-8 text-fd-muted-foreground md:max-w-[80%] md:text-lg">
-        আমার লক্ষ্য হলো ওয়েব প্রযুক্তির সর্বশেষ ট্রেন্ড, উদ্ভাবনী সমাধান ও বাস্তব অভিজ্ঞতা শেয়ার করা, যাতে আপনি দক্ষতা বাড়িয়ে পরবর্তী প্রজন্মের ওয়েব গড়ে তুলতে পারেন।
-        নতুন প্রযুক্তি শিখতে, গভীরে অনুসন্ধান করতে এবং ভবিষ্যতের ওয়েবে নেতৃত্ব দিতে
-        <span className="text-fd-foreground"> WebX</span>
-
-         -এর সাথেই থাকুন! 🚀
-      </p>
-      <div className="inline-flex items-center gap-3 max-md:mx-auto mb-8">
-        <Link
-          href="/learn"
-          className={cn(
-            buttonVariants({
-              size: "lg",
-              className: "rounded-full",
-              variant: "secondary",
-            })
-          )}
-        >
-          আপনার জার্নি শুরু করুন!
-        </Link>
+    <section id="topics" className="px-6 py-10 md:px-12 md:py-14">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">টপিকস এক্সপ্লোর করুন</h2>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {topics.map((t, i) => (
+          <SlideUp key={t.slug} delay={i * 0.05}>
+            <Highlight href={t.href} icon={t.icon} heading={t.title}>
+              {t.description || 'সংক্ষিপ্ত পরিচিতি পাওয়া যাচ্ছে না।'}
+            </Highlight>
+          </SlideUp>
+        ))}
       </div>
-      {/*<Image*/}
-      {/*  src={Img}*/}
-      {/*  alt="preview"*/}
-      {/*  className="mb-[-250px] mt-12 min-w-[800px] select-none duration-1000 animate-in fade-in slide-in-from-bottom-12 md:mb-[-340px] md:min-w-[1100px]"*/}
-      {/*  priority*/}
-      {/*/>*/}
-      <div
-        className="absolute inset-0 z-[-1]"
-        style={{
-          backgroundImage: [
-            "radial-gradient(ellipse at top, transparent 80%, color-mix(in oklab, var(--color-fd-primary) 10%, transparent))",
-            "linear-gradient(to bottom, var(--color-fd-background) 80%, transparent)",
-          ].join(", "),
-        }}
-      />
-    </div>
+    </section>
   );
 }
 
-function Introduction(): React.ReactElement {
+// curated manual selection section (migrated from former select-topic page)
+function SelectTopics() {
+  const cards: {
+    title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }
+  }[] = [
+      { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'নোড জেএস', description: 'বর্তমান সময়ে সবচেয়ে জনপ্রিয় সার্ভার সাইড জাভাস্ক্রিপ্ট রানটাইম এবং একটি লাইব্রেরি।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'HTML ও CSS', description: 'বিল্ডিং ব্লক অফ ওয়েবসাইট।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'আমার প্রোগ্রামিং শেখার ব্যাক্তিগত নোটবুক।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet' },
+      { title: 'নেটওয়ার্কিং', description: 'বিভিন্ন কম্পিউটার এবং ডিভাইসের মধ্যে সংযোগ স্থাপন ও ডেটা আদান-প্রদান সংক্রান্ত প্রযুক্তি।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+    ];
   return (
-    <div className="grid grid-cols-1 border-r md:grid-cols-2">
-      <div className="flex flex-col gap-2 border-l border-t px-6 py-12 md:py-16">
-        <div className={cn(badgeVariants())}>1</div>
-        <h3 className="text-xl font-bold">Code</h3>
-        <p className="mb-8 text-fd-muted-foreground">কোড লিখুন।</p>
-        <CreateAppAnimation />
+    <section id="select-topics" className="px-6 pt-12 md:px-12 md:pt-16">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">বিষয় নির্বাচন করো!</h2>
+      <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto">নিচের যেকোনো একটি বিষয় নির্বাচন করে শিখতে থাকো।</p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {cards.map((c, i) => (
+          <SlideUp key={c.title} delay={i * 0.05}>
+            <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+          </SlideUp>
+        ))}
       </div>
-      <div className="flex flex-col gap-2 border-l border-t px-6 py-12 md:py-16">
-        <div className={cn(badgeVariants())}>2</div>
-        <h3 className="text-xl font-bold">Eat.</h3>
-        <p className="mb-8 text-fd-muted-foreground">স্বাস্থ্যকর খাবার খান।</p>
-        <div className="relative flex flex-col">
-          <CodeBlock
-            lang="mdx"
-            wrapper={{ className: "absolute inset-x-2 top-0" }}
-            code={`---
-title: রেসিপি
----
+    </section>
+  );
+}
 
-## ভূমিকা
-`}
-          />
-          <Files className="z-[2] mt-48 shadow-xl">
-            <Folder name="content" defaultOpen>
-              <File name="index.mdx" />
-              <File name="components.mdx" />
-            </Folder>
-          </Files>
-        </div>
+async function FeaturedLessons() {
+  type LessonLink = { href: string; title: string; category: string };
+  const loadFeatured = async (): Promise<LessonLink[]> => {
+    const bucket: LessonLink[] = [];
+    const rootDir = path.join(process.cwd(), 'content', 'learn');
+    try {
+      const topMeta = JSON.parse(
+        fs.readFileSync(path.join(rootDir, 'meta.json'), 'utf8'),
+      ) as { pages: string[] };
+      for (const slug of topMeta.pages) {
+        if (typeof slug !== 'string') continue;
+        const metaPath = path.join(rootDir, slug, 'meta.json');
+        try {
+          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')) as {
+            pages?: string[];
+            title?: string;
+          };
+          const candidates = (meta.pages ?? []).filter(
+            (p) => typeof p === 'string' && p !== 'index' && !p.startsWith('---') && p !== '...' && p.trim().length > 0,
+          );
+          for (const p of candidates.slice(0, 2)) {
+            const page = source.getPage([slug, p]);
+            if (page) {
+              const data = await page.data;
+              bucket.push({
+                href: `/${slug}/${p}`,
+                title: data.title ?? p,
+                category: meta.title ?? slug,
+              });
+            } else {
+              bucket.push({ href: `/${slug}/${p}`, title: p, category: slug });
+            }
+          }
+        } catch {
+          // skip broken category
+        }
+      }
+    } catch {
+      // ignore top meta errors
+    }
+    return bucket.slice(0, 6);
+  };
+
+  const top = await loadFeatured();
+  if (top.length === 0) return null;
+  return (
+    <section className="px-6 py-10 md:px-12 md:py-14">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">নির্বাচিত পাঠ</h2>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {top.map((l, i) => (
+          <SlideUp key={l.href} delay={i * 0.05}>
+            <Highlight href={l.href} icon="ph:book-open-text-duotone" heading={l.title}>
+              {l.category}
+            </Highlight>
+          </SlideUp>
+        ))}
       </div>
-      <div className="flex flex-col gap-2 border-l border-t px-6 py-12 md:py-16">
-        <div className={cn(badgeVariants())}>3</div>
-        <h3 className="text-xl font-bold">Sleep.</h3>
-        <p className="mb-8 text-fd-muted-foreground">পরিমিত ঘুমান।</p>
-      </div>
-      <div className="flex flex-col gap-2 border-l border-t px-6 py-12 md:py-16">
-        <div className={cn(badgeVariants())}>4</div>
-        <h3 className="text-xl font-bold">Repeat.</h3>
-        <p className="text-fd-muted-foreground">পুনরায় শুরু করুন।</p>
-      </div>
-    </div>
+    </section>
   );
 }
