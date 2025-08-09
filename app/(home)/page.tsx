@@ -4,6 +4,7 @@ import { Iconify } from "@/components/iconify";
 import { HighlightCard } from '@/components/highlight-card';
 import { WebX } from "./svg";
 import { FadeIn, SlideUp } from '@/components/motion';
+// @ts-ignore - local client component
 import Hero from './hero';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,28 +17,30 @@ export default function Page() {
   return (
     <>
       <main className="container relative max-w-[1200px] px-2 py-4 z-[2] lg:py-16">
-        <div>
+        <div className="space-y-8 lg:space-y-14">
+          {/* Hero */}
           <div className="relative">
             <FadeIn>
               <Hero />
             </FadeIn>
             <UwuHero />
           </div>
+          {/* What We Teach (core domains) */}
+          <WhatWeTeach />
+          {/* Expectations / Value Proposition */}
+            <Expectations />
+          {/* Learning Path steps */}
+          <LearningPath />
+          {/* Curated starting points */}
           <SelectTopics />
+          {/* Full topic catalogue */}
           <Topics />
+          {/* Recently curated / featured docs */}
           <FeaturedLessons />
-          <div
-            className="relative overflow-hidden px-8 py-16 sm:py-24"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at bottom center, var(--color-fd-secondary), var(--color-fd-background))",
-            }}
-          >
-            <h2 className="bg-gradient-to-b from-fd-primary to-fd-foreground/40 bg-clip-text text-center text-2xl font-semibold text-transparent sm:text-3xl pt-3">
-              একেবারেই ফ্রিতে শিখুন
-            </h2>
-          </div>
-          <Highlights />
+          {/* Why WebX Beyond (benefits) */}
+          <WhyWebX />
+          {/* Free CTA */}
+          <FreeCTA />
         </div>
       </main>
     </>
@@ -75,41 +78,152 @@ function Highlight({
 }
 
 // highlights grid section (static marketing points)
-function Highlights() {
+function WhyWebX() {
+  const items = [
+    {
+      icon: 'ph:book-open-text-duotone',
+      title: 'ফ্রি ও ওপেন',
+      body: 'কোনো পেওয়াল নেই। শেখা সবার জন্য উন্মুক্ত।',
+    },
+    {
+      icon: 'ph:rocket-launch-duotone',
+      title: 'প্র্যাকটিস ও প্রজেক্ট ফোকাস',
+      body: 'শুধু তত্ত্ব নয়—বাস্তব উদাহরণ ও হাতে-কলমে নির্মাণ।',
+    },
+    {
+      icon: 'ph:brain-duotone',
+      title: 'এআই ইন্টিগ্রেটেড',
+      body: 'আধুনিক ওয়ার্কফ্লোতে এআই ব্যবহারের বাস্তব গাইড।',
+    },
+    {
+      icon: 'ph:cloud-duotone',
+      title: 'ডেভঅপস ও ক্লাউড',
+      body: 'CI/CD, কন্টেইনার, কুবেরনেটিস ও ইনফ্রা বেস্ট প্র্যাকটিস।',
+    },
+    {
+      icon: 'ph:sparkle-duotone',
+      title: 'বাংলায় গভীর কনটেন্ট',
+      body: 'সংক্ষিপ্ত না—কাঠামোবদ্ধ, প্রগ্রেসিভ শেখার পথ।',
+    },
+    {
+      icon: 'ph:users-three-duotone',
+      title: 'কমিউনিটি ফোকাস (শীঘ্রই)',
+      body: 'ফিডব্যাক ও সহযোগিতায় উন্নতি—কমিউনিটি যুক্ত হবে।',
+    },
+  ];
   return (
     <section className="px-6 py-12 md:px-12 md:py-16">
-      <h2 className="sr-only">Highlights</h2>
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">কেন WebX Beyond?</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <SlideUp delay={0.0}>
-          <Highlight icon="ph:rocket-launch-duotone" heading="আধুনিক ওয়েব ডেভেলপমেন্ট">
-            Next.js, React, Tailwind—বাস্তব উদাহরণ আর প্রজেক্ট-কেন্দ্রিক শেখা。
-          </Highlight>
-        </SlideUp>
-        <SlideUp delay={0.05}>
-          <Highlight icon="ph:cube-duotone" heading="ওয়েব৩ প্রস্তুতি">
-            ব্লকচেইন কনসেপ্ট, স্মার্ট কন্ট্রাক্ট ও ডিস্ট্রিবিউটেড ওয়েবের বেসিক。
-          </Highlight>
-        </SlideUp>
-        <SlideUp delay={0.1}>
-          <Highlight icon="ph:brain-duotone" heading="এআই-ফার্স্ট লার্নিং">
-            মডেল, এআই টুলিং, এবং ডেভেলপার ওয়ার্কফ্লোতে এআই ইন্টিগ্রেশন。
-          </Highlight>
-        </SlideUp>
-        <SlideUp delay={0.15}>
-          <Highlight icon="ph:cloud-duotone" heading="ক্লাউড ও ডেভঅপস">
-            AWS/Google Cloud, CI/CD, কন্টেইনার, কুবেরনেটিস—ডিপ্লয়মেন্ট প্র্যাকটিস。
-          </Highlight>
-        </SlideUp>
-        <SlideUp delay={0.2}>
-          <Highlight icon="ph:sparkle-duotone" heading="পারফরম্যান্স ও অ্যাক্সেসিবিলিটি">
-            দ্রুত, হালকা ও ব্যবহারবান্ধব অভিজ্ঞতার উপর বিশেষ জোর。
-          </Highlight>
-        </SlideUp>
-        <SlideUp delay={0.25}>
-          <Highlight icon="ph:book-open-text-duotone" heading="ফ্রি ও ওপেন কনটেন্ট">
-            বাংলায় বিজ্ঞানের মতো সাজানো শেখার রিসোর্স—সবাইয়ের জন্য উন্মুক্ত。
-          </Highlight>
-        </SlideUp>
+        {items.map((it, i) => (
+          <SlideUp key={it.title} delay={i * 0.05}>
+            <Highlight icon={it.icon} heading={it.title}>{it.body}</Highlight>
+          </SlideUp>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function WhatWeTeach() {
+  const domains = [
+    { icon: 'ph:code-duotone', title: 'ওয়েব ডেভেলপমেন্ট', body: 'HTML, CSS, JavaScript, React, Next.js, পারফরম্যান্স।' },
+    { icon: 'ph:cloud-duotone', title: 'ক্লাউড ও ডেভঅপস', body: 'লিনাক্স, Docker, Kubernetes, CI/CD, মনিটরিং।' },
+    { icon: 'ph:brain-duotone', title: 'কৃত্রিম বুদ্ধিমত্তা', body: 'এআই টুলিং, মডেল ইন্টিগ্রেশন, প্রম্পটিং স্ট্র্যাটেজি।' },
+    { icon: 'ph:network-duotone', title: 'নেটওয়ার্কিং ও নিরাপত্তা', body: 'প্রোটোকল, ট্রাবলশুটিং, সিকিউরিটি বেসিক।' },
+    { icon: 'ph:cube-duotone', title: 'ব্লকচেইন ভিত্তি', body: 'ডিসেন্ট্রালাইজড ধারণা ও স্মার্ট কন্ট্রাক্ট বেসিক।' },
+    { icon: 'ph:notebook-duotone', title: 'চিটশিট ও রেফারেন্স', body: 'দ্রুত পুনরায় দেখার জন্য সংক্ষিপ্ত নোট।' },
+  ];
+  return (
+    <section className="px-6 pt-10 md:px-12 md:pt-4">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">আমরা কী শেখাই</h2>
+      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8">মূল প্ল্যাটফর্মিং স্কিল থেকে শুরু করে আধুনিক ডিপ্লয়মেন্ট ও এআই ব্যবহারের বাস্তব কৌশল—এক জায়গায়।</p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {domains.map((d, i) => (
+          <SlideUp key={d.title} delay={i * 0.04}>
+            <Highlight icon={d.icon} heading={d.title}>{d.body}</Highlight>
+          </SlideUp>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Expectations() {
+  const points = [
+    'স্ট্রাকচার্ড রোডম্যাপ ও ধাপে ধাপে অগ্রগতি',
+    'বাস্তব প্রজেক্ট নির্দেশনা ও আইডিয়া',
+    'চিটশিট দিয়ে দ্রুত পুনরাবৃত্তি',
+    'বাংলা ভাষায় গভীর ব্যাখ্যা',
+    'এআই ও অটোমেশন যুক্ত লার্নিং অ্যাপ্রোচ',
+    'সম্পূর্ণ ফ্রি ও কোনো লকডাউন ছাড়া',
+  ];
+  return (
+    <section className="px-6 md:px-12 py-10 md:py-12">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">আপনি এখানে যা পাবেন</h2>
+      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-6">শুধু পড়ার জন্য নয়—তৈরি করার জন্য প্রস্তুত করে তোলা আমাদের লক্ষ্য।</p>
+      <ul className="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2">
+        {points.map((p, i) => (
+          <SlideUp key={p} delay={i * 0.04}>
+            <li className="flex items-start gap-2 rounded-xl border border-fd-foreground/10 bg-fd-muted/30 p-3 text-sm leading-relaxed">
+              <span className="mt-0.5 inline-flex size-5 items-center justify-center rounded-full border bg-fd-background/70 text-[10px] font-semibold">{i + 1}</span>
+              <span>{p}</span>
+            </li>
+          </SlideUp>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function LearningPath() {
+  const steps = [
+    { t: 'বেসিক শিখুন', d: 'ভিত্তি শক্ত করুন: ওয়েব, প্রোগ্রামিং, টুলিং।' },
+    { t: 'প্র্যাকটিস করুন', d: 'চিটশিট ও ছোট অনুশীলনে আত্মবিশ্বাস বাড়ান।' },
+    { t: 'প্রজেক্ট বানান', d: 'আইডিয়া থেকে বাস্তব অ্যাপ—ডিপ্লয় পর্যন্ত।' },
+    { t: 'অটোমেট ও অপ্টিমাইজ', d: 'ডেভঅপস, পারফরম্যান্স ও এআই টুলিং।' },
+    { t: 'ক্যারিয়ার প্রস্তুতি', d: 'প্রফেশনাল দক্ষতা ও প্রোফাইল শার্প করুন।' },
+  ];
+  return (
+    <section className="px-6 md:px-12 py-10 md:py-12">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">লার্নিং পথ</h2>
+      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8">একটি নিরবচ্ছিন্ন জার্নি—একেক ধাপ আপনার দক্ষতা মজবুত করবে।</p>
+      <ol className="mx-auto flex max-w-4xl flex-col gap-4 md:gap-5">
+        {steps.map((s, i) => (
+          <SlideUp key={s.t} delay={i * 0.05}>
+            <li className="relative rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-4 md:p-5">
+              <div className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-tight">
+                <span className="inline-flex size-6 items-center justify-center rounded-full bg-fd-primary/20 text-fd-primary text-[11px] font-bold">{i + 1}</span>
+                {s.t}
+              </div>
+              <p className="text-xs md:text-sm text-fd-muted-foreground leading-relaxed">{s.d}</p>
+            </li>
+          </SlideUp>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function FreeCTA() {
+  return (
+    <section className="relative overflow-hidden px-8 py-16 sm:py-20 rounded-3xl border border-fd-foreground/10 bg-fd-muted/20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom,var(--color-fd-secondary)/25,transparent_70%)]" />
+      <h2 className="relative bg-gradient-to-b from-fd-primary to-fd-foreground/60 bg-clip-text text-center text-2xl font-semibold text-transparent sm:text-3xl mb-4">
+        একেবারেই ফ্রি & ওপেন
+      </h2>
+      <p className="relative mx-auto mb-8 max-w-2xl text-center text-fd-muted-foreground text-sm md:text-base">
+        এখনই একটি টপিক বেছে নিয়ে শুরু করুন—কোনো সাইনআপ বা পেমেন্ট ছাড়াই। ভবিষ্যতে আরও প্র্যাকটিস, কমিউনিটি ও প্রজেক্ট যুক্ত হবে।
+      </p>
+      <div className="relative flex flex-wrap justify-center gap-4">
+        <Link href="#select-topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full shadow-lg shadow-fd-primary/20 hover:shadow-fd-primary/40', variant: 'secondary' }))}>
+          শুরু করুন
+          <Iconify icon="ph:arrow-right-duotone" width={18} className="ml-1" />
+        </Link>
+        <Link href="#topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full backdrop-blur supports-[backdrop-filter]:bg-fd-background/60', variant: 'outline' }))}>
+          সব টপিক দেখুন
+          <Iconify icon="ph:list-bullets-duotone" width={18} className="ml-1" />
+        </Link>
       </div>
     </section>
   );
@@ -230,7 +344,8 @@ function Topics() {
 
   return (
     <section id="topics" className="px-6 py-10 md:px-12 md:py-14">
-      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">টপিকস এক্সপ্লোর করুন</h2>
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">সব টপিক</h2>
+      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8 text-sm md:text-base">সব ক্যাটাগরির একটি পূর্ণ তালিকা। যেকোনো জায়গা থেকে জাম্প ইন করতে পারেন—প্রতিটি সেকশনে প্রগ্রেসিভ কাঠামো।</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {topics.map((t, i) => (
           <SlideUp key={t.slug} delay={i * 0.05}>
@@ -261,8 +376,8 @@ function SelectTopics() {
     ];
   return (
     <section id="select-topics" className="px-6 pt-12 md:px-12 md:pt-16">
-      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">বিষয় নির্বাচন করো!</h2>
-      <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto">নিচের যেকোনো একটি বিষয় নির্বাচন করে শিখতে থাকো।</p>
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">শুরু করার জন্য বেছে নিন</h2>
+      <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন।</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {cards.map((c, i) => (
           <SlideUp key={c.title} delay={i * 0.05}>
