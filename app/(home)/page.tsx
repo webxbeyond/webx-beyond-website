@@ -3,11 +3,8 @@ import type { ReactNode } from "react";
 import { Iconify } from "@/components/iconify";
 import { HighlightCard } from '@/components/highlight-card';
 import { FadeIn, SlideUp } from '@/components/motion';
-// @ts-expect-error: tooling cannot resolve hero path inside (home) segment but runtime is fine
+// @ts-expect-error: hero client component path resolution issue in (home) segment during type check
 import Hero from './hero';
-import fs from 'node:fs';
-import path from 'node:path';
-import { source } from '@/lib/source';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
 import { UwuHero } from './uwu';
