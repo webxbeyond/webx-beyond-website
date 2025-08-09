@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Iconify } from "@/components/iconify";
 import { HighlightCard } from '@/components/highlight-card';
 import { FadeIn, SlideUp } from '@/components/motion';
-// @ts-expect-error: hero client component path resolution issue in (home) segment during type check
 import Hero from './hero';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
