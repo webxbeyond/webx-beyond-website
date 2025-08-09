@@ -1,0 +1,9 @@
+{
+  "title": "নেটওয়ার্কিং",
+  "description": "পেশাদার নেটওয়ার্কিং ও সাইবার সিকিউরিটি",
+  "icon": "dashicons:networking",
+  "root": true,
+  "pages": [
+    "index"
+  ]
+}

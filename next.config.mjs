@@ -6,6 +6,20 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   images: { remotePatterns: [ { protocol: "https", hostname: "b.anis.cc", }, { protocol: "https", hostname: "avatars.githubusercontent.com", }, ], },
+  async redirects() {
+    return [
+      {
+        source: '/learn',
+        destination: '/#select-topics',
+        permanent: false,
+      },
+      {
+        source: '/learn/:slug*',
+        destination: '/:slug*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withMDX(config);

@@ -4,7 +4,7 @@ import { createElement } from 'react';
 import { Iconify } from '@/components/iconify';
 
 export const source = loader({
-  baseUrl: '/learn',
+  baseUrl: '/',
   icon(icon) {
 
     if (typeof icon !== "string") {

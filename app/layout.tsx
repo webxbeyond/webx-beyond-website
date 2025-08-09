@@ -13,15 +13,23 @@ const tiroBangla = Tiro_Bangla({
 });
 
 export const metadata = createMetadata({
-    title: {
-        template: '%s | ওয়েবএক্স',
-        default: 'ওয়েবএক্স',
-    },
-    description: 'Learn DevOps, Networking and Others with Anis Afifi',
-    metadataBase: baseUrl,
-    icons: {
-        icon: "/logo.png",
-    }
+  title: {
+    template: '%s | ওয়েবএক্স',
+    default: 'ওয়েবএক্স',
+  },
+  description: 'Learn DevOps, Networking, Cloud, AI and more in Bangla with WebX Beyond.',
+  metadataBase: baseUrl,
+  alternates: { canonical: '/' },
+  keywords: [
+    'DevOps','Networking','Cloud','Linux','Docker','Kubernetes','Bangla','Tutorial','WebX','Anis Afifi','Programming','AI','Open Source'
+  ],
+  authors: [{ name: 'Anis Afifi' }],
+  creator: 'WebX Beyond',
+  publisher: 'WebX Beyond',
+  category: 'technology',
+  openGraph: { locale: 'en_US' },
+  twitter: { site: '@money_is_shark' },
+  icons: { icon: '/logo.png' },
 });
 
 export const viewport: Viewport = {
@@ -33,12 +41,31 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={tiroBangla.className} suppressHydrationWarning>
+  <html lang="en" className={tiroBangla.className} suppressHydrationWarning>
       <Body>
         
       {/* <CustomBanner/> */}
         <Provider>
             <OfflineProvider />
+                {/* Global JSON-LD */}
+                <script
+                  type="application/ld+json"
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                      '@context': 'https://schema.org',
+                      '@type': 'WebSite',
+                      name: 'ওয়েবএক্স',
+                      url: baseUrl.toString(),
+                      inLanguage: 'bn',
+                      potentialAction: {
+                        '@type': 'SearchAction',
+                        target: `${baseUrl.toString()}search?q={search_term_string}`,
+                        'query-input': 'required name=search_term_string',
+                      },
+                    }),
+                  }}
+                />
                 {children}
         </Provider>
       </Body>

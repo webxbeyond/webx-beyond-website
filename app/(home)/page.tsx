@@ -34,9 +34,9 @@ export default function Page() {
           {/* Curated starting points */}
           <SelectTopics />
           {/* Full topic catalogue */}
-          <Topics />
+          {/* <Topics /> */}
           {/* Recently curated / featured docs */}
-          <FeaturedLessons />
+          {/* <FeaturedLessons /> */}
           {/* Why WebX Beyond (benefits) */}
           <WhyWebX />
           {/* Free CTA */}
