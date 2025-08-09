@@ -53,8 +53,8 @@ export default function Hero() {
                     const rect = target.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    const rx = ((y / rect.height) - 0.5) * 8; // rotateX
-                    const ry = ((x / rect.width) - 0.5) * -8; // rotateY
+                    const rx = ((y / rect.height) - 0.5) * 8;
+                    const ry = ((x / rect.width) - 0.5) * -8;
                     target.style.setProperty('--tilt', `rotateX(${rx}deg) rotateY(${ry}deg)`);
                   }}
                   onMouseLeave={(e) => {
