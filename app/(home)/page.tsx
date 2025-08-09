@@ -177,26 +177,65 @@ function Expectations() {
 }
 
 function LearningPath() {
-  const steps = [
-    { t: 'বেসিক শিখুন', d: 'ভিত্তি শক্ত করুন: ওয়েব, প্রোগ্রামিং, টুলিং।' },
-    { t: 'প্র্যাকটিস করুন', d: 'চিটশিট ও ছোট অনুশীলনে আত্মবিশ্বাস বাড়ান।' },
-    { t: 'প্রজেক্ট বানান', d: 'আইডিয়া থেকে বাস্তব অ্যাপ—ডিপ্লয় পর্যন্ত।' },
-    { t: 'অটোমেট ও অপ্টিমাইজ', d: 'ডেভঅপস, পারফরম্যান্স ও এআই টুলিং।' },
-    { t: 'ক্যারিয়ার প্রস্তুতি', d: 'প্রফেশনাল দক্ষতা ও প্রোফাইল শার্প করুন।' },
+  const steps: { t: string; d: string; icon: string; hint?: string; cta?: { label: string; href: string } }[] = [
+    { t: 'বেসিক শিখুন', icon: 'ph:brackets-curly-duotone', d: 'ওয়েব ভিত্তি, HTML/CSS, জাভাস্ক্রিপ্ট ও গিট দিয়ে একটি মজবুত ফান্ডামেন্টাল গড়ে তুলুন।', hint: 'শুরুর ১–২ সপ্তাহ', cta: { label: 'HTML & CSS', href: '/html-css' } },
+    { t: 'প্র্যাকটিস করুন', icon: 'ph:lightning-duotone', d: 'চিটশিট / ছোট অনুশীলনে নিয়মিত পুনরাবৃত্তি করে স্মৃতি শক্ত করুন ও হাত গরম রাখুন।', hint: 'দৈনিক অভ্যাস', cta: { label: 'Cheatsheets', href: '/cheatsheet' } },
+    { t: 'প্রজেক্ট বানান', icon: 'ph:stack-duotone', d: 'আইডিয়া বাছাই, ফিচার পরিকল্পনা, ভার্সন কন্ট্রোল, ডিপ্লয়—এন্ড টু এন্ড নির্মাণ।', hint: '২–৬ সপ্তাহ', cta: { label: 'Node.js', href: '/nodejs' } },
+    { t: 'অটোমেট ও অপ্টিমাইজ', icon: 'ph:gear-six-duotone', d: 'ডেভঅপস, ক্লাউড, পারফরম্যান্স টিউনিং, সিকিউরিটি বেসিক ও এআই টুলিং ইন্টিগ্রেশন।', hint: 'ইন্টারমিডিয়েট', cta: { label: 'DevOps', href: '/dev-ops' } },
+    { t: 'ক্যারিয়ার প্রস্তুতি', icon: 'ph:flag-checkered-duotone', d: 'প্রোফাইল/personal ব্র্যান্ড, ওপেন সোর্স কন্ট্রিবিউশন ও ইন্টারভিউ প্র্যাকটিস।', hint: 'চলমান', cta: { label: 'Start Now', href: '#select-topics' } },
   ];
   return (
-    <section className="px-6 md:px-12 py-10 md:py-12">
+    <section className="px-6 md:px-12 py-10 md:py-14">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">লার্নিং পথ</h2>
-      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8">একটি নিরবচ্ছিন্ন জার্নি—একেক ধাপ আপনার দক্ষতা মজবুত করবে।</p>
-      <ol className="mx-auto flex max-w-4xl flex-col gap-4 md:gap-5">
+      <p className="text-center text-fd-muted-foreground max-w-3xl mx-auto mb-10 text-sm md:text-base">ধাপে ধাপে অগ্রগতির একটি স্পষ্ট মানচিত্র। প্রতিটি স্টেপ পূর্বের ওপর দাঁড়িয়ে বাস্তব দক্ষতা তৈরি করে।</p>
+      {/* Horizontal stepper on md+, vertical on mobile */}
+      <ol className="relative mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:gap-4">
         {steps.map((s, i) => (
           <SlideUp key={s.t} delay={i * 0.05}>
-            <li className="relative rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-4 md:p-5">
-              <div className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <span className="inline-flex size-6 items-center justify-center rounded-full bg-fd-primary/20 text-fd-primary text-[11px] font-bold">{i + 1}</span>
-                {s.t}
+            <li
+              className="group relative flex-1 rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 backdrop-blur px-5 py-5 md:px-5 md:py-6 transition-colors hover:bg-fd-muted/50"
+            >
+              {/* Connector (desktop) */}
+              {i < steps.length - 1 && (
+                <span className="hidden md:block absolute top-1/2 left-[calc(100%+0.25rem)] h-[2px] w-[calc(100%-1rem)] bg-gradient-to-r from-fd-primary/30 to-fd-secondary/30" aria-hidden />
+              )}
+              <div className="mb-3 flex items-start gap-3">
+                <div className="relative">
+                  <span className="flex size-10 items-center justify-center rounded-xl border border-fd-foreground/10 bg-fd-background/70 shadow-sm shadow-fd-primary/10">
+                    <Iconify icon={s.icon} width={22} className="text-fd-primary" />
+                  </span>
+                  <span className="absolute -bottom-1 -right-1 inline-flex size-5 items-center justify-center rounded-full bg-gradient-to-br from-fd-primary to-fd-secondary text-[11px] font-bold text-white shadow">
+                    {i + 1}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm md:text-base font-semibold tracking-tight mb-1 flex items-center gap-2">
+                    {s.t}
+                    {s.hint && (
+                      <span className="inline-flex items-center rounded-full border border-fd-foreground/10 bg-fd-background/60 px-2 py-[2px] text-[10px] font-medium text-fd-muted-foreground">
+                        {s.hint}
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs md:text-sm leading-relaxed text-fd-muted-foreground mb-3">{s.d}</p>
+                  {s.cta && (
+                    <Link
+                      href={s.cta.href}
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm', className: 'rounded-full !h-7 text-xs px-3 py-0 backdrop-blur supports-[backdrop-filter]:bg-fd-background/60' }))}
+                      aria-label={`${s.t} - ${s.cta.label}`}
+                    >
+                      {s.cta.label}
+                      <Iconify icon="ph:arrow-up-right-duotone" width={14} className="ml-1" />
+                    </Link>
+                  )}
+                </div>
               </div>
-              <p className="text-xs md:text-sm text-fd-muted-foreground leading-relaxed">{s.d}</p>
+              {/* Mobile connector (vertical) */}
+              {i < steps.length - 1 && (
+                <span className="md:hidden absolute left-5 bottom-[-1.35rem] h-6 w-[2px] bg-gradient-to-b from-fd-primary/40 to-fd-secondary/40" aria-hidden />
+              )}
+              {/* Hover ring */}
+              <span className="pointer-events-none absolute inset-0 rounded-2xl ring-0 ring-fd-primary/0 transition group-hover:ring-2 group-hover:ring-fd-primary/30" aria-hidden />
             </li>
           </SlideUp>
         ))}
