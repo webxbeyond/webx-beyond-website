@@ -29,7 +29,7 @@ export function HighlightCard({ icon, title, description, href, badge, className
   return (
     <Link
       href={href}
-      className={`group block focus:outline-none rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-6 transition-colors hover:bg-fd-muted/50 focus-visible:ring-2 focus-visible:ring-fd-primary/40 ${className || ''}`.trim()}
+      className={`group h-full flex flex-col focus:outline-none rounded-2xl border border-fd-foreground/10 bg-fd-muted/30 p-6 transition-colors hover:bg-fd-muted/50 focus-visible:ring-2 focus-visible:ring-fd-primary/40 ${className || ''}`.trim()}
       aria-label={title}
     >
       <div className="mb-3 flex items-center gap-2">
@@ -46,7 +46,7 @@ export function HighlightCard({ icon, title, description, href, badge, className
         </h3>
       </div>
       {description && (
-        <p className="text-sm text-fd-muted-foreground leading-relaxed line-clamp-4">
+        <p className="text-sm text-fd-muted-foreground leading-relaxed line-clamp-4 mt-auto">
           {description}
         </p>
       )}
