@@ -1,3 +1,11 @@
 {
-  "pages": ["dev-ops", "networking", "nodejs", "html-css", "cheatsheet", "ai"]
+  "pages": [
+    "html-css",      
+    "git",           
+    "cheatsheet",    
+    "nodejs",        
+    "dev-ops",       
+    "networking",    
+    "ai"             
+  ]
 }

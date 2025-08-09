@@ -51,30 +51,9 @@ export default function Hero() {
             </Stagger>
             <SlideUp>
               <div className="inline-flex flex-wrap items-center gap-4 max-md:justify-center mb-10">
-                <Link
-                  href="/#select-topics"
-                  className={cn(
-                    buttonVariants({
-                      size: 'lg',
-                      className: 'rounded-full shadow-lg shadow-fd-primary/20 hover:shadow-fd-primary/40 transition-shadow',
-                      variant: 'secondary',
-                    }),
-                  )}
-                >
+                <Link href="#select-topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full backdrop-blur supports-[backdrop-filter]:bg-fd-background/60', variant: 'outline' }))}>
                   আপনার জার্নি শুরু করুন
                   <Iconify icon="ph:arrow-right-duotone" width={18} className="ml-1" />
-                </Link>
-                <Link
-                  href="#select-topics"
-                  className={cn(
-                    buttonVariants({
-                      size: 'lg',
-                      className: 'rounded-full backdrop-blur supports-[backdrop-filter]:bg-fd-background/60',
-                      variant: 'outline',
-                    }),
-                  )}
-                >
-                  টপিকস এক্সপ্লোর করুন
                 </Link>
               </div>
             </SlideUp>

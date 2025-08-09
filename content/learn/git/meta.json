@@ -1,0 +1,9 @@
+{
+  "title": "গিট ও গিটহাব",
+  "description": "HTML ও CSS -এর সহজ পাঠ",
+  "icon": "teenyicons:git-solid",
+  "root": true,
+  "pages": [
+    "index"
+  ]
+}

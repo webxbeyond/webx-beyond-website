@@ -66,6 +66,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     }),
                   }}
                 />
+                <script
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                      '@context': 'https://schema.org',
+                      '@type': 'Organization',
+                      name: 'WebX Beyond',
+                      url: baseUrl.toString(),
+                      logo: new URL('/logo.png', baseUrl).toString(),
+                      sameAs: [
+                        'https://github.com/webxbeyond'
+                      ],
+                      founder: { '@type': 'Person', name: 'Anis Afifi' }
+                    })
+                  }}
+                />
                 {children}
         </Provider>
       </Body>

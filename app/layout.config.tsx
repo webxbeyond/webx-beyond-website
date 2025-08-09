@@ -1,7 +1,7 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from "next/image";
-import {LinkItemType} from "fumadocs-ui/layouts/links";
-import { Book, ComponentIcon, Layout, Pencil, Server,} from "lucide-react";
+import { LinkItemType } from "fumadocs-ui/layouts/links";
+import { Book, ComponentIcon, Layout, Pencil, Server, Newspaper } from "lucide-react";
 import Img from "./(home)/img.png";
 
 /**
@@ -28,98 +28,33 @@ export const linkItems: LinkItemType[] = [
 
 export const logo = (
     <>
-      <Image
-          alt="WebX"
-          src="/logo.png"
-          sizes="100px"
-          width={35}
-          height={35}
-          aria-label="WebX"
-      />
+        <Image
+            alt="WebX"
+            src="/logo.png"
+            sizes="100px"
+            width={35}
+            height={35}
+            aria-label="WebX"
+        />
     </>
 );
 
 export const baseOptions: BaseLayoutProps = {
-  nav: {
-    title: (
-        <>
-          {logo}
-        {/*  <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">*/}
-        {/*  anisafifi.sh*/}
-        {/*</span>*/}
-        </>
-    ),
-    transparentMode: 'top',
-  },
-  links: [
-      {
-          type: 'menu',
-          text: 'চলো শুরু করি',
-          url: '/#select-topics',
-          items: [
-              {
-                  menu: {
-                      banner: (
-                          <div className="-mx-3 -mt-3">
-                              <Image
-                                  src={Img}
-                                  alt="Anis Afifi"
-                                  width={200}
-                                  height={200}
-                                  className="rounded-t-lg object-cover "
-                                  style={{
-                                      maskImage:
-                                          'linear-gradient(to bottom,white 60%,transparent)',
-                                  }}
-                              />
-                          </div>
-                      ),
-                      className: 'md:row-span-2',
-                  },
-                  icon: <Book />,
-                  text: 'DevOps',
-                  description: 'Learn the most earning skill of DevOps.',
-                  url: '/dev-ops',
-              },
-              {
-                  icon: <ComponentIcon />,
-                  text: 'Components',
-                  description: 'Add interactive experience to your docs.',
-                  url: '/docs/ui/components',
-                  menu: {
-                      className: 'lg:col-start-2',
-                  },
-              },
-              {
-                  icon: <Server />,
-                  text: 'OpenAPI',
-                  description:
-                      'Generate interactive playgrounds and docs for your OpenAPI schema.',
-                  url: '/docs/ui/openapi',
-                  menu: {
-                      className: 'lg:col-start-2',
-                  },
-              },
-              {
-                  icon: <Pencil />,
-                  text: 'Markdown',
-                  description: 'Learn the writing format/syntax of Fumadocs.',
-                  url: '/docs/ui/markdown',
-                  menu: {
-                      className: 'lg:col-start-3 lg:row-start-1',
-                  },
-              },
-              {
-                  icon: <Layout />,
-                  text: 'Layouts',
-                  description: 'See the available layouts of Fumadocs UI.',
-                  url: '/docs/ui/blocks',
-                  menu: {
-                      className: 'lg:col-start-3',
-                  },
-              },
-          ],
-      },
-      ...linkItems,
-  ],
+    nav: {
+        title: (
+            logo
+        ),
+        transparentMode: 'top',
+    },
+    links: [
+        { type: 'menu', text: 'চলো শুরু করি', url: '/#select-topics', items: [] },
+        { type: 'menu', text: 'এআই ডিরেক্টরি', url: 'https://ai.webxbeyond.com/', items: [] },
+        {
+            type: 'menu',
+            text: 'টেক নিউজ',
+            url: 'https://webxnewz.com',
+            items: []
+        },
+        ...linkItems,
+    ],
 };

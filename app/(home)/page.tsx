@@ -11,7 +11,7 @@ import { UwuHero } from './uwu';
 export default function Page() {
   return (
     <>
-      <main className="container relative max-w-[1200px] px-2 py-4 z-[2] lg:py-16">
+      <main className="container relative  px-2 py-4 z-[2] lg:py-16">
         <div className="space-y-8 lg:space-y-14">
           {/* Hero */}
           <div className="relative">
@@ -23,7 +23,7 @@ export default function Page() {
           {/* What We Teach (core domains) */}
           <WhatWeTeach />
           {/* Expectations / Value Proposition */}
-            <Expectations />
+          <Expectations />
           {/* Learning Path steps */}
           <LearningPath />
           {/* Curated starting points */}
@@ -104,8 +104,8 @@ function WhyWebX() {
     },
   ];
   return (
-    <section className="px-6 py-12 md:px-12 md:py-16">
-      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">কেন WebX Beyond?</h2>
+    <section className="px-6 py-12 md:px-12 md:py-16 ">
+      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">কেন ওয়েব বিওয়ান্ড?</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {items.map((it, i) => (
           <SlideUp key={it.title} delay={i * 0.05}>
@@ -174,7 +174,6 @@ function LearningPath() {
     { t: 'প্র্যাকটিস করুন', icon: 'ph:lightning-duotone', d: 'চিটশিট / ছোট অনুশীলনে নিয়মিত পুনরাবৃত্তি করে স্মৃতি শক্ত করুন ও হাত গরম রাখুন।', hint: 'দৈনিক অভ্যাস', cta: { label: 'Cheatsheets', href: '/cheatsheet' } },
     { t: 'প্রজেক্ট বানান', icon: 'ph:stack-duotone', d: 'আইডিয়া বাছাই, ফিচার পরিকল্পনা, ভার্সন কন্ট্রোল, ডিপ্লয়—এন্ড টু এন্ড নির্মাণ।', hint: '২–৬ সপ্তাহ', cta: { label: 'Node.js', href: '/nodejs' } },
     { t: 'অটোমেট ও অপ্টিমাইজ', icon: 'ph:gear-six-duotone', d: 'ডেভঅপস, ক্লাউড, পারফরম্যান্স টিউনিং, সিকিউরিটি বেসিক ও এআই টুলিং ইন্টিগ্রেশন।', hint: 'ইন্টারমিডিয়েট', cta: { label: 'DevOps', href: '/dev-ops' } },
-    { t: 'ক্যারিয়ার প্রস্তুতি', icon: 'ph:flag-checkered-duotone', d: 'প্রোফাইল/personal ব্র্যান্ড, ওপেন সোর্স কন্ট্রিবিউশন ও ইন্টারভিউ প্র্যাকটিস।', hint: 'চলমান', cta: { label: 'Start Now', href: '#select-topics' } },
   ];
   return (
     <section className="px-6 md:px-12 py-10 md:py-14">
@@ -203,14 +202,14 @@ function LearningPath() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm md:text-base font-semibold tracking-tight mb-1 flex items-center gap-2">
                     {s.t}
-                    {s.hint && (
+                    {/* {s.hint && (
                       <span className="inline-flex items-center rounded-full border border-fd-foreground/10 bg-fd-background/60 px-2 py-[2px] text-[10px] font-medium text-fd-muted-foreground">
                         {s.hint}
                       </span>
-                    )}
+                    )} */}
                   </h3>
                   <p className="text-xs md:text-sm leading-relaxed text-fd-muted-foreground mb-3">{s.d}</p>
-                  {s.cta && (
+                  {/* {s.cta && (
                     <Link
                       href={s.cta.href}
                       className={cn(buttonVariants({ variant: 'outline', size: 'sm', className: 'rounded-full !h-7 text-xs px-3 py-0 backdrop-blur supports-[backdrop-filter]:bg-fd-background/60' }))}
@@ -219,7 +218,7 @@ function LearningPath() {
                       {s.cta.label}
                       <Iconify icon="ph:arrow-up-right-duotone" width={14} className="ml-1" />
                     </Link>
-                  )}
+                  )} */}
                 </div>
               </div>
               {/* Mobile connector (vertical) */}
@@ -247,11 +246,8 @@ function FreeCTA() {
         এখনই একটি টপিক বেছে নিয়ে শুরু করুন—কোনো সাইনআপ বা পেমেন্ট ছাড়াই। ভবিষ্যতে আরও প্র্যাকটিস, কমিউনিটি ও প্রজেক্ট যুক্ত হবে।
       </p>
       <div className="relative flex flex-wrap justify-center gap-4">
-        <Link href="#select-topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full shadow-lg shadow-fd-primary/20 hover:shadow-fd-primary/40', variant: 'secondary' }))}>
-          শুরু করুন
-          <Iconify icon="ph:arrow-right-duotone" width={18} className="ml-1" />
-        </Link>
-        <Link href="#topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full backdrop-blur supports-[backdrop-filter]:bg-fd-background/60', variant: 'outline' }))}>
+
+        <Link href="#select-topics" className={cn(buttonVariants({ size: 'lg', className: 'rounded-full backdrop-blur supports-[backdrop-filter]:bg-fd-background/60', variant: 'outline' }))}>
           সব টপিক দেখুন
           <Iconify icon="ph:list-bullets-duotone" width={18} className="ml-1" />
         </Link>
@@ -260,138 +256,6 @@ function FreeCTA() {
   );
 }
 
-// Hero moved to client component ./hero.tsx
-
-// Deprecated (hidden) Topics section retained for future use
-/* function Topics() {
-  // helper moved here for clarity; could be hoisted if reused elsewhere
-  type Topic = {
-    slug: string;
-    title: string;
-    description?: string;
-    icon: string;
-    href: string;
-    count?: number;
-  };
-
-  const loadTopics = (): Topic[] => {
-    const rootDir = path.join(process.cwd(), 'content', 'learn');
-    let list: Topic[] = [];
-    try {
-      const topMeta = JSON.parse(
-        fs.readFileSync(path.join(rootDir, 'meta.json'), 'utf8'),
-      ) as { pages: string[] };
-
-      list = topMeta.pages
-        .filter((slug) => typeof slug === 'string')
-        .map((slug) => {
-          try {
-            const metaPath = path.join(rootDir, slug, 'meta.json');
-            const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')) as {
-              title?: string;
-              description?: string;
-              icon?: string;
-              pages?: string[];
-            };
-            const count = (meta.pages ?? []).filter(
-              (p) =>
-                typeof p === 'string' &&
-                p !== 'index' &&
-                !p.startsWith('---') &&
-                p !== '...' &&
-                p.trim().length > 0,
-            ).length;
-            return {
-              slug,
-              title: meta.title ?? slug,
-              description: meta.description,
-              icon: meta.icon ?? 'ph:bookmark-duotone',
-              href: `/${slug}`,
-              count,
-            } satisfies Topic;
-          } catch {
-            return {
-              slug,
-              title: slug,
-              href: `/${slug}`,
-              icon: 'ph:bookmark-duotone',
-            } as Topic;
-          }
-        });
-
-      // Enrich with selected cheatsheet subtopics
-      const cheatsheetMetaPath = path.join(rootDir, 'cheatsheet', 'meta.json');
-      if (fs.existsSync(cheatsheetMetaPath)) {
-        const cmeta = JSON.parse(fs.readFileSync(cheatsheetMetaPath, 'utf8')) as {
-          pages?: string[];
-        };
-        const picks = (cmeta.pages ?? []).filter((p) =>
-          ['aws', 'google-cloud', 'docker', 'kubernetes', 'git', 'linux'].includes(p),
-        );
-        for (const p of picks) {
-          list.push({
-            slug: `cheatsheet/${p}`,
-            title:
-              p === 'aws' ? 'AWS' :
-                p === 'google-cloud' ? 'Google Cloud' :
-                  p === 'docker' ? 'Docker' :
-                    p === 'kubernetes' ? 'Kubernetes' :
-                      p === 'git' ? 'Git' :
-                        p === 'linux' ? 'Linux' : p,
-            description: 'চিটশিট দিয়ে দ্রুত শিখুন।',
-            href: `/cheatsheet/${p}`,
-            icon:
-              p === 'aws' ? 'mdi:aws' :
-                p === 'google-cloud' ? 'logos:google-cloud' :
-                  p === 'docker' ? 'mdi:docker' :
-                    p === 'kubernetes' ? 'mdi:kubernetes' :
-                      p === 'git' ? 'mdi:git' :
-                        p === 'linux' ? 'mdi:linux' : 'ph:bookmark-duotone',
-          });
-        }
-      }
-    } catch {
-      // fallback minimal set
-      list = [
-        {
-          slug: 'html-css',
-          title: 'ওয়েব ডেভেলপমেন্ট',
-          href: '/html-css',
-          icon: 'ph:code-bold',
-          description: 'HTML এবং CSS দিয়ে শুরু করুন।',
-        },
-        {
-          slug: 'javascript',
-          title: 'জাভাস্ক্রিপ্ট',
-          href: '/javascript',
-          icon: 'mdi:language-javascript',
-          description: 'জাভাস্ক্রিপ্ট দিয়ে ইন্টারেক্টিভ ওয়েবসাইট তৈরি করুন।',
-        },
-      ];
-    }
-    return list;
-  };
-
-  const topics = loadTopics();
-
-  return (
-    <section id="topics" className="px-6 py-10 md:px-12 md:py-14">
-      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">সব টপিক</h2>
-      <p className="text-center text-fd-muted-foreground max-w-2xl mx-auto mb-8 text-sm md:text-base">সব ক্যাটাগরির একটি পূর্ণ তালিকা। যেকোনো জায়গা থেকে জাম্প ইন করতে পারেন—প্রতিটি সেকশনে প্রগ্রেসিভ কাঠামো।</p>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {topics.map((t, i) => (
-          <SlideUp key={t.slug} delay={i * 0.05}>
-            <Highlight href={t.href} icon={t.icon} heading={t.title}>
-              {t.description || 'সংক্ষিপ্ত পরিচিতি পাওয়া যাচ্ছে না।'}
-            </Highlight>
-          </SlideUp>
-        ))}
-      </div>
-    </section>
-  );
-} */
-
-// curated manual selection section (migrated from former select-topic page)
 function SelectTopics() {
   const cards: {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }
@@ -406,78 +270,37 @@ function SelectTopics() {
       { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
+
+  const current = cards.filter(c => !c.badge || c.badge.variant === 'progress');
+  const upcoming = cards.filter(c => c.badge?.variant === 'soon');
   return (
     <section id="select-topics" className="px-6 pt-12 md:px-12 md:pt-16">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">শুরু করার জন্য বেছে নিন</h2>
       <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন।</p>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {cards.map((c, i) => (
-          <SlideUp key={c.title} delay={i * 0.05}>
-            <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
-          </SlideUp>
-        ))}
+      {/* Current / Active topics */}
+      <div className="mb-12">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {current.map((c, i) => (
+            <SlideUp key={c.title} delay={i * 0.05}>
+              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+            </SlideUp>
+          ))}
+        </div>
       </div>
+
+      {/* Upcoming topics */}
+      {upcoming.length > 0 && (
+        <div>
+          <h3 className="text-center font-semibold mb-4">শীঘ্রই আসছে</h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 opacity-80">
+            {upcoming.map((c, i) => (
+              <SlideUp key={c.title} delay={i * 0.05}>
+                <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+              </SlideUp>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-
-/* async function FeaturedLessons() {
-  type LessonLink = { href: string; title: string; category: string };
-  const loadFeatured = async (): Promise<LessonLink[]> => {
-    const bucket: LessonLink[] = [];
-    const rootDir = path.join(process.cwd(), 'content', 'learn');
-    try {
-      const topMeta = JSON.parse(
-        fs.readFileSync(path.join(rootDir, 'meta.json'), 'utf8'),
-      ) as { pages: string[] };
-      for (const slug of topMeta.pages) {
-        if (typeof slug !== 'string') continue;
-        const metaPath = path.join(rootDir, slug, 'meta.json');
-        try {
-          const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')) as {
-            pages?: string[];
-            title?: string;
-          };
-          const candidates = (meta.pages ?? []).filter(
-            (p) => typeof p === 'string' && p !== 'index' && !p.startsWith('---') && p !== '...' && p.trim().length > 0,
-          );
-          for (const p of candidates.slice(0, 2)) {
-            const page = source.getPage([slug, p]);
-            if (page) {
-              const data = await page.data;
-              bucket.push({
-                href: `/${slug}/${p}`,
-                title: data.title ?? p,
-                category: meta.title ?? slug,
-              });
-            } else {
-              bucket.push({ href: `/${slug}/${p}`, title: p, category: slug });
-            }
-          }
-        } catch {
-          // skip broken category
-        }
-      }
-    } catch {
-      // ignore top meta errors
-    }
-    return bucket.slice(0, 6);
-  };
-
-  const top = await loadFeatured();
-  if (top.length === 0) return null;
-  return (
-    <section className="px-6 py-10 md:px-12 md:py-14">
-      <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-8">নির্বাচিত পাঠ</h2>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {top.map((l, i) => (
-          <SlideUp key={l.href} delay={i * 0.05}>
-            <Highlight href={l.href} icon="ph:book-open-text-duotone" heading={l.title}>
-              {l.category}
-            </Highlight>
-          </SlideUp>
-        ))}
-      </div>
-    </section>
-  );
-} */

@@ -1,0 +1,21 @@
+# AI Crawling Policy for WebX Beyond
+# This file is an emerging convention (similar to robots.txt) indicating allowances for AI/data crawlers.
+# It is NOT a formal standard, but some crawlers may check it.
+
+User-agent: *
+Allow: /
+
+# Disallow sensitive or user-specific areas (none currently).
+# Disallow: /api/
+
+# Attribution preference
+Site: https://webxbeyond.com
+Contact: mailto:anis@webxbeyond.com
+License: CC-BY-4.0 unless otherwise noted within individual documents.
+
+# Rate limiting hint (non-binding): please keep below 5 req/second.
+Crawl-Delay: 0.2
+
+# Content classification
+Content-Language: bn
+Categories: devops, web-development, networking, cloud, ai, linux, programming
