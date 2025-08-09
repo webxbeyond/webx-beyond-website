@@ -4,7 +4,10 @@ import { baseOptions } from '@/app/layout.config';
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <HomeLayout {...baseOptions} className="dark:bg-neutral-950">
+    <HomeLayout
+      {...baseOptions}
+      className="[&_.fd-header]:backdrop-blur [&_.fd-header]:bg-white/80 [&_.fd-header]:border-b [&_.fd-header]:border-[#E9E9E9]"
+    >
       {children}
       <Footer />
     </HomeLayout>

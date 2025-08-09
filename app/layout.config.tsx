@@ -2,8 +2,8 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from "next/image";
 import {LinkItemType} from "fumadocs-ui/layouts/links";
 import { X } from './(home)/svg';
-// import { Book, ComponentIcon, Layout, Pencil, Server,} from "lucide-react";
-// import Img from "./(home)/img.png";
+import { Book, ComponentIcon, Layout, Pencil, Server,} from "lucide-react";
+import Img from "./(home)/img.png";
 
 /**
  * Shared layout configurations
@@ -16,7 +16,7 @@ import { X } from './(home)/svg';
 export const linkItems: LinkItemType[] = [
     {
         type: 'icon',
-        url: 'https://github.com/anisafifi',
+        url: 'https://github.com/webxbeyond',
         text: 'Github',
         icon: (
             <svg role="img" viewBox="0 0 24 24" fill="currentColor">
@@ -52,75 +52,44 @@ export const baseOptions: BaseLayoutProps = {
     ),
     transparentMode: 'top',
   },
-//   links: [
-//       {
-//           type: 'menu',
-//           text: 'চলো শুরু করি',
-//           url: '/learn',
-//           items: [
-//               {
-//                   menu: {
-//                       banner: (
-//                           <div className="-mx-3 -mt-3">
-//                               <Image
-//                                   src={Img}
-//                                   alt="Anis Afifi"
-//                                   width={200}
-//                                   height={200}
-//                                   className="rounded-t-lg object-cover "
-//                                   style={{
-//                                       maskImage:
-//                                           'linear-gradient(to bottom,white 60%,transparent)',
-//                                   }}
-//                               />
-//                           </div>
-//                       ),
-//                       className: 'md:row-span-2',
-//                   },
-//                   icon: <Book />,
-//                   text: 'DevOps',
-//                   description: 'Learn the most earning skill of DevOps.',
-//                   url: '/learn/dev-ops',
-//               },
-//               {
-//                   icon: <ComponentIcon />,
-//                   text: 'Components',
-//                   description: 'Add interactive experience to your docs.',
-//                   url: '/docs/ui/components',
-//                   menu: {
-//                       className: 'lg:col-start-2',
-//                   },
-//               },
-//               {
-//                   icon: <Server />,
-//                   text: 'OpenAPI',
-//                   description:
-//                       'Generate interactive playgrounds and docs for your OpenAPI schema.',
-//                   url: '/docs/ui/openapi',
-//                   menu: {
-//                       className: 'lg:col-start-2',
-//                   },
-//               },
-//               {
-//                   icon: <Pencil />,
-//                   text: 'Markdown',
-//                   description: 'Learn the writing format/syntax of Fumadocs.',
-//                   url: '/docs/ui/markdown',
-//                   menu: {
-//                       className: 'lg:col-start-3 lg:row-start-1',
-//                   },
-//               },
-//               {
-//                   icon: <Layout />,
-//                   text: 'Layouts',
-//                   description: 'See the available layouts of Fumadocs UI.',
-//                   url: '/docs/ui/blocks',
-//                   menu: {
-//                       className: 'lg:col-start-3',
-//                   },
-//               },
-//           ],
-//       },
-//       ...linkItems,
-//   ],
+  links: [
+            {
+                type: 'menu',
+                text: 'টপিকস',
+                url: '/#topics',
+                items: [
+                    {
+                        icon: <Book />,
+                        text: 'ওয়েব ডেভ',
+                        description: 'HTML, CSS, JS, React, Next.js ভিত্তি ও প্র্যাকটিস।',
+                        url: '/html-css',
+                    },
+                    {
+                        icon: <Server />,
+                        text: 'ডেভঅপস',
+                        description: 'Linux, Docker, CI/CD, Kubernetes মৌলিক থেকে বাস্তব।',
+                        url: '/dev-ops',
+                    },
+                    {
+                        icon: <Pencil />,
+                        text: 'এআই',
+                        description: 'এআই টুলিং ও ডেভেলপার ওয়ার্কফ্লো ইন্টিগ্রেশন।',
+                        url: '/ai',
+                    },
+                    {
+                        icon: <Layout />,
+                        text: 'নেটওয়ার্কিং',
+                        description: 'নেটওয়ার্ক ভিত্তি, ট্রাবলশুটিং ও সিকিউরিটি।',
+                        url: '/networking',
+                    },
+                    {
+                        icon: <ComponentIcon />,
+                        text: 'চিটশিট',
+                        description: 'দ্রুত রেফারেন্সের জন্য সংক্ষিপ্ত নোটসমূহ।',
+                        url: '/cheatsheet',
+                    },
+                ],
+            },
+      ...linkItems,
+  ],
 };
