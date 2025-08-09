@@ -1,0 +1,20 @@
+---
+title: SSL / TLS অটোমেশন
+icon: ph:lock-key-duotone
+---
+
+Let's Encrypt ব্যবহার করে অটো রিনিউ SSL সেটআপ।
+
+## Certbot Quickstart
+```bash
+apt install -y certbot
+certbot certonly --standalone -d example.com -d '*.example.com'
+```
+
+## Renewal
+ক্রন / systemd timer সাধারণত অটো অ্যাড হয়। টেস্ট:
+```bash
+certbot renew --dry-run
+```
+
+> পরবর্তী: মনিটরিং স্ট্যাক।

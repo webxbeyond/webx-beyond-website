@@ -258,16 +258,17 @@ function FreeCTA() {
 
 function SelectTopics() {
   const cards: {
-    title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }
+    title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
-      { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' } },
-      { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' } },
-      { title: 'নোড জেএস', description: 'বর্তমান সময়ে সবচেয়ে জনপ্রিয় সার্ভার সাইড জাভাস্ক্রিপ্ট রানটাইম এবং একটি লাইব্রেরি।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' } },
-      { title: 'HTML ও CSS', description: 'বিল্ডিং ব্লক অফ ওয়েবসাইট।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' } },
-      { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'আমার প্রোগ্রামিং শেখার ব্যাক্তিগত নোটবুক।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet' },
+      { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' }, progress: 15 },
+      { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' }, progress: 10 },
+      { title: 'নোড জেএস', description: 'বর্তমান সময়ে সবচেয়ে জনপ্রিয় সার্ভার সাইড জাভাস্ক্রিপ্ট রানটাইম এবং একটি লাইব্রেরি।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' }, progress: 40 },
+      { title: 'HTML ও CSS', description: 'বিল্ডিং ব্লক অফ ওয়েবসাইট।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' }, progress: 70 },
+      { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'আমার প্রোগ্রামিং শেখার ব্যাক্তিগত নোটবুক।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' }, progress: 75 },
       { title: 'নেটওয়ার্কিং', description: 'বিভিন্ন কম্পিউটার এবং ডিভাইসের মধ্যে সংযোগ স্থাপন ও ডেটা আদান-প্রদান সংক্রান্ত প্রযুক্তি।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'সেলফ হোস্টিং', description: 'ওপেন-সোর্স সফটওয়্যার নিজস্ব সার্ভার/ইনফ্রায় চালানো: রিভার্স প্রক্সি, মনিটরিং, ব্যাকআপ, সিকিউরিটি বেসিক।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' }, progress: 5 },
       { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
 
@@ -282,7 +283,7 @@ function SelectTopics() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {current.map((c, i) => (
             <SlideUp key={c.title} delay={i * 0.05}>
-              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} progress={c.progress} />
             </SlideUp>
           ))}
         </div>

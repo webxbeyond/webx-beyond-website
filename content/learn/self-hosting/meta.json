@@ -1,0 +1,24 @@
+{
+  "title": "সেলফ হোস্টিং",
+  "description": "নিজস্ব সার্ভার / VPS / হোম ল্যাবে ওপেন-সোর্স সার্ভিস চালানোর পরিচিতি",
+  "icon": "ph:cloud-arrow-down-duotone",
+  "root": true,
+  "pages": [
+    "index",
+    "getting-started-env",
+    "reverse-proxy-basics",
+    "ssl-automation",
+    "monitoring-stack",
+    "backup-strategy",
+    "security-hardening",
+    "deployment-patterns",
+    "container-networking",
+    "orchestration-intro",
+    "secrets-management",
+    "zero-downtime-deploy",
+    "logging-observability",
+    "maintenance-checklist",
+    "---সেলফ হোস্টিঅ্যাবল অ্যাপস---",
+    "index-self-hosted-apps"
+  ]
+}
