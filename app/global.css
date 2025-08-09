@@ -2,4 +2,92 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 
-@source '../node_modules/fumadocs-ui/dist/**/*.js';
+/* (removed @source directive not supported by current toolchain) */
+
+/* Custom theme overrides */
+:root {
+	--color-fd-primary: #1F80FF;
+	--color-fd-secondary: #1F80FF; /* single primary used for accents */
+	--color-fd-background: #F6F7FA;
+	--color-fd-muted: #FFFFFF;
+	--color-fd-border: #E9E9E9;
+	--color-fd-foreground: #202935; /* main text */
+	--color-fd-muted-foreground: #6C7781; /* secondary text */
+
+	/* Semantic bridging for existing components */
+	--fd-background: var(--color-fd-background);
+	--fd-card: var(--color-fd-muted);
+	--fd-card-foreground: var(--color-fd-foreground);
+	--fd-border: var(--color-fd-border);
+	--fd-muted: var(--color-fd-muted);
+	--fd-muted-foreground: var(--color-fd-muted-foreground);
+	--fd-popover: var(--color-fd-muted);
+	--fd-popover-foreground: var(--color-fd-foreground);
+	--fd-primary: var(--color-fd-primary);
+	--fd-primary-foreground: #ffffff;
+	--fd-secondary: #0F5FCC; /* darker shade for depth */
+	--fd-secondary-foreground: #ffffff;
+	--fd-accent: #1F80FF;
+	--fd-accent-foreground: #ffffff;
+	--fd-destructive: #d92d20;
+	--fd-destructive-foreground: #ffffff;
+	--fd-ring: #1F80FF;
+	--fd-radius: 0.75rem;
+}
+
+/* Dark mode (fallback keeps previous neutral) */
+@media (prefers-color-scheme: dark) {
+	:root:not(.force-light) {
+		--color-fd-background: #0F1215;
+		--color-fd-muted: #14181c;
+		--color-fd-border: #222a31;
+		--color-fd-foreground: #F6F7FA;
+		--color-fd-muted-foreground: #88929b;
+
+		--fd-background: var(--color-fd-background);
+		--fd-card: var(--color-fd-muted);
+		--fd-card-foreground: var(--color-fd-foreground);
+		--fd-border: var(--color-fd-border);
+		--fd-muted: var(--color-fd-muted);
+		--fd-muted-foreground: var(--color-fd-muted-foreground);
+		--fd-popover: var(--color-fd-muted);
+		--fd-popover-foreground: var(--color-fd-foreground);
+		--fd-primary: #3D8FFF;
+		--fd-primary-foreground: #ffffff;
+		--fd-secondary: #1F80FF;
+		--fd-secondary-foreground: #ffffff;
+		--fd-accent: #3D8FFF;
+		--fd-accent-foreground: #ffffff;
+		--fd-ring: #3D8FFF;
+	}
+}
+
+body {
+	background: var(--color-fd-background);
+	color: var(--color-fd-foreground);
+}
+
+/* Card utility alignment */
+.card, .fd-card, [data-card] {
+	background: var(--fd-card);
+	border: 1px solid var(--fd-border);
+	border-radius: var(--fd-radius);
+}
+
+/* Links */
+a { color: var(--fd-primary); }
+a:hover { color: #0F5FCC; }
+
+/* Buttons override (if using buttonVariants rely on CSS vars) */
+button, .btn-primary, [data-variant="primary"] {
+	--btn-bg: var(--fd-primary);
+	--btn-color: var(--fd-primary-foreground);
+	background: var(--btn-bg);
+	color: var(--btn-color);
+}
+
+/* Subtle scroll bar theming (webkit) */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--color-fd-background); }
+::-webkit-scrollbar-thumb { background: var(--fd-border); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fd-primary); }
