@@ -8,17 +8,17 @@
 
 
 /* Custom theme overrides */
-:root {
-	/* --color-fd-primary: #1F80FF; */
-	/* --color-fd-secondary: #1F80FF;  */
+
+/* :root {
+	--color-fd-primary: #1F80FF;
+	--color-fd-secondary: #1F80FF; 
 	--color-fd-background: #F6F7FA;
 	--color-fd-muted: #FFFFFF;
 	--color-fd-border: #E9E9E9;
 	--color-fd-foreground: #202935; 
 	--color-fd-muted-foreground: #6C7781; 
 
-	/* Semantic bridging for existing components */
-	/* --fd-background: var(--color-fd-background);
+	--fd-background: var(--color-fd-background);
 	--fd-card: var(--color-fd-muted);
 	--fd-card-foreground: var(--color-fd-foreground);
 	--fd-border: var(--color-fd-border);
@@ -35,11 +35,12 @@
 	--fd-destructive: #d92d20;
 	--fd-destructive-foreground: #ffffff;
 	--fd-ring: #1F80FF;
-	--fd-radius: 0.75rem; */
-}
+	--fd-radius: 0.75rem;
+} */
 
 /* Dark mode (fallback keeps previous neutral) */
-@media (prefers-color-scheme: dark) {
+
+/* @media (prefers-color-scheme: dark) {
 	:root:not(.force-light) {
 		--color-fd-background: #0F1215;
 		--color-fd-muted: #14181c;
@@ -47,7 +48,7 @@
 		--color-fd-foreground: #F6F7FA;
 		--color-fd-muted-foreground: #88929b;
 
-		/* --fd-background: var(--color-fd-background);
+		--fd-background: var(--color-fd-background);
 		--fd-card: var(--color-fd-muted);
 		--fd-card-foreground: var(--color-fd-foreground);
 		--fd-border: var(--color-fd-border);
@@ -61,9 +62,9 @@
 		--fd-secondary-foreground: #ffffff;
 		--fd-accent: #3D8FFF;
 		--fd-accent-foreground: #ffffff;
-		--fd-ring: #3D8FFF; */
+		--fd-ring: #3D8FFF;
 	}
-}
+} */
 
 /* body {
 	background: var(--color-fd-background) !important;
