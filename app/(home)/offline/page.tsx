@@ -1,7 +1,4 @@
-"use client";
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { Iconify } from '@/components/iconify';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
@@ -13,6 +10,12 @@ export const metadata = {
 };
 
 export default function OfflinePage() {
+    return <OfflineClient />;
+}
+
+function OfflineClient() {
+    'use client';
+    const { useState, useEffect } = require('react') as typeof import('react');
     const [online, setOnline] = useState(true);
     const [since, setSince] = useState<Date | null>(null);
 
@@ -21,10 +24,7 @@ export default function OfflinePage() {
             const o = navigator.onLine;
             setOnline(o);
             if (!o) setSince(new Date());
-            if (o) {
-                // slight delay to allow network settle then reload to intended page
-                setTimeout(() => window.location.replace('/'), 500);
-            }
+            if (o) setTimeout(() => window.location.replace('/'), 500);
         };
         update();
         window.addEventListener('online', update);
