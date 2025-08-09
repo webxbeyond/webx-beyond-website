@@ -269,6 +269,12 @@ function SelectTopics() {
       { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি ও কোর ওয়েব ভাইটাল উন্নত করার কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'গো (Go)', description: 'কনকারেন্সি ফ্রেন্ডলি, পারফরম্যান্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ শেখা।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের আধুনিক ভাষা।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড দিয়ে পুনরুত্পাদনযোগ্য ক্লাউড রিসোর্স ম্যানেজমেন্ট।', icon: 'logos:terraform-icon', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস ও অ্যালার্টিং দিয়ে সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতা।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
 
   const current = cards.filter(c => !c.badge || c.badge.variant === 'progress');
