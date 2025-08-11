@@ -286,7 +286,7 @@ function SelectTopics() {
       { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'soon' } },
       { title: 'গো (Go)', description: 'কনকারেন্সি ফ্রেন্ডলি, পারফরম্যান্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ শেখা।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের আধুনিক ভাষা।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড দিয়ে পুনরুত্পাদনযোগ্য ক্লাউড রিসোর্স ম্যানেজমেন্ট।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' }, progress: 95 },
+      { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড দিয়ে পুনরুত্পাদনযোগ্য ক্লাউড রিসোর্স ম্যানেজমেন্ট।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' }, progress: 100 },
       { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস ও অ্যালার্টিং দিয়ে সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতা।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
 
