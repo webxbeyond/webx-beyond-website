@@ -1,0 +1,64 @@
+---
+title: REST API বিল্ডিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+REST API তৈরি করা মানে হচ্ছে স্ট্যান্ডার্ড HTTP মেথড (GET, POST, PUT, DELETE) ব্যবহার করে রিসোর্স CRUD অপারেশন ডিজাইন ও ইমপ্লিমেন্ট করা।
+
+## REST API বিল্ডিংয়ের ধাপ
+1. **রিসোর্স ডিজাইন করুন:**
+   - কী কী রিসোর্স থাকবে (যেমন: user, product, order)
+   - URL নাউন-ভিত্তিক ও প্লুরাল রাখুন: `/users`, `/products`
+2. **HTTP মেথড ঠিক করুন:**
+   - GET: ডেটা রিড
+   - POST: নতুন ডেটা তৈরি
+   - PUT/PATCH: ডেটা আপডেট
+   - DELETE: ডেটা ডিলিট
+3. **রেসপন্স ফরম্যাট:**
+   - সাধারণত JSON
+   - স্ট্যাটাস কোড ও মেসেজ স্পষ্ট রাখুন
+4. **ভ্যালিডেশন ও এরর হ্যান্ডলিং:**
+   - ইনপুট চেক করুন
+   - উপযুক্ত স্ট্যাটাস কোড (400, 404, 500) দিন
+5. **ডকুমেন্টেশন:**
+   - Swagger/OpenAPI দিয়ে ডকুমেন্ট করুন
+
+## উদাহরণ: Express.js-এ REST API
+```js
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+let users = [];
+
+app.get('/users', (req, res) => res.json(users));
+app.post('/users', (req, res) => {
+  users.push(req.body);
+  res.status(201).json({msg: 'User created'});
+});
+app.put('/users/:id', (req, res) => {
+  users[req.params.id] = req.body;
+  res.json({msg: 'User updated'});
+});
+app.delete('/users/:id', (req, res) => {
+  users.splice(req.params.id, 1);
+  res.json({msg: 'User deleted'});
+});
+
+app.listen(3000);
+```
+
+## বেস্ট প্র্যাকটিস
+- রিসোর্স URL প্লুরাল রাখুন: `/users`, `/orders`
+- ফিল্টারিং, প্যাজিনেশন, সার্টিং সাপোর্ট করুন
+- কনসিস্টেন্ট স্ট্যাটাস কোড ব্যবহার করুন
+- ডকুমেন্টেশন ও টেস্টিং বাধ্যতামূলক
+
+## টিপস
+- REST API বিল্ডিংয়ের জন্য Boilerplate/Starter Template ব্যবহার করতে পারেন
+- Postman দিয়ে API টেস্ট করুন
+- ডেভেলপমেন্টে Swagger UI দিয়ে ডকুমেন্টেশন দেখুন
+
+---
+
+পরবর্তী ধাপে: ডাটাবেস ইন্টিগ্রেশন!

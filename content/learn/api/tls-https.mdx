@@ -1,0 +1,58 @@
+---
+title: TLS/HTTPS
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# TLS/HTTPS
+
+API নিরাপত্তার জন্য TLS (Transport Layer Security) ও HTTPS অপরিহার্য। এগুলো ডেটা এনক্রিপ্ট করে, ম্যান-ইন-দ্য-মিডল (MITM) অ্যাটাক থেকে রক্ষা করে এবং ইউজার ও সার্ভারের মধ্যে নিরাপদ যোগাযোগ নিশ্চিত করে।
+
+## HTTPS কী?
+- HTTPS মানে HyperText Transfer Protocol Secure
+- HTTP-এর ওপর TLS/SSL লেয়ার যুক্ত হয়
+- ডেটা ট্রান্সমিশন এনক্রিপ্টেড হয়
+
+## TLS কী?
+- TLS (Transport Layer Security) হলো ক্রিপ্টোগ্রাফিক প্রোটোকল
+- SSL (Secure Sockets Layer) ছিল পুরনো ভার্সন
+- TLS v1.2 ও v1.3 বর্তমানে স্ট্যান্ডার্ড
+
+## কেন TLS/HTTPS দরকার?
+- ডেটা এনক্রিপশন: ক্লায়েন্ট-সার্ভার ডেটা কেউ মাঝপথে পড়তে পারে না
+- অথেন্টিকেশন: সার্ভারের পরিচয় যাচাই হয় (সার্টিফিকেট)
+- ডেটা ইন্টিগ্রিটি: ডেটা পরিবর্তন হলে ধরা যায়
+
+## কিভাবে API-তে HTTPS এনাবল করবেন?
+1. **SSL/TLS সার্টিফিকেট কিনুন বা ফ্রি (Let's Encrypt) নিন**
+2. **সার্ভারে ইনস্টল করুন**
+   - Nginx/Apache-এ কনফিগার করুন
+   - ক্লাউড প্ল্যাটফর্মে (Vercel, Netlify, AWS) সাধারণত অটো-ইনস্টল হয়
+3. **HTTP থেকে HTTPS-এ রিডাইরেক্ট করুন**
+4. **API ক্লায়েন্টে HTTPS ব্যবহার বাধ্যতামূলক করুন**
+
+## উদাহরণ: Nginx কনফিগ
+```nginx
+server {
+    listen 443 ssl;
+    server_name api.example.com;
+    ssl_certificate /etc/letsencrypt/live/api.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.example.com/privkey.pem;
+    ...
+}
+```
+
+## বেস্ট প্র্যাকটিস
+- সব API-তে HTTPS বাধ্যতামূলক করুন
+- TLS v1.2 বা v1.3 ব্যবহার করুন
+- সার্টিফিকেট রিনিউয়াল মনিটর করুন
+- HSTS (HTTP Strict Transport Security) এনাবল করুন
+- ক্লায়েন্ট-সাইডে সার্টিফিকেট ভ্যালিডেশন চেক করুন
+
+## টিপস
+- ডেভেলপমেন্টে self-signed সার্টিফিকেট ব্যবহার করা যায়, কিন্তু প্রোডাকশনে নয়
+- সার্টিফিকেট চেইন ও ট্রাস্টেড অথরিটি ব্যবহার করুন
+- API ডকুমেন্টেশনে HTTPS রিকোয়েস্টের উদাহরণ দিন
+
+---
+
+পরবর্তী ধাপে: রেট লিমিটিং ও থ্রেট প্রোটেকশন!

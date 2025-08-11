@@ -1,0 +1,67 @@
+---
+title: ইভেন্ট-ড্রিভেন API (Kafka, AsyncAPI)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ইভেন্ট-ড্রিভেন API (Kafka, AsyncAPI)
+
+ইভেন্ট-ড্রিভেন API মানে হচ্ছে ডেটা বা অ্যাকশন কোনো ইভেন্ট ঘটলেই ট্রিগার হয়—রিয়েল-টাইম, অ্যাসিনক্রোনাস ও স্কেলেবল আর্কিটেকচার।
+
+## ইভেন্ট-ড্রিভেন API কী?
+- ক্লায়েন্ট/সার্ভার ইভেন্ট সাবস্ক্রাইব করে
+- ইভেন্ট ঘটলে ডেটা/নোটিফিকেশন/অ্যাকশন ট্রিগার হয়
+- REST API-র তুলনায় কম লেটেন্সি, বেশি স্কেল
+
+## জনপ্রিয় টুল ও স্ট্যান্ডার্ড
+- **Kafka:** ডিস্ট্রিবিউটেড ইভেন্ট স্ট্রিমিং প্ল্যাটফর্ম
+- **AsyncAPI:** ইভেন্ট-ড্রিভেন API-এর জন্য ডকুমেন্টেশন ও স্পেসিফিকেশন
+- **RabbitMQ, NATS, MQTT**
+
+## Kafka উদাহরণ
+- প্রডিউসার ইভেন্ট পাঠায়, কনজিউমার সাবস্ক্রাইব করে
+- টপিক, পার্টিশন, কনজিউমার গ্রুপ
+
+```js
+// Node.js KafkaJS
+const { Kafka } = require('kafkajs');
+const kafka = new Kafka({ clientId: 'my-app', brokers: ['localhost:9092'] });
+const producer = kafka.producer();
+await producer.connect();
+await producer.send({ topic: 'test', messages: [{ value: 'Hello Event!' }] });
+```
+
+## AsyncAPI
+- ইভেন্ট-ড্রিভেন API-এর জন্য OpenAPI-এর মতো স্পেসিফিকেশন
+- চ্যানেল, মেসেজ, সাবস্ক্রাইবার, পাবলিশার ডিফাইন
+- ডকুমেন্টেশন, টেস্টিং, জেনারেশন টুল
+
+```yaml
+asyncapi: '2.0.0'
+info:
+  title: User Signed Up Event
+  version: '1.0.0'
+channels:
+  user/signedup:
+    subscribe:
+      message:
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+```
+
+## বেস্ট প্র্যাকটিস
+- ইভেন্ট স্কিমা ও ডকুমেন্টেশন স্পষ্ট রাখুন (AsyncAPI)
+- ইভেন্ট ডেলিভারি গ্যারান্টি (at-least-once, exactly-once)
+- ডেড-লেটার কিউ, রিট্রাই, মনিটরিং কনফিগার করুন
+- ইভেন্ট ভার্সনিং ও ব্যাকওয়ার্ড কম্প্যাটিবিলিটি
+
+## টিপস
+- Kafka/AsyncAPI দিয়ে মাইক্রোসার্ভিস ইন্টিগ্রেশন সহজ
+- ইভেন্ট-ড্রিভেন আর্কিটেকচারে স্কেলিং ও রেজিলিয়েন্স বাড়ে
+- ডকুমেন্টেশনে ইভেন্ট ফ্লো ও চ্যানেল ডায়াগ্রাম দিন
+
+---
+
+পরবর্তী ধাপে: মাল্টি-টেন্যান্সি!

@@ -1,0 +1,41 @@
+---
+title: অ্যানালিটিক্স ও মনিটরিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# অ্যানালিটিক্স ও মনিটরিং
+
+API-র পারফরম্যান্স, ইউজার বিহেভিয়ার, এরর, ও ট্রাফিক বুঝতে অ্যানালিটিক্স ও মনিটরিং অপরিহার্য। এতে সমস্যা দ্রুত ধরা, স্কেলিং প্ল্যান, ও বিজনেস ডিসিশন সহজ হয়।
+
+## অ্যানালিটিক্স
+- API usage, endpoint popularity, latency, error rate, user geography
+- ড্যাশবোর্ডে গ্রাফ, চার্ট, রিপোর্ট
+- টুল: Google Analytics (Measurement Protocol), Mixpanel, RapidAPI Analytics
+
+## মনিটরিং
+- API health, uptime, latency, error rate, throughput
+- অ্যালার্টিং: ইস্যু হলে ইমেইল/স্ল্যাক/পেজারডিউটি
+- টুল: Prometheus, Grafana, Datadog, New Relic, AWS CloudWatch
+
+## উদাহরণ: Prometheus + Grafana
+- Prometheus দিয়ে API মেট্রিক্স কালেক্ট
+- Grafana দিয়ে ড্যাশবোর্ড ও অ্যালার্ট
+
+## লগিং
+- API request/response, error, warning, info—সব লগ করুন
+- টুল: ELK Stack (Elasticsearch, Logstash, Kibana), Loki
+
+## বেস্ট প্র্যাকটিস
+- প্রতিটি endpoint-এর latency, error rate মনিটর করুন
+- অ্যালার্টিং কনফিগার করুন (threshold-based)
+- লগ রিটেনশন ও প্রাইভেসি মেইনটেইন করুন
+- ড্যাশবোর্ডে usage ও পারফরম্যান্স রিপোর্ট দেখান
+
+## টিপস
+- API Gateway-এ বিল্ট-ইন অ্যানালিটিক্স/মনিটরিং ফিচার ব্যবহার করুন
+- Custom মেট্রিক্স (e.g., payment success rate) ট্র্যাক করুন
+- লগ ও রিপোর্ট নিয়মিত রিভিউ করুন
+
+---
+
+পরবর্তী ধাপে: ডিপ্রিকেশন ও মাইগ্রেশন!

@@ -1,0 +1,62 @@
+---
+title: OpenAPI (Swagger)
+description: OpenAPI (Swagger) স্পেসিফিকেশন—কী, কেন, কিভাবে, এবং এর সুবিধা ও বাস্তব উদাহরণ।
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# OpenAPI (Swagger)
+
+OpenAPI (আগে Swagger নামে পরিচিত) হলো API স্পেসিফিকেশন লেখার জন্য সবচেয়ে জনপ্রিয় স্ট্যান্ডার্ড।
+
+## ১. OpenAPI কী?
+- **সংজ্ঞা:** YAML/JSON ফরম্যাটে API-এর কাঠামো, এন্ডপয়েন্ট, প্যারাম, রেসপন্স, অথেন্টিকেশন ইত্যাদি ডিফাইন করা যায়।
+- **ব্যবহার:** ডকুমেন্টেশন, অটো-জেনারেটেড কোড, টেস্টিং, মকিং
+
+## ২. কেন OpenAPI?
+- **ডকুমেন্টেশন:** স্পেসিফিকেশন থেকেই সুন্দর ডকুমেন্টেশন (Swagger UI, Redoc)
+- **কোড জেনারেশন:** স্পেসিফিকেশন থেকে ক্লায়েন্ট/সার্ভার SDK, টেস্ট, মকিং টুল তৈরি
+- **স্ট্যান্ডার্ডাইজেশন:** টিম ও থার্ড-পার্টি ইন্টিগ্রেশনে কম কনফিউশন
+
+## ৩. উদাহরণ (YAML)
+```yaml
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+paths:
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+```
+
+## ৪. Swagger UI
+- **Swagger UI:** স্পেসিফিকেশন থেকে ইন্টারেক্টিভ ডকুমেন্টেশন তৈরি
+- **Redoc:** আরও সুন্দর ও কাস্টমাইজড ডকুমেন্টেশন
+
+## সংক্ষেপে
+- OpenAPI (Swagger) API ডিজাইন, ডকুমেন্টেশন ও ইন্টিগ্রেশনের জন্য অপরিহার্য
+- YAML/JSON ফরম্যাটে API স্পেসিফিকেশন লিখুন, টিম ও টুলিং সহজ হবে
+
+> পরবর্তী অধ্যায়ে: API Naming ও Consistency

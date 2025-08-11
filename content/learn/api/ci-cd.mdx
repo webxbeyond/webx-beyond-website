@@ -1,0 +1,50 @@
+---
+title: CI/CD
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# CI/CD
+
+CI/CD (Continuous Integration/Continuous Deployment) হলো কোড টেস্ট, বিল্ড, ডিপ্লয়—সবকিছু অটোমেট করার প্রক্রিয়া। এতে ডেভেলপমেন্ট দ্রুত, বাগ কম, ও ডিপ্লয়মেন্ট নির্ভরযোগ্য হয়।
+
+## CI (Continuous Integration)
+- কোড চেঞ্জ পুশ হলেই অটোমেটেড টেস্ট, বিল্ড, লিন্টিং চলে
+- বাগ, কনফ্লিক্ট, ব্রেকিং চেঞ্জ দ্রুত ধরা যায়
+- জনপ্রিয় টুল: GitHub Actions, GitLab CI, Jenkins, CircleCI
+
+## CD (Continuous Deployment/Delivery)
+- টেস্ট পাস হলে অটোমেটেড বিল্ড ও ডিপ্লয়
+- ম্যানুয়াল ইন্টারভেনশন ছাড়াই নতুন ফিচার/বাগফিক্স প্রোডাকশনে যায়
+- ডেলিভারি মানে অটোমেটেড বিল্ড, ডিপ্লয় ম্যানুয়ালও হতে পারে
+
+## উদাহরণ: GitHub Actions (Node.js)
+```yaml
+name: CI/CD
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: npm install
+      - name: Test
+        run: npm test
+      - name: Deploy
+        run: npm run deploy
+```
+
+## বেস্ট প্র্যাকটিস
+- প্রতিটি পুশ/PR-এ টেস্ট, লিন্ট, বিল্ড চালান
+- ডিপ্লয়মেন্টে এনভায়রনমেন্ট ভ্যারিয়েবল ও সিক্রেট সুরক্ষিত রাখুন
+- রোলব্যাক ও মনিটরিং সাপোর্ট রাখুন
+- বিল্ড/ডিপ্লয় রিপোর্ট ও নোটিফিকেশন দিন
+
+## টিপস
+- ছোট প্রজেক্টে GitHub Actions ফ্রি ও সহজ
+- বড় প্রজেক্টে Jenkins, GitLab CI দিয়ে কাস্টমাইজড পাইপলাইন
+- ডকুমেন্টেশনে CI/CD স্ট্যাটাস ব্যাজ দিন
+
+---
+
+পরবর্তী ধাপে: লাইফসাইকেল ম্যানেজমেন্ট!

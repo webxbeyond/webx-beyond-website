@@ -1,0 +1,55 @@
+---
+title: ইন্টিগ্রেশন টেস্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ইন্টিগ্রেশন টেস্ট
+
+ইন্টিগ্রেশন টেস্ট API-র বিভিন্ন কম্পোনেন্ট (ডাটাবেস, সার্ভিস, এক্সটার্নাল API) একসাথে কাজ করছে কিনা তা যাচাই করে। এতে পুরো সিস্টেমের রিলায়েবিলিটি ও বাগ ধরা সহজ হয়।
+
+## ইন্টিগ্রেশন টেস্ট কী?
+- একাধিক মডিউল/কম্পোনেন্ট একসাথে টেস্ট করা
+- যেমন: API endpoint + ডাটাবেস + অথেন্টিকেশন
+
+## API-তে ইন্টিগ্রেশন টেস্টের গুরুত্ব
+- রিয়েল ডাটাবেস, সার্ভিস, এক্সটার্নাল API-এর সাথে ইন্টিগ্রেশন ঠিক আছে কিনা চেক
+- ফেইলিওর, টাইমআউট, পারমিশন ইত্যাদি টেস্ট
+
+## জনপ্রিয় টেস্টিং ফ্রেমওয়ার্ক
+- **Node.js:** Jest + Supertest
+- **Python:** pytest + requests
+- **Java:** Spring Boot Test
+- **Go:** net/http/httptest
+
+## উদাহরণ: Node.js (Jest + Supertest)
+```js
+const request = require('supertest');
+const app = require('../app');
+test('GET /users returns 200', async () => {
+  const res = await request(app).get('/users');
+  expect(res.statusCode).toBe(200);
+});
+```
+
+## উদাহরণ: Python (pytest + requests)
+```python
+import requests
+def test_get_users():
+    r = requests.get('http://localhost:8000/users')
+    assert r.status_code == 200
+```
+
+## বেস্ট প্র্যাকটিস
+- টেস্ট ডাটাবেস/মক সার্ভিস ব্যবহার করুন
+- টেস্ট কেসে রিয়েল ইন্টিগ্রেশন ও ফেইলিওর কেস কভার করুন
+- টেস্ট ডেটা ক্লিনআপ করুন
+- CI/CD-তে ইন্টিগ্রেশন টেস্ট চালান
+
+## টিপস
+- Docker দিয়ে টেস্ট ডাটাবেস চালান
+- Mock server দিয়ে এক্সটার্নাল API টেস্ট করুন
+- টেস্ট রিপোর্ট ও লগ মনিটর করুন
+
+---
+
+পরবর্তী ধাপে: লোড/পারফরম্যান্স টেস্ট!

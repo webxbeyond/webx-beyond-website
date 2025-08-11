@@ -1,0 +1,53 @@
+---
+title: SOAP
+description: SOAP API—XML, WSDL, লিগ্যাসি API—সহ বিস্তারিত ব্যাখ্যা, বেস্ট প্র্যাকটিস ও উদাহরণ।
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# XML, WSDL
+
+SOAP (Simple Object Access Protocol) হলো একটি পুরনো, স্ট্যান্ডার্ডাইজড ও এক্সটেনসিবল API প্রোটোকল, যা মূলত XML ও WSDL ব্যবহার করে।
+
+## ১. XML (eXtensible Markup Language)
+- **সংজ্ঞা:** ডেটা এক্সচেঞ্জের জন্য স্ট্রিক্ট, স্ট্রাকচারড ফরম্যাট।
+- **ব্যবহার:** SOAP মেসেজে ডেটা এনকোডিং ও ট্রান্সফার।
+- **উদাহরণ:**
+    ```xml
+    <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+      <soap:Body>
+        <getUser>
+          <id>123</id>
+        </getUser>
+      </soap:Body>
+    </soap:Envelope>
+    ```
+
+## ২. WSDL (Web Services Description Language)
+- **সংজ্ঞা:** XML-ভিত্তিক ভাষা, যা SOAP API-এর অপারেশন, ইনপুট-আউটপুট, এন্ডপয়েন্ট ইত্যাদি ডিফাইন করে।
+- **ব্যবহার:** ক্লায়েন্ট ও সার্ভার উভয়েই WSDL পড়ে API ব্যবহার ও ইমপ্লিমেন্ট করতে পারে।
+- **উদাহরণ:**
+    ```xml
+    <wsdl:definitions ...>
+      <wsdl:portType name="UserService">
+        <wsdl:operation name="getUser">
+          <wsdl:input message="tns:getUserRequest"/>
+          <wsdl:output message="tns:getUserResponse"/>
+        </wsdl:operation>
+      </wsdl:portType>
+    </wsdl:definitions>
+    ```
+
+## ৩. SOAP বনাম REST
+- SOAP: স্ট্রিক্ট, XML-ভিত্তিক, স্ট্যান্ডার্ডাইজড, এন্টারপ্রাইজ ফিচার-সমৃদ্ধ (ট্রানজেকশন, সিকিউরিটি, ইত্যাদি)
+- REST: ফ্লেক্সিবল, JSON/HTTP-ভিত্তিক, মডার্ন ও সহজ
+
+## বেস্ট প্র্যাকটিস
+- WSDL ডকুমেন্টেশন ভালোভাবে মেইনটেইন করুন
+- XML স্কিমা ভ্যালিডেশন ব্যবহার করুন
+- SOAP ফল্ট (error) হ্যান্ডলিং স্পষ্ট রাখুন
+
+## সংক্ষেপে
+- SOAP API-তে XML ও WSDL—দুইটি মূল কনসেপ্ট
+- লিগ্যাসি সিস্টেম, ব্যাংকিং, এন্টারপ্রাইজ ইন্টিগ্রেশনে এখনও ব্যবহৃত
+
+> পরবর্তী অধ্যায়ে: API ডিজাইন প্রিন্সিপলস—API-First, OpenAPI, Naming, Versioning

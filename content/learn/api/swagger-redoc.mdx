@@ -1,0 +1,64 @@
+---
+title: Swagger, Redoc
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Swagger, Redoc
+
+API ডকুমেন্টেশন ডেভেলপার এক্সপেরিয়েন্সের জন্য অত্যন্ত গুরুত্বপূর্ণ। Swagger (OpenAPI) ও Redoc—দুইটি জনপ্রিয় টুল, যেগুলো দিয়ে API ডকুমেন্টেশন সহজেই তৈরি ও শেয়ার করা যায়।
+
+## Swagger (OpenAPI)
+- **Swagger** এখন OpenAPI Specification (OAS) নামে পরিচিত
+- YAML/JSON ফরম্যাটে API-এর স্ট্রাকচার, এন্ডপয়েন্ট, প্যারাম, রেসপন্স, অথেন্টিকেশন ইত্যাদি ডিফাইন করা হয়
+- Swagger UI দিয়ে ইন্টারেক্টিভ ডকুমেন্টেশন দেখা ও টেস্ট করা যায়
+
+### উদাহরণ: OpenAPI YAML
+```yaml
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: OK
+```
+
+### Swagger UI ইন্টিগ্রেশন (Node.js)
+```js
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+```
+
+## Redoc
+- **Redoc** হলো OpenAPI স্পেসিফিকেশন থেকে সুন্দর, রিডেবল ডকুমেন্টেশন জেনারেট করার টুল
+- ডেভেলপারদের জন্য ক্লিন ও ইউজার-ফ্রেন্ডলি ইন্টারফেস
+- Custom branding ও থিমিং সাপোর্ট
+
+### Redoc ব্যবহার (Node.js)
+```js
+const redoc = require('redoc-express');
+app.get('/docs', redoc({
+  title: 'API Docs',
+  specUrl: '/swagger.json'
+}));
+```
+
+## বেস্ট প্র্যাকটিস
+- প্রতিটি এন্ডপয়েন্ট, প্যারাম, রেসপন্স, এরর কোড ডকুমেন্ট করুন
+- Swagger/OpenAPI ফাইল সোর্স কন্ট্রোলে রাখুন
+- ডকুমেন্টেশন অটোমেটেড টেস্টিংয়ের অংশ করুন
+- ডেভেলপারদের জন্য Try It Out ফিচার দিন
+
+## টিপস
+- Swagger Editor দিয়ে অনলাইনে OAS লিখুন ও ভ্যালিডেট করুন
+- Redoc CLI দিয়ে স্ট্যাটিক HTML ডকুমেন্টেশন জেনারেট করুন
+- ডকুমেন্টেশন সবসময় আপডেট রাখুন
+
+---
+
+পরবর্তী ধাপে: API Mocking!

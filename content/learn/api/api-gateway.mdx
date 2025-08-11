@@ -1,0 +1,51 @@
+---
+title: API Gateway
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Kong, AWS, Routing, Monitoring
+
+API Gateway হলো একাধিক API সার্ভিসের জন্য এক্সটার্নাল এন্ট্রি পয়েন্ট, যেখানে অথেন্টিকেশন, রেট লিমিটিং, রাউটিং, মনিটরিং, থ্রেট প্রোটেকশন ইত্যাদি এক জায়গায় কনফিগার করা যায়।
+
+## API Gateway-এর সুবিধা
+- একাধিক সার্ভিস/মাইক্রোসার্ভিসের জন্য এক্সটার্নাল URL
+- অথেন্টিকেশন, রেট লিমিটিং, লগিং, মনিটরিং, কনফিগারেশন এক জায়গায়
+- সার্ভিস ডিসকভারি, লোড ব্যালেন্সিং, কাস্টম রুল
+
+## জনপ্রিয় API Gateway
+- **Kong:** ওপেন সোর্স, প্লাগিন সাপোর্ট, UI ও CLI
+- **AWS API Gateway:** ক্লাউড-নেটিভ, স্কেলেবল, বিল্ট-ইন মনিটরিং
+- **Nginx, Apigee, Azure API Management**
+
+## Routing
+- URI/পাথ, হোস্ট, মেথড, হেডার—সবকিছু দিয়ে রাউটিং কনফিগার
+- উদাহরণ: `/api/v1/users` -> User Service, `/api/v1/orders` -> Order Service
+
+## Monitoring
+- API Usage, Latency, Error Rate, Traffic Pattern মনিটর
+- Kong/AWS-এ বিল্ট-ইন ড্যাশবোর্ড, Prometheus/Grafana ইন্টিগ্রেশন
+
+## উদাহরণ: Kong Gateway কনফিগ
+```bash
+# Kong ইনস্টল
+sudo apt install kong
+# সার্ভিস অ্যাড
+curl -i -X POST --url http://localhost:8001/services/ --data 'name=users-service&url=http://localhost:3000'
+# রাউট অ্যাড
+curl -i -X POST --url http://localhost:8001/routes --data 'service.name=users-service&paths[]=/users'
+```
+
+## বেস্ট প্র্যাকটিস
+- API Gateway-এ অথেন্টিকেশন, রেট লিমিটিং, লগিং এনাবল করুন
+- মনিটরিং ও অ্যালার্টিং কনফিগার করুন
+- সার্ভিস ডিসকভারি ও হেলথচেক চালু রাখুন
+- ডকুমেন্টেশন ও কনফিগ ব্যাকআপ রাখুন
+
+## টিপস
+- AWS API Gateway-এ Lambda, HTTP, REST, WebSocket API সাপোর্ট
+- Kong-এ Custom Plugin দিয়ে ফিচার বাড়ান
+- API Gateway-এ SSL/TLS এনাবল করুন
+
+---
+
+পরবর্তী ধাপে: CI/CD!

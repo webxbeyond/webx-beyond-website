@@ -1,0 +1,84 @@
+---
+title: টেক স্ট্যাক
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Node.js, Python, Java, Go
+
+API ডেভেলপমেন্টের জন্য বিভিন্ন টেক স্ট্যাক ও ফ্রেমওয়ার্ক ব্যবহার করা হয়। এখানে জনপ্রিয় চারটি ভাষা ও তাদের API ডেভেলপমেন্ট ইকোসিস্টেম নিয়ে আলোচনা করা হলো:
+
+## ১. Node.js
+- **ফ্রেমওয়ার্ক:** Express.js, Fastify, NestJS
+- **বৈশিষ্ট্য:**
+  - ইভেন্ট-ড্রিভেন, নন-ব্লকিং I/O
+  - জাভাস্ক্রিপ্ট/টাইপস্ক্রিপ্টে কোডিং
+  - দ্রুত প্রোটোটাইপিং
+- **কোড উদাহরণ (Express.js):**
+  ```js
+  const express = require('express');
+  const app = express();
+  app.get('/api', (req, res) => res.json({msg: 'Hello API'}));
+  app.listen(3000);
+  ```
+
+## ২. Python
+- **ফ্রেমওয়ার্ক:** Django REST Framework, FastAPI, Flask
+- **বৈশিষ্ট্য:**
+  - সহজ সিনট্যাক্স
+  - দ্রুত API ডেভেলপমেন্ট
+  - ডেটা সায়েন্স ও ML ইন্টিগ্রেশন সহজ
+- **কোড উদাহরণ (FastAPI):**
+  ```python
+  from fastapi import FastAPI
+  app = FastAPI()
+  @app.get('/api')
+  def read_api():
+      return {"msg": "Hello API"}
+  ```
+
+## ৩. Java
+- **ফ্রেমওয়ার্ক:** Spring Boot, Micronaut, Quarkus
+- **বৈশিষ্ট্য:**
+  - এন্টারপ্রাইজ-গ্রেড, স্কেলেবল
+  - স্ট্রং টাইপড, সিকিউর
+  - মাইক্রোসার্ভিস আর্কিটেকচারে জনপ্রিয়
+- **কোড উদাহরণ (Spring Boot):**
+  ```java
+  @RestController
+  public class ApiController {
+      @GetMapping("/api")
+      public Map<String, String> api() {
+          return Map.of("msg", "Hello API");
+      }
+  }
+  ```
+
+## ৪. Go (Golang)
+- **ফ্রেমওয়ার্ক:** Gin, Echo, Fiber
+- **বৈশিষ্ট্য:**
+  - কম মেমরি, দ্রুত পারফরম্যান্স
+  - কনকারেন্সি সহজ
+  - ক্লাউড-নেটিভ API-তে জনপ্রিয়
+- **কোড উদাহরণ (Gin):**
+  ```go
+  package main
+  import "github.com/gin-gonic/gin"
+  func main() {
+      r := gin.Default()
+      r.GET("/api", func(c *gin.Context) {
+          c.JSON(200, gin.H{"msg": "Hello API"})
+      })
+      r.Run()
+  }
+  ```
+
+---
+
+## টিপস
+- টিমের স্কিল, স্কেল, পারফরম্যান্স ও ইকোসিস্টেম দেখে টেক স্ট্যাক বাছাই করুন
+- REST, GraphQL, gRPC—যে কোনো API আর্কিটেকচারে এই স্ট্যাকগুলো ব্যবহার করা যায়
+- ডকুমেন্টেশন ও কমিউনিটি সাপোর্ট চেক করুন
+
+---
+
+পরবর্তী ধাপে: REST API বিল্ডিং!

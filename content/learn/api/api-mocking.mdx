@@ -1,0 +1,44 @@
+---
+title: API Mocking
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# API Mocking
+
+API Mocking মানে হচ্ছে আসল API ডেভেলপ বা ডিপ্লয় হওয়ার আগেই ফেক/সিমুলেটেড রেসপন্স দিয়ে ফ্রন্টএন্ড, টেস্টিং বা ইন্টিগ্রেশন সহজ করা।
+
+## কেন API Mocking দরকার?
+- ফ্রন্টএন্ড ও ব্যাকএন্ড টিম আলাদাভাবে ডেভেলপ করতে পারে
+- টেস্টিং ও ডেমো সহজ হয়
+- API ডাউন বা ডিপ্লয় না থাকলেও ডেভেলপমেন্ট চলতে পারে
+
+## জনপ্রিয় API Mocking টুল
+- **Mockoon:** GUI দিয়ে দ্রুত REST API mock করা যায়
+- **Postman Mock Server:** Postman-এ API collection থেকে mock server তৈরি
+- **Prism:** OpenAPI/Swagger ফাইল থেকে mock server
+- **json-server:** ফেক REST API তৈরি (Node.js)
+
+## উদাহরণ: json-server
+```bash
+npm install -g json-server
+json-server --watch db.json --port 3001
+```
+- `db.json` ফাইলে ডেটা লিখে ফেক API রেসপন্স পাওয়া যায়
+
+## উদাহরণ: Postman Mock Server
+- Postman Collection থেকে Mock Server তৈরি করুন
+- URL শেয়ার করে টিমে টেস্ট করুন
+
+## বেস্ট প্র্যাকটিস
+- Mock data ও schema আসল API-এর মতো রাখুন
+- Mock server-এর URL ও রেসপন্স ডকুমেন্ট করুন
+- টেস্টিং ও ডেভেলপমেন্টে mock ব্যবহার, প্রোডাকশনে আসল API
+
+## টিপস
+- OpenAPI/Swagger ফাইল থেকে Prism দিয়ে mock server চালান
+- ফ্রন্টএন্ড টিমের জন্য mock endpoint শেয়ার করুন
+- Mockoon দিয়ে GUI-তে দ্রুত mock তৈরি করুন
+
+---
+
+পরবর্তী ধাপে: Postman ও কালেকশন!

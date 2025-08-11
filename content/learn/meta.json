@@ -8,6 +8,7 @@
     "networking",    
     "ai",             
     "self-hosting",
-    "terraform"
+    "terraform",
+    "api"
   ]
 }

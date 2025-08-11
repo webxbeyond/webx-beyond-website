@@ -1,0 +1,80 @@
+---
+title: ডাটাবেস ইন্টিগ্রেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ডাটাবেস ইন্টিগ্রেশন
+
+API ডেভেলপমেন্টে ডাটাবেস ইন্টিগ্রেশন অপরিহার্য। ডাটাবেসের সাথে সংযোগ, CRUD অপারেশন, ORM/ODM ব্যবহার, ও নিরাপত্তা—সবকিছুই গুরুত্বপূর্ণ।
+
+## ডাটাবেস টাইপ
+- **রিলেশনাল:** MySQL, PostgreSQL, SQL Server
+- **নন-রিলেশনাল:** MongoDB, Redis, DynamoDB
+
+## সংযোগ ও CRUD অপারেশন
+### Node.js (Express + MongoDB)
+```js
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/mydb');
+const User = mongoose.model('User', { name: String });
+app.post('/users', async (req, res) => {
+  const user = new User(req.body);
+  await user.save();
+  res.json(user);
+});
+```
+
+### Python (FastAPI + SQLAlchemy)
+```python
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
+engine = create_engine('sqlite:///mydb.db')
+Base = declarative_base()
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+Session = sessionmaker(bind=engine)
+```
+
+### Java (Spring Boot + JPA)
+```java
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+}
+@Repository
+public interface UserRepo extends JpaRepository<User, Long> {}
+```
+
+### Go (GORM + MySQL)
+```go
+import "gorm.io/gorm"
+type User struct {
+    gorm.Model
+    Name string
+}
+db.Create(&User{Name: "Anis"})
+```
+
+## ORM/ODM ব্যবহারের সুবিধা
+- কোডে ডাটাবেস অপারেশন সহজ
+- SQL Injection প্রতিরোধ
+- মাইগ্রেশন ও রিলেশনশিপ সহজ
+
+## বেস্ট প্র্যাকটিস
+- এনভায়রনমেন্ট ভ্যারিয়েবল দিয়ে ডাটাবেস URI/Password রাখুন
+- ইনপুট ভ্যালিডেশন ও স্যানিটাইজেশন করুন
+- কানেকশন পুলিং ও ট্রানজেকশন ব্যবহার করুন
+- ডাটাবেস ব্যাকআপ ও মনিটরিং রাখুন
+
+## টিপস
+- ডেভেলপমেন্টে SQLite/MongoDB ব্যবহার সহজ
+- প্রোডাকশনে Always SSL/TLS এনাবল করুন
+- ডাটাবেস মাইগ্রেশন টুল (Flyway, Alembic, Prisma) ব্যবহার করুন
+
+---
+
+পরবর্তী ধাপে: এনভায়রনমেন্ট ও সিক্রেট ম্যানেজমেন্ট!
