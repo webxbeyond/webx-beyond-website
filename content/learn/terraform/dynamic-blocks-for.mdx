@@ -1,0 +1,122 @@
+---
+title: ডাইনামিক ব্লক ও For এক্সপ্রেশন
+icon: ph:repeat-duotone
+---
+
+Terraform-এ ডাইনামিক ব্লক ও for এক্সপ্রেশন ব্যবহার করে আপনি কনফিগারেশনকে আরও রিইউজেবল, ডাইনামিক ও শক্তিশালী করতে পারেন। এখানে হাতে-কলমে উদাহরণসহ সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ডাইনামিক ব্লক কী?
+
+- ডাইনামিক ব্লক দিয়ে একাধিক সাব-ব্লক (যেমন tags, ingress, egress) ডাইনামিকভাবে তৈরি করা যায়
+- লুপ চালিয়ে ব্লক তৈরি করা যায়
+
+**উদাহরণ:**
+```hcl
+variable "tags" {
+  default = {
+    Name = "MyServer"
+    Env  = "dev"
+    Owner = "anis"
+  }
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  dynamic "tag" {
+    for_each = var.tags
+    content {
+      key   = tag.key
+      value = tag.value
+    }
+  }
+}
+```
+
+---
+
+## For এক্সপ্রেশন
+
+- for এক্সপ্রেশন দিয়ে লিস্ট, ম্যাপ, সেট—সবকিছু লুপ করে নতুন ভ্যালু তৈরি করা যায়
+
+**বেসিক for:**
+```hcl
+output "upper_envs" {
+  value = [for env in ["dev", "prod"] : upper(env)]
+}
+# ফলাফল: ["DEV", "PROD"]
+```
+
+**for with condition:**
+```hcl
+output "prod_envs" {
+  value = [for env in ["dev", "prod"] : env if env == "prod"]
+}
+# ফলাফল: ["prod"]
+```
+
+**map তৈরি:**
+```hcl
+variable "users" {
+  default = ["anis", "rahim", "karim"]
+}
+
+output "user_map" {
+  value = { for name in var.users : name => upper(name) }
+}
+# ফলাফল: {"anis" = "ANIS", "rahim" = "RAHIM", "karim" = "KARIM"}
+```
+
+---
+
+## হাতে-কলমে: ডাইনামিক ব্লক ও for এক্সপ্রেশন
+
+**Security group-এর multiple ingress rule ডাইনামিকভাবে:**
+```hcl
+variable "ingress_ports" {
+  default = [22, 80, 443]
+}
+
+resource "aws_security_group" "web_sg" {
+  name = "web-sg"
+
+  dynamic "ingress" {
+    for_each = var.ingress_ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ডাইনামিক ব্লক শুধু দরকার হলে ব্যবহার করুন—কনফিগ জটিল না হয়
+- for এক্সপ্রেশন দিয়ে ডাটা ট্রান্সফর্ম সহজ
+- কমেন্ট দিন—জটিল লজিক হলে
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** ডাইনামিক ব্লক কাজ করছে না
+- **সমাধান:** for_each ও content ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** for এক্সপ্রেশন ভুল
+- **সমাধান:** syntax ও টাইপ চেক করুন
+
+---
+
+## আরও জানুন
+- [Terraform Dynamic Blocks](https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks)
+- [For Expressions](https://developer.hashicorp.com/terraform/language/expressions/for)
+
+এই টিউটোরিয়াল পড়ে আপনি ডাইনামিক ব্লক ও for এক্সপ্রেশন—সবকিছু হাতে-কলমে শিখতে পারবেন।

@@ -1,0 +1,82 @@
+---
+title: টেরাফর্ম ওয়ার্কস্পেস
+icon: lets-icons:layers-duotone
+---
+
+Terraform-এ ওয়ার্কস্পেস (workspace) ব্যবহার করে আপনি একই কনফিগারেশন দিয়ে মাল্টিপল environment (যেমন: dev, staging, prod) আলাদাভাবে ম্যানেজ করতে পারেন। প্রতিটি ওয়ার্কস্পেসের জন্য আলাদা state ফাইল থাকে, তাই environment আলাদা রাখা সহজ হয়। এই টিউটোরিয়ালে ওয়ার্কস্পেস কী, কেন দরকার, কীভাবে ব্যবহার করবেন—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ওয়ার্কস্পেস কী?
+
+- ওয়ার্কস্পেস হচ্ছে Terraform-এর state management-এর একটি ফিচার
+- প্রতিটি ওয়ার্কস্পেসের জন্য আলাদা state ফাইল থাকে
+- ডিফল্ট ওয়ার্কস্পেসের নাম: `default`
+
+---
+
+## কেন দরকার?
+
+- dev, staging, prod—একই কনফিগারেশন দিয়ে আলাদা environment
+- টিমে environment isolation
+- একই কোড, আলাদা ইনফ্রা
+
+---
+
+## ওয়ার্কস্পেস কমান্ড
+
+- ওয়ার্কস্পেস লিস্ট করুন:
+  ```sh
+  terraform workspace list
+  ```
+- নতুন ওয়ার্কস্পেস তৈরি:
+  ```sh
+  terraform workspace new dev
+  ```
+- ওয়ার্কস্পেস পরিবর্তন:
+  ```sh
+  terraform workspace select dev
+  ```
+- ওয়ার্কস্পেস ডিলিট:
+  ```sh
+  terraform workspace delete dev
+  ```
+
+---
+
+## হাতে-কলমে: উদাহরণ
+
+**main.tf:**
+```hcl
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-bucket-${terraform.workspace}"
+}
+```
+
+- এখানে `terraform.workspace` দিয়ে ওয়ার্কস্পেসের নাম ডাইনামিকভাবে ব্যবহার করা হয়েছে
+- dev ও prod ওয়ার্কস্পেসে আলাদা bucket তৈরি হবে: `my-bucket-dev`, `my-bucket-prod`
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ওয়ার্কস্পেস দিয়ে environment isolation সহজ, কিন্তু সব ক্ষেত্রে যথেষ্ট নয় (ক্লাউড অ্যাকাউন্ট, region ইত্যাদি আলাদা হলে আরও কনফিগ দরকার)
+- ওয়ার্কস্পেসের নাম স্পষ্ট রাখুন (dev, staging, prod)
+- state backend remote হলে ওয়ার্কস্পেস সাপোর্ট আছে কিনা চেক করুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** ওয়ার্কস্পেসে ভুল environment
+- **সমাধান:** apply করার আগে `terraform workspace show` দিয়ে চেক করুন
+
+**সমস্যা:** state কনফ্লিক্ট
+- **সমাধান:** remote backend ও ওয়ার্কস্পেস সাপোর্ট ঠিক আছে কিনা দেখুন
+
+---
+
+## আরও জানুন
+- [Terraform Workspaces Guide](https://developer.hashicorp.com/terraform/language/state/workspaces)
+
+এই টিউটোরিয়াল পড়ে আপনি ওয়ার্কস্পেস ব্যবহার করে মাল্টিপল environment সহজে ম্যানেজ করতে পারবেন।

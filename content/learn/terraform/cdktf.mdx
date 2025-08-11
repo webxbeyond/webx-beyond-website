@@ -1,0 +1,118 @@
+---
+title: টেরাফর্ম CDK (Cloud Development Kit)
+icon: ph:code-duotone
+---
+
+Terraform CDK (Cloud Development Kit) দিয়ে আপনি পরিচিত ভাষায় (TypeScript, Python, C#, Java, Go) Terraform কনফিগারেশন লিখতে পারেন। এখানে CDKTF-এর বেসিক, ইনস্টলেশন, কোড উদাহরণ ও বেস্ট প্র্যাকটিস সহজ ভাষায় ব্যাখ্যা করা হয়েছে।
+
+---
+
+## CDKTF কী?
+
+- CDK for Terraform (CDKTF) দিয়ে HCL না লিখে TypeScript, Python ইত্যাদিতে ইনফ্রা কোড করা যায়
+- কোডে লজিক, লুপ, কন্ডিশন, রিইউজেবল ফাংশন সহজ
+- শেষে HCL-এ synthesize হয়, তারপর plan/apply
+
+---
+
+## ইনস্টলেশন
+
+- Node.js ও npm লাগবে
+- Python হলে pip লাগবে
+
+**TypeScript:**
+```sh
+npm install -g cdktf-cli
+cdktf init --template=typescript --local
+```
+
+**Python:**
+```sh
+pip install cdktf-cli
+cdktf init --template=python --local
+```
+
+---
+
+## কোড উদাহরণ (TypeScript)
+
+**main.ts:**
+```ts
+import { Construct } from 'constructs';
+import { App, TerraformStack } from 'cdktf';
+import { AwsProvider, Instance } from '@cdktf/provider-aws';
+
+class MyStack extends TerraformStack {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+
+    new AwsProvider(this, 'aws', {
+      region: 'us-east-1',
+    });
+
+    new Instance(this, 'web', {
+      ami: 'ami-123456',
+      instanceType: 't2.micro',
+    });
+  }
+}
+
+const app = new App();
+new MyStack(app, 'cdktf-demo');
+app.synth();
+```
+
+---
+
+## কোড উদাহরণ (Python)
+
+**main.py:**
+```python
+from constructs import Construct
+from cdktf import App, TerraformStack
+from cdktf_cdktf_provider_aws import AwsProvider, Instance
+
+class MyStack(TerraformStack):
+    def __init__(self, scope: Construct, ns: str):
+        super().__init__(scope, ns)
+        AwsProvider(self, 'aws', region='us-east-1')
+        Instance(self, 'web', ami='ami-123456', instance_type='t2.micro')
+
+app = App()
+MyStack(app, "cdktf-demo")
+app.synth()
+```
+
+---
+
+## Synth, Plan, Apply
+
+- কোড লিখে `cdktf synth` চালান—HCL ফাইল তৈরি হবে
+- তারপর `terraform plan` ও `terraform apply` চালান
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- পরিচিত ভাষায় লজিক, ফাংশন, টেস্ট সহজ
+- মডিউল ও রিইউজেবল কোড লিখুন
+- cdktf.json-এ provider/version ঠিক রাখুন
+- ডকুমেন্টেশন দেখুন—নতুন ফিচার যোগ হচ্ছে
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** synth error
+- **সমাধান:** কোড, ডিপেন্ডেন্সি, provider ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** plan/apply mismatch
+- **সমাধান:** synth করার পর HCL ফাইল চেক করুন
+
+---
+
+## আরও জানুন
+- [CDK for Terraform Docs](https://developer.hashicorp.com/terraform/cdktf)
+- [CDKTF Examples](https://github.com/hashicorp/terraform-cdk-examples)
+
+এই টিউটোরিয়াল পড়ে আপনি TypeScript, Python ইত্যাদিতে Terraform কোড লিখতে পারবেন।

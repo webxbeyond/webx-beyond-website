@@ -1,0 +1,92 @@
+---
+title: টেরাফর্ম ক্লাউড ও এন্টারপ্রাইজ
+icon: ph:cloud-check-duotone
+---
+
+Terraform Cloud ও Enterprise হচ্ছে HashiCorp-এর managed Terraform প্ল্যাটফর্ম, যেখানে আপনি ওয়ার্কস্পেস, রিমোট রান, পলিসি (Sentinel) ইত্যাদি সুবিধা পাবেন। এখানে হাতে-কলমে উদাহরণসহ সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## Terraform Cloud/Enterprise কী?
+
+- HashiCorp-এর managed Terraform service
+- রিমোট state, রিমোট রান, টিম collaboration, পলিসি enforcement
+- Free ও paid plan—দুটোই আছে
+
+---
+
+## ওয়ার্কস্পেস (Workspace)
+
+- Terraform Cloud-এ ওয়ার্কস্পেস মানে—একটা environment বা প্রজেক্ট
+- প্রতিটি ওয়ার্কস্পেসের জন্য আলাদা state, variable, run history
+
+**ওয়ার্কস্পেস তৈরি:**
+- Terraform Cloud UI-তে New Workspace
+- VCS (GitHub, GitLab) repo connect করুন
+
+---
+
+## রিমোট রান (Remote Run)
+
+- কোড পুশ করলে Terraform Cloud-এ অটোমেটেড plan/apply চলে
+- লোকাল মেশিনে credentials/token রাখতে হয় না
+- Run history, approval, notification—all in one
+
+**backend কনফিগারেশন:**
+```hcl
+terraform {
+  backend "remote" {
+    organization = "my-org"
+    workspaces {
+      name = "my-workspace"
+    }
+  }
+}
+```
+
+---
+
+## Sentinel পলিসি
+
+- Sentinel হচ্ছে policy-as-code framework
+- আপনি চাইলে—কোনো resource, value, action—policy দিয়ে কন্ট্রোল করতে পারেন
+- যেমন: শুধু নির্দিষ্ট region-এ resource তৈরি হবে, instance_type ছোট হলে apply হবে না
+
+**Sentinel policy example:**
+```hcl
+import "tfplan/v2" as tfplan
+main = rule {
+  all tfplan.resources.aws_instance as _, instances {
+    all instances as _, r {
+      r.applied.instance_type is "t2.micro"
+    }
+  }
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- টিমে কাজ করলে Terraform Cloud/Enterprise ব্যবহার করুন
+- sensitive data variable হিসেবে রাখুন
+- Sentinel পলিসি দিয়ে compliance enforce করুন
+- রিমোট backend কনফিগারেশন version control-এ রাখুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** রিমোট রান fail
+- **সমাধান:** credentials, variable, policy ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** policy restrict করছে
+- **সমাধান:** Sentinel policy review করুন
+
+---
+
+## আরও জানুন
+- [Terraform Cloud Docs](https://developer.hashicorp.com/terraform/cloud-docs)
+- [Sentinel Policy as Code](https://developer.hashicorp.com/sentinel)
+
+এই টিউটোরিয়াল পড়ে আপনি Terraform Cloud/Enterprise—ওয়ার্কস্পেস, রিমোট রান, Sentinel পলিসি—সবকিছু হাতে-কলমে শিখতে পারবেন।

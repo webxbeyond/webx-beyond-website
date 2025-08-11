@@ -7,6 +7,7 @@
     "dev-ops",       
     "networking",    
     "ai",             
-    "self-hosting"
+    "self-hosting",
+    "terraform"
   ]
 }

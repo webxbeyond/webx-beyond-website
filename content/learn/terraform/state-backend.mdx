@@ -1,0 +1,110 @@
+---
+title: স্টেট ব্যাকএন্ড
+icon: ph:cloud-duotone
+---
+
+Terraform-এ স্টেট ফাইল (state file) ডিফল্টভাবে লোকাল মেশিনে থাকে। কিন্তু টিমে কাজ করলে বা প্রোডাকশন ইনফ্রা ম্যানেজ করতে হলে state ফাইল রিমোট ব্যাকএন্ডে (S3, Azure Blob, GCS, Terraform Cloud) রাখা নিরাপদ ও কার্যকর। এই টিউটোরিয়ালে স্টেট ব্যাকএন্ড কী, কেন দরকার, কীভাবে কনফিগার করবেন—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## স্টেট ব্যাকএন্ড কী?
+
+- ব্যাকএন্ড হচ্ছে state ফাইল কোথায় সংরক্ষণ হবে, তা নির্ধারণ করে
+- লোকাল (default) বা রিমোট (S3, Azure Blob, GCS, Terraform Cloud)
+- রিমোট ব্যাকএন্ডে state শেয়ার, লকিং, ব্যাকআপ সহজ হয়
+
+---
+
+## কেন দরকার?
+
+- টিমে একসাথে কাজ করলে সবার state এক জায়গায় রাখতে হবে
+- লোকাল state হারিয়ে গেলে রিকভারি কঠিন
+- রিমোট ব্যাকএন্ডে লকিং, history, ব্যাকআপ সুবিধা
+
+---
+
+## রিমোট ব্যাকএন্ড কনফিগারেশন
+
+### ১. S3 Backend (AWS)
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "global/s3/terraform.tfstate"
+    region = "us-east-1"
+    dynamodb_table = "terraform-lock" # optional, locking
+    encrypt = true
+  }
+}
+```
+
+### ২. Azure Blob Backend
+```hcl
+terraform {
+  backend "azurerm" {
+    storage_account_name = "mystorageaccount"
+    container_name      = "tfstate"
+    key                 = "terraform.tfstate"
+  }
+}
+```
+
+### ৩. Google Cloud Storage (GCS)
+```hcl
+terraform {
+  backend "gcs" {
+    bucket  = "my-tf-state"
+    prefix  = "terraform/state"
+  }
+}
+```
+
+### ৪. Terraform Cloud Backend
+```hcl
+terraform {
+  backend "remote" {
+    organization = "my-org"
+    workspaces {
+      name = "my-workspace"
+    }
+  }
+}
+```
+
+---
+
+## হাতে-কলমে: S3 Backend সেটআপ
+
+১. S3 bucket ও (ঐচ্ছিক) DynamoDB table তৈরি করুন
+২. উপরের মতো backend কনফিগার করুন
+৩. প্রথমবার `terraform init` দিলে state মাইগ্রেট হবে
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- রিমোট ব্যাকএন্ডে লকিং এনাবল করুন (S3 + DynamoDB)
+- state ফাইল version control-এ রাখবেন না
+- ব্যাকএন্ড কনফিগারেশন sensitve—শেয়ার করবেন না
+- ব্যাকএন্ড চেঞ্জ করলে state মাইগ্রেশন করতে হবে
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** ব্যাকএন্ড কনফিগ ভুল
+- **সমাধান:** provider credential, bucket/container ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** লকিং কাজ করছে না
+- **সমাধান:** S3 backend-এ DynamoDB table ব্যবহার করুন
+
+---
+
+## আরও জানুন
+- [Terraform Backends Guide](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
+- [S3 Backend Docs](https://developer.hashicorp.com/terraform/language/settings/backends/s3)
+- [Azure Backend Docs](https://developer.hashicorp.com/terraform/language/settings/backends/azurerm)
+- [GCS Backend Docs](https://developer.hashicorp.com/terraform/language/settings/backends/gcs)
+- [Terraform Cloud Backend](https://developer.hashicorp.com/terraform/cloud-docs/workspaces)
+
+এই টিউটোরিয়াল পড়ে আপনি রিমোট ব্যাকএন্ড কনফিগার ও ব্যবহার করতে পারবেন।

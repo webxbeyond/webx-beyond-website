@@ -1,0 +1,110 @@
+---
+title: টেরাফর্ম আর্কিটেকচার ও ওয়ার্কফ্লো
+icon: ph:flow-arrow-duotone
+---
+
+Terraform-এর কাজের পদ্ধতি ও মূল ধারণাগুলো বুঝলে আপনি সহজেই যেকোনো ইনফ্রা অটোমেট করতে পারবেন। এখানে আমরা Provider, Resource, State File, Execution Plan—সবকিছু উদাহরণসহ ব্যাখ্যা করব।
+
+---
+
+## ১. Provider কী?
+
+Provider হল সেই প্লাগইন, যেটা Terraform-কে বলে—কোন প্ল্যাটফর্মে (AWS, Azure, GCP, DigitalOcean, ইত্যাদি) রিসোর্স তৈরি করতে হবে।
+
+- AWS-এর জন্য `aws` provider
+- Azure-এর জন্য `azurerm` provider
+- Google Cloud-এর জন্য `google` provider
+
+**উদাহরণ:**
+```hcl
+provider "aws" {
+  region = "ap-south-1"
+}
+```
+
+এখানে আমরা AWS region নির্ধারণ করেছি।
+
+---
+
+## ২. Resource কী?
+
+Resource মানে—আপনার তৈরি করতে চাওয়া ইনফ্রার "একক" (যেমন EC2 instance, S3 bucket, VPC, ইত্যাদি)।
+
+**উদাহরণ:**
+```hcl
+resource "aws_instance" "my_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+```
+
+এখানে `aws_instance` হল resource type, আর `my_server` হল আপনার দেওয়া নাম।
+
+---
+
+## ৩. State File কী?
+
+Terraform যখনই কোনো ইনফ্রা তৈরি বা পরিবর্তন করে, তখন সে তার বর্তমান অবস্থা (state) একটি ফাইলে সংরক্ষণ করে—এটাই "state file" (`terraform.tfstate`)।
+
+- এতে সব রিসোর্সের তথ্য থাকে
+- পরবর্তী পরিবর্তন বা ডিলিট করার সময় Terraform এই ফাইল দেখে
+- লোকাল বা রিমোট (S3, GCS, ইত্যাদি) স্টোর করা যায়
+
+**State file না থাকলে:**
+- Terraform জানবে না, কী তৈরি হয়েছে, কী চেঞ্জ হবে
+
+---
+
+## ৪. Execution Plan (Plan & Apply)
+
+Terraform-এর কাজের ধাপ:
+
+1. **Write:** কোডে provider ও resource লিখুন
+2. **Init:** `terraform init` দিয়ে provider ডাউনলোড করুন
+3. **Plan:** `terraform plan`—কী কী চেঞ্জ হবে, সেটা দেখুন
+4. **Apply:** `terraform apply`—পরিবর্তন বাস্তবায়ন করুন
+5. **Destroy:** (প্রয়োজনে) `terraform destroy`—সব ডিলিট
+
+**উদাহরণ ও ওয়ার্কফ্লো:**
+
+```hcl
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "my_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+```
+
+- `terraform init` → provider ডাউনলোড
+- `terraform plan` → কী তৈরি হবে, দেখুন
+- `terraform apply` → EC2 instance তৈরি
+- `terraform.tfstate` ফাইলে state সংরক্ষণ
+
+---
+
+## ৫. ডায়াগ্রাম: Terraform ওয়ার্কফ্লো
+
+```
+[main.tf] → terraform init → terraform plan → terraform apply
+      ↓                ↓                ↓
+   Provider        Execution        State File
+   Block           Plan             Update
+```
+
+---
+
+## ৬. সংক্ষেপে
+
+- **Provider:** কোন প্ল্যাটফর্মে কাজ হবে
+- **Resource:** কী তৈরি হবে
+- **State File:** বর্তমান অবস্থা ট্র্যাক
+- **Execution Plan:** কী চেঞ্জ হবে, কীভাবে হবে
+
+Terraform-এর এই আর্কিটেকচার ও ওয়ার্কফ্লো বুঝলে, আপনি যেকোনো স্কেলে ইনফ্রা অটোমেট করতে পারবেন—সহজ, নিরাপদ ও রিপ্রোডিউসিবলভাবে।
+
+---
+
+পরবর্তী: [ইনস্টল ও সেটআপ](./module-1#ইনস্টল-ও-সেটআপ)

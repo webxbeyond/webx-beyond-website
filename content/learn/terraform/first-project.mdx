@@ -1,0 +1,106 @@
+---
+title: প্রথম টেরাফর্ম প্রজেক্ট
+icon: ph:rocket-duotone
+---
+
+এই টিউটোরিয়ালে আপনি শিখবেন—কীভাবে Terraform দিয়ে একদম প্রথম থেকে একটি AWS EC2 instance তৈরি করবেন। ধাপে ধাপে উদাহরণ, কমান্ড, ও টিপসসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ১. প্রজেক্ট ফোল্ডার তৈরি করুন
+
+```bash
+mkdir hello-terraform
+cd hello-terraform
+```
+
+---
+
+## ২. main.tf ফাইল লিখুন
+
+`main.tf` ফাইলে নিচের কোড লিখুন:
+
+```hcl
+provider "aws" {
+  region = "ap-south-1" # মুম্বাই রিজিওন (আপনার পছন্দমতো দিন)
+}
+
+resource "aws_instance" "my_server" {
+  ami           = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 (আপনার region অনুযায়ী)
+  instance_type = "t2.micro"
+}
+```
+
+---
+
+## ৩. AWS Credentials সেটআপ
+
+Terraform-কে AWS-এ কাজ করতে দিতে হবে Access Key ও Secret Key।
+
+- AWS Console → IAM → Users → Security credentials → Create access key
+- তারপর টার্মিনালে:
+  ```bash
+  aws configure
+  ```
+  - Access Key, Secret Key, region দিন
+
+---
+
+## ৪. Terraform কমান্ড চালান
+
+1. **Init:**
+   ```bash
+   terraform init
+   ```
+   - Provider plugin ডাউনলোড হবে
+2. **Plan:**
+   ```bash
+   terraform plan
+   ```
+   - কী কী তৈরি হবে, দেখাবে
+3. **Apply:**
+   ```bash
+   terraform apply
+   ```
+   - yes লিখে কনফার্ম করুন
+   - EC2 instance তৈরি হবে
+
+---
+
+## ৫. কী হলো বুঝে নিন
+
+- `terraform.tfstate` ফাইলে state সংরক্ষণ
+- AWS Console-এ গিয়ে EC2 instance দেখুন
+- কোড চেঞ্জ করলে আবার `plan` ও `apply` চালান
+
+---
+
+## ৬. রিসোর্স ডিলিট (পরিষ্কার করা)
+
+সব শেষ হলে, খরচ এড়াতে রিসোর্স ডিলিট করুন:
+```bash
+terraform destroy
+```
+- yes লিখে কনফার্ম করুন
+
+---
+
+## ৭. টিপস ও সমস্যা সমাধান
+
+- AMI ID region অনুযায়ী বদলান (AWS Console → EC2 → AMI → ID দেখুন)
+- Credentials ভুল হলে error দেখাবে—`aws configure` দিয়ে ঠিক করুন
+- Free Tier instance (t2.micro) ব্যবহার করুন
+- State file গিটে রাখবেন না
+
+---
+
+## সংক্ষেপে
+
+- main.tf ফাইলে provider ও resource লিখুন
+- init → plan → apply কমান্ড চালান
+- AWS Console-এ রিসোর্স চেক করুন
+- destroy দিয়ে সব ডিলিট করুন
+
+---
+
+পরবর্তী: [টেরাফর্ম কনফিগারেশন ল্যাঙ্গুয়েজ (HCL)](./module-1#টেরাফর্ম-কনফিগারেশন-ল্যাঙ্গুয়েজ-hcl)

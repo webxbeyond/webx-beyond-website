@@ -1,0 +1,96 @@
+---
+title: কমপ্লেক্স রিসোর্স ডিপেন্ডেন্সি
+icon: ph:git-branch-duotone
+---
+
+Terraform-এ রিসোর্সের মধ্যে ডিপেন্ডেন্সি (নির্ভরতা) স্বয়ংক্রিয়ভাবে তৈরি হয়। তবে কখনও কখনও আপনাকে স্পষ্টভাবে নির্ধারণ করতে হয় কোন রিসোর্স কোনটার পরে তৈরি হবে। এই টিউটোরিয়ালে `depends_on`, resource graph, implicit/explicit dependency—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ডিপেন্ডেন্সি কী?
+
+- এক রিসোর্স অন্য রিসোর্সের ডেটা/আউটপুট ব্যবহার করলে Terraform বুঝে নেয়—কোনটা আগে তৈরি হবে
+- একে বলে implicit dependency
+- কখনও আপনাকে স্পষ্টভাবে নির্ধারণ করতে হয়—explicit dependency
+
+---
+
+## Implicit Dependency
+
+- যখন এক রিসোর্সে অন্য রিসোর্সের আউটপুট ব্যবহার করেন, Terraform নিজে নিজে ডিপেন্ডেন্সি তৈরি করে
+
+**উদাহরণ:**
+```hcl
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "subnet" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+}
+```
+- এখানে subnet রিসোর্স vpc_id হিসেবে vpc-এর id ব্যবহার করছে, তাই vpc আগে তৈরি হবে
+
+---
+
+## Explicit Dependency (`depends_on`)
+
+- কখনও কখনও Terraform নিজে ডিপেন্ডেন্সি ধরতে পারে না
+- তখন `depends_on` দিয়ে স্পষ্টভাবে নির্ধারণ করতে হয়
+
+**উদাহরণ:**
+```hcl
+resource "null_resource" "example" {
+  depends_on = [aws_s3_bucket.bucket]
+  provisioner "local-exec" {
+    command = "echo Done"
+  }
+}
+```
+- এখানে null_resource স্পষ্টভাবে নির্ভর করছে S3 bucket-এর ওপর
+
+---
+
+## Resource Graph
+
+- Terraform apply করার সময় resource graph তৈরি করে—কোনটা আগে, কোনটা পরে
+- গ্রাফ দেখতে:
+  ```sh
+  terraform graph | dot -Tpng > graph.png
+  ```
+- এতে ডিপেন্ডেন্সি ভিজ্যুয়ালাইজ করা যায়
+
+---
+
+## Nested/Complex Dependency
+
+- বড় প্রজেক্টে অনেক রিসোর্সের মধ্যে ডিপেন্ডেন্সি থাকতে পারে
+- চেষ্টা করুন—ডিপেন্ডেন্সি স্বাভাবিকভাবেই (implicit) রাখতে
+- শুধু দরকার হলে explicit dependency (`depends_on`) ব্যবহার করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ডিপেন্ডেন্সি স্বাভাবিকভাবে (output/reference) তৈরি করুন
+- `depends_on` কম ব্যবহার করুন—maintainability বাড়ে
+- resource graph দেখে ডিপেন্ডেন্সি চেক করুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** রিসোর্স ভুল অর্ডারে তৈরি হচ্ছে
+- **সমাধান:** reference/depends_on ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** cyclic dependency (একটা আরেকটার ওপর নির্ভর করছে)
+- **সমাধান:** ডিজাইন পরিবর্তন করুন, ডিপেন্ডেন্সি সরান
+
+---
+
+## আরও জানুন
+- [Terraform Resource Dependency](https://developer.hashicorp.com/terraform/language/resources/behavior#resource-dependencies)
+- [terraform graph](https://developer.hashicorp.com/terraform/cli/commands/graph)
+
+এই টিউটোরিয়াল পড়ে আপনি কমপ্লেক্স রিসোর্স ডিপেন্ডেন্সি—সবকিছু হাতে-কলমে শিখতে পারবেন।

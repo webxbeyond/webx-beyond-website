@@ -1,0 +1,110 @@
+---
+title: ইনস্টল ও সেটআপ (Terraform)
+icon: ph:terminal-window-duotone
+---
+
+এই টিউটোরিয়ালে দেখানো হবে—কীভাবে Windows, Linux, Mac-এ Terraform ইন্সটল করবেন এবং CLI দিয়ে বেসিক ওয়ার্কফ্লো (init, plan, apply, destroy) চালাবেন।
+
+---
+
+## ১. Terraform ইন্সটলেশন
+
+### Windows:
+1. [Terraform Download Page](https://developer.hashicorp.com/terraform/downloads) থেকে Windows zip ডাউনলোড করুন
+2. Zip আনজিপ করুন (উদাহরণ: `C:\terraform`)
+3. সেই ফোল্ডারকে PATH-এ যোগ করুন:
+   - Start → "Environment Variables" → System variables → Path → Edit → `C:\terraform` যোগ করুন
+4. টার্মিনালে লিখুন:
+   ```powershell
+   terraform -version
+   ```
+   আউটপুটে ভার্সন দেখলে ইন্সটল সফল
+
+### Linux (Ubuntu):
+```bash
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+sudo apt-add-repository "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update && sudo apt-get install terraform
+terraform -version
+```
+
+### Mac (Homebrew):
+```bash
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+terraform -version
+```
+
+---
+
+## ২. প্রথম Terraform প্রজেক্ট: বেসিক ওয়ার্কফ্লো
+
+ধরা যাক, আপনি AWS-এ একটি EC2 instance তৈরি করতে চান।
+
+### Step 1: main.tf ফাইল তৈরি করুন
+```hcl
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "my_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+```
+
+### Step 2: CLI কমান্ড ও ওয়ার্কফ্লো
+
+1. **Init:**
+   ```bash
+   terraform init
+   ```
+   - Provider plugin ডাউনলোড হবে
+2. **Plan:**
+   ```bash
+   terraform plan
+   ```
+   - কী কী তৈরি/চেঞ্জ হবে, দেখাবে
+3. **Apply:**
+   ```bash
+   terraform apply
+   ```
+   - ইনফ্রা তৈরি হবে (yes লিখে কনফার্ম করুন)
+4. **Destroy:**
+   ```bash
+   terraform destroy
+   ```
+   - সব রিসোর্স ডিলিট (yes লিখে কনফার্ম)
+
+---
+
+## ৩. কমান্ড ও ফাইলের সংক্ষিপ্ত ব্যাখ্যা
+
+- `terraform init` : provider/plugin/setup
+- `terraform plan` : preview (কী হবে)
+- `terraform apply` : বাস্তবায়ন (create/update)
+- `terraform destroy` : সব ডিলিট
+- `main.tf` : আপনার কোড/কনফিগ
+- `terraform.tfstate` : state file (auto তৈরি)
+
+---
+
+## ৪. টিপস ও সমস্যা সমাধান
+
+- AWS credentials (access key/secret) না থাকলে error আসবে—`aws configure` দিয়ে সেট করুন
+- State file-এ গোপন তথ্য থাকে, গিটে রাখবেন না
+- সবসময় `plan` দেখে তারপর `apply` করুন
+- ভুল হলে `destroy` দিয়ে আবার শুরু করুন
+
+---
+
+## সংক্ষেপে
+
+- Terraform ইন্সটল করা খুবই সহজ—একবার শিখে নিন
+- CLI দিয়ে init → plan → apply → destroy—এই চারটি কমান্ডই মূল
+- main.tf ফাইলে কোড লিখে, এক কমান্ডে ইনফ্রা তৈরি/পরিবর্তন/ডিলিট
+
+---
+
+পরবর্তী: [প্রথম টেরাফর্ম প্রজেক্ট](./module-1#প্রথম-টেরাফর্ম-প্রজেক্ট)

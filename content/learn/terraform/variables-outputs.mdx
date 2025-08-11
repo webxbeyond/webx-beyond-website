@@ -1,0 +1,127 @@
+---
+title: ভ্যারিয়েবল ও আউটপুট
+icon: ph:brackets-curly-duotone
+---
+
+Terraform-এ ভ্যারিয়েবল (variable) ব্যবহার করলে কনফিগারেশন আরও ডাইনামিক, রিইউজেবল ও ফ্লেক্সিবল হয়। আউটপুট (output) দিয়ে আপনি apply করার পর দরকারি তথ্য সহজে দেখতে পারেন বা অন্য মডিউলে পাঠাতে পারেন। এই টিউটোরিয়ালে ইনপুট ভ্যারিয়েবল, আউটপুট, ডিফল্ট ভ্যালু, টাইপ—সবকিছু উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ইনপুট ভ্যারিয়েবল (Input Variable)
+
+ভ্যারিয়েবল দিয়ে কনফিগারেশনকে কাস্টমাইজ করা যায়।
+
+**ভ্যারিয়েবল ডিফাইন:**
+```hcl
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.micro"
+}
+```
+
+- **name:** `instance_type`
+- **description:** কী কাজে লাগবে
+- **type:** string, number, bool, list, map ইত্যাদি
+- **default:** ডিফল্ট ভ্যালু (না দিলে অবশ্যই মান দিতে হবে)
+
+**কনফিগে ব্যবহার:**
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = var.instance_type
+}
+```
+
+**ভ্যালু সেট করার উপায়:**
+- CLI ফ্ল্যাগ: `terraform apply -var="instance_type=t3.small"`
+- `.tfvars` ফাইল: `instance_type = "t3.small"`
+- env var: `TF_VAR_instance_type=t3.small`
+
+---
+
+## টাইপ (Type)
+
+ভ্যারিয়েবল টাইপ নির্ধারণ করলে ভুল কম হয়।
+
+**উদাহরণ:**
+```hcl
+variable "tags" {
+  type = map(string)
+  default = {
+    Name = "MyServer"
+    Env  = "dev"
+  }
+}
+```
+
+---
+
+## আউটপুট (Output)
+
+আউটপুট দিয়ে apply করার পর দরকারি তথ্য দেখানো যায়।
+
+**উদাহরণ:**
+```hcl
+output "instance_ip" {
+  description = "EC2 public IP"
+  value       = aws_instance.web.public_ip
+}
+```
+
+- apply করার পর পাবেন:
+  ```sh
+  Apply complete!
+  Outputs:
+  instance_ip = "3.120.45.67"
+  ```
+
+---
+
+## হাতে-কলমে: সম্পূর্ণ কনফিগারেশন
+
+```hcl
+variable "env" {
+  description = "Environment name"
+  type        = string
+  default     = "dev"
+}
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-bucket-${var.env}"
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.bucket.id
+}
+```
+
+- এখানে env ভ্যারিয়েবল দিয়ে S3 bucket-এর নাম ডাইনামিক করা হয়েছে
+- apply করার পর bucket_name আউটপুট পাবেন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- description দিন—বোঝা সহজ হবে
+- ডিফল্ট ভ্যালু না দিলে apply করার সময় মান দিতে হবে
+- টাইপ নির্ধারণ করুন—ভুল কম হবে
+- আউটপুটে sensitive=true দিলে সিক্রেট হাইড থাকবে
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** টাইপ mismatch
+- **সমাধান:** type ঠিকভাবে দিন, apply করার সময় ভুল দেখাবে
+
+**সমস্যা:** আউটপুটে null
+- **সমাধান:** রিসোর্স তৈরি হয়েছে কিনা চেক করুন
+
+---
+
+## আরও জানুন
+- [Terraform Input Variables](https://developer.hashicorp.com/terraform/language/values/variables)
+- [Terraform Output Values](https://developer.hashicorp.com/terraform/language/values/outputs)
+
+এই টিউটোরিয়াল পড়ে আপনি ভ্যারিয়েবল ও আউটপুটের সবকিছু হাতে-কলমে শিখতে পারবেন।

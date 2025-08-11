@@ -1,6 +1,6 @@
 {
   "title": "সেলফ হোস্টিং",
-  "description": "নিজস্ব সার্ভার / VPS / হোম ল্যাবে ওপেন-সোর্স সার্ভিস চালানোর পরিচিতি",
+  "description": "নিজস্ব সার্ভার / VPS / হোম ল্যাবে ওপেন-সোর্স সার্ভিস চালানো",
   "icon": "ph:cloud-arrow-down-duotone",
   "root": true,
   "pages": [

@@ -1,0 +1,67 @@
+---
+title: এক্সিস্টিং ইনফ্রা টেরাফর্মে মাইগ্রেট
+icon: stash:file-import-duotone
+---
+
+Terraform দিয়ে এক্সিস্টিং (ম্যানুয়ালি তৈরি) ইনফ্রা ম্যানেজ করতে চাইলে রিসোর্স ইম্পোর্ট ও state ম্যানেজমেন্ট করতে হয়। এখানে হাতে-কলমে উদাহরণসহ সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## কেন মাইগ্রেট করবেন?
+
+- আগে থেকেই ক্লাউডে তৈরি রিসোর্স Terraform দিয়ে ম্যানেজ করতে
+- কোড ও ইনফ্রা সিঙ্ক রাখতে
+
+---
+
+## রিসোর্স ইম্পোর্ট
+
+- `terraform import` দিয়ে এক্সিস্টিং রিসোর্স state-এ আনা যায়
+- প্রথমে HCL কোড লিখুন, তারপর import করুন
+
+**উদাহরণ:**
+```hcl
+resource "aws_instance" "web" {
+  # config
+}
+```
+```sh
+terraform import aws_instance.web i-1234567890abcdef0
+```
+
+- import করার পর state ফাইলে রিসোর্স যোগ হবে
+- HCL কোডে সব আর্গুমেন্ট থাকতে হবে না, পরে `terraform plan` চালিয়ে কোড আপডেট করুন
+
+---
+
+## স্টেট টিপস
+
+- import করলে state ফাইল আপডেট হয়, কোডে না
+- কোড ও state সিঙ্ক রাখতে plan ও apply চালান
+- state ফাইল ব্যাকআপ রাখুন
+- remote backend ব্যবহার করুন
+
+---
+
+## একাধিক রিসোর্স ইম্পোর্ট
+
+- স্ক্রিপ্ট দিয়ে একাধিক রিসোর্স import করুন
+- import address ও resource id ঠিকভাবে দিন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** import error
+- **সমাধান:** resource address ও id ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** কোড ও state mismatch
+- **সমাধান:** plan চালিয়ে diff দেখুন, কোড আপডেট করুন
+
+---
+
+## আরও জানুন
+- [terraform import](https://developer.hashicorp.com/terraform/cli/commands/import)
+- [Importing Resources](https://developer.hashicorp.com/terraform/language/import)
+
+এই টিউটোরিয়াল পড়ে আপনি এক্সিস্টিং ইনফ্রা Terraform-এ মাইগ্রেট ও ম্যানেজ করতে পারবেন।

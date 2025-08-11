@@ -1,0 +1,107 @@
+---
+title: মাল্টিপল প্রোভাইডার
+icon: ph:cloud-duotone
+---
+
+Terraform-এ একসাথে একাধিক প্রোভাইডার (যেমন: AWS, Azure, GCP) ব্যবহার করে মাল্টি-ক্লাউড বা হাইব্রিড ইনফ্রাস্ট্রাকচার তৈরি করা যায়। এখানে হাতে-কলমে উদাহরণসহ সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## প্রোভাইডার কী?
+
+- প্রোভাইডার হচ্ছে Terraform-এর প্লাগইন, যেটা নির্দিষ্ট ক্লাউড/প্ল্যাটফর্মে রিসোর্স তৈরি করে
+- যেমন: `aws`, `azurerm`, `google`
+
+---
+
+## একাধিক প্রোভাইডার কনফিগারেশন
+
+**main.tf:**
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+
+provider "azurerm" {
+  features {}
+}
+
+provider "google" {
+  project = "my-gcp-project"
+  region  = "us-central1"
+}
+```
+
+---
+
+## একই প্রোভাইডারের একাধিক কনফিগ (Alias)
+
+- একাধিক AWS account/region ব্যবহারে alias ব্যবহার করুন
+
+```hcl
+provider "aws" {
+  alias  = "west"
+  region = "us-west-2"
+}
+
+provider "aws" {
+  alias  = "east"
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "west_bucket" {
+  provider = aws.west
+  bucket   = "my-west-bucket"
+}
+
+resource "aws_s3_bucket" "east_bucket" {
+  provider = aws.east
+  bucket   = "my-east-bucket"
+}
+```
+
+---
+
+## মাল্টি-ক্লাউড রিসোর্স তৈরি
+
+```hcl
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-aws-bucket"
+}
+
+resource "azurerm_resource_group" "my_rg" {
+  name     = "my-rg"
+  location = "East US"
+}
+
+resource "google_storage_bucket" "my_gcp_bucket" {
+  name     = "my-gcp-bucket"
+  location = "US"
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- provider block-এ credentials নিরাপদে ম্যানেজ করুন (env var, Vault)
+- alias ব্যবহার করে স্পষ্ট naming করুন
+- মাল্টি-ক্লাউডে state ও backend কনফিগারেশন আলাদা রাখুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** provider credentials ভুল
+- **সমাধান:** env var/config ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** resource provider mismatch
+- **সমাধান:** resource-এ provider ঠিকভাবে উল্লেখ করুন
+
+---
+
+## আরও জানুন
+- [Terraform Providers](https://developer.hashicorp.com/terraform/language/providers/configuration)
+- [Multiple Provider Instances](https://developer.hashicorp.com/terraform/language/providers/configuration#alias-multiple-provider-configurations)
+
+এই টিউটোরিয়াল পড়ে আপনি একসাথে AWS, Azure, GCP—সব provider ব্যবহার করতে পারবেন।

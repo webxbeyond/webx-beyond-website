@@ -1,0 +1,116 @@
+---
+title: কাস্টম প্রোভাইডার ও প্লাগইন
+icon: ph:plug-duotone
+---
+
+Terraform-এ কাস্টম প্রোভাইডার ও প্লাগইন লিখে আপনি নতুন API, সার্ভিস বা প্ল্যাটফর্ম ইন্টিগ্রেট করতে পারেন। এখানে নিজস্ব প্রোভাইডার লেখার Go basics, স্টেপ-বাই-স্টেপ গাইড ও বেস্ট প্র্যাকটিস দেওয়া হয়েছে।
+
+---
+
+## প্রোভাইডার ও প্লাগইন কী?
+
+- প্রোভাইডার: Terraform-এর প্লাগইন, যেটা নির্দিষ্ট API/প্ল্যাটফর্মে রিসোর্স তৈরি/ম্যানেজ করে
+- প্লাগইন: প্রোভাইডার, প্রোভিশনার, অ্যানালাইসিস টুল ইত্যাদি
+
+---
+
+## কবে কাস্টম প্রোভাইডার লাগবে?
+
+- Terraform Registry-তে নেই এমন API/প্ল্যাটফর্ম ইন্টিগ্রেট করতে
+- নিজস্ব টুল/সার্ভিস অটোমেট করতে
+
+---
+
+## Go basics: প্রোভাইডার লেখার জন্য
+
+- Go programming language জানা লাগবে
+- HashiCorp Terraform Plugin SDK ব্যবহার করতে হয়
+
+**ইনস্টল:**
+```sh
+go install github.com/hashicorp/terraform-plugin-sdk/v2@latest
+```
+
+---
+
+## কাস্টম প্রোভাইডার লেখার স্টেপ
+
+১. Go module তৈরি করুন
+```sh
+mkdir terraform-provider-myprovider
+cd terraform-provider-myprovider
+go mod init terraform-provider-myprovider
+```
+
+২. main.go ফাইল লিখুন
+```go
+package main
+
+import (
+  "github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+  "github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+)
+
+func main() {
+  plugin.Serve(&plugin.ServeOpts{
+    ProviderFunc: MyProvider,
+  })
+}
+```
+
+৩. Provider ও Resource ডিফাইন করুন
+```go
+func MyProvider() *schema.Provider {
+  return &schema.Provider{
+    ResourcesMap: map[string]*schema.Resource{
+      "myprovider_resource": resourceMyResource(),
+    },
+  }
+}
+
+func resourceMyResource() *schema.Resource {
+  return &schema.Resource{
+    Create: ...,
+    Read: ...,
+    Update: ...,
+    Delete: ...,
+    Schema: map[string]*schema.Schema{
+      "name": {
+        Type:     schema.TypeString,
+        Required: true,
+      },
+    },
+  }
+}
+```
+
+৪. Build করুন
+```sh
+go build -o terraform-provider-myprovider
+```
+
+---
+
+## টেস্ট ও ডিবাগ
+
+- provider binary `.terraform/plugins/`-এ রাখুন
+- `terraform init` দিয়ে টেস্ট করুন
+- লগ ও error message দেখে ডিবাগ করুন
+
+---
+
+## বেস্ট প্র্যাকটিস
+
+- ডকুমেন্টেশন দিন (README.md)
+- versioning ও semantic release ফলো করুন
+- টেস্ট ও CI pipeline যোগ করুন
+- Terraform Registry-তে পাবলিশ করুন (প্রয়োজনে)
+
+---
+
+## আরও জানুন
+- [Terraform Provider Development](https://developer.hashicorp.com/terraform/plugin)
+- [Terraform Plugin SDK](https://github.com/hashicorp/terraform-plugin-sdk)
+- [Go Programming Basics](https://go.dev/learn/)
+
+এই টিউটোরিয়াল পড়ে আপনি নিজস্ব প্রোভাইডার ও প্লাগইন লেখার বেসিক ধারণা ও হাতে-কলমে স্টেপ পাবেন।

@@ -1,0 +1,76 @@
+---
+title: স্টেট লকিং ও টিম কোলাব
+icon: ph:lock-duotone
+---
+
+Terraform-এ টিমে কাজ করলে স্টেট লকিং ও কোলাবরেশন খুব গুরুত্বপূর্ণ। স্টেট লকিং দিয়ে একসাথে একাধিক ইউজার কনফ্লিক্ট এড়াতে পারেন। এখানে হাতে-কলমে উদাহরণসহ সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## স্টেট লকিং কী?
+
+- স্টেট লকিং মানে—একজন apply/plan করলে অন্য কেউ একই সময়ে করতে পারবে না
+- এতে স্টেট ফাইল কনফ্লিক্ট, ডেটা লস, ইনফ্রা ড্রিফট এড়ানো যায়
+
+---
+
+## কখন দরকার?
+
+- টিমে একাধিক ডেভেলপার একসাথে কাজ করলে
+- রিমোট ব্যাকএন্ড (S3 + DynamoDB, Terraform Cloud) ব্যবহার করলে
+
+---
+
+## S3 Backend-এ লকিং
+
+- S3 backend-এ DynamoDB table দিয়ে লকিং এনাবল হয়
+
+**backend config:**
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "global/s3/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-lock"
+    encrypt        = true
+  }
+}
+```
+
+- DynamoDB table-এ লক রেকর্ড রাখা হয়
+
+---
+
+## Terraform Cloud-এ লকিং
+
+- Terraform Cloud/Enterprise-এ বিল্ট-ইন লকিং আছে
+- apply চলাকালীন অন্য run শুরু করা যাবে না
+
+---
+
+## টিম কোলাবরেশন টিপস
+
+- remote backend ব্যবহার করুন—state শেয়ার ও লকিং সহজ
+- apply করার আগে plan দেখুন, টিমে আলোচনা করুন
+- pull request ও code review ফলো করুন
+- sensitive data variable/secret manager-এ রাখুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** Lock acquire error
+- **সমাধান:** কেউ apply করছে কিনা চেক করুন, প্রয়োজনে DynamoDB table চেক করুন
+
+**সমস্যা:** কনফ্লিক্টেড state
+- **সমাধান:** remote backend ও লকিং ঠিক আছে কিনা চেক করুন
+
+---
+
+## আরও জানুন
+- [State Locking](https://developer.hashicorp.com/terraform/language/state/locking)
+- [S3 Backend Locking](https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-optional)
+- [Terraform Cloud Collaboration](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/operations)
+
+এই টিউটোরিয়াল পড়ে আপনি টিমে কনফ্লিক্ট এড়িয়ে নিরাপদে Terraform ব্যবহার করতে পারবেন।

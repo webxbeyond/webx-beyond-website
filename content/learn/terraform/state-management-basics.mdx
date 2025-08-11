@@ -1,0 +1,109 @@
+---
+title: স্টেট ম্যানেজমেন্ট বেসিকস
+icon: ph:database-duotone
+---
+
+Terraform-এ "স্টেট" (state) হচ্ছে আপনার ইনফ্রাস্ট্রাকচারের বর্তমান অবস্থা সংরক্ষণের একটি ফাইল। এই state ফাইল ছাড়া Terraform জানবে না, কোন রিসোর্স আগে তৈরি হয়েছে, কোনটা পরিবর্তন হয়েছে, বা কোনটা ডিলিট করতে হবে। এই টিউটোরিয়ালে state কী, কেন দরকার, local vs remote state, এবং হাতে-কলমে উদাহরণসহ সবকিছু ব্যাখ্যা করা হয়েছে।
+
+---
+
+## State কী?
+
+- Terraform যখন কোনো রিসোর্স তৈরি, আপডেট বা ডিলিট করে, তখন তার বর্তমান অবস্থা (state) `terraform.tfstate` ফাইলে সংরক্ষণ করে।
+- এই ফাইল ছাড়া Terraform প্রতিবার নতুন করে সবকিছু তৈরি করতে চাইবে, কারণ সে জানবে না কী আগে ছিল।
+
+**উদাহরণ:**
+
+1. আপনি একটি EC2 instance তৈরি করলেন:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+}
+```
+2. `terraform apply` চালানোর পর, `terraform.tfstate` ফাইলে instance-এর তথ্য সংরক্ষিত হবে।
+
+---
+
+## State ফাইলের গুরুত্ব
+
+- **রিসোর্স ট্র্যাকিং:** কোন রিসোর্স কখন, কীভাবে তৈরি হয়েছে—সব তথ্য থাকে
+- **ডিফারেন্স বের করা:** নতুন apply দিলে, state ফাইল দেখে Terraform বুঝতে পারে কী পরিবর্তন দরকার
+- **রোলব্যাক ও রিকভারি:** ভুল হলে state ফাইল দেখে আগের অবস্থায় ফেরা যায়
+
+---
+
+## Local State
+
+- ডিফল্টভাবে state ফাইল আপনার লোকাল মেশিনে (`terraform.tfstate`) থাকে
+- ছোট প্রজেক্ট বা একক ডেভেলপারের জন্য যথেষ্ট
+- **সমস্যা:**
+  - টিমে কাজ করলে কনফ্লিক্ট হতে পারে
+  - state হারিয়ে গেলে রিকভারি কঠিন
+
+---
+
+## Remote State
+
+- টিমে কাজ করলে state ফাইল ক্লাউডে (S3, Azure Blob, GCS, Terraform Cloud) রাখা ভালো
+- সবাই একই state শেয়ার করতে পারে
+- **বৈশিষ্ট্য:**
+  - লকিং (একসাথে দুইজন পরিবর্তন করতে পারবে না)
+  - ব্যাকআপ ও রিকভারি সহজ
+
+**Remote state কনফিগার করার উদাহরণ (AWS S3):**
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "global/s3/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+```
+
+---
+
+## হাতে-কলমে: State দেখুন ও ম্যানেজ করুন
+
+- **State দেখুন:**
+  ```sh
+  terraform show
+  terraform state list
+  ```
+- **State ফাইল ম্যানুয়ালি এডিট করবেন না**
+- **State মুভ করুন:**
+  ```sh
+  terraform state mv <old> <new>
+  ```
+- **State ডিবাগ:**
+  ```sh
+  terraform state show <resource>
+  ```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- টিমে কাজ করলে remote state ব্যবহার করুন
+- state ফাইল version control (git)-এ রাখবেন না
+- sensitive data state ফাইলে থাকতে পারে—সতর্ক থাকুন
+- state ফাইল ব্যাকআপ রাখুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** state ফাইল হারিয়ে গেছে
+- **সমাধান:** remote backend ব্যবহার করুন, ব্যাকআপ রাখুন
+
+**সমস্যা:** টিমে কনফ্লিক্ট
+- **সমাধান:** locking-enabled remote backend ব্যবহার করুন
+
+---
+
+## আরও জানুন
+- [Terraform State Docs](https://developer.hashicorp.com/terraform/language/state)
+- [Backends Guide](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
+
+এই টিউটোরিয়াল পড়ে আপনি state-এর গুরুত্ব, ব্যবস্থাপনা ও best practices শিখতে পারবেন।

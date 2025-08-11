@@ -1,0 +1,136 @@
+---
+title: Provisioner ও Lifecycle
+icon: ph:terminal-window-duotone
+---
+
+Terraform-এ Provisioner দিয়ে রিসোর্স তৈরি/ডিলিটের সময় এক্সট্রা স্ক্রিপ্ট বা কমান্ড চালানো যায়। Lifecycle রুল দিয়ে রিসোর্সের আচরণ কাস্টমাইজ করা যায়—কখন তৈরি/ডিলিট হবে, ডিপেন্ডেন্সি কেমন হবে ইত্যাদি। এই টিউটোরিয়ালে Provisioner ও Lifecycle—দুটোই হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## Provisioner কী?
+
+- রিসোর্স তৈরি/ডিলিটের সময় এক্সট্রা কাজ করতে চাইলে Provisioner ব্যবহার করুন
+- দুই ধরনের Provisioner: `local-exec` (লোকাল মেশিনে কমান্ড), `remote-exec` (রিমোট সার্ভারে কমান্ড)
+
+---
+
+## local-exec Provisioner
+
+লোকাল মেশিনে কমান্ড চালায়
+
+**উদাহরণ:**
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  provisioner "local-exec" {
+    command = "echo ${self.public_ip} > ip.txt"
+  }
+}
+```
+
+---
+
+## remote-exec Provisioner
+
+রিমোট সার্ভারে (যেমন EC2 instance) কমান্ড চালায়
+
+**উদাহরণ:**
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y nginx"
+    ]
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
+    host     = self.public_ip
+  }
+}
+```
+
+---
+
+## Provisioner কখন ব্যবহার করবেন?
+
+- কনফিগারেশন/ইনস্টলেশন স্ক্রিপ্ট চালাতে
+- রিসোর্স তৈরি/ডিলিটের পর cleanup করতে
+- **কিন্তু:** Provisioner এড়িয়ে চলা ভালো—immutable infra ও idempotency নষ্ট হয়
+
+---
+
+## Lifecycle রুল
+
+Lifecycle দিয়ে রিসোর্সের আচরণ কাস্টমাইজ করা যায়
+
+**কিছু গুরুত্বপূর্ণ lifecycle রুল:**
+- `create_before_destroy`: নতুন রিসোর্স তৈরি, তারপর পুরনোটা ডিলিট
+- `prevent_destroy`: রিসোর্স ডিলিট accidental হলে ব্লক করবে
+- `ignore_changes`: নির্দিষ্ট আর্গুমেন্টে পরিবর্তন হলে Terraform action নেবে না
+
+**উদাহরণ:**
+```hcl
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-bucket"
+
+  lifecycle {
+    prevent_destroy      = true
+    ignore_changes       = [tags]
+    create_before_destroy = true
+  }
+}
+```
+
+---
+
+## হাতে-কলমে: সম্পূর্ণ উদাহরণ
+
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  provisioner "local-exec" {
+    command = "echo Instance created: ${self.id}"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- Provisioner কম ব্যবহার করুন—শুধু দরকার হলে
+- Lifecycle রুল দিয়ে প্রোডাকশন রিসোর্স সুরক্ষিত রাখুন
+- Provisioner error হলে Terraform apply fail করবে
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** Provisioner error
+- **সমাধান:** কমান্ড, connection, permission চেক করুন
+
+**সমস্যা:** রিসোর্স ডিলিট হয়ে যাচ্ছে
+- **সমাধান:** `prevent_destroy = true` দিন
+
+---
+
+## আরও জানুন
+- [Terraform Provisioners](https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax)
+- [Terraform Resource Lifecycle](https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle)
+
+এই টিউটোরিয়াল পড়ে আপনি Provisioner ও Lifecycle—দুটোই হাতে-কলমে শিখতে পারবেন।

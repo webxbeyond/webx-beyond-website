@@ -1,0 +1,158 @@
+---
+title: টেরাফর্ম মডিউল
+icon: ph:stack-duotone
+---
+
+Terraform-এ "মডিউল" হচ্ছে কোডের পুনঃব্যবহারযোগ্য (reusable) অংশ, যেটা দিয়ে আপনি ইনফ্রাস্ট্রাকচারের কমপ্লেক্সিটি কমাতে ও স্ট্যান্ডার্ডাইজ করতে পারেন। এই টিউটোরিয়ালে মডিউল কী, কেন দরকার, কীভাবে তৈরি ও ব্যবহার করবেন, এবং ভার্সন কন্ট্রোলসহ সবকিছু হাতে-কলমে দেখানো হয়েছে।
+
+---
+
+## মডিউল কেন?
+
+- একই ধরনের রিসোর্স বারবার লিখতে হয় না
+- টিমে স্ট্যান্ডার্ড ও বেস্ট প্র্যাকটিস ফলো করা যায়
+- বড় প্রজেক্টে কোড মেইনটেইন সহজ হয়
+
+**উদাহরণ:**
+- বারবার S3 bucket, VPC, EC2 instance তৈরি করতে হলে—একটা মডিউল বানিয়ে বারবার ব্যবহার করুন
+
+---
+
+## মডিউল তৈরি
+
+একটি মডিউল আসলে একটা ফোল্ডার, যেখানে main.tf, variables.tf, outputs.tf ইত্যাদি ফাইল থাকে।
+
+**স্টেপ ১: মডিউল ফোল্ডার তৈরি করুন**
+
+```
+modules/
+  s3_bucket/
+    main.tf
+    variables.tf
+    outputs.tf
+```
+
+**modules/s3_bucket/main.tf**
+```hcl
+resource "aws_s3_bucket" "this" {
+  bucket = var.bucket_name
+}
+```
+
+**modules/s3_bucket/variables.tf**
+```hcl
+variable "bucket_name" {
+  type = string
+}
+```
+
+**modules/s3_bucket/outputs.tf**
+```hcl
+output "bucket_id" {
+  value = aws_s3_bucket.this.id
+}
+```
+
+---
+
+## মডিউল ব্যবহার
+
+প্রধান কনফিগারেশন থেকে মডিউল কল করুন:
+
+```hcl
+module "my_bucket" {
+  source      = "./modules/s3_bucket"
+  bucket_name = "my-unique-bucket"
+}
+
+output "bucket_id" {
+  value = module.my_bucket.bucket_id
+}
+```
+
+- `source` দিয়ে লোকাল/রিমোট মডিউল লোকেশন দেখান
+- ইনপুট আর্গুমেন্ট দিন
+- আউটপুট ব্যবহার করুন
+
+---
+
+## রিমোট মডিউল ব্যবহার
+
+Terraform Registry-তে পাবলিক মডিউল আছে:
+
+```hcl
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.0.0"
+  name    = "my-vpc"
+  cidr    = "10.0.0.0/16"
+  azs     = ["us-east-1a", "us-east-1b"]
+  ...
+}
+```
+
+- `source`-এ registry url
+- `version` দিয়ে নির্দিষ্ট ভার্সন
+
+---
+
+## ভার্সনিং
+
+- রিমোট মডিউলে `version` ব্যবহার করুন
+- লোকাল মডিউলে git repo ব্যবহার করলে `ref` দিয়ে branch/tag/commit নির্দিষ্ট করুন
+
+**উদাহরণ:**
+```hcl
+module "vpc" {
+  source  = "git::https://github.com/your-org/terraform-vpc.git?ref=v1.2.0"
+  ...
+}
+```
+
+---
+
+## হাতে-কলমে: সম্পূর্ণ উদাহরণ
+
+**modules/s3_bucket/** ফোল্ডার তৈরি করুন (উপরের মতো)
+
+**main.tf:**
+```hcl
+module "my_bucket" {
+  source      = "./modules/s3_bucket"
+  bucket_name = "my-unique-bucket"
+}
+
+output "bucket_id" {
+  value = module.my_bucket.bucket_id
+}
+```
+
+- `terraform init` ও `terraform apply` চালান
+- আউটপুটে bucket_id পাবেন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ছোট, স্পষ্ট ও রিইউজেবল মডিউল বানান
+- variables.tf ও outputs.tf আলাদা রাখুন
+- ডকুমেন্টেশন দিন (README.md)
+- ভার্সন পিন করুন—production-এ stability
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** মডিউল সোর্স ভুল
+- **সমাধান:** path/url ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** ইনপুট/আউটপুট mismatch
+- **সমাধান:** variables.tf ও outputs.tf ঠিকভাবে লিখুন
+
+---
+
+## আরও জানুন
+- [Terraform Modules Guide](https://developer.hashicorp.com/terraform/language/modules)
+- [Terraform Registry](https://registry.terraform.io/)
+
+এই টিউটোরিয়াল পড়ে আপনি মডিউল তৈরি, ব্যবহার ও ভার্সনিং—সবকিছু হাতে-কলমে শিখতে পারবেন।

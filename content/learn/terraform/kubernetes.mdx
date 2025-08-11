@@ -1,0 +1,125 @@
+---
+title: কুবেরনেটিসের সাথে টেরাফর্ম
+icon: ph:cube-duotone
+---
+
+Terraform দিয়ে Kubernetes (k8s) cluster ও resource সহজেই ম্যানেজ করা যায়। এখানে cluster provision, k8s resource apply—সবকিছু হাতে-কলমে উদাহরণসহ সহজ ভাষায় ব্যাখ্যা করা হয়েছে।
+
+---
+
+## কেন Terraform দিয়ে Kubernetes?
+
+- cluster creation, scaling, upgrade—সবকিছু কোড দিয়ে
+- cloud-agnostic: AWS EKS, Azure AKS, GCP GKE, on-prem
+- k8s resource (deployment, service) Terraform দিয়ে ম্যানেজ
+
+---
+
+## Cluster Provision (EKS/AKS/GKE)
+
+**উদাহরণ: AWS EKS cluster**
+```hcl
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  cluster_name    = "my-eks"
+  cluster_version = "1.29"
+  subnets         = ["subnet-123", "subnet-456"]
+  vpc_id          = "vpc-123"
+  ...
+}
+```
+
+---
+
+## Kubernetes Provider কনফিগার
+
+- kubeconfig দিয়ে provider কনফিগার করুন
+
+```hcl
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+```
+
+---
+
+## Kubernetes Resource ম্যানেজ
+
+**উদাহরণ: Deployment ও Service**
+```hcl
+resource "kubernetes_deployment" "nginx" {
+  metadata {
+    name = "nginx"
+    labels = {
+      app = "nginx"
+    }
+  }
+  spec {
+    replicas = 2
+    selector {
+      match_labels = {
+        app = "nginx"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "nginx"
+        }
+      }
+      spec {
+        container {
+          image = "nginx:latest"
+          name  = "nginx"
+          port {
+            container_port = 80
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "nginx" {
+  metadata {
+    name = "nginx"
+  }
+  spec {
+    selector = {
+      app = "nginx"
+    }
+    port {
+      port        = 80
+      target_port = 80
+    }
+    type = "LoadBalancer"
+  }
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- cluster ও resource—দুটোই Terraform দিয়ে ম্যানেজ করুন
+- sensitive data (secret) কনফিগে রাখবেন না
+- provider config ও credentials নিরাপদে রাখুন
+- module ব্যবহার করুন—reusable code
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** provider config error
+- **সমাধান:** kubeconfig ও credentials চেক করুন
+
+**সমস্যা:** resource apply হচ্ছে না
+- **সমাধান:** API version, resource definition ঠিক আছে কিনা দেখুন
+
+---
+
+## আরও জানুন
+- [Terraform Kubernetes Provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
+- [EKS Module](https://github.com/terraform-aws-modules/terraform-aws-eks)
+
+এই টিউটোরিয়াল পড়ে আপনি Terraform দিয়ে Kubernetes cluster ও resource—দুটোই ম্যানেজ করতে পারবেন।

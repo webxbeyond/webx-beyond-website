@@ -1,0 +1,136 @@
+---
+title: টেরাফর্ম ফাংশন ও এক্সপ্রেশন
+icon: ph:function-duotone
+---
+
+Terraform-এ ফাংশন ও এক্সপ্রেশন ব্যবহার করে আপনি কনফিগারেশনকে আরও ডাইনামিক, স্মার্ট ও শক্তিশালী করতে পারেন। এখানে String, numeric, collection, conversion function—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## এক্সপ্রেশন কী?
+
+- এক্সপ্রেশন দিয়ে ভ্যালু ডাইনামিকভাবে সেট করা যায়
+- `${ ... }` বা সরাসরি HCL syntax-এ লেখা হয়
+- ভ্যারিয়েবল, রিসোর্স, ফাংশন—সব এক্সপ্রেশনে ব্যবহার করা যায়
+
+---
+
+## String Functions
+
+- `join`, `split`, `replace`, `format`, `trimspace` ইত্যাদি
+
+**উদাহরণ:**
+```hcl
+output "joined" {
+  value = join(",", ["a", "b", "c"])
+}
+# ফলাফল: "a,b,c"
+
+output "replaced" {
+  value = replace("hello world", "world", "Terraform")
+}
+# ফলাফল: "hello Terraform"
+```
+
+---
+
+## Numeric Functions
+
+- `min`, `max`, `abs`, `ceil`, `floor`, `parseint` ইত্যাদি
+
+**উদাহরণ:**
+```hcl
+output "max_value" {
+  value = max(5, 10, 3)
+}
+# ফলাফল: 10
+
+output "abs_value" {
+  value = abs(-7)
+}
+# ফলাফল: 7
+```
+
+---
+
+## Collection Functions
+
+- `length`, `contains`, `tolist`, `tomap`, `merge`, `flatten`, `distinct` ইত্যাদি
+
+**উদাহরণ:**
+```hcl
+output "list_length" {
+  value = length([1,2,3,4])
+}
+# ফলাফল: 4
+
+output "has_value" {
+  value = contains(["a", "b", "c"], "b")
+}
+# ফলাফল: true
+```
+
+---
+
+## Conversion Functions
+
+- `tostring`, `tonumber`, `toset`, `tolist`, `tomap` ইত্যাদি
+
+**উদাহরণ:**
+```hcl
+output "to_string" {
+  value = tostring(123)
+}
+# ফলাফল: "123"
+
+output "to_number" {
+  value = tonumber("42")
+}
+# ফলাফল: 42
+```
+
+---
+
+## হাতে-কলমে: কম্বিনেশন উদাহরণ
+
+```hcl
+variable "envs" {
+  default = ["dev", "staging", "prod"]
+}
+
+output "env_string" {
+  value = join("-", var.envs)
+}
+# ফলাফল: "dev-staging-prod"
+
+output "env_count" {
+  value = length(var.envs)
+}
+# ফলাফল: 3
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ফাংশন ও এক্সপ্রেশন দিয়ে কনফিগারেশন ডাইনামিক করুন
+- ডকুমেন্টেশন দেখুন—নতুন ফাংশন যোগ হচ্ছে
+- এক্সপ্রেশন জটিল হলে comment দিন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** টাইপ mismatch
+- **সমাধান:** conversion function ব্যবহার করুন (tostring, tonumber)
+
+**সমস্যা:** ফাংশন কাজ করছে না
+- **সমাধান:** syntax ও আর্গুমেন্ট চেক করুন
+
+---
+
+## আরও জানুন
+- [Terraform Functions Docs](https://developer.hashicorp.com/terraform/language/functions)
+- [Terraform Expressions](https://developer.hashicorp.com/terraform/language/expressions)
+
+এই টিউটোরিয়াল পড়ে আপনি টেরাফর্ম ফাংশন ও এক্সপ্রেশন—সবকিছু হাতে-কলমে শিখতে পারবেন।

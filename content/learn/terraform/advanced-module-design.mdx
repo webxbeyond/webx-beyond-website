@@ -1,0 +1,134 @@
+---
+title: অ্যাডভান্সড মডিউল ডিজাইন
+icon: ph:code-block-duotone
+---
+
+Terraform-এ অ্যাডভান্সড মডিউল ডিজাইন করলে কোড আরও রিইউজেবল, সুরক্ষিত ও maintainable হয়। এখানে ইনপুট ভ্যালিডেশন, আউটপুট ফরম্যাটিং, ভার্সন কনস্ট্রেইন্ট—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ইনপুট ভ্যালিডেশন
+
+- ভ্যারিয়েবল ডিফাইন করার সময় type, validation, description ব্যবহার করুন
+- ভুল ইনপুট দিলে apply করার সময় error দেখাবে
+
+**উদাহরণ:**
+```hcl
+variable "env" {
+  description = "Environment name"
+  type        = string
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.env)
+    error_message = "env must be dev, staging, or prod"
+  }
+}
+```
+
+---
+
+## আউটপুট ফরম্যাটিং
+
+- আউটপুটে sensitive, description, value formatting ব্যবহার করুন
+
+**উদাহরণ:**
+```hcl
+output "bucket_info" {
+  description = "S3 bucket info"
+  value = {
+    name = aws_s3_bucket.bucket.id
+    arn  = aws_s3_bucket.bucket.arn
+  }
+}
+
+output "secret" {
+  value     = var.secret
+  sensitive = true
+}
+```
+
+---
+
+## ভার্সন কনস্ট্রেইন্ট
+
+- মডিউল ও প্রোভাইডার—দুটোতেই version constraint দিন
+- নির্দিষ্ট ভার্সন বা ভার্সন রেঞ্জ ব্যবহার করুন
+
+**প্রোভাইডার ভার্সন:**
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0, < 6.0"
+    }
+  }
+}
+```
+
+**মডিউল ভার্সন:**
+```hcl
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.0.0"
+}
+```
+
+---
+
+## হাতে-কলমে: অ্যাডভান্সড মডিউল
+
+**variables.tf:**
+```hcl
+variable "instance_count" {
+  type        = number
+  default     = 1
+  validation {
+    condition     = var.instance_count > 0 && var.instance_count < 10
+    error_message = "instance_count must be between 1 and 9"
+  }
+}
+```
+
+**outputs.tf:**
+```hcl
+output "instance_ids" {
+  description = "List of instance IDs"
+  value       = aws_instance.web[*].id
+}
+```
+
+**main.tf:**
+```hcl
+module "web" {
+  source         = "./modules/web"
+  instance_count = 3
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- সব ভ্যারিয়েবলে type, description, validation দিন
+- আউটপুটে description ও sensitive ব্যবহার করুন
+- version constraint দিয়ে stability নিশ্চিত করুন
+- README.md-তে usage, input/output, version লিখুন
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** ভুল ইনপুট দিলে apply fail
+- **সমাধান:** validation ও error_message স্পষ্ট রাখুন
+
+**সমস্যা:** মডিউল/প্রোভাইডার ভার্সন mismatch
+- **সমাধান:** version constraint ঠিক করুন
+
+---
+
+## আরও জানুন
+- [Input Variable Validation](https://developer.hashicorp.com/terraform/language/values/variables#custom-validation-rules)
+- [Output Values](https://developer.hashicorp.com/terraform/language/values/outputs)
+- [Provider Version Constraint](https://developer.hashicorp.com/terraform/language/providers/requirements)
+
+এই টিউটোরিয়াল পড়ে আপনি অ্যাডভান্সড মডিউল ডিজাইন—সবকিছু হাতে-কলমে শিখতে পারবেন।

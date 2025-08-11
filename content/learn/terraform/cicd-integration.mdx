@@ -1,0 +1,131 @@
+---
+title: CI/CD ইন্টিগ্রেশন
+icon: ph:rocket-duotone
+---
+
+Terraform-কে CI/CD pipeline-এ ইন্টিগ্রেট করলে আপনি অটোমেটেড, রিপ্রোডিউসিবল ও টিম-ফ্রেন্ডলি ইনফ্রাস্ট্রাকচার ডেপ্লয় করতে পারবেন। এখানে GitHub Actions, GitLab CI, Jenkins দিয়ে Terraform অটোমেশন—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## CI/CD কী?
+
+- CI (Continuous Integration): কোড চেঞ্জ অটোমেটেড টেস্ট ও বিল্ড
+- CD (Continuous Deployment/Delivery): কোড চেঞ্জ অটোমেটেড ডেপ্লয়
+- Terraform-এ CI/CD মানে—কোড পুশ হলেই অটোমেটেড ইনফ্রা চেঞ্জ
+
+---
+
+## GitHub Actions দিয়ে Terraform
+
+**.github/workflows/terraform.yml:**
+```yaml
+name: 'Terraform'
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Plan
+        run: terraform plan
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
+```
+
+---
+
+## GitLab CI দিয়ে Terraform
+
+**.gitlab-ci.yml:**
+```yaml
+stages:
+  - validate
+  - plan
+  - apply
+
+validate:
+  stage: validate
+  script:
+    - terraform init
+    - terraform validate
+
+plan:
+  stage: plan
+  script:
+    - terraform plan
+
+apply:
+  stage: apply
+  when: manual
+  script:
+    - terraform apply -auto-approve
+```
+
+---
+
+## Jenkins দিয়ে Terraform
+
+- Jenkinsfile-এ Terraform স্টেপ যোগ করুন
+
+**Jenkinsfile:**
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Init') {
+      steps {
+        sh 'terraform init'
+      }
+    }
+    stage('Plan') {
+      steps {
+        sh 'terraform plan'
+      }
+    }
+    stage('Apply') {
+      steps {
+        input 'Apply changes?'
+        sh 'terraform apply -auto-approve'
+      }
+    }
+  }
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- CI/CD-তে sensitive data (token, credentials) secret manager/env var-এ রাখুন
+- `terraform plan` ও `apply` আলাদা stage-এ রাখুন
+- apply-তে manual approval দিন
+- remote backend ব্যবহার করুন—state শেয়ার ও লকিং
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** credentials leak
+- **সমাধান:** secret manager ব্যবহার করুন, log-এ sensitive data না রাখুন
+
+**সমস্যা:** state conflict
+- **সমাধান:** remote backend ও locking ব্যবহার করুন
+
+---
+
+## আরও জানুন
+- [Terraform CI/CD Patterns](https://developer.hashicorp.com/terraform/tutorials/automation/github-actions)
+- [GitHub Actions for Terraform](https://github.com/hashicorp/setup-terraform)
+- [GitLab CI/CD Docs](https://docs.gitlab.com/ee/ci/)
+- [Jenkins Pipeline Docs](https://www.jenkins.io/doc/book/pipeline/)
+
+এই টিউটোরিয়াল পড়ে আপনি CI/CD pipeline-এ Terraform ইন্টিগ্রেশন হাতে-কলমে শিখতে পারবেন।

@@ -1,0 +1,111 @@
+---
+title: ডাটা সোর্স
+icon: ph:database-duotone
+---
+
+Terraform-এ ডাটা সোর্স (data source) ব্যবহার করে আপনি এক্সটার্নাল বা বিদ্যমান রিসোর্সের তথ্য কনফিগারেশনে আনতে পারেন, যেগুলো Terraform নিজে তৈরি করেনি। এতে আপনার কনফিগ আরও ডাইনামিক ও ফ্লেক্সিবল হয়। এই টিউটোরিয়ালে ডাটা সোর্স কী, কেন দরকার, কীভাবে ব্যবহার করবেন—সবকিছু হাতে-কলমে উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ডাটা সোর্স কী?
+
+- ডাটা সোর্স দিয়ে বিদ্যমান রিসোর্সের তথ্য ফেচ করা যায়
+- যেমন: AWS-এ আগে থেকেই থাকা VPC, AMI, S3 bucket ইত্যাদি
+- ডাটা সোর্স কনফিগারেশনে `data` ব্লক দিয়ে ডিফাইন করা হয়
+
+---
+
+## কেন দরকার?
+
+- বিদ্যমান রিসোর্সের তথ্য দরকার হলে
+- ডাইনামিক কনফিগারেশন (hardcode না করে)
+- একাধিক Terraform প্রজেক্টের মধ্যে তথ্য শেয়ার
+
+---
+
+## ডাটা সোর্সের গঠন
+
+```hcl
+data "<PROVIDER>_<TYPE>" "<NAME>" {
+  # আর্গুমেন্ট
+}
+```
+
+- PROVIDER: যেমন aws, azurerm, google
+- TYPE: রিসোর্স টাইপ (ami, vpc, subnet)
+- NAME: লোকাল নাম
+
+---
+
+## হাতে-কলমে: উদাহরণ
+
+**১. AWS-এ বিদ্যমান AMI আইডি ফেচ করুন:**
+```hcl
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-20.04-amd64-server-*"]
+  }
+}
+
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+}
+```
+
+**২. বিদ্যমান VPC-এর তথ্য আনুন:**
+```hcl
+data "aws_vpc" "default" {
+  default = true
+}
+
+output "vpc_id" {
+  value = data.aws_vpc.default.id
+}
+```
+
+---
+
+## এক্সটার্নাল ডাটা সোর্স
+
+Terraform-এ `external` ডাটা সোর্স দিয়ে বাইরের স্ক্রিপ্ট/প্রোগ্রাম থেকে ডাটা আনা যায়।
+
+**উদাহরণ:**
+```hcl
+data "external" "example" {
+  program = ["python3", "./scripts/get_data.py"]
+}
+
+output "external_value" {
+  value = data.external.example.result
+}
+```
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- ডাটা সোর্স শুধু তথ্য ফেচ করে, রিসোর্স তৈরি/ডিলিট করে না
+- ডাটা সোর্সের আউটপুট রিসোর্সে ব্যবহার করুন
+- ডকুমেন্টেশন দেখুন—প্রতিটি provider-এর ডাটা সোর্স আলাদা
+
+---
+
+## সমস্যা ও সমাধান
+
+**সমস্যা:** ডাটা সোর্স কিছুই রিটার্ন করছে না
+- **সমাধান:** filter/argument ঠিক আছে কিনা চেক করুন
+
+**সমস্যা:** রিসোর্সের তথ্য পাওয়া যাচ্ছে না
+- **সমাধান:** provider config ও permission চেক করুন
+
+---
+
+## আরও জানুন
+- [Terraform Data Sources Guide](https://developer.hashicorp.com/terraform/language/data-sources)
+- [AWS Data Sources](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources)
+
+এই টিউটোরিয়াল পড়ে আপনি ডাটা সোর্স কীভাবে ব্যবহার করবেন, হাতে-কলমে শিখতে পারবেন।
