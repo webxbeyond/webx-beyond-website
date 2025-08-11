@@ -1,0 +1,64 @@
+---
+title: "জেনকিন্স পাইপলাইনে গিট ইন্টিগ্রেশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## জেনকিন্স ও গিট: পরিচিতি
+
+জেনকিন্স একটি ওপেন সোর্স অটোমেশন সার্ভার, যা CI/CD (Continuous Integration/Continuous Deployment) পাইপলাইন তৈরি ও পরিচালনা করতে ব্যবহৃত হয়। গিট ইন্টিগ্রেশন মানে—জেনকিন্স স্বয়ংক্রিয়ভাবে গিট রিপোজিটরির পরিবর্তন শনাক্ত করে বিল্ড, টেস্ট ও ডিপ্লয়মেন্ট চালাতে পারে।
+
+## ধাপ ১: জেনকিন্সে গিট প্লাগইন ইনস্টল
+
+১. জেনকিন্স ড্যাশবোর্ডে যান।
+২. **Manage Jenkins → Manage Plugins**-এ ক্লিক করুন।
+৩. **Available** ট্যাবে গিয়ে "Git plugin" খুঁজে ইনস্টল করুন।
+
+## ধাপ ২: ক্রেডেনশিয়াল সেটআপ
+
+- **Manage Jenkins → Credentials**-এ গিয়ে গিট রিপোর জন্য ইউজারনেম/পাসওয়ার্ড বা SSH কী যোগ করুন।
+
+## ধাপ ৩: নতুন জব/পাইপলাইন তৈরি
+
+১. **New Item**-এ ক্লিক করে Freestyle Project বা Pipeline নির্বাচন করুন।
+২. **Source Code Management**-এ "Git" নির্বাচন করুন।
+৩. রিপোজিটরির URL দিন ও Credentials নির্বাচন করুন।
+
+## ধাপ ৪: বিল্ড ট্রিগার কনফিগার
+
+- **Build Triggers**-এ "Poll SCM" বা "GitHub hook trigger for GITScm polling" নির্বাচন করুন।
+- Poll SCM: নির্দিষ্ট সময় পরপর গিট চেক করবে (উদাহরণ: `H/5 * * * *` প্রতি ৫ মিনিটে)।
+- GitHub hook: গিটহাব/গিটল্যাব থেকে push ইভেন্টে স্বয়ংক্রিয় ট্রিগার।
+
+## ধাপ ৫: পাইপলাইন স্ক্রিপ্টে গিট ব্যবহার (Declarative Pipeline)
+
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/your/repo.git'
+      }
+    }
+    stage('Build') {
+      steps {
+        // বিল্ড কমান্ড
+      }
+    }
+  }
+}
+```
+
+## বেস্ট প্র্যাকটিস
+- গিট ব্রাঞ্চ স্পেসিফাই করুন (যেমন: main, develop)।
+- ক্রেডেনশিয়াল নিরাপদে সংরক্ষণ করুন (Jenkins Credentials)।
+- SCM webhook ব্যবহার করুন—Push ইভেন্টে দ্রুত বিল্ড ট্রিগার হয়।
+- বিল্ড স্ক্রিপ্টে রিপো ক্লিন/ফ্রেশ চেকআউট নিশ্চিত করুন।
+
+## সমস্যা ও সমাধান
+- **Authentication error:** ক্রেডেনশিয়াল সঠিকভাবে যোগ হয়েছে কিনা চেক করুন।
+- **Webhook কাজ করছে না:** জেনকিন্স সার্ভার ইন্টারনেট থেকে অ্যাক্সেসযোগ্য কিনা ও Webhook কনফিগার চেক করুন।
+
+## আরও পড়ুন
+- [Jenkins Git Plugin Docs](https://plugins.jenkins.io/git/)
+- [Jenkins Pipeline Syntax](https://www.jenkins.io/doc/book/pipeline/syntax/)

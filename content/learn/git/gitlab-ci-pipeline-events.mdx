@@ -1,0 +1,70 @@
+---
+title: "গিটল্যাব সিআই/সিডি পাইপলাইন ও গিট ইভেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## গিটল্যাব সিআই/সিডি পরিচিতি
+
+গিটল্যাব সিআই/সিডি (GitLab CI/CD) হলো গিটল্যাবের বিল্ট-ইন কন্টিনিউয়াস ইন্টিগ্রেশন ও ডিপ্লয়মেন্ট টুল। `.gitlab-ci.yml` ফাইলের মাধ্যমে স্বয়ংক্রিয় বিল্ড, টেস্ট ও ডিপ্লয়মেন্ট চালানো যায়।
+
+## `.gitlab-ci.yml` ফাইলের গঠন
+
+- প্রজেক্টের রুটে `.gitlab-ci.yml` ফাইল তৈরি করুন।
+- প্রতিটি জব/স্টেজ YAML-এ ডিফাইন করুন।
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+test-job:
+  stage: test
+  script:
+    - npm test
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying..."
+  only:
+    - main
+```
+
+## গিট ইভেন্টে ট্রিগার
+- ডিফল্টভাবে, `push`, `merge request`, `tag` ইত্যাদি ইভেন্টে পাইপলাইন ট্রিগার হয়
+- `only`, `except`, `rules` দিয়ে নির্দিষ্ট ব্রাঞ্চ, ট্যাগ বা কন্ডিশন সেট করা যায়
+
+```yaml
+job:
+  script: echo Hello
+  only:
+    - main
+    - tags
+```
+
+## সাধারণ গিটল্যাব ইভেন্ট
+- `push`: নতুন কমিট পুশ হলে
+- `merge_request`: মার্জ রিকোয়েস্ট ওপেন/আপডেট হলে
+- `tag`: ট্যাগ পুশ হলে
+- `schedule`: নির্দিষ্ট সময়ে
+
+## সিক্রেট ও এনভায়রনমেন্ট ভ্যারিয়েবল
+- **Settings → CI/CD → Variables**-এ সিক্রেট সংরক্ষণ করুন
+- YAML-এ `$MY_SECRET` হিসেবে ব্যবহার করুন
+
+## বেস্ট প্র্যাকটিস
+- স্টেজভিত্তিক পাইপলাইন (build, test, deploy)
+- ছোট ও পুনঃব্যবহারযোগ্য স্ক্রিপ্ট
+- সিক্রেট কখনো কোডে হার্ডকোড করবেন না
+- মার্জ রিকোয়েস্টে অটো টেস্ট চালান
+
+## আরও পড়ুন
+- [GitLab CI/CD Docs](https://docs.gitlab.com/ee/ci/)
+- [`.gitlab-ci.yml` Reference](https://docs.gitlab.com/ee/ci/yaml/)

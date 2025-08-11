@@ -1,0 +1,58 @@
+---
+title: গিট সাবমডিউল দিয়ে ডিপেন্ডেন্সি ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিট সাবমডিউল ব্যবহার করে আপনি একাধিক রিপোজিটরির মধ্যে ডিপেন্ডেন্সি বা কোড শেয়ার করতে পারেন। এটি বড় প্রজেক্টে কমন লাইব্রেরি বা থার্ড-পার্টি কোড ম্যানেজ করার জন্য কার্যকর।
+
+## ১. সাবমডিউল কী?
+- সাবমডিউল হলো এক রিপোজিটরির মধ্যে আরেকটি গিট রিপোজিটরি এমবেড করার উপায়।
+- মূলত, parent রিপোতে child রিপোর নির্দিষ্ট কমিট রেফারেন্স রাখা হয়।
+
+## ২. সাবমডিউল যোগ করা
+```sh
+git submodule add <repo-url> path/to/submodule
+```
+- উদাহরণ:
+```sh
+git submodule add https://github.com/example/lib.git libs/lib
+```
+
+## ৩. সাবমডিউল ক্লোন ও আপডেট
+- সাবমডিউলসহ ক্লোন:
+```sh
+git clone --recurse-submodules <repo-url>
+```
+- বিদ্যমান ক্লোনে সাবমডিউল ফেচ/ইনিশিয়ালাইজ:
+```sh
+git submodule init
+git submodule update
+```
+
+## ৪. সাবমডিউল আপডেট ও সিঙ্ক
+- সাবমডিউল রিপোতে গিয়ে pull করুন:
+```sh
+cd libs/lib
+git pull origin main
+cd ../..
+git add libs/lib
+git commit -m "Update submodule"
+```
+
+## ৫. সাবমডিউল রিমুভ
+```sh
+git submodule deinit -f path/to/submodule
+rm -rf .git/modules/path/to/submodule
+rm -rf path/to/submodule
+git add .
+git commit -m "Remove submodule"
+```
+
+## ৬. সাবমডিউল ব্যবহারে সতর্কতা
+- সাবমডিউল আপডেট ভুলে গেলে কোড mismatch হতে পারে
+- CI/CD-তে `git submodule update --init --recursive` রান করুন
+- সাবমডিউল রিপোতে আলাদা পারমিশন/অ্যাক্সেস লাগতে পারে
+
+## ৭. রেফারেন্স
+- [Git Tools - Submodules (Pro Git Book)](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+- [GitHub Docs: Working with submodules](https://docs.github.com/en/get-started/working-with-submodules)

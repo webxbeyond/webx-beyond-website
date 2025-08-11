@@ -1,0 +1,52 @@
+---
+title: "অ্যাডভান্সড ডিফ ও মার্জ টুল"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ডিফ ও মার্জ টুল কী?
+
+ডিফ (diff) টুল—দুইটি ফাইল বা ব্রাঞ্চের পার্থক্য দেখায়। মার্জ (merge) টুল—কনফ্লিক্ট হলে ভিজ্যুয়ালি সমাধান করতে সাহায্য করে।
+
+## জনপ্রিয় ডিফ ও মার্জ টুল
+- **Meld**: ফ্রি, লিনাক্স/উইন্ডোজ/ম্যাক
+- **Beyond Compare**: পেইড, উইন্ডোজ/ম্যাক
+- **KDiff3**: ফ্রি, মাল্টিপ্ল্যাটফর্ম
+- **VSCode**: বিল্ট-ইন ডিফ/মার্জ
+- **P4Merge**: ফ্রি, ভিজ্যুয়াল মার্জ
+
+## গিটে ডিফ/মার্জ টুল কনফিগার
+
+### উদাহরণ: Meld
+```sh
+git config --global diff.tool meld
+git config --global merge.tool meld
+git config --global mergetool.prompt false
+```
+
+### উদাহরণ: VSCode
+```sh
+git config --global diff.tool vscode
+git config --global difftool.vscode.cmd "code --wait --diff $LOCAL $REMOTE"
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd "code --wait $MERGED"
+```
+
+## ডিফ/মার্জ টুল চালানো
+```sh
+git difftool
+# বা
+git mergetool
+```
+
+## বেস্ট প্র্যাকটিস
+- বড় কনফ্লিক্টে ভিজ্যুয়াল টুল ব্যবহার করুন
+- টিমে একই টুল কনফিগার করলে কনফ্লিক্ট সমাধান সহজ
+- মার্জের আগে সব ফাইল সেভ করুন
+
+## আরও পড়ুন
+- [Git Difftool Docs](https://git-scm.com/docs/git-difftool)
+- [Git Mergetool Docs](https://git-scm.com/docs/git-mergetool)
+- [Meld](https://meldmerge.org/)
+- [Beyond Compare](https://www.scootersoftware.com/)
+- [KDiff3](https://invent.kde.org/sdk/kdiff3)
+- [P4Merge](https://www.perforce.com/products/helix-core-apps/merge-diff-tool-p4merge)

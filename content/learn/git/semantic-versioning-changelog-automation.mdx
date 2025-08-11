@@ -1,0 +1,62 @@
+---
+title: "সেমান্টিক ভার্সনিং ও চেঞ্জলগ অটোমেশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সেমান্টিক ভার্সনিং (SemVer) কী?
+
+সেমান্টিক ভার্সনিং (Semantic Versioning) হলো ভার্সন নাম্বারিংয়ের একটি স্ট্যান্ডার্ড: `MAJOR.MINOR.PATCH` (যেমন: 2.5.1)
+- **MAJOR:** ব্রেকিং চেঞ্জ
+- **MINOR:** নতুন ফিচার, ব্রেকিং নয়
+- **PATCH:** বাগ ফিক্স
+
+## কনভেনশনাল কমিট
+
+কমিট মেসেজে নির্দিষ্ট ফরম্যাট ব্যবহার করলে (যেমন: `feat:`, `fix:`, `chore:`) স্বয়ংক্রিয়ভাবে ভার্সন ও চেঞ্জলগ তৈরি করা সহজ হয়।
+
+**উদাহরণ:**
+- `feat: ইউজার লগইন ফিচার`
+- `fix: লগইন বাগ ফিক্স`
+- `chore: ডিপেন্ডেন্সি আপডেট`
+
+## চেঞ্জলগ অটোমেশন টুল
+
+### ১. standard-version (npm)
+
+- ইনস্টল: `npm install --save-dev standard-version`
+- package.json-এ স্ক্রিপ্ট যোগ করুন:
+  ```json
+  "scripts": {
+    "release": "standard-version"
+  }
+  ```
+- রান করুন: `npm run release`
+- এটি স্বয়ংক্রিয়ভাবে ভার্সন বাম্প ও CHANGELOG.md আপডেট করবে
+
+### ২. release-please (GitHub Action)
+
+- `.github/workflows/release.yml` ফাইলে:
+  ```yaml
+  name: release-please
+  on:
+    push:
+      branches:
+        - main
+  jobs:
+    release:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: google-github-actions/release-please-action@v4
+  ```
+- এটি কনভেনশনাল কমিট দেখে PR ও চেঞ্জলগ তৈরি করবে
+
+## বেস্ট প্র্যাকটিস
+- সবসময় কনভেনশনাল কমিট ফরম্যাট অনুসরণ করুন
+- CHANGELOG.md ফাইল version control-এ রাখুন
+- স্বয়ংক্রিয় টুল দিয়ে রিলিজ ও চেঞ্জলগ মেইনটেইন করুন
+
+## আরও পড়ুন
+- [Semantic Versioning](https://semver.org/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [standard-version](https://github.com/conventional-changelog/standard-version)
+- [release-please](https://github.com/googleapis/release-please)

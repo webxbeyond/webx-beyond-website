@@ -1,0 +1,75 @@
+---
+title: গিটে সংবেদনশীল ডেটা ম্যানেজমেন্ট (git-secrets, git-crypt)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিট রিপোজিটরিতে পাসওয়ার্ড, API key, সিক্রেট ফাইল ইত্যাদি সংবেদনশীল ডেটা রাখা ঝুঁকিপূর্ণ। এই পাঠে দেখানো হয়েছে কীভাবে git-secrets ও git-crypt দিয়ে এসব ডেটা ম্যানেজ ও সুরক্ষিত রাখা যায়।
+
+## ১. `.gitignore` দিয়ে ডেটা এক্সক্লুড
+- সংবেদনশীল ফাইল/ফোল্ডার `.gitignore`-এ যোগ করুন:
+
+```
+.env
+config/secret.json
+*.key
+```
+
+- আগে কমিট হয়ে গেলে `git rm --cached <file>` দিয়ে আনট্র্যাক করুন।
+
+## ২. git-secrets দিয়ে সিক্রেট ডিটেকশন
+- AWS key, password, token ইত্যাদি কমিট হওয়ার আগে ব্লক করতে git-secrets ব্যবহার করুন।
+
+### (ক) ইনস্টল ও সেটআপ
+
+```sh
+git clone https://github.com/awslabs/git-secrets.git
+cd git-secrets && sudo make install
+cd <your-repo>
+git secrets --install
+```
+
+- নির্দিষ্ট প্যাটার্ন অ্যাড করুন:
+
+```sh
+git secrets --add 'API_KEY|SECRET|PASSWORD'
+```
+
+- এখন থেকে কমিট/পুশে এসব প্যাটার্ন থাকলে এরর দেখাবে।
+
+## ৩. git-crypt দিয়ে ফাইল এনক্রিপশন
+- সংবেদনশীল ফাইল রিপোতে এনক্রিপ্টেড রাখতে git-crypt ব্যবহার করুন।
+
+### (ক) ইনস্টল ও ইনিশিয়ালাইজ
+
+```sh
+brew install git-crypt # Mac
+sudo apt install git-crypt # Linux
+cd <your-repo>
+git-crypt init
+```
+
+### (খ) কোন ফাইল এনক্রিপ্ট হবে `.gitattributes`-এ লিখুন:
+
+```
+secret.env filter=git-crypt diff=git-crypt
+config/secret.json filter=git-crypt diff=git-crypt
+```
+
+### (গ) ইউজারকে কী শেয়ার করুন:
+
+```sh
+git-crypt add-gpg-user <gpg-key-id>
+```
+
+- কেবল অথরাইজড ইউজার ডিক্রিপ্টেড ফাইল দেখতে পারবে।
+
+## ৪. বেস্ট প্র্যাকটিস
+- কখনোই পাসওয়ার্ড/সিক্রেট সরাসরি রিপোতে রাখবেন না।
+- `.gitignore`, git-secrets, git-crypt—সবগুলো একসাথে ব্যবহার করুন।
+- সিক্রেট রিভোক হলে দ্রুত রোটেট করুন।
+
+---
+
+**সংক্ষেপে:**
+- `.gitignore` দিয়ে ফাইল এক্সক্লুড, git-secrets দিয়ে ডিটেক্ট, git-crypt দিয়ে এনক্রিপ্ট করুন।
+- সংবেদনশীল ডেটা গিটে নিরাপদ রাখতে এসব টুল ও নিয়ম মেনে চলুন।

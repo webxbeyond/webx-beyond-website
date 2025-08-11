@@ -1,0 +1,60 @@
+---
+title: নিজস্ব গিট সার্ভার সেটআপ (Gitea/GitLab)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নিজস্ব গিট সার্ভার সেটআপ করলে আপনি নিজের নিয়ন্ত্রণে প্রাইভেট বা টিম রিপোজিটরি হোস্ট করতে পারবেন। Gitea ও GitLab—দুইটি জনপ্রিয় ওপেন সোর্স সল্যুশন।
+
+## ১. কেন নিজস্ব গিট সার্ভার?
+- প্রাইভেসি ও কাস্টমাইজেশন
+- ইন্টারনাল টিম/এন্টারপ্রাইজ ব্যবহারের জন্য
+- ওপেন সোর্স বিকল্প
+
+## ২. Gitea সেটআপ (Docker দিয়ে)
+- **Docker ইনস্টল করুন**
+- কমান্ড:
+```sh
+docker run -d --name=gitea -p 3000:3000 -p 222:22 \
+  -v /data/gitea:/data \
+  gitea/gitea:latest
+```
+- ব্রাউজারে যান: `http://localhost:3000`
+- ইনিশিয়াল অ্যাডমিন ইউজার তৈরি করুন
+
+## ৩. GitLab সেটআপ (Docker দিয়ে)
+- **Docker ইনস্টল করুন**
+- কমান্ড:
+```sh
+docker run --detach \
+  --hostname gitlab.example.com \
+  --publish 443:443 --publish 80:80 --publish 22:22 \
+  --name gitlab \
+  --restart always \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume /srv/gitlab/data:/var/opt/gitlab \
+  gitlab/gitlab-ce:latest
+```
+- ব্রাউজারে যান: `http://localhost`
+- রুট পাসওয়ার্ড সেট করুন
+
+## ৪. ইউজার ও রিপোজিটরি তৈরি
+- অ্যাডমিন প্যানেল থেকে ইউজার ও প্রজেক্ট তৈরি করুন
+- SSH কী দিয়ে অ্যাক্সেস কনফিগার করুন
+
+## ৫. ক্লায়েন্ট থেকে ক্লোন/পুশ
+```sh
+git clone ssh://git@your-server:222/username/repo.git
+# বা
+git clone http://your-server/username/repo.git
+```
+
+## ৬. টিপস
+- ব্যাকআপ ও আপডেট নিয়মিত করুন
+- SSL/HTTPS কনফিগার করুন
+- LDAP/SAML দিয়ে ইউজার অথেন্টিকেশন সম্ভব
+
+## ৭. রেফারেন্স
+- [Gitea Docs](https://docs.gitea.com/)
+- [GitLab Docs](https://docs.gitlab.com/ee/install/docker.html)
+- [Gitea vs GitLab তুলনা](https://gitea.com/gitea/awesome-gitea#alternatives)

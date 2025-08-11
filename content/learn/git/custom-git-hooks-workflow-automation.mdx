@@ -1,0 +1,57 @@
+---
+title: কাস্টম গিট হুক লিখে ওয়ার্কফ্লো অটোমেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিট হুক দিয়ে আপনি রিপোজিটরির বিভিন্ন ইভেন্টে (যেমন commit, push, merge) স্বয়ংক্রিয়ভাবে স্ক্রিপ্ট চালাতে পারেন। এতে কোড স্টাইল চেক, টেস্ট, ডিপ্লয় ইত্যাদি অটোমেট করা যায়।
+
+## ১. গিট হুক কী?
+- `.git/hooks/` ফোল্ডারে শেল স্ক্রিপ্ট
+- নির্দিষ্ট ইভেন্টে (pre-commit, pre-push, post-merge ইত্যাদি) রান হয়
+
+## ২. কাস্টম হুক লেখার ধাপ
+- `.git/hooks/pre-commit` ফাইল তৈরি করুন
+- স্ক্রিপ্ট লিখুন (bash, python, ইত্যাদি)
+- ফাইল executable করুন:
+```sh
+chmod +x .git/hooks/pre-commit
+```
+
+## ৩. উদাহরণ: pre-commit হুক (লিন্টিং)
+```sh
+#!/bin/bash
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "Lint failed! Commit aborted."
+  exit 1
+fi
+```
+
+## ৪. উদাহরণ: pre-push হুক (টেস্ট)
+```sh
+#!/bin/bash
+npm test
+if [ $? -ne 0 ]; then
+  echo "Test failed! Push aborted."
+  exit 1
+fi
+```
+
+## ৫. হুক শেয়ার ও ম্যানেজমেন্ট
+- `.git/hooks/` লোকাল, রিপোতে শেয়ার হয় না
+- শেয়ার করার জন্য husky (npm), lefthook, pre-commit (python) ইত্যাদি টুল ব্যবহার করুন
+- উদাহরণ (husky):
+```sh
+npx husky-init && npm install
+npx husky add .husky/pre-commit "npm run lint"
+```
+
+## ৬. টিপস
+- হুক স্ক্রিপ্টে দ্রুত এক্সিট করুন
+- প্রয়োজনীয় ম্যাসেজ দিন
+- টিমে শেয়ার করার জন্য টুল ব্যবহার করুন
+
+## ৭. রেফারেন্স
+- [Git Hooks Docs](https://git-scm.com/docs/githooks)
+- [Husky](https://typicode.github.io/husky/)
+- [pre-commit](https://pre-commit.com/)

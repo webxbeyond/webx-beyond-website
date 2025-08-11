@@ -1,0 +1,55 @@
+---
+title: "গিট অ্যালিয়াস ও কাস্টম কমান্ড"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## গিট অ্যালিয়াস কী?
+
+গিট অ্যালিয়াস হলো—কোনো কমান্ড বা কমান্ড সিরিজের জন্য শর্টকাট তৈরি করা। যেমন: `git co` দিয়ে `git checkout` চালানো।
+
+## অ্যালিয়াস সেটআপ
+
+### গ্লোবাল অ্যালিয়াস
+```sh
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+```
+
+### কাস্টম কমান্ডের জন্য অ্যালিয়াস
+```sh
+git config --global alias.last 'log -1 HEAD'
+git config --global alias.lg 'log --oneline --graph --all --decorate'
+```
+
+## লোকাল (প্রজেক্ট-স্পেসিফিক) অ্যালিয়াস
+```sh
+git config alias.foo "!echo Hello from custom alias"
+```
+
+## কাস্টম শেল কমান্ড
+- `!` দিয়ে শুরু করলে যেকোনো শেল কমান্ড চালানো যাবে
+- যেমন:
+```sh
+git config --global alias.cleanup '!git branch --merged | grep -v "\*\|main\|master" | xargs -n 1 git branch -d'
+```
+
+## অ্যালিয়াস চেক ও রিমুভ
+- সব অ্যালিয়াস দেখতে:
+```sh
+git config --get-regexp alias
+```
+- অ্যালিয়াস রিমুভ:
+```sh
+git config --global --unset alias.co
+```
+
+## বেস্ট প্র্যাকটিস
+- সংক্ষিপ্ত ও অর্থবহ অ্যালিয়াস ব্যবহার করুন
+- বিপজ্জনক কমান্ড (force delete) সাবধানে অ্যালিয়াস করুন
+- টিমে শেয়ার করতে চাইলে `.gitconfig` ফাইল ডকুমেন্ট করুন
+
+## আরও পড়ুন
+- [Git Alias Docs](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases)
+- [Custom Git Commands](https://www.git-scm.com/docs/git-config#_aliases)

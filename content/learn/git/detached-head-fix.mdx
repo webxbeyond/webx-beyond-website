@@ -1,0 +1,44 @@
+---
+title: "ডিট্যাচড HEAD সমস্যা সমাধান"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ডিট্যাচড HEAD কী?
+
+ডিট্যাচড HEAD মানে—HEAD কোনো ব্রাঞ্চে নয়, বরং নির্দিষ্ট কমিট/ট্যাগে পয়েন্ট করছে। সাধারণত পুরনো কমিট চেকআউট করলে হয়।
+
+**উদাহরণ:**
+```sh
+git checkout <commit-hash>
+```
+
+## সমস্যা
+- নতুন কমিট করলে তা কোনো ব্রাঞ্চে যোগ হয় না
+- রিপোতে হারিয়ে যেতে পারে
+
+## সমাধান
+
+### ১. নতুন ব্রাঞ্চ তৈরি করে সেভ করুন
+```sh
+git checkout -b new-branch
+```
+এতে HEAD-এর বর্তমান অবস্থা নতুন ব্রাঞ্চে সংরক্ষিত হবে।
+
+### ২. মূল ব্রাঞ্চে ফিরতে
+```sh
+git checkout main
+```
+
+### ৩. ভুলে কমিট করলে কী করবেন?
+- ডিট্যাচড HEAD-এ কমিট করলে, দ্রুত নতুন ব্রাঞ্চে চেকআউট করুন:
+```sh
+git checkout -b rescue-branch
+```
+
+## ডিট্যাচড HEAD এড়ানোর টিপস
+- সবসময় ব্রাঞ্চে কাজ করুন
+- পুরনো কমিট দেখতে চাইলে ব্রাঞ্চে চেকআউট করুন
+
+## আরও পড়ুন
+- [Detached HEAD Explained](https://www.git-scm.com/docs/git-checkout#_detached_head)
+- [GitHub Docs: Detached HEAD](https://docs.github.com/en/get-started/using-git/about-branches#detached-heads)

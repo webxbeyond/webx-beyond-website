@@ -1,0 +1,44 @@
+---
+title: "কমিট আনডু, git reset বনাম git revert"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## কমিট আনডু করার দুটি প্রধান উপায়
+
+### ১. `git reset`
+- কমিট, স্টেজ, ওয়ার্কিং ডিরেক্টরি—সবকিছু পিছিয়ে দেয়
+- লোকাল হিস্টরি পরিবর্তন করে (রিমোটে পুশ করা কমিটে ব্যবহার বিপজ্জনক)
+- তিন ধরনের reset:
+  - `--soft`: শুধু HEAD পিছিয়ে দেয় (স্টেজড থাকে)
+  - `--mixed`: HEAD ও স্টেজ পিছিয়ে দেয় (ডিফল্ট)
+  - `--hard`: HEAD, স্টেজ, ও ফাইল—সব পিছিয়ে দেয় (ডেটা হারাতে পারেন)
+
+**উদাহরণ:**
+```sh
+git reset --soft HEAD~1
+git reset --mixed HEAD~1
+git reset --hard HEAD~1
+```
+
+### ২. `git revert`
+- নির্দিষ্ট কমিটের বিপরীত (reversal) কমিট তৈরি করে
+- হিস্টরি পরিবর্তন করে না, বরং নতুন কমিট যোগ হয়
+- রিমোট/শেয়ার্ড ব্রাঞ্চে নিরাপদ
+
+**উদাহরণ:**
+```sh
+git revert <commit-hash>
+```
+
+## কখন কোনটা ব্যবহার করবেন?
+- **reset:** লোকাল, আনপুশড কমিট আনডু করতে
+- **revert:** রিমোট/শেয়ার্ড ব্রাঞ্চে ভুল কমিট ঠিক করতে
+
+## সতর্কতা
+- `reset --hard` ডেটা পার্মানেন্টলি মুছে ফেলতে পারে
+- রিমোটে পুশ করা কমিটে reset না করাই ভালো
+
+## আরও পড়ুন
+- [Git Reset Docs](https://git-scm.com/docs/git-reset)
+- [Git Revert Docs](https://git-scm.com/docs/git-revert)
+- [Reset vs Revert Explained](https://www.atlassian.com/git/tutorials/undoing-changes/git-reset)

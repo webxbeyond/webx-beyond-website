@@ -1,0 +1,85 @@
+---
+title: GPG/SSH দিয়ে কমিট ও ট্যাগ সাইন করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিটে কমিট ও ট্যাগ সাইন করা নিরাপত্তা ও অথেন্টিসিটির জন্য গুরুত্বপূর্ণ। এতে বোঝা যায়, কমিটটি সত্যিই নির্দিষ্ট ডেভেলপার করেছেন। এই পাঠে GPG ও SSH দিয়ে কমিট/ট্যাগ সাইন করার পদ্ধতি দেখানো হয়েছে।
+
+## ১. GPG দিয়ে কমিট ও ট্যাগ সাইন
+
+### (ক) GPG কী জেনারেট করুন
+
+```sh
+gpg --full-generate-key
+```
+
+- টাইপ: RSA and RSA
+- Keysize: 4096
+- Validity: never/your choice
+- Name, Email দিন (গিটের ইমেইল যেন মিলে)
+
+### (খ) GPG পাবলিক কী কপি করুন
+
+```sh
+gpg --list-secret-keys --keyid-format LONG
+gpg --armor --export <GPG_KEY_ID>
+```
+
+- এই কী GitHub/GitLab-এ অ্যাড করুন (Settings > SSH and GPG keys)
+
+### (গ) গিটে GPG কী কনফিগার করুন
+
+```sh
+git config --global user.signingkey <GPG_KEY_ID>
+git config --global commit.gpgsign true
+```
+
+### (ঘ) সাইনড কমিট ও ট্যাগ
+
+```sh
+git commit -S -m "সাইনড কমিট"
+git tag -s v1.0 -m "সাইনড ট্যাগ"
+```
+
+- `-S` দিয়ে কমিট, `-s` দিয়ে ট্যাগ সাইন হয়।
+
+## ২. SSH দিয়ে কমিট সাইন (GitHub)
+
+- GitHub এখন SSH key দিয়ে কমিট সাইন সাপোর্ট করে।
+- [GitHub Docs: SSH Commit Signing](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/signing-commits)
+
+### (ক) SSH key জেনারেট করুন
+
+```sh
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+- পাবলিক কী GitHub-এ অ্যাড করুন (Settings > SSH and GPG keys)
+
+### (খ) গিটে SSH সাইনিং এনাবল করুন
+
+```sh
+git config --global gpg.format ssh
+git config --global user.signingkey "<SSH_PUBLIC_KEY_PATH>"
+git config --global commit.gpgsign true
+```
+
+### (গ) সাইনড কমিট
+
+```sh
+git commit -S -m "SSH দিয়ে সাইনড কমিট"
+```
+
+## ৩. টিপস ও সতর্কতা
+- GPG/SSH কী নিরাপদে রাখুন, কারো সাথে শেয়ার করবেন না।
+- সাইনড কমিট/ট্যাগ ভেরিফাই করতে:
+
+```sh
+git log --show-signature
+```
+
+---
+
+**সংক্ষেপে:**
+- GPG/SSH দিয়ে কমিট ও ট্যাগ সাইন করলে অথেন্টিসিটি নিশ্চিত হয়।
+- কী জেনারেট, কনফিগার ও সাইনিং নিয়মিত চর্চা করুন।

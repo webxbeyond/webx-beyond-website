@@ -1,0 +1,67 @@
+---
+title: গিট ইভেন্টে CI/CD পাইপলাইন তৈরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিট ইভেন্ট (যেমন: push, pull request, tag) ট্রিগার করে CI/CD পাইপলাইন চালানো আধুনিক সফটওয়্যার ডেভেলপমেন্টের গুরুত্বপূর্ণ অংশ। এতে কোড টেস্ট, বিল্ড, ও ডিপ্লয় স্বয়ংক্রিয়ভাবে হয়।
+
+## ১. CI/CD কী?
+- **CI (Continuous Integration):** কোড চেঞ্জ আসলেই স্বয়ংক্রিয় টেস্ট ও বিল্ড
+- **CD (Continuous Delivery/Deployment):** টেস্ট পাস হলে স্বয়ংক্রিয়ভাবে ডিপ্লয়
+
+## ২. গিট ইভেন্টে পাইপলাইন ট্রিগার
+- **GitHub Actions:** `.github/workflows/` ফোল্ডারে YAML ফাইল
+- **GitLab CI:** `.gitlab-ci.yml` ফাইল
+
+## ৩. GitHub Actions উদাহরণ
+```yaml
+name: Node.js CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm test
+```
+
+## ৪. GitLab CI উদাহরণ
+```yaml
+stages:
+  - test
+  - deploy
+test:
+  script:
+    - npm install
+    - npm test
+deploy:
+  script:
+    - echo "Deploying..."
+  only:
+    - main
+```
+
+## ৫. সাধারণ গিট ইভেন্ট
+- push
+- pull_request/merge_request
+- tag
+- schedule (cron)
+
+## ৬. টিপস
+- সিক্রেট/এনভায়রনমেন্ট ভ্যারিয়েবল নিরাপদে রাখুন
+- বিল্ড/ডিপ্লয় স্টেপে কন্ডিশন ব্যবহার করুন
+- টেস্ট কভারেজ রিপোর্ট যুক্ত করুন
+
+## ৭. রেফারেন্স
+- [GitHub Actions Docs](https://docs.github.com/en/actions)
+- [GitLab CI/CD Docs](https://docs.gitlab.com/ee/ci/)
+- [Awesome CI/CD](https://github.com/ciandcd/awesome-ciandcd)

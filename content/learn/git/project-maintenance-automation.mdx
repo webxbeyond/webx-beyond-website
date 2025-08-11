@@ -1,0 +1,67 @@
+---
+title: প্রজেক্ট মেইনটেন্যান্স টাস্ক অটোমেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+প্রজেক্ট মেইনটেন্যান্স টাস্ক অটোমেশন মানে রিপোজিটরির রুটিন কাজগুলো (যেমন ডিপেন্ডেন্সি আপডেট, টেস্ট রান, ক্লিনআপ, ডকুমেন্টেশন জেনারেশন) স্বয়ংক্রিয়ভাবে সম্পন্ন করা। এতে সময় বাঁচে, ভুল কমে এবং কোডবেস সবসময় আপডেট থাকে।
+
+## ১. কোন কোন টাস্ক অটোমেট করবেন?
+- ডিপেন্ডেন্সি আপডেট (npm, pip, composer ইত্যাদি)
+- টেস্ট ও লিন্টিং
+- ডকুমেন্টেশন জেনারেশন
+- পুরনো ব্রাঞ্চ/ইস্যু ক্লোজ
+- CI/CD বিল্ড ও ডিপ্লয়
+
+## ২. গিটহাব অ্যাকশনস দিয়ে অটোমেশন
+- `.github/workflows/` ফোল্ডারে YAML ফাইল লিখে টাস্ক অটোমেট করুন।
+- উদাহরণ: ডিপেন্ডেন্সি আপডেট
+```yaml
+name: NPM Audit & Update
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install deps
+        run: npm install
+      - name: Audit
+        run: npm audit fix
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "chore: weekly npm audit fix" || echo "No changes"
+          git push || echo "No changes to push"
+```
+
+## ৩. Dependabot
+- গিটহাবের Dependabot দিয়ে অটোমেটেড ডিপেন্ডেন্সি PR তৈরি করা যায়।
+- `.github/dependabot.yml` ফাইল কনফিগার করুন।
+
+## ৪. Custom Scripts
+- `package.json`-এ npm script, Makefile, বা Python script লিখে টাস্ক অটোমেট করুন।
+- উদাহরণ:
+```json
+"scripts": {
+  "lint": "eslint .",
+  "test": "jest",
+  "docs": "typedoc src/"
+}
+```
+
+## ৫. Cron Jobs
+- সার্ভারে cron দিয়ে রিপো ক্লিনআপ, ব্যাকআপ ইত্যাদি অটোমেট করা যায়।
+
+## ৬. টিপস
+- টাস্ক অটোমেশন নিয়মিত মনিটর করুন
+- অটোমেটেড PR/বিল্ডে রিভিউ ও অ্যাপ্রুভাল পলিসি রাখুন
+- অপ্রয়োজনীয় অটোমেশন এড়িয়ে চলুন
+
+## ৭. রেফারেন্স
+- [GitHub Actions Docs](https://docs.github.com/en/actions)
+- [Dependabot Docs](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically)
+- [Automation Scripts Example](https://github.com/marketplace?type=actions)

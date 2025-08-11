@@ -1,0 +1,80 @@
+---
+title: README, CONTRIBUTING, ISSUE টেমপ্লেট দিয়ে ডকুমেন্টেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+গিট রিপোজিটরির ডকুমেন্টেশন শুধু কোডের জন্য নয়, টিম ও ওপেন সোর্স কমিউনিটির জন্যও অত্যন্ত গুরুত্বপূর্ণ। README, CONTRIBUTING, ISSUE টেমপ্লেট ইত্যাদি ফাইল দিয়ে আপনি প্রজেক্টের উদ্দেশ্য, কন্ট্রিবিউশন নিয়ম, ও ইস্যু রিপোর্টিং প্রসেস পরিষ্কারভাবে জানাতে পারেন।
+
+## ১. README.md
+
+- **কী লিখবেন:**
+  - প্রজেক্টের সংক্ষিপ্ত পরিচিতি ও উদ্দেশ্য
+  - ইন্সটলেশন ও রান করার নির্দেশনা
+  - বেসিক ইউজেজ উদাহরণ
+  - কন্ট্রিবিউশন ও লাইসেন্স তথ্য
+- **উদাহরণ:**
+
+```markdown
+# MyProject
+
+একটি ওপেন সোর্স টুল...
+
+## ইন্সটলেশন
+```sh
+git clone https://github.com/user/myproject.git
+cd myproject
+npm install
+```
+
+## কন্ট্রিবিউশন
+দয়া করে CONTRIBUTING.md দেখুন।
+```
+
+## ২. CONTRIBUTING.md
+
+- **কী লিখবেন:**
+  - কন্ট্রিবিউটরদের জন্য গাইডলাইন (কোড স্টাইল, ব্রাঞ্চিং, PR প্রসেস)
+  - ইস্যু ও ফিচার অনুরোধের নিয়ম
+  - কমিট মেসেজ কনভেনশন
+- **উদাহরণ:**
+
+```markdown
+# কন্ট্রিবিউশন গাইডলাইন
+
+- ফিচার/বাগ ফিক্সের জন্য নতুন ব্রাঞ্চ করুন
+- PR সাবমিটের আগে টেস্ট চালান
+- কমিট মেসেজ: `feat: ...`, `fix: ...`
+```
+
+## ৩. ISSUE টেমপ্লেট
+
+- **কেন দরকার:**
+  - ইস্যু রিপোর্টিংয়ে প্রয়োজনীয় তথ্য নিশ্চিত করা
+- **কীভাবে বানাবেন:**
+  - `.github/ISSUE_TEMPLATE/` ফোল্ডারে YAML বা Markdown ফাইল
+- **উদাহরণ:**
+
+```markdown
+---
+name: বাগ রিপোর্ট
+about: বাগ রিপোর্ট করার জন্য টেমপ্লেট
+---
+
+**বাগের বিবরণ**
+
+**রিপ্রোডিউস করার স্টেপ**
+
+**প্রত্যাশিত আচরণ**
+
+**স্ক্রিনশট/লগ (যদি থাকে)**
+```
+
+## ৪. টিপস
+- ডকুমেন্টেশন ফাইল নিয়মিত আপডেট করুন
+- নতুন কন্ট্রিবিউটরদের জন্য লিংক ও রিসোর্স দিন
+- GitHub/GitLab এ `.github/` বা `.gitlab/` ফোল্ডার ব্যবহার করুন
+
+## ৫. রেফারেন্স
+- [GitHub Docs: Creating a README](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-readmes)
+- [CONTRIBUTING.md উদাহরণ](https://github.com/firstcontributions/first-contributions/blob/main/CONTRIBUTING.md)
+- [Issue Templates Guide](https://docs.github.com/en/issues/building-community/using-templates-to-encourage-useful-issues)

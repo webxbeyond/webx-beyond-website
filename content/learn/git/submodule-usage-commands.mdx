@@ -1,0 +1,51 @@
+---
+title: "সাবমডিউল নিয়ে কাজ"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## গিট সাবমডিউল কী?
+
+গিট সাবমডিউল হলো—একটি গিট রিপোজিটরির মধ্যে আরেকটি রিপোজিটরি (সাব-রিপো) যোগ করা। সাধারণত ডিপেন্ডেন্সি বা লাইব্রেরি আলাদা রাখতে ব্যবহৃত হয়।
+
+## কখন সাবমডিউল ব্যবহার করবেন?
+- বড় প্রজেক্টে বাইরের কোড/লাইব্রেরি আলাদা রাখতে
+- একাধিক প্রজেক্টে একই কোড শেয়ার করতে
+
+## সাবমডিউল যোগ করা
+```sh
+git submodule add https://github.com/user/repo.git path/to/submodule
+```
+
+## সাবমডিউল ক্লোন করা
+- মূল রিপো ক্লোন করার পর:
+```sh
+git submodule update --init --recursive
+```
+
+## সাবমডিউল আপডেট করা
+- সাবমডিউল রিপোতে গিয়ে pull করুন:
+```sh
+cd path/to/submodule
+git pull origin main
+```
+- মূল রিপোতে সাবমডিউল আপডেট কমিট করুন:
+```sh
+git add path/to/submodule
+git commit -m "Update submodule"
+```
+
+## সাবমডিউল রিমুভ করা
+```sh
+git submodule deinit -f path/to/submodule
+rm -rf .git/modules/path/to/submodule
+rm -rf path/to/submodule
+git commit -am "Remove submodule"
+```
+
+## সাবমডিউল সংক্রান্ত সতর্কতা
+- সাবমডিউল আপডেট করলে মূল রিপোতেও কমিট করতে হয়
+- সাবমডিউল ক্লোন/আপডেট না করলে কোড মিসিং থাকবে
+
+## আরও পড়ুন
+- [Git Submodules Docs](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+- [Git Submodule Tips](https://www.atlassian.com/git/tutorials/git-submodule)

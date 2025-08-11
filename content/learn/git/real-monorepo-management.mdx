@@ -1,0 +1,59 @@
+---
+title: বাস্তব মনোরেপো ব্যবস্থাপনা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মনোরেপো (Monorepo) মানে একাধিক প্রজেক্ট বা প্যাকেজ এক রিপোজিটরিতে রাখা। বড় টিম ও স্কেলেবল কোডবেসে এটি জনপ্রিয়।
+
+## ১. মনোরেপো কেন?
+- কোড শেয়ারিং সহজ
+- একসাথে টেস্ট, বিল্ড, ডিপ্লয়
+- ভার্সন কন্ট্রোল ও ডিপেন্ডেন্সি ম্যানেজমেন্ট সহজ
+
+## ২. মনোরেপো স্ট্রাকচার উদাহরণ
+```
+my-monorepo/
+  packages/
+    app1/
+    app2/
+    shared-lib/
+  tools/
+  package.json
+  lerna.json
+```
+
+## ৩. টুলস
+- **Lerna:** জাভাস্ক্রিপ্ট মনোরেপো ম্যানেজমেন্ট
+- **Nx:** ফ্রন্টএন্ড/ব্যাকএন্ড মনোরেপো
+- **Yarn Workspaces / npm workspaces:** প্যাকেজ লেভেল ডিপেন্ডেন্সি
+- **Bazel:** ল্যাঙ্গুয়েজ অ্যাগনস্টিক মনোরেপো
+
+## ৪. বেসিক সেটআপ (Lerna + Yarn Workspaces)
+```sh
+yarn init -y
+yarn add -D lerna
+yarn workspaces focus --all
+npx lerna init
+```
+- `lerna.json` ও `packages/` ফোল্ডার তৈরি করুন
+
+## ৫. কমন টাস্ক
+- সব প্যাকেজে টেস্ট: `lerna run test`
+- সব প্যাকেজে ডিপেন্ডেন্সি আপডেট: `lerna bootstrap`
+- নির্দিষ্ট প্যাকেজে বিল্ড: `lerna run build --scope=app1`
+
+## ৬. মনোরেপো-তে গিট
+- সাবডিরেক্টরি ফিল্টার দিয়ে সাব-প্রজেক্ট আলাদা ক্লোন/এক্সপোর্ট
+- সাবমডিউল/সাবট্রি ব্যবহার না করেও কোড শেয়ার
+
+## ৭. টিপস
+- CI/CD-তে affected only বিল্ড/টেস্ট চালান
+- ডকুমেন্টেশন ও কনভেনশন টিমে ঠিক করুন
+- বড় মনোরেপোতে কোড স্প্লিটিং ও পারফরম্যান্স মনিটর করুন
+
+## ৮. রেফারেন্স
+- [Monorepo.tools](https://monorepo.tools/)
+- [Lerna](https://lerna.js.org/)
+- [Nx](https://nx.dev/)
+- [Yarn Workspaces](https://classic.yarnpkg.com/en/docs/workspaces/)
+- [Bazel](https://bazel.build/)

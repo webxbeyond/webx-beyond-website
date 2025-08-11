@@ -1,0 +1,48 @@
+---
+title: "সাধারণ মার্জ ও রিবেস কনফ্লিক্ট সমাধান"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## মার্জ কনফ্লিক্ট কী?
+
+দুইটি ব্রাঞ্চ মার্জ বা রিবেস করার সময় একই ফাইলে ভিন্ন পরিবর্তন থাকলে কনফ্লিক্ট হয়।
+
+## কনফ্লিক্ট চিহ্নিত করা
+- মার্জ/রিবেস দিলে গিট বলে কোন ফাইলে কনফ্লিক্ট
+- কনফ্লিক্টেড ফাইলে এইরকম মার্কার থাকে:
+
+```text
+<<<<<<< HEAD
+আপনার পরিবর্তন
+=======
+অন্য ব্রাঞ্চের পরিবর্তন
+>>>>>>> feature-branch
+
+
+## কনফ্লিক্ট সমাধান ধাপ
+1. কনফ্লিক্টেড ফাইল খুলুন
+2. <<<<<<<, =======, >>>>>>> মার্কার দেখে ঠিক অংশ রেখে বাকিটা মুছে দিন
+3. ফাইল সেভ করুন
+4. মার্জ হলে:
+   ```sh
+   git add <file>
+   git commit
+   ```
+   রিবেস হলে:
+   ```sh
+   git add <file>
+   git rebase --continue
+   ```
+
+## ভিজ্যুয়াল টুল ব্যবহার
+- VSCode, Meld, Sourcetree ইত্যাদিতে কনফ্লিক্ট সহজে সমাধান করা যায়
+
+## কনফ্লিক্ট এড়ানোর টিপস
+- ছোট ও ফোকাসড কমিট করুন
+- ফ্রিকোয়েন্টলি পুল/ফেচ করুন
+- টিমে কমিউনিকেশন রাখুন
+
+## আরও পড়ুন
+- [Git Merge Conflicts](https://git-scm.com/docs/git-merge#_how_conflicts_are_presented)
+- [Git Rebase Conflicts](https://www.git-scm.com/docs/git-rebase#_merge_conflicts)
+- [VSCode Merge Conflicts](https://code.visualstudio.com/docs/sourcecontrol/merge-conflicts)

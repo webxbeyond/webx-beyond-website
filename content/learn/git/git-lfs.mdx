@@ -1,0 +1,50 @@
+---
+title: "বড় ফাইল ম্যানেজমেন্ট, Git LFS"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Git LFS কী?
+
+Git LFS (Large File Storage) হলো গিটের জন্য একটি এক্সটেনশন, যা বড় ফাইল (যেমন: ইমেজ, ভিডিও, বাইনারি) রিপোজিটরিতে স্টোর ও ট্র্যাক করতে সাহায্য করে।
+
+## কেন দরকার?
+- গিট সাধারণত বড় ফাইলের জন্য অপ্টিমাইজড না
+- বড় ফাইল রিপো সাইজ বাড়ায়, ক্লোন/ফেচ স্লো হয়
+- Git LFS ফাইলের শুধু pointer রাখে, আসল ফাইল আলাদা স্টোরেজে
+
+## Git LFS সেটআপ
+
+১. Git LFS ইনস্টল করুন:
+   - Windows: https://git-lfs.github.com/ থেকে ডাউনলোড
+   - macOS: `brew install git-lfs`
+   - Linux: প্যাকেজ ম্যানেজার দিয়ে
+
+২. প্রজেক্টে LFS ইনিশিয়ালাইজ করুন:
+   ```sh
+   git lfs install
+   ```
+
+৩. কোন ফাইল টাইপ LFS-এ ট্র্যাক করবেন সেট করুন:
+   ```sh
+   git lfs track "*.psd"
+   git add .gitattributes
+   ```
+
+৪. বড় ফাইল অ্যাড ও কমিট করুন:
+   ```sh
+   git add largefile.psd
+   git commit -m "Add large file with LFS"
+   git push
+   ```
+
+## LFS ফাইল ক্লোন/পুল
+- ক্লোন করলে LFS ফাইল অটো ডাউনলোড হবে
+- যদি না হয়: `git lfs pull`
+
+## সীমাবদ্ধতা ও সতর্কতা
+- GitHub, GitLab-এ LFS স্টোরেজের সীমা আছে (ফ্রি প্ল্যানে)
+- বড় ফাইলের জন্য LFS ছাড়া গিট ব্যবহার করবেন না
+
+## আরও পড়ুন
+- [Git LFS Docs](https://git-lfs.github.com/)
+- [GitHub LFS Guide](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-git-large-file-storage)

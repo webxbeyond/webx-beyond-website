@@ -1,0 +1,69 @@
+---
+title: "গিটহাব অ্যাকশনস (ওয়ার্কফ্লো ও ট্রিগার)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## গিটহাব অ্যাকশনস কী?
+
+গিটহাব অ্যাকশনস হলো গিটহাবের বিল্ট-ইন CI/CD টুল, যা রিপোজিটরিতে স্বয়ংক্রিয় ওয়ার্কফ্লো (যেমন: টেস্ট, বিল্ড, ডিপ্লয়) চালাতে দেয়।
+
+## ওয়ার্কফ্লো ফাইল তৈরি
+
+- `.github/workflows/` ফোল্ডারে YAML ফাইল তৈরি করুন (যেমন: `ci.yml`)
+
+```yaml
+name: Node.js CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - run: npm install
+      - run: npm test
+```
+
+## ট্রিগার কীভাবে কাজ করে?
+- `on:` ব্লকে ইভেন্ট নির্ধারণ (যেমন: `push`, `pull_request`, `schedule`, `workflow_dispatch`)
+- নির্দিষ্ট ব্রাঞ্চ, ট্যাগ বা ফাইলের জন্য ট্রিগার কাস্টমাইজ করা যায়
+
+## সাধারণ ট্রিগার উদাহরণ
+
+```yaml
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 0 * * 0' # প্রতি সপ্তাহে
+  workflow_dispatch:
+```
+
+## বিল্ট-ইন ও কমিউনিটি অ্যাকশন
+- `actions/checkout`, `actions/setup-node` ইত্যাদি বিল্ট-ইন অ্যাকশন
+- [GitHub Marketplace](https://github.com/marketplace?type=actions) থেকে আরও অ্যাকশন যোগ করা যায়
+
+## সিক্রেট ও এনভায়রনমেন্ট ভ্যারিয়েবল
+- রিপোজিটরির Settings → Secrets-এ API key, token ইত্যাদি সংরক্ষণ করুন
+- ওয়ার্কফ্লো YAML-এ `${{ secrets.MY_SECRET }}` দিয়ে ব্যবহার করুন
+
+## বেস্ট প্র্যাকটিস
+- ছোট, পুনঃব্যবহারযোগ্য ওয়ার্কফ্লো লিখুন
+- বিল্ড, টেস্ট, ডিপ্লয় আলাদা job/stage-এ ভাগ করুন
+- সিক্রেট কখনো কোডে হার্ডকোড করবেন না
+- ওয়ার্কফ্লো ফাইল version control-এ রাখুন
+
+## আরও পড়ুন
+- [GitHub Actions Docs](https://docs.github.com/en/actions)
+- [Actions Marketplace](https://github.com/marketplace?type=actions)

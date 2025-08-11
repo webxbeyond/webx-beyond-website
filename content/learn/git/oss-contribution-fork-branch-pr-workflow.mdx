@@ -1,0 +1,58 @@
+---
+title: ওপেন সোর্সে অবদান (ফর্ক, ব্রাঞ্চ, PR ওয়ার্কফ্লো)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ওপেন সোর্স প্রজেক্টে অবদান রাখতে হলে ফর্ক, ব্রাঞ্চ, ও পুল রিকোয়েস্ট (PR) ওয়ার্কফ্লো জানা জরুরি। এতে আপনি মূল কোডবেসে সরাসরি না গিয়ে নিরাপদে পরিবর্তন প্রস্তাব করতে পারেন।
+
+## ১. ফর্ক কী ও কেন?
+- ফর্ক মানে মূল রিপোজিটরির কপি নিজের GitHub/GitLab অ্যাকাউন্টে নেওয়া
+- এতে আপনি নিজের কন্ট্রোলে কোড পরিবর্তন করতে পারেন
+
+## ২. ফর্ক করার ধাপ
+- GitHub-এ প্রজেক্টে গিয়ে "Fork" বাটন ক্লিক করুন
+- আপনার অ্যাকাউন্টে কপি হয়ে যাবে
+
+## ৩. লোকাল ক্লোন ও ব্রাঞ্চ তৈরি
+```sh
+git clone https://github.com/your-username/project.git
+cd project
+git checkout -b feature/my-change
+```
+
+## ৪. পরিবর্তন করুন ও কমিট
+- কোড এডিট করুন
+- স্পষ্ট কমিট মেসেজ লিখুন
+
+## ৫. রিমোটে পুশ
+```sh
+git push origin feature/my-change
+```
+
+## ৬. মূল রিপোতে PR তৈরি
+- GitHub-এ গিয়ে "Compare & pull request" বাটন ক্লিক করুন
+- PR টেমপ্লেট অনুযায়ী বর্ণনা লিখুন
+
+## ৭. রিভিউ ও মর্জ
+- মেইনটেইনার রিভিউ করবেন
+- প্রয়োজন হলে ফিডব্যাক নিয়ে আপডেট দিন
+- সব ঠিক থাকলে PR মর্জ হবে
+
+## ৮. মূল রিপোর আপডেট নিজের ফর্কে আনুন
+```sh
+git remote add upstream https://github.com/original/project.git
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```
+
+## ৯. টিপস
+- ছোট ও ফোকাসড PR করুন
+- কনভেনশনাল কমিট মেসেজ ব্যবহার করুন
+- কনট্রিবিউশন গাইডলাইন পড়ুন
+
+## ১০. রেফারেন্স
+- [GitHub Docs: Fork a repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo)
+- [GitHub Docs: About pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests)
+- [Open Source Guides](https://opensource.guide/how-to-contribute/)

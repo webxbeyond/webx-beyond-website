@@ -1,0 +1,66 @@
+---
+title: গিটফ্লো ওয়ার্কফ্লো (ব্রাঞ্চ টাইপ ও লাইফসাইকেল)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## গিটফ্লো ওয়ার্কফ্লো: ব্রাঞ্চ টাইপ ও লাইফসাইকেল
+
+গিটফ্লো (Gitflow) হল গিটে কাজ করার একটি স্ট্রাকচার্ড ওয়ার্কফ্লো, যেখানে বিভিন্ন ধরণের ব্রাঞ্চ নির্দিষ্ট উদ্দেশ্যে ব্যবহৃত হয়। এতে বড় টিমে ফিচার, রিলিজ ও হটফিক্স ম্যানেজ করা সহজ হয়।
+
+### প্রধান ব্রাঞ্চ টাইপ
+- **main/master**: সবসময় প্রোডাকশন-রেডি কোড
+- **develop**: নতুন ফিচার ও ইন্টিগ্রেশনের জন্য
+- **feature/**: নতুন ফিচার ডেভেলপমেন্ট (যেমন `feature/login`)
+- **release/**: রিলিজ প্রস্তুতির জন্য (যেমন `release/v1.0.0`)
+- **hotfix/**: প্রোডাকশন বাগ দ্রুত ফিক্স (যেমন `hotfix/urgent-bug`)
+
+### ব্রাঞ্চ লাইফসাইকেল
+1. **ফিচার ব্রাঞ্চ**
+   - `develop` থেকে তৈরি
+   - কাজ শেষে `develop`-এ মার্জ
+   ```bash
+   git checkout develop
+   git checkout -b feature/feature-name
+   # কাজ করুন
+   git checkout develop
+   git merge feature/feature-name
+   ```
+2. **রিলিজ ব্রাঞ্চ**
+   - `develop` থেকে তৈরি
+   - টেস্টিং ও বাগফিক্স শেষে `main` ও `develop`-এ মার্জ
+   ```bash
+   git checkout develop
+   git checkout -b release/v1.0.0
+   # টেস্ট ও ফিক্স
+   git checkout main
+   git merge release/v1.0.0
+   git checkout develop
+   git merge release/v1.0.0
+   ```
+3. **হটফিক্স ব্রাঞ্চ**
+   - `main` থেকে তৈরি
+   - ফিক্স শেষে `main` ও `develop`-এ মার্জ
+   ```bash
+   git checkout main
+   git checkout -b hotfix/urgent-bug
+   # ফিক্স করুন
+   git checkout main
+   git merge hotfix/urgent-bug
+   git checkout develop
+   git merge hotfix/urgent-bug
+   ```
+
+### সুবিধা
+- বড় টিমে সমন্বিত ও স্কেলেবল ডেভেলপমেন্ট
+- রিলিজ ও হটফিক্স সহজে ম্যানেজ
+- ইতিহাস পরিষ্কার
+
+### সীমাবদ্ধতা
+- ছোট টিম বা সিম্পল প্রজেক্টে অতিরিক্ত জটিলতা
+- ব্রাঞ্চ ম্যানেজমেন্ট বেশি
+
+### টুল
+- [git-flow](https://github.com/nvie/gitflow) CLI টুল দিয়ে সহজেই গিটফ্লো ফলো করা যায়
+
+### উপসংহার
+গিটফ্লো ওয়ার্কফ্লো বড় টিম ও দীর্ঘমেয়াদি প্রজেক্টে কার্যকর। ব্রাঞ্চ টাইপ ও লাইফসাইকেল বুঝে ব্যবহার করলে ডেভেলপমেন্ট ও রিলিজ ম্যানেজমেন্ট সহজ হয়।

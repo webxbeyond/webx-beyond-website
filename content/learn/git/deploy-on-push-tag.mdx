@@ -1,0 +1,58 @@
+---
+title: "পুশ বা ট্যাগ ইভেন্টে ডিপ্লয়"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## পুশ বা ট্যাগ ইভেন্টে ডিপ্লয় কী?
+
+গিট রিপোজিটরিতে নতুন কোড পুশ বা ট্যাগ করলে স্বয়ংক্রিয়ভাবে ডিপ্লয় (Deploy) চালানো—এটাই CI/CD-এর মূল সুবিধা।
+
+## গিটহাব অ্যাকশনসে উদাহরণ
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy on Push or Tag
+on:
+  push:
+    branches: [ main ]
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Script
+        run: |
+          echo "Deploying..."
+```
+
+## গিটল্যাব সিআই/সিডি-তে উদাহরণ
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - deploy
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying..."
+  only:
+    - main
+    - tags
+```
+
+## কীভাবে কাজ করে?
+- **Push Event:** নির্দিষ্ট ব্রাঞ্চে (যেমন main) পুশ হলে ডিপ্লয় ট্রিগার হয়
+- **Tag Event:** নতুন ট্যাগ পুশ হলে (রিলিজের জন্য) ডিপ্লয় ট্রিগার হয়
+
+## বেস্ট প্র্যাকটিস
+- ডিপ্লয় স্ক্রিপ্টে এনভায়রনমেন্ট ভ্যারিয়েবল ও সিক্রেট ব্যবহার করুন
+- প্রোডাকশন ও স্টেজিং ডিপ্লয় আলাদা ব্রাঞ্চ/ট্যাগে ট্রিগার করুন
+- ডিপ্লয় লজিক ছোট ও নিরাপদ রাখুন
+
+## আরও পড়ুন
+- [GitHub Actions Deploy Docs](https://docs.github.com/en/actions/deployment)
+- [GitLab CI/CD Deploy Docs](https://docs.gitlab.com/ee/ci/examples/deployment/)

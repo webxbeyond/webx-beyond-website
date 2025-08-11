@@ -1,0 +1,58 @@
+---
+title: রিলিজ ভার্সনিং ও চেঞ্জলগ অটোমেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+রিলিজ ভার্সনিং ও চেঞ্জলগ অটোমেশন সফটওয়্যার ডেভেলপমেন্টে স্বচ্ছতা ও ট্র্যাকিং সহজ করে। এতে প্রতিটি রিলিজের পরিবর্তন স্বয়ংক্রিয়ভাবে ডকুমেন্ট হয় এবং ভার্সন নম্বর কনভেনশন মেনে বাড়ে।
+
+## ১. ভার্সনিং কী ও কেন?
+- **Semantic Versioning (SemVer):** MAJOR.MINOR.PATCH (e.g., 2.1.0)
+- ব্রেকিং চেঞ্জ, নতুন ফিচার, বাগ ফিক্স—সবকিছুর জন্য আলাদা ভার্সন
+
+## ২. চেঞ্জলগ কী?
+- প্রতিটি রিলিজে কী পরিবর্তন হয়েছে, তার তালিকা
+- ইউজার ও ডেভেলপারদের জন্য স্বচ্ছতা
+
+## ৩. চেঞ্জলগ ও ভার্সনিং অটোমেশন টুল
+- **standard-version** (npm)
+- **release-it** (npm)
+- **semantic-release** (CI/CD টুল)
+- **github-changelog-generator** (Ruby)
+
+## ৪. standard-version দিয়ে উদাহরণ
+```sh
+npm install --save-dev standard-version
+```
+- `package.json`-এ script যোগ করুন:
+```json
+"scripts": {
+  "release": "standard-version"
+}
+```
+- রিলিজ দিন:
+```sh
+npm run release
+```
+- এটি CHANGELOG.md ও ভার্সন bump করবে
+
+## ৫. semantic-release দিয়ে সম্পূর্ণ অটোমেশন
+- CI/CD-তে কমিট মেসেজ দেখে স্বয়ংক্রিয়ভাবে রিলিজ ও চেঞ্জলগ তৈরি
+- `.releaserc` বা CI config প্রয়োজন
+
+## ৬. গিট ট্যাগ দিয়ে রিলিজ
+```sh
+git tag v1.2.0
+git push origin v1.2.0
+```
+- ট্যাগের সাথে রিলিজ নোট যোগ করুন
+
+## ৭. টিপস
+- কনভেনশনাল কমিট মেসেজ ব্যবহার করুন (feat, fix, BREAKING CHANGE)
+- CHANGELOG.md ফাইল রিপোতে রাখুন
+- রিলিজ প্রক্রিয়া টিমে ডকুমেন্ট করুন
+
+## ৮. রেফারেন্স
+- [Semantic Versioning](https://semver.org/)
+- [standard-version](https://github.com/conventional-changelog/standard-version)
+- [semantic-release](https://semantic-release.gitbook.io/semantic-release/)
+- [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
