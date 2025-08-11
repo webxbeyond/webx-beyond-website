@@ -25,81 +25,81 @@ icon: ph:tree-structure-duotone
 
 ### মডিউল ১: টেরাফর্ম ফান্ডামেন্টালস
 
-- [**Infrastructure as Code (IaC) পরিচিতি**](./iac-intro.mdx)  
+- [**Infrastructure as Code (IaC) পরিচিতি**](/terraform/iac-intro)  
   কেন টেরাফর্ম? অন্যান্য IaC টুলের তুলনায় সুবিধা
-- [**টেরাফর্ম আর্কিটেকচার ও ওয়ার্কফ্লো**](./architecture-workflow.mdx)  
+- [**টেরাফর্ম আর্কিটেকচার ও ওয়ার্কফ্লো**](/terraform/architecture-workflow)  
   Provider, resource, state file, execution plan
-- [**ইনস্টল ও সেটআপ**](./installation-setup.mdx)  
+- [**ইনস্টল ও সেটআপ**](/terraform/installation-setup)  
   CLI কমান্ড ও বেসিক ওয়ার্কফ্লো (`init`, `plan`, `apply`, `destroy`)
-- [**প্রথম টেরাফর্ম প্রজেক্ট**](./first-project.mdx)  
+- [**প্রথম টেরাফর্ম প্রজেক্ট**](/terraform/first-project)  
   একটি সিম্পল কনফিগ লিখে রিসোর্স তৈরি (যেমন AWS EC2)
-- [**টেরাফর্ম কনফিগারেশন ল্যাঙ্গুয়েজ (HCL)**](./hcl-language.mdx)  
+- [**টেরাফর্ম কনফিগারেশন ল্যাঙ্গুয়েজ (HCL)**](/terraform/hcl-language)  
   সিনট্যাক্স, ব্লক, আর্গুমেন্ট, এক্সপ্রেশন
-- [**স্টেট ম্যানেজমেন্ট বেসিকস**](./state-management-basics.mdx)  
+- [**স্টেট ম্যানেজমেন্ট বেসিকস**](/terraform/state-management-basics)  
   State কী? Local vs remote state
 
 
 ### মডিউল ২: ইন্টারমিডিয়েট টেরাফর্ম কনসেপ্ট
 
-- [**ভ্যারিয়েবল ও আউটপুট**](./variables-outputs.mdx)  
+- [**ভ্যারিয়েবল ও আউটপুট**](/terraform/variables-outputs)  
   ইনপুট ভ্যারিয়েবল, আউটপুট, ডিফল্ট, টাইপ
-- [**টেরাফর্ম মডিউল**](./modules.mdx)  
+- [**টেরাফর্ম মডিউল**](/terraform/modules)  
   মডিউল কেন? তৈরি, ব্যবহার, ভার্সনিং
-- [**ডাটা সোর্স**](./data-sources.mdx)  
+- [**ডাটা সোর্স**](/terraform/data-sources)  
   এক্সটার্নাল ডাটা ফেচ
-- [**Provisioner ও Lifecycle**](./provisioner-lifecycle.mdx)  
+- [**Provisioner ও Lifecycle**](/terraform/provisioner-lifecycle)  
   Remote-exec, local-exec, lifecycle রুল
-- [**টেরাফর্ম ওয়ার্কস্পেস**](./workspaces.mdx)  
+- [**টেরাফর্ম ওয়ার্কস্পেস**](/terraform/workspaces)  
   মাল্টিপল এনভায়রনমেন্ট ম্যানেজ
-- [**স্টেট ব্যাকএন্ড**](./state-backend.mdx)  
+- [**স্টেট ব্যাকএন্ড**](/terraform/state-backend)  
   রিমোট ব্যাকএন্ড (S3, Azure Blob, GCS, Terraform Cloud)
 
 
 ### মডিউল ৩: অ্যাডভান্সড টেরাফর্ম টেকনিক
 
-- [**কমপ্লেক্স রিসোর্স ডিপেন্ডেন্সি**](./complex-dependency.mdx)  
+- [**কমপ্লেক্স রিসোর্স ডিপেন্ডেন্সি**](/terraform/complex-dependency)  
   `depends_on`, resource graph, implicit/explicit dependency
-- [**টেরাফর্ম ফাংশন ও এক্সপ্রেশন**](./functions-expressions.mdx)  
+- [**টেরাফর্ম ফাংশন ও এক্সপ্রেশন**](/terraform/functions-expressions)  
   String, numeric, collection, conversion function
-- [**ডাইনামিক ব্লক ও For এক্সপ্রেশন**](./dynamic-blocks-for.mdx)  
+- [**ডাইনামিক ব্লক ও For এক্সপ্রেশন**](/terraform/dynamic-blocks-for)  
   রিইউজেবল, ডাইনামিক কনফিগ
-- [**সিক্রেট ও সেনসিটিভ ডাটা ম্যানেজ**](./secrets-sensitive-data.mdx)  
+- [**সিক্রেট ও সেনসিটিভ ডাটা ম্যানেজ**](/terraform/secrets-sensitive-data)  
   বেস্ট প্র্যাকটিস, env var, Vault
-- [**মাল্টিপল প্রোভাইডার**](./multiple-providers.mdx)  
+- [**মাল্টিপল প্রোভাইডার**](/terraform/multiple-providers)  
   একসাথে AWS, Azure, GCP
-- [**অ্যাডভান্সড মডিউল ডিজাইন**](./advanced-module-design.mdx)  
+- [**অ্যাডভান্সড মডিউল ডিজাইন**](/terraform/advanced-module-design)  
   ইনপুট ভ্যালিডেশন, আউটপুট ফরম্যাটিং, ভার্সন কনস্ট্রেইন্ট
 
 
 ### মডিউল ৪: বাস্তব টেরাফর্ম
 
-- [**CI/CD ইন্টিগ্রেশন**](./cicd-integration.mdx)  
+- [**CI/CD ইন্টিগ্রেশন**](/terraform/cicd-integration)  
   GitHub Actions, GitLab CI, Jenkins দিয়ে অটোমেশন
-- [**টেরাফর্ম ক্লাউড ও এন্টারপ্রাইজ**](./cloud-enterprise.mdx)  
+- [**টেরাফর্ম ক্লাউড ও এন্টারপ্রাইজ**](/terraform/cloud-enterprise)  
   ওয়ার্কস্পেস, রিমোট রান, Sentinel পলিসি
-- [**স্টেট লকিং ও টিম কোলাব**](./state-locking-collab.mdx)  
+- [**স্টেট লকিং ও টিম কোলাব**](/terraform/state-locking-collab)  
   টিমে কনফ্লিক্ট এড়ানো
-- [**ইনফ্রা ড্রিফট ম্যানেজ**](./infra-drift-manage.mdx)  
+- [**ইনফ্রা ড্রিফট ম্যানেজ**](/terraform/infra-drift-manage)  
   ম্যানুয়াল চেঞ্জ ডিটেক্ট ও কারেক্ট
-- [**কুবেরনেটিসের সাথে টেরাফর্ম**](./kubernetes.mdx)  
+- [**কুবেরনেটিসের সাথে টেরাফর্ম**](/terraform/kubernetes)  
   k8s cluster ও resource ম্যানেজ
-- [**কস্ট ম্যানেজমেন্ট ও অপ্টিমাইজেশন**](./cost-management.mdx)  
+- [**কস্ট ম্যানেজমেন্ট ও অপ্টিমাইজেশন**](/terraform/cost-management)  
   `terraform plan` দিয়ে কস্ট এস্টিমেট
 
 
 ### মডিউল ৫: স্পেশালাইজড টপিক ও ইকোসিস্টেম
 
-- [**কাস্টম প্রোভাইডার ও প্লাগইন**](./custom-provider-plugin.mdx)  
+- [**কাস্টম প্রোভাইডার ও প্লাগইন**](/terraform/custom-provider-plugin)  
   নিজস্ব প্রোভাইডার লেখা (Go basics)
-- [**টেরাফর্ম CDK (Cloud Development Kit)**](./cdktf.mdx)  
+- [**টেরাফর্ম CDK (Cloud Development Kit)**](/terraform/cdktf)  
   পরিচিত ভাষায় (TypeScript, Python) টেরাফর্ম কোড
-- [**এক্সিস্টিং ইনফ্রা টেরাফর্মে মাইগ্রেট**](./import-existing-infra.mdx)  
+- [**এক্সিস্টিং ইনফ্রা টেরাফর্মে মাইগ্রেট**](/terraform/import-existing-infra)  
   রিসোর্স ইম্পোর্ট, স্টেট টিপস
 - [**সিকিউরিটি ও কমপ্লায়েন্স অটোমেশন**](#)  
   OPA, Chef InSpec ইন্টিগ্রেশন
-- [**মাল্টি-ক্লাউড ও হাইব্রিড স্ট্র্যাটেজি**](./multi-cloud-hybrid-strategy.mdx)  
+- [**মাল্টি-ক্লাউড ও হাইব্রিড স্ট্র্যাটেজি**](/terraform/multi-cloud-hybrid-strategy)  
   ক্লাউড-অ্যাগনস্টিক ডিজাইন
-- [**ট্রাবলশুটিং ও ডিবাগিং**](./troubleshooting-debugging.mdx)  
+- [**ট্রাবলশুটিং ও ডিবাগিং**](/terraform/troubleshooting-debugging)  
   লগ, এরর মেসেজ, বেস্ট প্র্যাকটিস
 
 ---
