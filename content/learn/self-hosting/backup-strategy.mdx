@@ -3,16 +3,126 @@ title: ব্যাকআপ স্ট্রাটেজি
 icon: ph:cloud-arrow-up-duotone
 ---
 
-ডাটা লস = সবচেয়ে বড় ঝুঁকি। 3-2-1 পলিসি বিবেচনা করুন।
 
-## কী ব্যাকআপ করবেন
-- কনফিগ ফাইল
-- ডাটাবেস ডাম্প
-- ভলিউম / পারসিস্টেন্ট ডাটা
+ডাটা হারানো মানে শুধু ফাইল নয়—ব্যবহারকারী, কনফিগ, লাইসেন্স, সিক্রেট, এমনকি ব্যবসার অস্তিত্বও হারাতে পারেন। এই অধ্যায়ে প্রোডাকশন-গ্রেড ব্যাকআপ স্ট্রাটেজি, টুল, অটোমেশন ও রিস্টোর কৌশল শিখবেন।
 
-## উদাহরণ: Postgres
+## ব্যাকআপের মূলনীতি
+| নীতি | ব্যাখ্যা |
+|------|----------|
+| 3-2-1 | ৩টি কপি, ২টি মিডিয়া, ১টি অফসাইট |
+| Immutable | র‍্যানসমওয়্যার/মানব ভুল থেকে সুরক্ষা |
+| Automation | ভুলে যাওয়ার সুযোগ নেই |
+| Verification | ব্যাকআপ না টেস্ট করলে, নেই ধরুন |
+
+## কী কী ব্যাকআপ করবেন?
+- অ্যাপ ডাটা (e.g. `/srv/data/*`)
+- কনফিগ ফাইল (e.g. `/srv/stack/*/*.yml`, `.env`)
+- ডাটাবেস (dump)
+- SSL/ACME স্টোর (e.g. `/srv/data/traefik-letsencrypt`)
+- ইউজার ফাইল, মিডিয়া
+- সিক্রেট/এনভায়রনমেন্ট ফাইল
+
+## Docker Volume ও Bind Mount ব্যাকআপ
+### Bind Mount (সহজ)
 ```bash
-pg_dump -Fc appdb > backup_$(date +%F).dump
+tar czf /backup/vaultwarden-$(date +%F).tar.gz /srv/data/vaultwarden-data
+```
+### Docker Volume (named)
+```bash
+docker run --rm -v vaultwarden-data:/data -v /backup:/backup busybox \
+	tar czf /backup/vaultwarden-vol-$(date +%F).tar.gz /data
 ```
 
-> পরবর্তী: সিকিউরিটি হার্ডেনিং।
+## ডাটাবেস ব্যাকআপ
+### PostgreSQL
+```bash
+docker exec -t postgres pg_dump -U USER DBNAME > /backup/db-$(date +%F).sql
+```
+### MariaDB/MySQL
+```bash
+docker exec mariadb sh -c 'exec mysqldump -uUSER -pPASS DBNAME' > /backup/db-$(date +%F).sql
+```
+
+## ব্যাকআপ স্ক্রিপ্ট (উদাহরণ)
+`/usr/local/bin/backup-all.sh`:
+```bash
+#!/usr/bin/env bash
+set -e
+DEST=/backup/$(date +%F)
+mkdir -p "$DEST"
+tar czf "$DEST/vaultwarden-data.tar.gz" /srv/data/vaultwarden-data
+docker exec -t postgres pg_dump -U USER DBNAME > "$DEST/db.sql"
+rsync -a /srv/stack/ "$DEST/stack-config/"
+find /backup -type d -mtime +7 -exec rm -rf {} + # ৭ দিনের পুরনো ডিলিট
+```
+```bash
+chmod +x /usr/local/bin/backup-all.sh
+```
+ক্রন (প্রতিদিন রাত ২টা):
+```
+0 2 * * * root /usr/local/bin/backup-all.sh
+```
+
+## অফসাইট ব্যাকআপ (Cloud/Remote)
+### rclone (Google Drive, S3, etc)
+```bash
+rclone sync /backup remote:server-backup --progress
+```
+### rsync (অন্য VPS)
+```bash
+rsync -az /backup user@remote:/srv/backup-server/
+```
+
+## Snapshot/Versioned Tools
+| টুল | বৈশিষ্ট্য |
+|-----|-----------|
+| BorgBackup | ডিডুপ, এনক্রিপশন, রিমোট |
+| Restic | ক্লাউড/রিমোট, সিম্পল |
+| ZFS/BTRFS | ফাইলসিস্টেম লেভেল স্ন্যাপশট |
+| Cloud Provider | S3 versioning, GCS object lock |
+
+## এনক্রিপশন ও নিরাপত্তা
+- অফসাইট ব্যাকআপে এনক্রিপশন বাধ্যতামূলক (rclone, borg, restic)
+- ব্যাকআপ স্ক্রিপ্টে সিক্রেট/কী ফাইল আলাদা রাখুন
+- ব্যাকআপ ডিরেক্টরিতে 700 পারমিশন
+
+## ব্যাকআপ ভেরিফিকেশন
+```bash
+tar -tzf /backup/vaultwarden-2025-08-11.tar.gz | head
+pg_restore -l /backup/db.sql
+```
+রিস্টোর টেস্ট: নতুন কন্টেইনারে ডাটা/ডিবি ইম্পোর্ট করে দেখুন
+
+## Disaster Recovery (রিস্টোর)
+### ডাটা রিস্টোর
+```bash
+tar xzf /backup/vaultwarden-2025-08-11.tar.gz -C /
+```
+### ডিবি রিস্টোর
+```bash
+cat /backup/db.sql | docker exec -i postgres psql -U USER DBNAME
+```
+
+## মনিটরিং ও অ্যালার্ট
+- ব্যাকআপ স্ক্রিপ্ট শেষে ইমেইল/Discord/Slack নোটিফিকেশন
+- ব্যাকআপ ফোল্ডার ফাইল সংখ্যা/তারিখ Prometheus node_exporter textfile collector দিয়ে এক্সপোজ
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| ব্যাকআপ ফেইল | ডিস্ক ফুল | পুরনো ডিলিট, মনিটরিং |
+| পারমিশন ডিনাইড | স্ক্রিপ্ট ইউজার ভুল | sudo/root দিয়ে চালান |
+| অফসাইট ফেইল | নেটওয়ার্ক/কনফিগ | rclone/rsync লগ চেক |
+| রিস্টোর ফেইল | ফাইল করাপ্ট | ভেরিফিকেশন টেস্ট করুন |
+
+## চেকলিস্ট
+- [ ] ৩-২-১ রুল ফলো
+- [ ] ডাটা, কনফিগ, ডিবি, সিক্রেট ব্যাকআপ
+- [ ] অফসাইট/ক্লাউড কপি
+- [ ] এনক্রিপশন সক্রিয়
+- [ ] রিস্টোর টেস্ট সফল
+- [ ] মনিটরিং/নোটিফিকেশন
+
+<Callout type="info">ব্যাকআপ না থাকলে, ডাটা হারানো শুধু সময়ের ব্যাপার। অটোমেশন ও টেস্টিং নিশ্চিত করুন।</Callout>
+
+<Callout type="success">এখন আপনার ইনফ্রা ব্যাকআপ অটোমেটেড, অফসাইট ও রিস্টোর-রেডি।</Callout>

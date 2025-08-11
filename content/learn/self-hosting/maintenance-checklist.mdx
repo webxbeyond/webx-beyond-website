@@ -3,13 +3,94 @@ title: মেইনটেন্যান্স চেকলিস্ট
 icon: ph:clipboard-text-duotone
 ---
 
-সাপ্তাহিক / মাসিক রুটিন যা আপনার সেলফ হোস্টেড স্ট্যাক হেলদি রাখে।
 
-## Checklist
-- [ ] আপডেট (OS + Packages)
+সেলফ-হোস্টেড সার্ভার/অ্যাপ চালু রাখার জন্য শুধু ডেপ্লয় করলেই হয় না—নিয়মিত রক্ষণাবেক্ষণ (maintenance) করলে ডাটা লস, সিকিউরিটি ইস্যু, ডাউনটাইম, পারফরম্যান্স ড্রপ এড়ানো যায়। এখানে সহজ ভাষায়, উদাহরণসহ, সম্পূর্ণ চেকলিস্ট ও কমান্ড দেওয়া হয়েছে।
+
+## কেন দরকার?
+- আপডেট না করলে সিকিউরিটি ঝুঁকি
+- ব্যাকআপ না টেস্ট করলে রিস্টোর হবে না
+- ডিস্ক ফুল হলে সার্ভিস ডাউন
+- লগ/টেম্প ফাইল জমে গেলে পারফরম্যান্স কমে
+- সিকিউরিটি স্ক্যান না করলে হ্যাক/ব্রিচ ধরা পড়ে না
+
+## সাপ্তাহিক টাস্ক
+- [ ] OS + প্যাকেজ আপডেট
+	```bash
+	apt update && apt upgrade -y
+	docker pull $(docker images --format '{{.Repository}}')
+	docker compose -f /srv/stack/yourapp.yml up -d
+	```
 - [ ] ব্যাকআপ ভেরিফাই
-- [ ] ডিস্ক ইউসেজ / লগ রোটেশন
-- [ ] সিকিউরিটি স্ক্যান / পোর্ট
-- [ ] সার্ভিস রিস্টার্ট প্রয়োজন কিনা দেখুন
+	```bash
+	tar -tzf /backup/last-backup.tar.gz | head
+	pg_restore -l /backup/db.sql
+	```
+- [ ] ডিস্ক ইউসেজ চেক
+	```bash
+	df -h
+	du -sh /var/log/*
+	```
+- [ ] লগ রোটেশন
+	```bash
+	logrotate -f /etc/logrotate.conf
+	```
+- [ ] সার্ভিস স্ট্যাটাস
+	```bash
+	systemctl list-units --failed
+	docker ps --format 'table {{.Names}}\t{{.Status}}'
+	```
 
-> সিরিজ প্রসারিত হবে। প্রস্তাব দিন।
+## মাসিক টাস্ক
+- [ ] সিকিউরিটি স্ক্যান
+	```bash
+	apt install -y lynis
+	lynis audit system
+	nmap -Pn your.server.ip
+	```
+- [ ] ইউজার/SSH অডিট
+	```bash
+	last
+	cat /etc/passwd
+	grep sshd /var/log/auth.log | tail -n 20
+	```
+- [ ] পুরনো ব্যাকআপ/লগ ডিলিট
+	```bash
+	find /backup -type f -mtime +30 -delete
+	find /var/log -type f -name '*.gz' -mtime +15 -delete
+	```
+- [ ] SSL/Cert expiry চেক
+	```bash
+	openssl s_client -connect your.domain:443 -servername your.domain </dev/null 2>/dev/null | openssl x509 -noout -dates
+	```
+
+## অটোমেশন টিপস
+- cronjob দিয়ে স্ক্রিপ্ট চালান
+- ব্যাকআপ/ডিস্ক/SSL মনিটরিং alert দিন (email/Discord)
+- logrotate, unattended-upgrades এনাবল রাখুন
+
+## Production টিপস
+- চেকলিস্ট ডকুমেন্ট করুন (Notion, Markdown, Google Sheet)
+- প্রতিটি টাস্কের জন্য responsible person ঠিক করুন
+- ব্যাকআপ/রিস্টোর টেস্ট automate করুন
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| ডিস্ক ফুল | পুরনো লগ/ব্যাকআপ | find/rm দিয়ে ডিলিট |
+| সার্ভিস ডাউন | আপডেট/রিস্টার্ট দরকার | systemctl/docker restart |
+| SSL expired | renewal fail | certbot/traefik log চেক |
+
+## চেকলিস্ট (Ready to Use)
+- [ ] apt update/upgrade
+- [ ] docker pull/compose up
+- [ ] ব্যাকআপ টেস্ট
+- [ ] ডিস্ক usage/log rotation
+- [ ] সার্ভিস status
+- [ ] সিকিউরিটি স্ক্যান
+- [ ] ইউজার/SSH অডিট
+- [ ] SSL expiry চেক
+- [ ] পুরনো ফাইল ডিলিট
+
+<Callout type="info">নিয়মিত মেইনটেন্যান্স করলে ডাটা লস, ডাউনটাইম, হ্যাকিং—সব ঝুঁকি কমে যায়।</Callout>
+
+<Callout type="success">এখন আপনার self-hosted stack দীর্ঘমেয়াদে হেলদি ও সিকিউর থাকবে!</Callout>

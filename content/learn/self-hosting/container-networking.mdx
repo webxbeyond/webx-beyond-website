@@ -3,11 +3,111 @@ title: কনটেইনার নেটওয়ার্কিং
 icon: ph:network-duotone
 ---
 
-Docker ব্রিজ, হোস্ট, মাকভ্ল্যান ও কাস্টম নেটওয়ার্ক—কবে কোনটি ব্যবহার করবেন তার ওভারভিউ।
+কনটেইনার নেটওয়ার্কিং মানে—কিভাবে আপনার Docker কনটেইনারগুলো একে অপরের সাথে, হোস্ট মেশিনের সাথে, এবং বাইরের ইন্টারনেটের সাথে যোগাযোগ করবে। এখানে সহজ ভাষায় সবকিছু ব্যাখ্যা করা হয়েছে, উদাহরণ ও ডায়াগ্রামসহ।
 
+## নেটওয়ার্ক টাইপস (Docker)
+| নাম | কী হয় | কখন ব্যবহার করবেন |
+|-----|-------|-------------------|
+| bridge | ডিফল্ট, আলাদা সাবনেট, কনটেইনার ↔ কনটেইনার | মাল্টি-অ্যাপ, আইসোলেশন দরকার |
+| host | কনটেইনার হোস্টের নেটওয়ার্ক শেয়ার করে | পারফরম্যান্স/লো-লেটেন্সি |
+| none | কোনো নেটওয়ার্ক নেই | এক্সট্রা আইসোলেশন |
+| macvlan | কনটেইনারকে আলাদা IP দেয় (LAN-এ) | নেটওয়ার্ক ডিভাইস হিসেবে দেখাতে |
+| overlay | মাল্টি-হোস্ট (Swarm/K8s) | ক্লাস্টার |
+
+## কিভাবে কাজ করে? (ডায়াগ্রাম)
+```
+┌────────────┐      ┌────────────┐
+│ ContainerA │─────│            │
+│ 172.18.0.2 │     │  bridge0   │─────┐
+└────────────┘      │ 172.18.0.1 │     │
+┌────────────┐      └────────────┘     │
+│ ContainerB │─────┘                   │
+│ 172.18.0.3 │                         │
+└────────────┘                         │
+																			▼
+																┌────────────┐
+																│  Host NIC  │
+																│ 10.0.0.5   │
+																└────────────┘
+```
+bridge নেটওয়ার্কে, কনটেইনারগুলো নিজেদের মধ্যে IP দিয়ে কথা বলে, হোস্টের সাথে NAT হয়।
+
+## কাস্টম ব্রিজ নেটওয়ার্ক (প্র্যাকটিক্যাল)
+ডিফল্ট bridge-এ DNS রেজলভ/লিঙ্কিং সীমিত। কাস্টম নেটওয়ার্কে কনটেইনার নামেই একে অপরকে পিং করা যায়।
+```bash
+docker network create mynet
+```
+Compose উদাহরণ:
+```yaml
+version: '3.9'
+services:
+	app1:
+		image: nginx
+		networks: [mynet]
+	app2:
+		image: alpine
+		command: sleep 1000
+		networks: [mynet]
+networks:
+	mynet:
+		external: true
+```
+`docker exec -it app2 ping app1` → কাজ করবে!
+
+## হোস্ট নেটওয়ার্ক
+```bash
+docker run --network host nginx
+```
+এতে কনটেইনারের 80 পোর্ট = হোস্টের 80 পোর্ট।
+সিকিউরিটি/আইসোলেশন কমে যায়, তাই production-এ bridge/networks প্রেফার করুন।
+
+## macvlan (LAN IP)
+```bash
+docker network create -d macvlan \
+	--subnet=192.168.1.0/24 \
+	--gateway=192.168.1.1 \
+	-o parent=eth0 mymacvlan
+```
+এভাবে কনটেইনারকে সরাসরি LAN-এ IP দেওয়া যায় (e.g. 192.168.1.50)।
+ব্যবহার: Home automation, NAS, printer, ইত্যাদি।
+
+## overlay (Swarm/K8s)
+মাল্টি-হোস্ট ক্লাস্টারে কনটেইনার ↔ কনটেইনার কমিউনিকেশন।
+```bash
+docker network create -d overlay myoverlay
+```
+Swarm/K8s না হলে দরকার নেই।
+
+## নেটওয়ার্ক inspect ও debug
 ```bash
 docker network ls
-docker network inspect bridge | less
+docker network inspect mynet
+docker exec -it app1 ip a
+docker exec -it app2 ping app1
 ```
 
-> পরবর্তী: অর্কেস্ট্রেশন পরিচিতি।
+## Production টিপস
+- প্রতিটি অ্যাপ stack আলাদা network-এ রাখুন (e.g. proxy, apps, monitoring)
+- Public expose দরকার না হলে, শুধু internal network ব্যবহার করুন
+- Traefik/Caddy reverse proxy-কে apps/proxy network-এ রাখুন
+- DNS resolution: কাস্টম network-এ কনটেইনার নামেই resolve হয়
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| ping/app নাম resolve হয় না | ডিফল্ট bridge | কাস্টম network ব্যবহার |
+| কনটেইনার ↔ হোস্ট পোর্ট কাজ করছে না | firewall/NAT | ufw/iptables চেক |
+| LAN IP দরকার | bridge/macvlan কনফিউশন | macvlan setup |
+
+## চেকলিস্ট
+- [ ] কাস্টম network তৈরি ও ব্যবহার
+- [ ] কনটেইনার ↔ কনটেইনার নাম resolve
+- [ ] হোস্ট ↔ কনটেইনার connectivity
+- [ ] Production-এ public expose সীমিত
+
+## পরবর্তী
+অর্কেস্ট্রেশন পরিচিতি: Docker Swarm, Kubernetes, automation → [/self-hosting/orchestration-intro](/self-hosting/orchestration-intro)
+
+<Callout type="info">নেটওয়ার্কিং বুঝলে, ডিপ্লয় ও ট্রাবলশুট অনেক সহজ হবে।</Callout>
+
+<Callout type="success">এখন আপনি কনটেইনার নেটওয়ার্কিং কনফিডেন্টলি ডিজাইন ও debug করতে পারবেন!</Callout>

@@ -3,12 +3,146 @@ title: অর্কেস্ট্রেশন পরিচিতি
 icon: ph:cube-duotone
 ---
 
-Docker Compose থেকে Kubernetes পর্যন্ত স্কেলিং ধারণা।
 
+অর্কেস্ট্রেশন মানে—একাধিক কনটেইনার/অ্যাপ/নোডকে স্বয়ংক্রিয়ভাবে চালানো, স্কেল করা, আপডেট, রোলব্যাক, হেলথচেক, নেটওয়ার্কিং, সিক্রেট, অটো-রিস্টার্ট, সবকিছু এক জায়গা থেকে ম্যানেজ করা। এখানে সহজ ভাষায় Docker Compose, Nomad, Kubernetes—সব ব্যাখ্যা ও উদাহরণসহ দেওয়া হয়েছে।
+
+## কেন অর্কেস্ট্রেশন দরকার?
+- একাধিক অ্যাপ/কনটেইনার চালাতে
+- ডাউন হলে অটো-রিস্টার্ট
+- স্কেল (লোড বাড়লে নতুন কপি)
+- আপডেট/রোলব্যাক সহজ
+- হেলথচেক, লোড-ব্যালেন্স
+
+## তুলনা
 | লেভেল | টুল | ইউজ-কেস |
 |-------|-----|---------|
 | 1 | Compose | ছোট / ব্যক্তিগত |
 | 2 | Nomad | মিড-সাইজ / সিম্পল |
 | 3 | Kubernetes | বড় স্কেল / ইকোসিস্টেম |
 
-> পরবর্তী: সিক্রেট ম্যানেজমেন্ট।
+## Docker Compose (Single Host)
+Compose দিয়ে এক সার্ভারে মাল্টি-অ্যাপ চালানো যায়।
+```yaml
+version: '3.9'
+services:
+	app:
+		image: nginx
+		restart: unless-stopped
+		healthcheck:
+			test: ["CMD", "curl", "-f", "http://localhost"]
+			interval: 30s
+			retries: 3
+```
+`restart: unless-stopped` → কনটেইনার ডাউন হলে অটো-রিস্টার্ট।
+
+## Nomad (HashiCorp)
+Docker Compose-এর চেয়ে বেশি ফ্লেক্সিবল, কিন্তু Kubernetes-এর চেয়ে সহজ।
+```hcl
+job "nginx" {
+	datacenters = ["dc1"]
+	group "web" {
+		count = 2
+		task "nginx" {
+			driver = "docker"
+			config {
+				image = "nginx"
+				port_map {
+					http = 80
+				}
+			}
+			resources {
+				cpu    = 100
+				memory = 128
+			}
+		}
+		network {
+			port "http" {}
+		}
+	}
+}
+```
+Nomad UI/CLI দিয়ে ডেপ্লয়, স্কেল, রোলব্যাক করা যায়।
+
+## Kubernetes (K8s)
+বড় স্কেল, ক্লাস্টার, অটো-স্কেল, সার্ভিস ডিসকভারি, সিক্রেট, কনফিগ, সবকিছু।
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: nginx
+spec:
+	replicas: 3
+	selector:
+		matchLabels:
+			app: nginx
+	template:
+		metadata:
+			labels:
+				app: nginx
+		spec:
+			containers:
+			- name: nginx
+				image: nginx:latest
+				ports:
+				- containerPort: 80
+				readinessProbe:
+					httpGet:
+						path: /
+						port: 80
+					initialDelaySeconds: 5
+					periodSeconds: 10
+```
+Kubernetes-এ `kubectl apply -f file.yaml` দিয়ে ডেপ্লয়, `kubectl scale`, `kubectl rollout undo` দিয়ে স্কেল/রোলব্যাক।
+
+## ডায়াগ্রাম (অর্কেস্ট্রেশন ফ্লো)
+```
+┌────────────┐   ┌────────────┐   ┌────────────┐
+│  User/API  │→  │  Orchestr. │→  │  Nodes     │
+│            │   │ (K8s/Nomad)|   │ (VM/Server)|
+└────────────┘   └────────────┘   └────────────┘
+												│
+								┌───────┴────────┐
+								│   Containers   │
+								└────────────────┘
+```
+
+## হেলথচেক ও অটো-রিস্টার্ট
+- Compose: `healthcheck` ব্লক
+- Nomad: `check { type = "http" ... }`
+- K8s: `readinessProbe`, `livenessProbe`
+
+## স্কেলিং ও আপডেট
+- Compose: `docker compose up --scale app=3`
+- Nomad: `count = 3`
+- K8s: `spec.replicas: 3`
+
+## রোলব্যাক
+- Compose: আগের ইমেজ ট্যাগ/sha দিয়ে `up -d`
+- Nomad: আগের job version
+- K8s: `kubectl rollout undo deployment/nginx`
+
+## Production টিপস
+- ছোট/পার্সোনাল: Compose যথেষ্ট
+- মিড-সাইজ: Nomad সহজ, কম রিসোর্স
+- বড়/ক্লাস্টার: Kubernetes
+- হেলথচেক, অটো-রিস্টার্ট, মনিটরিং সবসময় রাখুন
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| কনটেইনার ডাউন | healthcheck নেই | healthcheck যোগ করুন |
+| স্কেল কাজ করছে না | config ভুল | scale param চেক |
+| রোলব্যাক fail | আগের ইমেজ নেই | ইমেজ retention বাড়ান |
+
+## চেকলিস্ট
+- [ ] healthcheck/auto-restart
+- [ ] scale/rollback tested
+- [ ] production-এ মনিটরিং
+- [ ] ডকুমেন্টেশন/backup
+
+## পরবর্তী
+সিক্রেট ম্যানেজমেন্ট: env, vault, automation → [/self-hosting/secrets-management](/self-hosting/secrets-management)
+
+<Callout type="info">প্রথমে Compose দিয়ে শুরু করুন, পরে প্রয়োজনে Nomad/K8s-এ যান।</Callout>
+
+<Callout type="success">এখন আপনি orchestration-এর মূল ধারণা, টুল ও প্র্যাকটিস জানেন!</Callout>

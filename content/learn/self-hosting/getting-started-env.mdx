@@ -3,18 +3,215 @@ title: শুরু করার পরিবেশ প্রস্তুতি
 icon: ph:gear-duotone
 ---
 
-এই পেজে একটি মিনিমাল সেলফ হোস্টিং ল্যাব / VPS সেটআপের বেসিক দেখানো হবে।
+এই টিউটোরিয়াল শেষে আপনার থাকবে: নিরাপদ বেস OS, নন-রুট ইউজার, আপডেট + ফায়ারওয়াল + Fail2ban, Docker / Compose, একটি স্ট্রাকচার্ড ডিরেক্টরি, বেসিক ব্যাকআপ স্ক্রিপ্ট, হেলথ চেক এবং রিভার্স প্রক্সি বসানোর জন্য প্রস্তুত গ্রাউন্ড।
 
-## প্রি-রিকুইজিট
-- VPS বা লোকাল হোস্ট (Ubuntu 24.04)
-- SSH কী সেটআপ
-- নন-রুট ইউজার + sudo
+<Callout type="info">এখানে Ubuntu 24.04 LTS উদাহরণ ধরা হয়েছে (১ vCPU / 1–2GB RAM)। লোকাল Proxmox VM বা Contabo / Hetzner / DigitalOcean VPS যে কোনোটি হতে পারে।</Callout>
 
-## চেক
+## ১. VPS / সার্ভার নির্বাচন
+
+| ইউজকেস | মিনিমাম কনফিগ | নোট |
+|--------|----------------|-----|
+| ব্যক্তিগত পাসওয়ার্ড ম্যানেজার / ছোট Wiki | 1 vCPU / 1GB RAM / 20GB SSD | Swap 512MB রাখুন |
+| মিডিয়া (Jellyfin + Photos) | 2 vCPU / 4GB RAM / 80GB+ | হার্ডওয়্যার ট্রান্সকোড চাইলে GPU ভাবুন |
+| হাইব্রিড (মিডিয়া + Dev) | 4 vCPU / 8GB RAM | NVMe প্রাধান্য |
+
+প্রভাইডার বাছাইয়ের সময়: নেটওয়ার্ক লোকেশন (ল্যাটেন্সি), I/O বেঞ্চ, কমিউনিটি রিপোর্ট, Snapshots সাপোর্ট।
+
+## ২. SSH কী অথেন্টিকেশন সেটআপ
+
+লোকাল মেশিনে (যদি কী না থাকে):
 ```bash
-lsb_release -a
-whoami
-uptime
+ssh-keygen -t ed25519 -C "self-hosting"
+```
+সার্ভারে পাবলিক কী কপি:
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@SERVER_IP
+```
+ম্যানুয়ালি হলে:
+```bash
+cat ~/.ssh/id_ed25519.pub | ssh user@SERVER_IP 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys'
 ```
 
-> পরবর্তী ধাপ: রিভার্স প্রক্সি বেসিক।
+SSH কনফিগ (লোকাল):
+```bash
+cat >> ~/.ssh/config <<'EOF'
+Host myvps
+	HostName SERVER_IP
+	User user
+	IdentityFile ~/.ssh/id_ed25519
+	Port 22
+	ServerAliveInterval 30
+EOF
+```
+এখন:
+```bash
+ssh myvps
+```
+
+## ৩. নন-রুট ইউজার সৃষ্টি (যদি না থাকে)
+```bash
+adduser anis
+usermod -aG sudo anis
+```
+রুট SSH লকডাউন (পরে): `/etc/ssh/sshd_config` এ:
+```
+PermitRootLogin no
+PasswordAuthentication no
+```
+তারপর:
+```bash
+sudo systemctl reload sshd
+```
+
+<Callout type="warning">PasswordAuthentication বন্ধ করার আগে নিশ্চিত হোন আপনার কী লগইন কাজ করছে।</Callout>
+
+## ৪. সিস্টেম আপডেট ও বেসিক প্যাকেজ
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl vim git ufw fail2ban ca-certificates gnupg lsb-release htop
+```
+
+টাইমজোন ও NTP:
+```bash
+sudo timedatectl set-timezone Asia/Dhaka
+sudo timedatectl set-ntp true
+```
+
+## ৫. ফায়ারওয়াল (UFW)
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+sudo ufw status numbered
+```
+
+## ৬. Fail2ban বেসিক কনফিগ
+```bash
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo sed -i 's/^#?bantime =.*/bantime = 1h/' /etc/fail2ban/jail.local
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd
+```
+
+## ৭. Docker & Docker Compose
+অফিশিয়াল রিপো কী ও ইঞ্জিন:
+```bash
+sudo apt remove -y docker docker.io containerd runc || true
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+newgrp docker <<EOF
+docker version
+EOF
+```
+
+Compose v2 এখন `docker compose` সাবকমান্ড।
+
+## ৮. ডিরেক্টরি স্ট্রাকচার
+```bash
+sudo mkdir -p /srv/apps
+sudo mkdir -p /srv/data
+sudo mkdir -p /srv/stack
+sudo chown -R $USER: /srv
+tree -L 1 /srv || ls -1 /srv
+```
+
+নামকরন কনভেনশন:
+```
+/srv/apps/<app>/docker-compose.yml
+/srv/data/<app>-data (volumes bind)
+/srv/stack/reverse-proxy
+```
+
+## ৯. একটি স্যাম্পল অ্যাপ (Vaultwarden) + রিভার্স প্রক্সি প্রস্তুতি
+`/srv/apps/vaultwarden/docker-compose.yml`
+```yaml
+version: '3.9'
+services:
+	vaultwarden:
+		image: vaultwarden/server:latest
+		container_name: vaultwarden
+		restart: unless-stopped
+		environment:
+			WEBSOCKET_ENABLED: 'true'
+		volumes:
+			- /srv/data/vaultwarden-data:/data
+		networks:
+			- proxy
+		labels:
+			- traefik.enable=true
+			- traefik.http.routers.vw.rule=Host(`vault.localhost`)
+			- traefik.http.services.vw.loadbalancer.server.port=80
+networks:
+	proxy:
+		external: true
+```
+
+এখন শুধু নেটওয়ার্ক তৈরি (Traefik পরে আসবে):
+```bash
+docker network create proxy || true
+docker compose -f /srv/apps/vaultwarden/docker-compose.yml up -d
+docker ps --format 'table {{.Names}}\t{{.Status}}'
+```
+
+## ১০. বেসিক ব্যাকআপ স্ক্রিপ্ট
+`/srv/backup.sh`
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+TS=$(date +%Y%m%d-%H%M)
+DEST=/srv/backups
+mkdir -p "$DEST"
+tar -czf "$DEST/vaultwarden-$TS.tar.gz" -C /srv/data vaultwarden-data
+find "$DEST" -type f -mtime +7 -delete
+echo "Backup complete: $DEST"
+```
+```bash
+chmod +x /srv/backup.sh
+sudo bash -c 'cat > /etc/cron.d/vaultwarden-backup <<EOF
+0 3 * * * root /srv/backup.sh >/var/log/vaultwarden-backup.log 2>&1
+EOF'
+```
+
+## ১১. হেলথ চেক / লগ ইন্সপেকশন
+```bash
+docker logs -n 50 vaultwarden
+docker inspect -f '{{.State.Health.Status}}' vaultwarden 2>/dev/null || echo 'কোন হেলথ ইন্টিগ্রেশন নেই'
+df -h /srv
+free -h
+```
+
+## ১২. সিকিউরিটি কুইক পাস
+| বিষয় | চেক | স্ট্যাটাস |
+|-------|-----|----------|
+| Root SSH নিষ্ক্রিয় | `grep -i PermitRootLogin /etc/ssh/sshd_config` | হওয়া উচিত `no` |
+| Password Login বন্ধ | `grep -i PasswordAuthentication /etc/ssh/sshd_config` | `no` |
+| ফায়ারওয়াল অন | `sudo ufw status` | active |
+| Fail2ban চলছে | `sudo systemctl status fail2ban --no-pager` | active |
+| Docker group | `groups` | user এর মধ্যে `docker` |
+
+## ১৩. ভেরিফিকেশন চেকলিস্ট
+- [ ] SSH কী লগইন OK  
+- [ ] System packages updated  
+- [ ] UFW rules 22/80/443 ওপেন  
+- [ ] Fail2ban active  
+- [ ] Docker + compose কাজ করছে  
+- [ ] Sample app container RUNNING  
+- [ ] Backup cron ফাইল তৈরি  
+- [ ] Disk usage < 80%  
+
+## সাধারণ ট্রাবলশুট
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| `permission denied` data path | ভলিউম মালিকানা | `sudo chown -R $USER: /srv/data` |
+| Docker network not found | নেটওয়ার্ক create হয়নি | `docker network create proxy` |
+| SSH কেটে যায় | ServerAliveInterval নাই | লোকাল SSH config আপডেট |
+| timezone ভুল | default UTC | `timedatectl set-timezone Asia/Dhaka` |
+
+<Callout type="success">এই স্টেট এখন একটা মিনিমাল "base image" – এখান থেকে টুল অ্যাড করুন, নিয়মিত আপডেট + ব্যাকআপ মনিটর করুন।</Callout>

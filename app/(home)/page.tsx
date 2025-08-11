@@ -102,6 +102,16 @@ function WhyWebX() {
       title: 'কমিউনিটি ফোকাস (শীঘ্রই)',
       body: 'ফিডব্যাক ও সহযোগিতায় উন্নতি—কমিউনিটি যুক্ত হবে।',
     },
+    {
+      icon: 'ph:map-trifold-duotone',
+      title: 'স্ট্রাকচার্ড রোডম্যাপ',
+      body: 'প্রতিটি পথে ধাপে ধাপে স্পষ্ট অগ্রগতি—ভুলে হারিয়ে যান না।',
+    },
+    {
+      icon: 'ph:arrows-clockwise-duotone',
+      title: 'নিয়মিত আপডেট',
+      body: 'টুলিং ও বেস্ট প্র্যাকটিস পরিবর্তনের সাথে সাথে কনটেন্ট রিফ্রেশ।',
+    },
   ];
   return (
     <section className=" py-12 md:py-16 ">
@@ -124,7 +134,9 @@ function WhatWeTeach() {
     { icon: 'ph:brain-duotone', title: 'কৃত্রিম বুদ্ধিমত্তা', body: 'এআই টুলিং, মডেল ইন্টিগ্রেশন, প্রম্পটিং স্ট্র্যাটেজি।' },
     { icon: 'ph:network-duotone', title: 'নেটওয়ার্কিং ও নিরাপত্তা', body: 'প্রোটোকল, ট্রাবলশুটিং, সিকিউরিটি বেসিক।' },
     { icon: 'ph:cube-duotone', title: 'ব্লকচেইন ভিত্তি', body: 'ডিসেন্ট্রালাইজড ধারণা ও স্মার্ট কন্ট্রাক্ট বেসিক।' },
-    { icon: 'ph:notebook-duotone', title: 'চিটশিট ও রেফারেন্স', body: 'দ্রুত পুনরায় দেখার জন্য সংক্ষিপ্ত নোট।' },
+  { icon: 'ph:notebook-duotone', title: 'চিটশিট ও রেফারেন্স', body: 'দ্রুত পুনরায় দেখার জন্য সংক্ষিপ্ত নোট।' },
+  { icon: 'ph:database-duotone', title: 'ডাটা ইঞ্জিনিয়ারিং', body: 'ডাটাবেস বেসিক, মডেলিং, ইটিএল, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স।' },
+  { icon: 'ph:speedometer-duotone', title: 'পারফরম্যান্স অপ্টিমাইজেশন', body: 'লোড টাইম, কোর ওয়েব ভাইটাল, প্রোফাইলিং ও টিউনিং।' },
   ];
   return (
     <section className="pt-10 md:pt-4">
@@ -268,10 +280,10 @@ function SelectTopics() {
       { title: 'নেটওয়ার্কিং', description: 'বিভিন্ন কম্পিউটার এবং ডিভাইসের মধ্যে সংযোগ স্থাপন ও ডেটা আদান-প্রদান সংক্রান্ত প্রযুক্তি।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'সেলফ হোস্টিং', description: 'ওপেন-সোর্স সফটওয়্যার নিজস্ব সার্ভার/ইনফ্রায় চালানো: রিভার্স প্রক্সি, মনিটরিং, ব্যাকআপ, সিকিউরিটি বেসিক।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' }, progress: 5 },
+      { title: 'সেলফ হোস্টিং', description: 'ওপেন-সোর্স সফটওয়্যার নিজস্ব সার্ভার/ইনফ্রায় চালানো: রিভার্স প্রক্সি, মনিটরিং, ব্যাকআপ, সিকিউরিটি বেসিক।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' }, progress: 97 },
       { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি ও কোর ওয়েব ভাইটাল উন্নত করার কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+  { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি ও কোর ওয়েব ভাইটাল উন্নত করার কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'চলমান', variant: 'progress' }, progress: 5 },
+  { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'progress' }, progress: 5 },
       { title: 'গো (Go)', description: 'কনকারেন্সি ফ্রেন্ডলি, পারফরম্যান্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ শেখা।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের আধুনিক ভাষা।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড দিয়ে পুনরুত্পাদনযোগ্য ক্লাউড রিসোর্স ম্যানেজমেন্ট।', icon: 'logos:terraform-icon', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },

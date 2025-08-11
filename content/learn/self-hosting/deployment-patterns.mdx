@@ -3,14 +3,149 @@ title: ডেপ্লয়মেন্ট প্যাটার্ন
 icon: ph:stack-duotone
 ---
 
-Compose, স্বতন্ত্র systemd unit, Git pull workflow ও CI/CD (Watchtower / Woodpecker) চিন্তাধারা।
+
+প্রোডাকশন সার্ভারে কোড/কনফিগ আপডেট, রোলব্যাক, ডাউনটাইম-মুক্ত ডেপ্লয়, অটোমেশন—এসবের জন্য বিভিন্ন ডেপ্লয়মেন্ট প্যাটার্ন আছে। এই অধ্যায়ে বাস্তব উদাহরণ ও বেস্ট প্র্যাকটিস শিখবেন।
 
 ## প্যাটার্ন তুলনা
 | প্যাটার্ন | সুবিধা | সীমাবদ্ধতা |
 |----------|--------|------------|
-| Docker Compose | দ্রুত, মাল্টি-সার্ভিস | বড় হলে জটিল |
-| Systemd + Binary | মিনিমাল ওভারহেড | ম্যানুয়াল আপডেট |
-| Git Pull Deploy | খুব সহজ | অটোমেশন কম |
-| CI/CD পাইপলাইন | রিপ্রোডিউসেবল | সেটআপ সময় বেশি |
+| Docker Compose | দ্রুত, মাল্টি-সার্ভিস, rollback সহজ | বড় হলে জটিল |
+| Systemd + Binary | মিনিমাল ওভারহেড, 1-সার্ভিস | ম্যানুয়াল আপডেট |
+| Git Pull Deploy | খুব সহজ, zero-downtime | অটোমেশন কম |
+| CI/CD পাইপলাইন | রিপ্রোডিউসেবল, টেস্ট, অটো রোলব্যাক | সেটআপ সময় বেশি |
 
-> সিরিজের প্রাথমিক কাঠামো শেষ। আরও ডিপ ডাইভ শীঘ্রই।
+## Docker Compose ডেপ্লয়
+```bash
+cd /srv/apps/vaultwarden
+docker compose pull
+docker compose up -d
+docker compose ps
+```
+Rollback (আগের ইমেজ):
+```bash
+docker compose down
+docker compose up -d vaultwarden@sha256:OLD_HASH
+```
+Watchtower দিয়ে অটো-আপডেট:
+```bash
+docker run -d --name watchtower \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	containrrr/watchtower --cleanup --interval 300
+```
+
+## Systemd + Binary
+`/etc/systemd/system/myapp.service`:
+```ini
+[Unit]
+Description=My Go App
+After=network.target
+
+[Service]
+User=appuser
+ExecStart=/srv/apps/myapp/myapp-binary
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+রিলোড ও চালু:
+```bash
+systemctl daemon-reload
+systemctl enable --now myapp
+```
+আপডেট: নতুন binary কপি → `systemctl restart myapp`
+
+## Git Pull Deploy
+```bash
+cd /srv/apps/myapp
+git pull origin main
+docker compose up -d
+```
+Zero-downtime: নতুন কনফিগে `docker compose up -d` আগের কন্টেইনার নাম রেখে চালালে, নতুন ইমেজে seamless রিলোড হয়।
+
+## CI/CD পাইপলাইন (Woodpecker, GitHub Actions)
+CI/CD pipeline: push → build → test → deploy
+Woodpecker উদাহরণ:
+`.woodpecker.yml`:
+```yaml
+pipeline:
+	build:
+		image: node:20
+		commands:
+			- npm ci
+			- npm run build
+	deploy:
+		image: appleboy/scp
+		secrets: [SSH_KEY]
+		commands:
+			- scp -i $SSH_KEY -r dist/* user@server:/srv/apps/webapp/
+			- ssh -i $SSH_KEY user@server 'cd /srv/apps/webapp && docker compose up -d'
+```
+GitHub Actions উদাহরণ:
+```yaml
+name: Deploy
+on:
+	push:
+		branches: [main]
+jobs:
+	deploy:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- name: Deploy via SSH
+				uses: appleboy/ssh-action@v1
+				with:
+					host: ${{ secrets.HOST }}
+					username: ${{ secrets.USER }}
+					key: ${{ secrets.SSH_KEY }}
+					script: |
+						cd /srv/apps/webapp
+						git pull
+						docker compose up -d
+```
+
+## Blue-Green Deployment
+| স্টেপ | বিবরণ |
+|-------|--------|
+| A/B Stack | দুইটা environment (blue/green) |
+| Deploy | নতুন ভার্সন idle stack-এ |
+| Switch | Proxy config (Traefik/Caddy) দিয়ে ট্রাফিক নতুন stack-এ |
+| Rollback | আগের stack-এ রিটার্ন |
+
+## Zero-Downtime Tips
+- Healthcheck: `docker-compose.yml` এ `healthcheck` ব্লক
+- Readiness probe: অ্যাপ রেডি হলে ট্রাফিক নিন
+- Graceful shutdown: SIGTERM handle করুন
+- Database migration: backward compatible স্কিমা
+
+## Rollback
+- Docker: আগের ইমেজ ট্যাগ/sha দিয়ে `up -d`
+- Systemd: আগের binary রেখে `ExecStart` path বদলান
+- Git: আগের commit-এ checkout
+
+## মনিটরিং ও অ্যালার্ট
+- ডেপ্লয় ফেইল হলে ইমেইল/Discord alert
+- Prometheus: container restart, 5xx spike
+- Loki: ERROR, WARNING log spike
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| ডাউনটাইম | healthcheck নেই | healthcheck যোগ করুন |
+| রোলব্যাক fail | আগের ইমেজ নেই | ইমেজ রিটেনশন বাড়ান |
+| CI/CD deploy fail | SSH key/config ভুল | সিক্রেট চেক |
+| Proxy switch fail | Traefik config ভুল | config রিভিউ |
+
+## চেকলিস্ট
+- [ ] ডেপ্লয় zero-downtime
+- [ ] Rollback tested
+- [ ] Healthcheck/readiness probe
+- [ ] CI/CD pipeline OK
+- [ ] মনিটরিং/alert configured
+
+## সিরিজ শেষ
+এই সিরিজের মাধ্যমে আপনি প্রোডাকশন-গ্রেড self-hosting-এর জন্য environment, reverse proxy, SSL, monitoring, backup, security, deployment—সবকিছু হাতে-কলমে শিখলেন।
+
+<Callout type="info">প্রোডাকশন ডেপ্লয় আগে staging/test সার্ভারে dry-run করুন।</Callout>
+
+<Callout type="success">আপনি এখন নিজের সার্ভার, অ্যাপ ও ডাটা প্রফেশনালি পরিচালনা করতে পারবেন!</Callout>

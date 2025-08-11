@@ -3,12 +3,92 @@ title: সিকিউরিটি হার্ডেনিং
 icon: ph:shield-check-duotone
 ---
 
-মূল লক্ষ্য: Attack Surface কমানো + অননুমোদিত অ্যাক্সেস শনাক্ত।
 
-## বেসিক
-- SSH: Key only + Fail2Ban
-- ফায়ারওয়াল: allow 22,80,443
-- রুট লগইন বন্ধ
-- নিয়মিত আপডেট (unattended-upgrades)
+প্রোডাকশন সার্ভার নিরাপদ রাখতে শুধু ফায়ারওয়াল বা SSH কনফিগ যথেষ্ট নয়—OS, ইউজার, নেটওয়ার্ক, অ্যাপ, কন্টেইনার, সিক্রেট, মনিটরিং—সব স্তরে হার্ডেনিং দরকার। এই অধ্যায়ে ধাপে ধাপে সিকিউরিটি বেস্ট প্র্যাকটিস শিখবেন।
 
-> পরবর্তী: ডেপ্লয়মেন্ট প্যাটার্ন।
+## মূল লক্ষ্য
+- Attack Surface কমানো
+- অননুমোদিত অ্যাক্সেস শনাক্ত ও প্রতিরোধ
+- দ্রুত রেসপন্স ও রিকভারি
+
+## OS হার্ডেনিং
+- নিয়মিত আপডেট: `apt update && apt upgrade -y`
+- অটো আপডেট: `unattended-upgrades` প্যাকেজ
+- অপ্রয়োজনীয় প্যাকেজ/সার্ভিস রিমুভ: `apt purge`
+- Time sync: `systemctl enable --now systemd-timesyncd`
+
+## ইউজার ও SSH
+- রুট লগইন নিষ্ক্রিয়: `/etc/ssh/sshd_config` → `PermitRootLogin no`
+- পাসওয়ার্ড লগইন নিষ্ক্রিয়: `PasswordAuthentication no`
+- শুধু কী: `ssh-copy-id user@server`
+- Fail2Ban: ব্রুটফোর্স ব্লক
+```bash
+apt install -y fail2ban
+systemctl enable --now fail2ban
+```
+- 2FA (Google Authenticator, optional):
+```bash
+apt install libpam-google-authenticator
+google-authenticator
+```
+
+## ফায়ারওয়াল ও নেটওয়ার্ক
+- UFW (Ubuntu):
+```bash
+apt install ufw
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22,80,443/tcp
+ufw enable
+```
+- SSH port change (optional):
+`/etc/ssh/sshd_config` → `Port 2222`
+- GeoIP/IP allowlist (advanced):
+Cloudflare Proxy, VPN, বা security group
+
+## কন্টেইনার ও অ্যাপ হার্ডেনিং
+- Docker: সর্বদা লেটেস্ট ইমেজ টানুন
+- কন্টেইনার ইউজার: `user: 1000:1000` (root নয়)
+- কন্টেইনার ক্যাপাবিলিটি কমান: `cap_drop: [ALL]`
+- Read-only ফাইলসিস্টেম: `read_only: true`
+- সিক্রেট/এনভ ফাইল bind-mount, ইমেজে নয়
+- Public port expose এড়িয়ে proxy/networks ব্যবহার
+
+## সিক্রেট ও এনভায়রনমেন্ট
+- `.env`/config ফাইল 600 পারমিশন
+- গিটে সিক্রেট না রাখুন (git-crypt, sops, vault)
+- API key/token রোটেট ও মনিটর করুন
+
+## লগিং ও মনিটরিং
+- SSH, sudo, auth log মনিটর করুন
+- Prometheus alert: SSH login spike, container restart
+- Fail2Ban log → email/Discord alert
+- Loki/Grafana: ERROR, WARNING, 5xx spike
+
+## অডিট ও ইনসিডেন্ট রেসপন্স
+- `last`, `who`, `journalctl -u ssh`
+- `rkhunter`, `chkrootkit` (রুটকিট স্ক্যান)
+- ব্যাকআপ থেকে দ্রুত রিস্টোর প্রস্তুতি
+- Incident response plan লিখে রাখুন
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| SSH brute force | Password login খোলা | PasswordAuthentication no, Fail2Ban |
+| Port scan | 22/80/443 ছাড়া সব deny | ufw, security group |
+| Container escape | root ইউজার | user: non-root, cap_drop |
+| Secret leak | config গিটে | .gitignore, git-crypt |
+
+## চেকলিস্ট
+- [ ] SSH only-key, root login off
+- [ ] Firewall active, only 22/80/443 open
+- [ ] Fail2Ban running
+- [ ] Docker containers non-root
+- [ ] Secrets/configs secured
+- [ ] Regular updates enabled
+- [ ] Monitoring/alerts configured
+- [ ] Restore/incident plan documented
+
+<Callout type="info">সিকিউরিটি একবারের কাজ নয়—নিয়মিত অডিট, আপডেট ও মনিটরিং চালু রাখুন।</Callout>
+
+<Callout type="success">আপনার সার্ভার এখন প্রোডাকশন-রেডি সিকিউরিটি বেস্ট প্র্যাকটিসে হার্ডেনড।</Callout>

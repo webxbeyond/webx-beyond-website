@@ -3,17 +3,381 @@ title: মনিটরিং স্ট্যাক
 icon: ph:waveform-duotone
 ---
 
-Prometheus + Grafana + Loki + Node Exporter মিনিমাল কম্পোজ উদাহরণ।
+আপনার সার্ভিসগুলো সত্যিই চলছে কিনা, রিসোর্স কেমন ব্যবহার হচ্ছে, লেটেন্সি বেড়ে গেছে কিনা, লগে কোনো এরর স্পাইক আছে কিনা—এসব না জানলে প্রোডাকশন চালানো মানে অন্ধ হয়ে গাড়ি চালানো। এই অধ্যায়ে একটি প্রোডাকশন-অরিয়েন্টেড লাইটওয়েট অবজারভেবিলিটি স্ট্যাক গঠন করব:
 
+## কী শিখবেন
+| বিষয় | টুল |
+|------|-----|
+| মেট্রিক্স (Time‑series) | Prometheus, Exporters |
+| লগ অ্যাগ্রিগেশন | Loki + Promtail |
+| ভিজুয়াল & ড্যাশবোর্ড | Grafana |
+| অ্যালার্টিং | Alertmanager + রুল |
+| সার্ভিস হেলথ | Blackbox / Traefik metrics |
+| বেস লাইনার | Node Exporter / cAdvisor |
+
+## আর্কিটেকচার ও ডাটা ফ্লো
+```
+┌───────────────────┐     scrape    ┌──────────────┐
+│ Node Exporter     │──────────────▶│              │
+│ cAdvisor / App    │               │ Prometheus   │──┐  query
+│ Traefik Metrics   │──────────────▶│              │  │
+└───────────────────┘               └──────────────┘  │
+                 logs tail                              │
+┌───────────────────┐ ─────────────▶┌──────────┐       │
+│  Containers Logs  │               │ Promtail │       │
+└───────────────────┘               └────┬─────┘       │
+                                         │ push       │
+                                     ┌────▼─────┐     │
+                                     │  Loki    │◀────┘
+                                     └────┬─────┘
+                                          │ API
+                              ┌───────────▼─────────┐
+                              │      Grafana        │
+                              │ Dashboards + Alerts │
+                              └─────────┬───────────┘
+                                        │ webhooks/email
+                                 ┌───────▼────────┐
+                                 │ Alertmanager   │
+                                 └────────────────┘
+```
+
+## কম্পোনেন্ট নির্বাচন: কবে কী বাদ দেবেন
+| পরিস্থিতি | পরামর্শ |
+|-----------|---------|
+| একক VPS, অল্প সার্ভিস | Prometheus + Grafana + Node Exporter যথেষ্ট |
+| লগ গুরুত্বপূর্ণ (ডিবাগ ফ্রিকোয়েন্ট) | Loki + Promtail যোগ করুন |
+| এসএমএস / ইমেইল/ Discord অ্যালার্ট দরকার | Alertmanager অবশ্যই |
+| শুধু রিসোর্স মনিটর | Netdata (একক টুল) বিকল্প হতে পারে |
+
+## ফোল্ডার স্ট্রাকচার (প্রস্তাব)
+```
+/srv/monitoring/
+  prometheus/
+    prometheus.yml
+    rules/
+      alerts.yml
+  grafana/
+    provisioning/ (optional datasources & dashboards)
+  loki/
+    config.yml
+  promtail/
+    config.yml
+  alertmanager/
+    config.yml
+  compose.yml
+```
+
+## Docker Compose (সম্পূর্ণ স্ট্যাক উদাহরণ)
+`/srv/monitoring/compose.yml`
 ```yaml
 version: '3.9'
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.53.0
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
     ports: ["9090:9090"]
+    networks: [monitor]
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    restart: unless-stopped
+    volumes:
+      - ./alertmanager/config.yml:/etc/alertmanager/config.yml:ro
+    ports: ["9093:9093"]
+    networks: [monitor]
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
+    restart: unless-stopped
+    pid: host
+    network_mode: host
+    command: ["--collector.systemd"]
+    # host mode → Prometheus scrape টার্গেট 127.0.0.1:9100
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.2
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports: ["8088:8080"]
+    networks: [monitor]
+
+  loki:
+    image: grafana/loki:3.0.0
+    restart: unless-stopped
+    command: ["-config.file=/etc/loki/config.yml"]
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+    ports: ["3100:3100"]
+    networks: [monitor]
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    restart: unless-stopped
+    command: ["--config.file=/etc/promtail/config.yml"]
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail/config.yml:/etc/promtail/config.yml:ro
+    networks: [monitor]
+
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=StrongPass123
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     ports: ["3001:3000"]
+    networks: [monitor]
+
+volumes:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+
+networks:
+  monitor:
+    driver: bridge
 ```
 
-> পরবর্তী: ব্যাকআপ স্ট্রাটেজি।
+## Prometheus কনফিগ
+`prometheus/prometheus.yml`
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 30s
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['prometheus:9090']
+  - job_name: node
+    static_configs:
+      - targets: ['127.0.0.1:9100']
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+  - job_name: traefik
+    static_configs:
+      - targets: ['traefik:8080']
+    metrics_path: /metrics
+  - job_name: blackbox_http
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - https://example.com
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+```
+
+## Alert Rules উদাহরণ
+`prometheus/rules/alerts.yml`
+```yaml
+groups:
+  - name: infra-alerts
+    rules:
+      - alert: HighCPULoad
+        expr: avg(rate(node_cpu_seconds_total{mode!="idle"}[5m])) > 0.7
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: High CPU usage >70%
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Target down
+```
+
+রিলোড (লাইফসাইকেল):
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+
+## Alertmanager কনফিগ
+`alertmanager/config.yml`
+```yaml
+route:
+  receiver: 'default'
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: you@example.com
+        from: alert@example.com
+        smarthost: smtp.example.com:587
+        auth_username: alert@example.com
+        auth_identity: alert@example.com
+        auth_password: YOUR_PASSWORD
+```
+
+## Loki কনফিগ (মিনিমাল)
+`loki/config.yml`
+```yaml
+server:
+  http_listen_port: 3100
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  compactor:
+    working_directory: /loki/compactor
+    shared_store: filesystem
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+limits_config:
+  retention_period: 168h
+```
+
+## Promtail কনফিগ
+`promtail/config.yml`
+```yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+positions:
+  filename: /tmp/positions.yaml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: varlogs
+          __path__: /var/log/*.log
+  - job_name: containers
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*.log
+          env: prod
+```
+
+## রান
+```bash
+cd /srv/monitoring
+docker compose up -d
+docker compose ps
+```
+Grafana → `http://SERVER_IP:3001` (admin / StrongPass123)। Data Source যোগ: Prometheus (http://prometheus:9090), Loki (http://loki:3100)।
+
+## সিকিউরিটি বিবেচনা
+| টুল | রক্ষা |
+|-----|-------|
+| Grafana | Traefik সাবডোমেইন + Auth / OAuth (GitHub, Google) |
+| Prometheus | পাবলিক এক্সপোজ নয় (লোকাল নেটওয়ার্ক) |
+| Alertmanager | Rate limit / auth |
+| Loki | বড় লগ ingestion হলে tenant limit বিবেচনা |
+
+ফায়ারওয়ালে অপ্রয়োজনীয় পোর্ট বন্ধ: শুধুমাত্র রিভার্স প্রক্সি দিয়েই এক্সপোজ করুন।
+
+## পারফরম্যান্স টিউন (ছোট VPS)
+| বিষয় | টিপ |
+|------|-----|
+| Prometheus retention | 15d ছোট র‍্যামে নিরাপদ |
+| scrape interval | 15s → 30s CPU সেভ |
+| Loki retention | 7d লগ যথেষ্ট অনেক ক্ষেত্রে |
+| কম্প্রেশন | Loki filesystem default ঠিক আছে |
+
+## ড্যাশবোর্ড সাজেশন
+| নাম | আইডি (Grafana.com) |
+|-----|--------------------|
+| Node Exporter Full | 1860 |
+| Docker / Container Overview | 193 |
+| Traefik 2 Dashboard | 4475 |
+| Loki Logs Panel Starter | (Custom) |
+
+ইম্পোর্ট: Grafana → Dashboards → Import → আইডি লিখুন → Prometheus datasource সিলেক্ট।
+
+## অ্যালার্ট ডিজাইন নীতি
+1. অ্যাকশনেবল—যে নোটিফিকেশন পেয়ে আপনি কিছু করবেন।
+2. ফ্ল্যাপ কমানোর জন্য `for:` ব্যবহার।
+3. Severity লেবেল (warning, critical) অনুযায়ী রাউট।
+4. সিলেন্স পিরিয়ড ডকুমেন্ট করুন।
+
+## কুয়েরি উদাহরণ
+| লক্ষ্য | PromQL |
+|-------|--------|
+| CPU % | `100 - (avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m]))*100)` |
+| মেমরি ফ্রি % | `(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)*100` |
+| কনটেইনার রিস্টার্ট | `increase(container_last_seen[5m])` (cAdvisor সংস্করণভেদে ভিন্ন) |
+| Traefik 5xx রেট | `sum(rate(traefik_service_requests_total{code=~"5.."}[5m]))` |
+
+## লগ ফিল্টার Loki
+```bash
+{job="docker", env="prod"} |= "ERROR" |~ "timeout"
+```
+
+## ট্রাবলশুট
+| সমস্যা | কারণ | কমান্ড |
+|--------|------|--------|
+| Prometheus up নয় | config error | `docker logs prometheus | head` |
+| স্ক্র্যাপ হচ্ছে না | টার্গেট DNS/IP | Prometheus → Status → Targets |
+| Loki ingest fail | label cardinality খুব বেশি | লেবেল কমান (env, job সীমিত) |
+| Grafana login fail | env vars ভুল | `docker logs grafana` |
+| Alert send নয় | SMTP ভুল | `docker logs alertmanager` |
+
+## ব্যাকআপ কি লাগবে?
+| ডাটা | দরকার? | নোট |
+|------|--------|-----|
+| Prometheus TSDB | সাধারণত না (রিপোর্ট না হলে)| মেট্রিক্স পুনরায় জেনারেট হবে |
+| Loki লগ | জরুরি হলে | ক্রিটিক্যাল অডিট দরকার হলে ব্যাকআপ |
+| Grafana (ড্যাশবোর্ড/ইউজার) | হ্যাঁ | `/var/lib/grafana` স্ন্যাপশট |
+
+## চেকলিস্ট
+- [ ] Compose up সফল
+- [ ] Prometheus Targets সব UP
+- [ ] Grafana → Node / Traefik ড্যাশবোর্ড লোড
+- [ ] অন্তত ১টি Alert ফায়ার টেস্ট (CPU expr হ্রাস/বৃদ্ধি)
+- [ ] Loki তে ERROR সার্চ OK
+- [ ] ড্যাশবোর্ড JSON Export সংরক্ষণ
+
+## পরবর্তী
+ব্যাকআপ স্ট্রাটেজি: ডাটা Redundancy, Snapshot, Script Automation → [/self-hosting/backup-strategy](/self-hosting/backup-strategy)
+
+<Callout type="info">পরে চাইলে OpenTelemetry / Tempo / Jaeger যোগ করে tracing dimension অ্যাড করতে পারেন।</Callout>
+
+<Callout type="success">এখন আপনি মেট্রিক্স + লগ + অ্যালার্টিং সহ একটি ফাউন্ডেশনাল অবজারভেবিলিটি লেয়ার স্থাপন করলেন।</Callout>

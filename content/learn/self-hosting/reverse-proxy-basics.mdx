@@ -3,18 +3,220 @@ title: রিভার্স প্রক্সি বেসিক
 icon: ph:arrows-left-right-duotone
 ---
 
-রিভার্স প্রক্সি বহুসংখ্যক সার্ভিসকে একই সার্ভার / IP এর পেছনে একত্র করে ডোমেইন / সাবডোমেইন রাউটিং দেয়।
+রিভার্স প্রক্সি হলো এমন একটি সার্ভিস যা ব্রাউজারের রিকোয়েস্ট প্রথমে নিজে রিসিভ করে পরে আপনার অভ্যন্তরীণ (upstream) কন্টেইনার / অ্যাপ সার্ভিসে ফরওয়ার্ড করে। একাধিক অ্যাপকে এক IP / কয়েকটি পোর্টের পেছনে দাঁড় করিয়ে ডোমেইন/সাবডোমেইন হিসেবে আলাদা করে পরিবেশন, SSL টার্মিনেশন, রিকোয়েস্ট লগিং, সিকিউরিটি ফিল্টার ইত্যাদি করতে সাহায্য করে।
 
-## কেন দরকার
-- সিঙ্গেল 80/443 এ মাল্টি সার্ভিস
-- SSL টার্মিনেশন
-- Access লগ / সিকিউরিটি লেয়ার
+## কখন প্রয়োজন
+| পরিস্থিতি | লক্ষণ | রিভার্স প্রক্সি সমাধান |
+|-----------|-------|------------------------|
+| এক সার্ভারে ৫+ অ্যাপ | প্রত্যেক অ্যাপ আলাদা পোর্টে চলছে | hostnames দিয়ে সুন্দর আলাদা URL |
+| SSL সার্টিফিকেট ম্যানুয়ালি নবায়ন ঝামেলা | certbot আলাদা আলাদা | কেন্দ্রীয় ACME অটোমেশন |
+| অ্যাক্সেস কন্ট্রোল দরকার | sensitive বা ইন্টারনাল টুল | SSO / Basic auth / 2FA ইন্টিগ্রেশন |
+| লগ ও মেট্রিক্স একত্র দরকার | ছড়ানো লগ | single entrypoint logging |
 
-## উদাহরণ (Caddyfile)
-```caddyfile
-cloud.example.com {
-  reverse_proxy :9000
-}
+## জনপ্রিয় বিকল্প
+| টুল | শক্তি | কখন বেছে নেবেন |
+|-----|------|----------------|
+| Traefik | ডাইনামিক, Docker label auto-discovery, Let's Encrypt ইন্টিগ্রেটেড | কন্টেইনার heavy self-host সেটআপ |
+| Nginx Proxy Manager (NPM) | ওয়েব UI, সিম্পল সার্ট ম্যানেজ | নবাগত / GUI পছন্দ করলে |
+| Caddy | অটো HTTPS খুব সহজ, স্ট্যাটিক + রিভার্স প্রক্সি | ম্যানুয়াল কনফিগ কম, ফাইল বেস চাইলে |
+| Nginx (raw) | ফ্লেক্সিবল / পারফরম্যান্স | granular টিউন প্রয়োজন |
+
+## আর্কিটেকচার (ধারণা)
+```
+┌──────────┐      ┌────────────┐    ┌────────────────┐
+│ Browser  │ ───▶ │ Reverse    │──▶ │  App: VaultWdn │
+│ (HTTPS)  │      │ Proxy      │    └────────────────┘
+└──────────┘      │ (Traefik)  │    ┌────────────────┐
+                  │            │──▶ │  App: Outline  │
+                  │  ACME/SSL  │    └────────────────┘
+                  └────────────┘    ┌────────────────┐
+                                     │  App: Immich  │
+                                     └────────────────┘
 ```
 
-> পরবর্তী: SSL অটোমেশন।
+রিভার্স প্রক্সি 80/443 পোর্টে listen করে host / path rule দেখে উপযুক্ত কন্টেইনারে ফরওয়ার্ড করে।
+
+## Traefik সেটআপ (Compose)
+নেটওয়ার্ক আগে (যদি না থাকে):
+```bash
+docker network create proxy || true
+```
+`/srv/stack/reverse-proxy/traefik.yml`:
+```yaml
+version: '3.9'
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=you@example.com
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      - --api.dashboard=true
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080 # optional dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /srv/data/traefik-letsencrypt:/letsencrypt
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.example.com`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls.certresolver=le
+      - traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$SOME_BCRYPT_HASH
+      - traefik.http.routers.traefik.middlewares=auth
+networks:
+  proxy:
+    external: true
+```
+
+`acme.json` পারমিশন:
+```bash
+mkdir -p /srv/data/traefik-letsencrypt
+touch /srv/data/traefik-letsencrypt/acme.json
+chmod 600 /srv/data/traefik-letsencrypt/acme.json
+```
+রান:
+```bash
+docker compose -f /srv/stack/reverse-proxy/traefik.yml up -d
+docker logs -f traefik | grep -i acme
+```
+
+### একটি অ্যাপ লেবেলিং (Vaultwarden উদাহরণ)
+`/srv/apps/vaultwarden/docker-compose.yml` ফাইলের ভেতর:
+```yaml
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+    environment:
+      WEBSOCKET_ENABLED: 'true'
+    volumes:
+      - /srv/data/vaultwarden-data:/data
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vw.rule=Host(`vault.example.com`)
+      - traefik.http.routers.vw.entrypoints=websecure
+      - traefik.http.routers.vw.tls.certresolver=le
+      - traefik.http.services.vw.loadbalancer.server.port=80
+networks:
+  proxy:
+    external: true
+```
+ডিপ্লয়:
+```bash
+docker compose -f /srv/apps/vaultwarden/docker-compose.yml up -d
+```
+DNS এ A রেকর্ড `vault.example.com` → সার্ভার আইপি পয়েন্টেড হলে SSL অটো ইস্যু হবে (কয়েক সেকেন্ড)।
+
+### বেসিক অথ / মিডলওয়্যার
+Traefik basic auth bcrypt হ্যাশ বানাতে:
+```bash
+htpasswd -nbB admin StrongPass123 | sed -e 's/\$/\$\$/g'
+```
+হ্যাশ লেবেলে বসান (উদাহরণে আগে দিয়েছি)।
+
+## Nginx Proxy Manager (GUI বিকল্প)
+Compose (সরল):
+```yaml
+version: '3.9'
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 81:81 # dashboard
+      - 443:443
+    volumes:
+      - /srv/data/npm-data:/data
+      - /srv/data/npm-letsencrypt:/etc/letsencrypt
+```
+Login (প্রথমবার) → Hosts → Proxy Hosts → Domain, Forward Host/IP, SSL → Request a new certificate.
+
+## Caddy (মিনিমাল ফাইল বেস উদাহরণ)
+`Caddyfile`:
+```caddyfile
+vault.example.com {
+  reverse_proxy 127.0.0.1:9000
+}
+```
+চালু:
+```bash
+sudo setcap cap_net_bind_service=+ep $(which caddy)
+caddy start --config Caddyfile --adapter caddyfile
+```
+
+## রিভার্স প্রক্সি রুল ডিজাইন
+| ধরন | উদাহরণ | ব্যবহার |
+|------|--------|---------|
+| Host | `Host("git.example.com")` | সাবডোমেইন প্রতি অ্যাপ |
+| Path Prefix | `PathPrefix("/api")` | মোনোলিথ + API স্প্লিট |
+| Header | হেডার ইন্সপেকশন | A/B বা ফিচার গেট |
+| Method | `Method(POST)` | ওয়েবহুক ফিল্টার |
+
+## লগ ও মনিটরিং
+Traefik access log এনাবল:
+```
+--accesslog=true
+--accesslog.format=json
+```
+Prometheus metrics:
+```
+--metrics.prometheus=true
+--metrics.prometheus.entryPoint=traefik
+```
+
+## সিকিউরিটি ন্যূনতম
+| বিষয় | সমাধান |
+|------|---------|
+| ACME স্টোর permission | `chmod 600 acme.json` |
+| ড্যাশবোর্ড এক্সপোজার | Basic Auth / IP allowlist |
+| অপ্রয়োজনীয় পোর্ট | শুধু 80/443 এক্সপোজ রাখুন |
+| ফোর্স HTTPS | web → websecure রিডাইরেক্ট মিডলওয়্যার |
+| হেডার হার্ডেনিং | `traefik.http.middlewares.sec.headers.customResponseHeaders` |
+
+উদাহরণ হেডার লেবেল:
+```yaml
+    labels:
+      - traefik.http.middlewares.sec.headers.stsSeconds=63072000
+      - traefik.http.middlewares.sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.sec.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.sec.headers.browserXssFilter=true
+      - traefik.http.middlewares.sec.headers.referrerPolicy=no-referrer
+      - traefik.http.routers.vw.middlewares=sec
+```
+
+## ট্রাবলশুট চেকলিস্ট
+| সমস্যা | সম্ভাব্য কারণ | দ্রুত পরীক্ষা |
+|--------|---------------|---------------|
+| 404 from Traefik | rule mismatch | `docker inspect` → লেবেল ঠিক? |
+| SSL ইস্যু হচ্ছে না | DNS propagation হয়নি | `dig vault.example.com` |
+| সার্ট expired | ACME storage write সমস্যা | `ls -l acme.json` পারমিশন |
+| Redirect loop | HTTPS ↔ HTTP ভুল কনফিগ | entrypoints রিভিউ |
+| Dashboard unprotected | auth middleware নেই | লেবেল চেক |
+
+## ভেরিফিকেশন
+```bash
+curl -I https://vault.example.com
+curl -s https://vault.example.com | head -n 5
+docker logs traefik | tail -n 20
+``` 
+
+## পরবর্তী
+SSL অটোমেশন (গভীর) ও সার্ট রিনিউ ভিজিবিলিটি: [/self-hosting/ssl-automation](/self-hosting/ssl-automation)
+
+<Callout type="success">এখন আপনি একাধিক অ্যাপ ডিপ্লয় করে শুধু লেবেল / সাবডোমেইন অ্যাড করে স্কেল করতে পারবেন।</Callout>

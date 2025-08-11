@@ -3,12 +3,119 @@ title: জিরো ডাউনটাইম ডেপ্লয়
 icon: ph:arrows-clockwise-duotone
 ---
 
-লোড ব্যালান্সার / হেলথ চেক / ব্লু-গ্রিন / রোলিং আপডেট কৌশল।
 
+জিরো ডাউনটাইম ডেপ্লয় মানে—আপনার অ্যাপ/সার্ভিস আপডেটের সময় ইউজারদের কোনো বিরতি/এরর না দেখানো। এখানে সহজ ভাষায় সব স্ট্রাটেজি, উদাহরণ, ডায়াগ্রামসহ ব্যাখ্যা করা হয়েছে।
+
+## কেন দরকার?
+- ইউজার এক্সপেরিয়েন্স নষ্ট হয় না
+- সার্ভিস SLA বজায় থাকে
+- রোলব্যাক সহজ
+
+## স্ট্রাটেজি তুলনা
 | স্ট্রাটেজি | ধারণা | নোট |
 |-----------|-------|------|
 | Rolling | ধাপে ধাপে নতুন রিলিজ | Kubernetes / Compose ext |
 | Blue-Green | পুরনো + নতুন আলাদা | ফাস্ট রোলব্যাক |
 | Canary | ছোট ভাগে রিলিজ | মনিটরিং দরকার |
 
-> পরবর্তী: লগিং ও অবজারভেবিলিটি।
+## ডায়াগ্রাম (Rolling Update)
+```
+┌────────────┐   ┌────────────┐   ┌────────────┐
+│ Old v1     │→  │  LB/Proxy  │→  │  User      │
+│ New v2     │   │            │   │            │
+└────────────┘   └────────────┘   └────────────┘
+	 ▲   │
+	 └───┘  (ধাপে ধাপে v1 → v2)
+```
+
+## Docker Compose (Rolling)
+Compose v3-এ rolling update নেই, কিন্তু zero-downtime সম্ভব:
+```bash
+docker compose up -d --pull always
+```
+নতুন কনটেইনার রান হয়, পুরনোটা তখনও চলতে থাকে যতক্ষণ না নতুনটা ready।
+Healthcheck ব্লক দিন:
+```yaml
+services:
+	app:
+		image: myapp:latest
+		healthcheck:
+			test: ["CMD", "curl", "-f", "http://localhost"]
+			interval: 30s
+			retries: 3
+```
+Traefik/Caddy reverse proxy থাকলে, শুধু healthy কনটেইনারে ট্রাফিক যাবে।
+
+## Blue-Green Deployment
+| ধাপ | বিবরণ |
+|-----|--------|
+| Blue | পুরনো ভার্সন (live) |
+| Green | নতুন ভার্সন (idle) |
+| Switch | LB/Proxy config বদলান |
+| Rollback | Blue-তে ফেরত যান |
+
+Compose-এ দুইটা stack (blue/green) রান করুন, DNS/proxy দিয়ে সুইচ করুন।
+
+## Kubernetes Rolling Update
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: myapp
+spec:
+	replicas: 3
+	strategy:
+		type: RollingUpdate
+		rollingUpdate:
+			maxUnavailable: 1
+			maxSurge: 1
+	template:
+		metadata:
+			labels:
+				app: myapp
+		spec:
+			containers:
+			- name: myapp
+				image: myapp:2.0
+				readinessProbe:
+					httpGet:
+						path: /
+						port: 80
+```
+`kubectl rollout status deployment/myapp` দিয়ে প্রগ্রেস দেখুন।
+
+## Canary Deployment
+K8s-এ Istio/Traefik, Compose-এ manual proxy config দিয়ে 10% ট্রাফিক নতুন ভার্সনে দিন, মনিটর করুন, তারপর পুরোপুরি সুইচ।
+
+## Healthcheck ও Readiness
+- Healthcheck: কনটেইনার/পড ready না হলে ট্রাফিক না দিন
+- Readiness probe: অ্যাপ রেডি হলে ট্রাফিক নিন
+- Graceful shutdown: SIGTERM handle করুন
+
+## Rollback
+- Docker: আগের ইমেজ ট্যাগ/sha দিয়ে `up -d`
+- K8s: `kubectl rollout undo deployment/myapp`
+- Blue-Green: পুরনো stack-এ ফেরত যান
+
+## Production টিপস
+- Healthcheck/readiness probe বাধ্যতামূলক
+- Proxy/LB দিয়ে শুধু healthy instance-এ ট্রাফিক
+- ডাটাবেস migration backward compatible রাখুন
+- মনিটরিং/alert চালু রাখুন
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| ডাউনটাইম | healthcheck নেই | healthcheck যোগ করুন |
+| রোলব্যাক fail | আগের ইমেজ নেই | ইমেজ retention বাড়ান |
+| Canary fail | মনিটরিং নেই | alert/setup করুন |
+
+## চেকলিস্ট
+- [ ] Healthcheck/readiness probe
+- [ ] Proxy/LB config OK
+- [ ] Rollback tested
+- [ ] মনিটরিং/alert configured
+
+<Callout type="info">প্রোডাকশন-এ ডেপ্লয় আগে staging/test-এ dry-run করুন।</Callout>
+
+<Callout type="success">এখন আপনি zero-downtime ডেপ্লয় confidently করতে পারবেন!</Callout>

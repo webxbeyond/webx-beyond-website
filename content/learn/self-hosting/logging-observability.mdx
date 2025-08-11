@@ -3,13 +3,116 @@ title: লগিং ও অবজারভেবিলিটি
 icon: ph:eye-duotone
 ---
 
-লগ (Loki), মেট্রিক্স (Prometheus), ট্রেস (Tempo / Jaeger) ইন্টিগ্রেশন মানচিত্র।
 
-```text
-[request] -> ingress -> service -> db
-        \-> trace
-        \-> metrics
-        \-> structured log
+অ্যাপ/ইনফ্রা চালাতে গেলে শুধু রানিং থাকলেই হয় না—কী হচ্ছে, কোথায় সমস্যা, পারফরম্যান্স কেমন, কে কখন কী করল—সব জানতে লগিং, মেট্রিক্স, ট্রেসিং দরকার। এখানে Loki, Prometheus, Tempo/Jaeger—সবকিছু সহজ ভাষায়, উদাহরণসহ ব্যাখ্যা করা হয়েছে।
+
+## কেন দরকার?
+- সমস্যা দ্রুত খুঁজে বের করা
+- পারফরম্যান্স মনিটর
+- অ্যালার্টিং
+- অডিট/কমপ্লায়েন্স
+
+## ইন্টিগ্রেশন মানচিত্র
+```
+[request] → ingress → service → db
+                                 ↘ trace
+                                 ↘ metrics
+                                 ↘ structured log
 ```
 
-> পরবর্তী: মেইনটেন্যান্স চেকলিস্ট।
+## লগিং (Loki + Promtail)
+- কনটেইনার/অ্যাপ লগ → Promtail → Loki → Grafana
+Compose উদাহরণ:
+```yaml
+services:
+        loki:
+                image: grafana/loki:3.0.0
+                ports: ["3100:3100"]
+        promtail:
+                image: grafana/promtail:3.0.0
+                volumes:
+                        - /var/log:/var/log:ro
+                        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+                        - ./promtail/config.yml:/etc/promtail/config.yml:ro
+```
+Promtail config:
+```yaml
+scrape_configs:
+        - job_name: containers
+                static_configs:
+                        - targets: [localhost]
+                                labels:
+                                        job: docker
+                                        __path__: /var/lib/docker/containers/*/*.log
+```
+Grafana-তে Data Source: Loki যোগ করুন, `{job="docker"} |= "ERROR"` দিয়ে সার্চ করুন।
+
+## মেট্রিক্স (Prometheus)
+- অ্যাপ/নোড/কনটেইনার → Prometheus → Grafana
+Compose উদাহরণ:
+```yaml
+services:
+        prometheus:
+                image: prom/prometheus:v2.53.0
+                ports: ["9090:9090"]
+                volumes:
+                        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+```
+Prometheus config:
+```yaml
+scrape_configs:
+        - job_name: node
+                static_configs:
+                        - targets: ['127.0.0.1:9100']
+        - job_name: traefik
+                static_configs:
+                        - targets: ['traefik:8080']
+                metrics_path: /metrics
+```
+Grafana-তে Data Source: Prometheus যোগ করুন, ড্যাশবোর্ড ইম্পোর্ট করুন (ID: 1860, 4475)।
+
+## ট্রেসিং (Tempo/Jaeger)
+- অ্যাপ → OpenTelemetry SDK → Tempo/Jaeger → Grafana
+Compose উদাহরণ:
+```yaml
+services:
+        tempo:
+                image: grafana/tempo:2.5.0
+                ports: ["3200:3200"]
+```
+অ্যাপে OTEL ইনস্ট্রুমেন্টেশন (Python, Node.js, Go):
+```python
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+trace.set_tracer_provider(TracerProvider())
+tracer = trace.get_tracer(__name__)
+span_processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://tempo:4318"))
+trace.get_tracer_provider().add_span_processor(span_processor)
+```
+Grafana-তে Tempo Data Source যোগ করুন, ট্রেস ভিজুয়ালাইজ করুন।
+
+## Production টিপস
+- লগ: structure (JSON), timestamp, level (INFO/ERROR), trace id
+- মেট্রিক্স: alert rule, retention, scrape interval
+- ট্রেস: latency, error span, dependency
+- অ্যালার্ট: critical ইভেন্টে ইমেইল/Discord
+- ড্যাশবোর্ড: রেডি-মেড ইম্পোর্ট করুন, কাস্টমাইজ করুন
+
+## সাধারণ সমস্যা ও সমাধান
+| সমস্যা | কারণ | সমাধান |
+|--------|------|--------|
+| লগ ingest fail | config/path ভুল | promtail config চেক |
+| মেট্রিক্স নেই | scrape target ভুল | prometheus config চেক |
+| ট্রেস নেই | OTEL setup নেই | SDK/config চেক |
+
+## চেকলিস্ট
+- [ ] Loki/Promtail লগিং OK
+- [ ] Prometheus মেট্রিক্স OK
+- [ ] Tempo/Jaeger ট্রেস OK
+- [ ] Grafana ড্যাশবোর্ড/alert
+
+<Callout type="info">লগ, মেট্রিক্স, ট্রেস—তিনটি একসাথে থাকলে debug ও অপ্টিমাইজ সহজ হয়।</Callout>
+
+<Callout type="success">এখন আপনি production-grade observability stack confidently চালাতে পারবেন!</Callout>
