@@ -1,0 +1,61 @@
+---
+title: git cat-file ও অন্যান্য লো-লেভেল কমান্ড
+icon: teenyicons:git-solid
+---
+
+# `git cat-file` ও অন্যান্য লো-লেভেল কমান্ড
+
+গিটের ভিতরের অবজেক্ট ও স্ট্রাকচার বোঝার জন্য কিছু লো-লেভেল কমান্ড খুবই কার্যকর।
+
+## ১. `git cat-file`
+- অবজেক্টের টাইপ ও কনটেন্ট দেখতে
+- টাইপ দেখুন:
+  ```sh
+  git cat-file -t <hash>
+  ```
+- কনটেন্ট দেখুন:
+  ```sh
+  git cat-file -p <hash>
+  ```
+
+## ২. `git hash-object`
+- ফাইল থেকে SHA-1 হ্যাশ তৈরি করতে
+  ```sh
+  git hash-object <file>
+  ```
+
+## ৩. `git ls-tree`
+- ট্রি অবজেক্টের কনটেন্ট দেখতে
+  ```sh
+  git ls-tree <tree-hash>
+  git ls-tree HEAD
+  ```
+
+## ৪. `git rev-parse`
+- রেফারেন্স থেকে হ্যাশ বের করতে
+  ```sh
+  git rev-parse HEAD
+  git rev-parse main^{tree}
+  ```
+
+## ৫. `git show`
+- কমিট, ট্যাগ, ট্রি, ব্লব—সবকিছু দেখতে
+  ```sh
+  git show <hash>
+  ```
+
+## ৬. `git fsck`
+- অবজেক্ট ডাটাবেস চেক করতে
+  ```sh
+  git fsck
+  ```
+
+## সংক্ষেপে
+- `git cat-file` = অবজেক্ট দেখুন
+- `git hash-object` = হ্যাশ তৈরি
+- `git ls-tree` = ট্রি দেখুন
+- `git rev-parse` = রেফারেন্স রিজলভ
+- `git show` = অবজেক্ট ডিটেইল
+- `git fsck` = ডাটাবেস চেক
+
+এগুলো জানলে গিটের ভিতরের কাজ ও অবজেক্ট ম্যানিপুলেশন আরও পরিষ্কার হবে।

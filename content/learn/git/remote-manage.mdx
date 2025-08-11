@@ -1,0 +1,54 @@
+---
+title: রিমোট যোগ ও ম্যানেজ করা (git remote add, git remote -v)
+icon: teenyicons:git-solid
+---
+
+# রিমোট যোগ ও ম্যানেজ করা (`git remote add`, `git remote -v`)
+
+রিমোট রিপোজিটরি যোগ ও ম্যানেজ করলে আপনি একাধিক অনলাইন রিপোজিটরির সাথে কাজ করতে পারবেন।
+
+## ১. নতুন রিমোট যোগ করা
+
+```sh
+git remote add <name> <url>
+```
+
+উদাহরণ:
+```sh
+git remote add upstream https://github.com/owner/repo.git
+```
+
+## ২. সব রিমোটের তালিকা ও URL দেখা
+
+```sh
+git remote -v
+```
+
+এতে সব রিমোটের নাম ও URL দেখাবে।
+
+## ৩. রিমোট রিনেম করা
+
+```sh
+git remote rename <old> <new>
+```
+
+## ৪. রিমোট ডিলিট করা
+
+```sh
+git remote remove <name>
+```
+
+## ৫. রিমোট URL পরিবর্তন
+
+```sh
+git remote set-url <name> <new-url>
+```
+
+## সংক্ষেপে
+- নতুন রিমোট যোগ: `git remote add <name> <url>`
+- সব রিমোট দেখুন: `git remote -v`
+- রিমোট রিনেম: `git remote rename <old> <new>`
+- রিমোট ডিলিট: `git remote remove <name>`
+- রিমোট URL পরিবর্তন: `git remote set-url <name> <new-url>`
+
+এভাবে আপনি সহজেই গিটে রিমোট যোগ ও ম্যানেজ করতে পারবেন।

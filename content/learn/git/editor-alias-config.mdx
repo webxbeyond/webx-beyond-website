@@ -1,0 +1,56 @@
+---
+title: এডিটর ও অ্যালিয়াসের জন্য গিট কনফিগার
+icon: teenyicons:git-solid
+---
+
+# এডিটর ও অ্যালিয়াসের জন্য গিট কনফিগার
+
+গিটে কাজ আরও সহজ ও দ্রুত করতে চাইলে ডিফল্ট টেক্সট এডিটর সেট করা এবং প্রয়োজনীয় শর্টকাট (অ্যালিয়াস) তৈরি করা যায়।
+
+## ১. ডিফল্ট এডিটর কনফিগার
+
+কমিট মেসেজ লেখার সময় কোন এডিটর খুলবে তা নির্ধারণ করতে:
+
+### VS Code:
+```sh
+git config --global core.editor "code --wait"
+```
+
+### Vim:
+```sh
+git config --global core.editor "vim"
+```
+
+### Nano:
+```sh
+git config --global core.editor "nano"
+```
+
+## ২. গিট অ্যালিয়াস তৈরি
+
+গিটের কমান্ডগুলো ছোট করে ব্যবহার করতে অ্যালিয়াস সেট করা যায়।
+
+### কিছু জনপ্রিয় অ্যালিয়াস:
+```sh
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.last "log -1 HEAD"
+```
+
+এখন আপনি `git st`, `git co`, `git br`, `git ci`, `git last` ইত্যাদি কমান্ড ব্যবহার করতে পারবেন।
+
+## ৩. কনফিগারেশন যাচাই
+
+আপনার সব গিট কনফিগারেশন দেখতে:
+```sh
+git config --list
+```
+
+## সংক্ষেপে
+- পছন্দের এডিটর সেট করুন
+- প্রয়োজনীয় অ্যালিয়াস তৈরি করুন
+- কনফিগারেশন যাচাই করুন
+
+এগুলো ব্যবহার করে গিটে কাজ আরও দ্রুত ও সহজ হবে।

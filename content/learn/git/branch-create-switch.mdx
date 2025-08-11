@@ -1,0 +1,56 @@
+---
+title: ব্রাঞ্চ তৈরি ও পরিবর্তন (git branch, git checkout, git switch)
+icon: teenyicons:git-solid
+---
+
+# ব্রাঞ্চ তৈরি ও পরিবর্তন (`git branch`, `git checkout`, `git switch`)
+
+গিটে নতুন ব্রাঞ্চ তৈরি ও ব্রাঞ্চ পরিবর্তন করা খুবই সহজ। এতে আপনি আলাদা ফিচার, বাগ ফিক্স বা পরীক্ষা-নিরীক্ষার জন্য আলাদা শাখায় কাজ করতে পারেন।
+
+## ১. নতুন ব্রাঞ্চ তৈরি
+
+```sh
+git branch <branch-name>
+```
+
+উদাহরণ:
+```sh
+git branch feature/login
+```
+
+## ২. ব্রাঞ্চে সুইচ/পরিবর্তন
+
+### পুরনো পদ্ধতি:
+```sh
+git checkout <branch-name>
+```
+
+### নতুন ও সহজ পদ্ধতি (গিট 2.23+):
+```sh
+git switch <branch-name>
+```
+
+## ৩. নতুন ব্রাঞ্চ তৈরি ও সাথে সাথে সুইচ করা
+
+### পুরনো পদ্ধতি:
+```sh
+git checkout -b <branch-name>
+```
+
+### নতুন পদ্ধতি:
+```sh
+git switch -c <branch-name>
+```
+
+## ৪. বর্তমানে কোন ব্রাঞ্চে আছেন দেখার জন্য
+```sh
+git branch
+```
+
+## সংক্ষেপে
+- নতুন ব্রাঞ্চ: `git branch <branch-name>`
+- ব্রাঞ্চ পরিবর্তন: `git switch <branch-name>` বা `git checkout <branch-name>`
+- নতুন ব্রাঞ্চ তৈরি ও সুইচ: `git switch -c <branch-name>`
+- সব ব্রাঞ্চের তালিকা: `git branch`
+
+এভাবে আপনি সহজেই গিটে ব্রাঞ্চ তৈরি ও পরিবর্তন করতে পারবেন।
