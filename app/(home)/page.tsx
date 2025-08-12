@@ -275,48 +275,57 @@ function SelectTopics() {
   const cards: {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
-      { title: 'প্রোগ্রামিং বেসিক', description: 'শূন্য থেকে শুরু—ভাষার ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও তুলনামূলক উদাহরণ।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
-      { title: 'লিনাক্স', description: 'শূন্য থেকে হিরো—বাংলায় লিনাক্স মাস্টারি, কমান্ড, সার্ভার, ক্লাস্টার ও ওপেন সোর্স।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
-      { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' }, progress: 15 },
-      { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' }, progress: 10 },
-      { title: 'নোড জেএস', description: 'বর্তমান সময়ে সবচেয়ে জনপ্রিয় সার্ভার সাইড জাভাস্ক্রিপ্ট রানটাইম এবং একটি লাইব্রেরি।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' }, progress: 40 },
-      { title: 'HTML ও CSS', description: 'বিল্ডিং ব্লক অফ ওয়েবসাইট।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' }, progress: 70 },
-      { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'আমার প্রোগ্রামিং শেখার ব্যাক্তিগত নোটবুক।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' }, progress: 75 },
-      { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুল।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' }, progress: 99 },
-      { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, এবং কিভাবে ব্যবহার করতে হয়—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
-      { title: 'নেটওয়ার্কিং', description: 'বিভিন্ন কম্পিউটার এবং ডিভাইসের মধ্যে সংযোগ স্থাপন ও ডেটা আদান-প্রদান সংক্রান্ত প্রযুক্তি।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'সেলফ হোস্টিং', description: 'ওপেন-সোর্স সফটওয়্যার নিজস্ব সার্ভার/ইনফ্রায় চালানো: রিভার্স প্রক্সি, মনিটরিং, ব্যাকআপ, সিকিউরিটি বেসিক।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' }, progress: 97 },
-      { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল শিখে নিজেকে এবং অন্যকে নিরাপদ করার পথে এগিয়ে যাও।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি ও কোর ওয়েব ভাইটাল উন্নত করার কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'চলমান', variant: 'progress' }, progress: 5 },
-      { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং ও অ্যানালিটিক্স ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'soon' } },
-      { title: 'গো (Go)', description: 'কনকারেন্সি ফ্রেন্ডলি, পারফরম্যান্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ শেখা।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের আধুনিক ভাষা।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-      { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড দিয়ে পুনরুত্পাদনযোগ্য ক্লাউড রিসোর্স ম্যানেজমেন্ট।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' }, progress: 100 },
-      { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস ও অ্যালার্টিং দিয়ে সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতা।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'প্রোগ্রামিং বেসিক', description: 'প্রোগ্রামিংয়ের মূল ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও ভাষা তুলনা—সব এক জায়গায়। একদম শুরু থেকে অ্যাডভান্সড পর্যন্ত।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+      { title: 'লিনাক্স', description: 'কমান্ড লাইন, সার্ভার, ক্লাস্টার, শেল স্ক্রিপ্টিং ও ওপেন সোর্স—বাংলায় লিনাক্স মাস্টারি, হাতে-কলমে প্র্যাকটিস ও বাস্তব উদাহরণ।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+      { title: 'ডেভঅপস', description: 'CI/CD, কনটেইনার, ক্লাউড, মনিটরিং, অটোমেশন—সফটওয়্যার ডেভেলপমেন্ট ও অপারেশনের সংযোগস্থলে আধুনিক টুল ও কৌশল।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'এআই (AI)', description: 'এআই টুল, মডেল ইন্টিগ্রেশন, প্রম্পটিং, অটোমেশন—বাস্তব ওয়ার্কফ্লোতে কৃত্রিম বুদ্ধিমত্তার ব্যবহার ও কৌশল।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'নোড জেএস', description: 'জাভাস্ক্রিপ্ট সার্ভার সাইডে—API, CLI, লাইব্রেরি, ডিপ্লয়মেন্ট ও পারফরম্যান্স টিউনিংসহ আধুনিক Node.js ডেভেলপমেন্ট।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'HTML ও CSS', description: 'ওয়েবসাইটের ভিত্তি—HTML, CSS, রেসপনসিভ ডিজাইন, ইউআই কম্পোনেন্ট ও পারফরম্যান্স বেস্ট প্র্যাকটিস।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'প্রোগ্রামিং, টুলিং ও ডেভঅপসের জন্য দ্রুত রেফারেন্স—কমান্ড, সিনট্যাক্স, কনফিগ ও শর্টকাট।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক, ব্রাঞ্চিং, মার্জিং ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুলের হাতে-কলমে গাইড।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, REST, GraphQL, টেস্টিং ও ইন্টিগ্রেশন—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+      { title: 'নেটওয়ার্কিং', description: 'কম্পিউটার নেটওয়ার্ক, প্রোটোকল, ট্রাবলশুটিং, নিরাপত্তা ও বাস্তবিক উদাহরণ—নেটওয়ার্কিংয়ের বেসিক থেকে অ্যাডভান্সড।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত প্রযুক্তি, স্মার্ট কন্ট্রাক্ট, ক্রিপ্টোকারেন্সি ও নিরাপদ তথ্য সংরক্ষণের আধুনিক পদ্ধতি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'হোম সার্ভার', description: 'নিজস্ব সার্ভার সেটআপ, ফাইল শেয়ারিং, স্ট্রিমিং, ব্যাকআপ ও নিরাপত্তা—ব্যক্তিগত ক্লাউড ও হোস্টিং।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'সেলফ হোস্টিং', description: 'ওপেন-সোর্স সফটওয়্যার নিজস্ব সার্ভার/ইনফ্রায় চালানো: রিভার্স প্রক্সি, মনিটরিং, ব্যাকআপ, সিকিউরিটি বেসিক।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল, নিরাপত্তা টেস্টিং, সাইবার থ্রেট ও ডিফেন্স—নিজেকে ও অন্যকে নিরাপদ রাখার জন্য।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি, কোর ওয়েব ভাইটাল ও টিউনিং—পারফরম্যান্স বুস্টের কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং, অ্যানালিটিক্স ও ডেটা ইঞ্জিনিয়ারিংয়ের আধুনিক ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'soon' } },
+      { title: 'গো (Go)', description: 'পারফরম্যান্ট, কনকারেন্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ—ব্যবহারিক উদাহরণ ও বেস্ট প্র্যাকটিস।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের জন্য আধুনিক ভাষা—Rust শেখার পথ।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
+      { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড, ক্লাউড রিসোর্স ম্যানেজমেন্ট ও অটোমেশন—Terraform ও IaC-এর হাতে-কলমে গাইড।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' } },
+      { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস, অ্যালার্টিং ও মনিটরিং—সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতার জন্য।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
 
   const [showAll, setShowAll] = React.useState(false);
-  // Pick the most popular/recommended topics (first 6, can be adjusted)
-  const current = cards.filter(c => !c.badge || c.badge.variant === 'progress');
-  const recommended = current.slice(0, 8);
+  // Separate recommended (non-upcoming) and upcoming topics
+  const recommended = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(0, 8);
+  const rest = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(8);
   const upcoming = cards.filter(c => c.badge?.variant === 'soon');
   return (
     <section id="select-topics" className=" pt-12  md:pt-16">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">শুরু করার জন্য বেছে নিন</h2>
       <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন।</p>
-      {/* Current / Active topics */}
       <div className="mb-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {(showAll ? current : recommended).map((c, i) => (
+          {recommended.map((c, i) => (
             <SlideUp key={c.title} delay={i * 0.05}>
-              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} progress={c.progress} />
+              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+            </SlideUp>
+          ))}
+          {showAll && rest.map((c, i) => (
+            <SlideUp key={c.title} delay={(i + recommended.length) * 0.05}>
+              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
+            </SlideUp>
+          ))}
+          {showAll && upcoming.map((c, i) => (
+            <SlideUp key={c.title} delay={(i + recommended.length + rest.length) * 0.05}>
+              <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
             </SlideUp>
           ))}
         </div>
       </div>
-      {!showAll && current.length > recommended.length && (
+      {!showAll && (rest.length > 0 || upcoming.length > 0) && (
         <div className="flex justify-center mb-10">
           <button
             className={cn(buttonVariants({ size: 'lg', className: 'rounded-full', variant: 'outline' }))}
@@ -325,19 +334,6 @@ function SelectTopics() {
             সব টপিক দেখুন
             <Iconify icon="ph:list-bullets-duotone" width={18} className="ml-1" />
           </button>
-        </div>
-      )}
-      {/* Upcoming topics */}
-      {upcoming.length > 0 && (
-        <div>
-          <h3 className="text-center font-semibold mb-4">শীঘ্রই আসছে</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 opacity-80">
-            {upcoming.map((c, i) => (
-              <SlideUp key={c.title} delay={i * 0.05}>
-                <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} />
-              </SlideUp>
-            ))}
-          </div>
         </div>
       )}
     </section>
