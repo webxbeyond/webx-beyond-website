@@ -1,0 +1,141 @@
+---
+title: সফটওয়্যার ইন্সটল ও রিমুভ করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# সফটওয়্যার ইন্সটল ও রিমুভ করা: কমান্ড লাইন থেকে সম্পূর্ণ গাইড
+
+লিনাক্সে সফটওয়্যার ইন্সটল ও রিমুভ করা খুবই সহজ, যদি আপনি প্যাকেজ ম্যানেজার ও কমান্ডগুলো জানেন। এখানে আমরা APT, DNF, Pacman, Zypper—সব জনপ্রিয় প্যাকেজ ম্যানেজার দিয়ে সফটওয়্যার ইন্সটল, রিমুভ, ও কনফিগারেশন ফাইল ম্যানেজ করার বিস্তারিত পদ্ধতি জানব।
+
+---
+
+## ১. APT (Debian/Ubuntu)
+
+### সফটওয়্যার ইন্সটল:
+```bash
+sudo apt install package_name
+```
+উদাহরণ:
+```bash
+sudo apt install vim
+```
+
+### সফটওয়্যার রিমুভ:
+```bash
+sudo apt remove package_name
+```
+
+### কনফিগারেশন ফাইলসহ রিমুভ (purge):
+```bash
+sudo apt purge package_name
+```
+
+### একাধিক প্যাকেজ একসাথে:
+```bash
+sudo apt install git curl htop
+```
+
+---
+
+## ২. DNF (Fedora/RedHat)
+
+### সফটওয়্যার ইন্সটল:
+```bash
+sudo dnf install package_name
+```
+
+### সফটওয়্যার রিমুভ:
+```bash
+sudo dnf remove package_name
+```
+
+---
+
+## ৩. Pacman (Arch)
+
+### সফটওয়্যার ইন্সটল:
+```bash
+sudo pacman -S package_name
+```
+
+### সফটওয়্যার রিমুভ:
+```bash
+sudo pacman -R package_name
+```
+
+---
+
+## ৪. Zypper (openSUSE)
+
+### সফটওয়্যার ইন্সটল:
+```bash
+sudo zypper install package_name
+```
+
+### সফটওয়্যার রিমুভ:
+```bash
+sudo zypper remove package_name
+```
+
+---
+
+## ৫. GUI দিয়ে ইন্সটল/রিমুভ
+
+- Ubuntu: Software Center
+- Fedora: GNOME Software
+- Arch: Pamac
+
+---
+
+## ৬. ডিপেন্ডেন্সি ও অটো-রিমুভ
+
+- অপ্রয়োজনীয় ডিপেন্ডেন্সি রিমুভ করুন:
+```bash
+sudo apt autoremove
+sudo dnf autoremove
+sudo pacman -Rns $(pacman -Qdtq)
+```
+
+---
+
+## ৭. .deb ও .rpm ফাইল থেকে ইন্সটল
+
+### .deb (Debian/Ubuntu):
+```bash
+sudo dpkg -i file.deb
+sudo apt install -f   # ডিপেন্ডেন্সি ফিক্স
+```
+
+### .rpm (Fedora/RedHat):
+```bash
+sudo rpm -ivh file.rpm
+```
+
+---
+
+## ৮. Flatpak ও Snap
+
+- Flatpak:
+```bash
+sudo flatpak install flathub org.gimp.GIMP
+```
+- Snap:
+```bash
+sudo snap install code --classic
+```
+
+---
+
+## ৯. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. আপনার ডিস্ট্রো অনুযায়ী সফটওয়্যার ইন্সটল ও রিমুভ করুন
+২. .deb/.rpm ফাইল থেকে ইন্সটল করুন
+৩. অপ্রয়োজনীয় প্যাকেজ রিমুভ করুন
+
+---
+
+## উপসংহার
+
+কমান্ড লাইন ও GUI—দুইভাবেই লিনাক্সে সফটওয়্যার ইন্সটল ও রিমুভ করা যায়। প্যাকেজ ম্যানেজার ও ফাইল-ভিত্তিক ইন্সটলেশন—দুইটাই শিখুন, প্র্যাকটিস করুন।
+
+**প্র্যাকটিস করুন, সফটওয়্যার ম্যানেজমেন্টে এক্সপার্ট হোন!**

@@ -1,0 +1,149 @@
+---
+title: systemctl দিয়ে সার্ভিস ম্যানেজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## লিনাক্স সার্ভিস কন্ট্রোলের আধুনিক পদ্ধতি
+
+systemctl হলো systemd-ভিত্তিক লিনাক্স ডিস্ট্রোগুলোর জন্য সার্ভিস, টার্গেট, ইউনিট ইত্যাদি ম্যানেজ করার সবচেয়ে শক্তিশালী টুল। এখানে আমরা systemctl-এর বেসিক থেকে অ্যাডভান্সড—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. systemd ও systemctl কী?
+
+- **systemd:** আধুনিক init সিস্টেম, সার্ভিস ম্যানেজার, PID 1
+- **systemctl:** systemd-এর CLI টুল, সার্ভিস/ইউনিট কন্ট্রোল
+
+---
+
+## ২. সার্ভিস স্ট্যাটাস দেখা
+
+```bash
+systemctl status nginx
+systemctl status sshd
+```
+
+---
+
+## ৩. সার্ভিস চালু/বন্ধ/রিস্টার্ট/রিলোড
+
+```bash
+sudo systemctl start nginx
+sudo systemctl stop nginx
+sudo systemctl restart nginx
+sudo systemctl reload nginx
+```
+
+---
+
+## ৪. সার্ভিস এনাবল/ডিসেবল (বুটে চালু/বন্ধ)
+
+```bash
+sudo systemctl enable nginx
+sudo systemctl disable nginx
+```
+
+---
+
+## ৫. সব সার্ভিসের তালিকা
+
+```bash
+systemctl list-units --type=service
+```
+
+---
+
+## ৬. টার্গেট ও রানলেভেল
+
+- টার্গেট: multi-user.target, graphical.target
+- চেক: `systemctl get-default`
+- চেঞ্জ: `sudo systemctl set-default multi-user.target`
+
+---
+
+## ৭. ইউনিট ফাইল ও কনফিগ
+
+- লোকেশন: `/etc/systemd/system/`, `/lib/systemd/system/`
+- কাস্টম সার্ভিস ফাইল তৈরি:
+```ini
+[Unit]
+Description=My Custom Service
+
+[Service]
+ExecStart=/usr/bin/python3 /home/anis/myscript.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- এডিট করুন: `sudo systemctl daemon-reload`
+- চালু করুন: `sudo systemctl start my-custom.service`
+- এনাবল করুন: `sudo systemctl enable my-custom.service`
+
+---
+
+## ৮. লগ দেখা (journalctl)
+
+```bash
+journalctl -u nginx
+journalctl -xe
+```
+
+---
+
+## ৯. সার্ভিস মাস্ক/আনমাস্ক
+
+```bash
+sudo systemctl mask bluetooth
+sudo systemctl unmask bluetooth
+```
+
+---
+
+## ১০. টাইমড সার্ভিস ও টেমপ্লেট
+
+- timer unit: `.timer` ফাইল দিয়ে শিডিউলিং
+- টেমপ্লেট: `@` চিহ্ন (e.g. `nginx@site1.service`)
+
+---
+
+## ১১. কমন সমস্যা ও সমাধান
+
+- সার্ভিস স্ট্যাটাস চেক করুন
+- লগ দেখুন: `journalctl`
+- কনফিগ এডিটের পর `daemon-reload`
+- পারমিশন ও পাথ চেক করুন
+
+---
+
+## ১২. বাস্তব উদাহরণ: কাস্টম ব্যাকআপ সার্ভিস
+
+`/etc/systemd/system/backup.service`:
+```ini
+[Unit]
+Description=Home Folder Backup
+
+[Service]
+Type=oneshot
+ExecStart=/home/anis/backup.sh
+```
+
+চালু করুন:
+```bash
+sudo systemctl start backup.service
+```
+
+---
+
+## ১৩. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. ssh সার্ভিস রিস্টার্ট করুন
+২. কাস্টম সার্ভিস ফাইল তৈরি ও চালান
+৩. নির্দিষ্ট সার্ভিসের লগ দেখুন
+
+---
+
+## উপসংহার
+
+systemctl ও systemd ছাড়া আধুনিক লিনাক্স সার্ভার ম্যানেজমেন্ট অসম্ভব। এগুলো ভালোভাবে আয়ত্ত করুন, সিস্টেম অ্যাডমিনিস্ট্রেশনে দক্ষতা বাড়ান!

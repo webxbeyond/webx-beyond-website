@@ -1,0 +1,163 @@
+---
+title: if স্টেটমেন্ট ও লুপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# শেল স্ক্রিপ্টে if স্টেটমেন্ট ও লুপ: কন্ডিশনাল ও রিপিটেটিভ লজিক
+
+শেল স্ক্রিপ্টিংয়ে decision making (if) ও automation (loop) সবচেয়ে গুরুত্বপূর্ণ বিষয়। এখানে আমরা if, elif, else, for, while, এবং case—সবকিছু হাতে-কলমে, উদাহরণসহ শিখব।
+
+---
+
+## ১. if স্টেটমেন্ট: সিদ্ধান্ত নেওয়া
+
+### ১.১. বেসিক if
+```bash
+num=10
+if [ $num -gt 5 ]; then
+  echo "$num পাঁচের চেয়ে বড়"
+fi
+```
+
+### ১.২. if-else
+```bash
+if [ $num -lt 5 ]; then
+  echo "$num পাঁচের চেয়ে ছোট"
+else
+  echo "$num পাঁচের চেয়ে বড় বা সমান"
+fi
+```
+
+### ১.৩. if-elif-else
+```bash
+if [ $num -lt 5 ]; then
+  echo "কম"
+elif [ $num -eq 5 ]; then
+  echo "সমান"
+else
+  echo "বেশি"
+fi
+```
+
+---
+
+## ২. শর্তের ধরন
+
+- সংখ্যা তুলনা: `-eq`, `-ne`, `-gt`, `-lt`, `-ge`, `-le`
+- স্ট্রিং তুলনা: `=`, `!=`, `-z`, `-n`
+- ফাইল চেক: `-e`, `-f`, `-d`, `-r`, `-w`, `-x`
+
+```bash
+if [ -f myfile.txt ]; then
+  echo "ফাইল আছে"
+fi
+```
+
+---
+
+## ৩. লজিক্যাল অপারেটর
+
+- AND: `[ $a -gt 5 ] && [ $b -lt 10 ]`
+- OR: `[ $a -gt 5 ] || [ $b -lt 10 ]`
+
+---
+
+## ৪. for লুপ: রিপিটেটিভ টাস্ক
+
+### ৪.১. বেসিক for
+```bash
+for i in 1 2 3 4 5; do
+  echo "নাম্বার: $i"
+done
+```
+
+### ৪.২. ফাইল লিস্টিং
+```bash
+for file in *.txt; do
+  echo "ফাইল: $file"
+done
+```
+
+---
+
+## ৫. while লুপ
+
+```bash
+count=1
+while [ $count -le 5 ]; do
+  echo "কাউন্ট: $count"
+  count=$((count+1))
+done
+```
+
+---
+
+## ৬. until লুপ
+
+```bash
+num=1
+until [ $num -gt 5 ]; do
+  echo $num
+  num=$((num+1))
+done
+```
+
+---
+
+## ৭. case স্টেটমেন্ট: মাল্টিপল অপশন
+
+```bash
+read -p "আপনার পছন্দ (a/b/c): " choice
+case $choice in
+  a) echo "আপনি a বেছে নিয়েছেন" ;;
+  b) echo "আপনি b বেছে নিয়েছেন" ;;
+  c) echo "আপনি c বেছে নিয়েছেন" ;;
+  *) echo "ভুল ইনপুট" ;;
+esac
+```
+
+---
+
+## ৮. ব্রেক ও কন্টিনিউ
+
+```bash
+for i in {1..10}; do
+  if [ $i -eq 5 ]; then
+    break
+  fi
+  echo $i
+done
+
+for i in {1..5}; do
+  if [ $i -eq 3 ]; then
+    continue
+  fi
+  echo $i
+done
+```
+
+---
+
+## ৯. বাস্তব উদাহরণ: ফাইল এক্সটেনশন কাউন্ট
+
+```bash
+count=0
+for file in *.jpg; do
+  count=$((count+1))
+done
+echo "মোট $count টি jpg ফাইল আছে"
+```
+
+---
+
+## ১০. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. ইউজার ইনপুট নিয়ে পজিটিভ/নেগেটিভ চেক করুন
+২. ১-১০ পর্যন্ত সংখ্যার যোগফল বের করুন
+৩. ফোল্ডারে নির্দিষ্ট এক্সটেনশনের ফাইল গুনুন
+
+---
+
+## উপসংহার
+
+if ও loop ছাড়া স্ক্রিপ্টিং অসম্পূর্ণ। এগুলো ভালোভাবে আয়ত্ত করুন, আপনার অটোমেশন স্কিল হবে অনেক শক্তিশালী!

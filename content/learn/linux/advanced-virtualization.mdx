@@ -1,0 +1,165 @@
+---
+title: ভার্চুয়ালাইজেশন ও কন্টেইনার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Docker, Podman দিয়ে আধুনিক ডেভঅপস
+
+ভার্চুয়ালাইজেশন ও কন্টেইনার—দুইটি প্রযুক্তি লিনাক্সে সফটওয়্যার ডেভেলপমেন্ট, টেস্টিং, ডিপ্লয়মেন্ট ও স্কেলিংয়ে বিপ্লব এনেছে। এখানে আমরা ভার্চুয়াল মেশিন, কন্টেইনার, Docker, Podman—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. ভার্চুয়ালাইজেশন বনাম কন্টেইনার
+
+- **ভার্চুয়ালাইজেশন:** হার্ডওয়্যার এমুলেশন, VM (KVM, VirtualBox)
+- **কন্টেইনার:** অপারেটিং সিস্টেম লেভেল আইসোলেশন, লাইটওয়েট (Docker, Podman)
+
+---
+
+## ২. Docker ইনস্টল ও বেসিক ইউজ
+
+### ২.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+### ২.২. ইউজারকে docker গ্রুপে যুক্ত
+```bash
+sudo usermod -aG docker $USER
+```
+
+### ২.৩. Docker কমান্ড
+```bash
+docker run hello-world
+docker pull ubuntu
+docker images
+docker ps -a
+docker stop <container>
+docker rm <container>
+```
+
+---
+
+## ৩. Dockerfile ও ইমেজ তৈরি
+
+```dockerfile
+# Dockerfile
+FROM ubuntu:22.04
+RUN apt update && apt install -y nginx
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+```bash
+docker build -t mynginx .
+docker run -d -p 8080:80 mynginx
+```
+
+---
+
+## ৪. ডেটা পার্সিস্টেন্স: ভলিউম
+
+```bash
+docker volume create mydata
+docker run -v mydata:/data ubuntu
+```
+
+---
+
+## ৫. নেটওয়ার্কিং ও পোর্ট ফরওয়ার্ডিং
+
+```bash
+docker run -d -p 8080:80 nginx
+```
+
+---
+
+## ৬. কন্টেইনার অটোমেশন: docker-compose
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+```
+
+```bash
+docker-compose up -d
+docker-compose down
+```
+
+---
+
+## ৭. Podman: রুটলেস কন্টেইনার
+
+### ৭.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install podman
+```
+
+### ৭.২. বেসিক কমান্ড
+```bash
+podman run hello-world
+podman images
+podman ps -a
+```
+
+- Dockerfile, Compose—সবই সাপোর্টেড
+
+---
+
+## ৮. সিকিউরিটি ও বেস্ট প্র্যাকটিস
+
+- ইমেজ আপডেট রাখুন
+- অপ্রয়োজনীয় পোর্ট/ভলিউম বন্ধ
+- রুটলেস কন্টেইনার (Podman)
+- সিকিউরিটি স্ক্যান: `docker scan`
+
+---
+
+## ৯. কমন সমস্যা ও সমাধান
+
+- "permission denied": গ্রুপ/পারমিশন চেক
+- ইমেজ না পাওয়া: spelling/tag চেক
+- পোর্ট কনফ্লিক্ট: অন্য সার্ভিস চেক
+
+---
+
+## ১০. বাস্তব উদাহরণ: ওয়ার্ডপ্রেস কন্টেইনার
+
+```yaml
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_PASSWORD: example
+```
+
+---
+
+## ১১. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. Dockerfile লিখে কাস্টম ইমেজ তৈরি
+২. docker-compose দিয়ে মাল্টি-কন্টেইনার অ্যাপ রান
+৩. Podman দিয়ে রুটলেস কন্টেইনার চালান
+
+---
+
+## উপসংহার
+
+Docker ও Podman—দুইটি কন্টেইনার টুলই আধুনিক ডেভঅপসের জন্য অপরিহার্য। হাতে-কলমে শিখুন, ডেভেলপমেন্ট ও ডিপ্লয়মেন্টে দক্ষ হোন!

@@ -1,0 +1,141 @@
+---
+title: SSH কী ও সিকিউর অ্যাক্সেস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# SSH কী ও সিকিউর অ্যাক্সেস: নিরাপদ রিমোট কানেকশনের আধুনিক পদ্ধতি
+
+SSH (Secure Shell) দিয়ে আপনি নিরাপদভাবে রিমোট লিনাক্স সার্ভারে লগইন, ফাইল ট্রান্সফার, টানেলিং, অটোমেশন—সবকিছু করতে পারেন। এখানে আমরা SSH কী, পাসওয়ার্ডলেস লগইন, কনফিগ, সিকিউরিটি—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. SSH কী ও পাসওয়ার্ডলেস লগইন
+
+### ১.১. কী জেনারেট
+```bash
+ssh-keygen -t ed25519 -C "anis@yourpc"
+```
+
+- ডিফল্ট লোকেশন: `~/.ssh/id_ed25519` (private), `~/.ssh/id_ed25519.pub` (public)
+
+### ১.২. পাবলিক কী কপি
+```bash
+ssh-copy-id user@server
+```
+
+অথবা ম্যানুয়ালি:
+```bash
+cat ~/.ssh/id_ed25519.pub | ssh user@server "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+
+### ১.৩. লগইন
+```bash
+ssh user@server
+```
+
+---
+
+## ২. SSH কনফিগ ফাইল
+
+`~/.ssh/config` ফাইলে মাল্টিপল সার্ভার, কাস্টম পোর্ট, ইউজার, কী ফাইল সেট করুন:
+```
+Host myserver
+  HostName 192.168.1.10
+  User anis
+  Port 2222
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+লগইন:
+```bash
+ssh myserver
+```
+
+---
+
+## ৩. SSH সিকিউরিটি বেস্ট প্র্যাকটিস
+
+- পাসওয়ার্ড লগইন বন্ধ করুন: `/etc/ssh/sshd_config` এ `PasswordAuthentication no`
+- রুট লগইন বন্ধ: `PermitRootLogin no`
+- স্ট্রং কী (ed25519, rsa 4096)
+- ফায়ারওয়াল দিয়ে পোর্ট রেস্ট্রিক্ট
+- Fail2ban দিয়ে brute-force প্রতিরোধ
+
+---
+
+## ৪. SSH পোর্ট ফরওয়ার্ডিং ও টানেলিং
+
+### ৪.১. লোকাল ফরওয়ার্ডিং
+```bash
+ssh -L 8080:localhost:80 user@server
+```
+
+### ৪.২. রিমোট ফরওয়ার্ডিং
+```bash
+ssh -R 9000:localhost:22 user@server
+```
+
+### ৪.৩. ডাইনামিক (SOCKS Proxy)
+```bash
+ssh -D 1080 user@server
+```
+
+---
+
+## ৫. SSH এজেন্ট ও মাল্টিপল কী
+
+- এজেন্ট চালু: `eval $(ssh-agent)`
+- কী যোগ: `ssh-add ~/.ssh/id_ed25519`
+- কী লিস্ট: `ssh-add -l`
+
+---
+
+## ৬. SSH দিয়ে ফাইল ট্রান্সফার
+
+### ৬.১. scp
+```bash
+scp file.txt user@server:/home/user/
+scp user@server:/home/user/file.txt ./
+```
+
+### ৬.২. rsync
+```bash
+rsync -avz file.txt user@server:/home/user/
+```
+
+---
+
+## ৭. SSH লগ ও ডিবাগিং
+
+- লগ: `/var/log/auth.log`, `/var/log/secure`
+- ডিবাগ: `ssh -v user@server`
+
+---
+
+## ৮. কমন সমস্যা ও সমাধান
+
+- "Permission denied": কী পারমিশন, ইউজার, পাথ চেক
+- "Connection refused": সার্ভার চালু, ফায়ারওয়াল চেক
+- "Host key verification failed": `~/.ssh/known_hosts` এডিট
+
+---
+
+## ৯. বাস্তব উদাহরণ: গিটে SSH কী ব্যবহার
+
+```bash
+git clone git@github.com:anis/myrepo.git
+```
+
+---
+
+## ১০. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. SSH কী দিয়ে পাসওয়ার্ডলেস লগইন
+২. ssh config ফাইল কাস্টমাইজ
+৩. লোকাল পোর্ট ফরওয়ার্ডিং ব্যবহার
+
+---
+
+## উপসংহার
+
+SSH কী ও সিকিউর অ্যাক্সেস—লিনাক্স অ্যাডমিনিস্ট্রেশনের সবচেয়ে গুরুত্বপূর্ণ ও নিরাপদ টুল। হাতে-কলমে শিখুন, নিরাপদ থাকুন!

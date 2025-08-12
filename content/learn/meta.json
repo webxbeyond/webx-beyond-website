@@ -1,14 +1,15 @@
 {
   "pages": [
-    "html-css",      
-    "git",           
-    "cheatsheet",    
-    "nodejs",        
-    "dev-ops",       
-    "networking",    
-    "ai",             
+    "html-css",
+    "git",
+    "cheatsheet",
+    "nodejs",
+    "api",
+    "dev-ops",
+    "linux",
+    "networking",
     "self-hosting",
     "terraform",
-    "api"
+    "ai"
   ]
 }

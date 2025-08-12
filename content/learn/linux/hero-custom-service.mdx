@@ -1,0 +1,128 @@
+---
+title: কাস্টম সিস্টেম সার্ভিস তৈরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+লিনাক্সে কাস্টম সার্ভিস তৈরি করা মানে হচ্ছে নিজের প্রোগ্রাম, স্ক্রিপ্ট, বা অ্যাপ্লিকেশনকে systemd-এর মাধ্যমে স্বয়ংক্রিয়ভাবে চালানো, রিস্টার্ট করানো, এবং লগ মনিটর করা। এটি প্রফেশনাল লেভেলের অ্যাডমিন স্কিল, কারণ প্রোডাকশন সার্ভার বা ডেভ-অপ্সে কাস্টম সার্ভিস খুবই দরকারি।
+
+## systemd ও সার্ভিস ফাইল কী?
+
+systemd হলো লিনাক্সের আধুনিক init সিস্টেম, যা সার্ভিস ম্যানেজ করে। systemd সার্ভিস ফাইলগুলো `/etc/systemd/system/` বা `/usr/lib/systemd/system/` ডিরেক্টরিতে থাকে।
+
+প্রতিটি সার্ভিস ফাইলের এক্সটেনশন `.service` এবং এতে সার্ভিসের কনফিগারেশন থাকে।
+
+## উদাহরণ: কাস্টম Python স্ক্রিপ্ট সার্ভিস
+
+ধরা যাক, `/opt/myapp/hello.py` নামে একটি স্ক্রিপ্ট আছে, যেটি আমরা সার্ভিস হিসেবে চালাতে চাই।
+
+### ১. স্ক্রিপ্ট তৈরি করুন
+
+```bash
+sudo mkdir -p /opt/myapp
+sudo nano /opt/myapp/hello.py
+```
+
+hello.py:
+```python
+#!/usr/bin/env python3
+import time
+while True:
+    print("Hello from custom service!")
+    time.sleep(60)
+```
+
+স্ক্রিপ্ট executable করুন:
+```bash
+sudo chmod +x /opt/myapp/hello.py
+```
+
+### ২. সার্ভিস ফাইল তৈরি করুন
+
+```bash
+sudo nano /etc/systemd/system/hello.service
+```
+
+hello.service:
+```ini
+[Unit]
+Description=My Custom Hello Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/myapp/hello.py
+Restart=always
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**বিস্তারিত ব্যাখ্যা:**
+- `[Unit]` সেকশনে সার্ভিসের বেসিক তথ্য ও dependency
+- `[Service]` সেকশনে কীভাবে সার্ভিস চালু হবে, কে চালাবে, রিস্টার্ট পলিসি
+- `[Install]` সেকশনে কোন রানলেভেলে সার্ভিস চালু হবে
+
+### ৩. সার্ভিস রিলোড ও চালু করুন
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl start hello.service
+sudo systemctl status hello.service
+```
+
+### ৪. সার্ভিস অটো-স্টার্টে যুক্ত করুন
+
+```bash
+sudo systemctl enable hello.service
+```
+
+### ৫. লগ মনিটর করুন
+
+```bash
+journalctl -u hello.service -f
+```
+
+## Bash Script বা অন্য অ্যাপের জন্যও একই পদ্ধতি
+
+`ExecStart`-এ আপনার স্ক্রিপ্ট বা অ্যাপের path দিন।
+
+## Environment Variable ও Customization
+
+সার্ভিস ফাইলে environment variable যুক্ত করতে পারেন:
+```ini
+[Service]
+Environment="ENV=production"
+ExecStart=/opt/myapp/run.sh
+```
+
+## Common systemd কমান্ড
+
+- সার্ভিস চালু: `sudo systemctl start <service>`
+- সার্ভিস বন্ধ: `sudo systemctl stop <service>`
+- সার্ভিস রিস্টার্ট: `sudo systemctl restart <service>`
+- সার্ভিস স্ট্যাটাস: `sudo systemctl status <service>`
+- অটো-স্টার্ট: `sudo systemctl enable <service>`
+- অটো-স্টার্ট বন্ধ: `sudo systemctl disable <service>`
+
+## টিপস ও বেস্ট প্র্যাকটিস
+
+- সার্ভিস ফাইল এডিট করলে `sudo systemctl daemon-reload` দিতে ভুলবেন না
+- লগ মনিটর করতে `journalctl` ব্যবহার করুন
+- সার্ভিসে `Restart=always` দিলে ক্র্যাশ করলে নিজে নিজে চালু হবে
+- `User` হিসেবে root না দিয়ে সাধারণ ইউজার ব্যবহার করুন
+- সার্ভিস ফাইলের permission 644 রাখুন
+
+## সমস্যা সমাধান
+
+- সার্ভিস চালু হচ্ছে না? `sudo systemctl status <service>` ও `journalctl -xe` দেখে error চেক করুন
+- ExecStart path ভুল? Absolute path ব্যবহার করুন
+- Permission error? স্ক্রিপ্ট executable কিনা চেক করুন
+
+## আরও রিসোর্স
+- [systemd.service man page](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
+- [DigitalOcean: How To Create a Systemd Service in Linux](https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units)
+
+---
+
+কাস্টম সার্ভিস তৈরি করে আপনি নিজের অ্যাপ্লিকেশনকে প্রোডাকশন-রেডি করতে পারবেন। systemd-এর শক্তি কাজে লাগান, অটোমেশন ও রিলায়েবিলিটি বাড়ান!

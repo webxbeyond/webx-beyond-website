@@ -1,0 +1,136 @@
+---
+title: IP অ্যাড্রেস ও হোস্টনেম
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# IP অ্যাড্রেস ও হোস্টনেম: লিনাক্স নেটওয়ার্কিংয়ের বেসিক
+
+নেটওয়ার্কিং শুরু করতে হলে প্রথমেই জানতে হবে IP অ্যাড্রেস ও হোস্টনেম কী, কিভাবে চেক ও কনফিগার করবেন, এবং এগুলোর গুরুত্ব কী। এখানে আমরা IP, হোস্টনেম, কমান্ড, কনফিগারেশন ও প্র্যাকটিক্যাল টিপস জানব।
+
+---
+
+## ১. IP অ্যাড্রেস কী?
+
+- IP (Internet Protocol) অ্যাড্রেস হলো কম্পিউটারের নেটওয়ার্ক ঠিকানা
+- দুই ধরনের: IPv4 (192.168.1.10), IPv6 (fe80::1ff:fe23:4567:890a)
+- প্রতিটি ডিভাইসের ইউনিক IP থাকে
+
+---
+
+## ২. হোস্টনেম কী?
+
+- হোস্টনেম হলো কম্পিউটারের নাম (যেমন: anis-pc)
+- নেটওয়ার্কে ডিভাইস চেনার জন্য
+- DNS-এ হোস্টনেম থেকে IP রেজলভ হয়
+
+---
+
+## ৩. IP ও হোস্টনেম চেক করার কমান্ড
+
+### IP চেক:
+```bash
+ip addr
+```
+অথবা
+```bash
+ifconfig
+```
+
+### শুধু IPv4:
+```bash
+ip -4 addr
+```
+
+### হোস্টনেম চেক:
+```bash
+hostname
+```
+
+### হোস্টনেম ও IP একসাথে:
+```bash
+hostname -I
+```
+
+---
+
+## ৪. হোস্টনেম পরিবর্তন
+
+### টেম্পোরারি (রিবুটে চলে যাবে):
+```bash
+sudo hostname newname
+```
+
+### পার্মানেন্ট (Debian/Ubuntu):
+```bash
+echo 'newname' | sudo tee /etc/hostname
+sudo hostnamectl set-hostname newname
+```
+
+---
+
+## ৫. IP কনফিগারেশন (Manual/Static)
+
+- সাধারণত DHCP থেকে অটো IP আসে
+- ম্যানুয়ালি IP সেট করতে `/etc/network/interfaces` (Debian) বা `nmcli` (NetworkManager) ব্যবহার করুন
+
+### উদাহরণ (Debian):
+```bash
+sudo nano /etc/network/interfaces
+```
+
+```
+auto eth0
+iface eth0 inet static
+  address 192.168.1.100
+  netmask 255.255.255.0
+  gateway 192.168.1.1
+```
+
+### NetworkManager দিয়ে:
+```bash
+nmcli con mod "Wired connection 1" ipv4.addresses 192.168.1.100/24
+nmcli con mod "Wired connection 1" ipv4.gateway 192.168.1.1
+nmcli con mod "Wired connection 1" ipv4.method manual
+nmcli con up "Wired connection 1"
+```
+
+---
+
+## ৬. /etc/hosts ফাইল
+
+- হোস্টনেম ও IP ম্যাপিং
+- DNS ছাড়াও লোকাল নেম রেজলভ
+
+```bash
+sudo nano /etc/hosts
+```
+
+```
+127.0.0.1   localhost
+192.168.1.10 anis-pc
+```
+
+---
+
+## ৭. প্র্যাকটিক্যাল টিপস
+
+- `ip addr` ও `hostname` কমান্ডে দক্ষ হোন
+- হোস্টনেম পরিবর্তনের পর রিবুট/লগআউট করুন
+- IP কনফিগার করার আগে ব্যাকআপ নিন
+- man page পড়ুন: `man ip`, `man hostname`, `man hosts`
+
+---
+
+## ৮. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. নিজের IP ও হোস্টনেম চেক করুন
+২. হোস্টনেম পরিবর্তন করুন
+৩. ম্যানুয়ালি IP কনফিগার করুন
+
+---
+
+## উপসংহার
+
+IP অ্যাড্রেস ও হোস্টনেম—নেটওয়ার্কিংয়ের প্রথম ধাপ। এগুলো ভালোভাবে জানলে আপনি লিনাক্স নেটওয়ার্কিংয়ে আত্মবিশ্বাসী হবেন।
+
+**প্র্যাকটিস করুন, নেটওয়ার্কিংয়ের বেসিক মাস্টার করুন!**

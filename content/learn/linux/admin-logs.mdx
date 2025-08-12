@@ -1,0 +1,105 @@
+---
+title: /var/log দিয়ে লগ ফাইল পড়া
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# /var/log দিয়ে লগ ফাইল পড়া: সিস্টেম মনিটরিং ও ট্রাবলশুটিংয়ের হাতিয়ার
+
+লিনাক্সে /var/log ডিরেক্টরিতে সিস্টেম, সার্ভিস, অ্যাপ্লিকেশন—সবকিছুর লগ ফাইল থাকে। লগ পড়া ও বিশ্লেষণ করা সিস্টেম অ্যাডমিনিস্ট্রেশনের জন্য অপরিহার্য। এখানে আমরা লগ ফাইলের ধরন, পড়ার কৌশল, ফিল্টারিং, রিয়েল-টাইম মনিটরিং, এবং ট্রাবলশুটিং—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. /var/log ডিরেক্টরি ও এর গুরুত্ব
+
+- সব সিস্টেম লগ, সার্ভিস লগ, অ্যাপ্লিকেশন লগ এখানে থাকে
+- সমস্যা সমাধান, অডিট, সিকিউরিটির জন্য অপরিহার্য
+
+---
+
+## ২. কমন লগ ফাইল
+
+- `/var/log/syslog` : সিস্টেমের জেনারেল লগ (Debian/Ubuntu)
+- `/var/log/messages` : সিস্টেম লগ (RHEL/CentOS)
+- `/var/log/auth.log` : অথেন্টিকেশন/সিকিউরিটি
+- `/var/log/kern.log` : কার্নেল লগ
+- `/var/log/dmesg` : বুট ও হার্ডওয়্যার
+- `/var/log/apt/` : প্যাকেজ ম্যানেজার
+- `/var/log/nginx/`, `/var/log/apache2/` : ওয়েব সার্ভার
+
+---
+
+## ৩. লগ ফাইল পড়ার কমান্ড
+
+```bash
+cat /var/log/syslog
+less /var/log/auth.log
+tail /var/log/messages
+head /var/log/kern.log
+tail -f /var/log/syslog # রিয়েল-টাইম
+```
+
+---
+
+## ৪. ফিল্টারিং ও সার্চ
+
+```bash
+grep "error" /var/log/syslog
+grep "Failed" /var/log/auth.log
+less +/sshd /var/log/auth.log
+```
+
+---
+
+## ৫. লগ রোটেশন ও আর্কাইভ
+
+- পুরনো লগ gzipped: `/var/log/syslog.1`, `/var/log/syslog.2.gz`
+- লগ রোটেশন কনফিগ: `/etc/logrotate.conf`, `/etc/logrotate.d/`
+- ম্যানুয়ালি রোটেট: `sudo logrotate -f /etc/logrotate.conf`
+
+---
+
+## ৬. লগ পারমিশন ও সিকিউরিটি
+
+- অনেক লগ শুধুমাত্র root পড়তে পারে
+- sudo ব্যবহার করুন: `sudo less /var/log/secure`
+
+---
+
+## ৭. journalctl: systemd লগ
+
+```bash
+journalctl
+journalctl -u nginx
+journalctl --since "2025-08-01" --until "2025-08-12"
+journalctl -f # রিয়েল-টাইম
+```
+
+---
+
+## ৮. লগ মনিটরিং ও অ্যালার্টিং
+
+- `tail -f` দিয়ে লাইভ মনিটর
+- `multitail`, `lnav`, `goaccess` (advanced tools)
+- লগ থেকে ইমেইল/নোটিফিকেশন: `logwatch`, `logcheck`
+
+---
+
+## ৯. বাস্তব উদাহরণ: ssh login failure খোঁজা
+
+```bash
+grep "Failed password" /var/log/auth.log
+```
+
+---
+
+## ১০. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. কার্নেল প্যানিক খুঁজুন
+২. nginx error লগ ফিল্টার করুন
+৩. লগরোটেশন কনফিগ দেখুন
+
+---
+
+## উপসংহার
+
+লগ ফাইল পড়া মানে—আপনি সিস্টেমের ভেতরের খবর জানছেন। মনিটরিং, অডিট, এবং ট্রাবলশুটিংয়ে দক্ষ হতে হলে লগ বিশ্লেষণ শিখতেই হবে!

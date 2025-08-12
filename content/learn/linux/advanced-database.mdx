@@ -1,0 +1,146 @@
+---
+title: ডাটাবেস ম্যানেজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## MySQL/PostgreSQL দিয়ে প্রফেশনাল ডেটা হ্যান্ডলিং
+
+লিনাক্সে ডাটাবেস ম্যানেজমেন্ট—ওয়েব, অ্যাপ, অটোমেশন, ব্যাকআপ—সবকিছুর জন্য অপরিহার্য। এখানে আমরা MySQL ও PostgreSQL—দুইটি জনপ্রিয় ডাটাবেসের ইনস্টল, কনফিগ, ইউজার, ব্যাকআপ, সিকিউরিটি—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. ডাটাবেস কী ও কেন?
+
+- ডেটা সংরক্ষণ, রিলেশন, কুয়েরি, ব্যাকআপ
+- ওয়েব/এপ্লিকেশন/সার্ভার—সবখানে
+
+---
+
+## ২. MySQL ইনস্টল ও বেসিক কনফিগ
+
+### ২.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install mysql-server
+```
+
+### ২.২. সার্ভিস চালু/স্ট্যাটাস
+```bash
+sudo systemctl start mysql
+sudo systemctl enable mysql
+sudo systemctl status mysql
+```
+
+### ২.৩. সিকিউর ইনস্টলেশন
+```bash
+sudo mysql_secure_installation
+```
+
+---
+
+## ৩. PostgreSQL ইনস্টল ও বেসিক কনফিগ
+
+### ৩.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+
+### ৩.২. সার্ভিস চালু/স্ট্যাটাস
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+sudo systemctl status postgresql
+```
+
+---
+
+## ৪. ডাটাবেস ও ইউজার ম্যানেজমেন্ট
+
+### ৪.১. MySQL
+```bash
+sudo mysql -u root -p
+CREATE DATABASE mydb;
+CREATE USER 'anis'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON mydb.* TO 'anis'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### ৪.২. PostgreSQL
+```bash
+sudo -u postgres psql
+CREATE DATABASE mydb;
+CREATE USER anis WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE mydb TO anis;
+```
+
+---
+
+## ৫. ডেটা ইম্পোর্ট/এক্সপোর্ট (ব্যাকআপ/রিস্টোর)
+
+### ৫.১. MySQL
+```bash
+mysqldump -u root -p mydb > mydb.sql
+mysql -u root -p mydb < mydb.sql
+```
+
+### ৫.২. PostgreSQL
+```bash
+pg_dump -U postgres mydb > mydb.sql
+psql -U postgres mydb < mydb.sql
+```
+
+---
+
+## ৬. কনফিগ ফাইল ও টিউনিং
+
+- MySQL: `/etc/mysql/my.cnf`
+- PostgreSQL: `/etc/postgresql/14/main/postgresql.conf`
+- টিউনিং: max_connections, shared_buffers, query_cache_size
+
+---
+
+## ৭. সিকিউরিটি বেস্ট প্র্যাকটিস
+
+- স্ট্রং পাসওয়ার্ড
+- রিমোট অ্যাক্সেস রেস্ট্রিক্ট
+- SSL এনাবল
+- রেগুলার ব্যাকআপ
+- ইউজার পারমিশন মিনিমাইজ
+
+---
+
+## ৮. লগ ও মনিটরিং
+
+- MySQL: `/var/log/mysql/error.log`
+- PostgreSQL: `/var/log/postgresql/postgresql-14-main.log`
+
+---
+
+## ৯. কমন সমস্যা ও সমাধান
+
+- "Can't connect": সার্ভিস চালু, পোর্ট চেক
+- পারমিশন ডিনাইড: ইউজার/গ্রান্ট চেক
+- স্পেস/পারফরম্যান্স: টিউনিং
+
+---
+
+## ১০. বাস্তব উদাহরণ: ওয়ার্ডপ্রেস ডাটাবেস সেটআপ
+
+১. MySQL-এ ডাটাবেস ও ইউজার তৈরি
+২. wp-config.php-তে ডাটাবেস ডিটেইলস দিন
+৩. সাইট রান করুন
+
+---
+
+## ১১. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. PostgreSQL-এ নতুন ইউজার ও ডাটাবেস তৈরি
+২. mysqldump দিয়ে ব্যাকআপ
+৩. কনফিগ ফাইল টিউনিং
+
+---
+
+## উপসংহার
+
+MySQL ও PostgreSQL—দুইটি ডাটাবেসই প্রোডাকশন-গ্রেড, শক্তিশালী ও কনফিগারেবল। হাতে-কলমে শিখুন, ডেটা ম্যানেজমেন্টে দক্ষ হোন!

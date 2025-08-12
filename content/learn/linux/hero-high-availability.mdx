@@ -1,0 +1,154 @@
+---
+title: হাই-অ্যাভেলিবিলিটি (HA) সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+লিনাক্স সার্ভার বা সার্ভিসে হাই-অ্যাভেলিবিলিটি (HA) মানে হচ্ছে, সার্ভিস যেন সর্বদা চালু থাকে, হার্ডওয়্যার বা সফটওয়্যার ফেইল হলেও যেন ডাউনটাইম না হয়। প্রোডাকশন সিস্টেমে HA অপরিহার্য, বিশেষ করে ব্যাংকিং, ই-কমার্স, ক্লাউড, বা মিশন-ক্রিটিক্যাল অ্যাপ্লিকেশনে।
+
+## HA-এর মূল ধারণা
+
+- **Redundancy:** একাধিক সার্ভার/নোড, যাতে একটি নষ্ট হলেও অন্যটি চালু থাকে
+- **Failover:** একটি সার্ভার ডাউন হলে স্বয়ংক্রিয়ভাবে অন্যটিতে ট্রাফিক চলে যায়
+- **Load Balancing:** লোড ভাগ করে নেওয়া
+- **Monitoring & Self-Healing:** সার্ভিস মনিটরিং ও স্বয়ংক্রিয় রিকভারি
+
+## HA আর্কিটেকচারের কম্পোনেন্ট
+
+1. **Load Balancer:** (HAProxy, Nginx, Keepalived)
+2. **Clustered Servers:** (Multiple web/database servers)
+3. **Shared Storage:** (NFS, GlusterFS, Ceph)
+4. **Heartbeat/Failover Tools:** (Pacemaker, Corosync)
+5. **Monitoring:** (Prometheus, Nagios)
+
+## উদাহরণ: ২টি ওয়েব সার্ভার ও ১টি লোড ব্যালান্সার
+
+### ১. লোড ব্যালান্সার (HAProxy) সেটআপ
+
+**ইনস্টল করুন:**
+```bash
+sudo apt update
+sudo apt install haproxy
+```
+
+**কনফিগার করুন:**
+```bash
+sudo nano /etc/haproxy/haproxy.cfg
+```
+
+নিম্নরূপ কনফিগারেশন যুক্ত করুন:
+```ini
+defaults
+  mode http
+  timeout connect 5000ms
+  timeout client  50000ms
+  timeout server  50000ms
+
+frontend http_front
+  bind *:80
+  default_backend http_back
+
+backend http_back
+  balance roundrobin
+  server web1 192.168.1.101:80 check
+  server web2 192.168.1.102:80 check
+```
+
+**রিলোড করুন:**
+```bash
+sudo systemctl restart haproxy
+```
+
+### ২. ওয়েব সার্ভার (Apache/Nginx) ২টি আলাদা মেশিনে চালু করুন
+
+প্রতিটি সার্ভারে ওয়েব সার্ভার ইন্সটল ও কনফিগার করুন।
+
+### ৩. ফেইলওভার ও Heartbeat (Keepalived)
+
+লোড ব্যালান্সার নোডে Keepalived দিয়ে Virtual IP (VIP) সেট করুন, যাতে একটি LB ডাউন হলে অন্যটি IP নিয়ে নেয়।
+
+**ইনস্টল করুন:**
+```bash
+sudo apt install keepalived
+```
+
+**কনফিগার করুন:**
+```bash
+sudo nano /etc/keepalived/keepalived.conf
+```
+
+নিম্নরূপ কনফিগারেশন যুক্ত করুন (প্রাইমারি নোড):
+```ini
+vrrp_instance VI_1 {
+    state MASTER
+    interface eth0
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1234
+    }
+    virtual_ipaddress {
+        192.168.1.200
+    }
+}
+```
+
+**সার্ভিস চালু করুন:**
+```bash
+sudo systemctl enable keepalived
+sudo systemctl start keepalived
+```
+
+### ৪. Shared Storage (NFS/GlusterFS)
+
+যদি ফাইল শেয়ার করতে হয়, NFS বা GlusterFS ব্যবহার করুন।
+
+**NFS Example:**
+- সার্ভারে: `/etc/exports` এ শেয়ার কনফিগার
+- ক্লায়েন্টে: `sudo mount server_ip:/share /mnt/share`
+
+### ৫. Cluster Management (Pacemaker + Corosync)
+
+**ইনস্টল করুন:**
+```bash
+sudo apt install pacemaker corosync
+```
+
+**ক্লাস্টার তৈরি ও কনফিগার:**
+```bash
+sudo pcs cluster auth node1 node2
+sudo pcs cluster setup --name mycluster node1 node2
+sudo pcs cluster start --all
+```
+
+Pacemaker দিয়ে সার্ভিস ফেইলওভার, রিসোর্স ম্যানেজমেন্ট করা যায়।
+
+### ৬. মনিটরিং ও অটো-রিকভারি
+
+- **Prometheus, Nagios, Zabbix** দিয়ে সার্ভার ও সার্ভিস মনিটর করুন
+- অ্যালার্টিং ও অটো-রিকভারি স্ক্রিপ্ট ব্যবহার করুন
+
+## HA-এর বেস্ট প্র্যাকটিস
+
+- সবকিছু অটোমেটেড ও স্ক্রিপ্টেড রাখুন
+- রেগুলার ব্যাকআপ ও টেস্টেড রিকভারি প্ল্যান
+- ফেইলওভার টেস্ট রেগুলারলি করুন
+- মনিটরিং ও অ্যালার্টিং চালু রাখুন
+- ডকুমেন্টেশন আপডেট রাখুন
+
+## সমস্যা ও সমাধান
+
+- **Split-brain:** দুইটি নোড একসাথে master হলে ডেটা কনফ্লিক্ট হতে পারে; fencing/stonith ব্যবহার করুন
+- **Network latency:** Heartbeat timeout ঠিকমতো কনফিগার করুন
+- **Single Point of Failure:** একাধিক LB, DB, Storage রাখুন
+
+## আরও রিসোর্স
+- [Linux-HA.org](http://www.linux-ha.org/)
+- [DigitalOcean: How To Use HAProxy](https://www.digitalocean.com/community/tutorials/how-to-use-haproxy)
+- [ClusterLabs: Pacemaker](https://clusterlabs.org/pacemaker/doc/)
+- [GlusterFS](https://docs.gluster.org/en/latest/)
+
+---
+
+হাই-অ্যাভেলিবিলিটি সেটআপ দিয়ে আপনি এন্টারপ্রাইজ-লেভেল রিলায়েবিলিটি ও স্কেলেবিলিটি নিশ্চিত করতে পারবেন। প্র্যাকটিস করুন, টেস্ট করুন, এবং প্রোডাকশন-রেডি সিস্টেম গড়ে তুলুন!

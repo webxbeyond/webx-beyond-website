@@ -1,0 +1,155 @@
+---
+title: ওয়েব সার্ভার সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Nginx/Apache দিয়ে প্রোডাকশন-রেডি হোস্টিং
+
+লিনাক্সে ওয়েব সার্ভার (Nginx/Apache) সেটআপ করা মানে—আপনার ওয়েবসাইট, API, অ্যাপ্লিকেশনকে ইন্টারনেটে উন্মুক্ত করা। এখানে আমরা Nginx ও Apache—দুইটি জনপ্রিয় ওয়েব সার্ভারের ইনস্টল, কনফিগ, সিকিউরিটি, SSL, ভার্চুয়াল হোস্ট—সবকিছু হাতে-কলমে শিখব।
+
+---
+
+## ১. ওয়েব সার্ভার কী ও কেন?
+
+- HTTP/HTTPS দিয়ে ওয়েব কনটেন্ট সার্ভ
+- স্ট্যাটিক/ডাইনামিক সাইট, API, রিভার্স প্রক্সি
+
+---
+
+## ২. Nginx ইনস্টল ও বেসিক কনফিগ
+
+### ২.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install nginx
+```
+
+### ২.২. সার্ভিস চালু/স্ট্যাটাস
+```bash
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+```
+
+### ২.৩. ডিফল্ট কনফিগ
+- `/etc/nginx/nginx.conf`
+- সাইট কনফিগ: `/etc/nginx/sites-available/`, `/etc/nginx/sites-enabled/`
+
+### ২.৪. ভার্চুয়াল হোস্ট (server block)
+```nginx
+server {
+  listen 80;
+  server_name example.com;
+  root /var/www/example;
+  index index.html index.htm;
+}
+```
+
+- এনাবল করুন: `sudo ln -s /etc/nginx/sites-available/example /etc/nginx/sites-enabled/`
+- টেস্ট: `sudo nginx -t`
+- রিলোড: `sudo systemctl reload nginx`
+
+---
+
+## ৩. Apache ইনস্টল ও বেসিক কনফিগ
+
+### ৩.১. ইনস্টল
+```bash
+sudo apt update
+sudo apt install apache2
+```
+
+### ৩.২. সার্ভিস চালু/স্ট্যাটাস
+```bash
+sudo systemctl start apache2
+sudo systemctl enable apache2
+sudo systemctl status apache2
+```
+
+### ৩.৩. কনফিগ ফাইল
+- `/etc/apache2/apache2.conf`
+- ভার্চুয়াল হোস্ট: `/etc/apache2/sites-available/000-default.conf`
+
+### ৩.৪. ভার্চুয়াল হোস্ট উদাহরণ
+```apache
+<VirtualHost *:80>
+  ServerName example.com
+  DocumentRoot /var/www/example
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+- এনাবল: `sudo a2ensite example.conf`
+- রিলোড: `sudo systemctl reload apache2`
+
+---
+
+## ৪. ফায়ারওয়াল কনফিগ
+
+```bash
+sudo ufw allow 'Nginx Full'
+sudo ufw allow 'Apache Full'
+```
+
+---
+
+## ৫. SSL/HTTPS সেটআপ (Let's Encrypt)
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d example.com
+```
+
+Apache:
+```bash
+sudo apt install certbot python3-certbot-apache
+sudo certbot --apache -d example.com
+```
+
+---
+
+## ৬. সিকিউরিটি বেস্ট প্র্যাকটিস
+
+- সার্ভার টোকেন/সিগনেচার হাইড
+- HTTP/2 এনাবল
+- রেট লিমিটিং
+- Fail2ban
+- রিভার্স প্রক্সি (Nginx front, Apache backend)
+
+---
+
+## ৭. লগ ও মনিটরিং
+
+- Nginx: `/var/log/nginx/access.log`, `/var/log/nginx/error.log`
+- Apache: `/var/log/apache2/access.log`, `/var/log/apache2/error.log`
+
+---
+
+## ৮. কমন সমস্যা ও সমাধান
+
+- পোর্ট ৮০/৪৪৩ ব্লক: ফায়ারওয়াল চেক
+- কনফিগ এরর: `nginx -t`, `apachectl configtest`
+- পারমিশন: ডকুমেন্টরুট পারমিশন চেক
+
+---
+
+## ৯. বাস্তব উদাহরণ: স্ট্যাটিক ওয়েবসাইট হোস্টিং
+
+১. `/var/www/example`-এ index.html রাখুন
+২. Nginx/Apache ভার্চুয়াল হোস্ট কনফিগ
+৩. DNS-এ A রেকর্ড সেট করুন
+
+---
+
+## ১০. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. Nginx দিয়ে কাস্টম ডোমেইন হোস্ট করুন
+২. Apache-তে SSL সেটআপ করুন
+৩. রিভার্স প্রক্সি কনফিগ করুন
+
+---
+
+## উপসংহার
+
+Nginx/Apache—দুইটি ওয়েব সার্ভারই প্রোডাকশন-গ্রেড, শক্তিশালী ও কনফিগারেবল। হাতে-কলমে শিখুন, নিজের ওয়েবসাইট/অ্যাপ্লিকেশন হোস্ট করুন!

@@ -1,0 +1,110 @@
+---
+title: ping, curl, wget ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ping, curl, wget ব্যবহার: নেটওয়ার্ক টেস্ট ও ডাউনলোডের মাস্টারি
+
+লিনাক্সে নেটওয়ার্ক টেস্ট, কানেক্টিভিটি চেক, ও ফাইল ডাউনলোডের জন্য সবচেয়ে বেশি ব্যবহৃত টুল হলো `ping`, `curl`, ও `wget`। এখানে আমরা এই তিনটি টুলের কাজ, সিনট্যাক্স, উদাহরণ, ও প্র্যাকটিক্যাল টিপস জানব।
+
+---
+
+## ১. ping: কানেক্টিভিটি টেস্ট
+
+### বেসিক ব্যবহার:
+```bash
+ping google.com
+```
+- গন্তব্যে প্যাকেট পাঠিয়ে রেসপন্স চেক
+
+### নির্দিষ্ট সংখ্যা:
+```bash
+ping -c 4 google.com
+```
+- ৪টি প্যাকেট পাঠাবে
+
+### নির্দিষ্ট ইন্টারফেস দিয়ে:
+```bash
+ping -I eth0 google.com
+```
+
+### ping বন্ধ করতে: Ctrl+C
+
+---
+
+## ২. curl: URL থেকে ডেটা ফেচ
+
+### বেসিক ব্যবহার:
+```bash
+curl https://example.com
+```
+- ওয়েবপেজের কনটেন্ট টার্মিনালে দেখাবে
+
+### ফাইল ডাউনলোড:
+```bash
+curl -O https://example.com/file.zip
+```
+
+### POST রিকোয়েস্ট:
+```bash
+curl -X POST -d "name=anis" https://example.com/api
+```
+
+### হেডার দেখা:
+```bash
+curl -I https://example.com
+```
+
+### JSON API টেস্ট:
+```bash
+curl -H "Accept: application/json" https://api.example.com/data
+```
+
+---
+
+## ৩. wget: ফাইল ডাউনলোড
+
+### বেসিক ব্যবহার:
+```bash
+wget https://example.com/file.zip
+```
+
+### রিকার্সিভ ডাউনলোড:
+```bash
+wget -r https://example.com/folder/
+```
+
+### নির্দিষ্ট ফোল্ডারে ডাউনলোড:
+```bash
+wget -P ~/Downloads https://example.com/file.zip
+```
+
+### ডাউনলোড রিজিউম:
+```bash
+wget -c https://example.com/bigfile.iso
+```
+
+---
+
+## ৪. প্র্যাকটিক্যাল টিপস
+
+- ping দিয়ে latency ও packet loss চেক করুন
+- curl দিয়ে API টেস্ট, হেডার, ও ফাইল ডাউনলোড করুন
+- wget দিয়ে বড় ফাইল, ওয়েবসাইট mirror করুন
+- man page পড়ুন: `man ping`, `man curl`, `man wget`
+
+---
+
+## ৫. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. ping দিয়ে গন্তব্যে কানেক্টিভিটি চেক করুন
+২. curl দিয়ে ওয়েবপেজ ও API ফেচ করুন
+৩. wget দিয়ে ফাইল ও ফোল্ডার ডাউনলোড করুন
+
+---
+
+## উপসংহার
+
+ping, curl, wget—এই তিনটি টুল ছাড়া লিনাক্সে নেটওয়ার্ক টেস্ট ও ডাউনলোড অসম্ভব। এগুলো ভালোভাবে আয়ত্ত করলে আপনি নেটওয়ার্কিং ও ডেটা ফেচে এক্সপার্ট হবেন।
+
+**প্র্যাকটিস করুন, নেটওয়ার্ক টেস্ট ও ডাউনলোডে মাস্টার হোন!**

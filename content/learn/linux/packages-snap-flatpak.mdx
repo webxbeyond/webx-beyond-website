@@ -1,0 +1,114 @@
+---
+title: Snap ও Flatpak ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Snap ও Flatpak ব্যবহার: ইউনিভার্সাল প্যাকেজ ম্যানেজার
+
+লিনাক্সে সফটওয়্যার ইন্সটলেশনের নতুন যুগের নাম Snap ও Flatpak। এগুলো ইউনিভার্সাল প্যাকেজ ম্যানেজার—একই প্যাকেজ সব ডিস্ট্রোতে চলে, ডিপেন্ডেন্সি কনফ্লিক্ট কম, আপডেট সহজ। এখানে আমরা Snap ও Flatpak-এর কাজ, পার্থক্য, ইন্সটলেশন, ব্যবহারের নিয়ম ও বেস্ট প্র্যাকটিস জানব।
+
+---
+
+## ১. Snap কী?
+
+- Canonical (Ubuntu) দ্বারা তৈরি
+- সফটওয়্যার ও ডিপেন্ডেন্সি একসাথে bundle
+- সব মেজর ডিস্ট্রোতে চলে
+- Snap Store থেকে সরাসরি ইন্সটল
+
+### Snap ইন্সটল করা (Debian/Ubuntu):
+```bash
+sudo apt update
+sudo apt install snapd
+```
+
+### Snap দিয়ে সফটওয়্যার ইন্সটল:
+```bash
+sudo snap install package_name
+```
+উদাহরণ:
+```bash
+sudo snap install code --classic
+```
+
+### Snap সফটওয়্যার রিমুভ:
+```bash
+sudo snap remove package_name
+```
+
+### Snap-এ সার্চ:
+```bash
+snap find package_name
+```
+
+---
+
+## ২. Flatpak কী?
+
+- Red Hat দ্বারা তৈরি
+- sandboxed environment—নিরাপদ
+- Flathub থেকে হাজারো অ্যাপ
+- সব মেজর ডিস্ট্রোতে চলে
+
+### Flatpak ইন্সটল করা (Debian/Ubuntu):
+```bash
+sudo apt install flatpak
+sudo apt install gnome-software-plugin-flatpak  # GUI integration
+```
+
+### Flathub যুক্ত করা:
+```bash
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
+
+### Flatpak দিয়ে সফটওয়্যার ইন্সটল:
+```bash
+sudo flatpak install flathub org.gimp.GIMP
+```
+
+### Flatpak সফটওয়্যার রিমুভ:
+```bash
+sudo flatpak remove org.gimp.GIMP
+```
+
+### Flatpak-এ সার্চ:
+```bash
+flatpak search package_name
+```
+
+---
+
+## ৩. Snap বনাম Flatpak
+
+| বৈশিষ্ট্য | Snap | Flatpak |
+|-----------|------|---------|
+| ডেভেলপার | Canonical | Red Hat |
+| Store | Snap Store | Flathub |
+| Sandbox | আংশিক | সম্পূর্ণ |
+| CLI/GUI | CLI + GUI | CLI + GUI |
+| ডিপেন্ডেন্সি | bundle | bundle |
+
+---
+
+## ৪. বেস্ট প্র্যাকটিস ও টিপস
+
+- একই অ্যাপ Snap ও Flatpak—দুটোতেই ইন্সটল করবেন না
+- GUI integration চাইলে Gnome Software ব্যবহার করুন
+- Snap/Flatpak অ্যাপের আপডেট অটো হয়
+- স্পেস বেশি লাগতে পারে (bundle nature)
+
+---
+
+## ৫. চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. Snap ও Flatpak ইন্সটল করুন
+২. Flathub ও Snap Store থেকে অ্যাপ ইন্সটল করুন
+৩. GUI ও CLI—দুইভাবেই অ্যাপ ম্যানেজ করুন
+
+---
+
+## উপসংহার
+
+Snap ও Flatpak—দুইটি ইউনিভার্সাল প্যাকেজ ম্যানেজার, যা লিনাক্স সফটওয়্যার ইন্সটলেশনকে আরও সহজ ও আধুনিক করেছে। নিজের ডিস্ট্রোতে ব্যবহার করে দেখুন, পার্থক্য বুঝুন।
+
+**প্র্যাকটিস করুন, ইউনিভার্সাল প্যাকেজ ম্যানেজমেন্টে দক্ষ হোন!**

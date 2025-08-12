@@ -272,13 +272,14 @@ function SelectTopics() {
   const cards: {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
+      { title: 'লিনাক্স', description: 'শূন্য থেকে হিরো—বাংলায় লিনাক্স মাস্টারি, কমান্ড, সার্ভার, ক্লাস্টার ও ওপেন সোর্স।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
       { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' }, progress: 15 },
       { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' }, progress: 10 },
       { title: 'নোড জেএস', description: 'বর্তমান সময়ে সবচেয়ে জনপ্রিয় সার্ভার সাইড জাভাস্ক্রিপ্ট রানটাইম এবং একটি লাইব্রেরি।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' }, progress: 40 },
       { title: 'HTML ও CSS', description: 'বিল্ডিং ব্লক অফ ওয়েবসাইট।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' }, progress: 70 },
       { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'আমার প্রোগ্রামিং শেখার ব্যাক্তিগত নোটবুক।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' }, progress: 75 },
-  { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুল।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' }, progress: 99 },
-  { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, এবং কিভাবে ব্যবহার করতে হয়—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
+      { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুল।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' }, progress: 99 },
+      { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, এবং কিভাবে ব্যবহার করতে হয়—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
       { title: 'নেটওয়ার্কিং', description: 'বিভিন্ন কম্পিউটার এবং ডিভাইসের মধ্যে সংযোগ স্থাপন ও ডেটা আদান-প্রদান সংক্রান্ত প্রযুক্তি।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত ও নিরাপদ তথ্য সংরক্ষণ ব্যবস্থা, যা ক্রিপ্টোকারেন্সি এবং অন্যান্য প্রযুক্তির ভিত্তি।', icon: 'icon-park-twotone:blockchain', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
       { title: 'হোম সার্ভার', description: 'ব্যক্তিগত ব্যবহারের জন্য নির্মিত সার্ভার, যা ফাইল শেয়ারিং, স্ট্র্রিমিং ও অন্যান্য সেবার জন্য ব্যবহৃত হয়।', icon: 'solar:server-bold-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },

@@ -1,0 +1,133 @@
+---
+title: ক্লাস্টার ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ক্লাস্টার ম্যানেজমেন্ট
+
+লিনাক্সে ক্লাস্টার ম্যানেজমেন্ট মানে হচ্ছে একাধিক সার্ভার/নোডকে একত্রে একটি ইউনিট হিসেবে পরিচালনা করা, যাতে স্কেলেবিলিটি, হাই-অ্যাভেলিবিলিটি ও লোড-ব্যালান্সিং নিশ্চিত করা যায়। ক্লাস্টারিং ডেটা সেন্টার, ক্লাউড, বিগ ডেটা, ও মিশন-ক্রিটিক্যাল অ্যাপ্লিকেশনে অপরিহার্য।
+
+## ক্লাস্টারিং-এর মূল ধারণা
+
+- **Node:** ক্লাস্টারের প্রতিটি সার্ভার/কম্পিউটার
+- **Cluster:** একাধিক নোডের সমন্বয়ে গঠিত
+- **Resource:** সার্ভিস, অ্যাপ, ডেটাবেস ইত্যাদি যা ক্লাস্টারে চলে
+- **Failover:** একটি নোড ডাউন হলে অন্য নোডে রিসোর্স চলে যাওয়া
+- **Load Balancing:** কাজ ভাগ করে নেওয়া
+
+## ক্লাস্টারের ধরন
+
+1. **High-Availability (HA) Cluster:** সার্ভিস ডাউন না হয়, Failover ফোকাস
+2. **Load-Balancing Cluster:** লোড ভাগ করে নেওয়া, পারফরম্যান্স বাড়ানো
+3. **Compute Cluster:** বিগ ডেটা/সায়েন্টিফিক কম্পিউটিং (HPC)
+4. **Storage Cluster:** ডেটা রিডানডেন্সি ও স্কেলেবিলিটি (GlusterFS, Ceph)
+
+## ক্লাস্টার ম্যানেজমেন্ট টুলস
+
+- **Pacemaker + Corosync:** HA cluster management
+- **Kubernetes:** Container orchestration
+- **GlusterFS/Ceph:** Storage clustering
+- **SLURM:** HPC/Compute cluster
+- **Keepalived:** Load balancer failover
+
+## উদাহরণ: Pacemaker + Corosync দিয়ে HA Cluster
+
+### ১. নোড প্রস্তুত করুন
+
+- ২টি বা তার বেশি লিনাক্স সার্ভার (node1, node2)
+- Hostname ও /etc/hosts আপডেট করুন
+- SSH key-based authentication সেট করুন
+
+### ২. Pacemaker ও Corosync ইন্সটল করুন
+
+```bash
+sudo apt update
+sudo apt install pacemaker corosync pcs
+```
+
+### ৩. pcs ইউজার পাসওয়ার্ড সেট করুন
+
+```bash
+echo "yourpassword" | sudo passwd hacluster --stdin
+```
+
+### ৪. ক্লাস্টার অথরাইজ ও তৈরি করুন
+
+```bash
+sudo pcs cluster auth node1 node2
+sudo pcs cluster setup --name mycluster node1 node2
+sudo pcs cluster start --all
+```
+
+### ৫. ক্লাস্টার স্ট্যাটাস ও কনফিগারেশন
+
+```bash
+sudo pcs status
+sudo pcs cluster status
+```
+
+### ৬. রিসোর্স যোগ করুন (উদাহরণ: Apache)
+
+```bash
+sudo pcs resource create WebServer apache --clone
+```
+
+### ৭. ফেইলওভার টেস্ট করুন
+
+- একটি নোড shutdown/reboot করুন
+- `sudo pcs status` দিয়ে দেখুন রিসোর্স অন্য নোডে চলে গেছে কিনা
+
+### ৮. Fencing/STONITH কনফিগার করুন
+
+- Split-brain সমস্যা এড়াতে fencing ডিভাইস ব্যবহার করুন
+- উদাহরণ: IPMI, iLO, অথবা VM fencing
+
+### ৯. Cluster Properties টিউন করুন
+
+```bash
+sudo pcs property set stonith-enabled=true
+sudo pcs property set no-quorum-policy=ignore
+```
+
+## Kubernetes ক্লাস্টার (সংক্ষেপে)
+
+- `kubeadm`, `kubectl`, `kubelet` ইন্সটল করুন
+- `kubeadm init` দিয়ে master নোড তৈরি
+- worker নোড join করুন
+- pod, deployment, service ম্যানেজ করুন
+
+## Storage Cluster (GlusterFS উদাহরণ)
+
+- ২টি বা তার বেশি সার্ভারে GlusterFS ইন্সটল করুন
+- peer probe দিয়ে ক্লাস্টার তৈরি
+- volume create ও mount করুন
+
+## ক্লাস্টার মনিটরিং ও মেইনটেন্যান্স
+
+- **Monit, Prometheus, Nagios** দিয়ে ক্লাস্টার মনিটর করুন
+- রেগুলার ব্যাকআপ ও রিকভারি টেস্ট করুন
+- ক্লাস্টার কনফিগারেশন ডকুমেন্টেড রাখুন
+
+## বেস্ট প্র্যাকটিস
+
+- সব নোডে সময় (NTP) সিঙ্ক করুন
+- fencing/STONITH কনফিগার করুন
+- রিসোর্স কনস্ট্রেইন্ট ও অর্ডারিং ঠিকমতো সেট করুন
+- মনিটরিং ও অ্যালার্টিং চালু রাখুন
+- রেগুলার ফেইলওভার টেস্ট করুন
+
+## সমস্যা ও সমাধান
+
+- **Split-brain:** fencing ছাড়া HA cluster চালাবেন না
+- **Quorum loss:** নোড সংখ্যা বিজোড় রাখুন
+- **Network partition:** Heartbeat ও cluster network আলাদা রাখুন
+
+## আরও রিসোর্স
+- [ClusterLabs: Pacemaker](https://clusterlabs.org/pacemaker/doc/)
+- [Corosync](https://corosync.github.io/corosync/)
+- [Kubernetes Docs](https://kubernetes.io/docs/)
+- [GlusterFS](https://docs.gluster.org/en/latest/)
+
+---
+
+ক্লাস্টার ম্যানেজমেন্ট শিখে আপনি এন্টারপ্রাইজ-লেভেল স্কেলেবিলিটি, রিলায়েবিলিটি ও পারফরম্যান্স নিশ্চিত করতে পারবেন। হাতে-কলমে প্র্যাকটিস করুন, টেস্ট করুন, এবং প্রোডাকশন-রেডি ক্লাস্টার গড়ে তুলুন!
