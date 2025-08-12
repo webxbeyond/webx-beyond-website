@@ -1,14 +1,11 @@
 import type { Metadata } from 'next/types';
 
 // Determine the canonical base URL for the site (used across SEO helpers)
-export const baseUrl =
-  process.env.NODE_ENV === 'development'
-    ? new URL('http://localhost:3000')
-    : new URL('https://webxbeyond.com');
+export const baseUrl = "https://webxbeyond.com";
 
-const defaultOgImage = '/banner.png';
+const defaultOgImage = './banner.png';
 const siteName = 'ওয়েবএক্স';
-const twitterHandle = '@money_is_shark'; // adjust if you have a dedicated brand handle
+const twitterHandle = '@money_is_shark';
 
 export function createMetadata(override: Metadata): Metadata {
   const title = override.title ?? undefined;
@@ -16,7 +13,7 @@ export function createMetadata(override: Metadata): Metadata {
 
   return {
     ...override,
-    metadataBase: baseUrl,
+    metadataBase: new URL(baseUrl),
     alternates: {
       canonical: override.alternates?.canonical || baseUrl.toString(),
       ...override.alternates,
