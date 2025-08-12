@@ -91,6 +91,23 @@ export default async function Page(props: { params: Promise<{ slug: string[] }>;
           }}
         />
         {page.data.index ? <DocsCategory page={page} from={source} /> : null}
+        <div className="mt-10 flex justify-end">
+          <a
+            href={(() => {
+              // If the page is an index page (no slug or last slug is a section), link to index.mdx in the folder
+              if (page.slugs.length === 1) {
+                return `https://github.com/webxbeyond/webx-beyond-website/edit/main/content/learn/${page.slugs.slice(0, 1).join('/')}/index.mdx`;
+              }
+              return `https://github.com/webxbeyond/webx-beyond-website/edit/main/content/learn/${page.slugs.join('/')}.mdx`;
+            })()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-fd-muted-foreground hover:text-fd-primary underline flex items-center gap-1"
+          >
+            <Iconify icon="flowbite:edit-solid" width={16} />
+            কোথাও ভুল হয়েছে? এডিট সাজেস্ট করুন!
+          </a>
+        </div>
       </DocsBody>
     </DocsPage>
   );
@@ -102,7 +119,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   if (!page) notFound();
   const description = page.data.description ?? 'ওয়েবএক্স';
   const slugPath = page.slugs.join('/');
-  const canonical = `${baseUrl.origin}/${slugPath}`;
+  const canonical = `${baseUrl}/${slugPath}`;
   // Generate topic-specific OG image variant (using metadataImage helper)
   return createMetadata(
     metadataImage.withImage(page.slugs, {
