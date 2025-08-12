@@ -1,0 +1,111 @@
+---
+title: RIP, OSPF, BGP পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্কে ডেটা সঠিকভাবে গন্তব্যে পৌঁছাতে রাউটাররা একে অপরের সাথে রাউটিং তথ্য শেয়ার করে। এই তথ্য আদান-প্রদানের জন্য বিভিন্ন রাউটিং প্রোটোকল ব্যবহৃত হয়। সবচেয়ে জনপ্রিয় তিনটি ডায়নামিক রাউটিং প্রোটোকল হল: **RIP (Routing Information Protocol)**, **OSPF (Open Shortest Path First)** এবং **BGP (Border Gateway Protocol)**।
+
+---
+
+## ১. RIP (Routing Information Protocol)
+
+### সংক্ষিপ্ত পরিচিতি
+- প্রাচীনতম ডায়নামিক রাউটিং প্রোটোকল
+- Distance Vector প্রোটোকল
+- সর্বাধিক ১৫টি হপ পর্যন্ত রাউটিং করতে পারে
+
+### বৈশিষ্ট্য
+- সহজ কনফিগারেশন
+- ছোট নেটওয়ার্কের জন্য উপযোগী
+- প্রতি ৩০ সেকেন্ডে রাউটিং টেবিল আপডেট
+- Administrative Distance: 120
+
+### কিভাবে কাজ করে?
+- প্রতিটি রাউটার তার সম্পূর্ণ রাউটিং টেবিল প্রতিবেশী রাউটারকে পাঠায়
+- রাউটিং সিদ্ধান্ত নেওয়ার জন্য "হপ কাউন্ট" ব্যবহার করে
+- ১৬ হপ মানে নেটওয়ার্ক অপ্রাপ্য (unreachable)
+
+### RIP কনফিগারেশন (Cisco)
+```bash
+Router(config)# router rip
+Router(config-router)# version 2
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 10.0.0.0
+```
+
+---
+
+## ২. OSPF (Open Shortest Path First)
+
+### সংক্ষিপ্ত পরিচিতি
+- Link State প্রোটোকল
+- বড় ও জটিল নেটওয়ার্কের জন্য উপযোগী
+- দ্রুত কনভার্জেন্স
+
+### বৈশিষ্ট্য
+- Area ভিত্তিক ডিজাইন (OSPF Area 0 = Backbone)
+- Administrative Distance: 110
+- Dijkstra's Algorithm (SPF) ব্যবহার করে সর্বনিম্ন কস্টের পথ নির্ধারণ
+- Multicast ব্যবহার করে রাউটিং তথ্য শেয়ার
+- VLSM ও CIDR সাপোর্ট
+
+### কিভাবে কাজ করে?
+- প্রতিটি রাউটার তার লিঙ্ক স্টেট প্রতিবেশীদের জানায়
+- সম্পূর্ণ নেটওয়ার্কের টপোলজি ম্যাপ তৈরি করে
+- পরিবর্তন হলে দ্রুত আপডেট
+
+### OSPF কনফিগারেশন (Cisco)
+```bash
+Router(config)# router ospf 1
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 10.0.0.0 0.0.0.255 area 0
+```
+
+---
+
+## ৩. BGP (Border Gateway Protocol)
+
+### সংক্ষিপ্ত পরিচিতি
+- ইন্টারনেটের প্রধান রাউটিং প্রোটোকল
+- Path Vector প্রোটোকল
+- Autonomous System (AS) ভিত্তিক রাউটিং
+
+### বৈশিষ্ট্য
+- Exterior Gateway Protocol (EGP)
+- Administrative Distance: 20 (External), 200 (Internal)
+- Policy-based রাউটিং
+- বড় ISP ও ইন্টারনেট ব্যাকবোনে ব্যবহৃত
+
+### কিভাবে কাজ করে?
+- প্রতিটি রাউটার তার AS নম্বরসহ রাউটিং তথ্য শেয়ার করে
+- Policy ও Attribute ব্যবহার করে রাউট নির্ধারণ
+- Loop prevention-এর জন্য AS Path ব্যবহার
+
+### BGP কনফিগারেশন (Cisco)
+```bash
+Router(config)# router bgp 65001
+Router(config-router)# neighbor 203.0.113.2 remote-as 65002
+Router(config-router)# network 192.168.1.0 mask 255.255.255.0
+```
+
+---
+
+## তুলনামূলক টেবিল
+
+| বৈশিষ্ট্য         | RIP                | OSPF               | BGP                  |
+|-------------------|--------------------|--------------------|----------------------|
+| টাইপ              | Distance Vector    | Link State         | Path Vector          |
+| Administrative Distance | 120          | 110                | 20/200               |
+| স্কেলেবিলিটি      | কম                 | বেশি               | অত্যন্ত বেশি         |
+| কনভার্জেন্স      | ধীর                | দ্রুত              | ধীর                  |
+| ব্যবহারের ক্ষেত্র  | ছোট নেটওয়ার্ক     | বড় এন্টারপ্রাইজ    | ইন্টারনেট, ISP       |
+| হপ লিমিট          | ১৫                 | সীমাবদ্ধ নয়        | সীমাবদ্ধ নয়         |
+
+---
+
+## সংক্ষেপে
+- **RIP:** সহজ, ছোট নেটওয়ার্কে উপযোগী, কিন্তু স্কেলেবিলিটি কম
+- **OSPF:** বড়, জটিল নেটওয়ার্কে দ্রুত ও নির্ভরযোগ্য
+- **BGP:** ইন্টারনেট ও ISP-তে ব্যবহৃত, অত্যন্ত স্কেলেবল ও পলিসি-ভিত্তিক
+
+আপনার নেটওয়ার্কের আকার, জটিলতা ও চাহিদা অনুযায়ী সঠিক রাউটিং প্রোটোকল বেছে নিন।

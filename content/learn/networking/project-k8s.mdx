@@ -1,0 +1,110 @@
+---
+title: "Kubernetes ক্লাস্টার নেটওয়ার্কিং ও ইনগ্রেস কনফিগার"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই ক্যাপস্টোন প্রোজেক্টে আমরা Kubernetes ক্লাস্টারে নেটওয়ার্কিং ও ইনগ্রেস কনফিগার করব, যাতে একাধিক অ্যাপ্লিকেশনকে এক্সটার্নাল ট্রাফিকের জন্য এক্সপোজ ও সিকিউর করা যায়।
+
+## প্রোজেক্টের লক্ষ্য
+- **Pod ও Service নেটওয়ার্কিং বোঝা**
+- **ClusterIP, NodePort, LoadBalancer ও Ingress কনফিগার**
+- **ইনগ্রেস কন্ট্রোলার দিয়ে HTTP/HTTPS রাউটিং**
+- **সিকিউরিটি ও মনিটরিং**
+
+## নেটওয়ার্ক টপোলজি
+```
+[Internet]
+   |
+[Ingress Controller]
+   |
+[Service: Ingress]
+   |
+[Service: ClusterIP/NodePort]
+   |
+[Pods]
+```
+
+## ধাপ ১: Pod ও Service নেটওয়ার্কিং
+- প্রতিটি Pod-এর নিজস্ব IP থাকে (CNI plugin: Flannel, Calico, ইত্যাদি)
+- Service দিয়ে Pod-এ ট্রাফিক রাউট করা হয়
+
+### Service টাইপ
+| টাইপ         | ব্যবহার            |
+|--------------|-------------------|
+| ClusterIP    | ক্লাস্টার ইন্টারনাল |
+| NodePort     | এক্সটার্নাল এক্সেস |
+| LoadBalancer | ক্লাউড LB         |
+| ExternalName | DNS Alias         |
+
+#### Service YAML (NodePort)
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  type: NodePort
+  selector:
+    app: my-app
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080
+```
+
+## ধাপ ২: Ingress কনফিগারেশন
+- Ingress Controller (NGINX, Traefik) ইনস্টল করুন
+- Ingress resource দিয়ে HTTP/HTTPS রাউটিং সেট করুন
+
+#### Ingress Controller ইনস্টল (NGINX)
+```sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+```
+
+#### Ingress YAML
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-app
+            port:
+              number: 80
+```
+
+## ধাপ ৩: HTTPS/SSL কনফিগারেশন
+- cert-manager দিয়ে অটোমেটেড SSL সার্টিফিকেট ইস্যু করুন
+- Ingress-এ TLS সেকশন যোগ করুন
+
+#### Ingress TLS উদাহরণ
+```yaml
+spec:
+  tls:
+  - hosts:
+    - example.com
+    secretName: example-tls
+```
+
+## ধাপ ৪: মনিটরিং ও সিকিউরিটি
+- NetworkPolicy দিয়ে Pod-টু-Pod ট্রাফিক কন্ট্রোল
+- Prometheus, Grafana দিয়ে মনিটরিং
+- RBAC ও Secrets ব্যবস্থাপনা
+
+## বেস্ট প্র্যাকটিস
+- **CNI plugin সঠিকভাবে কনফিগার করুন**
+- **Ingress Controller redundancy রাখুন**
+- **SSL/TLS সর্বদা ব্যবহার করুন**
+- **নেটওয়ার্ক পলিসি দিয়ে মিনিমাম এক্সপোজার**
+- **মনিটরিং ও অডিটিং চালু রাখুন**
+
+## উপসংহার
+এই প্রোজেক্টের মাধ্যমে আপনি Kubernetes ক্লাস্টার নেটওয়ার্কিং ও ইনগ্রেস কনফিগার করার হাতে-কলমে অভিজ্ঞতা পাবেন। ক্লাউড-নেটিভ অ্যাপ্লিকেশন ডিপ্লয়মেন্টে এই স্কিলগুলো অত্যন্ত গুরুত্বপূর্ণ।

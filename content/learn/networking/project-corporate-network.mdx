@@ -1,0 +1,89 @@
+---
+title: "VLAN, রাউটিং ও ফায়ারওয়ালসহ কর্পোরেট নেটওয়ার্ক ডিজাইন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই ক্যাপস্টোন প্রোজেক্টে আমরা একটি কর্পোরেট অফিসের জন্য সম্পূর্ণ নেটওয়ার্ক ডিজাইন করব, যেখানে থাকবে VLAN, ইন্টার-ভিএলএন রাউটিং, এবং ফায়ারওয়াল কনফিগারেশন।
+
+## প্রোজেক্টের লক্ষ্য
+- **বিভিন্ন ডিপার্টমেন্টের জন্য আলাদা VLAN**
+- **ইন্টার-ভিএলএন রাউটিং**
+- **ফায়ারওয়াল দিয়ে সিকিউরিটি এনফোর্সমেন্ট**
+- **স্কেলেবল ও মেইনটেইনেবল ডিজাইন**
+
+## নেটওয়ার্ক টপোলজি
+
+```
+[Internet]
+    |
+[Firewall]
+    |
+[Core Router]
+    |
+[Layer 3 Switch]
+   /   |   \
+VLAN10 VLAN20 VLAN30
+(HR)  (IT)  (Finance)
+```
+
+## ধাপ ১: VLAN ডিজাইন
+
+| VLAN | নাম      | IP Range        |
+|------|----------|-----------------|
+| 10   | HR       | 192.168.10.0/24 |
+| 20   | IT       | 192.168.20.0/24 |
+| 30   | Finance  | 192.168.30.0/24 |
+
+### Cisco Switch-এ VLAN কনফিগারেশন
+```bash
+Switch# configure terminal
+Switch(config)# vlan 10
+Switch(config-vlan)# name HR
+Switch(config)# vlan 20
+Switch(config-vlan)# name IT
+Switch(config)# vlan 30
+Switch(config-vlan)# name Finance
+```
+
+## ধাপ ২: ইন্টার-ভিএলএন রাউটিং (Router-on-a-Stick)
+
+### Subinterface কনফিগারেশন (Cisco Router)
+```bash
+Router(config)# interface GigabitEthernet0/1.10
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config)# interface GigabitEthernet0/1.20
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+Router(config)# interface GigabitEthernet0/1.30
+Router(config-subif)# encapsulation dot1Q 30
+Router(config-subif)# ip address 192.168.30.1 255.255.255.0
+```
+
+## ধাপ ৩: ফায়ারওয়াল কনফিগারেশন
+
+### উদাহরণ: HR থেকে Finance-এ এক্সেস ব্লক
+```bash
+Firewall(config)# access-list 101 deny ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255
+Firewall(config)# access-list 101 permit ip any any
+Firewall(config)# interface GigabitEthernet0/1
+Firewall(config-if)# ip access-group 101 in
+```
+
+## ধাপ ৪: ইন্টারনেট ও DNS/DHCP
+- Core router-এ NAT কনফিগার করে ইন্টারনেট এক্সেস দিতে হবে।
+- DHCP সার্ভার থেকে প্রতিটি VLAN-এ IP বরাদ্দ।
+- DNS সার্ভার কনফিগারেশন।
+
+## ধাপ ৫: মনিটরিং ও ডকুমেন্টেশন
+- নেটওয়ার্ক ডায়াগ্রাম, কনফিগারেশন ফাইল ও অ্যাক্সেস পলিসি ডকুমেন্টেড রাখা।
+- SNMP, Syslog, NetFlow দিয়ে মনিটরিং।
+
+## বেস্ট প্র্যাকটিস
+- **প্রতিটি VLAN-এ আলাদা ব্রডকাস্ট ডোমেইন**
+- **ইন্টার-ভিএলএন ট্রাফিক কন্ট্রোল**
+- **ফায়ারওয়াল রুলস মিনিমাইজ করা**
+- **নেটওয়ার্ক ব্যাকআপ ও রোলব্যাক প্ল্যান**
+
+## উপসংহার
+এই প্রোজেক্টের মাধ্যমে আপনি VLAN, রাউটিং ও ফায়ারওয়ালসহ একটি কর্পোরেট নেটওয়ার্ক ডিজাইনের সম্পূর্ণ ধারণা পাবেন। বাস্তব জীবনে এই স্কিলগুলো অত্যন্ত গুরুত্বপূর্ণ।

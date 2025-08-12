@@ -1,0 +1,91 @@
+---
+title: AWS, Azure, GCP-তে নেটওয়ার্কিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্লাউড নেটওয়ার্কিং হলো AWS, Azure, GCP-এর মতো ক্লাউড প্ল্যাটফর্মে ভার্চুয়াল নেটওয়ার্ক, সাবনেট, রাউটিং, ফায়ারওয়াল, লোড ব্যালান্সার, VPN ইত্যাদি কনফিগার ও পরিচালনা করার প্রক্রিয়া।
+
+---
+
+## ক্লাউড নেটওয়ার্কিং-এর মূল উপাদান
+
+| উপাদান         | AWS (VPC)         | Azure (VNet)        | GCP (VPC)           |
+|----------------|-------------------|---------------------|---------------------|
+| ভার্চুয়াল নেটওয়ার্ক | VPC               | VNet                | VPC                 |
+| সাবনেট         | Subnet            | Subnet              | Subnet              |
+| রাউটিং         | Route Table       | Route Table         | Route Table         |
+| ফায়ারওয়াল     | Security Group, NACL | NSG, Firewall      | Firewall, Rules     |
+| লোড ব্যালান্সার | ELB               | Load Balancer       | Load Balancer       |
+| VPN            | VPN Gateway       | VPN Gateway         | Cloud VPN           |
+
+---
+
+## AWS-এ নেটওয়ার্কিং
+
+- VPC (Virtual Private Cloud): আইসোলেটেড নেটওয়ার্ক
+- Public/Private Subnet, Route Table, Internet Gateway
+- Security Group (Instance-level), NACL (Subnet-level)
+- ELB (Elastic Load Balancer), VPN Gateway
+- Peering, Transit Gateway, Direct Connect
+
+---
+
+## Azure-এ নেটওয়ার্কিং
+
+- VNet (Virtual Network): আইসোলেটেড নেটওয়ার্ক
+- Subnet, Route Table, NSG (Network Security Group)
+- Azure Firewall, Load Balancer, VPN Gateway
+- Peering, ExpressRoute
+- Application Gateway (L7 LB), Bastion
+
+---
+
+## GCP-তে নেটওয়ার্কিং
+
+- VPC: গ্লোবাল স্কোপ, সাবনেট রিজিওনাল
+- Subnet, Route Table, Firewall Rules
+- Load Balancer (HTTP(S), TCP/UDP, Internal)
+- Cloud VPN, Interconnect
+- Shared VPC, Peering
+
+---
+
+## তুলনামূলক টেবিল
+
+| বৈশিষ্ট্য         | AWS                  | Azure                | GCP                 |
+|-------------------|----------------------|----------------------|---------------------|
+| নেটওয়ার্ক স্কোপ   | রিজিওনাল             | রিজিওনাল             | গ্লোবাল             |
+| ফায়ারওয়াল        | SG, NACL             | NSG, Firewall        | Firewall Rules      |
+| লোড ব্যালান্সার   | ELB                  | LB, App Gateway      | LB (বিভিন্ন ধরন)    |
+| VPN               | VPN Gateway          | VPN Gateway          | Cloud VPN           |
+| পিয়ারিং           | VPC Peering          | VNet Peering         | VPC Peering         |
+
+---
+
+## ক্লাউড নেটওয়ার্কিং কনফিগারেশন (AWS VPC উদাহরণ)
+
+```bash
+# AWS CLI দিয়ে VPC তৈরি
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+
+# সাবনেট তৈরি
+aws ec2 create-subnet --vpc-id vpc-xxxx --cidr-block 10.0.1.0/24
+
+# ইন্টারনেট গেটওয়ে সংযুক্ত
+aws ec2 attach-internet-gateway --vpc-id vpc-xxxx --internet-gateway-id igw-xxxx
+```
+
+---
+
+## চ্যালেঞ্জ ও সীমাবদ্ধতা
+
+- কনফিগারেশন জটিল, ভুল হলে নিরাপত্তা ঝুঁকি
+- রিজিওন, সাবনেট, রাউটিং—সবকিছু বুঝে ডিজাইন করা জরুরি
+- ক্লাউড-নেটিভ ফিচার ও লিমিটেশন
+
+---
+
+## সংক্ষেপে
+- AWS, Azure, GCP—তিনটি ক্লাউডেই ভার্চুয়াল নেটওয়ার্ক, সাবনেট, ফায়ারওয়াল, লোড ব্যালান্সার অপরিহার্য
+- সঠিক ডিজাইন ও কনফিগারেশন ছাড়া নিরাপদ ও স্কেলেবল ক্লাউড নেটওয়ার্ক সম্ভব নয়
+- ক্লাউড নেটওয়ার্কিং ছাড়া আধুনিক আইটি ইকোসিস্টেম কল্পনা করা যায় না

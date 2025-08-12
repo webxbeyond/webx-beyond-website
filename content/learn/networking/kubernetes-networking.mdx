@@ -1,0 +1,88 @@
+---
+title: Kubernetes নেটওয়ার্কিং বেসিকস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Kubernetes নেটওয়ার্কিং হলো কন্টেইনার, পড, সার্ভিস, ও ক্লাস্টার কম্পোনেন্টগুলোর মধ্যে কমিউনিকেশন ও কানেক্টিভিটি নিশ্চিত করার জন্য ব্যবহৃত প্রযুক্তি ও কনসেপ্টের সমষ্টি।
+
+---
+
+## Kubernetes নেটওয়ার্কিং-এর মূল উপাদান
+
+- **Pod Network:** প্রতিটি Pod-এর ইউনিক IP, Pod-to-Pod কমিউনিকেশন
+- **Service:** ক্লাস্টার-ভিত্তিক DNS, লোড ব্যালান্সিং, এক্সটার্নাল এক্সেস
+- **Network Policy:** ট্রাফিক কন্ট্রোল ও সিকিউরিটি
+- **Ingress:** HTTP/HTTPS এক্সটার্নাল ট্রাফিক রাউটিং
+
+---
+
+## Pod-to-Pod Networking
+
+- প্রতিটি Pod-এর ইউনিক IP (Flat Network Model)
+- একই Node বা আলাদা Node—সব Pod একে অপরকে IP দিয়ে অ্যাক্সেস করতে পারে
+- CNI (Container Network Interface) প্লাগিন: Flannel, Calico, Weave
+
+---
+
+## Service ও DNS
+
+- Service: Pod-এর জন্য স্টেবল IP ও DNS নাম
+- ClusterIP (ডিফল্ট), NodePort, LoadBalancer, ExternalName
+- kube-dns/CoreDNS: ক্লাস্টার DNS সার্ভিস
+
+---
+
+## Network Policy
+
+- Pod-level ট্রাফিক কন্ট্রোল (Allow/Deny)
+- Namespace, Label, Port-ভিত্তিক নিয়ম
+- Calico, Cilium ইত্যাদি প্লাগিনে সাপোর্ট
+
+---
+
+## Ingress
+
+- HTTP/HTTPS ট্রাফিক ক্লাস্টারে রাউটিং
+- Ingress Controller (NGINX, Traefik, HAProxy)
+- SSL Termination, Path-based Routing
+
+---
+
+## Kubernetes নেটওয়ার্কিং কনফিগারেশন (Flannel উদাহরণ)
+
+```bash
+# Flannel ইনস্টলেশন
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# Network Policy উদাহরণ
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+```
+
+---
+
+## চ্যালেঞ্জ ও সীমাবদ্ধতা
+
+- CNI প্লাগিন কনফিগারেশন জটিল
+- Network Policy সঠিকভাবে না দিলে নিরাপত্তা ঝুঁকি
+- Multi-Cluster/Hybrid Networking কঠিন
+
+---
+
+## সংক্ষেপে
+- Kubernetes নেটওয়ার্কিং—Pod, Service, Policy, Ingress—সবকিছুতেই গুরুত্বপূর্ণ
+- CNI প্লাগিন, DNS, Policy—সঠিকভাবে কনফিগার করা জরুরি
+- আধুনিক ক্লাউড-নেটিভ অ্যাপ্লিকেশনের জন্য অপরিহার্য
+
+Kubernetes নেটওয়ার্কিং ছাড়া স্কেলেবল ও সিকিউর কন্টেইনার ক্লাস্টার কল্পনা করা যায় না।

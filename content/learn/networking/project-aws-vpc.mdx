@@ -1,0 +1,103 @@
+---
+title: "AWS-এ VPC, সাবনেট ও সিকিউরিটি গ্রুপ ইমপ্লিমেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই ক্যাপস্টোন প্রোজেক্টে আমরা AWS-এ একটি কাস্টম VPC, একাধিক সাবনেট ও সিকিউরিটি গ্রুপ কনফিগার করব। এতে ক্লাউড নেটওয়ার্ক ডিজাইনের বাস্তব অভিজ্ঞতা হবে।
+
+## প্রোজেক্টের লক্ষ্য
+- **কাস্টম VPC তৈরি**
+- **পাবলিক ও প্রাইভেট সাবনেট কনফিগার**
+- **ইন্টারনেট গেটওয়ে ও রাউট টেবিল সেটআপ**
+- **সিকিউরিটি গ্রুপ দিয়ে ট্রাফিক কন্ট্রোল**
+
+## নেটওয়ার্ক টপোলজি
+```
+[Internet]
+   |
+[Internet Gateway]
+   |
+[VPC: 10.0.0.0/16]
+  /           \
+[Public Subnet] [Private Subnet]
+   |                |
+[EC2 Web]       [EC2 DB]
+```
+
+## ধাপ ১: VPC তৈরি
+- AWS Console বা IaC (Terraform, CloudFormation) দিয়ে VPC তৈরি করুন।
+- উদাহরণ CIDR: 10.0.0.0/16
+
+### AWS CLI দিয়ে VPC
+```sh
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+```
+
+## ধাপ ২: সাবনেট তৈরি
+- **Public Subnet:** 10.0.1.0/24 (ইন্টারনেট এক্সেস আছে)
+- **Private Subnet:** 10.0.2.0/24 (শুধু ইন্টারনাল ট্রাফিক)
+
+```sh
+aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.1.0/24
+aws ec2 create-subnet --vpc-id <vpc-id> --cidr-block 10.0.2.0/24
+```
+
+## ধাপ ৩: ইন্টারনেট গেটওয়ে ও রাউট টেবিল
+- ইন্টারনেট গেটওয়ে তৈরি ও VPC-তে অ্যাটাচ করুন।
+- পাবলিক সাবনেটের রাউট টেবিলে 0.0.0.0/0 → IGW রুট যোগ করুন।
+
+```sh
+aws ec2 create-internet-gateway
+aws ec2 attach-internet-gateway --vpc-id <vpc-id> --internet-gateway-id <igw-id>
+```
+
+## ধাপ ৪: সিকিউরিটি গ্রুপ কনফিগারেশন
+- **Web SG:** 80/443 (HTTP/HTTPS) ও 22 (SSH) ওপেন
+- **DB SG:** শুধু Web SG থেকে 3306 (MySQL) এক্সেস
+
+```sh
+aws ec2 create-security-group --group-name WebSG --vpc-id <vpc-id> --description "Web SG"
+aws ec2 create-security-group --group-name DBSG --vpc-id <vpc-id> --description "DB SG"
+```
+
+### উদাহরণ SG রুল
+| SG Name | Inbound | Source         |
+|---------|---------|---------------|
+| WebSG   | 80,443  | 0.0.0.0/0     |
+| WebSG   | 22      | `<your-ip>/32`  |
+| DBSG    | 3306    | WebSG         |
+
+## ধাপ ৫: EC2 ইনস্ট্যান্স লঞ্চ
+- Public Subnet-এ Web Server (EC2)
+- Private Subnet-এ Database Server (EC2)
+- SG অ্যাসাইন করুন
+
+## ধাপ ৬: টেস্ট ও মনিটরিং
+- Web Server-এ SSH ও HTTP এক্সেস টেস্ট করুন
+- DB Server-এ শুধু Web Server থেকে এক্সেস হচ্ছে কিনা চেক করুন
+- CloudWatch দিয়ে মনিটরিং
+
+## IaC (Terraform) দিয়ে উদাহরণ
+```hcl
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+resource "aws_subnet" "public" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+}
+resource "aws_subnet" "private" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.2.0/24"
+}
+```
+
+## বেস্ট প্র্যাকটিস
+- **প্রাইভেট সাবনেট থেকে ইন্টারনেট এক্সেসের জন্য NAT Gateway ব্যবহার করুন**
+- **SG ও NACL দিয়ে মিনিমাম এক্সপোজার**
+- **লগিং ও মনিটরিং চালু রাখুন**
+- **IaC দিয়ে কনফিগারেশন ম্যানেজ করুন**
+
+## উপসংহার
+এই প্রোজেক্টের মাধ্যমে আপনি AWS-এ VPC, সাবনেট ও সিকিউরিটি গ্রুপ ইমপ্লিমেন্ট করার হাতে-কলমে অভিজ্ঞতা পাবেন। ক্লাউড নেটওয়ার্কিংয়ে এই স্কিলগুলো অত্যন্ত গুরুত্বপূর্ণ।
