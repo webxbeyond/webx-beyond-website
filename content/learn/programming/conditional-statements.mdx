@@ -1,0 +1,212 @@
+---
+title: শর্ত নির্ভর নিয়ন্ত্রণ
+icon: solar:code-bold-duotone
+---
+
+## if, else, switch
+
+প্রোগ্রামিংয়ে শর্ত নির্ভর নিয়ন্ত্রণ (Conditional Statements) ব্যবহার করে কোডের নির্দিষ্ট অংশ নির্দিষ্ট শর্তে চালানো যায়। এতে প্রোগ্রাম আরও স্মার্ট ও ডায়নামিক হয়। এই অধ্যায়ে আমরা if, else, elif/else if, এবং switch/case নিয়ে বিস্তারিত জানব।
+
+---
+
+## ১. শর্ত নির্ভর নিয়ন্ত্রণ কী?
+
+- শর্ত (condition) মানে কোনো নির্দিষ্ট সত্য/মিথ্যা যাচাই
+- শর্ত সত্য হলে এক ধরনের কোড, মিথ্যা হলে অন্য ধরনের কোড চলে
+
+---
+
+## ২. if স্টেটমেন্ট
+
+**if** দিয়ে কোনো শর্ত সত্য হলে নির্দিষ্ট কোড চালানো হয়।
+
+### Python:
+```python
+x = 10
+if x > 5:
+    print("x বড় ৫ থেকে")
+```
+
+### C:
+```c
+int x = 10;
+if (x > 5) {
+    printf("x বড় ৫ থেকে\n");
+}
+```
+
+---
+
+## ৩. if-else স্টেটমেন্ট
+
+শর্ত সত্য হলে এক কোড, মিথ্যা হলে অন্য কোড চালাতে if-else ব্যবহার হয়।
+
+### Python:
+```python
+age = 18
+if age >= 18:
+    print("বয়স্ক")
+else:
+    print("অপ্রাপ্তবয়স্ক")
+```
+
+### C:
+```c
+int age = 18;
+if (age >= 18) {
+    printf("বয়স্ক\n");
+} else {
+    printf("অপ্রাপ্তবয়স্ক\n");
+}
+```
+
+---
+
+## ৪. elif / else if
+
+একাধিক শর্ত চেক করতে elif (Python) বা else if (C, Java, JS) ব্যবহার হয়।
+
+### Python:
+```python
+num = 0
+if num > 0:
+    print("ধনাত্মক")
+elif num < 0:
+    print("ঋণাত্মক")
+else:
+    print("শূন্য")
+```
+
+### C:
+```c
+int num = 0;
+if (num > 0) {
+    printf("ধনাত্মক\n");
+} else if (num < 0) {
+    printf("ঋণাত্মক\n");
+} else {
+    printf("শূন্য\n");
+}
+```
+
+---
+
+## ৫. switch/case স্টেটমেন্ট
+
+একাধিক মানের জন্য ভিন্ন ভিন্ন কোড চালাতে switch/case ব্যবহার হয় (C, Java, JS ইত্যাদিতে)।
+
+### C:
+```c
+int day = 3;
+switch (day) {
+    case 1:
+        printf("রবিবার\n");
+        break;
+    case 2:
+        printf("সোমবার\n");
+        break;
+    case 3:
+        printf("মঙ্গলবার\n");
+        break;
+    default:
+        printf("অজানা দিন\n");
+}
+```
+
+### JavaScript:
+```js
+let color = "red";
+switch (color) {
+  case "red":
+    console.log("লাল");
+    break;
+  case "blue":
+    console.log("নীল");
+    break;
+  default:
+    console.log("অজানা রং");
+}
+```
+
+> **Python-এ switch নেই, তবে match-case (Python 3.10+) আছে।
+
+### Python (match-case):
+```python
+status = 404
+match status:
+    case 200:
+        print("OK")
+    case 404:
+        print("Not Found")
+    case _:
+        print("Unknown")
+```
+
+---
+
+## ৬. নেস্টেড শর্ত (Nested Condition)
+
+একটি শর্তের ভিতরে আরেকটি শর্ত ব্যবহার করা যায়।
+
+### উদাহরণ:
+```python
+x = 7
+y = 10
+if x > 5:
+    if y > 5:
+        print("x ও y দুটোই বড় ৫ থেকে")
+```
+
+---
+
+## ৭. টার্নারি অপারেটর (Short if)
+
+কিছু ভাষায় সংক্ষিপ্ত if-else এক লাইনে লেখা যায়।
+
+### Python:
+```python
+result = "বড়" if x > 5 else "ছোট"
+```
+
+### C/Java/JS:
+```c
+int max = (a > b) ? a : b;
+```
+
+---
+
+## ৮. অনুশীলন
+
+১. নিচের কোডের আউটপুট কী হবে?
+```python
+num = -3
+if num > 0:
+    print("ধনাত্মক")
+elif num < 0:
+    print("ঋণাত্মক")
+else:
+    print("শূন্য")
+```
+
+২. switch/case দিয়ে সপ্তাহের দিন প্রিন্ট করুন।
+
+৩. নেস্টেড if-else দিয়ে গ্রেড নির্ণয় করুন।
+
+---
+
+## ৯. ভালো অভ্যাস
+
+- শর্ত পরিষ্কার ও সংক্ষিপ্ত রাখুন
+- বেশি নেস্টিং এড়িয়ে চলুন
+- default বা else ব্যবহার করুন
+- ব্র্যাকেট/ইনডেন্টেশন ঠিক রাখুন
+
+---
+
+## ১০. উপসংহার
+
+শর্ত নির্ভর নিয়ন্ত্রণ ছাড়া প্রোগ্রামিং অসম্পূর্ণ। if, else, switch ইত্যাদি ভালোভাবে জানলে প্রোগ্রাম আরও শক্তিশালী ও ডায়নামিক হয়।
+
+---
+
+**পরবর্তী পাঠ:** [লুপ: for, while, do-while](/programming/loops)

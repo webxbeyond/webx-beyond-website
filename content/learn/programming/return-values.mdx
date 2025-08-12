@@ -1,0 +1,127 @@
+---
+title: রিটার্ন ভ্যালু
+icon: solar:code-bold-duotone
+---
+
+ফাংশন থেকে আউটপুট ফেরত পাঠাতে return value ব্যবহার করা হয়। এটি ফাংশনের অন্যতম গুরুত্বপূর্ণ বৈশিষ্ট্য, কারণ return value ছাড়া ফাংশন কেবল কাজ করে, কোনো ফলাফল দেয় না। এই অধ্যায়ে আমরা return value-এর ধারণা, ব্যবহার, ধরন, উদাহরণ, ভালো অভ্যাস ও বিভিন্ন ভাষায় return value নিয়ে আলোচনা করব।
+
+---
+
+## ১. return value কী?
+
+- ফাংশন এক্সিকিউশন শেষে যে মান ফেরত দেয়, সেটাই return value
+- return statement দিয়ে মান ফেরত পাঠানো হয়
+
+### উদাহরণ (Python):
+```python
+def add(a, b):
+    return a + b
+
+result = add(3, 4)
+print(result)  # 7
+```
+
+### উদাহরণ (C):
+```c
+int add(int a, int b) {
+    return a + b;
+}
+
+int result = add(3, 4);
+printf("%d\n", result);  // 7
+```
+
+---
+
+## ২. return value-এর ধরন
+
+- **একক মান:** একটি মান ফেরত দেয় (int, float, string ইত্যাদি)
+- **একাধিক মান:** (Python-এ tuple, list, dict; C-তে struct)
+- **কিছুই ফেরত না দেওয়া:** void (C), None (Python)
+
+### উদাহরণ (Python):
+```python
+def get_name_and_age():
+    return "Rahim", 25
+
+name, age = get_name_and_age()
+```
+
+### উদাহরণ (C):
+```c
+struct Person {
+    char name[20];
+    int age;
+};
+
+struct Person get_person() {
+    struct Person p = {"Rahim", 25};
+    return p;
+}
+```
+
+---
+
+## ৩. return statement-এর ব্যবহার
+
+- return statement ফাংশন এক্সিকিউশন থামিয়ে দেয়
+- return-এর পরের কোনো কোড আর চলে না
+
+### উদাহরণ:
+```python
+def check_even(n):
+    if n % 2 == 0:
+        return True
+    return False
+```
+
+---
+
+## ৪. কিছুই ফেরত না দেওয়া (void/None)
+
+- কিছু ফাংশন শুধু কাজ করে, কিছু ফেরত দেয় না
+- Python-এ return না দিলে None ফেরত দেয়
+- C-তে void টাইপ ব্যবহার হয়
+
+### উদাহরণ (Python):
+```python
+def greet(name):
+    print("Hello,", name)
+
+result = greet("Karim")
+print(result)  # None
+```
+
+### উদাহরণ (C):
+```c
+void greet(char name[]) {
+    printf("Hello, %s\n", name);
+}
+```
+
+---
+
+## ৫. ভালো অভ্যাস
+
+- return value স্পষ্ট রাখুন
+- এক ফাংশনে একাধিক return statement থাকলে লজিক পরিষ্কার রাখুন
+- প্রয়োজন ছাড়া ফাংশনকে side-effect ছাড়া রাখুন (pure function)
+- ফাংশনের শেষে return লিখুন (বিশেষত C, Java ইত্যাদিতে)
+
+---
+
+## ৬. অনুশীলন
+
+১. Python-এ দুটি সংখ্যার গুণফল ফেরত দেওয়া ফাংশন লিখুন
+২. C-তে struct ফেরত দেওয়া ফাংশনের উদাহরণ দিন
+৩. return ছাড়া ফাংশন কী ফেরত দেয়?
+
+---
+
+## ৭. উপসংহার
+
+return value ফাংশনের আউটপুট নির্ধারণ করে। return value-এর ধরন, ব্যবহার ও ভালো অভ্যাস জানা থাকলে ফাংশন আরও শক্তিশালী ও পরিষ্কার হয়।
+
+---
+
+**পরবর্তী পাঠ:** [স্কোপ ও লাইফটাইম](/programming/scope-lifetime)

@@ -1,3 +1,6 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Iconify } from "@/components/iconify";
@@ -272,6 +275,7 @@ function SelectTopics() {
   const cards: {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
+      { title: 'প্রোগ্রামিং বেসিক', description: 'শূন্য থেকে শুরু—ভাষার ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও তুলনামূলক উদাহরণ।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
       { title: 'লিনাক্স', description: 'শূন্য থেকে হিরো—বাংলায় লিনাক্স মাস্টারি, কমান্ড, সার্ভার, ক্লাস্টার ও ওপেন সোর্স।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, progress: 100 },
       { title: 'ডেভঅপস', description: 'সফটওয়্যার ডেভেলপমেন্ট এবং আইটি অপারেশনের সংযোগস্থলে কার্যকরী প্রক্রিয়াগুলোর সমন্বয়।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' }, progress: 15 },
       { title: 'এআই (AI)', description: 'বর্তমান সময়ের রিভ্যুলেশনারি ইনভেনশন।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' }, progress: 10 },
@@ -293,28 +297,40 @@ function SelectTopics() {
       { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস ও অ্যালার্টিং দিয়ে সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতা।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     ];
 
+  const [showAll, setShowAll] = React.useState(false);
+  // Pick the most popular/recommended topics (first 6, can be adjusted)
   const current = cards.filter(c => !c.badge || c.badge.variant === 'progress');
+  const recommended = current.slice(0, 8);
   const upcoming = cards.filter(c => c.badge?.variant === 'soon');
   return (
     <section id="select-topics" className=" pt-12  md:pt-16">
       <h2 className="text-center text-2xl font-semibold sm:text-3xl mb-4">শুরু করার জন্য বেছে নিন</h2>
       <p className="text-center text-fd-muted-foreground mb-10 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন।</p>
       {/* Current / Active topics */}
-      <div className="mb-12">
+      <div className="mb-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {current.map((c, i) => (
+          {(showAll ? current : recommended).map((c, i) => (
             <SlideUp key={c.title} delay={i * 0.05}>
               <HighlightCard icon={c.icon} title={c.title} href={c.href} description={c.description} badge={c.badge} progress={c.progress} />
             </SlideUp>
           ))}
         </div>
       </div>
-
+      {!showAll && current.length > recommended.length && (
+        <div className="flex justify-center mb-10">
+          <button
+            className={cn(buttonVariants({ size: 'lg', className: 'rounded-full', variant: 'outline' }))}
+            onClick={() => setShowAll(true)}
+          >
+            সব টপিক দেখুন
+            <Iconify icon="ph:list-bullets-duotone" width={18} className="ml-1" />
+          </button>
+        </div>
+      )}
       {/* Upcoming topics */}
       {upcoming.length > 0 && (
         <div>
           <h3 className="text-center font-semibold mb-4">শীঘ্রই আসছে</h3>
-          {/* grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 opacity-80">
             {upcoming.map((c, i) => (
               <SlideUp key={c.title} delay={i * 0.05}>
