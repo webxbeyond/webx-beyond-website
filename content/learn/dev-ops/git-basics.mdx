@@ -1,0 +1,86 @@
+---
+title: গিটের মৌলিক ধারণা
+icon: solar:git-branch-bold-duotone
+---
+
+গিট (Git) হচ্ছে একটি distributed version control system, যা ডেভেলপারদের কোড, কনফিগারেশন, এবং ডকুমেন্টেশন ট্র্যাক, শেয়ার, এবং ম্যানেজ করতে সাহায্য করে। এই পাঠে আমরা গিটের মৌলিক ধারণা, workflow, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করব।
+
+## গিটের workflow
+
+1. **Working Directory:** যেখানে কোড/ফাইল এডিট করেন
+2. **Staging Area:** পরিবর্তিত ফাইল stage করেন (commit করার জন্য)
+3. **Repository:** commit save হয়, history তৈরি হয়
+
+## গিটের প্রধান কমান্ড
+
+```bash
+git init        # নতুন গিট প্রোজেক্ট শুরু
+git status      # পরিবর্তন চেক করা
+git add .       # সব পরিবর্তিত ফাইল stage করা
+git commit -m "message"  # পরিবর্তন save করা
+git log         # ইতিহাস দেখা
+git diff        # পরিবর্তন তুলনা করা
+git branch      # নতুন branch তৈরি/দেখা
+git checkout    # branch switch করা
+git merge       # branch একত্র করা
+```
+
+## Branching
+
+Branching দিয়ে একাধিক ফিচার/বাগ ফিক্স আলাদাভাবে করা যায়।
+
+```bash
+git branch feature-x
+git checkout feature-x
+```
+
+## Merge
+
+Branch merge করে main/master-এ নতুন ফিচার/বাগ ফিক্স যোগ করা যায়।
+
+```bash
+git checkout main
+git merge feature-x
+```
+
+## Remote Repository
+
+Local repo থেকে remote (GitHub/GitLab) এ কোড push/pull করা যায়।
+
+```bash
+git remote add origin https://github.com/user/repo.git
+git push -u origin main
+git pull origin main
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: ফিচার ডেভেলপমেন্ট
+- নতুন ফিচার—নতুন branch, কাজ শেষ হলে merge
+
+### Example 2: Bug fix
+- bugfix branch—fix, test, merge
+
+### Example 3: Team collaboration
+- একাধিক ডেভেলপার—branch, pull request, review
+
+## Best Practices
+
+- Meaningful commit message লিখুন
+- ছোট ছোট commit করুন
+- Regularly push/pull করুন
+- Sensitive data (.env, key) গিটে না রাখুন
+
+## Troubleshooting
+
+- Merge conflict: `git status`, `git diff` দিয়ে চেক করুন
+- Detached HEAD: `git checkout branchname` দিয়ে ঠিক করুন
+- Push error: remote permission/config চেক করুন
+
+## শেষ কথা
+
+গিটের মৌলিক ধারণা—workflow, branching, merging, remote—শিখে নিলে DevOps, software development, এবং collaboration অনেক সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [রিমোট ও লোকাল গিট রিপোজিটরি সেটআপ](/dev-ops/git-remote-local)

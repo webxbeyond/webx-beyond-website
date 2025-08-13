@@ -1,0 +1,97 @@
+---
+title: Python/Go scripting for automation
+icon: solar:code-bold-duotone
+---
+
+DevOps-এ অটোমেশন অত্যন্ত গুরুত্বপূর্ণ। Shell স্ক্রিপ্টিং ছাড়াও Python ও Go দিয়ে আরও শক্তিশালী, ফ্লেক্সিবল ও স্কেলেবল অটোমেশন করা যায়। এই পাঠে আমরা দেখব—কেন Python/Go scripting দরকার, কীভাবে ব্যবহার হয়, এবং কিছু বাস্তব উদাহরণ।
+
+## কেন Python/Go scripting?
+
+- Shell স্ক্রিপ্টিং সীমিত; Python/Go দিয়ে জটিল লজিক, API, ফাইল প্রসেসিং, ডাটাবেজ, ওয়েব রিকোয়েস্ট, ইত্যাদি সহজে করা যায়
+- Cross-platform (Windows, Linux, Mac)
+- বড় বড় অটোমেশন টাস্ক, ডেটা প্রসেসিং, ক্লাউড/DevOps টুল ইন্টিগ্রেশন
+
+## Python scripting
+
+### Example 1: ফাইল প্রসেসিং
+```python
+# files_rename.py
+import os
+for filename in os.listdir('.'):
+    if filename.endswith('.txt'):
+        os.rename(filename, 'renamed_' + filename)
+```
+
+### Example 2: API call
+```python
+# api_call.py
+import requests
+response = requests.get('https://api.github.com')
+print(response.json())
+```
+
+### Example 3: Cron job
+```python
+# backup.py
+import shutil
+shutil.copy('data.txt', '/backup/data.txt')
+```
+
+## Go scripting
+
+Go দিয়ে দ্রুত, কম রিসোর্সে, compiled automation script লেখা যায়।
+
+### Example 1: ফাইল কপি
+```go
+// file_copy.go
+package main
+import (
+    "io"
+    "os"
+)
+func main() {
+    src, _ := os.Open("data.txt")
+    dst, _ := os.Create("backup.txt")
+    io.Copy(dst, src)
+}
+```
+
+### Example 2: HTTP request
+```go
+// http_request.go
+package main
+import (
+    "fmt"
+    "net/http"
+)
+func main() {
+    resp, _ := http.Get("https://api.github.com")
+    fmt.Println(resp.Status)
+}
+```
+
+## রিয়েল লাইফ DevOps Automation
+
+- **CI/CD pipeline:** Python/Go দিয়ে custom build/test/deploy script
+- **Cloud resource management:** AWS/GCP API call
+- **Log analysis:** Python দিয়ে লগ ফাইল প্রসেস
+- **Monitoring:** Go দিয়ে lightweight monitoring agent
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Shell:** ছোট, সিম্পল টাস্ক, OS-level automation
+- **Python:** ডেটা প্রসেসিং, API, ফাইল/ডাটাবেজ, cross-platform
+- **Go:** Fast, compiled, cloud-native, distributed automation
+
+## কিভাবে রান করবেন?
+
+- Python: `python script.py`
+- Go: `go run script.go` (বা build করে binary চালান)
+
+## শেষ কথা
+
+Python/Go scripting DevOps-এ অটোমেশন, স্কেলেবিলিটি, এবং ইন্টিগ্রেশনের জন্য অপরিহার্য। Shell স্ক্রিপ্টিংয়ের সীমাবদ্ধতা পেরিয়ে, বড় বড় টাস্ক, API, ক্লাউড, এবং ডেটা প্রসেসিং সহজে করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Cron jobs & Scheduled tasks](/dev-ops/cron-jobs)

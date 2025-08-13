@@ -1,0 +1,77 @@
+---
+title: ভার্সন কন্ট্রোল ও গিটের পরিচিতি
+icon: solar:git-branch-bold-duotone
+---
+
+DevOps-এ ভার্সন কন্ট্রোল (Version Control) ও গিট (Git) হচ্ছে কোড, কনফিগারেশন, এবং ডকুমেন্টেশনের ইতিহাস, পরিবর্তন, এবং collaboration-এর backbone। এই পাঠে আমরা ভার্সন কন্ট্রোল ও গিটের বেসিক ধারণা, ব্যবহার, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করব।
+
+## ভার্সন কন্ট্রোল কী?
+
+ভার্সন কন্ট্রোল হচ্ছে এমন একটি সিস্টেম, যা ফাইল/কোডের পরিবর্তন, ইতিহাস, এবং collaboration ট্র্যাক করে।
+
+- **History:** কে, কখন, কী পরিবর্তন করেছে
+- **Rollback:** পুরনো ভার্সনে ফিরে যাওয়া
+- **Collaboration:** একাধিক ডেভেলপার একসাথে কাজ
+
+## গিট (Git) কী?
+
+গিট হচ্ছে সবচেয়ে জনপ্রিয় ভার্সন কন্ট্রোল সিস্টেম, যা distributed, fast, এবং flexible।
+
+- **Local Repo:** নিজের কম্পিউটারে
+- **Remote Repo:** GitHub, GitLab, Bitbucket
+- **Branch:** আলাদা ফিচার/বাগ ফিক্সের জন্য
+
+## গিটের প্রধান কমান্ড
+
+```bash
+git init        # নতুন গিট প্রোজেক্ট শুরু
+git clone       # রিমোট থেকে কোড নামানো
+git add         # পরিবর্তিত ফাইল stage করা
+git commit      # পরিবর্তন save করা
+git push        # রিমোটে আপলোড
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: টিম collaboration
+- একাধিক ডেভেলপার—একই প্রোজেক্টে কাজ, branch, merge
+
+### Example 2: Production deploy
+- কোডের ইতিহাস, rollback, bug fix
+
+### Example 3: Open source
+- GitHub-এ হাজার হাজার ডেভেলপার—pull request, issue, contribution
+
+## ভার্সন কন্ট্রোলের সুবিধা
+
+- **Backup & Restore:** কোড হারিয়ে গেলে restore
+- **Collaboration:** টিমে কাজ সহজ
+- **History:** কে, কখন, কী পরিবর্তন করেছে
+- **Experiment:** নতুন ফিচার, branch, merge
+
+## DevOps-এ Git
+
+- CI/CD pipeline
+- Infrastructure as Code
+- Automation scripts
+- Documentation
+
+## Security Best Practices
+
+- Sensitive data (password, key) গিটে না রাখুন
+- .gitignore ব্যবহার করুন
+- Access control ঠিক রাখুন
+
+## Troubleshooting
+
+- Merge conflict: branch/history চেক করুন
+- Push error: remote permission/config চেক করুন
+- History missing: reflog, log চেক করুন
+
+## শেষ কথা
+
+ভার্সন কন্ট্রোল ও গিট DevOps-এর foundation—collaboration, history, automation, এবং reliability নিশ্চিত করতে সঠিকভাবে ব্যবহার করুন।
+
+---
+
+**পরবর্তী পাঠ:** [গিটের মৌলিক ধারণা](/dev-ops/git-basics)

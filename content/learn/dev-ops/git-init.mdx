@@ -1,0 +1,75 @@
+---
+title: লোকাল গিট প্রোজেক্ট ইনিশিয়ালাইজ করা
+icon: solar:git-branch-bold-duotone
+---
+
+নিজের কম্পিউটারে নতুন গিট প্রোজেক্ট শুরু করতে হলে লোকাল রিপোজিটরি ইনিশিয়ালাইজ করতে হয়। এই পাঠে আমরা গিট init, প্রথম commit, এবং best practices নিয়ে আলোচনা করব।
+
+## নতুন গিট প্রোজেক্ট শুরু
+
+```bash
+mkdir myproject
+cd myproject
+git init
+```
+
+- `git init`: নতুন গিট রিপোজিটরি শুরু
+- `.git` ফোল্ডার তৈরি হয়
+
+## প্রথম commit
+
+```bash
+touch README.md
+git add README.md
+git commit -m "Initial commit"
+```
+
+- README.md: প্রোজেক্টের বেসিক তথ্য
+- `git add`: ফাইল stage করা
+- `git commit`: পরিবর্তন save করা
+
+## .gitignore যোগ করা
+
+Sensitive/temporary ফাইল গিটে না রাখার জন্য `.gitignore` ব্যবহার করুন।
+
+```bash
+echo "node_modules/" >> .gitignore
+echo ".env" >> .gitignore
+git add .gitignore
+git commit -m "Add .gitignore"
+```
+
+## Branch তৈরি
+
+```bash
+git branch develop
+git checkout develop
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: Web app
+- নতুন প্রোজেক্ট—init, README.md, .gitignore, develop branch
+
+### Example 2: Automation script
+- init, commit, push
+
+## Best Practices
+
+- meaningful README.md লিখুন
+- .gitignore ব্যবহার করুন
+- ছোট ছোট commit করুন
+- branch ব্যবহার করুন
+
+## Troubleshooting
+
+- init error: directory permission/config চেক করুন
+- commit error: staged file আছে কিনা দেখুন
+
+## শেষ কথা
+
+লোকাল গিট প্রোজেক্ট ইনিশিয়ালাইজ করলে—history, collaboration, automation—সবকিছুই সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [ব্রাঞ্চের ধারণা](/dev-ops/git-branch)

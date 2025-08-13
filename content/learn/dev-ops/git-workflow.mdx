@@ -1,0 +1,67 @@
+---
+title: গিটের সাথে কাজ করা
+icon: solar:git-branch-bold-duotone
+---
+
+গিটে কাজ করার জন্য কিছু নির্দিষ্ট workflow, কমান্ড, এবং best practices আছে। এই পাঠে আমরা টিম collaboration, branch, pull request, এবং workflow নিয়ে আলোচনা করব।
+
+## গিট workflow
+
+1. **Fork/Clone:** রিমোট রিপোজিটরি ক্লোন/ফর্ক করুন
+2. **Branch:** নতুন ফিচার/বাগ ফিক্সের জন্য branch তৈরি করুন
+3. **Commit:** পরিবর্তন stage ও commit করুন
+4. **Push:** রিমোটে push করুন
+5. **Pull Request (PR):** কোড review ও merge করার জন্য PR তৈরি করুন
+6. **Merge:** PR review ও merge করুন
+
+## Branching Strategy
+
+- **main/master:** production-ready code
+- **feature/bugfix:** নতুন ফিচার/বাগ ফিক্স
+- **develop:** integration branch
+
+## Pull Request Workflow
+
+1. নতুন branch-এ কাজ করুন
+2. কাজ শেষ হলে push করুন
+3. PR তৈরি করুন
+4. টিমে review করুন
+5. Merge করুন
+
+## Rebase vs Merge
+
+- **Merge:** দুই branch একত্র করা
+- **Rebase:** history clean, linear করা
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: টিম collaboration
+- একাধিক ডেভেলপার—branch, commit, PR, review, merge
+
+### Example 2: Continuous Integration
+- PR merge হলে—CI/CD pipeline trigger, test, deploy
+
+### Example 3: Release management
+- release branch—feature freeze, bug fix, deploy
+
+## Best Practices
+
+- ছোট ছোট commit করুন
+- Meaningful commit message লিখুন
+- Regularly pull/push করুন
+- PR-এ review ও discussion encourage করুন
+- Conflict হলে—resolve করে merge করুন
+
+## Troubleshooting
+
+- Merge conflict: `git status`, `git diff` দিয়ে চেক করুন
+- PR not updating: branch rebase/pull করুন
+- Push error: remote permission/config চেক করুন
+
+## শেষ কথা
+
+গিট workflow—branch, commit, PR, merge—ঠিকভাবে follow করলে টিম collaboration, automation, এবং reliability অনেক সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [লোকাল গিট প্রোজেক্ট ইনিশিয়ালাইজ করা](/dev-ops/git-init)

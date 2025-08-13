@@ -1,0 +1,73 @@
+---
+title: ব্রাঞ্চের ধারণা
+icon: solar:git-branch-bold-duotone
+---
+
+গিটে ব্রাঞ্চ (Branch) হচ্ছে কোডের আলাদা লাইন, যেখানে নতুন ফিচার, বাগ ফিক্স, বা এক্সপেরিমেন্ট করা যায়—main/master branch-কে না বদলিয়ে। এই পাঠে আমরা ব্রাঞ্চের ধারণা, ব্যবহার, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করব।
+
+## ব্রাঞ্চ কী?
+
+- কোডের আলাদা লাইন
+- একাধিক ডেভেলপার একসাথে কাজ করতে পারে
+- main/master branch নিরাপদ থাকে
+
+## ব্রাঞ্চ তৈরি ও ব্যবহার
+
+```bash
+git branch feature-x
+git checkout feature-x
+```
+
+- `git branch`: নতুন branch তৈরি
+- `git checkout`: branch switch
+
+## ব্রাঞ্চ লিস্ট ও ডিলিট
+
+```bash
+git branch           # সব branch দেখুন
+git branch -d feature-x   # branch ডিলিট করুন
+```
+
+## ব্রাঞ্চে কাজ করা
+
+1. নতুন branch তৈরি করুন
+2. কাজ করুন, commit করুন
+3. main/master-এ merge করুন
+
+## Merge
+
+```bash
+git checkout main
+git merge feature-x
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: ফিচার ডেভেলপমেন্ট
+- feature branch—কাজ শেষ হলে main/master-এ merge
+
+### Example 2: Bug fix
+- bugfix branch—fix, test, merge
+
+### Example 3: Release management
+- release branch—feature freeze, bug fix, deploy
+
+## Best Practices
+
+- meaningful branch name দিন
+- ছোট ছোট branch ব্যবহার করুন
+- কাজ শেষ হলে merge ও delete করুন
+- main/master-এ সরাসরি commit না করুন
+
+## Troubleshooting
+
+- Merge conflict: `git status`, `git diff` দিয়ে চেক করুন
+- Branch not found: branch name ঠিক আছে কিনা দেখুন
+
+## শেষ কথা
+
+ব্রাঞ্চের ধারণা—parallel development, safe main/master, efficient collaboration—DevOps ও software development-এ অপরিহার্য।
+
+---
+
+**পরবর্তী পাঠ:** [মার্জ রিকোয়েস্ট](/dev-ops/git-merge-request)

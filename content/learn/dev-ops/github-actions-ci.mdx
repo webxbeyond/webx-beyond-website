@@ -1,0 +1,70 @@
+---
+title: GitHub Actions / GitLab CI/CD introduction
+description: CI/CD-এর ধারণা, GitHub Actions ও GitLab CI/CD-এর ব্যবহার, ও বাস্তব উদাহরণ
+---
+
+CI/CD মানে Continuous Integration (CI) ও Continuous Deployment/Delivery (CD)। DevOps-এ CI/CD pipeline অটোমেটেড বিল্ড, টেস্ট, ও ডিপ্লয় নিশ্চিত করে।
+
+## GitHub Actions
+
+GitHub Actions হলো GitHub-এর বিল্ট-ইন CI/CD টুল।
+- **Trigger:** কমিট, পুশ, pull request, issue—সবকিছুতে workflow চালানো যায়।
+- **Workflow:** `.github/workflows/` ফোল্ডারে YAML ফাইল দিয়ে pipeline define করা হয়।
+
+### উদাহরণ: Node.js অ্যাপের CI workflow
+```yaml
+name: Node.js CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+```
+
+## GitLab CI/CD
+
+GitLab CI/CD হলো GitLab-এর integrated pipeline টুল।
+- **Trigger:** commit, merge request, schedule, manual trigger
+- **Pipeline:** `.gitlab-ci.yml` ফাইল দিয়ে define করা হয়।
+
+### উদাহরণ: Python অ্যাপের CI pipeline
+```yaml
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - pytest
+```
+
+## CI/CD-এর সুবিধা
+- **Automation:** Build, test, deploy—all automated
+- **Quality:** Automated test, linting, security scan
+- **Speed:** Manual কাজ কম, দ্রুত ডেলিভারি
+- **Rollback:** আগের অবস্থায় সহজে ফিরে যাওয়া
+
+## বাস্তব উদাহরণ
+
+> "আমাদের টিমে GitHub Actions দিয়ে প্রতিটি কমিটে বিল্ড, টেস্ট, ও ডিপ্লয় অটোমেটেড হয়। GitLab CI/CD-তে merge request-এ pipeline চলে, কোড রিভিউ, টেস্ট, ও ডিপ্লয়—all automated. এতে bug কম, ডেলিভারি দ্রুত।"
+
+## টিপস
+- Pipeline-এ test, lint, security scan যুক্ত করুন
+- Fail হলে, ডিপ্লয় বন্ধ রাখুন
+- Secret/config environment variable-এ রাখুন, গিটে না রাখুন
+- Workflow ছোট ও modular রাখুন
+
+## সংক্ষেপে
+- CI/CD DevOps-এর core—automation, quality, speed
+- GitHub Actions ও GitLab CI/CD—দুই জনপ্রিয় টুল
+- YAML ফাইল দিয়ে pipeline define করুন, টিমওয়ার্কে অটোমেশন নিশ্চিত করুন
+
+---
+
+**পরবর্তী মডিউল:** [ডাটাবেজ](/dev-ops/databases-intro)

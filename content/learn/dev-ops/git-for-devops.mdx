@@ -1,0 +1,57 @@
+---
+title: ডেভঅপসের জন্য গিট (Git for DevOps)
+description: ডেভঅপস প্র্যাকটিসে গিটের গুরুত্ব, ব্যবহার, ও বাস্তব উদাহরণ
+---
+
+গিট শুধু ভার্সন কন্ট্রোল নয়—DevOps-এর workflow, automation, collaboration, ও security-র জন্য অপরিহার্য।
+
+## DevOps-এ গিটের ভূমিকা
+- **Collaboration:** টিমে একাধিক ডেভেলপার একসাথে কাজ করতে পারে, ব্রাঞ্চ, মার্জ, ও রিভিউয়ের মাধ্যমে।
+- **Automation:** CI/CD pipeline (GitHub Actions, GitLab CI) গিটের কমিট/পুশের উপর ভিত্তি করে অটোমেটেড বিল্ড, টেস্ট, ও ডিপ্লয় চালায়।
+- **Infrastructure as Code:** Terraform, Ansible, Dockerfile—সবকিছু গিটে versioned থাকে, history ও rollback সহজ হয়।
+- **Issue Tracking & Documentation:** Pull request, issue, commit message—সবকিছু ডেভঅপস কমিউনিকেশন ও ট্র্যাকিং সহজ করে।
+- **Security:** Access control, audit trail, secret management—গিটে সবকিছু ট্র্যাক হয়, নিরাপত্তা বজায় থাকে।
+
+## DevOps Workflow-এ গিট
+
+### ১. Feature Branch Workflow
+- প্রতিটি ফিচার/বাগ ফিক্স আলাদা ব্রাঞ্চে হয়, শেষে মার্জ/রিভিউ।
+
+### ২. GitOps
+- Infrastructure as Code (IaC) ও কনফিগারেশন গিটে থাকে, কমিট/পুল রিকোয়েস্টের মাধ্যমে ডিপ্লয়/পরিবর্তন হয়।
+- Kubernetes, ArgoCD, Flux—সবই GitOps ফলো করে।
+
+### ৩. CI/CD Integration
+- গিটে কমিট/পুশ হলে, pipeline trigger হয়—বিল্ড, টেস্ট, ডিপ্লয় অটোমেটেড হয়।
+- Example: GitHub Actions workflow:
+  ```yaml
+  on: [push]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Install dependencies
+          run: npm install
+        - name: Run tests
+          run: npm test
+  ```
+
+## বাস্তব উদাহরণ
+
+> "আমাদের DevOps টিমে সবাই গিট ব্যবহার করে। Infrastructure, config, app—all versioned in git. Pull request-এ কোড রিভিউ, CI/CD pipeline-এ অটোমেটেড টেস্ট, ডিপ্লয়—সবকিছু গিটের মাধ্যমে হয়।"
+
+## টিপস
+- গিটে সবকিছু versioned রাখুন—code, config, IaC, docs।
+- Pull request workflow ফলো করুন—রিভিউ, টেস্ট, মার্জ।
+- CI/CD pipeline গিটের সাথে ইন্টিগ্রেট করুন।
+- Secret/config ফাইল .gitignore-এ রাখুন, গিটে না রাখুন।
+
+## সংক্ষেপে
+- DevOps workflow, automation, ও collaboration-এর জন্য গিট অপরিহার্য।
+- গিট ছাড়া modern DevOps অসম্ভব।
+- টিমওয়ার্ক, history, rollback, security—সবকিছু গিটে সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [GitHub Actions / GitLab CI/CD introduction](/dev-ops/github-actions-ci)

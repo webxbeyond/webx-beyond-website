@@ -1,0 +1,93 @@
+---
+title: DNS, SSL/TLS & Firewall Rules
+icon: solar:shield-bold-duotone
+---
+
+DevOps-এ security, reliability, এবং accessibility নিশ্চিত করতে DNS, SSL/TLS, এবং Firewall Rules অপরিহার্য। এই পাঠে আমরা এগুলোর কনসেপ্ট, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করব।
+
+## DNS (Domain Name System)
+
+DNS হচ্ছে এমন একটি সিস্টেম, যা ডোমেইন নামকে IP address-এ রূপান্তর করে।
+
+- **A Record:** ডোমেইনকে IPv4 address-এ ম্যাপ করে
+- **AAAA Record:** ডোমেইনকে IPv6 address-এ ম্যাপ করে
+- **CNAME:** ডোমেইনকে অন্য ডোমেইনে রিডাইরেক্ট করে
+- **MX Record:** ইমেইল সার্ভারের জন্য
+
+### Example: DNS Lookup
+```bash
+nslookup example.com
+dig example.com
+```
+
+## SSL/TLS
+
+SSL/TLS হচ্ছে এনক্রিপশন প্রোটোকল, যা ওয়েবসাইট/সার্ভারকে নিরাপদ করে তোলে।
+
+- **SSL Certificate:** ওয়েবসাইটের পরিচয় ও এনক্রিপশন নিশ্চিত করে
+- **HTTPS:** SSL/TLS দিয়ে এনক্রিপ্টেড HTTP
+
+### Example: SSL Setup (NGINX)
+```nginx
+server {
+  listen 443 ssl;
+  server_name example.com;
+  ssl_certificate /etc/ssl/certs/example.crt;
+  ssl_certificate_key /etc/ssl/private/example.key;
+}
+```
+
+### Free SSL: Let's Encrypt
+```bash
+sudo certbot --nginx -d example.com
+```
+
+## Firewall Rules
+
+Firewall হচ্ছে security wall, যা network traffic control করে—কোনো port, IP, protocol allow/block করা যায়।
+
+- **Inbound/Outbound Rules:** কোন traffic আসবে/যাবে
+- **Port Control:** 22 (SSH), 80 (HTTP), 443 (HTTPS)
+- **IP Whitelisting/Blacklisting**
+
+### Example: UFW (Ubuntu Firewall)
+```bash
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw deny 23
+sudo ufw status
+```
+
+### Example: AWS Security Group
+- Allow: 22, 80, 443 from MyIP
+- Deny: All others
+
+## রিয়েল লাইফ DevOps উদাহরণ
+
+- Production server-এ SSL/TLS enable
+- DNS setup for custom domain
+- Firewall rules for only required ports
+- API server—IP whitelisting
+
+## Security Best Practices
+
+- Always use HTTPS
+- SSL certificate renew/check করুন
+- Firewall rules minimal রাখুন
+- DNS records regularly audit করুন
+- Public access restrict করুন
+
+## Troubleshooting
+
+- DNS not resolving: record/config চেক করুন
+- SSL error: certificate validity/config চেক করুন
+- Firewall block: rules/logs চেক করুন
+
+## শেষ কথা
+
+DNS, SSL/TLS, এবং Firewall Rules DevOps-এর security, reliability, এবং accessibility নিশ্চিত করে। সঠিকভাবে কনফিগার করলে—সার্ভার, ওয়েবসাইট, API—সবকিছুই নিরাপদ ও দ্রুত চলে।
+
+---
+
+**পরবর্তী পাঠ:** [ভার্সন কন্ট্রোল ও গিটের পরিচিতি](/dev-ops/version-control-intro)

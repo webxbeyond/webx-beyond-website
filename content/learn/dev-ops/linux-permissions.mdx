@@ -1,0 +1,82 @@
+---
+title: ফাইল মালিকানা ও পারমিশন (ব্যবহারকারী ও পারমিশন) পর্ব - ২
+icon: solar:lock-bold-duotone
+---
+
+লিনাক্সে ফাইল মালিকানা ও পারমিশন সিস্টেম সিকিউরিটি, মাল্টি-ইউজার এনভায়রনমেন্ট, এবং DevOps অটোমেশন স্ক্রিপ্টের জন্য অত্যন্ত গুরুত্বপূর্ণ। এই লেসনে আমরা মালিকানা, পারমিশন, এবং কমান্ডের অ্যাডভান্সড ব্যবহার দেখবো।
+
+## মালিকানা (Ownership)
+
+- **Owner:** ফাইল/ডিরেক্টরির মালিক
+- **Group:** কোন গ্রুপ ফাইল/ডিরেক্টরি ব্যবহার করতে পারবে
+- **Others:** বাকি সবাই
+
+## পারমিশন (Permission)
+
+- **Read (r):** ফাইল পড়া
+- **Write (w):** ফাইল এডিট/ডিলিট
+- **Execute (x):** ফাইল রান/ডিরেক্টরি এক্সেস
+
+## Permission Structure
+
+- rwxr-xr-- (Owner, Group, Others)
+- `ls -l` কমান্ডে দেখুন
+
+## Permission Change
+
+- **chmod:** পারমিশন পরিবর্তন
+  - `chmod 755 file.sh` (Owner: rwx, Group: r-x, Others: r-x)
+  - `chmod 700 file.sh` (Owner: rwx, Group/Others: ---)
+- **chown:** মালিকানা পরিবর্তন
+  - `chown anis:devops file.sh` (Owner: anis, Group: devops)
+- **chgrp:** গ্রুপ পরিবর্তন
+  - `chgrp devops file.sh`
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, `/var/www/html/index.html` ফাইলটি শুধু webadmin ইউজার এডিট করতে পারবে, বাকিরা শুধু পড়তে পারবে:
+```bash
+chown webadmin:web file.html
+chmod 644 file.html
+```
+
+## Special Permissions
+
+- **SUID:** ফাইল রান করলে Owner-এর পারমিশন পায়
+- **SGID:** ডিরেক্টরিতে নতুন ফাইল গ্রুপের হয়
+- **Sticky Bit:** /tmp-র মতো ডিরেক্টরিতে শুধু Owner ডিলিট করতে পারে
+
+## Permission Number System
+
+| Permission | Number |
+|------------|--------|
+| ---        | 0      |
+| --x        | 1      |
+| -w-        | 2      |
+| -wx        | 3      |
+| r--        | 4      |
+| r-x        | 5      |
+| rw-        | 6      |
+| rwx        | 7      |
+
+## DevOps-এ মালিকানা ও পারমিশন
+
+- সার্ভারে সিকিউরিটি
+- টিমের জন্য পারমিশন সেটআপ
+- অটোমেশন স্ক্রিপ্টে পারমিশন চেক/পরিবর্তন
+- কনফিগ ফাইল, লগ, স্ক্রিপ্ট—সবকিছু সঠিক পারমিশনে রাখতে হয়
+
+## Permission Audit
+
+- `find / -perm 777` (সবাই রান করতে পারে—সিকিউরিটি রিস্ক)
+- `ls -l /path` (পারমিশন চেক)
+
+## শুরু করার জন্য
+
+- chmod, chown, chgrp, ls -l কমান্ড প্র্যাকটিস করুন
+- মালিকানা ও পারমিশন বুঝুন
+- Special Permission (SUID, SGID, Sticky Bit) শিখুন
+
+---
+
+পরবর্তী লেসনে আমরা "বেসিক লিনাক্স কমান্ড - Pipes & Redirects" নিয়ে বিস্তারিত জানবো।

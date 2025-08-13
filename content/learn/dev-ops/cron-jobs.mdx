@@ -1,0 +1,87 @@
+---
+title: Cron jobs & Scheduled tasks
+icon: solar:calendar-bold-duotone
+---
+
+DevOps-এ অটোমেশন ও সময়মতো কাজ করানোর জন্য Cron jobs ও Scheduled tasks অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে আমরা শিখব—Cron কী, কীভাবে কাজ করে, কনফিগারেশন, এবং বাস্তব উদাহরণ।
+
+## Cron job কী?
+
+Cron হচ্ছে লিনাক্স/ইউনিক্স সিস্টেমের একটি টাইম-ভিত্তিক জব শিডিউলার, যা নির্দিষ্ট সময়/ইন্টারভ্যালে কমান্ড/স্ক্রিপ্ট চালায়।
+
+## Cron job-এর ব্যবহার
+
+- ডাটাবেজ ব্যাকআপ
+- লগ ক্লিনআপ
+- রিপোর্ট জেনারেশন
+- সার্ভার মনিটরিং
+- অটোমেটেড ডিপ্লয়মেন্ট
+
+## Cron job কনফিগারেশন
+
+Cron job কনফিগার করতে `crontab` ব্যবহার হয়।
+
+### Crontab ফরম্যাট:
+```
+* * * * * command_to_run
+| | | | |
+| | | | +---- সপ্তাহের দিন (0-7)
+| | | +------ মাস (1-12)
+| | +-------- দিন (1-31)
+| +---------- ঘন্টা (0-23)
++------------ মিনিট (0-59)
+```
+
+### Example: প্রতিদিন রাত ১২টায় ব্যাকআপ
+```
+0 0 * * * /home/user/backup.sh
+```
+
+### Example: প্রতি ৫ মিনিটে স্ক্রিপ্ট চালানো
+```
+*/5 * * * * /home/user/check_logs.sh
+```
+
+## Crontab কমান্ড
+
+- `crontab -e` : Edit cron jobs
+- `crontab -l` : List cron jobs
+- `crontab -r` : Remove cron jobs
+
+## Scheduled tasks (Windows)
+
+Windows-এ "Task Scheduler" দিয়ে একইভাবে নির্দিষ্ট সময়/ইভেন্টে স্ক্রিপ্ট/প্রোগ্রাম চালানো যায়।
+
+### Example: Python script schedule
+- Task Scheduler > Create Task > Trigger > Action: `python C:\scripts\backup.py`
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: লগ ফাইল ক্লিনআপ
+```
+0 3 * * * rm /var/log/*.log
+```
+
+### Example 2: সার্ভার health check
+```
+*/10 * * * * /home/user/health_check.sh
+```
+
+### Example 3: Windows Task Scheduler
+- Daily backup: `C:\scripts\backup.bat`
+
+## Cron job troubleshooting
+
+- Cron job কাজ করছে না? স্ক্রিপ্টে absolute path ব্যবহার করুন
+- Output/error দেখতে চাইলে:
+```
+0 0 * * * /home/user/backup.sh > /home/user/backup.log 2>&1
+```
+
+## শেষ কথা
+
+Cron jobs ও Scheduled tasks DevOps-এ অটোমেশন, রেগুলার maintenance, এবং reliability নিশ্চিত করে। সঠিকভাবে কনফিগার করলে—ব্যাকআপ, ক্লিনআপ, মনিটরিং, ডিপ্লয়মেন্ট—সবকিছু সময়মতো, নির্ভরযোগ্যভাবে হয়।
+
+---
+
+**পরবর্তী পাঠ:** [Networking](/dev-ops/networking)

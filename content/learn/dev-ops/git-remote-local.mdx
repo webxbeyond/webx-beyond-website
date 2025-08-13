@@ -1,0 +1,83 @@
+---
+title: রিমোট ও লোকাল গিট রিপোজিটরি সেটআপ
+icon: solar:git-branch-bold-duotone
+---
+
+গিটে কাজ করতে হলে লোকাল (নিজের কম্পিউটার) এবং রিমোট (GitHub/GitLab/Bitbucket) রিপোজিটরি সেটআপ করতে হয়। এই পাঠে আমরা লোকাল ও রিমোট রিপোজিটরি তৈরি, কানেক্ট, এবং ব্যবহার নিয়ে আলোচনা করব।
+
+## লোকাল রিপোজিটরি তৈরি
+
+```bash
+mkdir myproject
+cd myproject
+git init
+```
+
+- `git init`: নতুন গিট রিপোজিটরি শুরু
+- `.git` ফোল্ডার তৈরি হয়
+
+## রিমোট রিপোজিটরি তৈরি (GitHub)
+
+1. GitHub-এ নতুন রিপোজিটরি তৈরি করুন
+2. লোকাল রিপোজিটরিতে রিমোট অ্যাড করুন:
+
+```bash
+git remote add origin https://github.com/username/myproject.git
+```
+
+## প্রথমবার push করা
+
+```bash
+git add .
+git commit -m "Initial commit"
+git push -u origin main
+```
+
+- `-u`: upstream সেট করে, পরবর্তীতে শুধু `git push` করলেই হবে
+
+## রিমোট থেকে ক্লোন করা
+
+```bash
+git clone https://github.com/username/myproject.git
+```
+
+## রিমোট রিপোজিটরি চেঞ্জ/রিমুভ
+
+```bash
+git remote -v          # রিমোট লিস্ট
+
+git remote set-url origin https://github.com/username/newrepo.git
+
+git remote remove origin
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: টিমে কাজ
+- সবাই রিমোট রিপোজিটরি ক্লোন করে, branch, commit, push/pull
+
+### Example 2: Production deploy
+- কোড রিমোটে push, server থেকে pull
+
+### Example 3: Multiple remote
+- origin (GitHub), upstream (main repo)
+
+## Best Practices
+
+- README.md, .gitignore যোগ করুন
+- Regularly push/pull করুন
+- Remote URL ঠিক আছে কিনা চেক করুন
+
+## Troubleshooting
+
+- Push error: remote permission/config চেক করুন
+- Remote not found: URL ঠিক আছে কিনা দেখুন
+- Merge conflict: pull করে ঠিক করুন
+
+## শেষ কথা
+
+লোকাল ও রিমোট গিট রিপোজিটরি ঠিকভাবে সেটআপ করলে—collaboration, backup, automation—সবকিছুই সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [গিটের সাথে কাজ করা](/dev-ops/git-workflow)

@@ -1,0 +1,102 @@
+---
+title: SSH - Secure Shell
+icon: solar:lock-bold-duotone
+---
+
+SSH (Secure Shell) হচ্ছে একটি নিরাপদ নেটওয়ার্ক প্রোটোকল, যা রিমোট সার্ভারে নিরাপদে কানেক্ট, কনফিগার, এবং ম্যানেজ করার জন্য ব্যবহৃত হয়। DevOps-এ SSH ছাড়া সার্ভার, ক্লাউড, অটোমেশন—সবকিছুই অসম্ভব।
+
+## SSH কী?
+
+SSH হচ্ছে এনক্রিপ্টেড কানেকশন, যা ইউজারনেম/পাসওয়ার্ড বা SSH Key দিয়ে রিমোট সার্ভারে লগইন করতে দেয়।
+
+## SSH-এর ব্যবহার
+
+- রিমোট সার্ভারে লগইন
+- ফাইল ট্রান্সফার (SCP/SFTP)
+- অটোমেটেড ডিপ্লয়মেন্ট
+- টানেলিং ও ফরওয়ার্ডিং
+- কনফিগারেশন ম্যানেজমেন্ট
+
+## SSH কানেক্ট করার নিয়ম
+
+```bash
+ssh username@server_ip
+```
+
+### Example: AWS EC2-তে SSH
+```bash
+ssh -i mykey.pem ec2-user@54.123.45.67
+```
+
+## SSH Key Authentication
+
+পাসওয়ার্ড ছাড়াও, SSH Key দিয়ে আরও নিরাপদে কানেক্ট করা যায়।
+
+### SSH Key তৈরি
+```bash
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+- Public Key: `~/.ssh/id_rsa.pub` (সার্ভারে কপি করুন)
+- Private Key: `~/.ssh/id_rsa` (নিজের কাছে রাখুন)
+
+### Public Key সার্ভারে কপি
+```bash
+ssh-copy-id username@server_ip
+```
+
+## SSH Config ফাইল
+
+`~/.ssh/config` ফাইলে মাল্টিপল সার্ভার, কাস্টম পোর্ট, আলাদা Key কনফিগার করা যায়।
+
+```bash
+Host myserver
+  HostName 54.123.45.67
+  User ec2-user
+  IdentityFile ~/.ssh/mykey.pem
+```
+
+## ফাইল ট্রান্সফার (SCP/SFTP)
+
+### SCP
+```bash
+scp file.txt username@server_ip:/home/username/
+```
+
+### SFTP
+```bash
+sftp username@server_ip
+```
+
+## রিয়েল লাইফ উদাহরণ
+
+### Example 1: DevOps অটোমেশন
+- Jenkins/Ansible দিয়ে SSH Key ব্যবহার করে সার্ভারে ডিপ্লয়
+
+### Example 2: Git server
+- SSH Key দিয়ে GitHub/GitLab-এ কোড push/pull
+
+### Example 3: Secure file transfer
+- Production server থেকে backup server-এ ফাইল ট্রান্সফার
+
+## SSH Security Best Practices
+
+- Strong password/SSH Key ব্যবহার করুন
+- Public Key authentication prefer করুন
+- Unused port block করুন
+- Firewall rules ঠিক রাখুন
+- Fail2ban/2FA ব্যবহার করুন
+
+## Troubleshooting
+
+- Permission denied: Key/username ঠিক আছে কিনা চেক করুন
+- Port block: Firewall rules চেক করুন
+- Connection refused: সার্ভার চালু আছে কিনা দেখুন
+
+## শেষ কথা
+
+SSH DevOps-এর backbone—নিরাপদ কানেকশন, অটোমেশন, ফাইল ট্রান্সফার, কনফিগারেশন—সবকিছুই SSH ছাড়া অসম্ভব। সঠিকভাবে SSH ব্যবহার করলে—সার্ভার, ক্লাউড, ডিপ্লয়মেন্ট—সবকিছুই নিরাপদ ও সহজ হয়।
+
+---
+
+**পরবর্তী পাঠ:** [Load Balancer & Reverse Proxy (NGINX/HAProxy)](/dev-ops/load-balancer)

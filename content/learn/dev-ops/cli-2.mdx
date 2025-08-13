@@ -1,0 +1,95 @@
+---
+title: CLI (কমান্ড লাইন ইন্টারফেস) - পার্ট ২
+icon: solar:terminal-bold-duotone
+---
+
+CLI-এর অ্যাডভান্সড টেকনিক, টুলস, এবং স্ক্রিপ্টিং DevOps-এ অটোমেশন, ফাইল প্রসেসিং, এবং সার্ভার ম্যানেজমেন্টে অপরিহার্য। এই লেসনে আমরা পাইপ, রিডাইরেক্ট, ফাইল প্রসেসিং, এবং শেল স্ক্রিপ্টিংয়ের বেসিক দেখবো।
+
+## Pipe ও Redirect
+
+- **Pipe (|):** এক কমান্ডের আউটপুট অন্য কমান্ডে পাঠানো
+  - উদাহরণ: `cat logs.txt | grep error`
+- **Redirect (> , >>):** আউটপুট ফাইলে লেখা
+  - উদাহরণ: `ls > files.txt` (নতুন ফাইল), `echo "Hello" >> files.txt` (পুরনো ফাইলে যোগ)
+- **Input Redirect `(<)`:** ফাইল থেকে ইনপুট নেয়া
+  - উদাহরণ: `sort < names.txt`
+
+## ফাইল প্রসেসিং টুলস
+
+- **grep:** টেক্সট খুঁজে বের করা
+  - `grep "error" logs.txt`
+- **awk:** টেক্সট প্রসেসিং, কলাম/ফিল্ড
+  - `awk '{print $1}' data.txt`
+- **sed:** টেক্সট রিপ্লেস/এডিট
+  - `sed 's/old/new/g' file.txt`
+- **sort, uniq, wc:** সাজানো, ইউনিক, কাউন্ট
+  - `sort names.txt | uniq | wc -l`
+
+## শেল স্ক্রিপ্টিং বেসিক
+
+- **শেল স্ক্রিপ্ট:** একাধিক কমান্ড একসাথে চালানো
+- **ফাইল তৈরি:**
+  ```bash
+  #!/bin/bash
+  echo "Hello World"
+  ls -l
+  ```
+- **রান করুন:**
+  ```bash
+  chmod +x script.sh
+  ./script.sh
+  ```
+
+## Variable, Loop, Condition
+
+- **Variable:**
+  ```bash
+  name="Anis"
+  echo $name
+  ```
+- **Loop:**
+  ```bash
+  for file in *.txt; do
+    echo $file
+  done
+  ```
+- **Condition:**
+  ```bash
+  if [ -f file.txt ]; then
+    echo "File exists"
+  fi
+  ```
+
+## Automation Example
+
+ধরা যাক, আপনাকে ১০০টি `.log` ফাইল থেকে "error" খুঁজে বের করতে হবে:
+```bash
+for file in *.log; do
+  grep "error" $file >> errors.txt
+done
+```
+
+## CLI Customization
+
+- **Alias:** কমান্ড শর্টকাট
+  - `alias ll='ls -l'`
+- **Prompt Customization:** PS1 পরিবর্তন
+- **History:** আগের কমান্ড দেখতে (history)
+
+## DevOps-এ CLI অ্যাডভান্সড ব্যবহার
+
+- অটোমেশন স্ক্রিপ্ট
+- লগ প্রসেসিং
+- সার্ভার কনফিগারেশন
+- ডেটা ফিল্টারিং
+- CI/CD pipeline-এ স্ক্রিপ্ট
+
+## শুরু করার জন্য
+
+- grep, awk, sed, sort, uniq, wc কমান্ড প্র্যাকটিস করুন
+- ছোট ছোট শেল স্ক্রিপ্ট লিখুন
+- alias ও history ব্যবহার করুন
+
+---
+
+পরবর্তী লেসনে আমরা "প্যাকেজ ম্যানেজার - লিনাক্সে সফটওয়্যার ইনস্টলশেন" নিয়ে বিস্তারিত জানবো।

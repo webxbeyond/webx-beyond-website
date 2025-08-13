@@ -1,0 +1,78 @@
+---
+title: লিনাক্স ভার্চুয়াল মেশিন সেটআপ
+icon: solar:desktop-bold-duotone
+---
+
+লিনাক্স ভার্চুয়াল মেশিন (VM) সেটআপ করা DevOps-এর প্রথম ধাপগুলোর একটি। এতে আপনি নিরাপদ, আইসোলেটেড, এবং কাস্টমাইজড পরিবেশে লিনাক্স শিখতে, টেস্ট করতে, এবং ডেভেলপ করতে পারবেন।
+
+## কেন VM ব্যবহার করবেন?
+
+- **আইসোলেশন:** আপনার মূল সিস্টেমের কোনো ক্ষতি ছাড়াই নতুন জিনিস ট্রাই করতে পারবেন।
+- **টেস্টিং:** বিভিন্ন লিনাক্স ডিস্ট্রো, কনফিগারেশন, স্ক্রিপ্ট সহজে টেস্ট করা যায়।
+- **Automation:** DevOps টুলস ও স্ক্রিপ্ট VM-এ চালিয়ে অটোমেশন শেখা যায়।
+
+## VM সেটআপের ধাপ
+
+### ১. VirtualBox/VMware ডাউনলোড ও ইনস্টল
+
+- [VirtualBox](https://www.virtualbox.org/) (ফ্রি)
+- [VMware Workstation Player](https://www.vmware.com/products/workstation-player.html) (ফ্রি)
+
+### ২. লিনাক্স ISO ডাউনলোড
+
+- [Ubuntu](https://ubuntu.com/download/desktop)
+- [CentOS](https://www.centos.org/download/)
+- [Debian](https://www.debian.org/distrib/)
+
+### ৩. নতুন VM তৈরি
+
+- VirtualBox/VMware ওপেন করুন
+- "New" বাটনে ক্লিক করুন
+- VM-এর নাম, OS টাইপ (Linux), RAM, Disk সাইজ দিন
+- ISO ফাইল সিলেক্ট করুন
+
+### ৪. লিনাক্স ইনস্টল
+
+- VM চালু করুন
+- ISO থেকে বুট করুন
+- ইনস্টলেশন উইজার্ড ফলো করুন
+- ইউজারনেম, পাসওয়ার্ড, লোকেশন দিন
+
+### ৫. Guest Additions/Tools ইনস্টল
+
+- VM-এ কপি-পেস্ট, স্ক্রিন রিসাইজ, ফোল্ডার শেয়ার করতে Guest Additions (VirtualBox) বা VMware Tools ইনস্টল করুন
+
+### ৬. বেসিক কনফিগারেশন
+
+- SSH এনাবল করুন (sudo apt install openssh-server)
+- Network (NAT/Bridged) সিলেক্ট করুন
+- Snapshots নিন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি Ubuntu VM তৈরি করলেন। সেখানে আপনি DevOps টুলস (Git, Docker, Jenkins) ইনস্টল করে টেস্ট করতে পারবেন। আপনার মূল সিস্টেমে কোনো সমস্যা হবে না।
+
+## VM-এ কী কী শিখবেন?
+
+- লিনাক্স কমান্ড
+- ফাইল সিস্টেম
+- ইউজার/পারমিশন
+- Bash/Python স্ক্রিপ্টিং
+- DevOps টুলস
+
+## VM ব্যবহারের টিপস
+
+- RAM ও Disk সাইজ প্রয়োজন অনুযায়ী দিন
+- Snapshots নিয়ে রাখুন—ভুল হলে restore করতে পারবেন
+- Network Bridged করলে VM-কে LAN-এ আলাদা IP দেওয়া যায়
+- SSH দিয়ে VM-এ রিমোটলি কাজ করুন
+
+## DevOps-এ VM-এর গুরুত্ব
+
+- টিমের সবাই একই VM ইমেজ ব্যবহার করে কোড/টুলস টেস্ট করতে পারে
+- CI/CD pipeline-এ VM ব্যবহার করে বিল্ড/টেস্ট/ডিপ্লয় করা যায়
+- Infrastructure as Code (Vagrant, Terraform) দিয়ে VM অটোমেটেডভাবে তৈরি করা যায়
+
+---
+
+পরবর্তী লেসনে আমরা "লিনাক্স ফাইল সিস্টেম" নিয়ে বিস্তারিত জানবো।
