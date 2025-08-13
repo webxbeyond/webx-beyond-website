@@ -91,7 +91,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }>;
           }}
         />
         {page.data.index ? <DocsCategory page={page} from={source} /> : null}
-        <div className="mt-10 flex justify-end">
+        <div className="mt-10 flex flex-col items-end gap-2">
           <a
             href={(() => {
               // If the page is an index page (no slug or last slug is a section), link to index.mdx in the folder
@@ -108,6 +108,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }>;
             কোথাও ভুল হয়েছে? এডিট সাজেস্ট করুন!
           </a>
         </div>
+
       </DocsBody>
     </DocsPage>
   );
@@ -140,4 +141,23 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
 
 export function generateStaticParams(): { slug: string[] }[] {
   return source.generateParams();
+}
+
+// Helper: Convert date to Bangla format
+function banglaDate(date: string | number | Date): string {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'তারিখ পাওয়া যায়নি';
+  const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  const toBn = (num: number|string) => {
+    return String(num).replace(/[0-9]/g, (digit: string) => bnDigits[parseInt(digit, 10)]);
+  };
+  const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  const day = toBn(d.getDate());
+  const month = months[d.getMonth()];
+  const year = toBn(d.getFullYear());
+  let hour = d.getHours();
+  const min = toBn(d.getMinutes().toString().padStart(2,'0'));
+  const ampm = hour >= 12 ? 'AM' : 'PM';
+  hour = hour % 12 || 12;
+  return `${day} ${month} ${year}, ${toBn(hour)}:${min} ${ampm}`;
 }
