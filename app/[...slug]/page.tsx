@@ -20,6 +20,7 @@ import { Mermaid } from '@theguild/remark-mermaid/mermaid';
 import { Iconify } from '@/components/iconify';
 import YouTube from '@/components/youtube';
 import Roadmaps from '@/components/roadmaps';
+import SubnetCalculator from '@/components/subnet-calculator';
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
@@ -86,6 +87,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }>;
             Iconify,
             YouTube,
             Roadmaps,
+            SubnetCalculator,
             blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
             DocsCategory: () => <DocsCategory page={page} from={source} />,
           }}
