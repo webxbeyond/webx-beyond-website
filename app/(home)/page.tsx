@@ -24,7 +24,7 @@ export default function Page() {
             <UwuHero />
           </div>
           {/* What We Teach (core domains) */}
-          <WhatWeTeach />
+          {/* <WhatWeTeach /> */}
           {/* Expectations / Value Proposition */}
           <Expectations />
           {/* Learning Path steps */}
