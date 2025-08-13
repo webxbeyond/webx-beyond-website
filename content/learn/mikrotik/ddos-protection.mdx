@@ -1,0 +1,98 @@
+---
+title: DDoS ও Brute Force থেকে সুরক্ষা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটার ব্যবহারের সময় DDoS (Distributed Denial of Service) এবং Brute Force আক্রমণ থেকে সুরক্ষা নিশ্চিত করা অত্যন্ত গুরুত্বপূর্ণ। এই দুই ধরনের আক্রমণ নেটওয়ার্কের স্থিতিশীলতা ও নিরাপত্তার জন্য বড় হুমকি। এখানে আমরা কিভাবে মাইক্রোটিক রাউটার ব্যবহার করে এসব আক্রমণ প্রতিরোধ ও নিয়ন্ত্রণ করা যায়, তার বিস্তারিত আলোচনা করব।
+
+## DDoS আক্রমণ কী?
+
+DDoS আক্রমণ হলো একাধিক উৎস থেকে একসাথে বিপুল পরিমাণ ট্রাফিক পাঠিয়ে টার্গেট নেটওয়ার্ক বা ডিভাইসকে অকার্যকর করে ফেলা। এর ফলে নেটওয়ার্ক স্লো হয়ে যায় বা সম্পূর্ণ ডাউন হয়ে যেতে পারে।
+
+### DDoS আক্রমণের লক্ষণ
+- হঠাৎ করে ব্যান্ডউইথ ফুল হয়ে যাওয়া
+- CPU লোড বেড়ে যাওয়া
+- রাউটার বা সার্ভার রেসপন্স না করা
+- অস্বাভাবিক সংখ্যক কানেকশন
+
+## Brute Force আক্রমণ কী?
+
+Brute Force আক্রমণে আক্রমণকারী বারবার বিভিন্ন পাসওয়ার্ড বা ইউজারনেম চেষ্টা করে রাউটারে প্রবেশের চেষ্টা করে। SSH, Winbox, Telnet, FTP ইত্যাদি সার্ভিসে এই ধরনের আক্রমণ বেশি হয়।
+
+## DDoS ও Brute Force প্রতিরোধের কৌশল
+
+### ১. অপ্রয়োজনীয় সার্ভিস বন্ধ করুন
+
+```shell
+/ip service disable telnet
+/ip service disable ftp
+/ip service disable www
+```
+
+### ২. SSH/Winbox/HTTP অ্যাক্সেস সীমিত করুন
+
+```shell
+/ip service set ssh address=192.168.10.0/24
+/ip service set winbox address=192.168.10.0/24
+```
+
+### ৩. ফায়ারওয়াল ফিল্টার রুল ব্যবহার করুন
+
+#### DDoS SYN Flood প্রতিরোধ
+```shell
+/ip firewall filter
+add chain=input protocol=tcp tcp-flags=syn connection-limit=30,32 action=add-src-to-address-list address-list=syn_flood address-list-timeout=1h
+add chain=input src-address-list=syn_flood action=drop comment="Drop SYN flooders"
+```
+
+#### ICMP Flood প্রতিরোধ
+```shell
+/ip firewall filter
+add chain=input protocol=icmp limit=10,5 action=accept
+add chain=input protocol=icmp action=drop
+```
+
+#### Brute Force SSH/Winbox প্রতিরোধ
+```shell
+/ip firewall filter
+add chain=input protocol=tcp dst-port=22,8291 connection-state=new src-address-list=ssh_stage1 action=add-src-to-address-list address-list=ssh_blocked address-list-timeout=1d
+add chain=input protocol=tcp dst-port=22,8291 connection-state=new action=add-src-to-address-list address-list=ssh_stage1 address-list-timeout=1m
+add chain=input src-address-list=ssh_blocked action=drop comment="Block SSH/Winbox brute force"
+```
+
+### ৪. Port Knocking ও Strong Password ব্যবহার করুন
+- Port Knocking কনফিগার করলে অনুমোদিত ইউজার ছাড়া কেউ সার্ভিসে ঢুকতে পারবে না।
+- সব ইউজারের জন্য শক্তিশালী পাসওয়ার্ড ব্যবহার করুন।
+
+### ৫. Address List ও Time-based রুল ব্যবহার করুন
+- সন্দেহজনক IP Address গুলো Address List-এ যোগ করে নির্দিষ্ট সময়ের জন্য ব্লক করুন।
+
+### ৬. Logging ও Monitoring চালু রাখুন
+- ফায়ারওয়াল লগ মনিটর করুন।
+- Tools > Torch, Packet Sniffer ব্যবহার করে ট্রাফিক বিশ্লেষণ করুন।
+
+## বাস্তব উদাহরণ: DDoS ও Brute Force প্রতিরোধ
+
+```shell
+/ip firewall filter
+add chain=input protocol=tcp connection-limit=100,32 action=add-src-to-address-list address-list=ddos_block address-list-timeout=1h
+add chain=input src-address-list=ddos_block action=drop comment="Block DDoS IPs"
+
+add chain=input protocol=tcp dst-port=22 connection-state=new src-address-list=ssh_stage1 action=add-src-to-address-list address-list=ssh_blocked address-list-timeout=1d
+add chain=input protocol=tcp dst-port=22 connection-state=new action=add-src-to-address-list address-list=ssh_stage1 address-list-timeout=1m
+add chain=input src-address-list=ssh_blocked action=drop comment="Block SSH brute force"
+```
+
+## অতিরিক্ত টিপস
+- রাউটারের ফার্মওয়্যার আপডেট রাখুন
+- Public IP-তে সরাসরি অ্যাক্সেস সীমিত করুন
+- VPN ব্যবহার করে রিমোট অ্যাক্সেস করুন
+- SNMP, API, WebFig ইত্যাদি সার্ভিসে অ্যাক্সেস কড়া করুন
+
+## উপসংহার
+
+DDoS ও Brute Force আক্রমণ থেকে সুরক্ষা নিশ্চিত করতে হলে ফায়ারওয়াল রুল, Address List, সার্ভিস কনফিগারেশন ও মনিটরিং—সবকিছু মিলিয়ে একটি শক্তিশালী নিরাপত্তা ব্যবস্থা গড়ে তুলতে হবে। নিয়মিত লগ মনিটরিং ও আপডেটেড কনফিগারেশন আপনাকে নিরাপদ রাখবে।
+
+---
+
+**পরবর্তী টপিক:** [রাউটিং ও অ্যাডভান্সড নেটওয়ার্কিং](/mikrotik/static-routing)

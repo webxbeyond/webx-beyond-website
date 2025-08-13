@@ -1,0 +1,93 @@
+---
+title: Radius সার্ভারের মাধ্যমে ইউজার অথেন্টিকেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে Radius (Remote Authentication Dial-In User Service) হলো একটি এক্সটার্নাল অথেন্টিকেশন সার্ভার, যার মাধ্যমে ইউজার ম্যানেজমেন্ট, অথেন্টিকেশন ও অ্যাকাউন্টিং আরও সহজ ও স্কেলেবল হয়। ISP, হোটেল, হটস্পট, PPPoE, VPN ইত্যাদিতে ইউজার অথেন্টিকেশনের জন্য Radius ব্যাপকভাবে ব্যবহৃত হয়। এই টিউটোরিয়ালে আমরা Radius সার্ভার ইন্টিগ্রেশন, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Radius কী ও কেন দরকার?
+
+- এক্সটার্নাল অথেন্টিকেশন ও ইউজার ম্যানেজমেন্ট
+- একাধিক ডিভাইস/রাউটারে সেন্ট্রাল ইউজার কন্ট্রোল
+- ইউজার অ্যাকাউন্টিং, ব্যালেন্স, প্যাকেজ, এক্সপায়ারি ইত্যাদি
+- ISP, হোটেল, হটস্পট, PPPoE, VPN ইত্যাদিতে আদর্শ
+
+---
+
+## Radius সার্ভার কনফিগারেশন (সংক্ষেপে)
+
+Radius সার্ভার হিসেবে FreeRADIUS, MikroTik User Manager, Splynx, DMASoftlab ইত্যাদি ব্যবহার করা যায়।
+
+### FreeRADIUS ইনস্টল ও বেসিক কনফিগারেশন (Linux)
+
+```shell
+sudo apt update
+sudo apt install freeradius freeradius-utils
+```
+
+- `/etc/freeradius/3.0/clients.conf`-এ MikroTik-এর IP ও Secret যোগ করুন
+- `/etc/freeradius/3.0/users`-এ ইউজার অ্যাড করুন
+
+---
+
+## MikroTik-এ Radius ইন্টিগ্রেশন
+
+### ১. Radius সার্ভার অ্যাড করুন
+
+```shell
+/radius add service=ppp,login,hotspot address=192.168.88.200 secret=123456
+```
+
+- `service`: কোন সার্ভিসে Radius ব্যবহার হবে (ppp, login, hotspot, wireless)
+- `address`: Radius সার্ভারের IP
+- `secret`: শেয়ার্ড পাসওয়ার্ড
+
+### ২. ইউজার অথেন্টিকেশন টেস্ট করুন
+- PPP, Hotspot, বা Login-এ ইউজার লগইন করলে Radius-এ অথেন্টিকেশন হবে
+
+### ৩. Accounting (ঐচ্ছিক)
+
+```shell
+/radius incoming set accept=yes
+```
+
+---
+
+## Winbox-এ Radius কনফিগারেশন
+
+1. **Radius > Add**: সার্ভিস, Address, Secret দিন
+2. **PPP/Hotspot/Wireless > Use Radius**: টিক দিন
+3. **User Manager/FreeRADIUS**-এ ইউজার অ্যাড করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP-তে ৫০০+ ইউজার অথেন্টিকেশন ও ব্যালেন্স
+- FreeRADIUS + MikroTik User Manager ব্যবহার করুন
+
+### কেস ২: হোটেল/হটস্পটে সেন্ট্রাল ইউজার কন্ট্রোল
+- Radius ইন্টিগ্রেশন করুন
+
+### কেস ৩: PPPoE/Hotspot-এ এক্সপায়ারি ও প্যাকেজ
+- User Manager-এ প্যাকেজ ও এক্সপায়ারি সেট করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Radius Secret শক্তিশালী ও ইউনিক রাখুন
+- সার্ভার ও ক্লায়েন্টের টাইম সিঙ্ক ঠিক রাখুন
+- Accounting ও Monitoring চালু রাখুন
+- User Manager/FreeRADIUS-এর ব্যাকআপ রাখুন
+
+---
+
+## উপসংহার
+
+Radius সার্ভারের মাধ্যমে ইউজার অথেন্টিকেশন করলে ইউজার ম্যানেজমেন্ট, অথেন্টিকেশন ও অ্যাকাউন্টিং আরও সহজ, স্কেলেবল ও সিকিউর হয়। মাইক্রোটিকের বিল্ট-ইন Radius সাপোর্ট দিয়ে সহজেই এক্সটার্নাল অথেন্টিকেশন ইন্টিগ্রেশন করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [IP Binding ও ARP ম্যানেজমেন্ট](/mikrotik/ip-binding)

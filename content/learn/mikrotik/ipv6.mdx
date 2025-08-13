@@ -1,0 +1,91 @@
+---
+title: "IPv6 বেসিকস ও কনফিগারেশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ইন্টারনেটের ভবিষ্যৎ হচ্ছে IPv6। IPv4-এর সীমাবদ্ধতা কাটিয়ে আরও বেশি ডিভাইস ও আধুনিক নেটওয়ার্কিং সুবিধা দিতে IPv6 ব্যবহৃত হয়। এখানে IPv6-এর বেসিক ধারণা ও মাইক্রোটিক রাউটারে কনফিগারেশন নিয়ে বিস্তারিত আলোচনা করা হলো।
+
+## ১. IPv6 কী ও কেন?
+- 128-bit address (e.g., 2001:db8::1)
+- 3.4×10^38 ইউনিক অ্যাড্রেস
+- NAT ছাড়াই গ্লোবাল কানেক্টিভিটি
+- অটো কনফিগারেশন, সিকিউরিটি, মোবিলিটি
+
+## ২. IPv6 অ্যাড্রেস ফরম্যাট
+- Hexadecimal, 8টি ব্লক (e.g., 2001:0db8:85a3:0000:0000:8a2e:0370:7334)
+- সংক্ষেপ: 2001:db8::1
+- টাইপ: Unicast, Multicast, Anycast
+
+## ৩. IPv6 Prefix ও সাবনেটিং
+- Prefix: /64, /56, /48 ইত্যাদি
+- উদাহরণ: 2001:db8:abcd:1::/64
+
+## ৪. মাইক্রোটিকে IPv6 প্যাকেজ ইনস্টল
+- Winbox/WebFig: System > Packages > ipv6
+- CLI:
+  ```
+  /system package enable ipv6
+  /system reboot
+  ```
+
+## ৫. IPv6 অ্যাড্রেস কনফিগারেশন
+
+### ক. ইন্টারফেসে IPv6 অ্যাড্রেস যোগ
+- **Winbox/WebFig:**
+  - IPv6 > Addresses > +
+  - Address: 2001:db8:abcd:1::1/64
+  - Interface: bridge/local
+- **CLI:**
+  ```
+  /ipv6 address add address=2001:db8:abcd:1::1/64 interface=bridge
+  ```
+
+### খ. DHCPv6 Client (ISP থেকে IPv6)
+- **Winbox/WebFig:**
+  - IPv6 > DHCP Client > +
+  - Interface: ether1 (WAN)
+- **CLI:**
+  ```
+  /ipv6 dhcp-client add interface=ether1 pool-name=ipv6-pool request=address,prefix
+  ```
+
+### গ. SLAAC (Stateless Address Autoconfiguration)
+- LAN ইন্টারফেসে RA (Router Advertisement) চালু করুন
+- **CLI:**
+  ```
+  /ipv6 nd set [ find default=yes ] advertise=yes
+  ```
+
+## ৬. IPv6 রাউটিং ও গেটওয়ে
+- **Default Route:**
+  ```
+  /ipv6 route add dst-address=::/0 gateway=ISP-Gateway-IPv6
+  ```
+
+## ৭. ফায়ারওয়াল ও নিরাপত্তা
+- IPv6 ফায়ারওয়াল আলাদা (IPv4-এর মতোই কনফিগার)
+- **CLI:**
+  ```
+  /ipv6 firewall filter add chain=input action=accept connection-state=established,related
+  /ipv6 firewall filter add chain=input protocol=icmpv6 action=accept
+  /ipv6 firewall filter add chain=input action=drop
+  ```
+
+## ৮. সমস্যা ও সমাধান
+- **IPv6 Address পাওয়া যাচ্ছে না:** DHCPv6/RA কনফিগার চেক করুন
+- **ইন্টারনেট নেই:** Default Route ও DNS চেক করুন
+- **ফায়ারওয়াল ব্লক:** IPv6 firewall rules আপডেট করুন
+
+## ৯. বাস্তব কনফিগারেশন উদাহরণ
+```bash
+/ipv6 address add address=2001:db8:abcd:1::1/64 interface=bridge
+/ipv6 dhcp-client add interface=ether1 pool-name=ipv6-pool request=address,prefix
+/ipv6 nd set [ find default=yes ] advertise=yes
+/ipv6 route add dst-address=::/0 gateway=fe80::1
+/ipv6 firewall filter add chain=input action=accept connection-state=established,related
+/ipv6 firewall filter add chain=input protocol=icmpv6 action=accept
+/ipv6 firewall filter add chain=input action=drop
+```
+
+## ১০. উপসংহার
+IPv6 কনফিগারেশন জানা থাকলে ভবিষ্যতের নেটওয়ার্কিং চ্যালেঞ্জ সহজে মোকাবেলা করা যায়। পরবর্তী অধ্যায়ে একাধিক সাবনেট ম্যানেজমেন্ট নিয়ে আলোচনা করা হবে।

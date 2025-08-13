@@ -1,0 +1,83 @@
+---
+title: MPLS বেসিকস ও ইমপ্লিমেন্টেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+MPLS (Multi-Protocol Label Switching) হলো একটি অ্যাডভান্সড নেটওয়ার্কিং টেকনোলজি, যা বড় নেটওয়ার্ক, ISP ও ডাটা সেন্টারে দ্রুত, নির্ভরযোগ্য ও স্কেলেবল ট্রাফিক ফরোয়ার্ডিং নিশ্চিত করে। মাইক্রোটিক রাউটারে MPLS কনফিগারেশন ও ইমপ্লিমেন্টেশন তুলনামূলক সহজ।
+
+## MPLS কী?
+
+MPLS হলো এমন একটি প্রযুক্তি, যেখানে ট্রাফিক ফরোয়ার্ডিং IP Address-এর পরিবর্তে Label-এর মাধ্যমে হয়। এতে ট্রাফিক দ্রুত ও নির্দিষ্ট পথে যেতে পারে এবং VPN, Traffic Engineering, QoS ইত্যাদি সহজ হয়।
+
+## MPLS-এর সুবিধা
+- দ্রুত ট্রাফিক ফরোয়ার্ডিং
+- ট্রাফিক ইঞ্জিনিয়ারিং
+- VPN ও ভিন্ন ভিন্ন কাস্টমার আইসোলেশন
+- স্কেলেবিলিটি ও রিডান্ডেন্সি
+- QoS সহজে ইমপ্লিমেন্ট
+
+## MPLS নেটওয়ার্কের মূল উপাদান
+- LSR (Label Switch Router)
+- LER (Label Edge Router)
+- Label Distribution Protocol (LDP)
+- Label Stack
+
+## MPLS কনফিগারেশন (মাইক্রোটিক)
+
+ধরা যাক, দুটি রাউটার (R1 ও R2) MPLS দিয়ে কানেক্টেড:
+
+### Step 1: IP Routing ও OSPF কনফিগার করুন
+
+```shell
+/routing ospf instance
+set [ find default=yes ] router-id=10.0.0.1
+
+/routing ospf network
+add network=10.0.0.0/24 area=backbone
+```
+
+### Step 2: MPLS Enable করুন
+
+```shell
+/mpls interface
+add interface=ether1
+add interface=ether2
+```
+
+### Step 3: LDP Enable করুন
+
+```shell
+/mpls ldp interface
+add interface=ether1
+add interface=ether2
+```
+
+### Step 4: VRF ও VPN ইমপ্লিমেন্ট (প্রয়োজনে)
+
+```shell
+/ip vrf add name=customer1 interfaces=ether2
+```
+
+## MPLS-এ ট্রাফিক ফরোয়ার্ডিং কিভাবে হয়?
+
+- রাউটার প্যাকেটের জন্য Label অ্যাসাইন করে
+- Label অনুযায়ী প্যাকেট ফরোয়ার্ড হয়
+- শেষ রাউটারে Label Remove হয় (Penultimate Hop Popping)
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি ISP তার কাস্টমারদের জন্য আলাদা VPN ও QoS দিতে চায়। MPLS দিয়ে সহজেই এই কাজ করা যায়।
+
+## টিপস
+- OSPF/BGP দিয়ে MPLS নেটওয়ার্ক বিল্ড করুন
+- LDP ও MPLS ইন্টারফেস ঠিকমতো কনফিগার করুন
+- VRF ও VPN ব্যবহার করে কাস্টমার আইসোলেশন করুন
+- মনিটরিং ও ট্রাবলশুটিং টুল ব্যবহার করুন
+
+## উপসংহার
+
+MPLS বড় নেটওয়ার্ক, ISP ও ডাটা সেন্টারের জন্য অত্যন্ত কার্যকর। দ্রুত ট্রাফিক ফরোয়ার্ডিং, ট্রাফিক ইঞ্জিনিয়ারিং, VPN ও QoS—সবকিছুতেই MPLS আধুনিক নেটওয়ার্কের অপরিহার্য অংশ।
+
+---
+
+**পরবর্তী টপিক:** [ওয়্যারলেস মোড – AP, Station, Repeater, WDS](/mikrotik/wireless-modes)

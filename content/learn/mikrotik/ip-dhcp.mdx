@@ -1,0 +1,81 @@
+---
+title: "IP অ্যাড্রেসিং ও DHCP সার্ভার সেটআপ"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্কে ডিভাইসগুলোকে সঠিকভাবে কানেক্ট ও ম্যানেজ করার জন্য IP অ্যাড্রেসিং ও DHCP সার্ভার কনফিগারেশন অত্যন্ত গুরুত্বপূর্ণ। এখানে মাইক্রোটিক রাউটারে IP অ্যাড্রেস সেটআপ ও DHCP সার্ভার কনফিগারেশন নিয়ে ধাপে ধাপে আলোচনা করা হলো।
+
+## ১. IP অ্যাড্রেসিং
+
+### ক. ব্রিজ/ইন্টারফেসে IP অ্যাড্রেস যোগ করা
+- **Winbox/WebFig:**
+  - IP > Addresses > +
+  - Address: 192.168.88.1/24
+  - Interface: bridge/local
+  - Apply/OK
+- **CLI:**
+  ```
+  /ip address add address=192.168.88.1/24 interface=bridge
+  ```
+
+### খ. একাধিক ইন্টারফেসে আলাদা সাবনেট
+- LAN, WAN, GUEST ইত্যাদির জন্য আলাদা IP রেঞ্জ দিন
+- উদাহরণ:
+  ```
+  /ip address add address=10.10.10.1/24 interface=LAN
+  /ip address add address=192.168.1.2/30 interface=WAN
+  ```
+
+## ২. DHCP সার্ভার সেটআপ
+
+### ক. DHCP সার্ভার উইজার্ড (Winbox/WebFig)
+- IP > DHCP Server > DHCP Setup
+- Interface: LAN/bridge
+- DHCP Address Space: 192.168.88.0/24
+- Gateway: 192.168.88.1
+- DNS: 8.8.8.8, 1.1.1.1
+- Lease Time: 10m বা আপনার পছন্দমতো
+
+### খ. CLI দিয়ে DHCP সার্ভার
+  ```
+  /ip dhcp-server setup
+  # এরপর উইজার্ডের ধাপগুলো অনুসরণ করুন
+  ```
+
+### গ. ম্যানুয়াল DHCP সার্ভার কনফিগারেশন
+  ```
+  /ip pool add name=dhcp-pool ranges=192.168.88.10-192.168.88.254
+  /ip dhcp-server add name=dhcp1 interface=bridge address-pool=dhcp-pool lease-time=10m
+  /ip dhcp-server network add address=192.168.88.0/24 gateway=192.168.88.1 dns-server=8.8.8.8,1.1.1.1
+  ```
+
+## ৩. DHCP ক্লায়েন্ট (WAN ইন্টারফেসে)
+
+- যদি WAN ইন্টারফেসে অন্য রাউটার থেকে IP নিতে হয়:
+  ```
+  /ip dhcp-client add interface=ether1 disabled=no
+  ```
+
+## ৪. DHCP লিজ, রিজার্ভেশন ও স্ট্যাটিক IP
+
+- **DHCP Lease:** DHCP > Leases-এ ক্লায়েন্টদের তালিকা
+- **Static Lease:** নির্দিষ্ট MAC-এ নির্দিষ্ট IP রিজার্ভ করুন
+- **CLI:**
+  ```
+  /ip dhcp-server lease add mac-address=AA:BB:CC:DD:EE:FF address=192.168.88.100
+  ```
+
+## ৫. সমস্যা ও সমাধান
+- **ক্লায়েন্ট IP পাচ্ছে না:**
+  - Interface ঠিক আছে কিনা চেক করুন
+  - Pool ও Network ঠিক আছে কিনা দেখুন
+- **একাধিক DHCP সার্ভার কনফ্লিক্ট:**
+  - এক সাবনেটে একাধিক DHCP সার্ভার রাখবেন না
+
+## ৬. নিরাপত্তা টিপস
+- DHCP সার্ভার শুধুমাত্র LAN/Trusted ইন্টারফেসে চালু রাখুন
+- Guest নেটওয়ার্কে আলাদা DHCP Pool ব্যবহার করুন
+- DHCP Option দিয়ে DNS, Gateway কাস্টমাইজ করুন
+
+## উপসংহার
+IP অ্যাড্রেসিং ও DHCP সার্ভার কনফিগারেশন সঠিকভাবে করলে নেটওয়ার্ক ম্যানেজমেন্ট সহজ ও নির্ভরযোগ্য হয়। পরবর্তী অধ্যায়ে ইন্টারনেট অ্যাক্সেস সেটআপ নিয়ে আলোচনা করা হবে।

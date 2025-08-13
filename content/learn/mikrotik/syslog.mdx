@@ -1,0 +1,93 @@
+---
+title: Syslog ইন্টিগ্রেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে Syslog ইন্টিগ্রেশন হলো নেটওয়ার্ক লগিং, মনিটরিং ও অডিটিংয়ের জন্য অত্যন্ত গুরুত্বপূর্ণ টুল। Syslog-এর মাধ্যমে রাউটারের ইভেন্ট, এক্সেস, সিকিউরিটি, এবং সিস্টেম লগ এক্সটার্নাল Syslog সার্ভারে পাঠানো যায়, যা নেটওয়ার্ক বিশ্লেষণ ও সমস্যা শনাক্তে সহায়ক। এই টিউটোরিয়ালে আমরা Syslog ইন্টিগ্রেশন, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Syslog কী ও কেন দরকার?
+
+- রাউটারের ইভেন্ট, এক্সেস, সিকিউরিটি, সিস্টেম লগ সংরক্ষণ
+- এক্সটার্নাল Syslog সার্ভারে লগ পাঠানো
+- নেটওয়ার্ক অডিট, মনিটরিং, সমস্যা বিশ্লেষণ
+
+---
+
+## Syslog সার্ভার কী?
+
+- Syslog সার্ভার হলো এমন একটি সার্ভার, যেখানে নেটওয়ার্ক ডিভাইসের লগ সংরক্ষণ ও বিশ্লেষণ করা যায়
+- জনপ্রিয় Syslog সার্ভার: Graylog, rsyslog, Kiwi Syslog, Syslog-ng
+
+---
+
+## MikroTik-এ Syslog ইন্টিগ্রেশন
+
+### ১. Syslog Action তৈরি
+```shell
+/system logging action add name=syslogremote target=remote remote=192.168.88.200
+```
+- `remote`: Syslog সার্ভারের IP
+
+### ২. Logging Rule তৈরি
+```shell
+/system logging add topics=info action=syslogremote
+/system logging add topics=error action=syslogremote
+/system logging add topics=critical action=syslogremote
+```
+- `topics`: কোন ধরনের লগ পাঠানো হবে
+- `action`: আগের Action
+
+### ৩. Firewall, DHCP, VPN ইত্যাদির জন্যও Logging Rule অ্যাড করুন
+
+---
+
+## Winbox-এ Syslog কনফিগারেশন
+
+1. **System > Logging > Actions**: নতুন Action অ্যাড করুন (target=remote, remote IP)
+2. **System > Logging > Rules**: নতুন Rule অ্যাড করুন (topics, action)
+3. Syslog সার্ভারে লগ যাচ্ছি কিনা চেক করুন
+
+---
+
+## Syslog সার্ভার সেটআপ (Linux: rsyslog)
+```shell
+sudo apt update
+sudo apt install rsyslog
+sudo systemctl enable rsyslog
+sudo systemctl start rsyslog
+```
+- `/etc/rsyslog.conf`-এ UDP/TCP port enable করুন
+- `/var/log/syslog`-এ লগ দেখা যাবে
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP-তে রাউটার লগ সেন্ট্রালাইজড মনিটরিং
+- MikroTik থেকে Syslog সার্ভারে লগ পাঠান
+
+### কেস ২: সিকিউরিটি অডিট ও ট্রাবলশুটিং
+- Firewall, VPN, DHCP ইত্যাদির লগ Syslog-এ সংরক্ষণ করুন
+
+### কেস ৩: লগ বিশ্লেষণ ও রিপোর্টিং
+- Syslog সার্ভার থেকে Export/Report তৈরি করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- গুরুত্বপূর্ণ ইভেন্টের জন্য Logging Rule অ্যাড করুন
+- Syslog সার্ভারের IP ও Port ঠিকভাবে দিন
+- Syslog সার্ভারে Disk Space ও Retention Policy ঠিক রাখুন
+- লগ বিশ্লেষণ ও রিপোর্টিং নিয়মিত করুন
+
+---
+
+## উপসংহার
+
+Syslog ইন্টিগ্রেশন করলে নেটওয়ার্কের ইভেন্ট, সিকিউরিটি, এবং সিস্টেম লগ সেন্ট্রালাইজডভাবে সংরক্ষণ ও বিশ্লেষণ করা যায়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই Syslog ইন্টিগ্রেশন করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [SNMP নেটওয়ার্ক মনিটরিং](/mikrotik/snmp)

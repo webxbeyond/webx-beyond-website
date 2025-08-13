@@ -1,0 +1,109 @@
+---
+title: PPPoE সার্ভার ও ক্লায়েন্ট সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে PPPoE (Point-to-Point Protocol over Ethernet) হলো সবচেয়ে জনপ্রিয় ISP-গ্রেড অথেন্টিকেশন ও ইউজার ম্যানেজমেন্ট প্রযুক্তি। এটি বিশেষভাবে ব্রডব্যান্ড ইন্টারনেট সার্ভিস, হোটেল, হোস্টেল, এবং কর্পোরেট নেটওয়ার্কে ইউজার-ভিত্তিক কানেকশন ও ব্যান্ডউইথ কন্ট্রোলের জন্য ব্যবহৃত হয়। এই টিউটোরিয়ালে আমরা PPPoE সার্ভার ও ক্লায়েন্ট সেটআপ, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## PPPoE কী ও কেন ব্যবহার করবেন?
+
+- ইউজার-ভিত্তিক অথেন্টিকেশন ও ব্যান্ডউইথ কন্ট্রোল
+- ইউজার আইডি ও পাসওয়ার্ড দিয়ে ইন্টারনেট অ্যাক্সেস
+- একাধিক ইউজার, একাধিক প্যাকেজ, এবং এক্সটার্নাল Radius ইন্টিগ্রেশন
+
+---
+
+## PPPoE সার্ভার কনফিগারেশন
+
+### ১. PPPoE সার্ভার ইন্টারফেস তৈরি
+
+```shell
+/interface pppoe-server server add interface=ether2 service-name=pppoe-server disabled=no
+```
+
+- `interface`: যেই ইন্টারফেসে সার্ভার চালাবেন (যেমন: ether2)
+- `service-name`: সার্ভিসের নাম
+
+### ২. PPP Profile তৈরি
+
+```shell
+/ppp profile add name=pppoe-profile local-address=10.10.10.1 remote-address=pppoe-pool dns-server=8.8.8.8,8.8.4.4 rate-limit=5M/5M
+```
+
+- `local-address`: গেটওয়ে IP
+- `remote-address`: ইউজারদের জন্য IP Pool
+- `rate-limit`: আপলোড/ডাউনলোড স্পিড
+
+### ৩. IP Pool তৈরি
+
+```shell
+/ip pool add name=pppoe-pool ranges=10.10.10.2-10.10.10.100
+```
+
+### ৪. ইউজার অ্যাড করা
+
+```shell
+/ppp secret add name=user1 password=123 profile=pppoe-profile service=pppoe
+```
+
+- `name`: ইউজারনেম
+- `password`: পাসওয়ার্ড
+- `profile`: আগের profile
+
+---
+
+## PPPoE ক্লায়েন্ট কনফিগারেশন
+
+### ১. PPPoE ক্লায়েন্ট ইন্টারফেস তৈরি
+
+```shell
+/interface pppoe-client add name=pppoe-out1 interface=ether1 user=user1 password=123 disabled=no
+```
+
+- `interface`: যেই ইন্টারফেসে ইন্টারনেট কানেকশন
+- `user` ও `password`: সার্ভার-এডমিন দেয়া ইউজারনেম ও পাসওয়ার্ড
+
+### ২. ক্লায়েন্টে DHCP/Static IP বন্ধ রাখুন
+
+---
+
+## Winbox-এ PPPoE কনফিগারেশন
+
+1. **PPP > Interface > PPPoE Server**: Add এ ক্লিক করে ইন্টারফেস ও সার্ভিস নাম দিন
+2. **PPP > Profiles**: নতুন প্রোফাইল তৈরি করুন
+3. **IP > Pool**: IP Pool তৈরি করুন
+4. **PPP > Secrets**: ইউজার অ্যাড করুন
+5. **PPP > Interface > PPPoE Client**: ক্লায়েন্ট ইন্টারফেস তৈরি করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP-তে ১০০ ইউজার অথেন্টিকেশন ও ব্যান্ডউইথ কন্ট্রোল
+- PPPoE Server + Profile + Pool + Secrets ব্যবহার করুন
+
+### কেস ২: হোটেল/হোস্টেলে ইউজার-ভিত্তিক ইন্টারনেট
+- PPPoE Server + Userwise Rate Limit
+
+### কেস ৩: ক্লায়েন্ট রাউটারে PPPoE Client কনফিগার
+- PPPoE Client ইন্টারফেস তৈরি করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- ইউজারদের জন্য আলাদা Profile ও Rate Limit ব্যবহার করুন
+- Strong Password দিন
+- Secrets লিস্ট নিয়মিত আপডেট রাখুন
+- Radius ইন্টিগ্রেশন করলে এক্সটার্নাল অথেন্টিকেশন সহজ হয়
+
+---
+
+## উপসংহার
+
+PPPoE সার্ভার ও ক্লায়েন্ট কনফিগারেশন করলে ইউজার-ভিত্তিক অথেন্টিকেশন, ব্যান্ডউইথ কন্ট্রোল, এবং ইউজার ম্যানেজমেন্ট সহজ হয়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [DHCP সার্ভার, রিলে ও রিজার্ভেশন](/mikrotik/dhcp)

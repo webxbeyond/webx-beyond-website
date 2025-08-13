@@ -1,0 +1,82 @@
+---
+title: Site-to-Site VPN সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Site-to-Site VPN হলো এমন একটি প্রযুক্তি, যার মাধ্যমে দুটি বা একাধিক রিমোট নেটওয়ার্ককে নিরাপদভাবে ইন্টারনেটের মাধ্যমে কানেক্ট করা যায়। মাইক্রোটিক রাউটারে Site-to-Site VPN কনফিগারেশন অত্যন্ত সহজ এবং কার্যকর।
+
+## Site-to-Site VPN কী?
+
+Site-to-Site VPN মানে দুটি অফিস, ব্রাঞ্চ, বা ডাটা সেন্টার—যা ভৌগোলিকভাবে আলাদা—তাদের নেটওয়ার্ককে একসাথে যুক্ত করা। এতে লোকাল নেটওয়ার্কের মতোই রিসোর্স শেয়ার, ফাইল ট্রান্সফার, প্রিন্টার, সার্ভার এক্সেস করা যায়।
+
+## কোন VPN প্রোটোকল ব্যবহার করবেন?
+- L2TP/IPSec (সাধারণ ও নিরাপদ)
+- IPsec Tunnel (শুধুমাত্র IPsec)
+- OpenVPN
+- WireGuard (আধুনিক ও দ্রুত)
+
+## উদাহরণ: L2TP/IPSec Site-to-Site VPN
+
+### Site A (Server) কনফিগারেশন
+```shell
+/interface l2tp-server server set enabled=yes use-ipsec=required ipsec-secret=123456
+/ppp secret add name=siteb password=sitebpass service=l2tp remote-address=10.10.20.2 local-address=10.10.20.1
+/ip pool add name=siteb-pool ranges=10.10.20.2-10.10.20.10
+/ip address add address=10.10.20.1/24 interface=ether1
+```
+
+### Site B (Client) কনফিগারেশন
+```shell
+/interface l2tp-client add connect-to=203.0.113.1 user=siteb password=sitebpass use-ipsec=yes ipsec-secret=123456
+/ip address add address=10.10.20.2/24 interface=ether1
+```
+
+### Route যোগ করুন
+```shell
+/ip route add dst-address=192.168.1.0/24 gateway=10.10.20.1
+/ip route add dst-address=192.168.2.0/24 gateway=10.10.20.2
+```
+
+## উদাহরণ: WireGuard Site-to-Site VPN
+
+### Site A (Server)
+```shell
+/interface wireguard add name=wg1 listen-port=13231 private-key="<server-private-key>"
+/interface wireguard peers add interface=wg1 public-key="<client-public-key>" allowed-address=10.20.20.2/32
+/ip address add address=10.20.20.1/24 interface=wg1
+```
+
+### Site B (Client)
+```shell
+/interface wireguard add name=wg1 listen-port=13232 private-key="<client-private-key>"
+/interface wireguard peers add interface=wg1 public-key="<server-public-key>" allowed-address=10.20.20.1/32 endpoint-address=203.0.113.1 endpoint-port=13231
+/ip address add address=10.20.20.2/24 interface=wg1
+```
+
+### Route যোগ করুন
+```shell
+/ip route add dst-address=192.168.1.0/24 gateway=10.20.20.1
+/ip route add dst-address=192.168.2.0/24 gateway=10.20.20.2
+```
+
+## NAT ও Firewall কনফিগারেশন
+- VPN ইন্টারফেসে NAT ও ফায়ারওয়াল রুল ঠিকমতো দিন
+- Site-to-Site ট্রাফিকের জন্য accept রুল দিন
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, ঢাকা ও চট্টগ্রাম অফিসের মধ্যে Site-to-Site VPN দিয়ে লোকাল নেটওয়ার্কের মতোই ফাইল শেয়ার, প্রিন্টার, সার্ভার এক্সেস করা হচ্ছে।
+
+## টিপস
+- IP Address ও Subnet ঠিকমতো সেট করুন
+- VPN ইন্টারফেসে NAT ও ফায়ারওয়াল কনফিগার করুন
+- লগ মনিটর করুন
+- ফেইলওভার ও ব্যাকআপ রুট রাখুন
+
+## উপসংহার
+
+Site-to-Site VPN ব্যবহার করে আপনি ভিন্ন ভৌগোলিক অবস্থানের নেটওয়ার্ককে নিরাপদ ও সহজে যুক্ত করতে পারবেন। মাইক্রোটিক রাউটারে L2TP/IPSec, WireGuard, OpenVPN—সবকিছুই সহজে ইমপ্লিমেন্ট করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [রিমোট অ্যাক্সেস VPN](/mikrotik/remote-vpn)

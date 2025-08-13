@@ -1,0 +1,89 @@
+---
+title: "Source NAT (Masquerade) ও Destination NAT (Port Forwarding)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্কে ইন্টারনেট শেয়ারিং, পাবলিক-টু-প্রাইভেট ট্রাফিক রিডাইরেক্ট, ও নিরাপত্তার জন্য NAT (Network Address Translation) অপরিহার্য। মাইক্রোটিকে Source NAT (Masquerade) ও Destination NAT (Port Forwarding) নিয়ে এখানে হাতে-কলমে টিউটোরিয়াল দেয়া হলো।
+
+## ১. NAT কী ও কেন?
+- Private IP-কে Public IP-তে রূপান্তর (Source NAT)
+- বাইরের ট্রাফিক নির্দিষ্ট ডিভাইসে পাঠানো (Destination NAT)
+- নিরাপত্তা, IP সংরক্ষণ, সার্ভিস এক্সপোজ
+
+## ২. Source NAT (Masquerade)
+
+### কী?
+- LAN থেকে ইন্টারনেট অ্যাক্সেস দিতে ব্যবহৃত
+- Outgoing ট্রাফিকের Source IP পরিবর্তন করে Public IP করে দেয়
+
+### কনফিগারেশন (Winbox/WebFig)
+- IP > Firewall > NAT > +
+- Chain: srcnat
+- Out Interface: ether1 (WAN)
+- Action: masquerade
+
+### কনফিগারেশন (CLI)
+```bash
+/ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade comment="LAN to Internet"
+```
+
+### নোট
+- একাধিক WAN থাকলে out-interface স্পেসিফাই করুন
+
+## ৩. Destination NAT (Port Forwarding)
+
+### কী?
+- বাইরের (WAN) ট্রাফিক নির্দিষ্ট LAN ডিভাইসে পাঠানো
+- উদাহরণ: Public IP:80 → 192.168.10.10:80
+
+### কনফিগারেশন (Winbox/WebFig)
+- IP > Firewall > NAT > +
+- Chain: dstnat
+- Dst. Address: Public IP
+- Protocol: tcp
+- Dst. Port: 80
+- Action: dst-nat
+- To Address: 192.168.10.10
+- To Port: 80
+
+### কনফিগারেশন (CLI)
+```bash
+/ip firewall nat add chain=dstnat dst-address=203.0.113.2 protocol=tcp dst-port=80 action=dst-nat to-addresses=192.168.10.10 to-ports=80 comment="HTTP Port Forward"
+```
+
+### DMZ (All Ports Forward)
+```bash
+/ip firewall nat add chain=dstnat dst-address=203.0.113.2 action=dst-nat to-addresses=192.168.10.10 comment="DMZ"
+```
+
+## ৪. Port Forwarding উদাহরণ
+- **Web Server:** 80, 443
+- **Remote Desktop:** 3389
+- **FTP:** 21
+
+## ৫. নিরাপত্তা টিপস
+- Port Forwarding সাবধানে ব্যবহার করুন
+- Firewall দিয়ে WAN থেকে Access Control দিন
+- Unused Port Forwarding রুল ডিলিট করুন
+
+## ৬. সমস্যা ও সমাধান
+- **Port Forward কাজ করছে না:**
+  - Firewall Filter চেক করুন
+  - NAT রুল অর্ডার চেক করুন
+  - LAN/WAN ইন্টারফেস ঠিক আছে কিনা দেখুন
+- **Double NAT:** দুইটি রাউটারে NAT হলে Port Forwarding সমস্যা হতে পারে
+
+## ৭. বাস্তব কেস স্টাডি
+
+### কেস: অফিসে Web Server Port Forward
+```bash
+/ip firewall nat add chain=dstnat dst-address=203.0.113.2 protocol=tcp dst-port=80 action=dst-nat to-addresses=192.168.10.10 to-ports=80
+```
+
+### কেস: একাধিক সার্ভিস Forward
+```bash
+/ip firewall nat add chain=dstnat dst-address=203.0.113.2 protocol=tcp dst-port=3389 action=dst-nat to-addresses=192.168.10.20 to-ports=3389
+```
+
+## উপসংহার
+Source NAT (Masquerade) ও Destination NAT (Port Forwarding) কনফিগারেশন জানা থাকলে ইন্টারনেট শেয়ারিং ও সার্ভিস এক্সপোজ সহজ হয়। পরবর্তী অধ্যায়ে ফায়ারওয়াল চেইন নিয়ে আলোচনা করা হবে।

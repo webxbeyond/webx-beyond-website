@@ -1,0 +1,60 @@
+---
+title: Dynamic DNS (DDNS) কনফিগারেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Dynamic DNS (DDNS) কনফিগারেশন
+
+Dynamic DNS (DDNS) হলো এমন একটি প্রযুক্তি, যার মাধ্যমে আপনার পরিবর্তনশীল (Dynamic) Public IP-কে একটি নির্দিষ্ট ডোমেইন নেমের সাথে যুক্ত করা যায়। এতে রিমোট অ্যাক্সেস, VPN, হোস্টিং ইত্যাদি সহজ হয়, কারণ IP পরিবর্তন হলেও ডোমেইন ঠিক থাকে।
+
+## DDNS কী ও কেন দরকার?
+- ISP থেকে Dynamic IP পাওয়া গেলে
+- রিমোট অ্যাক্সেস, VPN, ক্যামেরা, সার্ভার ইত্যাদিতে সহজ কানেক্টিভিটি
+- Public IP পরিবর্তন হলেও ডোমেইন অপরিবর্তিত
+
+## MikroTik-এ DDNS কনফিগারেশন (Cloud DDNS)
+
+### Step 1: MikroTik Cloud Enable করুন
+```shell
+/ip cloud set ddns-enabled=yes update-time=yes
+```
+
+### Step 2: DDNS Address চেক করুন
+```shell
+/ip cloud print
+```
+- এখানে `dns-name` ফিল্ডে আপনার DDNS Address পাবেন (যেমন: abc1234.sn.mynetname.net)
+
+### Step 3: DDNS Address ব্যবহার করুন
+- রিমোট অ্যাক্সেস, VPN, Winbox, SSH—সবখানেই এই DDNS Address ব্যবহার করুন
+
+## No-IP, DuckDNS, DynDNS ইত্যাদি থার্ড-পার্টি DDNS
+
+### Step 1: Script তৈরি করুন
+```shell
+/system script add name=noip_ddns policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive source="...No-IP update script..."
+```
+
+### Step 2: Scheduler-এ Script রান করুন
+```shell
+/system scheduler add name=noip_ddns interval=5m on-event=noip_ddns
+```
+
+> বিস্তারিত স্ক্রিপ্ট ও সেটিংস No-IP, DuckDNS, DynDNS-এর অফিসিয়াল ডকুমেন্টেশন থেকে নিন।
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, আপনার বাসার ইন্টারনেটের Public IP বারবার পরিবর্তন হয়। MikroTik Cloud DDNS চালু করলে সবসময় একটি নির্দিষ্ট ডোমেইন (abc1234.sn.mynetname.net) দিয়ে রাউটার, ক্যামেরা, সার্ভার—সবকিছু রিমোট থেকে এক্সেস করা যাবে।
+
+## টিপস
+- DDNS Address গোপন রাখুন, শেয়ার করার আগে সতর্ক থাকুন
+- থার্ড-পার্টি DDNS ব্যবহার করলে স্ক্রিপ্ট ও API Key নিরাপদ রাখুন
+- DDNS Address পরিবর্তন হলে লগ মনিটর করুন
+
+## উপসংহার
+
+Dynamic DNS (DDNS) ব্যবহার করে Dynamic IP-র ঝামেলা ছাড়াই সহজে ও নিরাপদে রিমোট অ্যাক্সেস, VPN, হোস্টিং ইত্যাদি পরিচালনা করা যায়। MikroTik Cloud DDNS ও থার্ড-পার্টি DDNS—দুটোই সহজে কনফিগার করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [VPN ফায়ারওয়াল ও সিকিউরিটি](/mikrotik/vpn-security)

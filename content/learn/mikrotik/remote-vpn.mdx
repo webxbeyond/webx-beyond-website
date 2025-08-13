@@ -1,0 +1,74 @@
+---
+title: রিমোট অ্যাক্সেস VPN
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+রিমোট অ্যাক্সেস VPN হলো এমন একটি প্রযুক্তি, যার মাধ্যমে রিমোট ইউজাররা ইন্টারনেটের যেকোনো জায়গা থেকে নিরাপদভাবে অফিস বা প্রাইভেট নেটওয়ার্কে কানেক্ট করতে পারে। মাইক্রোটিক রাউটারে রিমোট অ্যাক্সেস VPN কনফিগারেশন অত্যন্ত সহজ এবং নিরাপদ।
+
+## রিমোট অ্যাক্সেস VPN কী?
+
+রিমোট অ্যাক্সেস VPN মানে, একজন ইউজার তার ল্যাপটপ, মোবাইল বা ডেস্কটপ থেকে ইন্টারনেট ব্যবহার করে অফিস নেটওয়ার্কে সরাসরি কানেক্ট হতে পারে। এতে অফিসের ফাইল, সার্ভার, প্রিন্টার—সবকিছুই দূর থেকে এক্সেস করা যায়।
+
+## কোন VPN প্রোটোকল ব্যবহার করবেন?
+- L2TP/IPSec (সাধারণ ও নিরাপদ)
+- SSTP (SSL/TLS ভিত্তিক, Firewall traversal সহজ)
+- OpenVPN (শক্তিশালী ও ওপেন সোর্স)
+- WireGuard (আধুনিক ও দ্রুত)
+
+## উদাহরণ: L2TP/IPSec রিমোট অ্যাক্সেস VPN
+
+### Server Side (MikroTik)
+```shell
+/interface l2tp-server server set enabled=yes use-ipsec=required ipsec-secret=123456
+/ppp secret add name=remote1 password=remotePass service=l2tp
+/ip pool add name=remote-pool ranges=10.20.30.2-10.20.30.20
+/ip address add address=10.20.30.1/24 interface=ether1
+```
+
+### Client Side (Windows/Android/iOS)
+- L2TP/IPSec VPN অ্যাড করুন
+- Server Address: [Public IP]
+- Username: remote1
+- Password: remotePass
+- IPSec Pre-shared Key: 123456
+
+## উদাহরণ: WireGuard রিমোট অ্যাক্সেস VPN
+
+### Server Side (MikroTik)
+```shell
+/interface wireguard add name=wg1 listen-port=13231 private-key="<server-private-key>"
+/interface wireguard peers add interface=wg1 public-key="<client-public-key>" allowed-address=10.30.30.2/32
+/ip address add address=10.30.30.1/24 interface=wg1
+```
+
+### Client Side (Windows/Linux/Android/iOS)
+- WireGuard অ্যাপ ইনস্টল করুন
+- Server Public Key, Endpoint, Allowed IPs কনফিগার করুন
+
+## ফায়ারওয়াল ও NAT কনফিগারেশন
+- VPN ইন্টারফেসে accept রুল দিন
+- NAT Masquerade দিন
+
+```shell
+/ip firewall filter add chain=input protocol=udp dst-port=1701,500,4500 action=accept
+/ip firewall filter add chain=input protocol=udp dst-port=13231 action=accept
+/ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade
+```
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একজন অফিস কর্মী বাসা থেকে অফিসের ফাইল সার্ভারে কাজ করতে চান। রিমোট অ্যাক্সেস VPN দিয়ে নিরাপদভাবে কানেক্ট হয়ে সব রিসোর্স ব্যবহার করতে পারবেন।
+
+## টিপস
+- শক্তিশালী পাসওয়ার্ড ও এনক্রিপশন ব্যবহার করুন
+- ইউজার এক্সেস নিয়মিত রিভিউ করুন
+- লগ মনিটর করুন
+- ফায়ারওয়াল ও NAT ঠিকমতো কনফিগার করুন
+
+## উপসংহার
+
+রিমোট অ্যাক্সেস VPN ব্যবহার করে অফিস, স্কুল, ডাটা সেন্টার—সবখানেই রিমোট ইউজারদের জন্য নিরাপদ কানেক্টিভিটি নিশ্চিত করা যায়। মাইক্রোটিক রাউটারে L2TP/IPSec, SSTP, OpenVPN, WireGuard—সবকিছুই সহজে ইমপ্লিমেন্ট করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [Dynamic DNS (DDNS) কনফিগারেশন](/mikrotik/ddns)

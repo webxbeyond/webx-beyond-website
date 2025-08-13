@@ -1,0 +1,98 @@
+---
+title: SNMP নেটওয়ার্ক মনিটরিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে SNMP (Simple Network Management Protocol) হলো নেটওয়ার্ক ডিভাইস মনিটরিং, রিপোর্টিং ও অটোমেশন-এর জন্য একটি স্ট্যান্ডার্ড প্রোটোকল। SNMP-এর মাধ্যমে আপনি রাউটার, সুইচ, সার্ভার, এবং অন্যান্য ডিভাইসের পারফরম্যান্স, ব্যান্ডউইথ, রিসোর্স ইউটিলাইজেশন, এবং ইভেন্ট রিয়েল-টাইমে মনিটর করতে পারেন। এই টিউটোরিয়ালে আমরা SNMP কনফিগারেশন, মনিটরিং সফটওয়্যার ইন্টিগ্রেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## SNMP কী ও কেন দরকার?
+
+- নেটওয়ার্ক ডিভাইসের পারফরম্যান্স, ব্যান্ডউইথ, রিসোর্স মনিটরিং
+- এক্সটার্নাল মনিটরিং সফটওয়্যারে (PRTG, Zabbix, LibreNMS) ডাটা পাঠানো
+- অটোমেশন, রিপোর্টিং, অ্যালার্টিং
+
+---
+
+## MikroTik-এ SNMP কনফিগারেশন
+
+### ১. SNMP Enable করুন
+```shell
+/snmp set enabled=yes
+```
+
+### ২. Community ও Contact সেট করুন
+```shell
+/snmp set community=public contact="Network Admin" location="Server Room"
+```
+- `community`: SNMP string (public/private)
+- `contact`: Admin info
+- `location`: Device location
+
+### ৩. SNMP Trap (ঐচ্ছিক)
+```shell
+/snmp set trap-community=public trap-version=2
+/snmp set trap-target=192.168.88.200
+```
+- `trap-target`: SNMP Trap Receiver IP
+
+---
+
+## Winbox-এ SNMP কনফিগারেশন
+
+1. **IP > SNMP**: Enable করুন, Community, Contact, Location দিন
+2. Trap Receiver অ্যাড করুন (ঐচ্ছিক)
+3. SNMP Status ও Logs চেক করুন
+
+---
+
+## SNMP মনিটরিং সফটওয়্যার
+
+- **PRTG Network Monitor**: Windows-based, সহজ UI
+- **Zabbix**: Linux-based, Highly Scalable
+- **LibreNMS**: Open Source, Auto Discovery
+- **Cacti**: Graphing-focused
+
+### SNMP Device অ্যাড করার ধাপ (PRTG/Zabbix)
+- Device IP, SNMP Community, Version দিন
+- Device Auto-Discovery করুন
+- Graph, Alert, Report Enable করুন
+
+---
+
+## SNMP Security
+- Community string শক্তিশালী ও ইউনিক রাখুন
+- SNMPv3 ব্যবহার করলে encryption ও authentication সুবিধা
+- Firewall দিয়ে SNMP port (UDP 161) restrict করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP-তে ৫০+ রাউটার মনিটরিং
+- SNMP Enable করে PRTG/Zabbix-এ Device অ্যাড করুন
+
+### কেস ২: Bandwidth ও Resource Usage রিপোর্টিং
+- SNMP Graph ও Report Export করুন
+
+### কেস ৩: Device Down/Alert
+- SNMP Trap Receiver Enable করুন, অ্যালার্ট পেতে
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Community string শক্তিশালী ও ইউনিক রাখুন
+- SNMP Trap Receiver Enable করলে দ্রুত অ্যালার্ট পাবেন
+- Firewall দিয়ে SNMP port restrict করুন
+- SNMP Status ও Logs নিয়মিত চেক করুন
+
+---
+
+## উপসংহার
+
+SNMP নেটওয়ার্ক মনিটরিং ব্যবহার করলে নেটওয়ার্ক ডিভাইসের পারফরম্যান্স, ব্যান্ডউইথ, রিসোর্স ইউটিলাইজেশন সহজেই মনিটর, রিপোর্ট ও অটোমেট করা যায়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই SNMP ইন্টিগ্রেশন করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [Netwatch ও স্ক্রিপ্টিং দ্বারা অ্যালার্ট](/mikrotik/netwatch)

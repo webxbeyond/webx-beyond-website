@@ -1,0 +1,81 @@
+---
+title: "অ্যাডভান্সড ফিল্টারিং – Layer 7, Raw Table"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্কে নির্দিষ্ট অ্যাপ্লিকেশন, কনটেন্ট বা ট্রাফিক ব্লক/আনুমতি দিতে মাইক্রোটিকের অ্যাডভান্সড ফায়ারওয়াল ফিচার Layer 7 Protocol ও Raw Table অত্যন্ত কার্যকর। এখানে হাতে-কলমে কনফিগারেশন ও ব্যবহারিক দিক নিয়ে আলোচনা করা হলো।
+
+## ১. Layer 7 Protocol (L7)
+
+### কী?
+- ট্রাফিকের পে-লোড (ডাটা) এনালাইসিস করে নির্দিষ্ট প্যাটার্ন/অ্যাপ্লিকেশন ফিল্টার
+- HTTP, Messenger, Torrent ইত্যাদি ব্লক/আনুমতি
+
+### কনফিগারেশন
+#### ক. L7 প্যাটার্ন তৈরি
+```bash
+/ip firewall layer7-protocol add name=block_facebook regexp="^.+(facebook.com).*$"
+```
+#### খ. ফায়ারওয়াল রুলে ব্যবহার
+```bash
+/ip firewall filter add chain=forward layer7-protocol=block_facebook action=drop comment="Block Facebook"
+```
+
+### টিপস
+- L7 বেশি ট্রাফিক হলে CPU লোড বাড়ে
+- ছোট নেটওয়ার্কে ব্যবহার উপযোগী
+
+## ২. Raw Table
+
+### কী?
+- Fastest packet filtering, connection tracking ছাড়াই
+- DDoS, Port Scan, Malicious Traffic ব্লক করতে কার্যকর
+
+### কনফিগারেশন
+#### ক. Simple Raw Rule
+```bash
+/ip firewall raw add chain=prerouting src-address-list=bad_ip action=drop comment="Block Bad IP"
+```
+#### খ. Port Scan Detection
+```bash
+/ip firewall raw add chain=prerouting protocol=tcp tcp-flags=fin,syn,rst,psh,ack,urg action=drop comment="Block Port Scan"
+```
+
+### টিপস
+- Raw Table রুল Filter Table-এর আগে প্রসেস হয়
+- Connection Tracking Off থাকলেও কাজ করে
+
+## ৩. বাস্তব উদাহরণ
+
+### কেস ১: Messenger ব্লক
+```bash
+/ip firewall layer7-protocol add name=block_messenger regexp="^.+(messenger.com).*$"
+/ip firewall filter add chain=forward layer7-protocol=block_messenger action=drop
+```
+
+### কেস ২: DDoS Source ব্লক
+```bash
+/ip firewall address-list add list=ddos_src address=1.2.3.4
+/ip firewall raw add chain=prerouting src-address-list=ddos_src action=drop
+```
+
+## ৪. সমস্যা ও সমাধান
+- **L7 Slow:** বেশি ট্রাফিকে CPU লোড বাড়ে
+- **Raw Table রুল কাজ করছে না:** রুল অর্ডার ও চেইন চেক করুন
+
+## ৫. Layer 7 vs Raw Table
+
+| ফিচার         | Layer 7           | Raw Table         |
+|---------------|-------------------|------------------|
+| কাজ           | পে-লোড এনালাইসিস | Fastest Filtering|
+| CPU লোড      | বেশি              | কম               |
+| ব্যবহার       | অ্যাপ/কনটেন্ট ব্লক| DDoS, Scan Block |
+| Connection Tracking | দরকার        | দরকার নেই        |
+
+## ৬. নিরাপত্তা টিপস
+- L7 Filter কম ব্যবহার করুন
+- Raw Table দিয়ে DDoS/Scan ব্লক করুন
+- রুল অর্ডার ও চেইন ঠিক রাখুন
+
+## উপসংহার
+Layer 7 ও Raw Table—দুইটি অ্যাডভান্সড ফায়ারওয়াল ফিচার সঠিকভাবে ব্যবহার করলে নেটওয়ার্ক আরও নিরাপদ ও কাস্টমাইজড করা যায়। পরবর্তী অধ্যায়ে Address List ও টাইম-বেইজড রুল নিয়ে আলোচনা করা হবে।

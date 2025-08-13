@@ -1,0 +1,64 @@
+---
+title: হটস্পট সেটআপ ও কাস্টম লগইন পেজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক হটস্পট হলো এমন একটি ফিচার, যার মাধ্যমে ইউজার অথেন্টিকেশন, ব্যান্ডউইথ কন্ট্রোল, ইউজার ম্যানেজমেন্ট এবং কাস্টম লগইন পেজসহ পাবলিক ওয়াইফাই সহজেই পরিচালনা করা যায়। হোটেল, রেস্টুরেন্ট, স্কুল, অফিস—সবখানেই হটস্পট অত্যন্ত জনপ্রিয়।
+
+## হটস্পট কী?
+
+হটস্পট হলো এমন একটি নেটওয়ার্ক, যেখানে ইউজাররা ওয়াইফাইতে কানেক্ট করার পর ব্রাউজার ওপেন করলে লগইন পেজ দেখতে পায় এবং ইউজারনেম/পাসওয়ার্ড দিয়ে ইন্টারনেট ব্যবহার করতে পারে।
+
+## হটস্পট সেটআপ (বেসিক)
+
+### Step 1: Address Pool ও DHCP Server তৈরি
+```shell
+/ip pool add name=hs-pool ranges=192.168.10.10-192.168.10.254
+/ip dhcp-server add name=hs-dhcp interface=bridge1 address-pool=hs-pool lease-time=1h
+```
+
+### Step 2: Hotspot Setup Wizard
+Winbox/WebFig-এ Hotspot Setup Wizard ব্যবহার করুন অথবা CLI-তে:
+```shell
+/ip hotspot setup
+```
+
+### Step 3: User Profile ও ইউজার তৈরি
+```shell
+/ip hotspot user add name=user1 password=pass1 profile=default
+```
+
+### Step 4: কাস্টম লগইন পেজ কনফিগার
+Hotspot ফোল্ডারে HTML ফাইল এডিট করে কাস্টম লগইন পেজ তৈরি করুন:
+- Winbox: Files > hotspot > login.html
+- FTP দিয়ে hotspot ফোল্ডারে কাস্টম HTML আপলোড করুন
+
+### Step 5: Bandwidth ও Session Control
+```shell
+/ip hotspot user profile set default rate-limit=2M/2M session-timeout=1h
+```
+
+## হটস্পট-এ আরও কী কী করা যায়?
+- Voucher/Token Based Access
+- MAC Authentication
+- Walled Garden (নির্দিষ্ট সাইট ফ্রি এক্সেস)
+- User Expiry ও Auto Disconnect
+- কাস্টম ব্র্যান্ডিং ও বিজ্ঞাপন
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি ক্যাফেতে ১০০ ইউজারকে ১ ঘণ্টা ফ্রি ইন্টারনেট দিতে হবে এবং কাস্টম ব্র্যান্ডিংসহ লগইন পেজ দেখাতে হবে। Hotspot Setup Wizard দিয়ে সহজেই এই কনফিগারেশন করা যায়।
+
+## টিপস
+- Default Login Page ব্যাকআপ রাখুন
+- User Profile-এ Rate Limit ও Session Timeout ঠিক করুন
+- Walled Garden দিয়ে নির্দিষ্ট সাইট ফ্রি রাখুন
+- লগ মনিটর করুন
+
+## উপসংহার
+
+মাইক্রোটিক হটস্পট ব্যবহার করে পাবলিক ওয়াইফাই, ইউজার অথেন্টিকেশন, কাস্টম লগইন পেজ—সবকিছুই সহজে ও পেশাদারভাবে পরিচালনা করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [ইউজার প্রোফাইল, ব্যান্ডউইথ লিমিট ও সেশন কন্ট্রোল](/mikrotik/hotspot-user-profile)

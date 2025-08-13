@@ -1,0 +1,118 @@
+---
+title: API ব্যবহার করে এক্সটার্নাল কন্ট্রোল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক RouterOS API ব্যবহার করে এক্সটার্নাল অ্যাপ্লিকেশন, স্ক্রিপ্ট, ও টুলস দ্বারা রাউটার কনফিগারেশন, মনিটরিং, ও অটোমেশন করা যায়। API ইন্টিগ্রেশন নেটওয়ার্ক অটোমেশন, কাস্টম ড্যাশবোর্ড, এবং থার্ড-পার্টি টুলসের জন্য অত্যন্ত গুরুত্বপূর্ণ।
+
+---
+
+## RouterOS API কী?
+
+- RouterOS API একটি TCP ভিত্তিক ইন্টারফেস, যা এক্সটার্নাল ক্লায়েন্ট থেকে রাউটার কনফিগার ও মনিটর করতে দেয়।
+- Winbox, WebFig ছাড়াও API দিয়ে প্রোগ্রামেটিক কনফিগারেশন সম্ভব।
+
+---
+
+## API Enable ও Basic Configuration
+
+### ১. API Enable করুন
+```shell
+/ip service enable api
+```
+
+### ২. API Port পরিবর্তন
+```shell
+/ip service set api port=8728
+```
+
+### ৩. API Service Security
+- Strong Password ব্যবহার করুন
+- IP Service Binding করুন
+- Firewall দিয়ে API Port Protect করুন
+
+---
+
+## API Client Libraries
+
+- **Python:** `routeros-api`, `librouteros`
+- **PHP:** `routeros-api`
+- **Node.js:** `node-routeros`
+- **Go:** `go-routeros`
+
+---
+
+## Python দিয়ে API Example
+
+```python
+from routeros_api import RouterOsApiPool
+
+api_pool = RouterOsApiPool('192.168.88.1', username='admin', password='password', port=8728)
+api = api_pool.get_api()
+
+# Interface List
+interfaces = api.get_resource('interface').get()
+for iface in interfaces:
+    print(iface['name'])
+
+api_pool.disconnect()
+```
+
+---
+
+## Node.js দিয়ে API Example
+
+```js
+const { RouterOSClient } = require('node-routeros');
+const client = new RouterOSClient({
+  host: '192.168.88.1',
+  user: 'admin',
+  password: 'password',
+  port: 8728
+});
+
+client.connect().then(async () => {
+  const interfaces = await client.menu('/interface').getAll();
+  interfaces.forEach(i => console.log(i.name));
+  client.close();
+});
+```
+
+---
+
+## API দিয়ে কী কী করা যায়?
+- কনফিগারেশন পরিবর্তন
+- মনিটরিং ও ড্যাশবোর্ড
+- ইউজার/ব্যান্ডউইথ ম্যানেজমেন্ট
+- অটোমেটেড টাস্ক ও রিপোর্টিং
+
+---
+
+## Security Best Practices
+- Strong Password ও User Permission
+- API Port Change ও Firewall Protect
+- Service Binding
+- TLS/SSL (API-SSL service)
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP Billing System Integration
+- API দিয়ে ইউজার, ব্যান্ডউইথ, ও পেমেন্ট অটোমেশন
+
+### কেস ২: Custom Dashboard
+- Node.js/Python দিয়ে লাইভ মনিটরিং ও কনফিগারেশন
+
+### কেস ৩: Automated Backup
+- API দিয়ে রাউটার কনফিগারেশন ব্যাকআপ ও ডাউনলোড
+
+---
+
+## উপসংহার
+
+RouterOS API ব্যবহার করে এক্সটার্নাল কন্ট্রোল, অটোমেশন, এবং কাস্টম টুলস তৈরি করা যায়। এটি নেটওয়ার্ক ম্যানেজমেন্টকে আরও সহজ, দ্রুত, এবং স্কেলেবল করে তোলে।
+
+---
+
+**পরবর্তী টপিক:** [স্মল অফিস/হোম নেটওয়ার্ক সেটআপ](/mikrotik/soho)

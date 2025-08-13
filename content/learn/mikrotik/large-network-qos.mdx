@@ -1,0 +1,96 @@
+---
+title: ৫০০+ ইউজারের জন্য ব্যান্ডউইথ কন্ট্রোল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় নেটওয়ার্কে (৫০০+ ইউজার) ব্যান্ডউইথ কন্ট্রোল, ট্রাফিক শেপিং, এবং QoS বাস্তবায়ন করা চ্যালেঞ্জিং। মাইক্রোটিক RouterOS-এ স্কেলেবল ব্যান্ডউইথ ম্যানেজমেন্ট, PCQ, Simple Queue, Queue Tree, এবং Layer 7 Filtering ব্যবহার করে সহজেই বড় নেটওয়ার্কের জন্য অপ্টিমাইজড কনফিগারেশন করা যায়।
+
+---
+
+## বড় নেটওয়ার্ক ডিজাইন
+
+- **Core Router:** High Performance
+- **Distribution Switch:** VLAN/Trunk
+- **Access Layer:** Multiple User Segments
+- **Monitoring:** Real-time Traffic Analysis
+
+---
+
+## PCQ (Per Connection Queuing) কনফিগারেশন
+
+### ১. PCQ Type Create
+```shell
+/queue type add name=pcq-download kind=pcq pcq-rate=2M pcq-classifier=dst-address
+/queue type add name=pcq-upload kind=pcq pcq-rate=1M pcq-classifier=src-address
+```
+
+### ২. Simple Queue for Large User Base
+```shell
+/queue simple add name="User-Internet" target=192.168.0.0/16 max-limit=500M/500M queue=pcq-upload/pcq-download
+```
+
+---
+
+## Queue Tree (Advanced Traffic Shaping)
+
+- Parent Queue দিয়ে Bandwidth Divide
+- Child Queue-এ PCQ/Other Type
+
+### Example
+```shell
+/queue tree add name="Download" parent=global-in queue=pcq-download max-limit=500M
+/queue tree add name="Upload" parent=global-out queue=pcq-upload max-limit=500M
+```
+
+---
+
+## Layer 7 Filtering
+
+- Application/Content Based Bandwidth Control
+
+### Example
+```shell
+/ip firewall layer7-protocol add name=facebook regexp="^.+(facebook.com).*$"
+/ip firewall mangle add chain=forward layer7-protocol=facebook action=mark-connection new-connection-mark=facebook_conn
+/queue tree add name="Facebook" parent=global-in packet-mark=facebook_conn max-limit=50M queue=pcq-download
+```
+
+---
+
+## Monitoring & Reporting
+
+- Graphing, SNMP, Syslog
+- Real-time Bandwidth Usage
+- Automated Alert
+
+---
+
+## Performance Optimization
+
+- High Performance Hardware
+- Connection Tracking Tuning
+- Regular Backup
+- Firmware Update
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP Network with ১০০০+ User
+- PCQ + Queue Tree দিয়ে Fair Bandwidth Distribution
+
+### কেস ২: Office Network with Application Control
+- Layer 7 Filtering + Queue Tree
+
+### কেস ৩: Real-time Monitoring
+- SNMP + Graphing
+
+---
+
+## উপসংহার
+
+বড় নেটওয়ার্কে ব্যান্ডউইথ কন্ট্রোল, ট্রাফিক শেপিং, এবং QoS বাস্তবায়ন করলে ইউজারদের জন্য ফেয়ার, দ্রুত, এবং নিরাপদ ইন্টারনেট নিশ্চিত করা যায়। মাইক্রোটিক RouterOS-এ PCQ, Queue Tree, Layer 7 Filtering, এবং Monitoring টুলস ব্যবহার করে সহজেই স্কেলেবল কনফিগারেশন করা যায়।
+
+---
+
+**শেষ টপিক!**

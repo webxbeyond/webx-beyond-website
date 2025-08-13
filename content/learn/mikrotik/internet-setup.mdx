@@ -1,0 +1,80 @@
+---
+title: "ইন্টারনেট অ্যাক্সেস সেটআপ – DHCP Client, PPPoE, Static IP"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে ইন্টারনেট সংযোগ কনফিগার করার জন্য সাধারণত তিনটি পদ্ধতি ব্যবহৃত হয়: DHCP Client, PPPoE Client ও Static IP। এখানে প্রতিটি পদ্ধতির ধাপে ধাপে কনফিগারেশন ও সমস্যা-সমাধান নিয়ে বিস্তারিত আলোচনা করা হলো।
+
+## ১. DHCP Client দিয়ে ইন্টারনেট
+
+যদি আপনার ISP বা আপস্ট্রিম রাউটার DHCP সার্ভার চালু রাখে, তাহলে WAN ইন্টারফেসে DHCP Client কনফিগার করুন।
+
+- **Winbox/WebFig:**
+  - IP > DHCP Client > +
+  - Interface: ether1 (WAN)
+  - Apply/OK
+- **CLI:**
+  ```
+  /ip dhcp-client add interface=ether1 disabled=no
+  ```
+- **নোট:** DHCP Client সফল হলে অটো IP, Gateway, DNS পাবে
+
+## ২. PPPoE Client দিয়ে ইন্টারনেট
+
+অনেক ISP ব্রডব্যান্ড সংযোগে PPPoE ব্যবহার করে।
+
+- **Winbox/WebFig:**
+  - PPP > Interface > + > PPPoE Client
+  - Interface: ether1 (WAN)
+  - User/Password: ISP থেকে পাওয়া তথ্য
+  - Apply/OK
+- **CLI:**
+  ```
+  /interface pppoe-client add name=pppoe-out1 interface=ether1 user=youruser password=yourpass disabled=no
+  ```
+- **নোট:** PPPoE সংযোগ হলে অটো IP, Gateway, DNS পাবে
+
+## ৩. Static IP দিয়ে ইন্টারনেট
+
+ISP থেকে নির্দিষ্ট IP, Gateway, DNS দিলে Static IP কনফিগার করুন।
+
+- **Winbox/WebFig:**
+  - IP > Addresses > +
+  - Address: 203.0.113.2/30 (উদাহরণ)
+  - Interface: ether1 (WAN)
+  - Apply/OK
+  - IP > Routes > + > Gateway: 203.0.113.1
+  - IP > DNS > Servers: 8.8.8.8, 1.1.1.1
+- **CLI:**
+  ```
+  /ip address add address=203.0.113.2/30 interface=ether1
+  /ip route add gateway=203.0.113.1
+  /ip dns set servers=8.8.8.8,1.1.1.1
+  ```
+
+## ৪. ইন্টারনেট টেস্ট ও ট্রাবলশুটিং
+
+- **Ping:**
+  ```
+  /ping 8.8.8.8
+  /ping google.com
+  ```
+- **DNS সমস্যা:** DNS Server ঠিক আছে কিনা চেক করুন
+- **Gateway সমস্যা:** Default Route (0.0.0.0/0) আছে কিনা দেখুন
+- **NAT:** LAN থেকে ইন্টারনেট দিতে NAT (Masquerade) দরকার
+  ```
+  /ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade
+  ```
+
+## ৫. Multi-WAN ও Failover (সংক্ষেপে)
+
+- একাধিক ISP থাকলে ECMP, Policy Routing, বা Scripted Failover ব্যবহার করা যায়
+- বিস্তারিত পরবর্তী মডিউলে
+
+## ৬. নিরাপত্তা টিপস
+- WAN ইন্টারফেসে অপ্রয়োজনীয় সার্ভিস বন্ধ রাখুন
+- Firewall দিয়ে WAN থেকে Management Access সীমিত করুন
+- Public IP থাকলে Port Forwarding সাবধানে কনফিগার করুন
+
+## উপসংহার
+DHCP Client, PPPoE ও Static IP—তিনটি পদ্ধতিতেই মাইক্রোটিক রাউটার ইন্টারনেট সংযোগ দিতে পারে। আপনার ISP-এর ধরন অনুযায়ী সঠিক পদ্ধতি বেছে নিন। পরবর্তী অধ্যায়ে বেসিক ফায়ারওয়াল নিয়ে আলোচনা করা হবে।

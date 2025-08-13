@@ -1,0 +1,78 @@
+---
+title: Policy Based Routing (PBR)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Policy Based Routing (PBR) হলো এমন একটি টেকনিক, যার মাধ্যমে নির্দিষ্ট নীতিমালা (Policy) অনুযায়ী ট্রাফিকের রাউট নির্ধারণ করা যায়। সাধারণত Source Address, Destination Address, Port, Protocol, Interface ইত্যাদির ভিত্তিতে ট্রাফিককে ভিন্ন ভিন্ন গেটওয়ে বা রাউটিং টেবিলে পাঠানো হয়।
+
+## PBR কেন দরকার?
+- মাল্টি-ISP সংযোগে নির্দিষ্ট ইউজার/নেটওয়ার্ককে নির্দিষ্ট ISP-তে পাঠানো
+- নির্দিষ্ট অ্যাপ্লিকেশন/সার্ভিসের জন্য আলাদা রাউট
+- লোড ব্যালান্সিং ও ফেইলওভার
+- ট্রাফিক ইঞ্জিনিয়ারিং
+
+## MikroTik-এ PBR কিভাবে কাজ করে?
+
+MikroTik-এ মূলত ফায়ারওয়াল Mangle রুল ব্যবহার করে ট্রাফিক মার্কিং করা হয়, এরপর Routing Table-এ Policy সেট করা হয়।
+
+### ধাপ ১: Routing Table তৈরি
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.2 routing-table=to_ISP2
+```
+
+### ধাপ ২: Mangle রুল দিয়ে ট্রাফিক মার্কিং
+
+ধরা যাক, 192.168.10.0/24 নেটওয়ার্কের ট্রাফিক ISP2-তে পাঠাতে চান:
+
+```shell
+/ip firewall mangle
+add chain=prerouting src-address=192.168.10.0/24 action=mark-routing new-routing-mark=to_ISP2
+```
+
+### ধাপ ৩: মার্ক করা ট্রাফিকের জন্য রাউটিং টেবিল অ্যাসাইন
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.2 routing-table=to_ISP2
+```
+
+## বাস্তব উদাহরণ: মাল্টি-ISP ও PBR
+
+ধরা যাক, আপনার দুটি ISP:
+- ISP1: 198.51.100.1 (Default)
+- ISP2: 203.0.113.2 (Specific Users)
+
+192.168.10.0/24 নেটওয়ার্ক ISP2-তে যাবে, বাকি সবাই ISP1-এ যাবে:
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=198.51.100.1
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.2 routing-table=to_ISP2
+
+/ip firewall mangle
+add chain=prerouting src-address=192.168.10.0/24 action=mark-routing new-routing-mark=to_ISP2
+```
+
+## PBR-এ আরও কী কী করা যায়?
+- নির্দিষ্ট Port/Protocol ভিত্তিক রাউটিং
+- Source Address List ব্যবহার
+- Time-based Policy
+
+### Port ভিত্তিক উদাহরণ:
+
+```shell
+/ip firewall mangle
+add chain=prerouting protocol=tcp dst-port=443 action=mark-routing new-routing-mark=to_ISP2
+```
+
+## PBR কনফিগারেশনে সতর্কতা
+- ভুল মার্কিং করলে ট্রাফিক লুপ বা ব্লক হতে পারে
+- Routing Table ও Mangle রুলের অর্ডার ঠিক রাখতে হবে
+- ফেইলওভার ও ব্যাকআপ রাউটিং ঠিকমতো কনফিগার করুন
+
+## উপসংহার
+
+Policy Based Routing (PBR) ব্যবহার করে আপনি নেটওয়ার্কের ট্রাফিককে আরও কাস্টমাইজড ও স্মার্টভাবে নিয়ন্ত্রণ করতে পারবেন। মাল্টি-ISP, লোড ব্যালান্সিং, নির্দিষ্ট অ্যাপ্লিকেশন বা ইউজার ভিত্তিক রাউটিং—সবকিছুতেই PBR অত্যন্ত কার্যকর।
+
+---
+
+**পরবর্তী টপিক:** [ECMP ও লোড ব্যালান্সিং](/mikrotik/ecmp-load-balancing)

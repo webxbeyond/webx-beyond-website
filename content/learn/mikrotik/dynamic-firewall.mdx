@@ -1,0 +1,89 @@
+---
+title: স্ক্রিপ্ট দিয়ে ডাইনামিক ফায়ারওয়াল রুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক RouterOS-এ স্ক্রিপ্টিং-এর মাধ্যমে ডাইনামিক ফায়ারওয়াল রুলস তৈরি, পরিবর্তন ও ম্যানেজ করা যায়। এটি নেটওয়ার্ক সিকিউরিটি, অটোমেশন, এবং কাস্টম কন্ডিশন অনুযায়ী ফায়ারওয়াল নিয়ন্ত্রণের জন্য অত্যন্ত গুরুত্বপূর্ণ। এই টিউটোরিয়ালে আমরা স্ক্রিপ্ট দিয়ে ডাইনামিক ফায়ারওয়াল রুলস কনফিগারেশন, উদাহরণ, এবং বাস্তব কেস স্টাডি নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## ডাইনামিক ফায়ারওয়াল রুলস কী ও কেন দরকার?
+
+- অটোমেটেড সিকিউরিটি
+- কাস্টম কন্ডিশন অনুযায়ী ফায়ারওয়াল নিয়ন্ত্রণ
+- Netwatch, Scheduler, Event-based Automation
+
+---
+
+## স্ক্রিপ্ট দিয়ে ফায়ারওয়াল রুল অ্যাড/রিমুভ
+
+### ১. ফায়ারওয়াল রুল অ্যাড
+```shell
+/ip firewall filter add chain=input src-address=192.168.88.10 action=drop comment="Block User"
+```
+
+### ২. ফায়ারওয়াল রুল রিমুভ
+```shell
+/ip firewall filter remove [find comment="Block User"]
+```
+
+### ৩. Address List-এ ডাইনামিক IP অ্যাড
+```shell
+/ip firewall address-list add list=blocked address=192.168.88.20 timeout=1h
+```
+
+---
+
+## Netwatch/Scheduler দিয়ে ডাইনামিক ফায়ারওয়াল
+
+- Netwatch-এর down-script-এ ফায়ারওয়াল রুল অ্যাড/রিমুভ
+- Scheduler দিয়ে নির্দিষ্ট সময়ে ফায়ারওয়াল রুল পরিবর্তন
+
+### Netwatch Example
+```shell
+/tool netwatch add host=8.8.8.8 down-script="/ip firewall filter add chain=input src-address=192.168.88.10 action=drop comment=\"Block User\"" up-script="/ip firewall filter remove [find comment=\"Block User\"]"
+```
+
+### Scheduler Example
+```shell
+/system scheduler add name=block-user interval=1d on-event="/ip firewall filter add chain=input src-address=192.168.88.10 action=drop comment=\"Block User\""
+```
+
+---
+
+## Winbox-এ Script দিয়ে ফায়ারওয়াল
+
+1. **System > Scripts/Scheduler**: Script ও Scheduler Add করুন
+2. **Tools > Netwatch**: up/down-script-এ ফায়ারওয়াল রুল দিন
+3. **IP > Firewall > Filter/Address List**: ডাইনামিক রুল দেখুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: Suspicious IP ডিটেক্ট হলে অটো-ব্লক
+- Script + Address List + Timeout ব্যবহার করুন
+
+### কেস ২: Gateway Down হলে ফায়ারওয়াল রুল পরিবর্তন
+- Netwatch + Script ব্যবহার করুন
+
+### কেস ৩: নির্দিষ্ট সময়ে ফায়ারওয়াল রুল অ্যাড/রিমুভ
+- Scheduler + Script ব্যবহার করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Script-এর Source ও Logic ভালোভাবে টেস্ট করুন
+- Timeout ও Comment ব্যবহার করুন
+- Automation-এর জন্য Netwatch/Scheduler ব্যবহার করুন
+- ফায়ারওয়াল রুলস নিয়মিত মনিটর করুন
+
+---
+
+## উপসংহার
+
+স্ক্রিপ্ট দিয়ে ডাইনামিক ফায়ারওয়াল রুলস ব্যবহার করলে নেটওয়ার্ক সিকিউরিটি, অটোমেশন, এবং কাস্টম কন্ডিশন অনুযায়ী ফায়ারওয়াল নিয়ন্ত্রণ সহজ ও শক্তিশালী হয়। মাইক্রোটিকের বিল্ট-ইন স্ক্রিপ্টিং ও Automation টুল ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [API ব্যবহার করে এক্সটার্নাল কন্ট্রোল](/mikrotik/api)

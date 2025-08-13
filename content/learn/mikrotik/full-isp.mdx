@@ -1,0 +1,113 @@
+---
+title: সম্পূর্ণ ISP নেটওয়ার্ক – PPPoE, Hotspot, VLANs
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+একটি পূর্ণাঙ্গ ISP নেটওয়ার্ক ডিজাইন ও কনফিগার করতে হলে PPPoE, Hotspot, VLANs, এবং অন্যান্য ফিচার একত্রে ব্যবহার করতে হয়। এই টিউটোরিয়ালে আমরা একটি বাস্তব ISP নেটওয়ার্কের ডিজাইন, কনফিগারেশন, এবং বেস্ট প্র্যাকটিস নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## ISP নেটওয়ার্ক ডিজাইন
+
+- **Core Router:** PPPoE Server, VLAN Management
+- **Distribution Switch:** VLAN Trunking
+- **Access Point:** Hotspot, DHCP
+- **Redundancy:** Multi-ISP, Failover
+
+---
+
+## PPPoE Server Setup
+
+### ১. PPPoE Server Enable
+```shell
+/interface pppoe-server server add interface=ether2 service-name=ISP-PPPoE disabled=no
+```
+
+### ২. PPP Profile ও Secrets
+```shell
+/ppp profile add name=ISP-Profile local-address=10.10.10.1 remote-address=pppoe-pool dns-server=8.8.8.8
+/ppp secret add name=user1 password=pass1 profile=ISP-Profile service=pppoe
+```
+
+### ৩. IP Pool
+```shell
+/ip pool add name=pppoe-pool ranges=10.10.10.2-10.10.10.254
+```
+
+---
+
+## VLAN Configuration
+
+### ১. VLAN Add
+```shell
+/interface vlan add name=VLAN10 vlan-id=10 interface=ether3
+/ip address add address=192.168.10.1/24 interface=VLAN10
+```
+
+### ২. VLAN Trunking (Switch)
+- Managed Switch-এ VLAN Trunk/Access Port কনফিগার করুন
+
+---
+
+## Hotspot Setup
+
+### ১. Hotspot Enable
+```shell
+/ip hotspot setup interface=ether4
+```
+
+### ২. User Profile ও Login Page
+- Custom Login Page, User Profile, Bandwidth Limit
+
+---
+
+## DHCP Server (Access Network)
+```shell
+/ip dhcp-server add name=dhcp1 interface=VLAN10 address-pool=192.168.10.10-192.168.10.254
+/ip dhcp-server network add address=192.168.10.0/24 gateway=192.168.10.1
+```
+
+---
+
+## Security & Management
+
+- Firewall Rules
+- NAT
+- User Management
+- Monitoring (SNMP, Graphing)
+- Backup & Restore
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: PPPoE + VLAN Based ISP
+- Core Router-এ PPPoE Server
+- Distribution Switch-এ VLAN Trunk
+- Access Point-এ Hotspot
+
+### কেস ২: Hotspot + Custom Login
+- Hotspot Interface-এ Custom Login Page
+- User Profile ও Bandwidth Control
+
+### কেস ৩: Multi-ISP Redundancy
+- Primary/Secondary ISP
+- Failover ও Load Balancing
+
+---
+
+## Monitoring & Maintenance
+
+- SNMP, Syslog, Netwatch
+- Scheduled Backup
+- Real-time Traffic Graphing
+
+---
+
+## উপসংহার
+
+একটি সম্পূর্ণ ISP নেটওয়ার্ক ডিজাইন ও কনফিগার করতে PPPoE, Hotspot, VLANs, DHCP, Firewall, এবং Monitoring একত্রে ব্যবহার করতে হয়। সঠিক কনফিগারেশন ও বেস্ট প্র্যাকটিস অনুসরণ করলে ISP নেটওয়ার্ক হবে দ্রুত, নিরাপদ, এবং স্কেলেবল।
+
+---
+
+**পরবর্তী টপিক:** [ব্রাঞ্চ অফিস VPN ও রাউটিং](/mikrotik/branch-office-vpn)

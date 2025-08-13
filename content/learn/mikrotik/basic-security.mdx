@@ -1,0 +1,82 @@
+---
+title: "বেসিক সিকিউরিটি রুলস"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্ক নিরাপত্তা নিশ্চিত করতে মাইক্রোটিক রাউটারে কিছু বেসিক সিকিউরিটি রুলস ও কনফিগারেশন অপরিহার্য। এখানে হাতে-কলমে উদাহরণসহ বেসিক সিকিউরিটি সেটআপ নিয়ে আলোচনা করা হলো।
+
+## ১. ডিফল্ট ইউজার ও পাসওয়ার্ড পরিবর্তন
+- প্রথম লগইনেই admin পাসওয়ার্ড পরিবর্তন করুন
+- নতুন ইউজার তৈরি করে admin ইউজার ডিলিট করুন
+```bash
+/user set admin password=StrongPassword
+/user add name=anis group=full password=AnotherStrongPass
+/user remove admin
+```
+
+## ২. অপ্রয়োজনীয় সার্ভিস বন্ধ
+- Telnet, FTP, www (HTTP) সার্ভিস বন্ধ রাখুন
+```bash
+/ip service disable telnet,ftp,www
+```
+
+## ৩. Management Access সীমিত করুন
+- Winbox, WebFig, SSH-তে শুধুমাত্র LAN থেকে এক্সেস Allow করুন
+```bash
+/ip service set winbox address=192.168.10.0/24
+/ip service set ssh address=192.168.10.0/24
+/ip service set www-ssl address=192.168.10.0/24
+```
+
+## ৪. MAC Winbox/WebFig Access সীমিত করুন
+```bash
+/tool mac-server set allowed-interface-list=LAN
+/tool mac-server mac-winbox set allowed-interface-list=LAN
+```
+
+## ৫. SSH-তে Public Key Authentication
+- Password-based login বন্ধ করে Public Key ব্যবহার করুন
+
+## ৬. Firewall দিয়ে Management Access কন্ট্রোল
+```bash
+/ip firewall filter add chain=input protocol=tcp dst-port=8291,22,443 in-interface=LAN action=accept
+/ip firewall filter add chain=input protocol=tcp dst-port=8291,22,443 in-interface=WAN action=drop
+```
+
+## ৭. RouterOS আপডেট রাখুন
+- System > Packages > Check For Updates
+- CLI:
+```bash
+/system package update check-for-updates
+/system package update download
+/system reboot
+```
+
+## ৮. Logging ও Notification
+- গুরুত্বপূর্ণ ইভেন্টের জন্য লগিং চালু রাখুন
+- Email/Telegram-এ নোটিফিকেশন সেট করুন
+
+## ৯. Port Forwarding সাবধানে ব্যবহার
+- শুধুমাত্র প্রয়োজনীয় পোর্ট Forward করুন
+- Firewall দিয়ে Access Control দিন
+
+## ১০. Remote Management নিরাপদ করুন
+- Public IP থেকে সরাসরি Management Access বন্ধ রাখুন
+- VPN ব্যবহার করুন
+
+## ১১. ব্যাকআপ ও Restore
+- কনফিগারেশন ব্যাকআপ রাখুন
+- Export ফাইল থেকে পাসওয়ার্ড/সিক্রেট তথ্য মুছে ফেলুন
+
+## ১২. নিরাপত্তা চেকলিস্ট
+- ডিফল্ট ইউজার/পাসওয়ার্ড পরিবর্তন
+- অপ্রয়োজনীয় সার্ভিস বন্ধ
+- Management Access সীমিত
+- SSH-তে Public Key
+- Firewall দিয়ে Access Control
+- RouterOS আপডেট
+- Port Forwarding সাবধানে
+- Logging চালু
+
+## উপসংহার
+বেসিক সিকিউরিটি রুলস ও কনফিগারেশন ফলো করলে মাইক্রোটিক রাউটার অনেক বেশি নিরাপদ ও ম্যানেজেবল হয়। পরবর্তী অধ্যায়ে অ্যাডভান্সড ফায়ারওয়াল নিয়ে আলোচনা করা হবে।

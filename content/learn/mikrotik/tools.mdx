@@ -1,0 +1,87 @@
+---
+title: Ping, Traceroute, Bandwidth Test টুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে নেটওয়ার্ক মনিটরিং ও ট্রাবলশুটিংয়ের জন্য Ping, Traceroute, Bandwidth Test অত্যন্ত গুরুত্বপূর্ণ টুল। এগুলোর মাধ্যমে আপনি নেটওয়ার্ক কানেক্টিভিটি, রুটিং, ব্যান্ডউইথ, এবং সমস্যা দ্রুত শনাক্ত করতে পারবেন। এই টিউটোরিয়ালে আমরা Ping, Traceroute, Bandwidth Test-এর ব্যবহার, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Ping টুল
+
+Ping হলো নেটওয়ার্কে কোনো ডিভাইস/সার্ভার অ্যাক্সেসযোগ্য কিনা তা চেক করার জন্য ব্যবহৃত হয়।
+
+### Ping কমান্ড
+```shell
+/ping 8.8.8.8
+```
+- `8.8.8.8` হলো Google DNS
+- Reply এ latency, packet loss দেখা যায়
+
+### Winbox-এ Ping
+- **New Terminal** > `/ping [target IP]`
+- **Tools > Ping**: GUI থেকে Ping করুন
+
+---
+
+## Traceroute টুল
+
+Traceroute দিয়ে নেটওয়ার্কে কোন কোন রাউটার/হপ পার হয়ে টার্গেট IP-তে পৌঁছানো যায় তা দেখা যায়।
+
+### Traceroute কমান্ড
+```shell
+/tool traceroute 8.8.8.8
+```
+- প্রতিটি হপের IP, latency দেখা যায়
+
+### Winbox-এ Traceroute
+- **Tools > Traceroute**: GUI থেকে Traceroute করুন
+
+---
+
+## Bandwidth Test টুল
+
+Bandwidth Test দিয়ে দুইটি MikroTik ডিভাইসের মধ্যে ব্যান্ডউইথ, latency, jitter, packet loss ইত্যাদি টেস্ট করা যায়।
+
+### Bandwidth Test কমান্ড
+```shell
+/tool bandwidth-test address=192.168.88.2 user=admin password=123 direction=both duration=30s
+```
+- `address`: টার্গেট MikroTik IP
+- `user` ও `password`: টার্গেট ডিভাইসের ইউজার
+- `direction`: upload/download/both
+- `duration`: কতক্ষণ টেস্ট চলবে
+
+### Winbox-এ Bandwidth Test
+- **Tools > Bandwidth Test**: GUI থেকে টেস্ট করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: নেটওয়ার্কে latency বেশি
+- Ping ও Traceroute দিয়ে কোন হপে সমস্যা চিহ্নিত করুন
+
+### কেস ২: দুই ব্রাঞ্চের মধ্যে ব্যান্ডউইথ টেস্ট
+- Bandwidth Test দিয়ে স্পিড, latency, packet loss চেক করুন
+
+### কেস ৩: ISP-তে ক্লায়েন্টের কানেক্টিভিটি সমস্যা
+- Ping ও Traceroute দিয়ে দ্রুত ডায়াগনোসিস করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Ping ও Traceroute দিয়ে নিয়মিত নেটওয়ার্ক মনিটর করুন
+- Bandwidth Test চালানোর সময় production ট্রাফিকের উপর প্রভাব পড়তে পারে, তাই সতর্ক থাকুন
+- Latency, packet loss, jitter মনিটর করুন
+- টেস্টের সময় firewall rules ও bandwidth limit বিবেচনা করুন
+
+---
+
+## উপসংহার
+
+Ping, Traceroute, Bandwidth Test টুলস ব্যবহার করলে নেটওয়ার্ক সমস্যা দ্রুত শনাক্ত ও সমাধান করা যায়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [Torch ও Packet Sniffer](/mikrotik/torch)

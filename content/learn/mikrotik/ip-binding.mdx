@@ -1,0 +1,95 @@
+---
+title: IP Binding ও ARP ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে IP Binding ও ARP (Address Resolution Protocol) ম্যানেজমেন্ট হলো নেটওয়ার্ক সিকিউরিটি, ইউজার কন্ট্রোল ও ট্রাফিক ফিল্টারিংয়ের জন্য অত্যন্ত গুরুত্বপূর্ণ টুল। এর মাধ্যমে নির্দিষ্ট MAC/IP-কে নির্দিষ্টভাবে কন্ট্রোল, ব্লক বা পারমিট করা যায় এবং নেটওয়ার্কে IP স্পুফিং, অননুমোদিত ডিভাইস ব্লক করা সহজ হয়। এই টিউটোরিয়ালে আমরা IP Binding ও ARP ম্যানেজমেন্টের কনফিগারেশন, বাস্তব উদাহরণ ও বেস্ট প্র্যাকটিস নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## ARP কী ও কেন দরকার?
+
+- ARP (Address Resolution Protocol) হলো IP থেকে MAC Address রেজলভ করার পদ্ধতি
+- নেটওয়ার্কে কে কোন IP/MAC ব্যবহার করছে তা ট্র্যাক করা যায়
+- IP স্পুফিং, অননুমোদিত ডিভাইস ব্লক করা যায়
+
+---
+
+## ARP Modes
+
+- **enabled**: ডিফল্ট, সবকিছু অটো
+- **reply-only**: শুধু লিস্টে থাকা MAC/IP-ই পারমিট
+- **disabled**: ARP বন্ধ
+
+### ARP reply-only কনফিগারেশন
+
+```shell
+/interface ethernet set ether2 arp=reply-only
+```
+
+---
+
+## IP Binding কী?
+
+- Hotspot বা DHCP-তে নির্দিষ্ট MAC/IP-কে পারমিট, ব্লক বা বাইপাস করা
+- Hotspot ইউজারদের MAC/IP ভিত্তিক কন্ট্রোল
+
+### IP Binding কনফিগারেশন (Hotspot)
+
+```shell
+/ip hotspot ip-binding add mac-address=AA:BB:CC:DD:EE:FF type=bypassed
+/ip hotspot ip-binding add mac-address=11:22:33:44:55:66 type=blocked
+```
+
+- `type=bypassed`: হটস্পট অথেন্টিকেশন ছাড়াই ইন্টারনেট
+- `type=blocked`: সম্পূর্ণ ব্লক
+- `type=regular`: সাধারণ ইউজার
+
+---
+
+## Static ARP Entry কনফিগারেশন
+
+- নির্দিষ্ট IP/MAC পেয়ার লিস্টে অ্যাড করুন
+
+```shell
+/ip arp add address=192.168.88.10 mac-address=AA:BB:CC:DD:EE:FF interface=ether2
+```
+
+---
+
+## Winbox-এ ARP ও IP Binding কনফিগারেশন
+
+1. **Interfaces > ARP**: ARP Table দেখুন ও Static Entry অ্যাড করুন
+2. **IP > Hotspot > IP Bindings**: নতুন Binding অ্যাড করুন
+3. **Interfaces > Ethernet > ARP Mode**: reply-only সিলেক্ট করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: অফিসে শুধু নির্দিষ্ট ডিভাইস ইন্টারনেট পাবে
+- ARP reply-only + Static ARP Entry ব্যবহার করুন
+
+### কেস ২: Hotspot-এ VIP ইউজার অথেন্টিকেশন ছাড়াই ইন্টারনেট পাবে
+- IP Binding (type=bypassed) ব্যবহার করুন
+
+### কেস ৩: অননুমোদিত ডিভাইস ব্লক
+- IP Binding (type=blocked) ব্যবহার করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Static ARP Entry ও reply-only mode ব্যবহার করলে IP স্পুফিং বন্ধ হয়
+- IP Binding দিয়ে Hotspot-এ MAC/IP ভিত্তিক কন্ট্রোল সহজ হয়
+- Static Entry অ্যাড করার সময় MAC/IP ঠিকভাবে দিন
+- ARP Table নিয়মিত মনিটর করুন
+
+---
+
+## উপসংহার
+
+IP Binding ও ARP ম্যানেজমেন্ট করলে নেটওয়ার্ক সিকিউরিটি, ইউজার কন্ট্রোল ও ট্রাফিক ফিল্টারিং অনেক সহজ হয়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [Ping, Traceroute, Bandwidth Test টুলস](/mikrotik/tools)

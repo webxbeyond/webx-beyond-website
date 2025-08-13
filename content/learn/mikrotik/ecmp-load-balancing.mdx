@@ -1,0 +1,85 @@
+---
+title: ECMP ও লোড ব্যালান্সিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ECMP (Equal Cost Multi-Path) ও লোড ব্যালান্সিং হলো এমন প্রযুক্তি, যার মাধ্যমে একাধিক গেটওয়ে বা ইন্টারনেট লিঙ্কের মধ্যে ট্রাফিক সমানভাবে ভাগ করে নেটওয়ার্কের ব্যান্ডউইথ ও রিডান্ডেন্সি বাড়ানো যায়। মাইক্রোটিক রাউটারে ECMP ও লোড ব্যালান্সিং কনফিগারেশন অত্যন্ত সহজ এবং শক্তিশালী।
+
+## ECMP (Equal Cost Multi-Path) কী?
+
+ECMP হলো একাধিক গেটওয়ে বা রাউট একই কস্ট (Cost) বা মেট্রিক দিয়ে কনফিগার করা, যাতে রাউটার স্বয়ংক্রিয়ভাবে ট্রাফিককে সমানভাবে ভাগ করে দেয়।
+
+### ECMP-এর সুবিধা
+- মাল্টিপল ইন্টারনেট লিঙ্ক ব্যবহার
+- লোড ব্যালান্সিং
+- ফেইলওভার
+- ব্যান্ডউইথ অপ্টিমাইজেশন
+
+## ECMP কনফিগারেশন (মাইক্রোটিক)
+
+ধরা যাক, আপনার দুটি ISP:
+- ISP1: 198.51.100.1
+- ISP2: 203.0.113.2
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=198.51.100.1,203.0.113.2
+```
+
+এখানে দুটি গেটওয়ে কমা দিয়ে একসাথে দেয়া হয়েছে। রাউটার স্বয়ংক্রিয়ভাবে ট্রাফিক ভাগ করে দেবে।
+
+## PCC (Per Connection Classifier) দিয়ে লোড ব্যালান্সিং
+
+ECMP ছাড়াও MikroTik-এ PCC (Per Connection Classifier) ব্যবহার করে আরও কাস্টমাইজড লোড ব্যালান্সিং করা যায়।
+
+### PCC কনফিগারেশন ধাপ
+
+#### Step 1: Mangle রুল দিয়ে কানেকশন মার্কিং
+
+```shell
+/ip firewall mangle
+add chain=prerouting dst-address-type=!local in-interface=LAN per-connection-classifier=both-addresses:2/0 action=mark-connection new-connection-mark=ISP1_conn
+add chain=prerouting dst-address-type=!local in-interface=LAN per-connection-classifier=both-addresses:2/1 action=mark-connection new-connection-mark=ISP2_conn
+```
+
+#### Step 2: Routing Mark সেট করা
+
+```shell
+/ip firewall mangle
+add chain=prerouting connection-mark=ISP1_conn in-interface=LAN action=mark-routing new-routing-mark=to_ISP1
+add chain=prerouting connection-mark=ISP2_conn in-interface=LAN action=mark-routing new-routing-mark=to_ISP2
+```
+
+#### Step 3: আলাদা Routing Table তৈরি
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=198.51.100.1 routing-table=to_ISP1
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.2 routing-table=to_ISP2
+```
+
+## ফেইলওভার কনফিগারেশন
+
+ECMP-তে ফেইলওভার স্বয়ংক্রিয়ভাবে হয় না। এজন্য Routing Distance ব্যবহার করা হয়।
+
+```shell
+/ip route add dst-address=0.0.0.0/0 gateway=198.51.100.1 distance=1
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.2 distance=2
+```
+
+প্রথম লিঙ্ক ডাউন হলে দ্বিতীয়টি স্বয়ংক্রিয়ভাবে চালু হবে।
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি অফিসে দুটি ইন্টারনেট লিঙ্ক আছে। ECMP দিয়ে লোড ব্যালান্সিং করলে সব ইউজার দুই লিঙ্কের ব্যান্ডউইথ পাবে। PCC ব্যবহার করলে নির্দিষ্ট ইউজার বা অ্যাপ্লিকেশনকে নির্দিষ্ট লিঙ্কে পাঠানো যাবে।
+
+## টিপস
+- ECMP কনফিগারেশনে DNS ও NAT ঠিকমতো সেট করুন
+- PCC-তে per-connection-classifier সঠিকভাবে ব্যবহার করুন
+- ফেইলওভার ও মনিটরিং চালু রাখুন
+
+## উপসংহার
+
+ECMP ও লোড ব্যালান্সিং ব্যবহার করে আপনি নেটওয়ার্কের ব্যান্ডউইথ ও রিডান্ডেন্সি বাড়াতে পারবেন। বড় অফিস, ISP, মাল্টি-হোমড নেটওয়ার্ক—সবখানেই এই প্রযুক্তি অত্যন্ত কার্যকর।
+
+---
+
+**পরবর্তী টপিক:** [মাল্টি-ISP ফেইলওভার ও রিডান্ডেন্সি](/mikrotik/failover)

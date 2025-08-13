@@ -1,0 +1,89 @@
+---
+title: VoIP, গেমিং ও স্ট্রিমিং এর জন্য QoS
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে QoS (Quality of Service) কনফিগারেশন অত্যন্ত গুরুত্বপূর্ণ, বিশেষ করে যখন নেটওয়ার্কে VoIP কল, গেমিং, এবং স্ট্রিমিং সার্ভিস একসাথে চলে। QoS-এর মাধ্যমে গুরুত্বপূর্ণ ট্রাফিককে সর্বোচ্চ প্রায়োরিটি, নির্দিষ্ট ব্যান্ডউইথ, এবং কম ডিলে নিশ্চিত করা যায়। এই টিউটোরিয়ালে আমরা VoIP, গেমিং ও স্ট্রিমিং-এর জন্য আদর্শ QoS কনফিগারেশন, বাস্তব উদাহরণ ও বেস্ট প্র্যাকটিস নিয়ে আলোচনা করব।
+
+---
+
+## QoS কী ও কেন দরকার?
+
+QoS (Quality of Service) হলো এমন একটি প্রযুক্তি, যার মাধ্যমে নেটওয়ার্কের বিভিন্ন ধরনের ট্রাফিকের জন্য আলাদা প্রায়োরিটি, ব্যান্ডউইথ, এবং ডিলে নির্ধারণ করা যায়।
+
+- VoIP: কম ডিলে ও জিটার, সর্বোচ্চ প্রায়োরিটি দরকার
+- গেমিং: কম ল্যাটেন্সি ও স্টেবল কানেকশন দরকার
+- স্ট্রিমিং: নিরবচ্ছিন্ন ব্যান্ডউইথ দরকার
+
+---
+
+## QoS বাস্তবায়নের ধাপ
+
+### ১. ট্রাফিক মার্কিং (Mangle)
+
+প্রথমে বিভিন্ন ট্রাফিক আলাদা করতে হবে।
+
+```shell
+/ip firewall mangle add chain=forward protocol=udp port=5060 action=mark-packet new-packet-mark=VoIP passthrough=yes
+/ip firewall mangle add chain=forward protocol=udp port=27015-27050 action=mark-packet new-packet-mark=Gaming passthrough=yes
+/ip firewall mangle add chain=forward protocol=tcp port=80,443,1935 action=mark-packet new-packet-mark=Streaming passthrough=yes
+```
+
+- VoIP: SIP (UDP 5060)
+- গেমিং: Steam/Online Games (UDP 27015-27050)
+- স্ট্রিমিং: HTTP/HTTPS/RTMP (TCP 80,443,1935)
+
+### ২. Queue Tree-তে আলাদা কিউ ও প্রায়োরিটি সেট
+
+```shell
+/ip queue tree add name="VoIP" parent=global packet-mark=VoIP max-limit=2M priority=1
+/ip queue tree add name="Gaming" parent=global packet-mark=Gaming max-limit=5M priority=2
+/ip queue tree add name="Streaming" parent=global packet-mark=Streaming max-limit=10M priority=3
+```
+
+- Priority 1: VoIP (Highest)
+- Priority 2: Gaming
+- Priority 3: Streaming
+
+### ৩. বাকি ট্রাফিকের জন্য Default Queue
+
+```shell
+/ip queue tree add name="Default" parent=global max-limit=20M priority=8
+```
+
+---
+
+## Winbox-এ QoS কনফিগারেশন
+1. **IP > Firewall > Mangle**: নতুন রুল তৈরি করে ট্রাফিক মার্ক করুন
+2. **Queues > Queue Tree**: আলাদা কিউ তৈরি করে Packet Mark ও Priority দিন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: অফিসে VoIP কল ড্রপ হচ্ছে
+- VoIP ট্রাফিককে Priority 1 দিন, Dedicated Bandwidth দিন
+
+### কেস ২: গেমিং ল্যাগ হচ্ছে
+- গেমিং ট্রাফিককে Priority 2 দিন, Low Latency নিশ্চিত করুন
+
+### কেস ৩: স্ট্রিমিং বাফারিং
+- স্ট্রিমিং ট্রাফিকের জন্য নির্দিষ্ট ব্যান্ডউইথ ও Priority 3 দিন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- গুরুত্বপূর্ণ ট্রাফিকের জন্য সর্বোচ্চ প্রায়োরিটি দিন
+- ট্রাফিক মার্কিং সঠিকভাবে করুন
+- Queue Tree-এর Parent ও Packet Mark ঠিকভাবে দিন
+- ব্যান্ডউইথ ও প্রায়োরিটি নেটওয়ার্কের চাহিদা অনুযায়ী নির্ধারণ করুন
+
+---
+
+## উপসংহার
+
+VoIP, গেমিং ও স্ট্রিমিং-এর জন্য QoS কনফিগারেশন করলে নেটওয়ার্কের পারফরম্যান্স ও ইউজার এক্সপেরিয়েন্স অনেক উন্নত হয়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [PPPoE সার্ভার ও ক্লায়েন্ট সেটআপ](/mikrotik/pppoe)

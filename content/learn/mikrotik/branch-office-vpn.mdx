@@ -1,0 +1,83 @@
+---
+title: ব্রাঞ্চ অফিস VPN ও রাউটিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ব্রাঞ্চ অফিস VPN ও রাউটিং বাস্তবায়ন করলে একাধিক অফিস/লোকেশন নিরাপদভাবে সংযুক্ত করা যায় এবং ডেটা ট্রান্সফার, রিসোর্স শেয়ারিং, ও সেন্ট্রালাইজড ম্যানেজমেন্ট সহজ হয়। মাইক্রোটিক RouterOS-এ Site-to-Site VPN, Routing, এবং Security কনফিগারেশন খুবই সহজ।
+
+---
+
+## ব্রাঞ্চ অফিস নেটওয়ার্ক ডিজাইন
+
+- **Head Office:** Core Router, VPN Server
+- **Branch Office:** VPN Client, Local Network
+- **Secure Tunnel:** PPTP, L2TP/IPSec, SSTP, OpenVPN, WireGuard
+- **Routing:** Static/Dynamic Routing
+
+---
+
+## Site-to-Site VPN Setup
+
+### ১. Head Office (VPN Server)
+```shell
+/interface pptp-server server set enabled=yes
+/ppp secret add name=branch1 password=pass1 service=pptp profile=default
+```
+
+### ২. Branch Office (VPN Client)
+```shell
+/interface pptp-client add connect-to=HO-IP user=branch1 password=pass1 disabled=no
+```
+
+---
+
+## Routing Configuration
+
+### ১. Static Routing
+```shell
+/ip route add dst-address=192.168.2.0/24 gateway=VPN-Interface
+```
+
+### ২. Dynamic Routing (OSPF)
+- OSPF Instance ও Network Add করুন
+
+---
+
+## Security Best Practices
+
+- Strong Password ও Encryption
+- Firewall দিয়ে VPN Port Protect
+- User Permission ও Access Control
+
+---
+
+## Monitoring & Maintenance
+
+- VPN Status Monitor
+- Log ও Alert
+- Scheduled Backup
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: Head Office + Multiple Branch
+- Head Office-এ VPN Server
+- Branch Office-এ VPN Client
+- Routing দিয়ে Resource Share
+
+### কেস ২: Dynamic Routing
+- OSPF দিয়ে Multiple Branch Interconnect
+
+### কেস ৩: Secure File Transfer
+- VPN Tunnel দিয়ে Data Encryption
+
+---
+
+## উপসংহার
+
+ব্রাঞ্চ অফিস VPN ও রাউটিং বাস্তবায়ন করলে একাধিক লোকেশন নিরাপদভাবে সংযুক্ত, রিসোর্স শেয়ার, এবং সেন্ট্রালাইজড ম্যানেজমেন্ট সহজ হয়। মাইক্রোটিক RouterOS-এ Site-to-Site VPN ও Routing কনফিগারেশন খুবই সহজ ও শক্তিশালী।
+
+---
+
+**পরবর্তী টপিক:** [৫০০+ ইউজারের জন্য ব্যান্ডউইথ কন্ট্রোল](/mikrotik/large-network-qos)

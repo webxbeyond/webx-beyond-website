@@ -1,0 +1,57 @@
+---
+title: ইউজার প্রোফাইল, ব্যান্ডউইথ লিমিট ও সেশন কন্ট্রোল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক হটস্পট ব্যবস্থাপনায় ইউজার প্রোফাইল, ব্যান্ডউইথ লিমিট ও সেশন কন্ট্রোল অত্যন্ত গুরুত্বপূর্ণ। এর মাধ্যমে আপনি ইউজারদের জন্য আলাদা আলাদা নিয়ম, স্পিড, সময়সীমা ও এক্সেস কনফিগার করতে পারেন।
+
+## ইউজার প্রোফাইল কী?
+
+User Profile হলো এমন একটি সেটিংস গ্রুপ, যেখানে নির্দিষ্ট ব্যান্ডউইথ, সেশন টাইম, আইডল টাইম, ইউজার লিমিট ইত্যাদি নির্ধারণ করা যায়।
+
+### ইউজার প্রোফাইল তৈরি ও কনফিগার
+```shell
+/ip hotspot user profile add name=student rate-limit=2M/2M session-timeout=1h shared-users=1
+/ip hotspot user profile add name=vip rate-limit=10M/10M session-timeout=8h shared-users=5
+```
+
+## ব্যান্ডউইথ লিমিট
+
+প্রতিটি ইউজার বা প্রোফাইলের জন্য আলাদা স্পিড লিমিট সেট করা যায়।
+- `rate-limit=2M/2M` মানে আপলোড/ডাউনলোড ২ Mbps
+- `shared-users=1` মানে একসাথে এক ডিভাইস
+
+## সেশন কন্ট্রোল
+
+- `session-timeout`: এক সেশনের সর্বোচ্চ সময়
+- `idle-timeout`: নির্দিষ্ট সময় ইউজার অ্যাক্টিভ না থাকলে ডিসকানেক্ট
+- `keepalive-timeout`: ইউজার কানেক্টেড কিনা চেক করার জন্য
+
+### উদাহরণ:
+```shell
+/ip hotspot user profile set student idle-timeout=5m keepalive-timeout=2m
+```
+
+## ইউজার তৈরি ও প্রোফাইল অ্যাসাইন
+```shell
+/ip hotspot user add name=rahim password=1234 profile=student
+/ip hotspot user add name=karim password=abcd profile=vip
+```
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি লাইব্রেরিতে স্টুডেন্টদের জন্য ২ Mbps, ১ ঘণ্টা সেশন, আর VIP ইউজারদের জন্য ১০ Mbps, ৮ ঘণ্টা সেশন দিতে হবে। User Profile দিয়ে সহজেই এই কনফিগারেশন করা যায়।
+
+## টিপস
+- Shared Users বাড়ালে একাধিক ডিভাইস এক ইউজারনেমে লগইন করতে পারবে
+- Rate Limit ও Session Timeout ঠিকমতো সেট করুন
+- User Profile-এ Expiry Date ও MAC Binding ব্যবহার করুন
+- লগ মনিটর করুন
+
+## উপসংহার
+
+User Profile, Bandwidth Limit ও Session Control ব্যবহার করে আপনি হটস্পট ইউজারদের জন্য কাস্টমাইজড এক্সেস ও কন্ট্রোল নিশ্চিত করতে পারবেন। এতে নেটওয়ার্ক ম্যানেজমেন্ট সহজ ও পেশাদার হয়।
+
+---
+
+**পরবর্তী টপিক:** [সোশ্যাল লগইন ও এক্সটার্নাল Radius ইন্টিগ্রেশন](/mikrotik/hotspot-radius)

@@ -1,0 +1,122 @@
+---
+title: স্মল অফিস/হোম নেটওয়ার্ক সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটার ব্যবহার করে স্মল অফিস বা হোম নেটওয়ার্ক সহজেই কনফিগার ও ম্যানেজ করা যায়। এই টিউটোরিয়ালে আমরা একটি আদর্শ SOHO (Small Office/Home Office) নেটওয়ার্ক ডিজাইন, কনফিগারেশন, সিকিউরিটি, এবং বেস্ট প্র্যাকটিস নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## SOHO নেটওয়ার্ক ডিজাইন
+
+- **ইন্টারনেট কানেকশন:** PPPoE, DHCP, Static IP
+- **LAN:** একাধিক ডিভাইস, WiFi, Wired
+- **Guest Network:** আলাদা VLAN বা SSID
+- **Security:** Firewall, NAT, User Management
+
+---
+
+## Initial Setup
+
+### ১. রাউটার রিসেট ও ডিফল্ট কনফিগ
+```shell
+/system reset-configuration no-defaults=no
+```
+
+### ২. WAN ও LAN Interface কনফিগার
+```shell
+/interface ethernet set [find default-name=ether1] name=WAN
+/interface ethernet set [find default-name=ether2] name=LAN
+```
+
+### ৩. DHCP Server Setup
+```shell
+/ip pool add name=dhcp-pool ranges=192.168.88.10-192.168.88.254
+/ip dhcp-server add name=dhcp1 interface=LAN address-pool=dhcp-pool
+/ip dhcp-server network add address=192.168.88.0/24 gateway=192.168.88.1
+```
+
+### ৪. NAT ও Firewall
+```shell
+/ip firewall nat add chain=srcnat out-interface=WAN action=masquerade
+/ip firewall filter add chain=input connection-state=established,related action=accept
+/ip firewall filter add chain=input connection-state=invalid action=drop
+```
+
+---
+
+## WiFi Setup (RouterBOARD with Wireless)
+
+### ১. Wireless Interface Enable
+```shell
+/interface wireless set [find] disabled=no
+```
+
+### ২. SSID ও Security
+```shell
+/interface wireless set [find] ssid="SOHO-Network" security-profile=default
+```
+
+---
+
+## Guest Network (VLAN/SSID)
+
+- VLAN বা আলাদা SSID দিয়ে Guest Network তৈরি করুন
+- Guest Network-এ LAN Access Block করুন
+
+### VLAN Example
+```shell
+/interface vlan add name=guest-vlan vlan-id=20 interface=LAN
+/ip address add address=192.168.20.1/24 interface=guest-vlan
+/ip dhcp-server add name=guest-dhcp interface=guest-vlan address-pool=192.168.20.10-192.168.20.254
+```
+
+---
+
+## User Management
+
+- Strong Password
+- Limited Access User
+- Winbox/WebFig/SSH Access Control
+
+---
+
+## Security Best Practices
+
+- Default Password Change
+- Firewall Rules
+- Service Disable (Unused)
+- Regular Backup
+
+---
+
+## Monitoring & Maintenance
+
+- Bandwidth Usage Monitor
+- Device Health Check
+- Scheduled Backup
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: Home Network with Parental Control
+- Address List ও Firewall দিয়ে কন্টেন্ট ফিল্টার
+
+### কেস ২: Small Office with Guest WiFi
+- VLAN/SSID দিয়ে Guest Network
+- Firewall দিয়ে LAN Access Block
+
+### কেস ৩: Remote Access
+- VPN Setup
+- Secure Remote Management
+
+---
+
+## উপসংহার
+
+মাইক্রোটিক SOHO নেটওয়ার্ক সেটআপ সহজ, নিরাপদ, এবং কাস্টমাইজযোগ্য। সঠিক কনফিগারেশন ও বেস্ট প্র্যাকটিস অনুসরণ করলে আপনার অফিস বা বাসার নেটওয়ার্ক হবে দ্রুত, নিরাপদ, এবং স্থিতিশীল।
+
+---
+
+**পরবর্তী টপিক:** [মাল্টি-ISP ফেইলওভার ও লোড ব্যালান্সিং](/mikrotik/multi-isp)

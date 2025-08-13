@@ -1,0 +1,76 @@
+---
+title: "রাউটার আইডেন্টিটি ও বেসিক সিকিউরিটি সেটআপ"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নতুন মাইক্রোটিক রাউটার কনফিগার করার সময় প্রথমেই রাউটারের নাম (Identity) ও বেসিক সিকিউরিটি সেটআপ করা জরুরি। এতে নেটওয়ার্কে ডিভাইস চেনা সহজ হয় এবং নিরাপত্তা নিশ্চিত হয়। এখানে ধাপে ধাপে সবকিছু আলোচনা করা হলো।
+
+## ১. রাউটার আইডেন্টিটি (Router Identity) সেটআপ
+
+রাউটারের নামকরণ করলে নেটওয়ার্কে একাধিক ডিভাইস থাকলে চেনা সহজ হয়।
+
+- **Winbox/WebFig:**
+  - System > Identity
+  - New Name লিখে Apply/OK
+- **CLI:**
+  ```
+  /system identity set name="Office-Router"
+  ```
+
+## ২. ইউজার ও পাসওয়ার্ড পরিবর্তন
+
+- **ডিফল্ট ইউজার admin, পাসওয়ার্ড ফাঁকা থাকে**
+- প্রথম লগইনেই পাসওয়ার্ড পরিবর্তন করুন
+- **Winbox/WebFig:**
+  - System > Users > admin > Password
+- **CLI:**
+  ```
+  /user set admin password=newpassword
+  ```
+- চাইলে নতুন ইউজার তৈরি করুন:
+  ```
+  /user add name=anis group=full password=strongpass
+  ```
+
+## ৩. সার্ভিস পোর্ট ও এক্সেস কন্ট্রোল
+
+- অপ্রয়োজনীয় সার্ভিস (telnet, ftp, www) বন্ধ করুন
+- SSH, Winbox, WebFig-এ স্ট্রং পাসওয়ার্ড/কী ব্যবহার করুন
+- **CLI:**
+  ```
+  /ip service print
+  /ip service disable telnet,ftp,www
+  /ip service set winbox address=192.168.88.0/24
+  ```
+
+## ৪. MAC Winbox/WebFig এক্সেস সীমিত করুন
+
+- শুধুমাত্র নির্দিষ্ট ইন্টারফেসে MAC এক্সেস দিন
+- **CLI:**
+  ```
+  /tool mac-server set allowed-interface-list=LAN
+  /tool mac-server mac-winbox set allowed-interface-list=LAN
+  ```
+
+## ৫. Remote Management নিরাপদ করুন
+
+- Public IP থেকে সরাসরি Winbox/WebFig/SSH এক্সেস বন্ধ রাখুন
+- VPN বা Port Knocking ব্যবহার করুন
+- Firewall দিয়ে এক্সেস কন্ট্রোল করুন
+
+## ৬. System Logging ও Notification
+
+- লগিং চালু রাখুন
+- গুরুত্বপূর্ণ ইভেন্টের জন্য ইমেইল/নোটিফিকেশন সেট করুন
+
+## ৭. বেসিক সিকিউরিটি চেকলিস্ট
+
+- ডিফল্ট ইউজার/পাসওয়ার্ড পরিবর্তন
+- অপ্রয়োজনীয় সার্ভিস বন্ধ
+- Winbox/WebFig-এ শুধুমাত্র লোকাল নেটওয়ার্ক থেকে এক্সেস
+- SSH-তে Public Key Authentication
+- Firewall দিয়ে Management Access সীমিত
+- RouterOS আপডেট
+
+## উপসংহার
+রাউটারের নামকরণ ও বেসিক সিকিউরিটি নিশ্চিত করা হলে নেটওয়ার্ক অনেক বেশি নিরাপদ ও ম্যানেজেবল হয়। পরবর্তী অধ্যায়ে IP অ্যাড্রেসিং ও DHCP সেটআপ নিয়ে আলোচনা করা হবে।

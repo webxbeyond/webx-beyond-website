@@ -276,6 +276,7 @@ function SelectTopics() {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
     // Easy to hard order:
+    { title: 'মাইক্রোটিক', description: 'রাউটার, নেটওয়ার্কিং, ISP, VPN, ফায়ারওয়াল, অটোমেশন—বাংলায় সম্পূর্ণ মাইক্রোটিক মাস্টারি সিরিজ।', icon: 'solar:wi-fi-router-bold', href: '/learn/mikrotik', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'প্রোগ্রামিং বেসিক', description: 'প্রোগ্রামিংয়ের মূল ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও ভাষা তুলনা—সব এক জায়গায়। একদম শুরু থেকে অ্যাডভান্সড পর্যন্ত।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'HTML ও CSS', description: 'ওয়েবসাইটের ভিত্তি—HTML, CSS, রেসপনসিভ ডিজাইন, ইউআই কম্পোনেন্ট ও পারফরম্যান্স বেস্ট প্র্যাকটিস।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'প্রোগ্রামিং, টুলিং ও ডেভঅপসের জন্য দ্রুত রেফারেন্স—কমান্ড, সিনট্যাক্স, কনফিগ ও শর্টকাট।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' } },

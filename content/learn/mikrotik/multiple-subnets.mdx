@@ -1,0 +1,80 @@
+---
+title: "একাধিক সাবনেট তৈরি ও ম্যানেজমেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় নেটওয়ার্ক বা মাল্টি-ডিপার্টমেন্ট অফিসে একাধিক সাবনেট ব্যবহৃত হয়। এতে ট্রাফিক আলাদা রাখা, নিরাপত্তা বাড়ানো ও নেটওয়ার্ক ম্যানেজমেন্ট সহজ হয়। এখানে মাইক্রোটিক রাউটারে একাধিক সাবনেট তৈরি, কনফিগারেশন ও ম্যানেজমেন্ট নিয়ে বিস্তারিত আলোচনা করা হলো।
+
+## ১. কেন একাধিক সাবনেট?
+- ডিপার্টমেন্ট/ভিন্ন গ্রুপ আলাদা রাখা
+- ব্রডকাস্ট ট্রাফিক কমানো
+- নিরাপত্তা ও অ্যাক্সেস কন্ট্রোল
+- স্কেলেবিলিটি
+
+## ২. সাবনেট ডিজাইন উদাহরণ
+
+- HR: 192.168.10.0/26
+- Accounts: 192.168.10.64/26
+- IT: 192.168.10.128/26
+- Admin: 192.168.10.192/26
+
+## ৩. ইন্টারফেসে সাবনেট অ্যাসাইন
+```bash
+/ip address add address=192.168.10.1/26 interface=HR
+/ip address add address=192.168.10.65/26 interface=Accounts
+/ip address add address=192.168.10.129/26 interface=IT
+/ip address add address=192.168.10.193/26 interface=Admin
+```
+
+## ৪. DHCP Pool ও সার্ভার কনফিগারেশন
+```bash
+/ip pool add name=pool_hr ranges=192.168.10.10-192.168.10.62
+/ip pool add name=pool_accounts ranges=192.168.10.74-192.168.10.126
+/ip pool add name=pool_it ranges=192.168.10.138-192.168.10.190
+/ip pool add name=pool_admin ranges=192.168.10.202-192.168.10.254
+
+/ip dhcp-server add name=dhcp_hr interface=HR address-pool=pool_hr
+/ip dhcp-server add name=dhcp_accounts interface=Accounts address-pool=pool_accounts
+/ip dhcp-server add name=dhcp_it interface=IT address-pool=pool_it
+/ip dhcp-server add name=dhcp_admin interface=Admin address-pool=pool_admin
+```
+
+## ৫. রাউটিং ও ইন্টার-সাবনেট কমিউনিকেশন
+- মাইক্রোটিক রাউটার স্বয়ংক্রিয়ভাবে ডিরেক্ট কানেক্টেড সাবনেট রাউট করে
+- VLAN বা ফায়ারওয়াল দিয়ে ইন্টার-সাবনেট ট্রাফিক কন্ট্রোল করা যায়
+
+## ৬. VLAN দিয়ে সাবনেট আলাদা করা
+- একাধিক সাবনেট এক ইন্টারফেসে চাইলে VLAN ব্যবহার করুন
+```bash
+/interface vlan add name=HR_vlan vlan-id=10 interface=ether2
+/interface vlan add name=IT_vlan vlan-id=20 interface=ether2
+/ip address add address=192.168.10.1/26 interface=HR_vlan
+/ip address add address=192.168.10.129/26 interface=IT_vlan
+```
+
+## ৭. ফায়ারওয়াল দিয়ে সাবনেট আইসোলেশন
+```bash
+/ip firewall filter add chain=forward src-address=192.168.10.0/26 dst-address=192.168.10.128/26 action=drop comment="HR থেকে IT ব্লক"
+```
+
+## ৮. সমস্যা ও সমাধান
+- **DHCP Pool Overlap:** pool রেঞ্জ চেক করুন
+- **Routing সমস্যা:** ইন্টারফেস ও সাবনেট ঠিক আছে কিনা দেখুন
+- **VLAN Tagging ভুল:** switch/PC-তে VLAN config চেক করুন
+
+## ৯. বাস্তব কেস স্টাডি
+
+### কেস: অফিসে ৪টি সাবনেট, VLAN সহ
+- HR: VLAN 10, 192.168.10.0/26
+- IT: VLAN 20, 192.168.10.128/26
+
+### কনফিগারেশন
+```bash
+/interface vlan add name=HR_vlan vlan-id=10 interface=ether2
+/interface vlan add name=IT_vlan vlan-id=20 interface=ether2
+/ip address add address=192.168.10.1/26 interface=HR_vlan
+/ip address add address=192.168.10.129/26 interface=IT_vlan
+```
+
+## উপসংহার
+একাধিক সাবনেট ও VLAN ব্যবহারে নেটওয়ার্ক আরও স্কেলেবল, নিরাপদ ও ম্যানেজেবল হয়। পরবর্তী অধ্যায়ে Bridge, VLAN ও Routing তুলনা নিয়ে আলোচনা করা হবে।

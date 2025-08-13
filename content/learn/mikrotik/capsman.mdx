@@ -1,0 +1,78 @@
+---
+title: CAPsMAN – সেন্ট্রালাইজড ওয়্যারলেস ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+CAPsMAN (Controlled Access Point system Manager) হলো মাইক্রোটিকের একটি শক্তিশালী ফিচার, যার মাধ্যমে একাধিক ওয়্যারলেস অ্যাক্সেস পয়েন্ট (AP) এক জায়গা থেকে কেন্দ্রীয়ভাবে কনফিগার ও ম্যানেজ করা যায়। বড় অফিস, স্কুল, হোটেল, ক্যাম্পাস—যেখানে অনেকগুলো AP থাকে, সেখানে CAPsMAN অত্যন্ত কার্যকর।
+
+## CAPsMAN কী?
+
+CAPsMAN হলো একটি সেন্ট্রালাইজড কন্ট্রোলার, যা একাধিক MikroTik রাউটারের ওয়্যারলেস ইন্টারফেসকে একসাথে কনফিগার, মনিটর ও ম্যানেজ করতে পারে। এতে WiFi নেটওয়ার্ক স্কেল করা, রোয়ামিং, সিকিউরিটি ও ট্রাবলশুটিং সহজ হয়।
+
+## CAPsMAN-এর উপকারিতা
+- একাধিক AP একসাথে কনফিগারেশন
+- Seamless Roaming
+- সেন্ট্রালাইজড মনিটরিং ও ম্যানেজমেন্ট
+- VLAN, Band Steering, Load Balancing
+- স্কেলেবিলিটি ও রিডান্ডেন্সি
+
+## CAPsMAN কনফিগারেশন (বেসিক)
+
+### Step 1: CAPsMAN প্যাকেজ ইনস্টল ও চালু করুন
+
+RouterOS v6.22+ এ CAPsMAN বিল্ট-ইন থাকে।
+
+```shell
+/caps-man manager set enabled=yes
+```
+
+### Step 2: CAP (Controlled AP) হিসেবে ক্লায়েন্ট রাউটার কনফিগার
+
+```shell
+/interface wireless cap set enabled=yes interfaces=wlan1 discovery-interfaces=ether1
+```
+
+### Step 3: CAPsMAN-এ Configuration Profile তৈরি
+
+```shell
+/caps-man configuration add name=wifi_cfg ssid="OfficeWiFi" security=default datapath=default
+```
+
+### Step 4: Provisioning ও AP-তে প্রোফাইল অ্যাসাইন
+
+```shell
+/caps-man provisioning add action=create-enabled master-configuration=wifi_cfg
+```
+
+### Step 5: মনিটরিং ও ম্যানেজমেন্ট
+
+```shell
+/caps-man registration-table print
+/caps-man interface print
+```
+
+## VLAN ও Guest Network কনফিগারেশন
+
+CAPsMAN দিয়ে সহজেই VLAN ও Guest WiFi তৈরি করা যায়।
+
+```shell
+/caps-man configuration add name=guest_cfg ssid="GuestWiFi" vlan-id=20 vlan-mode=use-tag
+```
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি বিশ্ববিদ্যালয়ে ২০টি বিল্ডিংয়ে ৫০টি MikroTik AP আছে। CAPsMAN দিয়ে সবগুলো AP একসাথে কনফিগার, আপডেট ও মনিটর করা যায়। নতুন SSID, VLAN, Security—সবকিছু এক ক্লিকে আপডেট করা যায়।
+
+## টিপস
+- CAPsMAN ও CAP-এ একই RouterOS ভার্সন ব্যবহার করুন
+- Discovery Interface ও Security Profile ঠিকমতো সেট করুন
+- মনিটরিং ও লগিং চালু রাখুন
+- ফার্মওয়্যার আপডেট রাখুন
+
+## উপসংহার
+
+CAPsMAN ব্যবহার করে বড় নেটওয়ার্কে ওয়্যারলেস ম্যানেজমেন্ট অনেক সহজ ও স্কেলেবল হয়। একাধিক AP, VLAN, Guest Network—সবকিছুই কেন্দ্রীয়ভাবে কনফিগার ও মনিটর করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [হটস্পট সেটআপ ও কাস্টম লগইন পেজ](/mikrotik/hotspot-setup)

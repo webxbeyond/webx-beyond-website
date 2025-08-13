@@ -1,0 +1,77 @@
+---
+title: Torch ও Packet Sniffer
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে Torch ও Packet Sniffer হলো নেটওয়ার্ক ট্রাফিক অ্যানালাইসিস ও ডায়াগনোসিসের জন্য অত্যন্ত শক্তিশালী টুল। Torch দিয়ে রিয়েল-টাইমে ট্রাফিকের IP, Port, Bandwidth, Protocol দেখা যায় এবং Packet Sniffer দিয়ে ডিটেইলড প্যাকেট ক্যাপচার ও অ্যানালাইসিস করা যায়। এই টিউটোরিয়ালে আমরা Torch ও Packet Sniffer-এর ব্যবহার, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Torch টুল
+
+Torch হলো রিয়েল-টাইম ট্রাফিক অ্যানালাইসিস টুল।
+- নির্দিষ্ট ইন্টারফেসে কোন IP, Port, Protocol কত Bandwidth ব্যবহার করছে তা দেখা যায়
+- Suspicious/High Bandwidth ইউজার দ্রুত শনাক্ত করা যায়
+
+### Torch কমান্ড
+```shell
+/tool torch interface=ether2
+```
+- `interface`: যে ইন্টারফেসে ট্রাফিক দেখতে চান
+
+### Winbox-এ Torch
+- **Tools > Torch**: ইন্টারফেস সিলেক্ট করে Start করুন
+- Source/Destination IP, Port, Bandwidth, Protocol দেখা যায়
+
+---
+
+## Packet Sniffer টুল
+
+Packet Sniffer দিয়ে নেটওয়ার্কের ডিটেইলড প্যাকেট ক্যাপচার ও অ্যানালাইসিস করা যায়।
+- Suspicious Traffic, Malware, Protocol Analysis, Troubleshooting ইত্যাদিতে ব্যবহৃত
+- Export করে Wireshark-এ অ্যানালাইসিস করা যায়
+
+### Packet Sniffer কমান্ড
+```shell
+/tool sniffer set file-name=sniff.pcap filter-interface=ether2 filter-ip-address=192.168.88.10
+/tool sniffer start
+/tool sniffer stop
+```
+- `file-name`: ক্যাপচার ফাইলের নাম
+- `filter-interface`: কোন ইন্টারফেসে ক্যাপচার
+- `filter-ip-address`: নির্দিষ্ট IP-এর ট্রাফিক
+
+### Winbox-এ Packet Sniffer
+- **Tools > Packet Sniffer**: ইন্টারফেস, Filter, File Name দিন, Start করুন
+- Stop করে Export করুন, Wireshark-এ অ্যানালাইসিস করুন
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: নেটওয়ার্কে হাই ব্যান্ডউইথ ইউজার শনাক্ত
+- Torch দিয়ে রিয়েল-টাইমে IP/Port/Protocol দেখে দ্রুত শনাক্ত করুন
+
+### কেস ২: Malware/Attack Traffic ক্যাপচার
+- Packet Sniffer দিয়ে ক্যাপচার করে Wireshark-এ অ্যানালাইসিস করুন
+
+### কেস ৩: Slow Network/Latency Issue
+- Torch ও Packet Sniffer দিয়ে Root Cause বের করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Torch দিয়ে নিয়মিত High Bandwidth ইউজার/Service মনিটর করুন
+- Packet Sniffer চালানোর সময় production ট্রাফিকের উপর প্রভাব পড়তে পারে, তাই সতর্ক থাকুন
+- Sniffer File Export করে Wireshark-এ ডিটেইল অ্যানালাইসিস করুন
+- Filter ব্যবহার করে নির্দিষ্ট IP/Protocol ক্যাপচার করুন
+
+---
+
+## উপসংহার
+
+Torch ও Packet Sniffer ব্যবহার করলে নেটওয়ার্কের সমস্যা, Suspicious Traffic, Malware, High Bandwidth ইউজার দ্রুত শনাক্ত ও অ্যানালাইসিস করা যায়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [গ্রাফিং ও ট্রাফিক মনিটরিং](/mikrotik/graphing)

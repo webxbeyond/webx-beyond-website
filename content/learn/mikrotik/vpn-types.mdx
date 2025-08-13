@@ -1,0 +1,93 @@
+---
+title: মাইক্রোটিকের VPN টাইপ – PPTP, L2TP/IPSec, SSTP, OpenVPN, WireGuard
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# মাইক্রোটিকের VPN টাইপ – PPTP, L2TP/IPSec, SSTP, OpenVPN, WireGuard
+
+মাইক্রোটিক রাউটারে বিভিন্ন ধরনের VPN (Virtual Private Network) সাপোর্ট করে, যার মাধ্যমে নিরাপদ রিমোট কানেকশন, ব্রাঞ্চ কানেক্টিভিটি, ওয়ান-টু-ওয়ান/মাল্টি-সাইট কানেকশন সহজে করা যায়। এখানে PPTP, L2TP/IPSec, SSTP, OpenVPN, WireGuard—সবগুলো VPN টাইপের বেসিকস, কনফিগারেশন ও পার্থক্য নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+## VPN কী ও কেন দরকার?
+- নিরাপদ রিমোট অ্যাক্সেস
+- ব্রাঞ্চ অফিস কানেক্টিভিটি
+- ডেটা এনক্রিপশন ও সিকিউরিটি
+- পাবলিক নেটওয়ার্কে প্রাইভেট ট্রাফিক
+
+## PPTP (Point-to-Point Tunneling Protocol)
+- সহজ কনফিগারেশন
+- Windows, Android, MikroTik—সবখানেই সাপোর্টেড
+- এনক্রিপশন দুর্বল (MS-CHAPv2)
+
+### PPTP Server কনফিগারেশন
+```shell
+/interface pptp-server server set enabled=yes
+/ppp secret add name=user1 password=pass1 service=pptp
+```
+
+## L2TP/IPSec
+- L2TP-এর সাথে IPSec ব্যবহার করলে শক্তিশালী এনক্রিপশন
+- Windows, Android, iOS—সবখানেই সাপোর্টেড
+
+### L2TP/IPSec Server কনফিগারেশন
+```shell
+/interface l2tp-server server set enabled=yes use-ipsec=required ipsec-secret=123456
+/ppp secret add name=user2 password=pass2 service=l2tp
+```
+
+## SSTP (Secure Socket Tunneling Protocol)
+- SSL/TLS এনক্রিপশন
+- Firewall traversal সহজ
+- Windows, MikroTik—সবখানেই সাপোর্টেড
+
+### SSTP Server কনফিগারেশন
+```shell
+/interface sstp-server server set enabled=yes certificate=server-cert verify-client-certificate=no
+/ppp secret add name=user3 password=pass3 service=sstp
+```
+
+## OpenVPN
+- ওপেন সোর্স, শক্তিশালী এনক্রিপশন
+- কাস্টমাইজড কনফিগারেশন
+- Windows, Linux, MikroTik—সবখানেই সাপোর্টেড
+
+### OpenVPN Server কনফিগারেশন
+```shell
+/interface ovpn-server server set enabled=yes certificate=server-cert auth=sha1 cipher=aes256
+/ppp secret add name=user4 password=pass4 service=ovpn
+```
+
+## WireGuard
+- নতুন, দ্রুত ও আধুনিক VPN
+- সহজ কনফিগারেশন, স্ট্রং এনক্রিপশন
+- Windows, Linux, Android, iOS, MikroTik—সবখানেই সাপোর্টেড
+
+### WireGuard Server কনফিগারেশন
+```shell
+/interface wireguard add name=wg1 listen-port=13231 private-key="<server-private-key>"
+/interface wireguard peers add interface=wg1 public-key="<client-public-key>" allowed-address=10.10.10.2/32
+/ip address add address=10.10.10.1/24 interface=wg1
+```
+
+## পার্থক্য ও কখন কোনটি ব্যবহার করবেন?
+- সহজ ও দ্রুত: PPTP, L2TP
+- শক্তিশালী এনক্রিপশন: L2TP/IPSec, SSTP, OpenVPN, WireGuard
+- Firewall traversal: SSTP, WireGuard
+- আধুনিক ও দ্রুত: WireGuard
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, অফিসে রিমোট ইউজারদের জন্য L2TP/IPSec, ব্রাঞ্চ কানেক্টিভিটির জন্য WireGuard, আর ক্লাসিক ক্লায়েন্টদের জন্য PPTP ব্যবহার করা হচ্ছে।
+
+## টিপস
+- সর্বদা শক্তিশালী পাসওয়ার্ড ও এনক্রিপশন ব্যবহার করুন
+- ফায়ারওয়াল ও NAT কনফিগারেশন ঠিকমতো দিন
+- সার্টিফিকেট ব্যবহারে CA ও Server Cert ঠিকমতো সেট করুন
+- লগ মনিটর করুন
+
+## উপসংহার
+
+মাইক্রোটিক রাউটারে বিভিন্ন ধরনের VPN ব্যবহার করে আপনি নিরাপদ ও ফ্লেক্সিবল নেটওয়ার্ক কানেক্টিভিটি নিশ্চিত করতে পারবেন। প্রয়োজন ও নিরাপত্তা অনুযায়ী সঠিক VPN টাইপ নির্বাচন করুন।
+
+---
+
+**পরবর্তী টপিক:** [Site-to-Site VPN সেটআপ](/mikrotik/site-to-site-vpn)

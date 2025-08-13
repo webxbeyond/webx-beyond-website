@@ -1,0 +1,90 @@
+---
+title: "ফায়ারওয়াল চেইন – Input, Forward, Output"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে ফায়ারওয়াল ফিল্টার রুলস তিনটি প্রধান চেইনে বিভক্ত: Input, Forward, Output। প্রতিটি চেইনের কাজ, ব্যবহারিক দিক ও কনফিগারেশন নিয়ে এখানে বিশ্লেষণধর্মী ও হাতে-কলমে আলোচনা করা হলো।
+
+## ১. ফায়ারওয়াল চেইন কী?
+- **Input:** রাউটারের নিজের সার্ভিসে আসা ট্রাফিক (e.g., Winbox, SSH, WebFig)
+- **Forward:** রাউটারের মধ্য দিয়ে অন্য নেটওয়ার্কে যাওয়া ট্রাফিক (e.g., LAN→WAN)
+- **Output:** রাউটার থেকে বের হওয়া ট্রাফিক (e.g., রাউটার নিজে পিং/আপডেট করছে)
+
+## ২. Input চেইন
+
+### কী?
+- রাউটারের নিজস্ব IP-তে আসা ট্রাফিক
+- Management, Remote Access, Ping ইত্যাদি
+
+### উদাহরণ
+```bash
+/ip firewall filter add chain=input protocol=tcp dst-port=8291 action=accept comment="Allow Winbox"
+/ip firewall filter add chain=input protocol=icmp action=accept comment="Allow Ping"
+/ip firewall filter add chain=input action=drop comment="Drop Everything Else"
+```
+
+### টিপস
+- WAN থেকে Management Access সীমিত করুন
+- Established/Related Allow করুন
+
+## ৩. Forward চেইন
+
+### কী?
+- রাউটারের মধ্য দিয়ে এক নেটওয়ার্ক থেকে আরেক নেটওয়ার্কে যাওয়া ট্রাফিক
+- সাধারণত LAN→WAN, VLAN→VLAN
+
+### উদাহরণ
+```bash
+/ip firewall filter add chain=forward in-interface=LAN out-interface=WAN action=accept comment="Allow LAN to Internet"
+/ip firewall filter add chain=forward connection-state=established,related action=accept
+/ip firewall filter add chain=forward action=drop comment="Drop Everything Else"
+```
+
+### টিপস
+- Inter-VLAN Routing কন্ট্রোল করতে Forward চেইন ব্যবহার করুন
+- ফায়ারওয়াল দিয়ে সাবনেট আইসোলেশন করুন
+
+## ৪. Output চেইন
+
+### কী?
+- রাউটার নিজে থেকে Initiate করা ট্রাফিক (e.g., Update, NTP, Ping)
+
+### উদাহরণ
+```bash
+/ip firewall filter add chain=output protocol=icmp action=accept comment="Allow Router Ping"
+/ip firewall filter add chain=output action=accept comment="Allow All Output"
+```
+
+### টিপস
+- সাধারণত Output চেইনে কম রুল লাগে
+- রাউটার নিজে থেকে ইন্টারনেট অ্যাক্সেস কন্ট্রোল করতে ব্যবহার
+
+## ৫. চেইন ও রুল প্রসেসিং অর্ডার
+- ফায়ারওয়াল রুলস টপ-টু-বটম প্রসেস হয়
+- চেইন অনুযায়ী ট্রাফিক ফিল্টার হয়
+- `/ip firewall filter print` দিয়ে চেক করুন
+
+## ৬. তুলনামূলক টেবিল
+
+| চেইন    | ট্রাফিক উৎস/গন্তব্য         | সাধারণ ব্যবহার                |
+|---------|-----------------------------|------------------------------|
+| Input   | External → Router           | Management, Ping, SSH        |
+| Forward | LAN ↔ WAN, VLAN ↔ VLAN      | ইন্টারনেট, Inter-VLAN Routing|
+| Output  | Router → External           | Update, NTP, Ping            |
+
+## ৭. সমস্যা ও সমাধান
+- **নিজেকে ব্লক:** Input চেইনে ভুল রুল দিলে Winbox/SSH বন্ধ হতে পারে
+- **LAN→WAN ব্লক:** Forward চেইনে রুল চেক করুন
+- **Output Issue:** রাউটার নিজে ইন্টারনেট পাচ্ছে কিনা দেখুন
+
+## ৮. বাস্তব কেস স্টাডি
+
+### কেস: শুধুমাত্র LAN থেকে Management Allow
+```bash
+/ip firewall filter add chain=input in-interface=LAN protocol=tcp dst-port=8291 action=accept
+/ip firewall filter add chain=input in-interface=LAN protocol=tcp dst-port=22 action=accept
+/ip firewall filter add chain=input action=drop
+```
+
+## উপসংহার
+Input, Forward, Output—এই তিনটি চেইনের কাজ ও কনফিগারেশন জানা থাকলে ফায়ারওয়াল রুলস আরও কার্যকর ও নিরাপদ হয়। পরবর্তী অধ্যায়ে বেসিক সিকিউরিটি নিয়ে আলোচনা করা হবে।

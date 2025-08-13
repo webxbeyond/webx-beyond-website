@@ -1,0 +1,87 @@
+---
+title: "RouterOS আপডেট ও ব্যাকআপ ম্যানেজমেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# RouterOS আপডেট ও ব্যাকআপ ম্যানেজমেন্ট
+
+নেটওয়ার্ক নিরাপত্তা ও স্থিতিশীলতার জন্য RouterOS আপডেট এবং কনফিগারেশন ব্যাকআপ রাখা অত্যন্ত গুরুত্বপূর্ণ। এখানে ধাপে ধাপে আপডেট ও ব্যাকআপ/রিস্টোর নিয়ে বিস্তারিত আলোচনা করা হলো।
+
+## ১. RouterOS আপডেট
+
+### ক. কেন আপডেট করবেন?
+- নিরাপত্তা দুর্বলতা দূর করতে
+- নতুন ফিচার পেতে
+- বাগ ফিক্স ও পারফরম্যান্স উন্নয়ন
+
+### খ. আপডেট চেক ও ডাউনলোড
+- **Winbox/WebFig:**
+  - System > Packages > Check For Updates
+  - Channel: stable/release
+  - Download & Install
+- **CLI:**
+  ```
+  /system package update check-for-updates
+  /system package update download
+  /system reboot
+  ```
+- **নোট:** আপডেটের আগে ব্যাকআপ নিন
+
+### গ. Manual Upgrade (npk file)
+- mikrotik.com থেকে npk ফাইল ডাউনলোড করুন
+- Files-এ আপলোড করুন
+- Reboot দিন
+
+## ২. RouterBOARD Firmware আপডেট
+- System > RouterBOARD > Upgrade
+- CLI:
+  ```
+  /system routerboard upgrade
+  /system reboot
+  ```
+
+## ৩. কনফিগারেশন ব্যাকআপ
+
+### ক. Binary Backup
+- **Winbox/WebFig:** Files > Backup > Name দিন > Backup
+- **CLI:**
+  ```
+  /system backup save name=backup
+  /system backup load name=backup
+  ```
+- **নোট:** Binary backup শুধুমাত্র একই ডিভাইস/মডেলে restore করা যায়
+
+### খ. Export/Import (Text)
+- **CLI:**
+  ```
+  /export file=config
+  /import file=config
+  ```
+- **নোট:** Export ফাইল অন্য ডিভাইসে এডিট করে ব্যবহার করা যায়
+
+## ৪. Scheduled/Remote Backup
+- Script ও Scheduler দিয়ে অটো ব্যাকআপ
+- Email/FTP-তে ব্যাকআপ পাঠানো যায়
+- উদাহরণ:
+  ```
+  /tool e-mail set server=smtp.example.com from=router@example.com
+  /system backup save name=auto-backup
+  /tool fetch address=ftp.example.com src-path=auto-backup user=ftpuser password=ftppass upload=yes
+  ```
+
+## ৫. Restore ও সতর্কতা
+- Restore করার আগে ডিভাইস রিসেট করুন
+- Binary backup-এ RouterOS ভার্সন মিলিয়ে নিন
+- Import করলে ডুপ্লিকেট এন্ট্রি হতে পারে
+
+## ৬. সমস্যা ও সমাধান
+- **Backup ফাইল নষ্ট/Corrupt:** নতুন ব্যাকআপ নিন
+- **Restore-এ Error:** RouterOS ভার্সন/মডেল চেক করুন
+
+## ৭. নিরাপত্তা টিপস
+- Backup ফাইল নিরাপদ স্থানে রাখুন
+- Export ফাইল এডিট করার সময় পাসওয়ার্ড/সিক্রেট তথ্য মুছে ফেলুন
+- অটো ব্যাকআপের জন্য Script ব্যবহার করুন
+
+## উপসংহার
+RouterOS আপডেট ও ব্যাকআপ ম্যানেজমেন্ট জানা থাকলে নেটওয়ার্ক নিরাপদ ও স্থিতিশীল রাখা সহজ হয়। পরবর্তী মডিউলে IP সাবনেটিং নিয়ে আলোচনা করা হবে।

@@ -1,0 +1,69 @@
+---
+title: VPN ফায়ারওয়াল ও সিকিউরিটি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+VPN ব্যবহারের সময় ফায়ারওয়াল ও সিকিউরিটি কনফিগারেশন অত্যন্ত গুরুত্বপূর্ণ। সঠিকভাবে ফায়ারওয়াল রুল, এনক্রিপশন, ইউজার অথেন্টিকেশন ও মনিটরিং ছাড়া VPN নেটওয়ার্ক ঝুঁকিপূর্ণ হতে পারে। এখানে মাইক্রোটিক রাউটারে VPN ফায়ারওয়াল ও সিকিউরিটি নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+## কেন VPN ফায়ারওয়াল দরকার?
+- অননুমোদিত অ্যাক্সেস রোধ
+- ডেটা এনক্রিপশন ও নিরাপত্তা
+- রিমোট ইউজারদের জন্য কাস্টম এক্সেস কন্ট্রোল
+- ব্রুট ফোর্স ও DDoS প্রতিরোধ
+
+## ফায়ারওয়াল রুল উদাহরণ (L2TP/IPSec, SSTP, WireGuard)
+
+### L2TP/IPSec
+```shell
+/ip firewall filter add chain=input protocol=udp dst-port=500,1701,4500 action=accept comment="Allow L2TP/IPSec"
+/ip firewall filter add chain=input protocol=ipsec-esp action=accept comment="Allow IPSec ESP"
+/ip firewall filter add chain=input protocol=ipsec-ah action=accept comment="Allow IPSec AH"
+```
+
+### SSTP
+```shell
+/ip firewall filter add chain=input protocol=tcp dst-port=443 action=accept comment="Allow SSTP"
+```
+
+### WireGuard
+```shell
+/ip firewall filter add chain=input protocol=udp dst-port=13231 action=accept comment="Allow WireGuard"
+```
+
+## ইউজার অথেন্টিকেশন ও এনক্রিপশন
+- শক্তিশালী পাসওয়ার্ড ও ইউজারনেম ব্যবহার করুন
+- সর্বদা AES, SHA-256, RSA, Curve25519 ইত্যাদি শক্তিশালী এনক্রিপশন নির্বাচন করুন
+- সার্টিফিকেট ব্যবহার করলে CA ও Server Cert ঠিকমতো সেট করুন
+
+## NAT ও VPN
+- VPN ইন্টারফেসে NAT Masquerade দিন (প্রয়োজনে)
+```shell
+/ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade
+```
+
+## রিমোট ইউজার এক্সেস কন্ট্রোল
+- Address List ব্যবহার করে নির্দিষ্ট IP-কে এক্সেস দিন
+- Time-based রুল ব্যবহার করুন
+
+## লগিং ও মনিটরিং
+- ফায়ারওয়াল লগ চালু রাখুন
+- VPN লগ মনিটর করুন
+- সন্দেহজনক অ্যাক্টিভিটি হলে নোটিফিকেশন সেট করুন
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি অফিসে শুধুমাত্র নির্দিষ্ট IP-র ইউজাররা VPN-এ কানেক্ট করতে পারবে এবং প্রতিটি কানেকশনের লগ সংরক্ষণ হবে। ফায়ারওয়াল ও লগিং দিয়ে সহজেই এই কনফিগারেশন করা যায়।
+
+## টিপস
+- Public IP-তে সরাসরি VPN এক্সেস সীমিত করুন
+- ফায়ারওয়াল রুলের অর্ডার ঠিক রাখুন
+- ফার্মওয়্যার আপডেট রাখুন
+- লগ মনিটর করুন
+
+## উপসংহার
+
+VPN ফায়ারওয়াল ও সিকিউরিটি কনফিগারেশন ছাড়া নিরাপদ রিমোট অ্যাক্সেস সম্ভব নয়। সঠিক ফায়ারওয়াল, এনক্রিপশন, ইউজার কন্ট্রোল ও মনিটরিং—সবকিছু মিলিয়ে VPN নেটওয়ার্ককে নিরাপদ রাখুন।
+
+---
+
+**পরবর্তী টপিক:** [Simple Queue ও Queue Tree](/mikrotik/simple-queue)

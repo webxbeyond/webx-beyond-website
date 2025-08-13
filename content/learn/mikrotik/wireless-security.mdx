@@ -1,0 +1,69 @@
+---
+title: ওয়্যারলেস সিকিউরিটি – WPA2/WPA3
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ওয়্যারলেস নেটওয়ার্কের নিরাপত্তা নিশ্চিত করতে WPA2 ও WPA3 সবচেয়ে আধুনিক ও শক্তিশালী এনক্রিপশন পদ্ধতি। মাইক্রোটিক রাউটারে এই সিকিউরিটি প্রোটোকলগুলো কনফিগার করা খুবই সহজ এবং কার্যকর।
+
+## ওয়্যারলেস সিকিউরিটি কেন গুরুত্বপূর্ণ?
+- অজানা ইউজার দ্বারা নেটওয়ার্কে প্রবেশ রোধ
+- ডেটা সুরক্ষা ও এনক্রিপশন
+- ম্যান-ইন-দ্য-মিডল ও স্নিফিং প্রতিরোধ
+- নেটওয়ার্কের পারফরম্যান্স ও রিলায়েবিলিটি বাড়ানো
+
+## WPA2 ও WPA3 কী?
+
+### WPA2 (Wi-Fi Protected Access 2)
+- AES এনক্রিপশন
+- Personal (Pre-Shared Key) ও Enterprise (RADIUS) মোড
+- অধিকাংশ ডিভাইসে সাপোর্টেড
+
+### WPA3
+- আরও শক্তিশালী এনক্রিপশন (SAE, 192-bit)
+- Brute Force ও Dictionary Attack প্রতিরোধ
+- Forward Secrecy
+- নতুন ডিভাইস ও OS-এ সাপোর্টেড
+
+## মাইক্রোটিক-এ WPA2/WPA3 কনফিগারেশন
+
+### Step 1: Security Profile তৈরি
+```shell
+/interface wireless security-profiles set default authentication-types=wpa2-psk,wpa3-psk wpa2-pre-shared-key="StrongPassword" wpa3-pre-shared-key="StrongerPassword"
+```
+
+### Step 2: Wireless Interface-এ Security Profile অ্যাসাইন
+```shell
+/interface wireless set wlan1 security-profile=default
+```
+
+### Step 3: SSID ও Frequency ঠিক করুন
+```shell
+/interface wireless set wlan1 ssid="SecureWiFi" frequency=2412
+```
+
+## Enterprise (RADIUS) মোড
+
+বড় অফিস বা ISP-তে RADIUS সার্ভার দিয়ে ইউজার অথেন্টিকেশন করা যায়।
+
+```shell
+/interface wireless security-profiles set default authentication-types=wpa2-eap,wpa3-eap eap-methods=peap,ttls tls-mode=no-certificates radius-mac-authentication=yes radius-mac-accounting=yes
+```
+
+## নিরাপত্তা বাড়াতে আরও কিছু টিপস
+- শক্তিশালী ও ইউনিক পাসওয়ার্ড ব্যবহার করুন
+- Hidden SSID ব্যবহার করুন (প্রয়োজনে)
+- MAC Filtering চালু করুন
+- AP Isolation ও Client Isolation ব্যবহার করুন
+- রেগুলার ফার্মওয়্যার আপডেট করুন
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি অফিসে শুধুমাত্র অথেন্টিকেটেড ইউজারদের WiFi এক্সেস দিতে হবে। WPA2-Enterprise ও RADIUS ব্যবহার করলে ইউজার ও ডিভাইস ভিত্তিক কন্ট্রোল সহজ হয়।
+
+## উপসংহার
+
+ওয়্যারলেস নেটওয়ার্কে WPA2 ও WPA3 সিকিউরিটি কনফিগার করলে ডেটা ও ইউজার নিরাপত্তা অনেক বেড়ে যায়। মাইক্রোটিক রাউটারে এই সেটআপ খুবই সহজ এবং আধুনিক নেটওয়ার্কের জন্য অপরিহার্য।
+
+---
+
+**পরবর্তী টপিক:** [CAPsMAN – সেন্ট্রালাইজড ওয়্যারলেস ম্যানেজমেন্ট](/mikrotik/capsman)

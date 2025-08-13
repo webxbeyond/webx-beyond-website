@@ -1,0 +1,88 @@
+---
+title: "বেসিক ফায়ারওয়াল রুলস"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+নেটওয়ার্ক নিরাপত্তা নিশ্চিত করতে ফায়ারওয়াল রুলস অত্যন্ত গুরুত্বপূর্ণ। মাইক্রোটিক রাউটারে বেসিক ফায়ারওয়াল কনফিগারেশন করলে অপ্রয়োজনীয় এক্সেস, স্ক্যানিং, ও আক্রমণ থেকে নেটওয়ার্ক সুরক্ষিত থাকে। এখানে ধাপে ধাপে বেসিক ফায়ারওয়াল রুলস নিয়ে আলোচনা করা হলো।
+
+## ১. ফায়ারওয়াল চেইন ও কনসেপ্ট
+
+- **Input Chain:** রাউটারের নিজের সার্ভিসে এক্সেস
+- **Forward Chain:** রাউটারের মধ্য দিয়ে যাওয়া ট্রাফিক
+- **Output Chain:** রাউটার থেকে বের হওয়া ট্রাফিক
+
+## ২. Default Drop Policy
+
+সবশেষে একটি Drop Rule রাখলে অপ্রত্যাশিত ট্রাফিক ব্লক হয়।
+
+```bash
+/ip firewall filter add chain=input action=drop comment="Drop everything else"
+/ip firewall filter add chain=forward action=drop comment="Drop everything else"
+```
+
+## ৩. LAN থেকে ইন্টারনেট Allow
+
+```bash
+/ip firewall filter add chain=forward in-interface=LAN out-interface=WAN action=accept comment="Allow LAN to Internet"
+```
+
+## ৪. Established/Related Allow
+
+```bash
+/ip firewall filter add chain=input connection-state=established,related action=accept comment="Allow Established/Related"
+/ip firewall filter add chain=forward connection-state=established,related action=accept comment="Allow Established/Related"
+```
+
+## ৫. ICMP (Ping) Allow
+
+```bash
+/ip firewall filter add chain=input protocol=icmp action=accept comment="Allow Ping"
+```
+
+## ৬. Management Access (Winbox, SSH, WebFig) Only from LAN
+
+```bash
+/ip firewall filter add chain=input protocol=tcp dst-port=8291,22,80,443 in-interface=LAN action=accept comment="Allow Management from LAN"
+```
+
+## ৭. Drop Bogus/Invalid Packets
+
+```bash
+/ip firewall filter add chain=input connection-state=invalid action=drop comment="Drop Invalid"
+/ip firewall filter add chain=forward connection-state=invalid action=drop comment="Drop Invalid"
+```
+
+## ৮. Port Scan, Brute Force, DoS Basic Protection (সংক্ষেপে)
+
+- Advanced ফায়ারওয়াল মডিউলে বিস্তারিত থাকবে
+- Basic: Input chain-এ Drop Rule
+
+## ৯. রুল অর্ডার ও টেস্ট
+
+- ফায়ারওয়াল রুলস টপ-টু-বটম প্রসেস হয়
+- ভুল হলে নিজেকে ব্লক করবেন না—Always keep Winbox open
+- `/ip firewall filter print` দিয়ে রুল চেক করুন
+
+## ১০. উদাহরণ: বেসিক ফায়ারওয়াল রুলসের সম্পূর্ণ সেট
+
+```bash
+/ip firewall filter
+add chain=input connection-state=established,related action=accept comment="Allow Established/Related"
+add chain=input protocol=icmp action=accept comment="Allow Ping"
+add chain=input in-interface=LAN action=accept comment="Allow LAN Management"
+add chain=input connection-state=invalid action=drop comment="Drop Invalid"
+add chain=input action=drop comment="Drop Everything Else"
+
+add chain=forward connection-state=established,related action=accept comment="Allow Established/Related"
+add chain=forward in-interface=LAN out-interface=WAN action=accept comment="Allow LAN to Internet"
+add chain=forward connection-state=invalid action=drop comment="Drop Invalid"
+add chain=forward action=drop comment="Drop Everything Else"
+```
+
+## ১১. নিরাপত্তা টিপস
+- WAN থেকে সরাসরি Management Access বন্ধ রাখুন
+- Port Forwarding সাবধানে কনফিগার করুন
+- ফায়ারওয়াল রুলস ব্যাকআপ রাখুন
+
+## উপসংহার
+বেসিক ফায়ারওয়াল রুলস কনফিগার করলে নেটওয়ার্কের নিরাপত্তা অনেকাংশে নিশ্চিত হয়। পরবর্তী অধ্যায়ে RouterOS আপডেট ও ব্যাকআপ নিয়ে আলোচনা করা হবে।

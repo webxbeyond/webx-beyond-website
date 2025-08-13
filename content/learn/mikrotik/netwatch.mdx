@@ -1,0 +1,87 @@
+---
+title: Netwatch ও স্ক্রিপ্টিং দ্বারা অ্যালার্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে Netwatch ও স্ক্রিপ্টিং হলো নেটওয়ার্ক মনিটরিং, অ্যালার্টিং ও অটোমেশন-এর জন্য অত্যন্ত শক্তিশালী টুল। Netwatch দিয়ে নির্দিষ্ট IP/Host-এর কানেক্টিভিটি মনিটর করা যায় এবং স্ক্রিপ্টিং-এর মাধ্যমে ডাউন/আপ হলে অ্যালার্ট, রিকভারি, বা কাস্টম অ্যাকশন নেওয়া যায়। এই টিউটোরিয়ালে আমরা Netwatch ও স্ক্রিপ্টিং-এর ব্যবহার, কনফিগারেশন, এবং বাস্তব উদাহরণ নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Netwatch কী ও কেন দরকার?
+
+- নির্দিষ্ট IP/Host-এর কানেক্টিভিটি মনিটর
+- ডাউন/আপ হলে অ্যালার্ট, রিকভারি, বা কাস্টম অ্যাকশন
+- নেটওয়ার্ক অটোমেশন ও সেল্ফ-হিলিং
+
+---
+
+## Netwatch কনফিগারেশন
+
+### ১. Netwatch Entry তৈরি
+```shell
+/tool netwatch add host=8.8.8.8 interval=00:01:00 up-script=":log info 'Google is UP'" down-script=":log warning 'Google is DOWN'"
+```
+- `host`: টার্গেট IP/Host
+- `interval`: কতক্ষণ পরপর চেক
+- `up-script`: Host UP হলে কি হবে
+- `down-script`: Host DOWN হলে কি হবে
+
+### ২. Email/SMS/Telegram অ্যালার্ট (ঐচ্ছিক)
+- up-script/down-script-এ Email/SMS/Telegram API ব্যবহার করুন
+
+#### Email Alert Example
+```shell
+/tool e-mail send to="admin@example.com" subject="Host Down" body="Google is DOWN"
+```
+
+---
+
+## Winbox-এ Netwatch কনফিগারেশন
+
+1. **Tools > Netwatch**: নতুন Entry অ্যাড করুন
+2. Host, Interval, Up-Script, Down-Script দিন
+3. Status ও Logs চেক করুন
+
+---
+
+## স্ক্রিপ্টিং দ্বারা অ্যালার্ট ও অটোমেশন
+
+- Netwatch-এর up/down-script-এ কাস্টম স্ক্রিপ্ট লিখে অটোমেশন করুন
+- উদাহরণ: ইন্টারফেস রিস্টার্ট, Email/SMS/Telegram অ্যালার্ট, Firewall Rule Change
+
+### Interface Restart Example
+```shell
+/interface disable ether2
+/interface enable ether2
+```
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: ISP-তে Gateway Down হলে Email অ্যালার্ট
+- Netwatch + Email Script ব্যবহার করুন
+
+### কেস ২: Branch Office VPN Down হলে Interface Restart
+- Netwatch + Interface Restart Script ব্যবহার করুন
+
+### কেস ৩: Critical Server Down হলে SMS/Telegram অ্যালার্ট
+- Netwatch + SMS/Telegram API Script ব্যবহার করুন
+
+---
+
+## টিপস ও বেস্ট প্র্যাকটিস
+- Netwatch Entry-তে Host, Interval, Script ঠিকভাবে দিন
+- Email/SMS/Telegram API কনফিগার করুন
+- Logs ও Status নিয়মিত মনিটর করুন
+- স্ক্রিপ্টিং-এর মাধ্যমে অটোমেশন ও সেল্ফ-হিলিং ইমপ্লিমেন্ট করুন
+
+---
+
+## উপসংহার
+
+Netwatch ও স্ক্রিপ্টিং ব্যবহার করলে নেটওয়ার্ক মনিটরিং, অ্যালার্টিং ও অটোমেশন সহজ ও শক্তিশালী হয়। মাইক্রোটিকের বিল্ট-ইন টুল ও কনফিগারেশন ব্যবহার করে সহজেই এই সুবিধা পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [RouterOS স্ক্রিপ্টিং পরিচিতি](/mikrotik/scripting)

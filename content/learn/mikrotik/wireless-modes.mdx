@@ -1,0 +1,66 @@
+---
+title: ওয়্যারলেস মোড – AP, Station, Repeater, WDS
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক রাউটারে ওয়্যারলেস মোড নির্বাচন করা অত্যন্ত গুরুত্বপূর্ণ, কারণ এটি নির্ধারণ করে ডিভাইসটি কীভাবে নেটওয়ার্কে কাজ করবে। এখানে AP, Station, Repeater, WDS—সবগুলো মোডের বেসিকস ও কনফিগারেশন নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+## AP (Access Point) মোড
+
+AP মোডে রাউটার ওয়্যারলেস ক্লায়েন্টদের জন্য নেটওয়ার্ক তৈরি করে। সাধারণত অফিস, বাসা, ক্যাফে ইত্যাদিতে WiFi দিতে AP মোড ব্যবহার হয়।
+
+### AP মোড কনফিগারেশন
+```shell
+/interface wireless set wlan1 mode=ap-bridge ssid="MyWiFi" frequency=2412
+/interface wireless security-profiles set default authentication-types=wpa2-psk wpa2-pre-shared-key="password"
+```
+
+## Station মোড
+
+Station মোডে রাউটার নিজে অন্য AP-তে ক্লায়েন্ট হিসেবে কানেক্ট হয়।
+
+### Station মোড কনফিগারেশন
+```shell
+/interface wireless set wlan1 mode=station ssid="OfficeWiFi" frequency=2412
+```
+
+## Repeater মোড
+
+Repeater মোডে রাউটার একটি WiFi সিগন্যাল রিসিভ করে সেটিকে আবার সম্প্রচার করে। এতে কভারেজ বাড়ে।
+
+### Repeater কনফিগারেশন
+- প্রথমে Station হিসেবে কানেক্ট করুন
+- তারপর Virtual AP তৈরি করুন
+
+```shell
+/interface wireless set wlan1 mode=station ssid="MainWiFi"
+/interface wireless add name=wlan2 master-interface=wlan1 mode=ap-bridge ssid="RepeaterWiFi"
+```
+
+## WDS (Wireless Distribution System)
+
+WDS হলো একাধিক AP-কে ওয়্যারলেসভাবে কানেক্ট করার প্রযুক্তি, যাতে একই নেটওয়ার্কে Seamless Roaming ও Bandwidth Sharing হয়।
+
+### WDS কনফিগারেশন
+```shell
+/interface wireless set wlan1 wds-mode=dynamic wds-default-bridge=bridge1
+/interface wireless set wlan2 wds-mode=dynamic wds-default-bridge=bridge1
+```
+
+## বাস্তব কেস স্টাডি
+
+ধরা যাক, একটি স্কুলে একাধিক বিল্ডিংয়ে WiFi দিতে হবে। Main বিল্ডিংয়ে AP, অন্য বিল্ডিংয়ে Repeater ও WDS ব্যবহার করলে পুরো ক্যাম্পাসে Seamless WiFi পাওয়া যাবে।
+
+## টিপস
+- Frequency ও Channel ঠিকমতো নির্বাচন করুন
+- Security Profile-এ WPA2/WPA3 ব্যবহার করুন
+- Signal Strength ও Coverage মনিটর করুন
+- WDS-এ Loop Avoidance ও Bridge ঠিকমতো কনফিগার করুন
+
+## উপসংহার
+
+ওয়্যারলেস মোড সঠিকভাবে নির্বাচন ও কনফিগার করলে নেটওয়ার্কের পারফরম্যান্স, কভারেজ ও নিরাপত্তা অনেক বাড়ে। AP, Station, Repeater, WDS—সবকিছুই মাইক্রোটিক রাউটারে সহজে ইমপ্লিমেন্ট করা যায়।
+
+---
+
+**পরবর্তী টপিক:** [ওয়্যারলেস সিকিউরিটি – WPA2/WPA3](/mikrotik/wireless-security)

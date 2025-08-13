@@ -1,0 +1,88 @@
+---
+title: Address List ও সময়ভিত্তিক রুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক ফায়ারওয়াল ব্যবস্থাপনায় Address List এবং সময়ভিত্তিক (Time-based) রুলস অত্যন্ত গুরুত্বপূর্ণ ভূমিকা রাখে। এগুলোর মাধ্যমে আপনি নির্দিষ্ট IP, নেটওয়ার্ক বা গ্রুপকে টার্গেট করে ফায়ারওয়াল রুল তৈরি করতে পারেন এবং নির্দিষ্ট সময়ে স্বয়ংক্রিয়ভাবে রুল কার্যকর/নিষ্ক্রিয় করতে পারেন।
+
+## Address List কী?
+
+Address List হলো এক ধরনের ডাইনামিক বা স্ট্যাটিক তালিকা, যেখানে আপনি একাধিক IP Address বা সাবনেট সংরক্ষণ করতে পারেন। পরে এই তালিকাকে ফায়ারওয়াল রুলে ব্যবহার করে সহজেই বড় নেটওয়ার্ক বা গ্রুপকে টার্গেট করা যায়।
+
+### Address List তৈরি করার উপকারিতা
+- একাধিক IP/নেটওয়ার্ককে একসাথে নিয়ন্ত্রণ
+- ডাইনামিক ব্লক/আনব্লক (যেমন: DDoS, Brute Force)
+- ফায়ারওয়াল রুল সহজ ও ম্যানেজেবল রাখা
+
+### Address List তৈরি করার উদাহরণ
+
+```shell
+/ip firewall address-list
+add list=blocked address=192.168.1.100 comment="Blocked user"
+add list=office address=192.168.10.0/24 comment="Office Network"
+```
+
+এখানে `blocked` ও `office` নামে দুটি Address List তৈরি হয়েছে।
+
+### Address List ব্যবহার করে ফায়ারওয়াল রুল
+
+```shell
+/ip firewall filter
+add chain=forward src-address-list=blocked action=drop comment="Block listed IPs"
+add chain=forward src-address-list=office action=accept comment="Allow office network"
+```
+
+## ডাইনামিক Address List (উদাহরণ)
+
+অনেক সময় ফায়ারওয়াল রুলের মাধ্যমে স্বয়ংক্রিয়ভাবে Address List-এ IP যোগ করা হয়।
+
+```shell
+/ip firewall filter
+add chain=input protocol=tcp dst-port=22 src-address-list=!trusted action=add-src-to-address-list address-list=ssh_blocked address-list-timeout=1d comment="Block SSH brute force"
+```
+
+এখানে, SSH-তে বারবার চেষ্টা করলে ঐ IP স্বয়ংক্রিয়ভাবে `ssh_blocked` লিস্টে ১ দিনের জন্য যোগ হবে।
+
+## সময়ভিত্তিক (Time-based) ফায়ারওয়াল রুলস
+
+কখনো কখনো নির্দিষ্ট সময়ে ফায়ারওয়াল রুল চালু/বন্ধ করতে হয়। যেমন, অফিস টাইমে ইন্টারনেট এক্সেস, রাত ১০টার পর ব্লক ইত্যাদি।
+
+### Time Parameter
+- `time`: কোন সময়ে রুল কার্যকর হবে (HH:MM:SS-ফরম্যাটে)
+- `days`: কোন দিনগুলোতে রুল কার্যকর হবে (mon, tue, wed, ...)
+
+### সময়ভিত্তিক রুলের উদাহরণ
+
+```shell
+/ip firewall filter
+add chain=forward src-address-list=office action=accept time=08:00:00-18:00:00,mon,tue,wed,thu,fri comment="Office hours only"
+add chain=forward src-address-list=office action=drop time=18:00:01-07:59:59,mon,tue,wed,thu,fri comment="Block after office hours"
+```
+
+এখানে, অফিস নেটওয়ার্কের জন্য সকাল ৮টা থেকে সন্ধ্যা ৬টা পর্যন্ত এক্সেস দেয়া হচ্ছে, বাকি সময় ব্লক করা হচ্ছে।
+
+## Address List ও Time-based রুলস – বাস্তব উদাহরণ
+
+ধরা যাক, আপনি চান নির্দিষ্ট কিছু IP রাত ১০টা থেকে সকাল ৬টা পর্যন্ত ইন্টারনেট ব্যবহার করতে না পারে:
+
+```shell
+/ip firewall address-list
+add list=night_block address=192.168.1.50
+add list=night_block address=192.168.1.51
+
+/ip firewall filter
+add chain=forward src-address-list=night_block action=drop time=22:00:00-05:59:59 comment="Block internet at night"
+```
+
+## Address List ও সময়ভিত্তিক রুলস ব্যবহারে সতর্কতা
+- ভুল Address List ব্যবহার করলে বৈধ ইউজার ব্লক হতে পারে
+- Time-based রুলে সময় ও দিন সঠিকভাবে নির্ধারণ করুন
+- Address List বেশি বড় হলে রাউটারের পারফরম্যান্সে প্রভাব পড়তে পারে
+
+## উপসংহার
+
+Address List ও সময়ভিত্তিক রুলস ব্যবহার করে আপনি মাইক্রোটিক রাউটারে আরও স্মার্ট ও কাস্টমাইজড ফায়ারওয়াল নিয়ন্ত্রণ করতে পারবেন। বড় নেটওয়ার্ক, অফিস, স্কুল, ISP—সবখানেই এই ফিচারগুলো অত্যন্ত কার্যকর।
+
+---
+
+**পরবর্তী টপিক:** [DDoS ও Brute Force থেকে সুরক্ষা](/mikrotik/ddos-protection)
