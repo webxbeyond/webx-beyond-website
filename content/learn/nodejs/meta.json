@@ -4,8 +4,9 @@
   "icon": "famicons:logo-nodejs",
   "root": true,
   "pages": [
-    "---টিউটোরিয়াল---",
     "index",
+    "...",
+    "intro-architecture",
     "make-npm-package",
     "..."
   ]
