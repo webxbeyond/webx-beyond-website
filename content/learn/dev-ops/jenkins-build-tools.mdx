@@ -1,0 +1,62 @@
+---
+title: বিল্ড টুলস ইনস্টল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins-এ বিল্ড অটোমেশন করতে হলে প্রয়োজনীয় build tools (JDK, Maven, Gradle, Node.js, Python, Docker) ইনস্টল ও কনফিগার করতে হয়। এই টিউটোরিয়ালে দেখানো হয়েছে কীভাবে Jenkins-এ build tools ইনস্টল ও configure করবেন।
+
+## ১. JDK (Java Development Kit) ইনস্টল
+- Jenkins server-এ JDK install করুন
+- Jenkins UI > Manage Jenkins > Global Tool Configuration > JDK
+- Name দিন, path select করুন
+
+## ২. Maven/Gradle ইনস্টল
+- Jenkins UI > Manage Jenkins > Global Tool Configuration > Maven/Gradle
+- Name দিন, Install automatically select করুন
+
+## ৩. Node.js ইনস্টল
+- Node.js server-এ install করুন
+- Jenkins UI > Manage Jenkins > Global Tool Configuration > NodeJS
+- Name দিন, version select করুন
+- [NodeJS Plugin](https://plugins.jenkins.io/nodejs/)
+
+## ৪. Python ইনস্টল
+- Python server-এ install করুন
+- Jenkins UI > Manage Jenkins > Global Tool Configuration > Python
+- Name দিন, path select করুন
+- [ShiningPanda Plugin](https://plugins.jenkins.io/shiningpanda/)
+
+## ৫. Docker ইনস্টল
+- Jenkins server-এ Docker install করুন
+- Jenkins UI > Manage Jenkins > Global Tool Configuration > Docker
+- Name দিন, path select করুন
+- [Docker Plugin](https://plugins.jenkins.io/docker/)
+
+## ৬. Build Tool Integration in Job
+- Job configuration > Build Environment
+- Tool select করুন (JDK, Maven, NodeJS)
+- Build steps: shell/batch/script
+
+## রিয়েল লাইফ উদাহরণ: Node.js Build Pipeline
+1. NodeJS plugin install
+2. Global Tool Config-এ Node.js add
+3. Job-এ NodeJS select
+4. Build step: `npm run build`
+
+## সেরা প্র্যাকটিস
+- Tool version naming convention
+- Install automatically select করুন
+- Regular update
+- Tool path documentation
+
+## টিম ও Collaboration
+- Shared tool config
+- Version control-এ build config
+- Build tool update notification
+
+## সংক্ষেপে
+Jenkins-এ build tools install ও configure করলে বিল্ড অটোমেশন environment ready হয়, টিমের productivity ও reliability বাড়ে।
+
+---
+
+**পরবর্তী টপিক:** [ফ্রিস্টাইল জব](/dev-ops/jenkins-freestyle-job)

@@ -1,0 +1,82 @@
+---
+title: পাইপলাইনে ভার্সন ইনক্রিমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Continuous Delivery-তে Version Automation
+
+Continuous Delivery pipeline-এ version increment অটোমেটেড হলে release management সহজ হয়, human error কমে, এবং artifact traceability নিশ্চিত হয়। এই টিউটোরিয়ালে version increment কী, কিভাবে Jenkins pipeline-এ সেটআপ করবেন, বাস্তব উদাহরণ, এবং best practices দেখানো হয়েছে।
+
+## ১. Version Increment কী?
+- Build, release, deployment-এর জন্য unique version
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- Automated version bump (commit, tag, artifact)
+
+## ২. Version Automation কেন দরকার?
+- Manual version update ঝামেলাপূর্ণ
+- Automated pipeline-এ consistency
+- Artifact traceability
+- Rollback সহজ
+
+## ৩. Jenkins Pipeline-এ Version Increment
+### Example: Node.js অ্যাপ্লিকেশনে
+1. `package.json`-এ version field
+2. Pipeline-এ shell command দিয়ে version bump:
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Version Bump') {
+      steps {
+        sh 'npm version patch'
+        sh 'git push --follow-tags'
+      }
+    }
+    // ...other stages...
+  }
+}
+```
+
+### Example: Custom Version File
+- `version.txt`-এ version store
+- Pipeline-এ read, increment, write
+```groovy
+stage('Version Increment') {
+  steps {
+    script {
+      def version = readFile('version.txt').trim()
+      def parts = version.tokenize('.')
+      def newVersion = "${parts[0]}.${parts[1].toInteger() + 1}.${parts[2]}"
+      writeFile file: 'version.txt', text: newVersion
+      sh 'git add version.txt && git commit -m "Version bump" && git push'
+    }
+  }
+}
+```
+
+## ৪. Artifact Naming & Release Tagging
+- Build artifact-এ version attach করুন
+- Release/tag automation
+- Example: `myapp-1.2.3.jar`, `v1.2.3` tag
+
+## ৫. Best Practices
+- Semantic versioning follow করুন
+- Automated commit/tag
+- Release note generate করুন
+- Version bump stage pipeline-এর শুরুতে রাখুন
+- Rollback strategy
+
+## ৬. Real-life Workflow
+1. Developer code push
+2. Pipeline trigger
+3. Version bump
+4. Build & test
+5. Artifact publish (with version)
+6. Notification
+
+## সংক্ষেপে
+Pipeline-এ version increment অটোমেটেড হলে release management, traceability, এবং rollback সহজ হয়—DevOps workflow আরও efficient ও reliable হয়।
+
+---
+
+**পরবর্তী টপিক:** [Blue-Green & Canary Deployment](/dev-ops/blue-green-canary)

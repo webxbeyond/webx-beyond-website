@@ -1,0 +1,71 @@
+---
+title: Minikube / k3s / kind setup
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Minikube, k3s, kind—local Kubernetes cluster setup-এর জন্য lightweight, easy-to-use tool। এই টিউটোরিয়ালে concept, installation, workflow, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Minikube কী?
+- Local single-node Kubernetes cluster
+- VM, container, bare-metal support
+- Developer-friendly, quick start
+
+### Minikube Installation
+```bash
+# Linux
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube start
+```
+
+## ২. k3s কী?
+- Lightweight Kubernetes distribution
+- ARM, IoT, edge device support
+- Production-grade, easy install
+
+### k3s Installation
+```bash
+curl -sfL https://get.k3s.io | sh -
+# kubeconfig: /etc/rancher/k3s/k3s.yaml
+```
+
+## ৩. kind কী?
+- Kubernetes IN Docker
+- Multi-node cluster in Docker container
+- CI/CD pipeline integration
+
+### kind Installation
+```bash
+GO111MODULE="on" go get sigs.k8s.io/kind@v0.20.0
+kind create cluster
+```
+
+## ৪. Workflow
+1. Tool install করুন (Minikube/k3s/kind)
+2. Cluster start করুন
+3. kubectl দিয়ে deploy/manage করুন
+4. Local development, testing, CI/CD
+
+## ৫. Real-life Scenario
+- Developer local cluster-এ microservice deploy/test
+- CI/CD pipeline-এ automated integration test
+- Edge device-এ k3s cluster
+
+## ৬. Best Practices
+- Resource limit define করুন
+- Cluster config version control-এ রাখুন
+- Automated cleanup
+- Security (RBAC, network policy)
+- Monitoring (Prometheus, Grafana)
+
+## ৭. Tool Integration
+- Jenkins pipeline integration
+- Helm chart test
+- Multi-cloud workload simulation
+
+## সংক্ষেপে
+Minikube, k3s, kind—local Kubernetes cluster setup, development, testing, automation—modern DevOps workflow efficient ও scalable হয়।
+
+---
+
+**পরবর্তী টপিক:** [Deployment, Services, ConfigMaps & Secrets](/dev-ops/k8s-deploy-services)

@@ -1,0 +1,65 @@
+---
+title: Prometheus & Grafana
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Prometheus ও Grafana—modern DevOps-এ server, application, network monitoring ও visualization-এর জন্য essential tool। এই টিউটোরিয়ালে concept, setup, integration, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Prometheus কী?
+- Open-source monitoring ও alerting toolkit
+- Time-series database
+- Pull-based metrics collection (HTTP endpoint)
+- Query language: PromQL
+
+### Prometheus Setup
+1. Prometheus install করুন
+2. `prometheus.yml`-এ target server/service define করুন
+3. Service-এ `/metrics` endpoint expose করুন
+
+### Example `prometheus.yml`
+```yaml
+scrape_configs:
+  - job_name: 'webapp'
+    static_configs:
+      - targets: ['localhost:8080']
+```
+
+## ২. Grafana কী?
+- Visualization ও dashboard tool
+- Multiple data source (Prometheus, MySQL, Elasticsearch)
+- Custom dashboard, alert, sharing
+
+### Grafana Setup
+1. Grafana install করুন
+2. Data source হিসেবে Prometheus add করুন
+3. Dashboard create করুন
+
+## ৩. Integration Workflow
+1. Application-এ `/metrics` endpoint add করুন
+2. Prometheus scrape করে metrics collect করে
+3. Grafana-তে dashboard visualize করুন
+4. Alert rule configure করুন
+
+## ৪. Real-life Scenario
+- Server CPU, RAM, disk usage monitor
+- Application error rate, latency, traffic visualize
+- Alert—high CPU হলে Slack/email notification
+
+## ৫. Best Practices
+- Custom metrics expose করুন
+- Dashboard modular করুন
+- Alert rule tune করুন
+- Retention policy configure করুন
+- Security (user access, data source)
+
+## ৬. Tool Integration
+- Jenkins pipeline monitoring
+- Cloud monitoring (AWS CloudWatch integration)
+- Log aggregation tool (ELK, Loki)
+
+## সংক্ষেপে
+Prometheus ও Grafana—modern monitoring ও visualization-এর foundation। Real-time metrics, alert, dashboard—DevOps workflow efficient ও reliable হয়।
+
+---
+
+**পরবর্তী টপিক:** [Netdata / ELK Stack](/dev-ops/netdata-elk)

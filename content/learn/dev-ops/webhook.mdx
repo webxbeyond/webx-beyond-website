@@ -1,0 +1,61 @@
+---
+title: ওয়েবহুক
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Jenkins Pipeline-এ Automation Trigger
+
+ওয়েবহুক হলো এমন একটি HTTP callback mechanism, যা বাইরের ইভেন্ট থেকে Jenkins pipeline trigger করতে ব্যবহৃত হয়। এই টিউটোরিয়ালে ওয়েবহুক কী, কিভাবে সেটআপ করবেন, বাস্তব উদাহরণ, এবং best practices দেখানো হয়েছে।
+
+## ১. ওয়েবহুক কী?
+- External event-driven trigger
+- Source control (GitHub/GitLab), Issue tracker, Deployment tool থেকে pipeline চালু
+- Automation, integration, notification
+
+## ২. ওয়েবহুক কিভাবে কাজ করে?
+- বাইরের সিস্টেম (যেমন GitHub) থেকে HTTP POST request আসে
+- Jenkins job/pipeline trigger হয়
+- Custom payload, authentication, security
+
+## ৩. Jenkins-এ ওয়েবহুক সেটআপ
+### Example: GitHub থেকে push হলে pipeline trigger
+1. Jenkins job/pipeline তৈরি করুন
+2. Job configuration > Build Triggers > "Trigger builds remotely (e.g., from scripts)" > Authentication token দিন
+3. GitHub repo > Settings > Webhooks > Add webhook
+   - Payload URL: `http://<jenkins-server>/job/<job-name>/build?token=<your-token>`
+   - Content type: `application/json`
+   - Events: "push"
+
+## ৪. Real-life Example: Automated Deployment
+- Developer code push করলে Jenkins pipeline trigger হয়
+- Automated build, test, deploy
+- Example workflow:
+  1. Developer pushes code
+  2. GitHub sends webhook
+  3. Jenkins pipeline runs
+  4. Notification goes to Slack/Email
+
+## ৫. Security Best Practices
+- Authentication token ব্যবহার করুন
+- IP whitelist করুন
+- HTTPS ব্যবহার করুন
+- Payload validation করুন
+
+## ৬. Advanced Usage
+- Custom payload process
+- Multiple webhook source
+- Notification integration (Slack, Teams)
+- Audit log
+
+## ৭. Troubleshooting
+- Webhook delivery log চেক করুন (GitHub/GitLab)
+- Jenkins job log দেখুন
+- HTTP response code (200 = success)
+- Firewall/port issue
+
+## সংক্ষেপে
+ওয়েবহুক DevOps automation-এ গুরুত্বপূর্ণ—external event থেকে Jenkins pipeline trigger, faster feedback, seamless integration, এবং efficient workflow নিশ্চিত করে।
+
+---
+
+**পরবর্তী টপিক:** [পাইপলাইনে ভার্সন ইনক্রিমেন্ট](/dev-ops/pipeline-version-increment)

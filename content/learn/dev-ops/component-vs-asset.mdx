@@ -1,0 +1,100 @@
+---
+title: কম্পোনেন্ট বনাম অ্যাসেট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Nexus Repository Manager-এ "কম্পোনেন্ট" ও "অ্যাসেট"—এই দুটি শব্দ প্রায়ই দেখা যায়, কিন্তু এদের মধ্যে পার্থক্য, ব্যবহার, এবং ডেটা সংগঠনের কৌশল অনেক গুরুত্বপূর্ণ। এই টিউটোরিয়ালে আমরা সহজ ভাষায়, বাস্তব উদাহরণসহ, Component ও Asset-এর পার্থক্য, সম্পর্ক, এবং DevOps pipeline-এ এদের গুরুত্ব নিয়ে আলোচনা করব।
+
+---
+
+## Component কী?
+
+Component হচ্ছে একটি সফটওয়্যারের versioned release বা package, যা একাধিক ফাইল বা অ্যাসেট নিয়ে গঠিত।
+
+**উদাহরণ:**
+- Maven-এর একটি JAR package
+- npm-এর একটি package
+- Docker image
+
+একটি Component সাধারণত একাধিক অ্যাসেট ধারণ করে।
+
+---
+
+## Asset কী?
+
+Asset হচ্ছে Component-এর অন্তর্গত individual ফাইল বা binary blob।
+
+**উদাহরণ:**
+- JAR, POM, README, LICENSE (Maven package-এর asset)
+- .tgz, package.json (npm package-এর asset)
+- Docker image-এর layer, manifest, config
+
+---
+
+## Component vs Asset: পার্থক্য
+
+| বিষয়           | Component                        | Asset                          |
+|----------------|----------------------------------|--------------------------------|
+| সংজ্ঞা         | Versioned package/release        | Individual file/blob           |
+| Example        | my-app-1.0.jar (Maven)           | my-app-1.0.jar, pom.xml        |
+| Relationship   | একাধিক Asset ধারণ করে           | Component-এর অংশ              |
+| Management     | Component level delete/publish   | Individual asset delete/view   |
+| Metadata       | Version, group, name, etc.       | Size, checksum, path           |
+
+---
+
+## Nexus-এ Component ও Asset-এর সম্পর্ক
+
+- একটি Component = একাধিক Asset
+- Component publish/delete করলে সংশ্লিষ্ট সব Asset-ও publish/delete হয়
+- Asset individually view, download, বা delete করা যায়
+
+**REST API Example:**
+- Component list: `/service/rest/v1/components?repository=my-repo`
+- Asset list: `/service/rest/v1/assets?repository=my-repo`
+
+---
+
+## Component ও Asset ম্যানেজমেন্ট
+
+### Component Delete
+```bash
+curl -u admin:yourpassword -X DELETE \
+  http://localhost:8081/service/rest/v1/components/{componentId}
+```
+
+### Asset Delete
+```bash
+curl -u admin:yourpassword -X DELETE \
+  http://localhost:8081/service/rest/v1/assets/{assetId}
+```
+
+### Component Metadata
+- Name, version, group, format
+
+### Asset Metadata
+- Size, checksum, path, content type
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+**Case Study:**
+একটি কোম্পানি তাদের Nexus-এ Maven package publish করে। প্রতিটি package (Component) এর মধ্যে jar, pom.xml, README (Asset) থাকে। Component-level delete করলে সব ফাইল একসাথে ডিলিট হয়, কিন্তু কোনো নির্দিষ্ট asset (e.g. README) আলাদাভাবে ডিলিট করা যায়।
+
+---
+
+## Component ও Asset-এর গুরুত্ব
+
+- Component: Version management, release tracking
+- Asset: Storage optimization, individual file management
+
+DevOps pipeline-এ Component publish/delete দিয়ে version control সহজ হয়, আর Asset-level management দিয়ে storage cleanup ও auditing সহজ হয়।
+
+---
+
+## Conclusion
+
+Nexus-এ Component ও Asset-এর পার্থক্য বুঝলে আপনি ডেটা সংগঠন, ম্যানেজমেন্ট, এবং DevOps pipeline আরও efficient করতে পারবেন। Component release management ও Asset-level auditing—দুটিই DevOps workflow-এর জন্য অপরিহার্য।
+
+পরবর্তী টিউটোরিয়ালে Cleanup Policy ও নির্ধারিত কাজ নিয়ে বিস্তারিত আলোচনা করা হবে।

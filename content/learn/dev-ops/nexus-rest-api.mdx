@@ -1,0 +1,156 @@
+---
+title: Nexus REST API
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Nexus Repository Manager-এর REST API ডেভঅপস ইঞ্জিনিয়ারদের জন্য এক অসাধারণ টুল, যা দিয়ে আপনি রিপোজিটরি, আর্টিফ্যাক্ট, ইউজার, পারমিশন, এবং আরও অনেক কিছু অটোমেটেডভাবে ম্যানেজ করতে পারেন। এই টিউটোরিয়ালে আমরা Nexus REST API-এর ব্যবহার, বাস্তব উদাহরণ, এবং সিকিউরিটি কনসিডারেশন নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## REST API কী এবং কেন?
+
+REST API (Representational State Transfer Application Programming Interface) হলো এমন একটি ইন্টারফেস, যা HTTP প্রোটোকল ব্যবহার করে ডেটা আদান-প্রদান করে। Nexus-এর REST API দিয়ে আপনি ওয়েব UI-তে না গিয়ে স্ক্রিপ্ট, CI/CD pipeline, বা অন্য টুল থেকে সরাসরি রিপোজিটরি ম্যানেজ করতে পারবেন।
+
+**ব্যবহার:**
+- রিপোজিটরি তৈরি, আপডেট, ডিলিট
+- আর্টিফ্যাক্ট আপলোড/ডাউনলোড
+- ইউজার ও পারমিশন ম্যানেজ
+- Blob store, Cleanup policy, Component management
+
+---
+
+## Nexus REST API: কনফিগারেশন ও অ্যাক্সেস
+
+### ১. API Endpoint
+
+Nexus REST API সাধারণত `/service/rest/v1/` path-এ পাওয়া যায়।
+
+```
+http://<nexus-server>/service/rest/v1/
+```
+
+### ২. Authentication
+
+Nexus API-তে অ্যাক্সেস পেতে হলে আপনাকে Basic Auth (username/password) অথবা Token ব্যবহার করতে হবে।
+
+**উদাহরণ:**
+```bash
+curl -u admin:yourpassword http://localhost:8081/service/rest/v1/repositories
+```
+
+---
+
+## রিপোজিটরি ম্যানেজমেন্ট: বাস্তব উদাহরণ
+
+### ১. রিপোজিটরি লিস্ট করা
+```bash
+curl -u admin:yourpassword http://localhost:8081/service/rest/v1/repositories
+```
+
+### ২. নতুন রিপোজিটরি তৈরি করা
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-maven-repo",
+    "format": "maven2",
+    "type": "hosted",
+    "url": "http://localhost:8081/repository/my-maven-repo"
+  }' \
+  http://localhost:8081/service/rest/v1/repositories
+```
+
+### ৩. রিপোজিটরি ডিলিট করা
+```bash
+curl -u admin:yourpassword -X DELETE \
+  http://localhost:8081/service/rest/v1/repositories/my-maven-repo
+```
+
+---
+
+## আর্টিফ্যাক্ট ম্যানেজমেন্ট
+
+### ১. আর্টিফ্যাক্ট আপলোড
+
+Maven, npm, Docker ইত্যাদি ফরম্যাটে আর্টিফ্যাক্ট আপলোডের জন্য Nexus API ব্যবহার করা যায়।
+
+**Maven Example:**
+```bash
+curl -u admin:yourpassword --upload-file my-app-1.0.jar \
+  http://localhost:8081/repository/my-maven-repo/my/app/1.0/my-app-1.0.jar
+```
+
+### ২. আর্টিফ্যাক্ট ডিলিট
+```bash
+curl -u admin:yourpassword -X DELETE \
+  http://localhost:8081/service/rest/v1/components?repository=my-maven-repo
+```
+
+---
+
+## ইউজার ও পারমিশন ম্যানেজমেন্ট
+
+### ১. ইউজার লিস্ট
+```bash
+curl -u admin:yourpassword http://localhost:8081/service/rest/v1/security/users
+```
+
+### ২. নতুন ইউজার তৈরি
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "devopsuser",
+    "firstName": "DevOps",
+    "lastName": "User",
+    "emailAddress": "devops@example.com",
+    "password": "StrongPassword123",
+    "status": "active",
+    "roles": ["nx-admin"]
+  }' \
+  http://localhost:8081/service/rest/v1/security/users
+```
+
+---
+
+## CI/CD Pipeline-এ Nexus REST API
+
+Nexus REST API ব্যবহার করে আপনি Jenkins, GitHub Actions, GitLab CI/CD pipeline-এ অটোমেটেডভাবে আর্টিফ্যাক্ট পাবলিশ, রিপোজিটরি ক্লিনআপ, ইউজার ম্যানেজমেন্ট করতে পারেন।
+
+**Jenkins Pipeline Example:**
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Publish Artifact') {
+      steps {
+        sh 'curl -u admin:yourpassword --upload-file my-app-1.0.jar http://localhost:8081/repository/my-maven-repo/my/app/1.0/my-app-1.0.jar'
+      }
+    }
+  }
+}
+```
+
+---
+
+## সিকিউরিটি ও বেস্ট প্র্যাকটিস
+
+- API Token ব্যবহার করুন, সরাসরি password না দিয়ে
+- HTTPS ব্যবহার করুন
+- Role-based Access Control (RBAC) নিশ্চিত করুন
+- Automation script-এ credentials encrypt করুন
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+**Case Study:**
+একটি সফটওয়্যার কোম্পানি তাদের CI/CD pipeline-এ Nexus REST API ব্যবহার করে প্রতিদিন শত শত বিল্ডের আর্টিফ্যাক্ট অটোমেটেডভাবে পাবলিশ করে। এতে ডেভেলপারদের সময় বাঁচে, ম্যানুয়াল ভুল কমে, এবং সিকিউরিটি নিশ্চিত হয়।
+
+---
+
+## Conclusion
+
+Nexus REST API ডেভঅপস অটোমেশন, স্কেলিং, এবং সিকিউরিটি নিশ্চিত করতে অপরিহার্য। এই API ব্যবহার করে আপনি রিপোজিটরি, আর্টিফ্যাক্ট, ইউজার, পারমিশন, এবং আরও অনেক কিছু অটোমেটেডভাবে ম্যানেজ করতে পারবেন।
+
+পরবর্তী টিউটোরিয়ালে Blob Store, Component vs Asset, Cleanup Policy নিয়ে বিস্তারিত আলোচনা করা হবে।

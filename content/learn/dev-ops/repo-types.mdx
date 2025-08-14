@@ -1,0 +1,68 @@
+---
+title: রিপোজিটরি টাইপস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps workflow-এ build করা artifact/package/versioned file store, manage, ও publish করার জন্য বিভিন্ন ধরনের repository ব্যবহৃত হয়। এখানে সহজ ভাষায়, repository-এর টাইপ, ব্যবহার, DevOps-এ গুরুত্ব, বাস্তব উদাহরণ, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## Common Repository Types
+
+### ১. Hosted Repository
+- Organization/server-এ artifact/package store
+- Example: Maven hosted, npm hosted, Docker hosted
+- Own artifact publish/store
+
+### ২. Proxy Repository
+- External public repository-এর cache/copy
+- Example: Maven Central proxy, npmjs proxy, Docker Hub proxy
+- Faster build, offline access
+
+### ৩. Group Repository
+- Multiple hosted/proxy repository-কে group করে single endpoint
+- Example: Maven group, npm group, Docker group
+- Simplified access/config
+
+### ৪. Raw Repository
+- Any file/binary store
+- Example: zip, tar.gz, exe, image
+- Custom artifact/package
+
+## Format-specific Repository
+- **Maven:** Java/JVM package
+- **npm:** Node.js package
+- **PyPI:** Python package
+- **Docker:** Container image
+- **NuGet:** .NET package
+- **Raw:** Any file/binary
+
+## DevOps-এ গুরুত্ব
+- Automated build/publish pipeline
+- Versioned artifact management
+- Team collaboration
+- Security/access control
+- Faster build/offline access
+
+## বাস্তব উদাহরণ
+
+> "আমরা Nexus-এ Maven hosted, npm hosted, Docker hosted repository setup করি। Proxy repository দিয়ে external package cache করি। Group repository দিয়ে single endpoint access করি। Raw repository-তে custom file store করি। Build pipeline-এ automated publish/access করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Publish fail:** Credential/config/repository type চেক করুন
+- **Access denied:** User/role/config চেক করুন
+- **Storage full:** Cleanup policy/setup করুন
+- **Manual error:** Automated pipeline/script ব্যবহার করুন
+
+## টিপস
+- Repository type/format ঠিকভাবে setup/config করুন
+- Automated build/publish pipeline ব্যবহার করুন
+- Access control/security setup করুন
+- Cleanup policy/setup করুন—storage optimize
+
+## সংক্ষেপে
+- Artifact repository-এর বিভিন্ন টাইপ—hosted, proxy, group, raw—DevOps workflow-এ automation, versioning, security, faster build সহজ করে
+- Manual error কমাতে automation/pipeline/setup ব্যবহার করুন
+- Security, backup, monitoring—manager-এর built-in সুবিধা নিন
+
+---
+
+**পরবর্তী পাঠ:** [রিপোজিটরিতে আর্টিফ্যাক্ট পাবলিশ](/dev-ops/artifact-publish)

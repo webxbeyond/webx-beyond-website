@@ -1,0 +1,74 @@
+---
+title: Serverless Basics (Lambda / Cloud Functions)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Serverless architecture DevOps workflow-এ automation, scalability, ও cost efficiency-এর জন্য জনপ্রিয়। এখানে সহজ ভাষায়, serverless-এর ধারণা, Lambda/Cloud Functions ব্যবহার, DevOps-এ গুরুত্ব, বাস্তব উদাহরণ, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## Serverless কী?
+- Server manage করার দরকার নেই—cloud provider automatically manage করে
+- Function/unit of code deploy—on-demand run
+- Example: AWS Lambda, GCP Cloud Functions, Azure Functions
+
+## Serverless-এর সুবিধা
+- No server management
+- Auto scaling
+- Pay-per-use
+- Fast deployment
+- Event-driven architecture
+
+## Lambda/Cloud Functions ব্যবহার
+
+### ১. Function লিখুন
+- Example (Node.js):
+    ```javascript
+    exports.handler = async (event) => {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "Hello from Lambda!" })
+      };
+    };
+    ```
+
+### ২. Deploy করুন
+- AWS Console/CLI দিয়ে Lambda deploy
+- GCP Console/CLI দিয়ে Cloud Function deploy
+- Azure Portal/CLI দিয়ে Function deploy
+
+### ৩. Trigger setup
+- HTTP/API Gateway, S3 event, Pub/Sub, Timer
+
+### ৪. Monitoring/logging
+- Cloud provider-এর built-in monitoring/logging
+
+## DevOps-এ Serverless-এর গুরুত্ব
+- Automated deployment
+- Microservice architecture
+- Cost-effective scaling
+- Event-driven workflow
+- CI/CD pipeline integration
+
+## বাস্তব উদাহরণ
+
+> "আমরা AWS Lambda-তে Node.js function deploy করি—API Gateway দিয়ে trigger করি। GCP-তে Cloud Function deploy করি—Pub/Sub event দিয়ে run করি। Production-এ automated pipeline দিয়ে serverless function deploy/manage করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Cold start latency:** Function optimize করুন—memory/runtime
+- **Permission issue:** IAM/config চেক করুন
+- **Timeout/error:** Function config/log চেক করুন
+- **Manual error:** Automated pipeline/script ব্যবহার করুন
+
+## টিপস
+- Function size optimize করুন—fast start/run
+- Automated deploy pipeline/setup করুন
+- Monitoring/logging setup করুন—error/debugging
+- Security best practices follow করুন—IAM/config
+
+## সংক্ষেপে
+- Serverless architecture—automation, scalability, cost efficiency
+- Lambda/Cloud Functions—event-driven, fast deploy, pay-per-use
+- Manual error কমাতে automated pipeline/setup ব্যবহার করুন
+
+---
+
+**পরবর্তী মডিউল:** [আর্টিফ্যাক্ট রিপোজিটরি ম্যানেজার](/dev-ops/artifact-repo-manager)

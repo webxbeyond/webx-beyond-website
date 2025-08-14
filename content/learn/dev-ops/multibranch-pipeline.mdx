@@ -1,0 +1,71 @@
+---
+title: মাল্টিব্রাঞ্চ পাইপলাইন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins Multibranch Pipeline দিয়ে একাধিক ব্রাঞ্চের জন্য আলাদা pipeline automate করা যায়—feature, develop, release, PR—সব branch-এর জন্য আলাদা build/test/deploy। এই টিউটোরিয়ালে Multibranch Pipeline setup, workflow, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Multibranch Pipeline কী?
+- Multiple branch-এর জন্য আলাদা pipeline
+- Automatic branch discovery
+- PR build/test automation
+- Visualization ও logs
+
+## ২. Multibranch Pipeline Job তৈরি
+1. Jenkins UI > New Item
+2. Name দিন, "Multibranch Pipeline" select করুন
+3. OK ক্লিক করুন
+4. Branch source: Git/GitHub select করুন
+5. Repo URL, credentials add করুন
+6. Jenkinsfile path select করুন
+
+## ৩. Workflow
+- Jenkins repo scan করে সব branch detect করে
+- প্রতিটি branch-এর জন্য pipeline run হয়
+- PR open হলে auto build/test
+- Branch delete হলে job remove
+
+## ৪. Real-life Example: Node.js Repo
+1. Repo-তে master, develop, feature/* branch
+2. Jenkinsfile-এ build/test/deploy stage
+3. PR open হলে Jenkins auto build/test
+4. Merge হলে deploy
+
+## ৫. Jenkinsfile Example
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Build') { steps { sh 'npm install' } }
+    stage('Test') { steps { sh 'npm test' } }
+    stage('Deploy') {
+      when { branch 'master' }
+      steps { sh 'npm run deploy' }
+    }
+  }
+}
+```
+
+## ৬. Visualization
+- Branch-wise build history
+- PR status
+- Stage view
+
+## ৭. Best Practices
+- Jenkinsfile version control-এ রাখুন
+- Branch naming convention
+- PR-এ pipeline test
+- Secrets credentials manager-এ
+- Notification configure
+
+## ৮. Team Collaboration
+- Shared Jenkinsfile
+- Build status dashboard
+- PR-এ auto test/deploy
+
+## সংক্ষেপে
+Multibranch Pipeline দিয়ে Jenkins-এ branch-based automation, visibility, reliability ও collaboration সহজ হয়—DevOps টিমের productivity ও quality বাড়ে।
+
+---
+
+**পরবর্তী টপিক:** [ক্রেডেনশিয়াল ব্যবস্থাপনা](/dev-ops/jenkins-credentials)

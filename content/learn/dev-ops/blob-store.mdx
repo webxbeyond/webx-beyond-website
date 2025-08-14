@@ -1,0 +1,117 @@
+---
+title: ব্লব স্টোর
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Nexus Repository Manager-এ ব্লব স্টোর (Blob Store) হলো এমন একটি স্টোরেজ সিস্টেম, যেখানে আপনার সমস্ত আর্টিফ্যাক্ট, কম্পোনেন্ট, ও অ্যাসেট ফাইল সেভ হয়। এই টিউটোরিয়ালে আমরা Blob Store-এর কনসেপ্ট, কনফিগারেশন, ব্যবহারের বেস্ট প্র্যাকটিস, এবং রিয়েল লাইফ উদাহরণ নিয়ে আলোচনা করব।
+
+---
+
+## Blob Store কী?
+
+Blob Store হচ্ছে ফাইল স্টোরেজের জন্য Nexus-এর নিজস্ব সিস্টেম, যেখানে ডেটা ব্লব (Binary Large Object) আকারে সংরক্ষিত হয়। এটি মূলত আর্টিফ্যাক্ট, ডকার ইমেজ, npm package, jar, zip ইত্যাদি ফাইল Efficiently স্টোর ও রিট্রিভ করার জন্য ব্যবহৃত হয়।
+
+**কেন Blob Store দরকার?**
+- স্কেলেবল স্টোরেজ
+- পারফরম্যান্স অপ্টিমাইজেশন
+- ডেটা রিডানডেন্সি ও ক্লিনআপ
+- মাল্টিপল রিপোজিটরির জন্য সেন্ট্রাল স্টোরেজ
+
+---
+
+## Blob Store-এর টাইপ
+
+Nexus-এ সাধারণত দুই ধরনের Blob Store থাকে:
+1. **File Blob Store:** Local disk-এ ফাইল হিসেবে ডেটা সেভ হয়
+2. **S3 Blob Store:** Amazon S3-তে ডেটা সেভ হয় (Cloud integration)
+
+---
+
+## Blob Store কনফিগারেশন
+
+### ১. নতুন Blob Store তৈরি
+
+Nexus UI > Administration > Blob Stores > Create Blob Store
+
+- Name: `my-blob-store`
+- Type: File / S3
+- Path: `/nexus-data/blobs/my-blob-store`
+
+**CLI/REST API Example:**
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-blob-store",
+    "type": "File",
+    "path": "/nexus-data/blobs/my-blob-store"
+  }' \
+  http://localhost:8081/service/rest/v1/blobstores/file
+```
+
+### ২. Blob Store অ্যাসাইন করা
+
+নতুন বা পুরাতন রিপোজিটরিতে Blob Store অ্যাসাইন করা যায়।
+
+- Repository > Settings > Blob Store
+
+---
+
+## Blob Store-এর বেস্ট প্র্যাকটিস
+
+- **Multiple Blob Store:** বড় কোম্পানিতে আলাদা আলাদা Blob Store ব্যবহার করুন (e.g. dev, staging, prod)
+- **Storage Monitoring:** Blob Store-এর usage নিয়মিত মনিটর করুন
+- **Cleanup Policy:** অপ্রয়োজনীয় Blob/Artifact ক্লিনআপ করুন
+- **Backup:** Blob Store-এর ডেটা নিয়মিত ব্যাকআপ নিন
+- **Cloud Integration:** S3 Blob Store ব্যবহার করলে Disaster Recovery সহজ হয়
+
+---
+
+## Blob Store Cleanup Policy
+
+Blob Store-এ অপ্রয়োজনীয়, পুরাতন, বা এক্সপায়ার্ড আর্টিফ্যাক্ট ক্লিন করার জন্য Cleanup Policy ব্যবহার করা হয়।
+
+- Administration > Cleanup Policies > Create Policy
+- Policy অ্যাসাইন করুন Blob Store-এ
+
+**REST API Example:**
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "old-artifact-cleanup",
+    "criteria": {
+      "lastDownloaded": "30d"
+    }
+  }' \
+  http://localhost:8081/service/rest/v1/cleanup/policies
+```
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি তাদের Nexus-এ dev, staging, prod environment-এর জন্য আলাদা Blob Store ব্যবহার করে। এতে ডেটা আইসোলেশন, পারফরম্যান্স, এবং ক্লিনআপ সহজ হয়।
+
+---
+
+## Blob Store Monitoring
+
+Blob Store usage, storage health, এবং error log নিয়মিত মনিটর করুন।
+
+- Administration > Blob Stores > Usage
+- REST API দিয়ে usage data পাওয়া যায়
+
+**Example:**
+```bash
+curl -u admin:yourpassword http://localhost:8081/service/rest/v1/blobstores
+```
+
+---
+
+## Conclusion
+
+Blob Store Nexus-এর স্টোরেজ অপ্টিমাইজেশন, ডেটা আইসোলেশন, এবং পারফরম্যান্সের জন্য অপরিহার্য। সঠিক Blob Store কনফিগারেশন ও ক্লিনআপ policy ব্যবহার করে আপনি আপনার DevOps pipeline আরও efficient ও scalable করতে পারবেন।
+
+পরবর্তী টিউটোরিয়ালে Component vs Asset, Cleanup Policy নিয়ে বিস্তারিত আলোচনা করা হবে।

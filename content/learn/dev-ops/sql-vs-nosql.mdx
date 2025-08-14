@@ -1,0 +1,61 @@
+---
+title: SQL vs NoSQL
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডাটাবেজের দুই প্রধান ধরন—SQL (Relational) ও NoSQL (Non-relational)। প্রয়োজন, স্কেল, ও ডাটা স্ট্রাকচারের উপর ভিত্তি করে নির্বাচন করতে হয়।
+
+## SQL (Relational Database)
+- **উদাহরণ:** MySQL, PostgreSQL, Oracle, SQL Server
+- **বৈশিষ্ট্য:**
+  - Fixed schema, টেবিল, রো, কলাম
+  - SQL query language
+  - ACID properties (Atomicity, Consistency, Isolation, Durability)
+- **ব্যবহার:** Transactional data, reporting, user management
+
+## NoSQL (Non-relational Database)
+- **উদাহরণ:** MongoDB, Cassandra, Redis, DynamoDB
+- **বৈশিষ্ট্য:**
+  - Schema-less, flexible structure
+  - Document, Key-Value, Graph, Column-based
+  - High scalability, distributed
+- **ব্যবহার:** Big data, real-time analytics, caching, IoT
+
+## পার্থক্য
+| বিষয়         | SQL                   | NoSQL                  |
+|--------------|-----------------------|------------------------|
+| Schema       | Fixed                 | Flexible               |
+| Scalability  | Vertical (scale-up)   | Horizontal (scale-out) |
+| Query        | SQL                   | API/JSON/Custom        |
+| Transaction  | Strong (ACID)         | Eventual consistency   |
+| Structure    | Table-based           | Document/Key-value/etc |
+| Use Case     | Transaction, reporting| Big data, analytics    |
+
+## কখন SQL ব্যবহার করবেন?
+- Transaction-heavy app (banking, ecommerce)
+- Data integrity, strong consistency দরকার
+- Complex query, join, reporting
+
+## কখন NoSQL ব্যবহার করবেন?
+- Big data, real-time analytics
+- Flexible schema, rapid development
+- High scalability, distributed system
+- Caching, session, IoT
+
+## বাস্তব উদাহরণ
+
+> "আমরা ইউজার, অর্ডার, রিপোর্টিং-এ PostgreSQL (SQL) ব্যবহার করি। Real-time analytics, caching-এ MongoDB ও Redis (NoSQL)।"
+
+## টিপস
+- প্রয়োজন অনুযায়ী SQL/NoSQL নির্বাচন করুন
+- Polyglot persistence—একাধিক ডাটাবেজ একসাথে ব্যবহার করা যায়
+- Security, backup, scaling—সবকিছু বিবেচনা করুন
+
+## সংক্ষেপে
+- SQL—transactional, integrity, reporting
+- NoSQL—big data, scalability, flexibility
+- Modern app-এ দুই ধরনের ডাটাবেজই প্রয়োজন হতে পারে
+
+---
+
+**পরবর্তী পাঠ:** [Database Backups & Restore](/dev-ops/db-backup-restore)

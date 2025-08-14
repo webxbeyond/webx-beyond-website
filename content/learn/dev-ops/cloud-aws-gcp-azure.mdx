@@ -1,0 +1,67 @@
+---
+title: AWS / GCP / Azure বেসিক সার্ভিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps workflow-এ AWS, GCP, Azure—এই তিনটি cloud provider-এর মূল সার্ভিস জানা জরুরি। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, cloud provider-এর core service, DevOps-এ ব্যবহার, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## AWS (Amazon Web Services)
+- **EC2:** Virtual server
+- **S3:** Object storage
+- **RDS:** Managed database
+- **IAM:** User/role/access management
+- **CloudWatch:** Monitoring/logging
+- **VPC:** Network setup
+- **Lambda:** Serverless function
+
+## GCP (Google Cloud Platform)
+- **Compute Engine:** Virtual server
+- **Cloud Storage:** Object storage
+- **Cloud SQL:** Managed database
+- **IAM:** User/role/access management
+- **Stackdriver:** Monitoring/logging
+- **VPC:** Network setup
+- **Cloud Functions:** Serverless function
+
+## Azure
+- **Virtual Machines:** Virtual server
+- **Blob Storage:** Object storage
+- **Azure SQL:** Managed database
+- **IAM (RBAC):** User/role/access management
+- **Monitor:** Monitoring/logging
+- **VNet:** Network setup
+- **Functions:** Serverless function
+
+## DevOps-এ ব্যবহার
+- Automated server provisioning (EC2/Compute Engine/VM)
+- Storage/backup (S3/Cloud Storage/Blob)
+- Database setup (RDS/Cloud SQL/Azure SQL)
+- Monitoring/logging (CloudWatch/Stackdriver/Monitor)
+- CI/CD pipeline integration
+- Security/access control (IAM)
+- Serverless deployment (Lambda/Cloud Functions/Functions)
+
+## বাস্তব উদাহরণ
+
+> "আমরা AWS-এ EC2 instance launch করি—Terraform দিয়ে। S3-তে backup/store করি। RDS-এ database setup করি। CloudWatch-এ monitoring করি। IAM দিয়ে user/access manage করি। GCP-তে Compute Engine, Cloud Storage, Cloud SQL—সব automate করি। Azure-এ VM, Blob Storage, Functions—DevOps pipeline-এ integrate করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Resource limit:** Usage monitor করুন, auto-scale/setup করুন
+- **Cost overrun:** Billing alert/setup করুন
+- **Permission denied:** IAM/RBAC config চেক করুন
+- **Manual error:** IaC/script/pipeline ব্যবহার করুন
+
+## টিপস
+- Always use IaC—manual provisioning এড়িয়ে চলুন
+- Resource usage monitor করুন—cost control
+- Security/access best practices follow করুন
+- Automated backup/setup করুন
+
+## সংক্ষেপে
+- AWS, GCP, Azure—cloud provider-এর core service DevOps workflow-এ automation, scalability, reliability, security—সবকিছু সহজ করে
+- Manual error কমাতে automation/script/IaC/pipeline ব্যবহার করুন
+- Security, monitoring, backup—cloud provider-এর সুবিধা নিন
+
+---
+
+**পরবর্তী পাঠ:** [Terraform / Pulumi - Infrastructure as Code](/dev-ops/terraform-pulumi)

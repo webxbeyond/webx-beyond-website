@@ -1,0 +1,77 @@
+---
+title: একটি আর্টিফ্যাক্ট বিল্ড ও প্রকাশ করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেভঅপসে "আর্টিফ্যাক্ট" মানে হচ্ছে—build process শেষে তৈরি হওয়া output file/package, যেমন: `.jar`, `.war`, `.zip`, `.tar.gz`, `.exe`, Docker image ইত্যাদি।
+
+## আর্টিফ্যাক্ট বিল্ড করার ধাপ
+
+### ১. সোর্স কোড প্রস্তুত
+- কোড clean, tested, version-controlled (Git)
+- Example: `main.py`, `app.js`, `pom.xml`, `Dockerfile`
+
+### ২. Build Tools ব্যবহার
+- **Java:** Maven/Gradle
+    ```bash
+    mvn clean package
+    # target/app.jar
+    ```
+- **Node.js:** npm/yarn
+    ```bash
+    npm run build
+    # dist/app.js
+    ```
+- **Python:** PyInstaller
+    ```bash
+    pyinstaller main.py
+    # dist/main.exe
+    ```
+- **Docker:**
+    ```bash
+    docker build -t myapp:1.0 .
+    # Docker image
+    ```
+
+### ৩. আর্টিফ্যাক্ট সংগ্রহ
+- Build output directory থেকে `.jar`, `.exe`, `.zip`, Docker image সংগ্রহ করুন
+- Example: `target/`, `dist/`, `build/`, Docker local registry
+
+### ৪. আর্টিফ্যাক্ট প্রকাশ (Publish)
+- **Manual:** Email, Google Drive, FTP, etc.
+- **Automated:** Artifact Repository (Nexus, JFrog Artifactory), Docker Hub
+    - Example: Maven publish
+        ```bash
+        mvn deploy
+        ```
+    - Example: Docker Hub
+        ```bash
+        docker login
+        docker tag myapp:1.0 username/myapp:1.0
+        docker push username/myapp:1.0
+        ```
+
+## বাস্তব উদাহরণ
+
+> "আমরা Node.js অ্যাপ build করি—`npm run build` দিয়ে, তারপর dist ফোল্ডার থেকে `.js` ফাইল zip করে Google Drive-এ দিই। Docker image হলে—build করে Docker Hub-এ push করি। Java হলে—Maven দিয়ে `.jar` build করে Nexus-এ publish করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Build fail:** Dependency/version mismatch—package manager দিয়ে fix করুন
+- **Permission denied:** Output directory/write permission চেক করুন
+- **Publish fail:** Repository credentials/config ঠিক করুন
+- **Docker push fail:** Docker Hub login/check
+
+## টিপস
+- Build script/automation ব্যবহার করুন (CI/CD)
+- Artifact naming convention follow করুন
+- Version/tag ঠিকভাবে দিন
+- Automated publish pipeline তৈরি করুন
+
+## সংক্ষেপে
+- সোর্স কোড → build tool → artifact → publish
+- Manual/automated দুইভাবেই publish করা যায়
+- Artifact repository ব্যবহার করলে versioning, access, automation সহজ হয়
+
+---
+
+**পরবর্তী পাঠ:** [জাভাস্ক্রিপ্ট অ্যাপ্লিকেশন বিল্ড করা](/dev-ops/js-app-build)

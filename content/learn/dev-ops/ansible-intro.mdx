@@ -1,0 +1,81 @@
+---
+title: Ansible পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Ansible হলো agentless, open-source configuration management ও automation tool—server, cloud, network device, application deploy ও manage করতে সহজ, দ্রুত ও নিরাপদ। এই টিউটোরিয়ালে Ansible-এর concept, architecture, setup, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Ansible কী?
+- Infrastructure automation
+- Agentless (SSH-ভিত্তিক)
+- YAML-এ playbook লিখে automation
+- Idempotent—repeatable, predictable result
+
+## ২. Architecture
+- Control Node: যেখানে Ansible install
+- Managed Node: যেসব server/device configure হবে
+- SSH/WinRM দিয়ে communication
+- Inventory file-এ managed node list
+
+## ৩. Installation
+### Linux-এ:
+```bash
+sudo apt update
+sudo apt install ansible
+```
+### Windows-এ (WSL/VM):
+```bash
+pip install ansible
+```
+
+## ৪. Inventory File
+- `hosts` file-এ server list:
+```ini
+[web]
+web1.example.com
+web2.example.com
+[db]
+db1.example.com
+```
+
+## ৫. Playbook Example
+- YAML-এ automation steps:
+```yaml
+---
+- name: Install NGINX on web servers
+  hosts: web
+  become: yes
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+```
+
+## ৬. Run Playbook
+```bash
+ansible-playbook -i hosts nginx.yml
+```
+
+## ৭. Real-life Scenario
+- ১০০+ server-এ package install, config update, user add—একটি playbook-এ
+- Cloud VM spin-up, app deploy, security patch—all automated
+
+## ৮. Best Practices
+- Inventory group ব্যবহার করুন
+- Playbook modular করুন (role, task)
+- Variable ও template ব্যবহার করুন
+- Version control-এ playbook রাখুন
+- Test environment-এ আগে run করুন
+
+## ৯. Tool Integration
+- Jenkins pipeline-এ Ansible
+- Cloud provider (AWS, GCP, Azure)
+- Monitoring tool
+
+## সংক্ষেপে
+Ansible—DevOps automation-এর জন্য সহজ, scalable, এবং powerful tool। Manual কাজ কমিয়ে, efficiency ও reliability বাড়ায়।
+
+---
+
+**পরবর্তী টপিক:** [Playbooks & Roles](/dev-ops/ansible-playbooks)

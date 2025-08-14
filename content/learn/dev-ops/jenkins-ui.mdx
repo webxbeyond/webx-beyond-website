@@ -1,0 +1,69 @@
+---
+title: জেনকিন্স UI পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins UI হচ্ছে DevOps টিমের বিল্ড, টেস্ট, ডিপ্লয় ও অটোমেশন ম্যানেজ করার graphical interface। এই টিউটোরিয়ালে Jenkins UI-এর মূল অংশ, ফিচার, এবং রিয়েল লাইফ workflow দেখানো হয়েছে।
+
+## ১. Dashboard
+- সব জব, বিল্ড, স্ট্যাটাস এক জায়গায়
+- Recent build, success/failure, queue
+
+## ২. New Item (Job) Creation
+- Freestyle, Pipeline, Multibranch, Folder
+- Job name দিয়ে create করুন
+
+## ৩. Job Configuration
+- Source code repo (Git, SVN)
+- Build trigger (SCM, schedule, webhook)
+- Build steps (shell, batch, script)
+- Post-build actions (email, deploy)
+
+## ৪. Build History
+- Success, failure, duration
+- Console output, logs
+- Re-run, delete build
+
+## ৫. Credentials Management
+- Username/password, SSH key, secret text
+- Credentials > Add > Scope select
+
+## ৬. Plugin Management
+- Manage Jenkins > Manage Plugins
+- Install/update plugins
+- Popular plugins: Git, Docker, Blue Ocean, Slack
+
+## ৭. User & Role Management
+- Manage Jenkins > Manage Users
+- Multiple user, role-based access control
+
+## ৮. System Configuration
+- Global tool config (JDK, Git, Maven)
+- Node/agent config
+- Security, backup
+
+## ৯. Monitoring & Notification
+- Build status email, Slack
+- Build health, trend graph
+
+## রিয়েল লাইফ উদাহরণ: Typical Workflow
+1. New pipeline job create
+2. GitHub repo connect
+3. Build trigger: push event
+4. Build steps: test, build, deploy
+5. Notification: email/Slack
+6. Build history review
+
+## সেরা প্র্যাকটিস
+- Job naming convention
+- Credentials security
+- Plugin update
+- Backup config
+- Dashboard customize
+
+## সংক্ষেপে
+Jenkins UI দিয়ে DevOps টিম সহজে বিল্ড, টেস্ট, ডিপ্লয়, অটোমেশন ও collaboration ম্যানেজ করতে পারে।
+
+---
+
+**পরবর্তী টপিক:** [বিল্ড টুলস ইনস্টল](/dev-ops/jenkins-build-tools)

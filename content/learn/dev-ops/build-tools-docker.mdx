@@ -1,0 +1,84 @@
+---
+title: বিল্ড টুলস ও ডকার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বিল্ড টুলস (npm, Maven, Gradle, PyInstaller) দিয়ে অ্যাপ্লিকেশন build করার পর, Docker ব্যবহার করে container তৈরি ও deploy করা হয়। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, বিল্ড টুলস ও ডকারের integration দেখানো হলো।
+
+## কেন বিল্ড টুলস ও ডকার একসাথে?
+- Build tool দিয়ে optimized artifact তৈরি
+- Docker দিয়ে artifact-কে container-এ package ও deploy
+- Automation, portability, scalability
+
+## Integration Steps
+
+### ১. Build Tool দিয়ে Artifact তৈরি
+- Example: Node.js
+    ```bash
+    npm run build
+    # dist/
+    ```
+- Example: Java
+    ```bash
+    mvn package
+    # target/app.jar
+    ```
+
+### ২. Dockerfile তৈরি
+- Build output-কে Docker image-এ package করার জন্য
+    ```dockerfile
+    # Node.js
+    FROM node:20-alpine
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm install --production
+    COPY . .
+    RUN npm run build
+    CMD ["node", "dist/app.js"]
+    ```
+    ```dockerfile
+    # Java
+    FROM openjdk:17-jdk-alpine
+    WORKDIR /app
+    COPY target/app.jar ./app.jar
+    CMD ["java", "-jar", "app.jar"]
+    ```
+
+### ৩. Docker Image Build
+```bash
+docker build -t myapp:1.0 .
+```
+
+### ৪. Docker Image Run
+```bash
+docker run -d -p 8080:8080 myapp:1.0
+```
+
+### ৫. Automation (CI/CD)
+- Build tool → Docker build → Docker push → Deploy
+- Example: GitHub Actions/Jenkins pipeline
+
+## বাস্তব উদাহরণ
+
+> "আমরা Node.js অ্যাপ build করি—`npm run build` দিয়ে, তারপর Dockerfile-এ build output copy করি। Docker image বানিয়ে server-এ deploy করি। Java অ্যাপ হলে—Maven দিয়ে `.jar` build করি, Dockerfile-এ jar copy করি, image বানিয়ে deploy করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Build fail:** Dependency/version mismatch—build tool দিয়ে fix করুন
+- **Docker build fail:** Dockerfile syntax, missing files, permission issue
+- **Image size বড়:** Multi-stage build ব্যবহার করুন
+- **Port/config issue:** Dockerfile ও run command চেক করুন
+
+## টিপস
+- Multi-stage Dockerfile ব্যবহার করুন—image ছোট রাখতে
+- Build output test করুন—Docker image বানানোর আগে
+- Automated pipeline ব্যবহার করুন—manual error কমাতে
+- Docker ignore file (`.dockerignore`) ব্যবহার করুন—unnecessary file বাদ দিতে
+
+## সংক্ষেপে
+- Build tool দিয়ে optimized artifact তৈরি
+- Dockerfile-এ artifact copy করে image বানান
+- Automation, portability, error handling—সবকিছু চেক করুন
+
+---
+
+**পরবর্তী পাঠ:** [ডেভঅপসের জন্য বিল্ড টুলস](/dev-ops/build-tools-for-devops)

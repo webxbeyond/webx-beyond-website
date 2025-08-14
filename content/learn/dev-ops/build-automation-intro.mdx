@@ -1,0 +1,75 @@
+---
+title: বিল্ড অটোমেশন পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সফটওয়্যার ডেভেলপমেন্টে গতি ও নির্ভরতা
+
+বিল্ড অটোমেশন হচ্ছে এমন একটি প্রক্রিয়া, যেখানে কোড থেকে সফটওয়্যার তৈরি, টেস্ট, প্যাকেজিং, ডিপ্লয়মেন্ট—সবকিছু স্বয়ংক্রিয়ভাবে হয়। এতে ডেভেলপারদের সময় বাঁচে, ভুল কমে, এবং সফটওয়্যার ডেলিভারি দ্রুত হয়।
+
+## কেন বিল্ড অটোমেশন?
+- **Manual কাজ কমানো**
+- **Consistency:** প্রতিবার একইভাবে বিল্ড
+- **Error কমানো:** Human error কমে
+- **Continuous Integration/Delivery (CI/CD)**
+- **Fast feedback:** কোড চেঞ্জের সাথে সাথে টেস্ট
+
+## বিল্ড অটোমেশন কীভাবে কাজ করে?
+- Source code → Build tool → Automated steps → Artifact (executable, package)
+- Example: Java-তে Maven/Gradle, Node.js-এ npm/yarn, Python-এ setuptools
+
+## বিল্ড অটোমেশন টুলস
+- **Maven, Gradle (Java)**
+- **npm, yarn (Node.js)**
+- **Make, CMake (C/C++)**
+- **setuptools, poetry (Python)**
+- **Jenkins, GitHub Actions, GitLab CI (CI/CD)**
+
+## রিয়েল লাইফ উদাহরণ: Node.js অ্যাপ বিল্ড অটোমেশন
+
+1. `package.json`-এ build script:
+```json
+"scripts": {
+  "build": "webpack --config webpack.config.js"
+}
+```
+2. Automation:
+```bash
+npm run build
+```
+3. CI/CD pipeline-এ:
+```yaml
+# .github/workflows/ci.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+```
+
+## বিল্ড অটোমেশন ও DevOps
+- Continuous Integration (CI): কোড চেঞ্জ push হলে অটো বিল্ড ও টেস্ট
+- Continuous Delivery (CD): বিল্ডের পর অটো ডিপ্লয়
+- Automated testing, linting, packaging
+
+## সেরা প্র্যাকটিস
+- Build script version control-এ রাখুন
+- Automated test ও linting যুক্ত করুন
+- Build failure notification
+- Artifact versioning
+
+## টিম ও Collaboration
+- Build automation documentation
+- Build status dashboard
+- Pull request-এ build automation trigger
+
+## সংক্ষেপে
+বিল্ড অটোমেশন সফটওয়্যার ডেভেলপমেন্টে গতি, নির্ভরতা ও কোয়ালিটি নিশ্চিত করে। DevOps টিমের জন্য এটি must-have practice।
+
+---
+
+**পরবর্তী টপিক:** [জেনকিন্স ইনস্টল](/dev-ops/jenkins-install)

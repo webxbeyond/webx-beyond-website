@@ -1,0 +1,80 @@
+---
+title: জেনকিন্স ইনস্টল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins হচ্ছে সবচেয়ে জনপ্রিয় ওপেন সোর্স বিল্ড অটোমেশন ও CI/CD টুল। এই টিউটোরিয়ালে দেখানো হবে কীভাবে Windows, Linux ও Docker-এ Jenkins ইনস্টল করবেন, কনফিগার করবেন এবং প্রথমবার UI-তে লগইন করবেন।
+
+## ১. Linux-এ Jenkins ইনস্টল
+
+### Prerequisites:
+- Java (OpenJDK 11+)
+
+### Steps:
+```bash
+sudo apt update
+sudo apt install openjdk-11-jre -y
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins -y
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+```
+
+### Access Jenkins UI:
+- URL: `http://<server-ip>:8080/`
+- Initial password: `/var/lib/jenkins/secrets/initialAdminPassword`
+
+## ২. Windows-এ Jenkins ইনস্টল
+
+### Steps:
+1. [Jenkins Download](https://www.jenkins.io/download/)
+2. Windows installer (.msi) ডাউনলোড করুন
+3. Installer চালান, Java install prompt এ Yes দিন
+4. Installation শেষে Jenkins service চালু হবে
+5. Browser-এ: `http://localhost:8080/`
+6. Initial password: `C:\Program Files\Jenkins\secrets\initialAdminPassword`
+
+## ৩. Docker-এ Jenkins ইনস্টল
+
+### Steps:
+```bash
+docker pull jenkins/jenkins:lts
+
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+```
+- `-v jenkins_home:/var/jenkins_home` : Persistent data
+
+### Access Jenkins UI:
+- URL: `http://<server-ip>:8080/`
+- Initial password: `/var/jenkins_home/secrets/initialAdminPassword`
+
+## ৪. প্রথমবার UI-তে লগইন ও কনফিগার
+- Initial password দিয়ে লগইন করুন
+- Suggested plugins install করুন
+- Admin user তৈরি করুন
+
+## রিয়েল লাইফ উদাহরণ: VPS-এ Jenkins
+
+1. Ubuntu VPS-এ Jenkins ইনস্টল
+2. Firewall-এ 8080 পোর্ট ওপেন
+3. Jenkins UI-তে লগইন ও কনফিগার
+
+## সিকিউরিটি ও বেস্ট প্র্যাকটিস
+- Strong admin password
+- HTTPS এনাবল করুন
+- Regular backup
+- Plugin update
+
+## টিম ও Collaboration
+- Multiple user account
+- Role-based access control
+- Build status notification
+
+## সংক্ষেপে
+Jenkins ইনস্টল করলে DevOps টিমের বিল্ড অটোমেশন, CI/CD pipeline ও collaboration সহজ হয়।
+
+---
+
+**পরবর্তী টপিক:** [জেনকিন্স UI পরিচিতি](/dev-ops/jenkins-ui)

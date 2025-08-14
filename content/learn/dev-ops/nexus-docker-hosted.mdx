@@ -1,0 +1,108 @@
+---
+title: Nexus-এ Docker Hosted Repository
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডকার ইমেজ ম্যানেজমেন্টের জন্য অনেকেই Docker Hub ব্যবহার করেন। কিন্তু এন্টারপ্রাইজ বা প্রোডাকশন লেভেলে নিজেরা ইমেজ হোস্ট করতে চাইলে Nexus Repository Manager একটি শক্তিশালী সমাধান।
+
+## Nexus Repository Manager কী?
+Nexus Repository Manager হচ্ছে একটি আর্টিফ্যাক্ট রিপোজিটরি, যেখানে আপনি ডকার ইমেজ, জার ফাইল, npm প্যাকেজ, Python প্যাকেজ ইত্যাদি সংরক্ষণ ও ম্যানেজ করতে পারেন।
+
+## কেন Nexus-এ Docker Hosted Repo?
+- **প্রাইভেট ইমেজ হোস্টিং**
+- **একাধিক টিমের জন্য সেন্ট্রাল রিপোজিটরি**
+- **এক্সেস কন্ট্রোল ও সিকিউরিটি**
+- **ইমেজ রিটেনশন, ক্লিনআপ, অডিটিং**
+
+## স্টেপ বাই স্টেপ: Nexus-এ Docker Hosted Repo তৈরি
+
+### ১. Nexus Repository Manager ইনস্টল
+
+- [Official Guide](https://help.sonatype.com/repomanager3/installation)
+- Linux-এ ইনস্টল: (উদাহরণ)
+```bash
+wget https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+tar -xvf latest-unix.tar.gz
+cd nexus-3*
+./bin/nexus start
+```
+
+### ২. Nexus UI-তে লগইন করুন
+- Default URL: `http://<server-ip>:8081/`
+- Default credentials: `admin` / (password: `admin.password` ফাইলে)
+
+### ৩. Docker Hosted Repository তৈরি
+1. **Repositories > Create repository > docker (hosted)**
+2. Name: `docker-hosted`
+3. HTTP port: যেমন `5000`
+4. Deployment policy: Allow redeploy
+5. Create করুন
+
+### ৪. Docker Client-এ Registry কনফিগার
+
+#### Linux/Windows-এ:
+```bash
+docker login <server-ip>:5000
+```
+
+#### Credentials দিন (Nexus-এর ইউজার)
+
+### ৫. Docker ইমেজ Push করা
+
+#### ১. ইমেজ ট্যাগ করুন:
+```bash
+docker tag myapp:latest <server-ip>:5000/myapp:latest
+```
+
+#### ২. ইমেজ Push করুন:
+```bash
+docker push <server-ip>:5000/myapp:latest
+```
+
+### ৬. Docker ইমেজ Pull করা
+```bash
+docker pull <server-ip>:5000/myapp:latest
+```
+
+## রিয়েল লাইফ উদাহরণ: টিমের জন্য প্রাইভেট ইমেজ
+
+ধরা যাক, আপনার টিমের জন্য একটি Node.js অ্যাপের ইমেজ Nexus-এ রাখতে চান:
+
+1. Dockerfile দিয়ে ইমেজ বিল্ড করুন:
+```bash
+docker build -t nodeapp:1.0 .
+```
+2. ট্যাগ করুন:
+```bash
+docker tag nodeapp:1.0 192.168.1.100:5000/nodeapp:1.0
+```
+3. Push করুন:
+```bash
+docker push 192.168.1.100:5000/nodeapp:1.0
+```
+4. টিমের অন্য সদস্য Pull করতে পারবে:
+```bash
+docker pull 192.168.1.100:5000/nodeapp:1.0
+```
+
+## সিকিউরিটি: HTTPS ও Access Control
+- Production-এ HTTP না, HTTPS ব্যবহার করুন
+- Nexus-এ Role-based Access Control (RBAC) কনফিগার করুন
+- SSL/TLS সেটআপ: [Nexus SSL Guide](https://help.sonatype.com/repomanager3/security/ssl)
+
+## ক্লিনআপ ও রিটেনশন
+- পুরনো ইমেজ অটো-ডিলিটের জন্য Cleanup Policy ব্যবহার করুন
+- Storage অপ্টিমাইজ করুন
+
+## Nexus-এ Docker Hosted Repo Best Practices
+- ইমেজ ট্যাগিং কনভেনশন ফলো করুন
+- RBAC ও SSL/TLS এনাবল করুন
+- নিয়মিত ব্যাকআপ নিন
+- Cleanup Policy কনফিগার করুন
+
+## সংক্ষেপে
+Nexus-এ Docker Hosted Repository ব্যবহার করলে আপনার টিমের ইমেজ ম্যানেজমেন্ট, সিকিউরিটি, স্কেলিং ও অডিটিং সহজ হয়। এন্টারপ্রাইজ লেভেলে Docker Hub-এর চেয়ে অনেক বেশি কাস্টমাইজেশন ও কন্ট্রোল পাওয়া যায়।
+
+---
+
+**পরবর্তী টপিক:** [ডকার কন্টেইনার হিসাবে Nexus ডিপ্লয়](/dev-ops/nexus-docker-deploy)

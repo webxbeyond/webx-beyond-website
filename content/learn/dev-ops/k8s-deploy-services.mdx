@@ -1,0 +1,113 @@
+---
+title: Deployment, Services, ConfigMaps & Secrets
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Kubernetes-এ Deployment, Service, ConfigMap, Secret—container orchestration, automation, security ও configuration management-এর foundation। এই টিউটোরিয়ালে concept, YAML example, workflow, real-life scenario, এবং best practices দেখানো হয়েছে।
+
+## ১. Deployment
+- Application container deploy, update, rollback
+- Replica, rolling update, self-healing
+
+### Example: Deployment YAML
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: myrepo/webapp:latest
+        ports:
+        - containerPort: 80
+```
+
+## ২. Service
+- Pod-এ network access, load balancing
+- ClusterIP, NodePort, LoadBalancer
+
+### Example: Service YAML
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+```
+
+## ৩. ConfigMap
+- Non-sensitive configuration data store
+- Environment variable, config file inject
+
+### Example: ConfigMap YAML
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_ENV: production
+  LOG_LEVEL: info
+```
+
+## ৪. Secret
+- Sensitive data (password, token, key) store
+- Base64 encode, secure inject
+
+### Example: Secret YAML
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  DB_PASSWORD: cGFzc3dvcmQ=
+```
+
+## ৫. Workflow
+1. Deployment, Service, ConfigMap, Secret YAML define করুন
+2. kubectl দিয়ে apply/manage করুন
+3. Application-এ config/secret inject করুন
+4. Update, rollback, scale
+
+## ৬. Real-life Scenario
+- Webapp deploy, service expose, config inject, secret manage
+- Rolling update, zero-downtime deployment
+- Multi-environment config management
+
+## ৭. Best Practices
+- Resource request/limit define করুন
+- RBAC, namespace ব্যবহার করুন
+- Secret encryption
+- Modular YAML structure
+- Automated backup
+
+## ৮. Tool Integration
+- CI/CD pipeline (Jenkins, GitHub Actions)
+- Monitoring (Prometheus, Grafana)
+- Secret manager integration (Vault, AWS Secrets Manager)
+
+## সংক্ষেপে
+Deployment, Service, ConfigMap, Secret—Kubernetes orchestration, automation, security ও configuration management-এর backbone। Efficient, scalable, secure DevOps workflow নিশ্চিত হয়।
+
+---
+
+**পরবর্তী টপিক:** [Helm Charts](/dev-ops/helm-charts)

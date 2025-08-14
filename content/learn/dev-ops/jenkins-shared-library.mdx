@@ -1,0 +1,81 @@
+---
+title: শেয়ার্ড লাইব্রেরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins Shared Library দিয়ে pipeline-এ reusable function, step, variable, template ব্যবহার করা যায়—code duplication কমে, টিম collaboration বাড়ে। এই টিউটোরিয়ালে shared library setup, usage, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Shared Library কী?
+- Pipeline code reuse
+- Custom function, step, template
+- Centralized management
+- Version control-এ
+
+## ২. Shared Library Structure
+- Repo root-এ `vars/`, `src/`, `resources/` folder
+- Example:
+```
+(root)
+ ├── vars/
+ │    └── hello.groovy
+ ├── src/
+ │    └── org/example/MyClass.groovy
+ └── resources/
+      └── templates/
+```
+
+## ৩. Library Function Example
+- `vars/hello.groovy`:
+```groovy
+def call(name = 'World') {
+  echo "Hello, ${name}!"
+}
+```
+
+## ৪. Usage in Jenkinsfile
+- Jenkinsfile-এ:
+```groovy
+@Library('my-shared-lib') _
+hello('DevOps')
+```
+
+## ৫. Library Configuration
+1. Jenkins UI > Manage Jenkins > Configure System > Global Pipeline Libraries
+2. Name, repo URL, credentials add করুন
+3. Default version select করুন
+
+## ৬. Real-life Example: Deployment Function
+- `vars/deployApp.groovy`:
+```groovy
+def call(env) {
+  if (env == 'prod') {
+    sh 'npm run deploy:prod'
+  } else {
+    sh 'npm run deploy:staging'
+  }
+}
+```
+- Jenkinsfile-এ:
+```groovy
+@Library('my-shared-lib') _
+deployApp('prod')
+```
+
+## ৭. Best Practices
+- Function naming convention
+- Version control-এ library
+- Documentation
+- Unit test for library code
+- Access control
+
+## ৮. Team Collaboration
+- Shared library repo
+- PR-এ library code review
+- Centralized update
+
+## সংক্ষেপে
+Jenkins Shared Library দিয়ে pipeline code reuse, standardization, collaboration ও maintainability বাড়ে—DevOps টিমের productivity ও quality নিশ্চিত হয়।
+
+---
+
+**পরবর্তী টপিক:** [ওয়েবহুক](/dev-ops/webhook)

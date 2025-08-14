@@ -1,0 +1,87 @@
+---
+title: Compliance Basics
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেভঅপসে Compliance মানে হলো—নির্দিষ্ট নিয়ম, আইন, ও স্ট্যান্ডার্ড মেনে সফটওয়্যার, সার্ভার, ও ডেটা পরিচালনা করা।
+
+## কেন Compliance গুরুত্বপূর্ণ?
+- Data leak, security breach, বা legal penalty এড়াতে
+- User trust ও business reputation বজায় রাখতে
+- Industry standard (GDPR, HIPAA, PCI-DSS, SOC2) মেনে চলতে
+
+## Common Compliance Standards
+- **GDPR:** ইউরোপিয়ান ডেটা প্রাইভেসি
+- **HIPAA:** Healthcare data security
+- **PCI-DSS:** Payment card data security
+- **SOC2:** Service organization controls
+
+## Compliance in DevOps Workflow
+
+### ১. Data Protection
+- Sensitive data encrypt করুন (at rest & in transit)
+- Access control enforce করুন
+- Regular audit করুন
+
+### ২. Infrastructure as Code (IaC) Policy
+- Terraform/Pulumi-তে security & compliance policy add করুন
+- Example: Only approved AMI ব্যবহার
+
+### ৩. Logging & Monitoring
+- Audit log enable করুন
+- User activity track করুন
+- Log retention policy follow করুন
+
+### ৪. Automated Compliance Checks
+- CI/CD pipeline-এ compliance check stage add করুন
+- Example: Open Policy Agent (OPA), Chef InSpec
+
+### ৫. Secrets Management
+- Secrets manager ব্যবহার করুন
+- Credentials leak audit করুন
+
+## Real Life Scenario: GDPR Compliance
+
+ধরা যাক, আপনি ইউরোপিয়ান ইউজারদের জন্য একটি SaaS অ্যাপ ডিপ্লয় করছেন।
+- User data encrypt করুন
+- Data retention policy enforce করুন
+- User consent management implement করুন
+- Regularly audit log review করুন
+
+**Benefits:**
+- Legal penalty এড়ানো যাবে
+- User trust বাড়বে
+- Business reputation বজায় থাকবে
+
+## Common Mistakes & Solutions
+- **Mistake:** Sensitive data unencrypted
+  - **Solution:** Encryption enforce করুন
+- **Mistake:** No audit log
+  - **Solution:** Logging enable করুন
+- **Mistake:** No compliance check in pipeline
+  - **Solution:** Automated compliance check add করুন
+
+## Compliance Automation Tools
+- **Open Policy Agent (OPA):** Policy-as-code
+- **Chef InSpec:** Infrastructure compliance
+- **AWS Config:** Cloud resource compliance
+- **HashiCorp Sentinel:** Policy enforcement in IaC
+
+## Best Practices
+- Compliance requirement early identify করুন
+- Automation ব্যবহার করুন
+- Regular audit & review
+- Documentation maintain করুন
+
+# Conclusion
+
+Compliance DevOps-এর অপরিহার্য অংশ। Automation, audit, এবং best practices follow করলে production environment legal ও secure থাকবে।
+
+**Practice:**
+- IaC-তে compliance policy add করুন
+- Audit log enable করুন
+- Automated compliance check configure করুন
+
+---
+
+**এই সিরিজের টিউটোরিয়াল এখানেই শেষ। আরও জানতে index পেজে ফিরে যান বা নতুন টপিকের জন্য অনুরোধ করুন।**

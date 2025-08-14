@@ -1,0 +1,91 @@
+---
+title: প্রাইভেট ডকার রিপোজিটরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker ইমেজ নিরাপদভাবে সংরক্ষণ, শেয়ার, ও ডিপ্লয় করার জন্য প্রাইভেট রিপোজিটরি অপরিহার্য। এই টিউটোরিয়ালে আমরা প্রাইভেট Docker Registry-এর কনসেপ্ট, সেটআপ, authentication, বাস্তব workflow, এবং Best Practices নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## প্রাইভেট Docker Registry কী?
+
+- নিজস্ব ইমেজ store, share, deploy করার জন্য
+- Public registry (Docker Hub) থেকে আলাদা
+- Security, access control, custom workflow
+
+---
+
+## Registry Type
+
+- **Docker Hub Private Repo**
+- **Self-hosted Registry:**
+  - Docker Registry
+  - Nexus Repository
+  - GitHub Container Registry
+
+---
+
+## Self-hosted Registry Setup
+
+### ১. Docker Registry Container
+```bash
+docker run -d -p 5000:5000 --name registry registry:2
+```
+- Local/private registry 5000 port-এ রান হবে
+
+### ২. Nexus-এ Docker Hosted Repo
+- Nexus UI > Repositories > Create > Docker (hosted)
+- Port: 5000/8082
+
+---
+
+## Image Push/Pull Workflow
+
+### ১. Tag Image
+```bash
+docker tag my-app:1.0 localhost:5000/my-app:1.0
+```
+
+### ২. Push Image
+```bash
+docker push localhost:5000/my-app:1.0
+```
+
+### ৩. Pull Image
+```bash
+docker pull localhost:5000/my-app:1.0
+```
+
+---
+
+## Authentication & Security
+
+- Username/password, token-based authentication
+- TLS/SSL encryption
+- Role-based access control (RBAC)
+- Nexus/GitHub registry-তে advanced security
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি production-ready ইমেজ শুধু প্রাইভেট registry-তে store করে—security, version control, এবং custom workflow নিশ্চিত হয়।
+
+---
+
+## Best Practices
+
+- TLS/SSL enable করুন
+- Strong authentication enforce করুন
+- Automation script-এ credentials encrypt করুন
+- Image scan করুন (security)
+- Access log monitor করুন
+
+---
+
+## Conclusion
+
+প্রাইভেট Docker Registry দিয়ে নিরাপদ, কাস্টম, এবং scalable ইমেজ management, automation, এবং DevOps workflow সহজ হয়। Practice ও automation script-এ প্রাইভেট registry ব্যবহার করুন—আপনার container security ও workflow next level হবে!
+
+পরবর্তী টিউটোরিয়ালে server deploy, volume, advanced orchestration নিয়ে বিস্তারিত আলোচনা করা হবে।

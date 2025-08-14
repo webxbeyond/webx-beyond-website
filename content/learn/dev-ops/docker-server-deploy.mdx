@@ -1,0 +1,98 @@
+---
+title: সার্ভারে ডকার অ্যাপ্লিকেশন ডিপ্লয়
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker container ব্যবহার করে production/server-এ অ্যাপ্লিকেশন deploy করা DevOps-এর অন্যতম গুরুত্বপূর্ণ স্কিল। এই টিউটোরিয়ালে আমরা server-এ Docker app deploy করার step-by-step workflow, automation, security, এবং Best Practices নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Step 1: Server Setup
+
+- Linux server (Ubuntu/Debian/CentOS)
+- Docker install: `sudo apt install docker.io`
+- Firewall configure: `sudo ufw allow 80/tcp && sudo ufw allow 443/tcp`
+
+---
+
+## Step 2: Image Build & Push
+
+- Local machine-এ Dockerfile দিয়ে image build করুন
+```bash
+docker build -t my-app:1.0 .
+```
+- Private registry-তে push করুন
+```bash
+docker tag my-app:1.0 registry.example.com/my-app:1.0
+docker push registry.example.com/my-app:1.0
+```
+
+---
+
+## Step 3: Server-এ Image Pull
+
+- Server-এ registry থেকে image pull করুন
+```bash
+docker pull registry.example.com/my-app:1.0
+```
+
+---
+
+## Step 4: Container Run
+
+- Production port, volume, env variable configure করুন
+```bash
+docker run -d -p 80:3000 --name webapp \
+  -v /srv/app/data:/app/data \
+  -e NODE_ENV=production \
+  registry.example.com/my-app:1.0
+```
+
+---
+
+## Step 5: Automation Script
+
+**deploy.sh:**
+```bash
+#!/bin/bash
+docker pull registry.example.com/my-app:1.0
+docker stop webapp || true
+docker rm webapp || true
+docker run -d -p 80:3000 --name webapp \
+  -v /srv/app/data:/app/data \
+  -e NODE_ENV=production \
+  registry.example.com/my-app:1.0
+```
+
+---
+
+## Step 6: Healthcheck & Monitoring
+
+- Docker healthcheck configure করুন
+- Monitoring tool: Prometheus, Grafana, Netdata
+- Log management: `docker logs webapp`
+
+---
+
+## Security Best Practices
+
+- Firewall properly configure করুন
+- Registry authentication enforce করুন
+- Resource limit (CPU/RAM) configure করুন
+- Secrets/config `.env` ফাইলে রাখুন
+- Regularly update image
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি production server-এ automation script দিয়ে Docker app deploy করে—image pull, container run, healthcheck—all automated, secure, efficient deployment হয়।
+
+---
+
+## Conclusion
+
+Server-এ Docker app deploy workflow, automation, security, এবং monitoring—সব DevOps pipeline-এর জন্য অপরিহার্য। Practice ও automation script-এ এই workflow ব্যবহার করুন—আপনার production deployment next level হবে!
+
+পরবর্তী টিউটোরিয়ালে volume, Nexus registry, advanced orchestration নিয়ে বিস্তারিত আলোচনা করা হবে।

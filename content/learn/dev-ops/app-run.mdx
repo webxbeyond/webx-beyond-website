@@ -1,0 +1,86 @@
+---
+title: অ্যাপ্লিকেশন চালানো
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Build process শেষে artifact তৈরি হলে, সেটি server/local machine-এ চালাতে হয়। এখানে বিভিন্ন language/platform অনুযায়ী অ্যাপ্লিকেশন চালানোর ধাপ, টুলস, বাস্তব উদাহরণ ও সমস্যা সমাধান দেওয়া হলো।
+
+## কেন চালানো হয়?
+- Build output test/deploy
+- Production environment-এ run
+- Automation pipeline-এ deploy
+
+## কমন Application Run টুলস
+- **Node.js:** `node`, `pm2`
+- **Java:** `java -jar`, `systemd`, `docker`
+- **Python:** `python`, `gunicorn`, `docker`
+- **Docker:** `docker run`, `docker-compose`
+- **Process Manager:** `pm2`, `systemd`, `supervisor`
+
+## Run Steps
+
+### ১. Local Run
+- **Node.js:**
+    ```bash
+    node dist/app.js
+    ```
+- **Java:**
+    ```bash
+    java -jar target/app.jar
+    ```
+- **Python:**
+    ```bash
+    python main.py
+    ```
+
+### ২. Production Run
+- **Process Manager:**
+    ```bash
+    pm2 start dist/app.js
+    # Node.js
+    ```
+    ```bash
+    gunicorn app:app
+    # Python
+    ```
+    ```bash
+    systemctl start myapp
+    # Java
+    ```
+- **Docker:**
+    ```bash
+    docker run -d -p 8080:8080 myapp:1.0
+    ```
+- **Docker Compose:**
+    ```bash
+    docker-compose up -d
+    ```
+
+### ৩. Automation (CI/CD)
+- Automated deploy pipeline-এ run command
+- Example: GitHub Actions/Jenkins
+
+## বাস্তব উদাহরণ
+
+> "আমরা Node.js অ্যাপ build করি—`node dist/app.js` দিয়ে local run করি, production-এ pm2 দিয়ে চালাই। Java অ্যাপ jar build করে—`java -jar` দিয়ে চালাই, Docker image হলে—`docker run` দিয়ে deploy করি। Python অ্যাপ—local run, production-এ gunicorn/supervisor দিয়ে চালাই।"
+
+## কমন সমস্যা ও সমাধান
+- **Port conflict:** অন্য অ্যাপ same port-এ চললে—port change করুন
+- **Permission denied:** Run command sudo/system user দিয়ে চালান
+- **Environment variable ভুল:** `.env` ফাইল চেক করুন
+- **Crash/restart:** Process manager ব্যবহার করুন—pm2/systemd
+
+## টিপস
+- Production-এ process manager ব্যবহার করুন—auto restart/crash handling
+- Docker/container ব্যবহার করুন—portability/security
+- Automated deploy pipeline ব্যবহার করুন
+- Log/output monitor করুন—error/debugging
+
+## সংক্ষেপে
+- Build output run করতে language/platform অনুযায়ী command/process manager লাগে
+- Production-এ automation, error handling, monitoring—সবকিছু চেক করুন
+- Manual error কমাতে automated deploy pipeline ব্যবহার করুন
+
+---
+
+**পরবর্তী মডিউল:** [ক্লাউড ও IaaS এর পরিচিতি](/dev-ops/cloud-iaas-intro)

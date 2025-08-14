@@ -1,0 +1,101 @@
+---
+title: ডকারের সেরা প্র্যাকটিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডকার ব্যবহার করলে শুধু কন্টেইনার চালানোই যথেষ্ট নয়—সঠিকভাবে কনফিগার, অপ্টিমাইজ ও সিকিউর করা জরুরি। এই টিউটোরিয়ালে ডকারের সেরা প্র্যাকটিস, রিয়েল লাইফ উদাহরণ ও DevOps টিমের জন্য টিপস দেওয়া হয়েছে।
+
+## ১. Dockerfile Best Practices
+- **ছোট ইমেজ:** কম unnecessary layer, ছোট base image (alpine)
+- **Multi-stage build:** Build tools ও runtime আলাদা
+- **Layer caching:** কমন ফাইল আগে কপি করুন
+- **.dockerignore:** Unnecessary ফাইল exclude করুন
+- **Environment variables:** `ENV` দিয়ে কনফিগার
+
+### উদাহরণ:
+```dockerfile
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM node:18-alpine AS prod
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+CMD ["node", "dist/index.js"]
+```
+
+## ২. ইমেজ ট্যাগিং ও Naming Convention
+- **Latest tag এvoid করুন**
+- **Semantic versioning:** `myapp:1.0.0`
+- **Repository naming:** `org/app:tag`
+
+## ৩. Resource Limits
+- **CPU/RAM limit:**
+```bash
+docker run --memory=512m --cpus=1 ...
+```
+- **Healthcheck:** Dockerfile-এ `HEALTHCHECK` ব্যবহার করুন
+
+## ৪. Secrets Management
+- **Environment variable-এ secrets না রাখুন**
+- **Docker secrets, Vault, K8s secrets ব্যবহার করুন**
+
+## ৫. Security Best Practices
+- **User privileges:**
+```dockerfile
+USER node
+```
+- **Unnecessary port expose করবেন না**
+- **Image scan করুন:** Trivy, Clair, Snyk
+- **Regular update:** Base image ও dependency
+
+## ৬. Logging & Monitoring
+- **Stdout/stderr-এ log দিন**
+- **Centralized logging:** ELK, Prometheus, Grafana
+
+## ৭. Persistent Data
+- **Volume ব্যবহার করুন**
+- **Backup policy:** Volume backup automation
+
+## ৮. Network Best Practices
+- **Custom network:**
+```bash
+docker network create mynet
+docker run --network=mynet ...
+```
+- **Internal network:** Sensitive service `internal` network-এ রাখুন
+
+## ৯. Build Automation
+- **CI/CD pipeline:** Docker build, test, push automation
+- **Linting:** Hadolint দিয়ে Dockerfile lint করুন
+
+## ১০. Image Cleanup & Maintenance
+- **Unused image/container/volume prune করুন:**
+```bash
+docker system prune -a
+```
+- **Cleanup policy:** Registry-তে retention policy
+
+## রিয়েল লাইফ উদাহরণ: Production Node.js App
+
+1. Multi-stage build Dockerfile
+2. Resource limit, healthcheck
+3. Secrets externalize
+4. Logging stdout/stderr
+5. Automated build/push (GitHub Actions)
+
+## টিম ও Collaboration
+- **Documentation:** Dockerfile, Compose, README
+- **Version control:** Dockerfile ও Compose YAML গিটে রাখুন
+- **Review:** PR-এ Dockerfile review করুন
+
+## সংক্ষেপে
+ডকারের সেরা প্র্যাকটিস ফলো করলে আপনার অ্যাপ্লিকেশন হবে সিকিউর, স্কেলেবল, অপ্টিমাইজড ও প্রোডাকশন-রেডি। DevOps টিমের জন্য এটি must-have guideline।
+
+---
+
+**পরবর্তী টপিক:** [Container Security Best Practices](/dev-ops/docker-security)

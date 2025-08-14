@@ -1,0 +1,65 @@
+---
+title: Infrastructure as Code (IaC) Workflow
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Infrastructure as Code (IaC)—manual server setup, config, network managementকে automation-এ রূপান্তর করে। এই টিউটোরিয়ালে IaC concept, workflow, tool, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. IaC কী?
+- Infrastructure automation—code দিয়ে server, network, storage, config manage
+- Repeatable, scalable, version-controlled
+- Manual error কমে, efficiency বাড়ে
+
+## ২. IaC Workflow
+1. Infrastructure requirement define করুন (server, network, security)
+2. IaC tool-এ configuration লিখুন (Terraform, Pulumi, CloudFormation)
+3. Version control-এ code রাখুন (Git)
+4. Automated pipeline-এ IaC code apply/run করুন
+5. Monitoring ও auditing
+
+### Example: Terraform Workflow
+```hcl
+# main.tf
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+}
+```
+- `terraform init`
+- `terraform plan`
+- `terraform apply`
+
+### Example: CloudFormation Workflow
+```yaml
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-123456
+      InstanceType: t2.micro
+```
+
+## ৩. Real-life Scenario
+- ১০০+ VM, network, firewall—একটি IaC codebase-এ
+- Multi-cloud deployment
+- Automated rollback ও audit
+
+## ৪. Best Practices
+- Modular code structure
+- Variable ও template ব্যবহার করুন
+- Version control-এ IaC code
+- Automated testing (lint, validate)
+- Documentation
+- Security (secret management)
+
+## ৫. Tool Integration
+- Jenkins pipeline-এ IaC
+- Monitoring tool (Prometheus, Grafana)
+- Cloud provider API
+
+## সংক্ষেপে
+IaC—modern DevOps workflow-এর foundation। Automation, scalability, consistency, এবং efficiency—manual কাজ কমিয়ে, quality ও reliability নিশ্চিত করে।
+
+---
+
+**পরবর্তী টপিক:** [Prometheus & Grafana](/dev-ops/prometheus-grafana)

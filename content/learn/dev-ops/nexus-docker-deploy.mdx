@@ -1,0 +1,90 @@
+---
+title: ডকার কন্টেইনার হিসাবে Nexus ডিপ্লয়
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সহজে এন্টারপ্রাইজ আর্টিফ্যাক্ট রিপোজিটরি
+
+Nexus Repository Manager-কে ডকার কন্টেইনার হিসাবে ডিপ্লয় করা হলে সেটআপ, স্কেলিং, আপগ্রেড ও মাইগ্রেশন অনেক সহজ হয়। এই টিউটোরিয়ালে দেখানো হবে কীভাবে Docker-এ Nexus চালানো যায়, কনফিগারেশন, ভলিউম, নেটওয়ার্কিং ও সিকিউরিটি সহ।
+
+## কেন ডকার কন্টেইনারে Nexus?
+- **Quick Deployment:** ইনস্টলেশন ঝামেলা কম
+- **Portability:** যেকোনো সার্ভারে সহজে চালানো যায়
+- **Backup & Restore:** ভলিউম দিয়ে ডেটা পার্সিস্টেন্স
+- **Scalability:** Docker Compose/Kubernetes দিয়ে স্কেল করা যায়
+
+## স্টেপ বাই স্টেপ: Docker-এ Nexus ডিপ্লয়
+
+### ১. Docker Image Pull করুন
+```bash
+docker pull sonatype/nexus3:latest
+```
+
+### ২. Persistent Volume তৈরি করুন
+```bash
+docker volume create nexus-data
+```
+
+### ৩. Nexus কন্টেইনার চালান
+```bash
+docker run -d -p 8081:8081 --name nexus -v nexus-data:/nexus-data sonatype/nexus3:latest
+```
+- `-p 8081:8081` : হোস্টের 8081 পোর্টে Nexus UI
+- `-v nexus-data:/nexus-data` : ডেটা পার্সিস্টেন্স
+
+### ৪. Nexus UI-তে লগইন করুন
+- URL: `http://<server-ip>:8081/`
+- Default credentials: `admin` / (password: `/nexus-data/admin.password`)
+
+## Docker Compose দিয়ে Nexus ডিপ্লয়
+
+`docker-compose.yml`:
+```yaml
+version: '3.8'
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    restart: always
+volumes:
+  nexus-data:
+```
+
+### চালানোর কমান্ড:
+```bash
+docker compose up -d
+```
+
+## রিয়েল লাইফ উদাহরণ: Production-Ready Deployment
+
+ধরা যাক, আপনি একটি VPS-এ Nexus চালাতে চান:
+1. Docker ও Docker Compose ইনস্টল করুন
+2. উপরের `docker-compose.yml` ব্যবহার করুন
+3. Firewall-এ 8081 পোর্ট ওপেন করুন
+4. SSL/TLS কনফিগার করুন (Production-এর জন্য)
+
+## সিকিউরিটি ও বেস্ট প্র্যাকটিস
+- **SSL/TLS:** Production-এ HTTPS এনাবল করুন
+- **RBAC:** Nexus-এ Role-based Access Control কনফিগার করুন
+- **Backup:** `nexus-data` ভলিউম নিয়মিত ব্যাকআপ নিন
+- **Resource Limits:** Docker কন্টেইনারে CPU/RAM লিমিট দিন
+
+## কনটেইনার আপগ্রেড ও মাইগ্রেশন
+- নতুন ইমেজ Pull করুন
+- পুরনো কন্টেইনার Stop করুন
+- নতুন কন্টেইনারে আগের `nexus-data` ভলিউম Attach করুন
+
+## সমস্যা ও সমাধান
+- **Port Conflict:** অন্য সার্ভিসে 8081 ব্যবহার হলে অন্য পোর্টে চালান
+- **Low Memory:** Nexus-এ মিনিমাম 2GB RAM দিন
+- **Volume Permission:** Linux-এ volume permission ঠিক রাখুন
+
+## সংক্ষেপে
+Docker-এ Nexus ডিপ্লয় করলে আপনার আর্টিফ্যাক্ট রিপোজিটরি সহজে স্কেল, ব্যাকআপ, আপগ্রেড ও ম্যানেজ করা যায়। এন্টারপ্রাইজ লেভেলে DevOps টিমের জন্য এটি একটি must-have solution।
+
+---
+
+**পরবর্তী টপিক:** [ডকারের সেরা প্র্যাকটিস](/dev-ops/docker-best-practices)

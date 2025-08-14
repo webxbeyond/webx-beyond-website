@@ -1,0 +1,96 @@
+---
+title: সম্পূর্ণ পাইপলাইন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins-এ সম্পূর্ণ পাইপলাইন মানে—কোড থেকে শুরু করে বিল্ড, টেস্ট, ডিপ্লয়, নোটিফিকেশন—সবকিছু একসাথে automate করা। এই টিউটোরিয়ালে দেখানো হয়েছে কীভাবে একটি production-grade end-to-end pipeline তৈরি করবেন, real-life example, এবং best practices।
+
+## ১. সম্পূর্ণ পাইপলাইনের ধাপসমূহ
+- **Source Code Checkout**
+- **Build**
+- **Test**
+- **Artifact Archive**
+- **Deploy**
+- **Notification**
+
+## ২. Declarative Jenkinsfile Example
+```groovy
+pipeline {
+  agent any
+  environment {
+    NODE_ENV = 'production'
+    SECRET = credentials('my-secret')
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Build') {
+      steps {
+        sh 'npm install'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+    stage('Archive') {
+      steps {
+        archiveArtifacts artifacts: 'dist/**', fingerprint: true
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh 'npm run deploy'
+      }
+    }
+  }
+  post {
+    success {
+      mail to: 'team@example.com', subject: 'Build Success', body: 'Pipeline completed successfully.'
+    }
+    failure {
+      mail to: 'team@example.com', subject: 'Build Failed', body: 'Pipeline failed. Check Jenkins.'
+    }
+  }
+}
+```
+
+## ৩. Key Concepts
+- **Stages:** Logical steps (checkout, build, test, deploy)
+- **Environment:** Env variables, credentials
+- **Post Actions:** Success/failure notification
+- **Artifact Archive:** Build output save
+- **Parallel Execution:** Multiple test stages
+
+## ৪. Real-life Example: Node.js Production Pipeline
+1. GitHub repo থেকে কোড checkout
+2. Build: `npm install`
+3. Test: `npm test`
+4. Archive: `dist/` folder
+5. Deploy: `npm run deploy`
+6. Success/failure notification
+
+## ৫. Best Practices
+- Pipeline code version control-এ রাখুন
+- Stage naming convention
+- Error handling
+- Secrets credentials manager-এ
+- Artifact archive
+- Notification configure
+
+## ৬. Team Collaboration
+- Shared Jenkinsfile
+- PR-এ pipeline test
+- Build status dashboard
+- Notification to team
+
+## সংক্ষেপে
+সম্পূর্ণ পাইপলাইন দিয়ে Jenkins-এ end-to-end automation, visibility, reliability ও collaboration নিশ্চিত হয়—DevOps টিমের productivity ও quality বাড়ে।
+
+---
+
+**পরবর্তী টপিক:** [মাল্টিব্রাঞ্চ পাইপলাইন](/dev-ops/multibranch-pipeline)

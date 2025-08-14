@@ -1,0 +1,164 @@
+---
+title: প্রধান ডকার কমান্ডসমূহ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## DevOps-এ Container Management-এর জন্য Must-Know
+
+Docker CLI কমান্ডগুলো container management, image build/push/pull, network, volume—all automate ও simplify করে। এই টিউটোরিয়ালে আমরা Docker-এর প্রধান কমান্ড, বাস্তব উদাহরণ, এবং DevOps workflow-এ ব্যবহার নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Docker CLI: Basic Structure
+
+প্রতিটি Docker কমান্ড `docker` দিয়ে শুরু হয়।
+
+**Syntax:**
+```
+docker <command> [options]
+```
+
+---
+
+## Image Management
+
+### ১. Image Pull
+```bash
+docker pull nginx:latest
+```
+
+### ২. Image Build
+```bash
+docker build -t my-app:1.0 .
+```
+
+### ৩. Image List
+```bash
+docker images
+```
+
+### ৪. Image Remove
+```bash
+docker rmi my-app:1.0
+```
+
+---
+
+## Container Management
+
+### ১. Container Run
+```bash
+docker run -d -p 8080:80 nginx:latest
+```
+
+### ২. Container List
+```bash
+docker ps
+```
+
+### ৩. Container Stop
+```bash
+docker stop <container_id>
+```
+
+### ৪. Container Remove
+```bash
+docker rm <container_id>
+```
+
+### ৫. Container Logs
+```bash
+docker logs <container_id>
+```
+
+### ৬. Container Exec (Shell Access)
+```bash
+docker exec -it <container_id> /bin/bash
+```
+
+---
+
+## Volume Management
+
+### ১. Volume Create
+```bash
+docker volume create mydata
+```
+
+### ২. Volume List
+```bash
+docker volume ls
+```
+
+### ৩. Volume Remove
+```bash
+docker volume rm mydata
+```
+
+---
+
+## Network Management
+
+### ১. Network Create
+```bash
+docker network create mynet
+```
+
+### ২. Network List
+```bash
+docker network ls
+```
+
+### ৩. Network Connect
+```bash
+docker network connect mynet <container_id>
+```
+
+---
+
+## Docker Compose
+
+Multiple container orchestration—`docker-compose.yml` দিয়ে:
+```bash
+docker-compose up -d
+docker-compose down
+```
+
+---
+
+## Docker Info & System
+
+### ১. Docker Info
+```bash
+docker info
+```
+
+### ২. System Prune (Unused Resource Cleanup)
+```bash
+docker system prune -a
+```
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি production server-এ `docker-compose up -d` দিয়ে web, db, cache—সব container একসাথে deploy করে।
+
+---
+
+## Best Practices
+
+- Container name/tag meaningful রাখুন
+- Resource limit (CPU/RAM) configure করুন
+- Regularly prune unused images/volumes/networks
+- Logs monitor করুন
+- Automation script-এ Docker CLI ব্যবহার করুন
+
+---
+
+## Conclusion
+
+Docker CLI-এর প্রধান কমান্ডগুলো জানলে container/image/network/volume management, automation, এবং DevOps workflow সহজ হয়। Practice ও automation script-এ এই কমান্ডগুলো ব্যবহার করুন—আপনার DevOps skill next level হবে!
+
+পরবর্তী টিউটোরিয়ালে Docker debug, demo, Compose, এবং advanced management নিয়ে বিস্তারিত আলোচনা করা হবে।

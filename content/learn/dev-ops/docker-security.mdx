@@ -1,0 +1,87 @@
+---
+title: Container Security Best Practices
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সিকিউর কন্টেইনার, সিকিউর ডিপ্লয়মেন্ট
+
+কন্টেইনার প্রযুক্তি অ্যাপ্লিকেশন ডিপ্লয়মেন্টকে সহজ করেছে, কিন্তু সিকিউরিটি চ্যালেঞ্জও এনেছে। এই টিউটোরিয়ালে ডকার ও কন্টেইনার সিকিউরিটির সেরা প্র্যাকটিস, রিয়েল লাইফ উদাহরণ ও DevOps টিমের জন্য গাইডলাইন দেওয়া হয়েছে।
+
+## ১. Minimal Base Image ব্যবহার করুন
+- **Alpine, Distroless, BusyBox**
+- Unnecessary tools ও package বাদ দিন
+
+## ২. User Privilege কমান
+- Root user avoid করুন
+- Dockerfile-এ:
+```dockerfile
+USER appuser
+```
+
+## ৩. Secrets Management
+- Environment variable-এ secrets না রাখুন
+- Docker secrets, Vault, K8s secrets ব্যবহার করুন
+
+## ৪. Image Vulnerability Scan
+- Trivy, Clair, Snyk দিয়ে ইমেজ স্ক্যান করুন
+- CI/CD pipeline-এ scan automate করুন
+
+## ৫. Regular Update
+- Base image ও dependency নিয়মিত আপডেট করুন
+- Unmaintained image avoid করুন
+
+## ৬. Network Security
+- Internal network ব্যবহার করুন
+- Unnecessary port expose করবেন না
+- Firewall ও network policy enforce করুন
+
+## ৭. Resource Limit
+- CPU/RAM limit দিন
+- Denial of Service (DoS) attack mitigate করুন
+
+## ৮. Read-only Filesystem
+- Sensitive container-এ read-only filesystem ব্যবহার করুন
+```bash
+docker run --read-only ...
+```
+
+## ৯. Capability Drop করুন
+- Unnecessary Linux capability drop করুন
+```bash
+docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE ...
+```
+
+## ১০. Logging & Monitoring
+- Centralized logging (ELK, Prometheus)
+- Security alerting ও anomaly detection
+
+## ১১. Image Signing & Verification
+- Docker Content Trust (DCT) এনাবল করুন
+```bash
+export DOCKER_CONTENT_TRUST=1
+```
+
+## ১২. Automated Security Testing
+- CI/CD pipeline-এ security test automate করুন
+- PR-এ Dockerfile ও Compose review করুন
+
+## রিয়েল লাইফ উদাহরণ: Production-Grade Security
+
+1. Multi-stage build Dockerfile
+2. Non-root user
+3. Trivy দিয়ে image scan
+4. Vault/K8s secrets
+5. Read-only filesystem
+6. Automated security test (CI/CD)
+
+## টিম ও Collaboration
+- Security documentation
+- Security training
+- Incident response plan
+
+## সংক্ষেপে
+Container security best practices ফলো করলে আপনার অ্যাপ্লিকেশন, ডেটা ও ইনফ্রাস্ট্রাকচার সুরক্ষিত থাকবে। DevOps টিমের জন্য এটি must-have guideline।
+
+---
+
+**পরবর্তী টপিক:** [জেনকিন্স: বিল্ড অটোমেশন পরিচিতি](/dev-ops/build-automation-intro)

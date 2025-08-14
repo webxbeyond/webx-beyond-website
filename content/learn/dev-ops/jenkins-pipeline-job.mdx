@@ -1,0 +1,106 @@
+---
+title: পাইপলাইন জব
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins Pipeline Job হচ্ছে advanced automation workflow, যেখানে কোড, বিল্ড, টেস্ট, ডিপ্লয়—সবকিছু একসাথে automate করা যায়। এই টিউটোরিয়ালে declarative ও scripted pipeline, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Pipeline Job কী?
+- Code-based automation workflow
+- Multiple stage (build, test, deploy)
+- Version control-এ Jenkinsfile
+- Visualization ও logs
+
+## ২. Pipeline Job তৈরি
+1. Jenkins UI > New Item
+2. Name দিন, "Pipeline" select করুন
+3. OK ক্লিক করুন
+
+## ৩. Declarative Pipeline Example
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        sh 'npm install'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh 'npm run deploy'
+      }
+    }
+  }
+}
+```
+
+## ৪. Scripted Pipeline Example
+```groovy
+node {
+  stage('Build') {
+    sh 'npm install'
+  }
+  stage('Test') {
+    sh 'npm test'
+  }
+  stage('Deploy') {
+    sh 'npm run deploy'
+  }
+}
+```
+
+## ৫. Jenkinsfile
+- Project root-এ `Jenkinsfile`
+- Version control-এ
+- Example:
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Build') { steps { sh 'npm install' } }
+    stage('Test') { steps { sh 'npm test' } }
+    stage('Deploy') { steps { sh 'npm run deploy' } }
+  }
+}
+```
+
+## ৬. Pipeline Visualization
+- Stage view, logs, status
+- Parallel stage, input approval
+
+## ৭. Advanced Features
+- Environment variable
+- Credentials binding
+- Parallel execution
+- Post actions (cleanup, notification)
+
+## রিয়েল লাইফ উদাহরণ: Node.js CI/CD Pipeline
+1. Jenkinsfile-এ build, test, deploy stage
+2. GitHub repo connect
+3. Automated trigger (push, PR)
+4. Notification (email, Slack)
+
+## সেরা প্র্যাকটিস
+- Pipeline code version control-এ রাখুন
+- Stage naming convention
+- Error handling
+- Secrets credentials manager-এ
+- Visualization customize
+
+## টিম ও Collaboration
+- Shared Jenkinsfile
+- PR-এ pipeline test
+- Build status dashboard
+
+## সংক্ষেপে
+Pipeline Job দিয়ে Jenkins-এ end-to-end automation, visibility ও collaboration সহজ হয়—DevOps টিমের productivity ও reliability বাড়ে।
+
+---
+
+**পরবর্তী টপিক:** [Jenkinsfile সিনট্যাক্স](/dev-ops/jenkinsfile-syntax)

@@ -1,0 +1,85 @@
+---
+title: বিল্ড টুলস ইনস্টল করা (Installing Build Tools)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বিল্ড টুলস ইনস্টল করা মানে—আপনার ডেভেলপমেন্ট এনভায়রনমেন্টে প্রয়োজনীয় টুলস, প্যাকেজ, ও লাইব্রেরি সেটআপ করা।
+
+## সাধারণ বিল্ড টুলস ইনস্টল
+
+### Node.js (npm, yarn)
+- **Windows/Mac/Linux:**
+  - https://nodejs.org থেকে installer ডাউনলোড করুন
+  - ইনস্টল শেষে টার্মিনালে:
+    ```bash
+    npm -v
+    yarn -v
+    ```
+
+### Python (pip, poetry)
+- **Windows/Mac/Linux:**
+  - https://python.org থেকে installer ডাউনলোড করুন
+  - ইনস্টল শেষে:
+    ```bash
+    pip --version
+    python -m pip install poetry
+    poetry --version
+    ```
+
+### Java (Maven, Gradle)
+- **Windows/Mac/Linux:**
+  - https://maven.apache.org/download.cgi
+  - https://gradle.org/install/
+  - ইনস্টল শেষে:
+    ```bash
+    mvn -v
+    gradle -v
+    ```
+
+### C/C++ (Make, CMake)
+- **Linux:**
+    ```bash
+    sudo apt install build-essential cmake
+    make --version
+    cmake --version
+    ```
+- **Windows:**
+  - Chocolatey দিয়ে:
+    ```powershell
+    choco install make cmake
+    ```
+
+### Docker
+- **Windows/Mac/Linux:**
+  - https://www.docker.com/products/docker-desktop
+  - ইনস্টল শেষে:
+    ```bash
+    docker --version
+    ```
+
+## OS অনুযায়ী ইনস্টলেশন টিপস
+- **Windows:** Installer/Chocolatey ব্যবহার করুন
+- **Mac:** Homebrew দিয়ে:
+    ```bash
+    brew install node python maven gradle cmake docker
+    ```
+- **Linux:** apt/yum/pacman দিয়ে ইনস্টল করুন
+
+## বাস্তব উদাহরণ
+
+> "আমরা টিমে সবাই OS অনুযায়ী build tools ইনস্টল করি—Windows-এ Chocolatey, Mac-এ Homebrew, Linux-এ apt। Docker, Node.js, Python—সব টুলস latest version রাখি।"
+
+## টিপস
+- ইনস্টল শেষে version চেক করুন
+- PATH variable ঠিকভাবে সেট করুন
+- Documentation/official guide অনুসরণ করুন
+- Automated script দিয়ে ইনস্টলেশন সহজ করুন
+
+## সংক্ষেপে
+- Build tools ইনস্টল করা ডেভেলপমেন্টের প্রথম ধাপ
+- OS অনুযায়ী installer/package manager ব্যবহার করুন
+- Version, PATH, documentation—সবকিছু ঠিক রাখুন
+
+---
+
+**পরবর্তী পাঠ:** [উইন্ডোজ/MacOS-Unix ব্যবহারকারীদের জন্য ইনস্টলেশন সহায়তা](/dev-ops/build-tools-os)

@@ -1,0 +1,85 @@
+---
+title: ক্লাউড সার্ভারে Nexus ইনস্টল ও চালানো
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps workflow-এ build করা artifact/package/versioned file store, manage, ও publish করার জন্য Nexus Repository Manager server/cloud-এ ইনস্টল ও চালানো হয়। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, Nexus install/config, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## কেন Nexus?
+- Centralized artifact storage
+- Automated build/publish pipeline
+- Security/access control
+- Multi-format support (Maven, npm, Docker, PyPI, Raw)
+
+## Install Steps (Ubuntu/Debian)
+
+### ১. Java install করুন
+```bash
+sudo apt update
+sudo apt install openjdk-17-jre -y
+```
+
+### ২. Nexus download ও extract করুন
+```bash
+wget https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+sudo tar -xvzf latest-unix.tar.gz -C /opt
+sudo mv /opt/nexus-3* /opt/nexus
+```
+
+### ৩. Nexus user তৈরি করুন
+```bash
+sudo adduser nexus
+sudo chown -R nexus:nexus /opt/nexus /opt/sonatype-work
+```
+
+### ৪. Nexus service configure করুন
+- `/opt/nexus/bin/nexus.rc`-এ:
+    ```
+    run_as_user="nexus"
+    ```
+- Systemd service file তৈরি করুন
+    ```bash
+    sudo nano /etc/systemd/system/nexus.service
+    # [Unit], [Service], [Install] section add করুন
+    ```
+
+### ৫. Nexus start করুন
+```bash
+sudo systemctl enable nexus
+sudo systemctl start nexus
+```
+
+### ৬. Web UI-তে login করুন
+- `http://your_server_ip:8081`
+- Default admin password: `/opt/sonatype-work/nexus3/admin.password`
+
+## Cloud Setup Tips
+- Firewall rule: port 8081 allow করুন
+- Backup: `/opt/sonatype-work` directory
+- Monitoring/logging: Nexus dashboard
+- Automated install: Ansible/Chef/Puppet script
+
+## বাস্তব উদাহরণ
+
+> "আমরা Ubuntu server-এ Nexus install করি—Java install, Nexus extract, user setup, service configure করি। Web UI-তে login করে repository create করি। Build pipeline-এ automated publish করি। Backup/monitoring করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Service fail:** Log (`journalctl -u nexus`) চেক করুন
+- **Port block:** Firewall rule/config চেক করুন
+- **Login fail:** Admin password/config চেক করুন
+- **Storage full:** Cleanup policy/setup করুন
+
+## টিপস
+- Automated install/config script ব্যবহার করুন
+- Firewall/security setup করুন
+- Backup policy/setup করুন
+- Monitoring/logging setup করুন
+
+## সংক্ষেপে
+- Cloud server-এ Nexus install/config—artifact/package management সহজ
+- Manual error কমাতে automation/script/setup ব্যবহার করুন
+- Security, backup, monitoring—server launch-এর পরেই
+
+---
+
+**পরবর্তী পাঠ:** [রিপোজিটরি টাইপস](/dev-ops/repo-types)

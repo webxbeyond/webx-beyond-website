@@ -1,0 +1,89 @@
+---
+title: Droplet-এ অ্যাপ্লিকেশন আর্টিফ্যাক্ট ডিপ্লয়
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DigitalOcean Droplet-এ build করা artifact/app deploy করা DevOps workflow-এর গুরুত্বপূর্ণ স্টেপ। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, Droplet-এ app deploy করার ধাপ, টুলস, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## কেন Droplet-এ Deploy?
+- Production-ready server
+- Public IP, firewall, monitoring
+- Automated deploy possible
+
+## Deploy Steps
+
+### ১. Build Artifact/App প্রস্তুত
+- Local machine/server-এ build করুন
+- Example: `.jar`, `.zip`, `dist/`, Docker image
+
+### ২. Artifact/App Droplet-এ Transfer
+- **SCP:**
+    ```bash
+    scp dist/app.js root@your_droplet_ip:/home/devops/app.js
+    scp target/app.jar root@your_droplet_ip:/home/devops/app.jar
+    ```
+- **rsync:**
+    ```bash
+    rsync -avz dist/ root@your_droplet_ip:/home/devops/app/
+    ```
+- **Git clone:**
+    ```bash
+    ssh root@your_droplet_ip
+    git clone https://github.com/your/repo.git
+    ```
+
+### ৩. Dependency Install
+- **Node.js:**
+    ```bash
+    cd /home/devops/app
+    npm install --production
+    ```
+- **Java:**
+    No extra dependency if jar built
+- **Python:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### ৪. App Run
+- **Node.js:**
+    ```bash
+    node app.js
+    ```
+- **Java:**
+    ```bash
+    java -jar app.jar
+    ```
+- **Docker:**
+    ```bash
+    docker run -d -p 8080:8080 myapp:1.0
+    ```
+
+### ৫. Automation (CI/CD)
+- Deploy script/pipeline—GitHub Actions/Jenkins
+- Example: SSH deploy step
+
+## বাস্তব উদাহরণ
+
+> "আমরা Node.js অ্যাপ build করি—local machine-এ, তারপর scp দিয়ে Droplet-এ transfer করি। SSH দিয়ে login করে dependency install করি, app run করি। Production-এ deploy script pipeline-এ automate করি। Docker image হলে—Droplet-এ pull/run করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Permission denied:** File transfer/run command sudo/user দিয়ে চালান
+- **Port block:** Firewall rule চেক করুন
+- **Dependency missing:** Install command/check
+- **Manual error:** Automated deploy script/pipeline ব্যবহার করুন
+
+## টিপস
+- Automated deploy pipeline/script ব্যবহার করুন
+- Firewall/security setup করুন—deploy-এর পরেই
+- Log/output monitor করুন—error/debugging
+- Resource usage monitor করুন—cost control
+
+## সংক্ষেপে
+- Build করা artifact/app Droplet-এ transfer, dependency install, run—সবকিছু সহজ
+- Manual error কমাতে automation/script/pipeline ব্যবহার করুন
+- Security, monitoring, backup—deploy-এর পরেই
+
+---
+
+**পরবর্তী পাঠ:** [ক্লাউড সার্ভারে লিনাক্স ব্যবহারকারী তৈরি ও কনফিগার](/dev-ops/cloud-linux-user)

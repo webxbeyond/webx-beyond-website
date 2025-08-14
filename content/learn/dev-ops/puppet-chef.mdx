@@ -1,0 +1,77 @@
+---
+title: Puppet / Chef overview
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Puppet ও Chef—দুইটি powerful configuration management tool, যা large-scale server automation, consistency, এবং repeatability নিশ্চিত করে। এই টিউটোরিয়ালে concept, architecture, workflow, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Puppet কী?
+- Declarative configuration management tool
+- Master-agent architecture
+- Infrastructure as Code (IaC)
+- Resource-based configuration (file, package, service)
+
+### Puppet Workflow
+1. Master server-এ configuration define
+2. Agent server-এ Puppet install
+3. Agent periodic master থেকে config fetch করে apply করে
+
+### Example Puppet Manifest
+```puppet
+file { '/etc/motd':
+  content => "Welcome to DevOps!",
+}
+package { 'nginx':
+  ensure => installed,
+}
+service { 'nginx':
+  ensure => running,
+}
+```
+
+## ২. Chef কী?
+- Ruby-based configuration management tool
+- Master-agent (Chef Server, Chef Client)
+- Cookbook, recipe, resource
+- Infrastructure automation, cloud integration
+
+### Chef Workflow
+1. Cookbook-এ recipe define
+2. Chef Server-এ cookbook upload
+3. Node-এ Chef Client run করে config apply
+
+### Example Chef Recipe
+```ruby
+package 'nginx' do
+  action :install
+end
+service 'nginx' do
+  action [:enable, :start]
+end
+file '/etc/motd' do
+  content 'Welcome to DevOps!'
+end
+```
+
+## ৩. Real-life Scenario
+- ৫০০+ server-এ package install, config update—একটি manifest/recipe-এ
+- Cloud VM provisioning, security patch automation
+
+## ৪. Best Practices
+- Version control-এ config রাখুন
+- Modular manifest/cookbook লিখুন
+- Automated testing
+- Documentation
+- Role-based access control
+
+## ৫. Tool Integration
+- Jenkins pipeline-এ Puppet/Chef
+- Cloud provider integration (AWS OpsWorks)
+- Monitoring tool
+
+## সংক্ষেপে
+Puppet ও Chef—large-scale configuration management, automation, consistency ও efficiency নিশ্চিত করে। Modern DevOps workflow-এ essential tool।
+
+---
+
+**পরবর্তী টপিক:** [Infrastructure as Code (IaC) Workflow](/dev-ops/iac-workflow)

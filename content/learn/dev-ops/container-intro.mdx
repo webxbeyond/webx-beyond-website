@@ -1,0 +1,95 @@
+---
+title: কন্টেইনার কী?
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+কন্টেইনার (Container) হচ্ছে এমন একটি প্রযুক্তি, যা সফটওয়্যারকে তার সমস্ত ডিপেন্ডেন্সি, লাইব্রেরি, কনফিগারেশনসহ একত্রে প্যাকেজ করে আলাদা পরিবেশে রান করার সুযোগ দেয়। এই টিউটোরিয়ালে আমরা কন্টেইনারের মূল ধারণা, বাস্তব উদাহরণ, এবং DevOps pipeline-এ এর গুরুত্ব নিয়ে আলোচনা করব।
+
+---
+
+## কন্টেইনারের মূল ধারণা
+
+কন্টেইনার হচ্ছে lightweight, portable, এবং isolated execution environment, যেখানে অ্যাপ্লিকেশন ও তার ডিপেন্ডেন্সি একসাথে থাকে।
+
+**কীভাবে কাজ করে?**
+- Host OS-এর kernel শেয়ার করে
+- আলাদা filesystem, network, process space
+- Virtual Machine-এর তুলনায় অনেক কম resource ব্যবহার করে
+
+---
+
+## কন্টেইনারের সুবিধা
+
+- **Portability:** যেকোনো environment-এ একইভাবে রান হয়
+- **Isolation:** একাধিক অ্যাপ্লিকেশন আলাদা কন্টেইনারে রান হয়, একে অপরের সাথে conflict হয় না
+- **Scalability:** সহজে horizontal/vertical scale করা যায়
+- **Efficiency:** VM-এর তুলনায় কম RAM/CPU লাগে
+- **Fast startup:** কন্টেইনার দ্রুত চালু হয়
+
+---
+
+## বাস্তব উদাহরণ
+
+**Example 1:**
+আপনি একটি Node.js অ্যাপ Docker কন্টেইনারে প্যাকেজ করলেন। এখন Windows, Linux, Mac—যেকোনো OS-এ একই কন্টেইনার রান হবে, কোনো dependency conflict হবে না।
+
+**Example 2:**
+একটি SaaS কোম্পানি তাদের production, staging, dev environment-এ একই কন্টেইনার ইমেজ ব্যবহার করে—code drift, environment mismatch হয় না।
+
+---
+
+## কন্টেইনার বনাম ভার্চুয়াল মেশিন
+
+| বিষয়           | Container                        | Virtual Machine                |
+|----------------|----------------------------------|-------------------------------|
+| Resource usage | Lightweight                      | Heavyweight                   |
+| Startup time   | Seconds                          | Minutes                       |
+| Isolation      | OS-level                         | Hardware-level                |
+| Portability    | High                             | Medium                        |
+| Management     | Easy (Docker, Kubernetes)        | Complex (VMware, Hyper-V)     |
+
+---
+
+## DevOps pipeline-এ কন্টেইনারের গুরুত্ব
+
+- Continuous Integration/Delivery (CI/CD)-এ কন্টেইনার ব্যবহার করলে build, test, deploy—all environment-এ একইভাবে কাজ করে
+- Microservices architecture-এ প্রতিটি সার্ভিস আলাদা কন্টেইনারে deploy করা যায়
+- Rollback, scaling, blue-green deployment—সব সহজ হয়
+
+---
+
+## কন্টেইনার ইমেজ
+
+কন্টেইনার ইমেজ হচ্ছে কন্টেইনার তৈরির জন্য প্রয়োজনীয় ফাইল, কনফিগ, এবং ডিপেন্ডেন্সির snapshot।
+
+- Dockerfile দিয়ে ইমেজ তৈরি হয়
+- ইমেজ registry (Docker Hub, Nexus, GitHub Container Registry)-এ store করা হয়
+
+---
+
+## কন্টেইনার রান করার উদাহরণ
+
+**Docker Example:**
+```bash
+docker run -d -p 8080:80 nginx:latest
+```
+
+এখানে nginx-এর কন্টেইনার 8080 port-এ রান হচ্ছে।
+
+---
+
+## Best Practices
+
+- Minimal base image ব্যবহার করুন
+- Secrets/config আলাদা রাখুন
+- Healthcheck configure করুন
+- Resource limit (CPU/RAM) সেট করুন
+- Regularly update image
+
+---
+
+## Conclusion
+
+কন্টেইনার DevOps-এ অ্যাপ্লিকেশন ডেলিভারি, স্কেলিং, এবং অটোমেশন সহজ করে। Portability, isolation, efficiency—এই তিনটি কারণে কন্টেইনার আধুনিক সফটওয়্যার ইঞ্জিনিয়ারিং-এর অপরিহার্য অংশ।
+
+পরবর্তী টিউটোরিয়ালে কন্টেইনার বনাম ইমেজ, Docker architecture, এবং Docker command নিয়ে বিস্তারিত আলোচনা করা হবে।

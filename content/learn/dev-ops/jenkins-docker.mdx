@@ -1,0 +1,111 @@
+---
+title: জেনকিন্সে ডকার ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## বিল্ড, টেস্ট ও ডিপ্লয়মেন্ট অটোমেশন
+
+Jenkins-এ Docker ব্যবহার করলে বিল্ড, টেস্ট, ডিপ্লয়মেন্ট আরও flexible, portable ও scalable হয়। এই টিউটোরিয়ালে দেখানো হয়েছে কীভাবে Jenkins-এ Docker integration, Docker agent, এবং real-life workflow করা যায়।
+
+## ১. কেন Jenkins-এ Docker?
+- Build/test environment isolate
+- Containerized build agent
+- Docker image build/push automation
+- Microservice deployment
+
+## ২. Docker Plugin Install
+- Jenkins UI > Manage Jenkins > Manage Plugins
+- "Docker" plugin install করুন
+- "Docker Pipeline" plugin install করুন
+
+## ৩. Docker Host Configuration
+- Jenkins server-এ Docker install করুন
+- Jenkins UI > Manage Jenkins > Configure System > Docker
+- Docker host URL, credentials add করুন
+
+## ৪. Freestyle Job-এ Docker ব্যবহার
+- Build step: shell command
+- Example:
+```bash
+docker build -t myapp:latest .
+docker run --rm myapp:latest
+```
+
+## ৫. Pipeline Job-এ Docker ব্যবহার
+- Jenkinsfile-এ Docker step
+- Example:
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          docker.build('myapp:latest')
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        script {
+          docker.image('myapp:latest').inside {
+            sh 'npm test'
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## ৬. Docker Agent/Slave
+- Jenkins master থেকে Docker container-এ build/run
+- Dynamic agent provisioning
+- Example:
+```groovy
+pipeline {
+  agent {
+    docker { image 'node:18-alpine' }
+  }
+  stages {
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+  }
+}
+```
+
+## ৭. Docker Image Push Automation
+- Docker registry credentials add করুন
+- Build step:
+```bash
+docker login -u $DOCKER_USER -p $DOCKER_PASS registry.example.com
+docker build -t registry.example.com/myapp:1.0 .
+docker push registry.example.com/myapp:1.0
+```
+
+## রিয়েল লাইফ উদাহরণ: Node.js CI/CD Pipeline
+1. Docker plugin install
+2. Jenkinsfile-এ Docker build/test/push
+3. Registry credentials add
+4. Automated deployment
+
+## সেরা প্র্যাকটিস
+- Docker agent version specify করুন
+- Secrets credentials manager-এ রাখুন
+- Resource limit দিন
+- Build cache optimize করুন
+
+## টিম ও Collaboration
+- Shared Dockerfile/Jenkinsfile
+- Build status notification
+- Registry access control
+
+## সংক্ষেপে
+Jenkins-এ Docker integration করলে build/test/deploy automation আরও efficient, portable ও scalable হয়—DevOps টিমের জন্য must-have solution।
+
+---
+
+**পরবর্তী টপিক:** [পাইপলাইন জব](/dev-ops/jenkins-pipeline-job)

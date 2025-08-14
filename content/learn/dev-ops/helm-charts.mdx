@@ -1,0 +1,69 @@
+---
+title: Helm Charts
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Helm—Kubernetes-এ application packaging, deployment, versioning ও configuration management-এর জন্য industry standard। এই টিউটোরিয়ালে Helm concept, chart structure, installation, workflow, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Helm কী?
+- Kubernetes package manager
+- Application deploy, upgrade, rollback
+- Chart—application, config, dependency package
+
+## ২. Chart Structure
+```
+mychart/
+  Chart.yaml
+  values.yaml
+  templates/
+    deployment.yaml
+    service.yaml
+    configmap.yaml
+```
+- `Chart.yaml`: chart metadata
+- `values.yaml`: default config
+- `templates/`: YAML template file
+
+## ৩. Installation & Usage
+### Helm Install
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+### Chart Create & Deploy
+```bash
+helm create mychart
+helm install myapp ./mychart
+helm upgrade myapp ./mychart
+helm rollback myapp 1
+```
+
+## ৪. Workflow
+1. Chart create করুন
+2. values.yaml-এ config define করুন
+3. templates-এ YAML file লিখুন
+4. helm install/upgrade/rollback করুন
+5. Version control-এ chart রাখুন
+
+## ৫. Real-life Scenario
+- Microservice deploy—single chart-এ multiple resource
+- Multi-environment config—values.yaml override
+- Automated upgrade/rollback
+
+## ৬. Best Practices
+- Chart modular করুন
+- values.yaml-এ sensitive data না রাখুন
+- Version control-এ chart
+- Documentation লিখুন
+- Automated test (lint, dry-run)
+
+## ৭. Tool Integration
+- CI/CD pipeline (Jenkins, GitHub Actions)
+- Artifact repository (ChartMuseum, Harbor)
+- Monitoring tool integration
+
+## সংক্ষেপে
+Helm—Kubernetes application packaging, deployment, versioning ও configuration management-এর backbone। Efficient, scalable, automated DevOps workflow নিশ্চিত হয়।
+
+---
+
+**পরবর্তী টপিক:** [Kubernetes Best Practices](/dev-ops/k8s-best-practices)

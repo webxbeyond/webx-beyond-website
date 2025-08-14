@@ -1,0 +1,61 @@
+---
+title: আর্টিফ্যাক্ট রিপোজিটরি ম্যানেজার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps workflow-এ build করা artifact/package/versioned file store, manage, ও publish করার জন্য artifact repository manager অপরিহার্য। এখানে সহজ ভাষায়, artifact repository manager-এর ধারণা, Nexus/JFrog ব্যবহার, DevOps-এ গুরুত্ব, বাস্তব উদাহরণ, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## Artifact Repository Manager কী?
+- Build করা artifact/package/versioned file store, manage, publish করার tool
+- Example: Sonatype Nexus, JFrog Artifactory, GitHub Packages
+
+## কেন ব্যবহার করবেন?
+- Centralized storage
+- Versioning, access control
+- Automated publish/deploy
+- Security, backup
+
+## Common Repository Types
+- **Maven:** Java/JVM package
+- **npm:** Node.js package
+- **PyPI:** Python package
+- **Docker:** Container image
+- **Raw:** Any file/binary
+
+## Nexus/JFrog ব্যবহার
+- **Install:** Server/cloud setup
+- **Repository create:** Hosted/proxy/group
+- **Artifact publish:** Build tool integration (Maven, npm, Docker)
+- **Access control:** User/role setup
+- **Monitoring/logging:** Built-in dashboard
+
+## DevOps-এ গুরুত্ব
+- Automated build/publish pipeline
+- Versioned artifact management
+- Team collaboration
+- Security/access control
+
+## বাস্তব উদাহরণ
+
+> "আমরা Nexus server setup করি—Java, Node.js, Docker artifact store করি। Build pipeline-এ automated publish করি। Access control দিয়ে team-wise permission setup করি। Production-এ backup/monitoring করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Publish fail:** Credential/config চেক করুন
+- **Access denied:** User/role/config চেক করুন
+- **Storage full:** Cleanup policy/setup করুন
+- **Manual error:** Automated pipeline/script ব্যবহার করুন
+
+## টিপস
+- Automated build/publish pipeline ব্যবহার করুন
+- Access control/security setup করুন
+- Cleanup policy/setup করুন—storage optimize
+- Monitoring/logging setup করুন
+
+## সংক্ষেপে
+- Artifact repository manager—centralized, versioned, secure artifact/package management
+- Manual error কমাতে automation/pipeline/setup ব্যবহার করুন
+- Security, backup, monitoring—manager-এর built-in সুবিধা নিন
+
+---
+
+**পরবর্তী পাঠ:** [ক্লাউড সার্ভারে Nexus ইনস্টল ও চালানো](/dev-ops/nexus-install)

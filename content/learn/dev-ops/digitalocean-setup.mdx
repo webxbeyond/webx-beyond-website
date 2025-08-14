@@ -1,0 +1,83 @@
+---
+title: DigitalOcean-এ সার্ভার সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DigitalOcean-এ Droplet (virtual server) তৈরি ও কনফিগার করা DevOps workflow-এর প্রথম ক্লাউড স্টেপ। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, DigitalOcean-এ server setup-এর ধাপ, টুলস, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## কেন DigitalOcean?
+- Simple UI/API
+- Low cost, fast provisioning
+- Developer-friendly
+- Automated setup possible
+
+## Droplet তৈরি করার ধাপ
+
+### ১. DigitalOcean-এ Account তৈরি
+- https://digitalocean.com
+- Email/Google/GitHub দিয়ে signup
+
+### ২. Droplet তৈরি
+- Dashboard → Create → Droplet
+- OS select করুন (Ubuntu, Debian, CentOS)
+- Size select করুন (RAM, CPU)
+- Datacenter region select করুন
+- Authentication: SSH key/password
+
+### ৩. SSH Key যুক্ত করা
+- Local machine-এ SSH key generate করুন:
+    ```bash
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+    # ~/.ssh/id_ed25519.pub
+    ```
+- Public key DigitalOcean-এ add করুন
+
+### ৪. Droplet-এ SSH দিয়ে Login
+    ```bash
+    ssh root@your_droplet_ip
+    ```
+
+### ৫. Initial Server Setup
+- Update package:
+    ```bash
+    sudo apt update && sudo apt upgrade -y
+    ```
+- New user create করুন:
+    ```bash
+    adduser devops
+    usermod -aG sudo devops
+    ```
+- Firewall setup:
+    ```bash
+    ufw allow OpenSSH
+    ufw enable
+    ```
+
+### ৬. Automated Setup (API/Script)
+- DigitalOcean API/token দিয়ে automated provisioning
+- Example: Terraform/Pulumi
+
+## বাস্তব উদাহরণ
+
+> "আমরা DigitalOcean-এ Droplet তৈরি করি—dashboard বা Terraform দিয়ে। SSH key দিয়ে secure login করি। Initial setup—update, user add, firewall—সব automate করি। Production-এ multiple Droplet scale করি—API/script দিয়ে।"
+
+## কমন সমস্যা ও সমাধান
+- **SSH login fail:** IP, username, key ঠিক আছে কিনা চেক করুন
+- **Port block:** Firewall rule চেক করুন
+- **Resource limit:** Droplet size/region ঠিক করুন
+- **Manual error:** Automated script ব্যবহার করুন
+
+## টিপস
+- Always use SSH key—password avoid করুন
+- Automated provisioning—Terraform/Pulumi ব্যবহার করুন
+- Firewall/security setup করুন—server launch-এর পরেই
+- Resource usage monitor করুন—cost control
+
+## সংক্ষেপে
+- DigitalOcean-এ Droplet তৈরি, SSH login, initial setup—সবকিছু সহজ
+- Manual error কমাতে automation/script ব্যবহার করুন
+- Security, monitoring, backup—server launch-এর পরেই
+
+---
+
+**পরবর্তী পাঠ:** [Droplet-এ অ্যাপ্লিকেশন আর্টিফ্যাক্ট ডিপ্লয়](/dev-ops/droplet-deploy)

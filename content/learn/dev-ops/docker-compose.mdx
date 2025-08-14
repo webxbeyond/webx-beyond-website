@@ -1,0 +1,112 @@
+---
+title: Docker Compose
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## মাল্টি-কন্টেইনার অর্কেস্ট্রেশন ও DevOps Workflow
+
+Docker Compose হচ্ছে এমন একটি টুল, যা দিয়ে আপনি একাধিক container (web, db, cache, etc.) একসাথে define, deploy, ও manage করতে পারেন। এই টিউটোরিয়ালে Docker Compose-এর কনসেপ্ট, ব্যবহার, বাস্তব উদাহরণ, এবং DevOps pipeline-এ integration নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## Docker Compose কী?
+
+- YAML ফাইল (`docker-compose.yml`) দিয়ে service, network, volume—all define করা যায়
+- Single command (`docker-compose up`) দিয়ে সব container deploy হয়
+- Development, testing, production—সব environment-এ ব্যবহারযোগ্য
+
+---
+
+## Compose File Structure
+
+**docker-compose.yml Example:**
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+  cache:
+    image: redis:latest
+```
+
+---
+
+## Common Commands
+
+### ১. Deploy All Services
+```bash
+docker-compose up -d
+```
+
+### ২. Stop & Remove All
+```bash
+docker-compose down
+```
+
+### ৩. View Logs
+```bash
+docker-compose logs
+```
+
+### ৪. Scale Service
+```bash
+docker-compose up -d --scale web=3
+```
+
+### ৫. Exec Shell
+```bash
+docker-compose exec web /bin/bash
+```
+
+---
+
+## Network & Volume Management
+
+- Compose file-এ network/volume define করা যায়
+- Example:
+```yaml
+networks:
+  mynet:
+    driver: bridge
+volumes:
+  mydata:
+```
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি production server-এ `docker-compose.yml` দিয়ে web, db, cache—সব service একসাথে deploy করে। Scale, update, rollback—all automation script-এ manage হয়।
+
+---
+
+## DevOps Pipeline Integration
+
+- CI/CD pipeline-এ automated testing/deployment
+- Local development environment replicate
+- Infrastructure as Code (IaC) workflow
+
+---
+
+## Best Practices
+
+- Service name/tag meaningful রাখুন
+- Environment variable `.env` ফাইলে রাখুন
+- Volume/network properly configure করুন
+- Version/tag ব্যবহার করুন
+- Automation script-এ error handling যোগ করুন
+
+---
+
+## Conclusion
+
+Docker Compose দিয়ে মাল্টি-কন্টেইনার অর্কেস্ট্রেশন, automation, এবং DevOps workflow সহজ হয়। Practice ও automation script-এ Compose ব্যবহার করুন—আপনার container management next level হবে!
+
+পরবর্তী টিউটোরিয়ালে Dockerfile, private registry, advanced orchestration নিয়ে বিস্তারিত আলোচনা করা হবে।

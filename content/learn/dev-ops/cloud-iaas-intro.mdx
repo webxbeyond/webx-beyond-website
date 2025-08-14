@@ -1,0 +1,53 @@
+---
+title: ক্লাউড ও IaaS এর পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্লাউড কম্পিউটিং ও IaaS (Infrastructure as a Service) DevOps-এর workflow-এ বিপ্লব এনেছে। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, ক্লাউড ও IaaS-এর ধারণা, সুবিধা, এবং DevOps-এ গুরুত্ব তুলে ধরা হলো।
+
+## ক্লাউড কম্পিউটিং কী?
+- Remote server-এ storage, compute, networking, security—সবকিছু পাওয়া যায়
+- On-demand, pay-as-you-go
+- Example: AWS, Azure, GCP, DigitalOcean
+
+## IaaS (Infrastructure as a Service) কী?
+- Physical server/VM/network/storage—সবকিছু cloud provider manage করে
+- User শুধু resource provision/configure করে
+- Example: EC2 (AWS), Droplet (DigitalOcean), VM (Azure/GCP)
+
+## কেন ক্লাউড/IaaS?
+- Scalability: Resource grow/shrink করা যায়
+- Cost-effective: Pay only for usage
+- Automation: API/script দিয়ে resource manage
+- Reliability: High availability, backup, disaster recovery
+
+## DevOps-এ ক্লাউড/IaaS-এর গুরুত্ব
+- Automated server provisioning
+- CI/CD pipeline-এ dynamic environment
+- Infrastructure as Code (IaC)—Terraform/Pulumi
+- Monitoring, logging, security—সবকিছু cloud service-এ
+
+## বাস্তব উদাহরণ
+
+> "আমরা DigitalOcean-এ Droplet তৈরি করি—API/script দিয়ে। AWS-এ EC2 instance launch করি—Terraform দিয়ে automated। Production-এ server scale করি—load বাড়লে। Backup, monitoring—সবকিছু cloud provider manage করে।"
+
+## কমন সমস্যা ও সমাধান
+- **Resource limit:** Usage monitor করুন, auto-scale setup করুন
+- **Cost overrun:** Billing alert/setup করুন
+- **Security issue:** Firewall, IAM, encryption ব্যবহার করুন
+- **Manual error:** IaC/script দিয়ে automation করুন
+
+## টিপস
+- Always use IaC—manual provisioning এড়িয়ে চলুন
+- Resource usage monitor করুন—cost control
+- Security best practices follow করুন—IAM, encryption
+- Automated backup/setup করুন
+
+## সংক্ষেপে
+- ক্লাউড/IaaS DevOps workflow-এ automation, scalability, reliability, cost control—সবকিছু সহজ করে
+- Manual error কমাতে automation/script/IaC ব্যবহার করুন
+- Security, monitoring, backup—cloud provider-এর সুবিধা নিন
+
+---
+
+**পরবর্তী পাঠ:** [DigitalOcean-এ সার্ভার সেটআপ](/dev-ops/digitalocean-setup)

@@ -1,0 +1,127 @@
+---
+title: ডিবাগ কমান্ডসমূহ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker container ব্যবহার করতে গেলে অনেক সময় সমস্যা, error, বা unexpected behavior দেখা যায়। এই টিউটোরিয়ালে Docker debug command, troubleshooting technique, এবং বাস্তব উদাহরণসহ container debug করার সহজ ও কার্যকর উপায় নিয়ে আলোচনা করব।
+
+---
+
+## Container Status ও Logs
+
+### ১. Container Status Check
+```bash
+docker ps -a
+```
+
+### ২. Container Logs
+```bash
+docker logs <container_id>
+```
+
+### ৩. Real-time Logs
+```bash
+docker logs -f <container_id>
+```
+
+---
+
+## Container Shell Access
+
+### ১. Exec Shell
+```bash
+docker exec -it <container_id> /bin/bash
+```
+
+### ২. Inspect Container
+```bash
+docker inspect <container_id>
+```
+
+### ৩. Top (Process List)
+```bash
+docker top <container_id>
+```
+
+---
+
+## Network Debugging
+
+### ১. Network Inspect
+```bash
+docker network inspect <network_name>
+```
+
+### ২. Container Port Mapping
+```bash
+docker port <container_id>
+```
+
+---
+
+## Resource Usage Debug
+
+### ১. Stats (Live Resource Usage)
+```bash
+docker stats
+```
+
+### ২. Disk Usage
+```bash
+docker system df
+```
+
+---
+
+## Image Debugging
+
+### ১. Image History
+```bash
+docker history <image_name>
+```
+
+### ২. Image Inspect
+```bash
+docker inspect <image_name>
+```
+
+---
+
+## Common Problems & Solutions
+
+- **Container Crash:**
+  - Check logs: `docker logs <container_id>`
+  - Inspect config: `docker inspect <container_id>`
+- **Port Conflict:**
+  - Check port mapping: `docker port <container_id>`
+- **Resource Exhaustion:**
+  - Monitor: `docker stats`
+- **Network Issue:**
+  - Inspect network: `docker network inspect <network_name>`
+- **Image Build Fail:**
+  - Check Dockerfile, use `docker build --no-cache`
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানির production container হঠাৎ crash করে। DevOps engineer `docker logs`, `docker stats`, `docker exec` দিয়ে debug করে—error trace, resource usage, এবং shell access নিয়ে দ্রুত সমস্যা সমাধান করে।
+
+---
+
+## Best Practices
+
+- Container log monitor করুন
+- Resource usage (CPU/RAM/Disk) নিয়মিত চেক করুন
+- Automation script-এ debug command ব্যবহার করুন
+- Dockerfile-এ healthcheck configure করুন
+- Image build/test automation করুন
+
+---
+
+## Conclusion
+
+Docker debug command ও technique জানলে container problem দ্রুত সমাধান, automation, এবং DevOps workflow efficient করা যায়। Practice ও automation script-এ এই কমান্ডগুলো ব্যবহার করুন—আপনার troubleshooting skill next level হবে!
+
+পরবর্তী টিউটোরিয়ালে Docker demo, Compose, advanced orchestration নিয়ে বিস্তারিত আলোচনা করা হবে।

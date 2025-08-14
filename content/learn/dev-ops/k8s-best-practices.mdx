@@ -1,0 +1,59 @@
+---
+title: Kubernetes Best Practices
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Kubernetes-এ best practices follow করলে cluster, application, security, automation—সব efficiently ও reliably manage করা যায়। এই টিউটোরিয়ালে architecture, resource, security, monitoring, automation, এবং real-life scenario নিয়ে best practices দেখানো হয়েছে।
+
+## ১. Cluster Architecture
+- Multi-zone, multi-region cluster
+- High availability (HA) master/control plane
+- Automated backup ও disaster recovery
+
+## ২. Resource Management
+- Resource request/limit define করুন
+- Horizontal Pod Autoscaler (HPA) ব্যবহার করুন
+- Namespace-এ workload isolate করুন
+- Pod anti-affinity, node selector
+
+## ৩. Security
+- RBAC (Role-based access control)
+- Network policy enforce করুন
+- Secret encryption
+- Image scanning (vulnerability)
+- Least privilege principle
+
+## ৪. Configuration & Secrets
+- ConfigMap ও Secret ব্যবহার করুন
+- Sensitive data external secret manager-এ রাখুন
+- Version control-এ YAML config
+
+## ৫. Monitoring & Logging
+- Prometheus, Grafana, ELK Stack integration
+- Health check (liveness/readiness probe)
+- Centralized log aggregation
+- Alerting rule tune করুন
+
+## ৬. Automation
+- CI/CD pipeline integration
+- Automated deployment, rollback
+- Helm chart ব্যবহার করুন
+- GitOps workflow
+
+## ৭. Upgrades & Maintenance
+- Rolling update, canary deployment
+- Automated cluster upgrade
+- Backup before upgrade
+- Maintenance window plan করুন
+
+## ৮. Real-life Scenario
+- Production cluster—multi-zone, RBAC, HPA, monitoring, automated deployment
+- Staging cluster—feature test, canary deployment
+- Disaster recovery—backup, restore, audit
+
+## সংক্ষেপে
+Kubernetes best practices—efficiency, security, scalability, reliability—modern DevOps workflow-এর foundation। Cluster ও application management আরও সহজ ও automated হয়।
+
+---
+
+**পরবর্তী টপিক:** [Secrets Management (Vault / AWS Secrets Manager)](/dev-ops/secrets-management)

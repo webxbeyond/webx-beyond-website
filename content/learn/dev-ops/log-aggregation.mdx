@@ -1,0 +1,70 @@
+---
+title: Log Aggregation & Analysis
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Log Aggregation ও Analysis—modern DevOps-এ distributed system, application, network-এর log collect, search, visualize ও troubleshoot করার জন্য essential। এই টিউটোরিয়ালে concept, setup, integration, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Log Aggregation কী?
+- Multiple server/app/network log central location-এ collect
+- Scalable, searchable, retention policy
+- Efficient troubleshooting
+
+### Aggregation Tool
+- ELK Stack (Elasticsearch, Logstash, Kibana)
+- Fluentd, Loki, Graylog
+
+## ২. Log Analysis কী?
+- Log search, filter, visualize
+- Error, anomaly, pattern detect
+- Alert, dashboard, report
+
+### Analysis Tool
+- Kibana, Grafana, Graylog
+- Custom dashboard, alert rule
+
+## ৩. Integration Workflow
+1. Log collect করুন (Logstash, Fluentd)
+2. Centralized storage (Elasticsearch, Loki)
+3. Visualization ও search (Kibana, Grafana)
+4. Alert rule configure করুন
+
+### Example: Logstash Config
+```conf
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    type => "nginx"
+  }
+}
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "nginx-logs"
+  }
+}
+```
+
+## ৪. Real-life Scenario
+- Distributed microservices log collect
+- Error, latency, traffic pattern detect
+- Automated alert—error spike হলে notification
+
+## ৫. Best Practices
+- Retention policy configure করুন
+- Dashboard modular করুন
+- Alert rule tune করুন
+- Security (user access, data privacy)
+- Automated backup
+
+## ৬. Tool Integration
+- Jenkins pipeline log aggregation
+- Cloud log integration (AWS CloudWatch, GCP Logging)
+- Incident management tool
+
+## সংক্ষেপে
+Log Aggregation ও Analysis—efficient troubleshooting, fast issue detection, scalable monitoring—DevOps workflow reliable ও resilient হয়।
+
+---
+
+**পরবর্তী টপিক:** [Kubernetes পরিচিতি](/dev-ops/kubernetes-intro)

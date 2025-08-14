@@ -1,0 +1,125 @@
+---
+title: ডকার ডেমো
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker-এর ব্যবহার শুধু থিওরি নয়—প্র্যাকটিক্যাল ডেমোতে container build, run, network, volume, এবং automation workflow দেখলে DevOps skill আরও শক্তিশালী হয়। এই টিউটোরিয়ালে আমরা Docker-এর হাতে-কলমে ডেমো, step-by-step command, এবং বাস্তব workflow দেখাবো।
+
+---
+
+## Step 1: Docker Install
+
+- Windows/Mac: Docker Desktop
+- Linux: `sudo apt install docker.io`
+
+---
+
+## Step 2: Simple Container Run
+
+```bash
+docker run -d -p 8080:80 nginx:latest
+```
+- nginx container 8080 port-এ রান হবে
+- Browser-এ `localhost:8080` খুলুন
+
+---
+
+## Step 3: Custom App Build & Run
+
+**Dockerfile:**
+```Dockerfile
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "start"]
+```
+
+**Build Image:**
+```bash
+docker build -t my-node-app:1.0 .
+```
+
+**Run Container:**
+```bash
+docker run -d -p 3000:3000 my-node-app:1.0
+```
+
+---
+
+## Step 4: Volume Attach
+
+```bash
+docker run -d -v mydata:/data nginx:latest
+```
+- Persistent data `/data` path-এ store হবে
+
+---
+
+## Step 5: Network Create & Connect
+
+```bash
+docker network create mynet
+docker run -d --name web --network mynet nginx:latest
+docker run -d --name db --network mynet mysql:latest
+```
+- web ও db container একই network-এ
+
+---
+
+## Step 6: Docker Compose Demo
+
+**docker-compose.yml:**
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+```
+
+**Run Compose:**
+```bash
+docker-compose up -d
+docker-compose down
+```
+
+---
+
+## Step 7: Automation Script
+
+**deploy.sh:**
+```bash
+#!/bin/bash
+docker build -t my-app:1.0 .
+docker run -d -p 4000:4000 my-app:1.0
+```
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি production server-এ automation script দিয়ে build, deploy, scale—all Docker command automate করে।
+
+---
+
+## Best Practices
+
+- Dockerfile minimal ও secure রাখুন
+- Compose file version/tag ব্যবহার করুন
+- Volume/network properly configure করুন
+- Automation script-এ error handling যোগ করুন
+
+---
+
+## Conclusion
+
+Docker ডেমোতে হাতে-কলমে container build, run, network, volume, compose, automation—সব workflow দেখলে DevOps skill বাস্তবভাবে grow করে। Practice ও automation script-এ এই ডেমো workflow ব্যবহার করুন—আপনার container management next level হবে!
+
+পরবর্তী টিউটোরিয়ালে Docker Compose, Dockerfile, এবং advanced orchestration নিয়ে বিস্তারিত আলোচনা করা হবে।

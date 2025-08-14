@@ -1,0 +1,111 @@
+---
+title: ক্লিনআপ পলিসি ও নির্ধারিত কাজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+Nexus Repository Manager-এ ক্লিনআপ পলিসি (Cleanup Policy) এবং নির্ধারিত কাজ (Scheduled Task)—এই দুটি ফিচার স্টোরেজ অপ্টিমাইজেশন, অটোমেটেড মেইনটেন্যান্স, এবং ডেটা ম্যানেজমেন্টের জন্য অত্যন্ত গুরুত্বপূর্ণ। এই টিউটোরিয়ালে আমরা ক্লিনআপ পলিসি কনফিগারেশন, Scheduled Task সেটআপ, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করব।
+
+---
+
+## Cleanup Policy কী?
+
+Cleanup Policy হচ্ছে এমন একটি নিয়ম, যা অনুযায়ী Nexus পুরাতন, অপ্রয়োজনীয়, বা এক্সপায়ার্ড আর্টিফ্যাক্ট/কম্পোনেন্ট/অ্যাসেট অটোমেটেডভাবে ডিলিট করে।
+
+**কেন দরকার?**
+- স্টোরেজ অপ্টিমাইজেশন
+- পুরাতন/অপ্রয়োজনীয় ডেটা রিমুভ
+- পারফরম্যান্স ও সিকিউরিটি
+
+---
+
+## Cleanup Policy কনফিগারেশন
+
+### ১. UI দিয়ে পলিসি তৈরি
+
+Nexus UI > Administration > Cleanup Policies > Create Policy
+
+- Name: `old-artifact-cleanup`
+- Criteria: Last downloaded, Created date, Tag, Format
+
+### ২. REST API দিয়ে পলিসি তৈরি
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "old-artifact-cleanup",
+    "criteria": {
+      "lastDownloaded": "30d"
+    }
+  }' \
+  http://localhost:8081/service/rest/v1/cleanup/policies
+```
+
+### ৩. পলিসি অ্যাসাইন করা
+
+- Repository > Settings > Cleanup Policy
+
+---
+
+## Scheduled Task কী?
+
+Scheduled Task হচ্ছে এমন একটি অটোমেটেড কাজ, যা নির্দিষ্ট সময়/ইন্টারভালে Nexus-এ রান হয়।
+
+**কেন দরকার?**
+- Cleanup Policy apply করা
+- Blob Store compact/repair
+- Database backup
+- Security audit
+
+---
+
+## Scheduled Task কনফিগারেশন
+
+### ১. UI দিয়ে Task তৈরি
+
+Nexus UI > Administration > Scheduled Tasks > Create Task
+
+- Task Type: `Cleanup unused components`, `Compact blob store`, `Backup database`, etc.
+- Schedule: Daily, Weekly, Custom cron
+
+### ২. REST API দিয়ে Task তৈরি
+```bash
+curl -u admin:yourpassword -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "daily-cleanup",
+    "typeId": "cleanupUnusedComponents",
+    "schedule": {
+      "type": "daily",
+      "time": "02:00"
+    },
+    "properties": {
+      "repositoryName": "my-repo",
+      "policyName": "old-artifact-cleanup"
+    }
+  }' \
+  http://localhost:8081/service/rest/v1/tasks
+```
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+**Case Study:**
+একটি কোম্পানি তাদের Nexus-এ "old-artifact-cleanup" নামে Cleanup Policy তৈরি করে এবং "daily-cleanup" নামে Scheduled Task সেট করে। এতে প্রতিদিন রাত ২টায় পুরাতন, অপ্রয়োজনীয় আর্টিফ্যাক্ট অটোমেটেডভাবে ডিলিট হয়, ফলে স্টোরেজ অপ্টিমাইজড থাকে এবং ম্যানুয়াল মেইনটেন্যান্সের প্রয়োজন হয় না।
+
+---
+
+## Best Practices
+
+- Cleanup Policy নিয়মিত রিভিউ করুন
+- Scheduled Task-এর লগ মনিটর করুন
+- Blob Store compact/repair Task ব্যবহার করুন
+- Automation script-এ credentials encrypt করুন
+- Disaster recovery plan রাখুন
+
+---
+
+## Conclusion
+
+Nexus-এ Cleanup Policy ও Scheduled Task ব্যবহার করে আপনি স্টোরেজ অপ্টিমাইজেশন, অটোমেটেড ডেটা মেইনটেন্যান্স, এবং সিকিউরিটি নিশ্চিত করতে পারবেন। DevOps pipeline-এ এই ফিচারগুলো ব্যবহার করলে workflow আরও efficient ও scalable হয়।
+
+এই সিরিজের পরবর্তী টিউটোরিয়ালে Docker, Jenkins, এবং আরও advanced DevOps টপিক নিয়ে আলোচনা করা হবে।

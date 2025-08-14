@@ -1,0 +1,95 @@
+---
+title: ডকার বনাম ভার্চুয়াল মেশিন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker (কন্টেইনার) ও Virtual Machine (VM)—দুইটি প্রযুক্তি সফটওয়্যার ডেলিভারি ও ইনফ্রাস্ট্রাকচার ম্যানেজমেন্টে বিপ্লব এনেছে। কিন্তু এদের মধ্যে পার্থক্য, ব্যবহার, এবং DevOps pipeline-এ কোনটা কখন ব্যবহার করবেন—এই টিউটোরিয়ালে সহজ ভাষায়, উদাহরণসহ, বিস্তারিত আলোচনা করা হবে।
+
+---
+
+## Virtual Machine (VM) কী?
+
+- VM হচ্ছে hardware-level virtualization
+- প্রতিটি VM-এ আলাদা OS, kernel, filesystem
+- Hypervisor (VMware, VirtualBox, Hyper-V) দিয়ে VM চালানো হয়
+- Resource usage বেশি, startup slow
+
+**Example:**
+- Windows-এ VirtualBox দিয়ে Ubuntu VM চালানো
+
+---
+
+## Docker (Container) কী?
+
+- Docker হচ্ছে OS-level virtualization
+- Host OS-এর kernel শেয়ার করে
+- Lightweight, fast, resource-efficient
+- Container-এ app, dependency, config—all packaged
+
+**Example:**
+- Windows-এ Docker Desktop দিয়ে nginx container চালানো
+
+---
+
+## Docker vs VM: পার্থক্য
+
+| বিষয়           | Docker (Container)               | Virtual Machine (VM)           |
+|----------------|----------------------------------|-------------------------------|
+| Virtualization | OS-level                         | Hardware-level                |
+| Resource usage | Lightweight                      | Heavyweight                   |
+| Startup time   | Seconds                          | Minutes                       |
+| Isolation      | Process-level                    | Full OS-level                 |
+| Portability    | High                             | Medium                        |
+| Management     | Easy (Docker, Kubernetes)        | Complex (VMware, Hyper-V)     |
+| Security       | Moderate (shared kernel)         | Strong (full isolation)       |
+| Use case       | Microservices, CI/CD, DevOps     | Legacy apps, full OS testing  |
+
+---
+
+## Workflow: VM vs Docker
+
+**VM Workflow:**
+1. Hypervisor install
+2. VM create (OS install)
+3. App install/configure
+4. Resource allocate (RAM, CPU, Disk)
+
+**Docker Workflow:**
+1. Docker install
+2. Image pull/build
+3. Container run
+4. Resource limit set (optional)
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study 1:**
+একটি SaaS কোম্পানি production server-এ Docker container ব্যবহার করে—fast deployment, low resource usage, easy scaling.
+
+**Case Study 2:**
+Legacy app বা full OS testing-এর জন্য VM ব্যবহার—e.g. Windows XP VM-এ পুরাতন সফটওয়্যার টেস্ট করা।
+
+---
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Docker:** Modern app, microservices, CI/CD, fast deployment, resource efficiency
+- **VM:** Legacy app, full OS isolation, security-critical workload, OS-level testing
+
+---
+
+## Best Practices
+
+- Docker container-এ minimal image ব্যবহার করুন
+- VM-এ resource allocation optimize করুন
+- Security-critical workload-এ VM prefer করুন
+- Hybrid approach: কিছু workload VM-এ, কিছু Docker-এ
+
+---
+
+## Conclusion
+
+Docker ও VM—দুটিই DevOps-এ গুরুত্বপূর্ণ। Docker দিয়ে fast, efficient, portable deployment সম্ভব; VM দিয়ে full OS isolation, legacy app support, এবং security-critical workload handle করা যায়।
+
+পরবর্তী টিউটোরিয়ালে Docker architecture, Docker command, এবং advanced container management নিয়ে বিস্তারিত আলোচনা করা হবে।

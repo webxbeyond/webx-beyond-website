@@ -1,0 +1,82 @@
+---
+title: Playbooks & Roles
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Ansible Playbook ও Role—automation workflow modular, readable, reusable ও scalable করে। এই টিউটোরিয়ালে playbook structure, role concept, বাস্তব উদাহরণ, এবং best practices দেখানো হয়েছে।
+
+## ১. Playbook কী?
+- YAML-এ লেখা automation script
+- Multiple task, host, variable, handler
+- Sequential execution
+
+### Playbook Example
+```yaml
+---
+- name: Web server setup
+  hosts: web
+  become: yes
+  vars:
+    nginx_port: 8080
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+    - name: Start NGINX
+      service:
+        name: nginx
+        state: started
+```
+
+## ২. Role কী?
+- Playbook-এর reusable module
+- Directory structure: tasks, handlers, files, templates, vars
+- Code reuse, team collaboration, standardization
+
+### Role Structure Example
+```
+roles/
+  webserver/
+    tasks/
+      main.yml
+    handlers/
+      main.yml
+    files/
+    templates/
+    vars/
+      main.yml
+```
+
+### Role Usage in Playbook
+```yaml
+---
+- hosts: web
+  become: yes
+  roles:
+    - webserver
+```
+
+## ৩. Real-life Scenario
+- Webserver role—NGINX install, config, start
+- Database role—MySQL install, user setup
+- Multiple server-এ একই role reuse
+
+## ৪. Best Practices
+- Role modular করুন
+- Variable ও template ব্যবহার করুন
+- Version control-এ role রাখুন
+- Documentation লিখুন
+- Galaxy থেকে community role ব্যবহার করুন
+
+## ৫. Tool Integration
+- Jenkins pipeline-এ playbook/role run
+- Cloud provisioning
+- Monitoring tool integration
+
+## সংক্ষেপে
+Playbook ও Role—Ansible automation workflow-এর backbone। Modular, reusable, scalable automation—DevOps efficiency ও quality নিশ্চিত করে।
+
+---
+
+**পরবর্তী টপিক:** [Puppet / Chef overview](/dev-ops/puppet-chef)

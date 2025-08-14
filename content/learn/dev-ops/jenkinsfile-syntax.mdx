@@ -1,0 +1,138 @@
+---
+title: Jenkinsfile সিনট্যাক্স
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Declarative ও Scripted Pipeline Explained
+
+Jenkinsfile হচ্ছে Jenkins Pipeline automation-এর কোড, যা version control-এ রাখা হয়। এই টিউটোরিয়ালে Declarative ও Scripted syntax, key concepts, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Declarative Pipeline Syntax
+- Structure: `pipeline { ... }`
+- Stages, steps, agent, environment
+
+### Example:
+```groovy
+pipeline {
+  agent any
+  environment {
+    NODE_ENV = 'production'
+    SECRET = credentials('my-secret')
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'npm install'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh 'npm run deploy'
+      }
+    }
+  }
+  post {
+    success {
+      echo 'Build Success!'
+    }
+    failure {
+      echo 'Build Failed!'
+    }
+  }
+}
+```
+
+## ২. Scripted Pipeline Syntax
+- Structure: `node { ... }`
+- Flexible, Groovy-based
+
+### Example:
+```groovy
+node {
+  stage('Build') {
+    sh 'npm install'
+  }
+  stage('Test') {
+    sh 'npm test'
+  }
+  stage('Deploy') {
+    sh 'npm run deploy'
+  }
+}
+```
+
+## ৩. Key Concepts
+- **agent:** Where pipeline runs (any, docker, label)
+- **environment:** Env variables, credentials
+- **stages:** Multiple steps (build, test, deploy)
+- **steps:** Shell, script, tool
+- **post:** Success/failure actions
+- **parameters:** User input
+- **parallel:** Multiple stages at once
+
+## ৪. Credentials & Secrets
+- `credentials('id')` for secret binding
+- Example:
+```groovy
+environment {
+  SECRET = credentials('my-secret')
+}
+```
+
+## ৫. Error Handling
+- `try/catch` in scripted
+- `post` block in declarative
+
+## ৬. Advanced Features
+- Matrix, parallel, input, timeout
+- Example:
+```groovy
+stages {
+  stage('Test') {
+    parallel {
+      stage('Unit') { steps { sh 'npm run test:unit' } }
+      stage('Integration') { steps { sh 'npm run test:integration' } }
+    }
+  }
+}
+```
+
+## রিয়েল লাইফ উদাহরণ: Node.js CI/CD Jenkinsfile
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Build') { steps { sh 'npm install' } }
+    stage('Test') { steps { sh 'npm test' } }
+    stage('Deploy') { steps { sh 'npm run deploy' } }
+  }
+  post {
+    success { echo 'Deployed!' }
+    failure { echo 'Error!' }
+  }
+}
+```
+
+## সেরা প্র্যাকটিস
+- Declarative syntax prefer করুন
+- Jenkinsfile version control-এ রাখুন
+- Stage naming convention
+- Secrets credentials manager-এ
+- Error handling
+
+## টিম ও Collaboration
+- Shared Jenkinsfile
+- PR-এ pipeline test
+- Build status dashboard
+
+## সংক্ষেপে
+Jenkinsfile সিনট্যাক্স শিখলে Jenkins Pipeline automation, visibility ও reliability বাড়ে—DevOps টিমের productivity নিশ্চিত হয়।
+
+---
+
+**পরবর্তী টপিক:** [সম্পূর্ণ পাইপলাইন](/dev-ops/full-pipeline)

@@ -1,0 +1,126 @@
+---
+title: Container Security & Image Scanning
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেভঅপসে কন্টেইনার নিরাপত্তা ও ইমেজ স্ক্যানিং অত্যন্ত গুরুত্বপূর্ণ। Docker, Kubernetes, ও cloud-native environment-এ container security নিশ্চিত না করলে production environment ঝুঁকিপূর্ণ হয়ে পড়ে।
+
+## Container Security: কেন জরুরি?
+- Containers isolate application, কিন্তু host system-এর সাথে সংযোগ থাকে
+- Vulnerable image বা misconfigured container থেকে security breach হতে পারে
+- Secrets, credentials, network exposure—সবকিছুই container security-র অংশ
+
+## Common Container Security Risks
+- Vulnerable base image
+- Unpatched OS/package
+- Excessive privileges (root user)
+- Open ports
+- Secrets/credentials leak
+- Insecure network configuration
+
+# Best Practices for Container Security
+
+### ১. Minimal Base Image ব্যবহার করুন
+- `alpine`, `distroless` ইমেজ ব্যবহার করুন
+- Unnecessary packages/remove করুন
+
+### ২. Non-root User ব্যবহার করুন
+Dockerfile-এ:
+```dockerfile
+FROM node:alpine
+RUN adduser -D appuser
+USER appuser
+```
+
+### ৩. Secrets/credentials container-এ hardcode করবেন না
+- Environment variables বা external secrets manager ব্যবহার করুন
+
+### ৪. Only required ports expose করুন
+```dockerfile
+EXPOSE 8080
+```
+
+### ৫. Read-only filesystem
+- Container run করার সময় read-only flag ব্যবহার করুন
+```bash
+docker run --read-only ...
+```
+
+### ৬. Resource limits enforce করুন
+```yaml
+# Kubernetes YAML
+resources:
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+```
+
+### ৭. Regularly update images
+- Latest security patches apply করুন
+- Automated build pipeline ব্যবহার করুন
+
+# Image Scanning: Vulnerability Detection
+
+### Image Scanning Tools
+- **Trivy:** Open source, fast, easy to use
+- **Clair:** Static analysis for vulnerabilities
+- **Anchore:** Policy-based image scanning
+- **Docker Hub:** Built-in scanning
+
+### Trivy Practical Example
+```bash
+# Install Trivy
+sudo apt install trivy
+
+# Scan local image
+trivy image node:alpine
+
+# Scan Dockerfile
+trivy config ./Dockerfile
+```
+
+### CI/CD Pipeline-এ Image Scanning
+- Build pipeline-এ image scan stage add করুন
+- Vulnerability found হলে build fail করুন
+
+### Kubernetes Admission Controller
+- Image scan result অনুযায়ী deployment block করুন
+- OPA/Gatekeeper, Kyverno ব্যবহার করুন
+
+# Real Life Scenario: Secure Deployment Workflow
+
+ধরা যাক, আপনি একটি Node.js অ্যাপ Docker-এ containerize করেছেন।
+- Minimal base image (`node:alpine`) ব্যবহার করুন
+- Non-root user configure করুন
+- Trivy দিয়ে image scan করুন
+- Vulnerability-free image deploy করুন
+- Kubernetes-এ resource limits enforce করুন
+
+**Benefits:**
+- Attack surface কমে যাবে
+- Vulnerability early detect হবে
+- Production environment নিরাপদ থাকবে
+
+# Common Mistakes & Solutions
+- **Mistake:** Root user দিয়ে container run
+  - **Solution:** Non-root user ব্যবহার করুন
+- **Mistake:** Old/unpatched image
+  - **Solution:** Regularly update & scan
+- **Mistake:** Secrets Dockerfile-এ hardcode
+  - **Solution:** External secrets manager
+
+# Conclusion
+
+Container security ও image scanning—DevOps workflow-এর অপরিহার্য অংশ। Automation, best practices, এবং vulnerability scanning follow করলে production environment অনেক বেশি নিরাপদ হবে।
+
+**Practice:**
+- Dockerfile-এ non-root user configure করুন
+- Trivy দিয়ে image scan করুন
+- Kubernetes-এ resource limits enforce করুন
+
+**Next Steps:**
+- Compliance basics শিখুন
+
+---
+
+**পরবর্তী পাঠ:** [Compliance Basics](/dev-ops/compliance-intro)

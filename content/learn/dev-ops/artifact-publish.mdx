@@ -1,0 +1,84 @@
+---
+title: রিপোজিটরিতে আর্টিফ্যাক্ট পাবলিশ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps workflow-এ build করা artifact/package/versioned file automated pipeline-এ artifact repository-তে publish করা হয়। এখানে সহজ ভাষায়, publish process, টুলস, DevOps-এ গুরুত্ব, বাস্তব উদাহরণ, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## কেন publish করবেন?
+- Centralized storage
+- Automated deploy/distribution
+- Versioning, access control
+- Team collaboration
+
+## Publish Steps
+
+### ১. Build Artifact প্রস্তুত
+- Example: `.jar`, `.zip`, `dist/`, Docker image
+
+### ২. Repository config/setup
+- Nexus/JFrog/GitHub Packages
+- Hosted/proxy/group repository
+
+### ৩. Build Tool Integration
+- **Maven:**
+    ```xml
+    <distributionManagement>
+      <repository>
+        <id>nexus</id>
+        <url>http://your_nexus_server/repository/maven-releases/</url>
+      </repository>
+    </distributionManagement>
+    ```
+    ```bash
+    mvn deploy
+    ```
+- **npm:**
+    ```bash
+    npm publish --registry http://your_nexus_server/repository/npm-hosted/
+    ```
+- **Docker:**
+    ```bash
+    docker login your_nexus_server:8082
+    docker tag myapp:1.0 your_nexus_server:8082/myapp:1.0
+    docker push your_nexus_server:8082/myapp:1.0
+    ```
+- **PyPI:**
+    ```bash
+    twine upload --repository-url http://your_nexus_server/repository/pypi-hosted/ dist/*
+    ```
+
+### ৪. Automated Pipeline
+- CI/CD pipeline-এ publish step
+- Example: GitHub Actions/Jenkins
+
+## DevOps-এ গুরুত্ব
+- Automated build/publish/deploy
+- Versioned artifact management
+- Team collaboration
+- Security/access control
+
+## বাস্তব উদাহরণ
+
+> "আমরা Maven দিয়ে jar build করি—pipeline-এ automated deploy করি। npm package build করে—Nexus-এ publish করি। Docker image build করে—Nexus-এ push করি। PyPI package build করে—Nexus-এ upload করি। Production-এ automated pipeline-এ publish/manage করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Publish fail:** Credential/config/repository type চেক করুন
+- **Access denied:** User/role/config চেক করুন
+- **Version conflict:** Artifact naming/versioning ঠিক করুন
+- **Manual error:** Automated pipeline/script ব্যবহার করুন
+
+## টিপস
+- Automated build/publish pipeline ব্যবহার করুন
+- Access control/security setup করুন
+- Artifact naming/versioning convention follow করুন
+- Monitoring/logging setup করুন
+
+## সংক্ষেপে
+- Artifact/package publish process—automation, versioning, security, team collaboration সহজ করে
+- Manual error কমাতে automation/pipeline/setup ব্যবহার করুন
+- Security, backup, monitoring—manager-এর built-in সুবিধা নিন
+
+---
+
+**পরবর্তী পাঠ:** [Nexus REST API](/dev-ops/nexus-rest-api)

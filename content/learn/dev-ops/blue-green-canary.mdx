@@ -1,0 +1,99 @@
+---
+title: Blue-Green & Canary Deployment
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Blue-Green এবং Canary Deployment—দুইটি modern deployment strategy, যা production-এ নতুন release zero-downtime ও minimal risk-এ deploy করতে সাহায্য করে। এই টিউটোরিয়ালে concept, setup, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Blue-Green Deployment কী?
+- Production environment-এ দুটি identical setup: Blue (current), Green (new)
+- New version deploy হয় Green-এ
+- Traffic switch করে Blue থেকে Green-এ
+- Rollback সহজ—Blue-তে traffic ফেরত
+
+### Example Workflow
+1. Blue: live production
+2. Green: new version deploy
+3. QA/test Green
+4. Switch traffic to Green
+5. Blue becomes standby
+
+### Jenkins Pipeline Example
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Deploy Green') {
+      steps {
+        sh './deploy-green.sh'
+      }
+    }
+    stage('Switch Traffic') {
+      steps {
+        sh './switch-traffic.sh green'
+      }
+    }
+  }
+}
+```
+
+## ২. Canary Deployment কী?
+- New version deploy হয় small user group-এ
+- Gradually traffic increase
+- Issue detect হলে rollback
+- Risk কম, feedback দ্রুত
+
+### Example Workflow
+1. Deploy new version to 5% users
+2. Monitor error/performance
+3. Gradually increase to 25%, 50%, 100%
+4. Issue হলে rollback
+
+### Jenkins Pipeline Example
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Deploy Canary') {
+      steps {
+        sh './deploy-canary.sh --percent=5'
+      }
+    }
+    stage('Monitor') {
+      steps {
+        sh './monitor.sh'
+      }
+    }
+    stage('Increase Traffic') {
+      steps {
+        sh './deploy-canary.sh --percent=25'
+      }
+    }
+  }
+}
+```
+
+## ৩. Real-life Scenario
+- E-commerce site—new feature Canary-তে deploy
+- Issue detect হলে rollback
+- Stable হলে Blue-Green switch
+
+## ৪. Best Practices
+- Automated monitoring
+- Rollback strategy
+- Gradual traffic increase
+- QA/test before full switch
+- Documentation
+
+## ৫. Tool Integration
+- Jenkins pipeline
+- Load balancer (NGINX, HAProxy)
+- Cloud platform (AWS, GCP, Azure)
+- Monitoring tool (Prometheus, Grafana)
+
+## সংক্ষেপে
+Blue-Green ও Canary Deployment—modern DevOps strategy, যা zero-downtime, risk mitigation, এবং fast feedback নিশ্চিত করে। Production release আরও safe ও efficient হয়।
+
+---
+
+**পরবর্তী টপিক:** [Ansible পরিচিতি](/dev-ops/ansible-intro)

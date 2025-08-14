@@ -1,0 +1,73 @@
+---
+title: জাভাস্ক্রিপ্ট অ্যাপ্লিকেশন বিল্ড করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট অ্যাপ্লিকেশন (Node.js, React, Vue, Angular) বিল্ড করার জন্য বিভিন্ন টুলস ও স্টেপ থাকে। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, বিল্ড প্রসেস দেখানো হলো।
+
+## কেন বিল্ড করা হয়?
+- কোড অপ্টিমাইজ, মিনিফাই, ট্রান্সপাইল, ডিপ্লয় করার জন্য
+- Source code → optimized build → deployable artifact
+
+## কমন বিল্ড টুলস
+- **npm/yarn/pnpm:** Node.js ecosystem
+- **Webpack:** Module bundler
+- **Parcel, Vite:** Modern JS build tools
+- **Babel:** JS transpiler
+- **ESLint, Prettier:** Code quality
+
+## বিল্ড প্রসেস
+
+### ১. প্রজেক্ট তৈরি
+```bash
+npx create-react-app my-app
+cd my-app
+```
+
+### ২. ডিপেন্ডেন্সি ইনস্টল
+```bash
+npm install
+```
+
+### ৩. বিল্ড স্ক্রিপ্ট
+- `package.json`-এ "build" script থাকে:
+    ```json
+    "scripts": {
+      "build": "react-scripts build"
+    }
+    ```
+
+### ৪. বিল্ড কমান্ড চালানো
+```bash
+npm run build
+```
+- Output: `build/` বা `dist/` ফোল্ডারে optimized files
+
+### ৫. Production Deploy
+- Build output server-এ upload/deploy করুন
+- Example: Netlify, Vercel, AWS S3, Docker
+
+## বাস্তব উদাহরণ
+
+> "আমরা React অ্যাপ বানাই—`npm run build` দিয়ে optimized build পাই। তারপর Netlify-তে deploy করি। Node.js API হলে—`npm run build` দিয়ে dist ফোল্ডার পাই, Docker image বানিয়ে server-এ deploy করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Build fail:** Dependency/version mismatch—`npm install` দিয়ে fix করুন
+- **Outdated Node/npm:** Latest version install করুন
+- **Permission denied:** Output directory/write permission চেক করুন
+- **Environment variable ভুল:** `.env` ফাইল চেক করুন
+
+## টিপস
+- Build script automate করুন (CI/CD)
+- Production build always optimized/minified
+- Static assets (images, CSS) ঠিকভাবে include করুন
+- Build output test করুন—deployment আগে
+
+## সংক্ষেপে
+- JS অ্যাপ বিল্ড করতে npm/yarn, Webpack/Vite, Babel ইত্যাদি টুল লাগে
+- Build output deployable artifact—server/cloud-এ deploy করা যায়
+- Automation, optimization, error handling—সবকিছু চেক করুন
+
+---
+
+**পরবর্তী পাঠ:** [বিল্ড টুলস ও ডকার](/dev-ops/build-tools-docker)

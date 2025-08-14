@@ -1,0 +1,74 @@
+---
+title: উইন্ডোজ/MacOS-Unix ব্যবহারকারীদের জন্য ইনস্টলেশন সহায়তা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বিভিন্ন অপারেটিং সিস্টেমে বিল্ড টুলস ইনস্টল করার নিয়ম, কমন সমস্যা, ও সমাধান এখানে দেওয়া হলো।
+
+## Windows
+- **Installer:** Node.js, Python, Docker—official installer ব্যবহার করুন
+- **Chocolatey:**
+    ```powershell
+    choco install nodejs python docker maven gradle cmake
+    ```
+- **PATH Issue:** Installer শেষে PATH variable ঠিকভাবে সেট হয়েছে কিনা চেক করুন
+- **Admin Permission:** কিছু টুল ইনস্টল করতে admin access লাগতে পারে
+- **PowerShell/Command Prompt:** টার্মিনালে version চেক করুন
+    ```powershell
+    node -v; python --version; docker --version
+    ```
+
+## MacOS
+- **Homebrew:**
+    ```bash
+    brew install node python docker maven gradle cmake
+    ```
+- **Installer:** Docker Desktop, Node.js—official installerও ব্যবহার করা যায়
+- **PATH Issue:** Homebrew ইনস্টল শেষে PATH ঠিক আছে কিনা চেক করুন
+- **Terminal:**
+    ```bash
+    node -v; python --version; docker --version
+    ```
+
+## Linux (Ubuntu/Debian)
+- **APT:**
+    ```bash
+    sudo apt update
+    sudo apt install nodejs npm python3 python3-pip docker.io maven gradle cmake
+    ```
+- **Permission:** Docker চালাতে user-কে docker group-এ যুক্ত করুন
+    ```bash
+    sudo usermod -aG docker $USER
+    ```
+- **PATH Issue:** apt ইনস্টল করলে সাধারণত PATH ঠিক থাকে
+
+## Linux (Fedora/RedHat)
+- **DNF/YUM:**
+    ```bash
+    sudo dnf install nodejs npm python3 python3-pip docker maven gradle cmake
+    ```
+
+## কমন সমস্যা ও সমাধান
+- **PATH variable ভুল:** Installer শেষে version চেক করুন, না দেখালে PATH ঠিক করুন
+- **Permission denied:** Admin/root access ব্যবহার করুন
+- **Old version:** Latest installer/package manager ব্যবহার করুন
+- **Docker চালাতে সমস্যা:** User-কে docker group-এ যুক্ত করুন, system restart করুন
+
+## বাস্তব উদাহরণ
+
+> "আমরা টিমে Windows-এ Chocolatey, Mac-এ Homebrew, Linux-এ apt/dnf দিয়ে build tools ইনস্টল করি। PATH, version, permission—সবকিছু চেক করি। Docker চালাতে user group issue হলে, usermod দিয়ে ঠিক করি।"
+
+## টিপস
+- Installer/package manager ব্যবহার করুন—manual install এড়িয়ে চলুন
+- Documentation/official guide অনুসরণ করুন
+- Version, PATH, permission—সবকিছু চেক করুন
+- Automated script দিয়ে ইনস্টলেশন সহজ করুন
+
+## সংক্ষেপে
+- OS অনুযায়ী build tools ইনস্টলেশন নিয়ম আলাদা
+- PATH, version, permission—সবকিছু চেক করা জরুরি
+- কমন সমস্যা ও সমাধান জানা থাকলে ইনস্টলেশন সহজ হয়
+
+---
+
+**পরবর্তী পাঠ:** [একটি আর্টিফ্যাক্ট বিল্ড ও প্রকাশ করা](/dev-ops/artifact-build-publish)

@@ -1,0 +1,71 @@
+---
+title: Database Types
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডাটাবেজ বিভিন্ন ধরনের হয়—প্রয়োজন, স্কেল, ও ডাটা স্ট্রাকচারের উপর ভিত্তি করে।
+
+## ১. Relational Database (RDBMS)
+- **উদাহরণ:** MySQL, PostgreSQL, Oracle, SQL Server
+- **বৈশিষ্ট্য:**
+  - টেবিল, রো, কলাম
+  - SQL (Structured Query Language) দিয়ে ডাটা ম্যানেজ
+  - রিলেশন, ফরেন কি, নরমালাইজেশন
+- **ব্যবহার:** ইউজার, অর্ডার, ট্রানজেকশন, রিপোর্টিং
+
+## ২. NoSQL Database
+- **উদাহরণ:** MongoDB, Cassandra, Redis, DynamoDB
+- **বৈশিষ্ট্য:**
+  - Schema-less, flexible structure
+  - Document, Key-Value, Graph, Column-based
+  - High scalability, distributed
+- **ব্যবহার:** Big data, real-time analytics, caching, IoT
+
+## ৩. In-memory Database
+- **উদাহরণ:** Redis, Memcached
+- **বৈশিষ্ট্য:**
+  - RAM-এ ডাটা রাখে, দ্রুত অ্যাক্সেস
+  - Caching, session management
+- **ব্যবহার:** Fast lookup, temporary storage
+
+## ৪. Graph Database
+- **উদাহরণ:** Neo4j, ArangoDB
+- **বৈশিষ্ট্য:**
+  - Node, edge, property
+  - Relationship-heavy data
+- **ব্যবহার:** Social network, recommendation engine
+
+## ৫. Time-series Database
+- **উদাহরণ:** InfluxDB, TimescaleDB
+- **বৈশিষ্ট্য:**
+  - Time-stamped data
+  - Monitoring, metrics, IoT
+- **ব্যবহার:** Server monitoring, sensor data
+
+## পার্থক্য ও ব্যবহার
+| ধরন         | Structure      | Scalability | Use Case                |
+|-------------|---------------|-------------|-------------------------|
+| Relational  | Fixed schema  | Medium      | Transaction, reporting  |
+| NoSQL       | Flexible      | High        | Big data, analytics     |
+| In-memory   | Key-value     | High        | Caching, session        |
+| Graph       | Node-edge     | Medium      | Relationship-heavy      |
+| Time-series | Time-stamped  | High        | Monitoring, metrics     |
+
+## বাস্তব উদাহরণ
+
+> "আমরা ইউজার, অর্ডার, রিপোর্টিং-এ PostgreSQL ব্যবহার করি। Real-time analytics, caching-এ MongoDB ও Redis। Monitoring-এ InfluxDB।"
+
+## টিপস
+- প্রয়োজন অনুযায়ী ডাটাবেজ ধরন বাছাই করুন
+- Relational—transactional data, NoSQL—big data/analytics
+- In-memory—performance, Graph—relationship-heavy
+- Time-series—metrics/logging
+
+## সংক্ষেপে
+- ডাটাবেজের ধরন, বৈশিষ্ট্য, ও ব্যবহার বুঝে নির্বাচন করুন
+- একাধিক ডাটাবেজ একসাথে ব্যবহার করা যায় (polyglot persistence)
+- স্কেল, পারফরম্যান্স, ও ডাটা স্ট্রাকচার—সবকিছু বিবেচনা করুন
+
+---
+
+**পরবর্তী পাঠ:** [SQL vs NoSQL](/dev-ops/sql-vs-nosql)

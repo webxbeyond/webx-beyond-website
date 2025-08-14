@@ -1,0 +1,78 @@
+---
+title: Terraform / Pulumi - Infrastructure as Code
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Infrastructure as Code (IaC) DevOps-এর automation, consistency, ও error-free provisioning-এর জন্য অপরিহার্য। এখানে সহজ ভাষায়, Terraform ও Pulumi দিয়ে IaC-এর ধারণা, ব্যবহার, বাস্তব উদাহরণ, কমন সমস্যা ও সমাধান দেওয়া হলো।
+
+## IaC (Infrastructure as Code) কী?
+- Manual server/resource provisioning-এর পরিবর্তে code/script দিয়ে automated provisioning
+- Version control, repeatability, automation
+
+## Terraform
+- HashiCorp-এর open-source IaC tool
+- Declarative language (HCL)
+- Multi-cloud support (AWS, GCP, Azure, DigitalOcean)
+- Example:
+    ```hcl
+    provider "aws" {
+      region = "us-east-1"
+    }
+    resource "aws_instance" "web" {
+      ami           = "ami-123456"
+      instance_type = "t2.micro"
+    }
+    ```
+- Command:
+    ```bash
+    terraform init
+    terraform plan
+    terraform apply
+    ```
+
+## Pulumi
+- Modern IaC tool—TypeScript, Python, Go, C# language support
+- Multi-cloud support
+- Example (TypeScript):
+    ```typescript
+    import * as aws from "@pulumi/aws";
+    const server = new aws.ec2.Instance("web", {
+      ami: "ami-123456",
+      instanceType: "t2.micro",
+    });
+    ```
+- Command:
+    ```bash
+    pulumi up
+    ```
+
+## DevOps-এ IaC-এর গুরুত্ব
+- Automated, repeatable infrastructure
+- Version control—Git-এ IaC code
+- Team collaboration
+- Error-free, fast provisioning
+
+## বাস্তব উদাহরণ
+
+> "আমরা Terraform দিয়ে AWS/GCP/DO-তে server/network/database automated provision করি। IaC code Git-এ version control করি। Pulumi দিয়ে TypeScript/Python-এ IaC লিখি—multi-cloud deploy করি। Production-এ IaC pipeline automate করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Resource drift:** Manual change avoid করুন—IaC code দিয়ে manage করুন
+- **Credential issue:** Provider config/check করুন
+- **Syntax error:** IaC code lint/test করুন
+- **Manual error:** Automated pipeline/script ব্যবহার করুন
+
+## টিপস
+- Always use IaC—manual provisioning এড়িয়ে চলুন
+- IaC code version control করুন—Git-এ
+- Automated pipeline/setup করুন—error-free provisioning
+- Documentation/best practices follow করুন
+
+## সংক্ষেপে
+- Terraform/Pulumi দিয়ে IaC—automation, consistency, error-free provisioning
+- Manual error কমাতে IaC code/pipeline ব্যবহার করুন
+- Version control, team collaboration—IaC-এর বড় সুবিধা
+
+---
+
+**পরবর্তী পাঠ:** [Serverless Basics (Lambda / Cloud Functions)](/dev-ops/serverless-intro)

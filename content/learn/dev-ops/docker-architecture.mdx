@@ -1,0 +1,113 @@
+---
+title: ডকারের আর্কিটেকচার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Docker-এর আর্কিটেকচার বুঝলে আপনি container management, orchestration, এবং DevOps pipeline-এ advanced automation সহজে করতে পারবেন। এই টিউটোরিয়ালে Docker-এর মূল component, workflow, এবং বাস্তব উদাহরণসহ architecture নিয়ে বিস্তারিত আলোচনা করা হবে।
+
+---
+
+## Docker Architecture Overview
+
+Docker মূলত তিনটি প্রধান অংশ নিয়ে গঠিত:
+1. **Docker Client**
+2. **Docker Daemon (Server)**
+3. **Docker Registry**
+
+---
+
+## Component Details
+
+### ১. Docker Client
+- User interface (CLI/GUI)
+- Command পাঠায় Docker Daemon-এ
+- Example: `docker run`, `docker build`, `docker push`
+
+### ২. Docker Daemon (dockerd)
+- Core engine, container management
+- Image build, container run, network, volume—all manage করে
+- REST API exposed
+
+### ৩. Docker Registry
+- Image store/retrieve
+- Public (Docker Hub), Private (Nexus, GitHub Container Registry)
+- Example: `docker pull nginx:latest`
+
+---
+
+## Workflow: Docker Architecture
+
+1. User CLI দিয়ে command দেয় (e.g. `docker run nginx`)
+2. Docker Client command পাঠায় Docker Daemon-এ
+3. Daemon image pull/check করে registry থেকে
+4. Daemon container create/run/manage করে
+5. Container network, volume, resource—all manage হয়
+
+---
+
+## Docker Architecture Diagram
+
+```
++-------------------+
+|   Docker Client   |
++-------------------+
+          |
+          v
++-------------------+
+|  Docker Daemon    |
++-------------------+
+   |    |     |   |
+   v    v     v   v
+Image Network Volume Container
+   |                |
+   v                v
++-------------------+
+|  Docker Registry  |
++-------------------+
+```
+
+---
+
+## Docker Component Explained
+
+- **Image:** App, dependency, config packaged
+- **Container:** Running instance of image
+- **Network:** Container communication
+- **Volume:** Persistent storage
+- **Registry:** Image store/distribute
+
+---
+
+## বাস্তব উদাহরণ
+
+**Example 1:**
+আপনি `docker build` দিয়ে image তৈরি করলেন, `docker push` দিয়ে registry-তে পাঠালেন, তারপর production server-এ `docker pull` দিয়ে image এনে container চালালেন।
+
+**Example 2:**
+Multiple container (web, db, cache) Docker network-এ connect করে microservices deploy করলেন।
+
+---
+
+## Advanced: Orchestration & Security
+
+- **Docker Compose:** Multiple container deploy/manage
+- **Docker Swarm/Kubernetes:** Cluster orchestration
+- **Security:** Namespace, cgroups, image scan, secrets management
+
+---
+
+## Best Practices
+
+- Minimal image ব্যবহার করুন
+- Network segmentation করুন
+- Volume encryption ব্যবহার করুন
+- Registry authentication enforce করুন
+- Daemon security harden করুন
+
+---
+
+## Conclusion
+
+Docker-এর architecture বুঝলে container management, automation, security, এবং orchestration সহজ হয়। Client, Daemon, Registry—এই তিনটি component workflow-এ master করলে DevOps pipeline আরও efficient ও scalable হবে।
+
+পরবর্তী টিউটোরিয়ালে Docker command, Compose, এবং advanced container management নিয়ে বিস্তারিত আলোচনা করা হবে।

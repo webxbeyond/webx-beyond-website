@@ -1,0 +1,72 @@
+---
+title: Alerting & Metrics
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Alerting ও Metrics—modern DevOps-এ system, application, network health proactively monitor ও issue detect করার জন্য essential। এই টিউটোরিয়ালে concept, setup, integration, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Metrics কী?
+- Quantitative data—CPU, RAM, disk, latency, error rate
+- Time-series database-এ store
+- Visualization tool-এ dashboard
+
+### Metrics Collection Tool
+- Prometheus, Netdata, ELK, CloudWatch
+- Application-এ custom metrics expose (`/metrics` endpoint)
+
+## ২. Alerting কী?
+- Automated notification—issue detect হলে
+- Threshold, anomaly, event-based
+- Email, Slack, SMS, webhook
+
+### Alerting Tool
+- Prometheus Alertmanager, Grafana, ELK, Netdata
+- Custom alert rule configure
+
+## ৩. Integration Workflow
+1. Metrics collect করুন (Prometheus, Netdata)
+2. Visualization করুন (Grafana, Kibana)
+3. Alert rule configure করুন (Alertmanager, Netdata)
+4. Issue detect হলে notification
+
+### Example: Prometheus Alert Rule
+```yaml
+groups:
+- name: instance-down
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+```
+
+### Example: Netdata Alert
+- Web UI-তে alert configure
+- Email/Slack integration
+
+## ৪. Real-life Scenario
+- Server CPU > 90% হলে alert
+- Application error rate spike হলে notification
+- Automated incident response
+
+## ৫. Best Practices
+- Alert rule tune করুন (false positive কমান)
+- Escalation policy
+- Dashboard modular করুন
+- Retention policy
+- Security (alert channel, data privacy)
+
+## ৬. Tool Integration
+- Jenkins pipeline monitoring
+- Cloud alert integration (AWS SNS, GCP Pub/Sub)
+- Incident management tool (PagerDuty, Opsgenie)
+
+## সংক্ষেপে
+Alerting ও Metrics—proactive monitoring, fast issue detection, efficient troubleshooting—DevOps workflow reliable ও resilient হয়।
+
+---
+
+**পরবর্তী টপিক:** [Log Aggregation & Analysis](/dev-ops/log-aggregation)

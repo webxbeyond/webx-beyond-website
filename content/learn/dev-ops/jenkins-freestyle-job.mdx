@@ -1,0 +1,74 @@
+---
+title: ফ্রিস্টাইল জব
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Jenkins-এর Freestyle Job হচ্ছে সবচেয়ে সহজ ও flexible বিল্ড অটোমেশন টাস্ক। এই টিউটোরিয়ালে দেখানো হয়েছে কীভাবে Freestyle Job তৈরি, কনফিগার ও রান করবেন, এবং রিয়েল লাইফ workflow।
+
+## ১. Freestyle Job কী?
+- Simple build, test, deploy automation
+- GUI দিয়ে configure
+- Shell/batch script, build tool, SCM integration
+
+## ২. Freestyle Job তৈরি
+1. Jenkins UI > New Item
+2. Name দিন, "Freestyle project" select করুন
+3. OK ক্লিক করুন
+
+## ৩. Source Code Management
+- Git, SVN, Mercurial
+- Repo URL, credentials
+
+## ৪. Build Trigger
+- SCM polling
+- Schedule (CRON)
+- Manual trigger
+- Webhook
+
+## ৫. Build Steps
+- Shell/batch command
+- Build tool (Maven, Gradle, npm)
+- Custom script
+
+### Example:
+```bash
+echo "Build started"
+npm install
+npm run build
+echo "Build finished"
+```
+
+## ৬. Post-build Actions
+- Email notification
+- Archive artifacts
+- Deploy to server
+- Trigger other jobs
+
+## ৭. Build History ও Console Output
+- Success/failure status
+- Logs, duration
+- Re-run, delete build
+
+## রিয়েল লাইফ উদাহরণ: Node.js Freestyle Job
+1. New Freestyle Job create
+2. GitHub repo connect
+3. Build step: `npm install && npm run build`
+4. Post-build: email notification
+
+## সেরা প্র্যাকটিস
+- Job naming convention
+- Build script version control-এ রাখুন
+- Notification configure
+- Artifact archive
+
+## টিম ও Collaboration
+- Shared job config
+- Build status dashboard
+- PR-এ build trigger
+
+## সংক্ষেপে
+Freestyle Job দিয়ে Jenkins-এ সহজে build, test, deploy automation করা যায়—DevOps টিমের productivity বাড়ে।
+
+---
+
+**পরবর্তী টপিক:** [জেনকিন্সে ডকার ব্যবহার](/dev-ops/jenkins-docker)

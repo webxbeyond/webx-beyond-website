@@ -1,0 +1,71 @@
+---
+title: Kubernetes পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Kubernetes (K8s)—modern DevOps-এ container orchestration, automation, scalability ও reliability-এর জন্য industry standard। এই টিউটোরিয়ালে concept, architecture, workflow, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Kubernetes কী?
+- Open-source container orchestration platform
+- Automated deployment, scaling, management
+- Multi-cloud, hybrid, on-premise support
+
+## ২. Architecture
+- Cluster: master/control plane + worker node
+- Master: API server, scheduler, controller manager, etcd
+- Node: kubelet, container runtime (Docker/Containerd), kube-proxy
+- Pod: container group (smallest deployable unit)
+
+## ৩. Workflow
+1. Application containerize করুন (Docker)
+2. Kubernetes cluster setup করুন (Minikube, k3s, cloud)
+3. YAML-এ deployment, service, config define করুন
+4. kubectl দিয়ে deploy/manage করুন
+
+### Example: Deployment YAML
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: myrepo/webapp:latest
+        ports:
+        - containerPort: 80
+```
+
+## ৪. Real-life Scenario
+- ১০০+ microservice deploy, scale, update—single cluster-এ
+- Rolling update, self-healing, auto-scaling
+- Multi-cloud workload management
+
+## ৫. Best Practices
+- Resource request/limit define করুন
+- Namespace ব্যবহার করুন
+- RBAC (Role-based access control)
+- Health check (liveness/readiness probe)
+- Automated backup
+- Monitoring (Prometheus, Grafana)
+
+## ৬. Tool Integration
+- CI/CD pipeline (Jenkins, GitHub Actions)
+- Cloud provider integration (GKE, EKS, AKS)
+- Service mesh (Istio, Linkerd)
+
+## সংক্ষেপে
+Kubernetes—container orchestration-এর foundation। Automation, scalability, reliability—modern DevOps workflow efficient ও resilient হয়।
+
+---
+
+**পরবর্তী টপিক:** [Minikube / k3s / kind setup](/dev-ops/minikube-k3s-kind)

@@ -1,0 +1,88 @@
+---
+title: কন্টেইনার বনাম ইমেজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+কন্টেইনার ও ইমেজ—এই দুটি শব্দ Docker ও DevOps-এ খুবই গুরুত্বপূর্ণ, কিন্তু অনেকেই এদের মধ্যে পার্থক্য ও সম্পর্ক ঠিকভাবে বোঝেন না। এই টিউটোরিয়ালে আমরা সহজ ভাষায়, উদাহরণসহ, Container ও Image-এর পার্থক্য, সম্পর্ক, এবং workflow-এ ব্যবহার নিয়ে আলোচনা করব।
+
+---
+
+## কন্টেইনার কী?
+
+- কন্টেইনার হচ্ছে একটি রানিং environment, যেখানে অ্যাপ্লিকেশন ও তার dependency isolate হয়ে চলে
+- কন্টেইনার তৈরি হয় ইমেজ থেকে
+- কন্টেইনার runtime-এ পরিবর্তন হতে পারে
+
+**Example:**
+```bash
+docker run -d -p 8080:80 nginx:latest
+```
+এখানে nginx কন্টেইনার তৈরি হয়েছে nginx:latest ইমেজ থেকে
+
+---
+
+## ইমেজ কী?
+
+- ইমেজ হচ্ছে একটি static template/snapshot, যেখানে অ্যাপ্লিকেশন, dependency, config, environment variable—all packaged
+- ইমেজ read-only, runtime-এ পরিবর্তন হয় না
+- ইমেজ registry-তে store হয় (Docker Hub, Nexus, GitHub Container Registry)
+
+**Example:**
+```bash
+docker pull nginx:latest
+docker images
+```
+
+---
+
+## Container vs Image: পার্থক্য
+
+| বিষয়           | Container                        | Image                          |
+|----------------|----------------------------------|--------------------------------|
+| Nature         | Running instance                 | Static template                |
+| Mutability     | Mutable (runtime changes)        | Immutable (read-only)          |
+| Storage        | RAM/Filesystem                   | Registry/Disk                  |
+| Creation       | Image থেকে তৈরি হয়               | Dockerfile দিয়ে build হয়       |
+| Lifecycle      | Start/Stop/Delete                | Build/Push/Pull                |
+
+---
+
+## Workflow: Image থেকে Container
+
+1. **Build Image:**
+   - Dockerfile দিয়ে ইমেজ তৈরি
+   - Example: `docker build -t my-app:1.0 .`
+2. **Push Image:**
+   - Registry-তে ইমেজ push
+   - Example: `docker push my-app:1.0`
+3. **Pull Image:**
+   - অন্য environment-এ ইমেজ pull
+   - Example: `docker pull my-app:1.0`
+4. **Run Container:**
+   - ইমেজ থেকে কন্টেইনার তৈরি
+   - Example: `docker run -d my-app:1.0`
+
+---
+
+## বাস্তব উদাহরণ
+
+**Case Study:**
+একটি SaaS কোম্পানি তাদের Node.js অ্যাপ Dockerfile দিয়ে build করে, ইমেজ registry-তে push করে, তারপর production server-এ ইমেজ pull করে কন্টেইনার রান করে। এতে environment mismatch, dependency conflict হয় না।
+
+---
+
+## Best Practices
+
+- ইমেজ minimal ও secure রাখুন
+- Version/tag ব্যবহার করুন
+- ইমেজ scan করুন (security)
+- কন্টেইনারে resource limit দিন
+- কন্টেইনারে sensitive data না রাখুন
+
+---
+
+## Conclusion
+
+Image হচ্ছে static template, আর Container হচ্ছে তার running instance। DevOps pipeline-এ ইমেজ build/push/pull, আর কন্টেইনার run/stop/delete—এই workflow বুঝলে আপনি অ্যাপ্লিকেশন ডেলিভারি, স্কেলিং, ও অটোমেশন সহজে করতে পারবেন।
+
+পরবর্তী টিউটোরিয়ালে Docker vs VM, Docker architecture, এবং Docker command নিয়ে বিস্তারিত আলোচনা করা হবে।

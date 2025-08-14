@@ -1,0 +1,127 @@
+---
+title: SSH Keys, Firewall & User Roles
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেভঅপসে নিরাপত্তা নিশ্চিত করার জন্য SSH Keys, Firewall এবং User Roles অত্যন্ত গুরুত্বপূর্ণ। এই টিউটোরিয়ালে আমরা এগুলোর ব্যবহার, কনফিগারেশন ও সেরা প্র্যাকটিস নিয়ে আলোচনা করবো।
+
+## SSH Keys: নিরাপদ রিমোট অ্যাক্সেস
+
+### SSH কী?
+SSH (Secure Shell) হলো একটি প্রোটোকল, যা নিরাপদভাবে রিমোট সার্ভারে লগইন করতে ব্যবহৃত হয়। Password-এর পরিবর্তে SSH Key authentication ব্যবহার করলে নিরাপত্তা অনেক বেশি হয়।
+
+### SSH Key Generation (Linux/Windows)
+```bash
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+- `id_rsa` (private key) নিরাপদে রাখুন
+- `id_rsa.pub` (public key) সার্ভারে আপলোড করুন
+
+### Public Key সার্ভারে কপি করা
+```bash
+ssh-copy-id user@server_ip
+```
+
+### Practical Example
+- DevOps pipeline-এ server access automation
+- GitHub Actions/CI/CD-তে SSH key ব্যবহার
+
+### Best Practices
+- Private key কখনো শেয়ার করবেন না
+- Passphrase ব্যবহার করুন
+- Key rotation policy রাখুন
+- Old/unused keys revoke করুন
+
+## Firewall: Network Security
+
+### Firewall কী?
+Firewall হলো একটি security system, যা network traffic filter করে। এটি server-এ অনাকাঙ্ক্ষিত access block করতে ব্যবহৃত হয়।
+
+### Linux-এ Firewall (UFW)
+```bash
+sudo apt install ufw
+sudo ufw enable
+sudo ufw allow 22/tcp   # SSH
+sudo ufw allow 80/tcp   # HTTP
+sudo ufw allow 443/tcp  # HTTPS
+sudo ufw status
+```
+
+### Advanced Firewall (firewalld, iptables)
+- CentOS/RHEL-এ `firewalld` ব্যবহার
+- Custom rules লিখে granular control
+
+### Practical Example
+- Production server-এ শুধু নির্দিষ্ট IP থেকে SSH access
+- Web server-এ শুধু HTTP/HTTPS port খোলা
+
+### Best Practices
+- Default deny policy
+- Only required ports open
+- Firewall rules version control (infrastructure as code)
+- Regular audit
+
+## User Roles: Principle of Least Privilege
+
+### User Roles কী?
+User Role মানে কে কোন কাজ করতে পারবে—এটা নির্ধারণ করা। DevOps-এ RBAC (Role-Based Access Control) খুব গুরুত্বপূর্ণ।
+
+### Linux User Management
+```bash
+sudo adduser devopsuser
+sudo usermod -aG sudo devopsuser
+```
+- `sudo` group-এ যোগ করলে administrative privilege
+- `groups devopsuser` দিয়ে group membership দেখুন
+
+### SSH-তে User Role
+- `AllowUsers`/`AllowGroups` দিয়ে SSH access restrict করুন
+- `/etc/ssh/sshd_config` এ কনফিগার করুন
+
+### Application-Level RBAC
+- Jenkins, Kubernetes, AWS-এ RBAC enforce করুন
+- Example: Jenkins-এ শুধু build trigger করার permission
+
+### Best Practices
+- Principle of Least Privilege
+- Regular user & role audit
+- Temporary privilege (just-in-time access)
+- User activity logging
+
+# Real Life Scenario: Production Server Security
+
+ধরা যাক, আপনি একটি production server deploy করেছেন।
+- SSH key authentication enable করুন
+- Firewall-এ শুধু 22, 80, 443 port open
+- User role-based access enforce করুন
+- Regularly unused user/keys revoke করুন
+
+**Benefits:**
+- Unauthorized access কমবে
+- Security breach কমবে
+- Audit trail থাকবে
+
+# Common Mistakes & Solutions
+- **Mistake:** Password-based SSH
+  - **Solution:** SSH key authentication
+- **Mistake:** All ports open
+  - **Solution:** Only required ports open
+- **Mistake:** All users have sudo
+  - **Solution:** Role-based privilege
+
+# Conclusion
+
+SSH Keys, Firewall, এবং User Roles—এই তিনটি pillar DevOps security নিশ্চিত করে। Automation, audit, এবং best practices follow করলে production environment অনেক বেশি নিরাপদ হবে।
+
+**Practice:**
+- SSH key generate ও server-এ configure করুন
+- Firewall rules লিখে test করুন
+- User role-based access enforce করুন
+
+**Next Steps:**
+- Container security ও image scanning শিখুন
+- Compliance basics জানুন
+
+---
+
+**পরবর্তী পাঠ:** [Container Security & Image Scanning](/dev-ops/container-security)

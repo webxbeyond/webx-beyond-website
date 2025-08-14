@@ -1,0 +1,91 @@
+---
+title: ক্লাউড সার্ভারে লিনাক্স ব্যবহারকারী তৈরি ও কনফিগার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Production server-এ security, automation, এবং management-এর জন্য multiple Linux user তৈরি ও configure করা জরুরি। এখানে সহজ ভাষায়, বাস্তব উদাহরণসহ, cloud server-এ Linux user তৈরি, পারমিশন, এবং security best practices দেওয়া হলো।
+
+## কেন Linux user তৈরি করবেন?
+- Security: root user avoid করুন
+- Automation: deploy, backup, monitoring user
+- Access control: team/user-wise permission
+
+## User Creation Steps
+
+### ১. SSH দিয়ে server-এ login
+```bash
+ssh root@your_server_ip
+```
+
+### ২. নতুন user তৈরি
+```bash
+adduser devops
+```
+- Password দিন
+- User details দিন
+
+### ৩. User-কে sudo group-এ যুক্ত করা
+```bash
+usermod -aG sudo devops
+```
+
+### ৪. SSH key-based login setup
+- Local machine-এ SSH key generate করুন
+    ```bash
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+    # ~/.ssh/id_ed25519.pub
+    ```
+- Public key server-এ user-এর home-এ add করুন
+    ```bash
+    mkdir /home/devops/.ssh
+    nano /home/devops/.ssh/authorized_keys
+    # public key paste করুন
+    chown -R devops:devops /home/devops/.ssh
+    chmod 700 /home/devops/.ssh
+    chmod 600 /home/devops/.ssh/authorized_keys
+    ```
+
+### ৫. Password authentication disable (security best practice)
+- `/etc/ssh/sshd_config`-এ
+    ```
+    PasswordAuthentication no
+    ```
+- SSH service restart করুন
+    ```bash
+    systemctl restart sshd
+    ```
+
+### ৬. User-wise permission/config
+- Deploy user: only deploy directory access
+- Backup user: only backup directory access
+- Monitoring user: only log/read access
+- Example:
+    ```bash
+    chown devops:devops /var/www/app
+    chmod 750 /var/www/app
+    ```
+
+## বাস্তব উদাহরণ
+
+> "Production server-এ devops, deploy, backup user তৈরি করি। SSH key-based login setup করি—password disable করি। User-wise directory permission দিয়ে security বাড়াই। Deploy script/pipeline-এ deploy user ব্যবহার করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Permission denied:** User/group/config চেক করুন
+- **SSH login fail:** Key/config/file permission চেক করুন
+- **Root login enabled:** `/etc/ssh/sshd_config`-এ `PermitRootLogin no` করুন
+- **Manual error:** Automated script/pipeline ব্যবহার করুন
+
+## টিপস
+- Always use SSH key-based login—password avoid করুন
+- User-wise permission/config—security বাড়াতে
+- Automated user creation/config script ব্যবহার করুন
+- Log/output monitor করুন—error/debugging
+
+## সংক্ষেপে
+- Cloud server-এ Linux user তৈরি, SSH key-based login, permission/config—সবকিছু security ও automation-এর জন্য জরুরি
+- Manual error কমাতে automation/script/pipeline ব্যবহার করুন
+- Security best practices follow করুন—root/password avoid করুন
+
+---
+
+**পরবর্তী পাঠ:** [AWS / GCP / Azure বেসিক সার্ভিস](/dev-ops/cloud-aws-gcp-azure)

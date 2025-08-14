@@ -1,0 +1,64 @@
+---
+title: ডেভঅপসের জন্য বিল্ড টুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেভঅপসের workflow-এ বিল্ড টুলস (npm, Maven, Gradle, Make, PyInstaller, Docker) অত্যন্ত গুরুত্বপূর্ণ। Automation, consistency, error-free deployment—সবকিছুই build tools দিয়ে সহজ হয়।
+
+## কেন বিল্ড টুলস?
+- Automated build process
+- Repeatable, error-free artifact creation
+- Integration with CI/CD pipeline
+- Versioning, dependency management
+
+## ডেভঅপস workflow-এ বিল্ড টুলসের ব্যবহার
+
+### ১. Continuous Integration (CI)
+- Code commit হলে build tool দিয়ে automated build/test
+- Example: GitHub Actions/Jenkins pipeline
+    ```yaml
+    # GitHub Actions
+    steps:
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+    ```
+
+### ২. Continuous Delivery/Deployment (CD)
+- Build tool দিয়ে artifact তৈরি → automated deploy
+- Example: Docker build, Maven deploy
+
+### ৩. Dependency Management
+- Build tool দিয়ে dependency/version manage
+- Example: `package.json`, `pom.xml`, `requirements.txt`
+
+### ৪. Multi-environment Build
+- Build tool দিয়ে dev/staging/prod environment-এ build
+- Example: `.env` file, build flags
+
+## বাস্তব উদাহরণ
+
+> "আমরা Node.js অ্যাপের জন্য npm ব্যবহার করি—build, test, deploy সব automated pipeline-এ। Java অ্যাপের জন্য Maven—dependency, build, deploy সবকিছু handle করে। Docker দিয়ে container build করি, Jenkins pipeline-এ automated deploy করি।"
+
+## কমন সমস্যা ও সমাধান
+- **Build fail:** Dependency/version mismatch—package manager দিয়ে fix করুন
+- **Environment mismatch:** Build flags/config file চেক করুন
+- **Manual error:** Automated script/pipeline ব্যবহার করুন
+
+## টিপস
+- Always use build tool—manual build এড়িয়ে চলুন
+- Automated pipeline তৈরি করুন—error-free deployment
+- Dependency/version regularly update করুন
+- Build output test করুন—deployment আগে
+
+## সংক্ষেপে
+- ডেভঅপস workflow-এ build tools অপরিহার্য
+- Automation, consistency, error handling—build tool দিয়ে সহজ হয়
+- Manual error কমাতে automated pipeline ব্যবহার করুন
+
+---
+
+**পরবর্তী পাঠ:** [অ্যাপ্লিকেশন চালানো](/dev-ops/app-run)
