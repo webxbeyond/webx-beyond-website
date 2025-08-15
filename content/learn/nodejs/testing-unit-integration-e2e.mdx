@@ -1,0 +1,80 @@
+---
+title: Unit, Integration, E2E টেস্টিং ম্যাপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ robust application build করতে তিন ধরনের testing—Unit, Integration, E2E—critical।
+
+## Testing কী?
+
+Testing মানে—code expected result দিচ্ছে কিনা verify করা।
+
+### Analogy
+"গাড়ি বানানোর পর আলাদা আলাদা পার্টস, পুরো গাড়ি, এবং রাস্তায় চালিয়ে সবকিছু ঠিক আছে কিনা দেখা।"
+
+## Unit Test
+- Individual function/component test
+- Fast, isolated
+- Example:
+```js
+function add(a, b) { return a + b; }
+test('add', () => {
+  expect(add(2, 3)).toBe(5);
+});
+```
+
+## Integration Test
+- Multiple module/component interaction test
+- Database, API, external service
+- Example:
+```js
+const request = require('supertest');
+const app = require('./app');
+test('GET /users', async () => {
+  const res = await request(app).get('/users');
+  expect(res.statusCode).toBe(200);
+});
+```
+
+## E2E (End-to-End) Test
+- Full workflow test (UI/API/database)
+- Real user scenario
+- Example:
+```js
+const puppeteer = require('puppeteer');
+test('user signup flow', async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3000/signup');
+  await page.type('#email', 'test@example.com');
+  await page.type('#password', '123456');
+  await page.click('#submit');
+  await page.waitForSelector('#welcome');
+  await browser.close();
+});
+```
+
+## Test Pyramid
+- বেশি Unit, কিছু Integration, কম E2E
+- Cost, speed, reliability balance
+
+## Real World Example
+- **Unit:** Utility function test
+- **Integration:** API + DB interaction
+- **E2E:** User registration flow
+
+## Best Practices
+- Test automation করুন
+- Mock/stub external dependency
+- Coverage report দেখুন
+- CI/CD-তে test run করুন
+- Flaky test minimize করুন
+
+## Performance Tips
+- Parallel test run করুন
+- Database transaction rollback করুন
+- Headless browser ব্যবহার করুন
+
+## উপসংহার
+
+Unit, Integration, E2E testing—Node.js-এ quality, reliability, এবং maintainability নিশ্চিত করে। Test pyramid, automation, এবং best practices follow করুন। পরবর্তী পাঠে Mocha, Jest, Tap framework নিয়ে আলোচনা হবে।

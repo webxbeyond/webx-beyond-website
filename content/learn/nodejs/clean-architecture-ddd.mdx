@@ -1,0 +1,86 @@
+---
+title: Layered Architecture ও Domain-Driven Design
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় স্কেল Node.js অ্যাপে maintainability, scalability ও business logic clear রাখতে Layered Architecture ও Domain-Driven Design (DDD) অপরিহার্য।
+
+## Layered Architecture কী?
+
+Layered Architecture হচ্ছে এমন structure, যেখানে code আলাদা layer-এ ভাগ করা হয়—presentation, business, data।
+
+### Analogy
+Layered Architecture হচ্ছে "বহুতল ভবন"—প্রতিটি তলায় আলাদা কাজ, একসাথে পুরো ভবন চলে।
+
+### Common Layers
+- **Presentation Layer:** API/controller
+- **Business Layer:** Service/domain logic
+- **Data Layer:** Database/repository
+
+### Example Structure
+```
+project/
+  controllers/
+  services/
+  models/
+  repositories/
+  app.js
+```
+
+## Domain-Driven Design (DDD) কী?
+
+DDD হচ্ছে এমন approach, যেখানে business domain ও logic code structure-এ reflect হয়।
+
+### Analogy
+DDD হচ্ছে "একটা কোম্পানির ডিপার্টমেন্ট"—HR, Finance, Sales—প্রতিটি ডিপার্টমেন্টের আলাদা rule, আলাদা কাজ।
+
+### DDD Concepts
+- **Entity:** Unique object (User, Order)
+- **Value Object:** Attribute-only object (Address)
+- **Aggregate:** Group of related entities
+- **Repository:** Data access abstraction
+- **Service:** Business logic
+- **Domain Event:** Important change notification
+
+### Example Structure
+```
+project/
+  user/
+    entities/
+    services/
+    repositories/
+    controllers/
+  order/
+    entities/
+    services/
+    repositories/
+    controllers/
+  shared/
+    value-objects/
+    events/
+```
+
+## Best Practices
+- Layer separation maintain করুন
+- Domain logic service-এ রাখুন
+- Repository pattern ব্যবহার করুন
+- Entity/value-object clearly define করুন
+- Unit test করুন domain logic
+
+## Real World Example
+- **Banking app:** Account, Transaction, User—entity, service, repository
+- **E-commerce:** Product, Cart, Order—domain-driven module
+
+## Performance Tips
+- Layer boundary clear রাখুন
+- Service/repository singleton করুন
+- DTO ব্যবহার করুন data transferে
+
+## Transition Tips
+- Legacy app-এ layer add করুন
+- Domain boundary define করুন
+- Gradual refactor করুন
+
+## উপসংহার
+
+Layered Architecture ও Domain-Driven Design Node.js-এ scalable, maintainable ও business-centric app design করতে সাহায্য করে। Production-এ layer separation, domain logic ও testability best practices অনুসরণ করুন। পরবর্তী পাঠে কনফিগারেশন ম্যানেজমেন্ট নিয়ে আলোচনা হবে।

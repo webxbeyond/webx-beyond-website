@@ -1,0 +1,78 @@
+---
+title: Cluster Module ও লোড ব্যালেন্সিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js single-threaded, তাই একা process সব CPU core ব্যবহার করতে পারে না। Cluster module দিয়ে multiple process চালিয়ে load balance করা যায়।
+
+## Cluster Module কী?
+
+Cluster module Node.js-এর built-in API, যা একই server code multiple process-এ চালায়। প্রতিটি process (worker) আলাদা CPU core-এ চলে, ফলে concurrency ও scalability বাড়ে।
+
+### Real Life Analogy
+একটি রেস্টুরেন্টে একাধিক কুক—সবাই একই মেনু রান্না করছে, কিন্তু আলাদা অর্ডার handle করছে।
+
+## Cluster Module ব্যবহার
+
+```js
+const cluster = require('cluster');
+const http = require('http');
+const os = require('os');
+
+if (cluster.isMaster) {
+  const numCPUs = os.cpus().length;
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    cluster.fork(); // Auto-restart
+  });
+} else {
+  http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('Hello from worker ' + process.pid);
+  }).listen(3000);
+}
+```
+
+## Load Balancing Explained
+
+Cluster module master process incoming connection worker-এ distribute করে। Default round-robin, OS-dependent।
+
+### Load Balancing Strategies
+- **Round Robin:** Default, sequentially distribute
+- **Sticky Sessions:** User-specific worker assignment (WebSocket/long-lived connection)
+- **External Load Balancer:** Nginx, HAProxy, cloud LB
+
+## Production Best Practices
+- **Use PM2/forever for process management**
+- **Monitor worker health, auto-restart on crash**
+- **Use external load balancer for large scale**
+- **Share session/cache via Redis/Memcached**
+
+## Practical Example: PM2
+
+PM2 দিয়ে cluster mode সহজে চালানো যায়:
+```sh
+pm2 start app.js -i max
+```
+
+## Cluster Communication
+
+Master-worker IPC message passing করা যায়:
+```js
+// worker.js
+process.send({ msg: 'Hello Master' });
+process.on('message', (data) => {
+  console.log('From master:', data);
+});
+```
+
+## Limitations
+- Shared memory নেই, তাই state sync করতে external store দরকার
+- Heavy computation main thread-এ না রেখে worker/child process-এ দিন
+
+## উপসংহার
+
+Cluster module ও load balancing দিয়ে Node.js অ্যাপ horizontally scalable, fault-tolerant ও efficient হয়। Production-এ PM2, external LB, ও session sharing ব্যবহার করুন। পরবর্তী পাঠে Native Addons (N-API) নিয়ে আলোচনা হবে।

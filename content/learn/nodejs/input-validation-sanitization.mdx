@@ -1,0 +1,69 @@
+---
+title: ইনপুট ভ্যালিডেশন ও স্যানিটাইজেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ security, reliability ও data integrity নিশ্চিত করতে input validation ও sanitization অপরিহার্য।
+
+## Input Validation কী?
+- User input expected format, type, range, value-এ আছে কিনা check করা।
+
+## Input Sanitization কী?
+- Malicious/invalid input থেকে harmful part remove/escape করা।
+
+### Analogy
+"বাড়িতে কেউ ঢুকতে চাইলে gatekeeper identity check করে (validation), সন্দেহজনক কিছু থাকলে সরিয়ে দেয় (sanitization)।"
+
+## কেন দরকার?
+- XSS, SQLi, RCE prevent
+- Data integrity
+- Application crash/breakdown prevent
+
+## Validation Example (express-validator)
+```js
+const { body, validationResult } = require('express-validator');
+app.post('/user', [
+  body('email').isEmail(),
+  body('age').isInt({ min: 18 })
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  // process user
+});
+```
+
+## Sanitization Example
+```js
+const sanitizeHtml = require('sanitize-html');
+const dirty = '<script>alert("XSS")</script>hello';
+const clean = sanitizeHtml(dirty);
+console.log(clean); // 'hello'
+```
+
+## Real World Example
+- **Signup form:** Email, password validation
+- **Comment box:** HTML/script sanitize
+- **API input:** Type, range, format check
+
+## Best Practices
+- Whitelist validation করুন
+- Error message informative রাখুন
+- Nested object validation করুন
+- Input sanitize করুন (HTML, SQL, JSON)
+- Library/package ব্যবহার করুন
+
+## Performance Tips
+- Minimal validation logic
+- Batch validation
+- Async validation
+
+## Challenges
+- Complex/nested input
+- Third-party data
+- Legacy code
+
+## উপসংহার
+
+Input validation ও sanitization—Node.js-এ security, reliability, এবং data integrity নিশ্চিত করে। Proper validation, sanitization, informative error, এবং best practices follow করুন। পরবর্তী পাঠে Secure Session Management নিয়ে আলোচনা হবে।

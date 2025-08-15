@@ -1,0 +1,90 @@
+---
+title: EventEmitter প্যাটার্ন ও Pitfalls
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ EventEmitter হচ্ছে ইভেন্ট-ড্রিভেন আর্কিটেকচারের মূল ভিত্তি। এটি দিয়ে অ্যাসিনক্রোনাস ইভেন্ট হ্যান্ডলিং, কাস্টম ইভেন্ট, ও ডেটা ফ্লো সহজ হয়।
+
+## EventEmitter কী?
+
+EventEmitter Node.js-এর core module (`events`)। এটি ইভেন্ট "emit" ও "listen" করার জন্য API দেয়।
+
+### Syntax:
+```js
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
+emitter.on('greet', name => {
+  console.log('Hello', name);
+});
+emitter.emit('greet', 'Node.js');
+```
+
+- **Use Case:** HTTP server, Stream, Custom events
+
+## Real Life Analogy
+
+EventEmitter হচ্ছে "মাইক্রোফোন"—একজন কথা বললে (emit), অন্যরা শুনতে পারে (on)।
+
+## Common Pitfalls
+
+### ১. Memory Leak (Too Many Listeners)
+
+EventEmitter-এ ১০টির বেশি listener হলে warning দেয়।
+
+```js
+emitter.setMaxListeners(20);
+```
+
+### ২. Unhandled Error Event
+
+Error ইভেন্ট handle না করলে process crash হতে পারে।
+
+```js
+emitter.on('error', err => {
+  console.error('Error:', err);
+});
+```
+
+### ৩. Synchronous Execution
+
+EventEmitter-এর callback synchronous, তাই heavy computation না রাখাই ভালো।
+
+### ৪. Listener Removal
+
+Listener remove না করলে memory leak হতে পারে।
+
+```js
+emitter.removeListener('greet', handler);
+```
+
+## Best Practices
+
+- **Always handle 'error' event**
+- **Limit number of listeners**
+- **Remove unused listeners**
+- **Avoid heavy computation in listeners**
+
+## Practical Example: HTTP Server Logging
+
+```js
+const http = require('http');
+const EventEmitter = require('events');
+const logger = new EventEmitter();
+logger.on('log', msg => {
+  console.log('Log:', msg);
+});
+const server = http.createServer((req, res) => {
+  logger.emit('log', `Request: ${req.url}`);
+  res.end('Hello Node.js');
+});
+server.listen(3000);
+```
+
+## Performance Tips
+
+- **Use once() for one-time listeners**
+- **Use setMaxListeners() for large apps**
+
+## উপসংহার
+
+EventEmitter—Node.js-এর ইভেন্ট-ড্রিভেন আর্কিটেকচারের "হৃদপিণ্ড"। Pitfalls এড়িয়ে, Best Practices অনুসরণ করে efficient, scalable অ্যাপ লিখুন। পরবর্তী মডিউলে Node.js Internals ও Performance নিয়ে আলোচনা হবে।

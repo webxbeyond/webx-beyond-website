@@ -1,0 +1,77 @@
+---
+title: CI/CD পাইপলাইন ডিজাইন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ Continuous Integration (CI) ও Continuous Deployment (CD)—automation, reliability, এবং fast delivery নিশ্চিত করে।
+
+## CI/CD কী?
+- **CI:** Code change commit হলে automated build, test, integration
+- **CD:** Automated deploy, release, rollback
+
+### Analogy
+"কারখানায় conveyor belt—প্রতিটি ধাপে quality check, শেষে প্যাকেট হয়ে বাজারে যায়।"
+
+## Typical CI/CD Pipeline Steps
+1. Code commit/push
+2. Automated build
+3. Automated test
+4. Lint/coverage check
+5. Artifact/package build
+6. Deploy/stage/prod
+7. Rollback/alert
+
+## Example (GitHub Actions)
+```yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm test
+      - run: npm run build
+      - name: Deploy
+        run: echo "Deploy step here"
+```
+
+## Popular Tools
+- GitHub Actions
+- GitLab CI
+- Jenkins
+- CircleCI
+- Travis CI
+
+## Real World Example
+- **E-commerce:** Automated test/deploy
+- **API:** Lint, coverage, staging deploy
+- **Microservices:** Multi-service pipeline
+
+## Best Practices
+- Automated test, lint, coverage
+- Environment variable securely manage করুন
+- Rollback strategy implement করুন
+- Notification/alert setup করুন
+- Secrets management করুন
+
+## Performance Tips
+- Parallel job run
+- Cache dependency
+- Minimal build step
+
+## Challenges
+- Legacy app integration
+- Secrets leak
+- Flaky test
+
+## উপসংহার
+
+CI/CD pipeline—Node.js-এ automation, reliability, এবং fast delivery নিশ্চিত করে। Proper pipeline design, automated test, rollback, এবং best practices follow করুন। পরবর্তী পাঠে Logging ও Centralization নিয়ে আলোচনা হবে।

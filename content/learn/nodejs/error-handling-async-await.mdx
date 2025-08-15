@@ -1,0 +1,119 @@
+---
+title: এরর হ্যান্ডলিং - Sync, Async, Promise, async/await
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ এরর হ্যান্ডলিং হচ্ছে "প্রোডাকশন-রেডি" কোড লেখার জন্য অপরিহার্য। সঠিক এরর হ্যান্ডলিং না করলে অ্যাপ ক্র্যাশ, ডাটা লিক, বা অপ্রত্যাশিত আচরণ হতে পারে।
+
+## Sync Error Handling
+
+Synchronous কোডে এরর হ্যান্ডলিং সহজ:
+
+```js
+try {
+  throw new Error('Something went wrong!');
+} catch (err) {
+  console.error('Caught:', err.message);
+}
+```
+
+## Async Error Handling (Callback)
+
+Node.js-এ callback-এর প্রথম প্যারামিটার সাধারণত error:
+
+```js
+const fs = require('fs');
+fs.readFile('file.txt', (err, data) => {
+  if (err) {
+    console.error('File read error:', err.message);
+    return;
+  }
+  console.log('File data:', data.toString());
+});
+```
+
+## Promise Error Handling
+
+Promise-এ `.catch()` ব্যবহার করুন:
+
+```js
+const promise = new Promise((resolve, reject) => {
+  reject(new Error('Promise failed!'));
+});
+promise.catch(err => {
+  console.error('Promise error:', err.message);
+});
+```
+
+## async/await Error Handling
+
+async/await-এ try/catch ব্যবহার করুন:
+
+```js
+async function fetchData() {
+  try {
+    const data = await fs.promises.readFile('file.txt');
+    console.log('File:', data.toString());
+  } catch (err) {
+    console.error('Async error:', err.message);
+  }
+}
+fetchData();
+```
+
+## Real Life Analogy
+
+ধরা যাক, আপনি ATM-এ টাকা তুলতে গেলেন। যদি কার্ড ভুল হয়, মেশিন "এরর" দেখায়, টাকা দেয় না। ঠিক তেমনি, Node.js-এ এরর হ্যান্ডলিং না করলে "অপ্রত্যাশিত" কিছু ঘটতে পারে।
+
+## Best Practices
+
+- **Always Handle Errors:** Callback, Promise, async/await—সবখানে এরর হ্যান্ডলিং করুন
+- **Never Ignore Errors:** console.log দিয়ে এরর "চেপে" রাখবেন না
+- **Use Custom Error Classes:**
+
+```js
+class AppError extends Error {
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+  }
+}
+```
+
+- **Global Error Handler:**
+
+```js
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', err => {
+  console.error('Unhandled Rejection:', err);
+  process.exit(1);
+});
+```
+
+## Performance Tips
+
+- **Avoid Throwing Errors in Hot Paths**
+- **Use Error Boundaries in Large Apps**
+
+## ছোট্ট প্রজেক্ট উদাহরণ: Error Handling Demo
+
+```js
+// error-demo.js
+const fs = require('fs');
+async function readFileSafe(path) {
+  try {
+    const data = await fs.promises.readFile(path);
+    return data.toString();
+  } catch (err) {
+    return 'File not found!';
+  }
+}
+readFileSafe('missing.txt').then(console.log);
+```
+
+## উপসংহার
+
+Sync, Async, Promise, async/await—সবখানে এরর হ্যান্ডলিং Node.js অ্যাপের "লাইফলাইন"। Robust, secure, scalable অ্যাপের জন্য সঠিক এরর হ্যান্ডলিং করুন। পরবর্তী পাঠে Buffer, Stream ও File System API নিয়ে আলোচনা হবে।

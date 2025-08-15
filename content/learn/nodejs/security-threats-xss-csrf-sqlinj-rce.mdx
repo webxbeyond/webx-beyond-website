@@ -1,0 +1,56 @@
+---
+title: কমন থ্রেট - XSS, CSRF, SQLi, RCE
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application security নিশ্চিত করতে XSS, CSRF, SQL Injection, RCE—এই common threat গুলো বুঝা ও প্রতিরোধ করা জরুরি।
+
+## XSS (Cross-Site Scripting)
+- Malicious script user input থেকে inject হয়ে browser-এ execute হয়
+- Example: `<script>alert('XSS')</script>`
+- **Prevent:** Input sanitize, output encode, CSP
+
+## CSRF (Cross-Site Request Forgery)
+- User unknowingly attacker-এর crafted request execute করে
+- Example: User logged-in, attacker malicious request পাঠায়
+- **Prevent:** CSRF token, SameSite cookie, user authentication
+
+## SQL Injection (SQLi)
+- Malicious input দিয়ে database query manipulate করা
+- Example: `SELECT * FROM users WHERE name = 'admin' OR '1'='1'`
+- **Prevent:** Parameterized query, ORM, input validation
+
+## RCE (Remote Code Execution)
+- Attacker server-এ arbitrary code execute করতে পারে
+- Example: User input eval(), exec() দিয়ে run
+- **Prevent:** User input never eval/exec, dependency audit
+
+### Analogy
+"বাড়ির দরজা-জানালা খোলা থাকলে চোর ঢুকে যেতে পারে—security hole।"
+
+## Real World Example
+- **XSS:** Forum/site-এ malicious script
+- **CSRF:** Bank transaction attacker trigger
+- **SQLi:** Database dump, data leak
+- **RCE:** Server hijack, malware deploy
+
+## Best Practices
+- Input validation/sanitization করুন
+- Output encode করুন
+- Dependency audit করুন
+- Security header ব্যবহার করুন
+- Regular penetration test করুন
+
+## Performance Tips
+- Minimal privilege principle
+- Automated security scan
+- Rate limiting
+
+## Challenges
+- Legacy code security
+- Third-party package vulnerability
+- User education
+
+## উপসংহার
+
+XSS, CSRF, SQLi, RCE—Node.js-এ application security-এর জন্য critical threat। Proper validation, encoding, token, এবং best practices follow করুন। পরবর্তী পাঠে input validation/sanitization নিয়ে আলোচনা হবে।

@@ -1,0 +1,74 @@
+---
+title: স্কেলিং - Horizontal বনাম Vertical
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application performance, availability, এবং growth নিশ্চিত করতে scaling অপরিহার্য। দুই ধরনের scaling—Horizontal ও Vertical—ব্যবহার হয়।
+
+## Vertical Scaling কী?
+- Single server/resource-এ CPU, RAM, disk বাড়ানো
+- Example: 8GB RAM থেকে 32GB RAM
+
+## Horizontal Scaling কী?
+- Multiple server/resource add—load distribute
+- Example: 1 server থেকে 5 server
+
+### Analogy
+"একটা দোকানে cashier বাড়ানো (vertical), নতুন শাখা খুলে cashier বাড়ানো (horizontal)।"
+
+## Vertical Scaling Pros/Cons
+- **Pros:** Simple, quick
+- **Cons:** Physical limit, downtime, expensive
+
+## Horizontal Scaling Pros/Cons
+- **Pros:** No physical limit, high availability, fault tolerance
+- **Cons:** Complex, distributed system, load balancer needed
+
+## Node.js-এ Scaling Example
+- **Vertical:** Bigger server, more RAM/CPU
+- **Horizontal:** Cluster mode (PM2), load balancer (NGINX), container orchestration (Kubernetes)
+
+## Cluster Example (PM2)
+```bash
+pm2 start app.js -i max
+```
+
+## Load Balancer Example (NGINX)
+```nginx
+upstream node_app {
+  server 192.168.1.10:3000;
+  server 192.168.1.11:3000;
+}
+server {
+  listen 80;
+  location / {
+    proxy_pass http://node_app;
+  }
+}
+```
+
+## Real World Example
+- **E-commerce:** Traffic spike handle
+- **API:** High availability
+- **Microservices:** Distributed scaling
+
+## Best Practices
+- Auto-scaling setup করুন
+- Health check implement করুন
+- Load balancer configure করুন
+- Resource utilization monitor করুন
+- Stateless app design করুন
+
+## Performance Tips
+- Bottleneck detect করুন
+- Efficient resource allocation
+- Monitoring tool integrate করুন
+
+## Challenges
+- Distributed data consistency
+- Network latency
+- Cost management
+
+## উপসংহার
+
+Horizontal ও Vertical scaling—Node.js-এ performance, availability, এবং growth নিশ্চিত করে। Proper scaling strategy, monitoring, এবং best practices follow করুন। পরবর্তী পাঠে Blue-Green ও Canary Deployment নিয়ে আলোচনা হবে।

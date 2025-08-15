@@ -1,0 +1,77 @@
+---
+title: Connection Pooling ও Query Optimization
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js অ্যাপে ডাটাবেস performance, scalability ও reliability বাড়াতে connection pooling ও query optimization অপরিহার্য।
+
+## Connection Pooling কী?
+
+Connection pooling মানে—একাধিক database connection তৈরি করে pool-এ রাখা, যাতে প্রতিবার নতুন connection না খুলে pool থেকে reuse করা যায়।
+
+### Analogy
+Connection pooling হচ্ছে "বাস স্ট্যান্ডে একাধিক বাস standby"—যাত্রী এলেই বাস ready, নতুন বাস আনতে সময় লাগে না।
+
+### কেন Connection Pooling?
+- Fast response
+- Resource efficiency
+- Prevent connection exhaustion
+- Better concurrency
+
+### Node.js Example (PostgreSQL)
+```js
+const { Pool } = require('pg');
+const pool = new Pool({ max: 10, connectionString: 'postgres://...' });
+const client = await pool.connect();
+const res = await client.query('SELECT * FROM users');
+client.release();
+```
+
+### Best Practices
+- Pool size optimize করুন (CPU, DB limit অনুযায়ী)
+- Idle connection timeout set করুন
+- Error handling করুন (connection leak avoid)
+- Pool stats monitor করুন
+
+## Query Optimization কী?
+
+Query optimization মানে—database query efficient করা, যাতে কম resource-এ দ্রুত result পাওয়া যায়।
+
+### Analogy
+Query optimization হচ্ছে "বাজারে ছোট রাস্তা ধরে যাওয়া"—কম সময়, কম খরচে গন্তব্যে পৌঁছানো।
+
+### Optimization Techniques
+- Index ব্যবহার করুন
+- Select only needed columns
+- WHERE clause optimize করুন
+- JOIN minimize করুন
+- Pagination ব্যবহার করুন
+- Prepared statement ব্যবহার করুন
+
+### Node.js Example (MongoDB)
+```js
+const users = await db.collection('users')
+  .find({ age: { $gt: 18 } })
+  .project({ name: 1, age: 1 })
+  .limit(10)
+  .toArray();
+```
+
+### Best Practices
+- Query plan analyze করুন (EXPLAIN)
+- Slow query log monitor করুন
+- Database stats review করুন
+- Query cache ব্যবহার করুন
+
+## Real World Example
+- **E-commerce:** Product search optimize
+- **Analytics:** Aggregation query efficient
+
+## Performance Tips
+- Pool size ও query optimize করুন
+- Async query ব্যবহার করুন
+- Database connection health check করুন
+
+## উপসংহার
+
+Connection pooling ও query optimization Node.js-এ scalable, fast ও reliable database integration নিশ্চিত করে। Production-এ pool, query plan ও monitoring best practices অনুসরণ করুন। পরবর্তী পাঠে ক্যাশিং স্ট্র্যাটেজি নিয়ে আলোচনা হবে।

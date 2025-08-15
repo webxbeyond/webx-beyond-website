@@ -1,0 +1,77 @@
+---
+title: বড় ডাটাসেট স্ট্রিমিং (CSV/JSON/Parquet)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ বড় ডাটাসেট (CSV, JSON, Parquet) process ও transfer efficient করতে streaming অপরিহার্য। Buffer-এ পুরো ডাটা না রেখে chunk-by-chunk process করা যায়—memory ও performance optimal থাকে।
+
+## Streaming কী?
+
+Streaming মানে—data chunk-by-chunk পড়া/লেখা, পুরো ডাটা একবারে না নিয়ে।
+
+### Analogy
+Streaming হচ্ছে "বড় ট্রাকের মাল ছোট ছোট ট্রাকে ভাগ করে পাঠানো"—একবারে সব পাঠালে জ্যাম, ভাগ করে পাঠালে দ্রুত ও নিরাপদে পৌঁছায়।
+
+## কেন Streaming?
+- Low memory usage
+- Fast processing
+- Real-time analytics
+- Large file transfer
+
+## CSV Streaming Example
+```js
+const fs = require('fs');
+const csv = require('csv-parser');
+fs.createReadStream('large.csv')
+  .pipe(csv())
+  .on('data', row => {
+    // process row
+  })
+  .on('end', () => {
+    console.log('CSV streaming done');
+  });
+```
+
+## JSON Streaming Example
+```js
+const fs = require('fs');
+const { parser } = require('stream-json');
+fs.createReadStream('large.json')
+  .pipe(parser())
+  .on('data', chunk => {
+    // process chunk.value
+  });
+```
+
+## Parquet Streaming Example
+```js
+const parquet = require('parquetjs-lite');
+const reader = await parquet.ParquetReader.openFile('large.parquet');
+const cursor = reader.getCursor();
+let record = null;
+while (record = await cursor.next()) {
+  // process record
+}
+await reader.close();
+```
+
+## Best Practices
+- Always use stream for large dataset
+- Error handling করুন (stream.on('error'))
+- Backpressure handle করুন
+- Chunk size optimize করুন
+- Resource cleanup করুন
+
+## Real World Example
+- **ETL pipeline:** Data transform/transfer
+- **Analytics:** Real-time log processing
+- **Backup/restore:** Database dump
+
+## Performance Tips
+- Async processing ব্যবহার করুন
+- Stream pipeline chain করুন
+- Buffer size adjust করুন
+
+## উপসংহার
+
+বড় ডাটাসেট স্ট্রিমিং (CSV/JSON/Parquet) Node.js-এ efficient, scalable ও memory-friendly data processing নিশ্চিত করে। Production-এ stream, pipeline ও error handling best practices অনুসরণ করুন। পরবর্তী পাঠে Transactions ও Data Consistency নিয়ে আলোচনা হবে।

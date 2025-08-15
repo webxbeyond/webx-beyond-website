@@ -1,0 +1,62 @@
+---
+title: সিকিউর হেডারস (Helmet.js)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ HTTP security header configure করা—application security, privacy ও vulnerability mitigation-এর জন্য অপরিহার্য। Helmet.js package দিয়ে সহজেই secure header set করা যায়।
+
+## Security Headers কী?
+- HTTP response-এ browser/server-এ security policy enforce করা।
+
+### Analogy
+"বাড়ির দরজায় তালা, জানালায় গ্রিল—Helmet.js application-এ security layer।"
+
+## Common Security Headers
+- **Content-Security-Policy (CSP):** XSS prevent
+- **X-Frame-Options:** Clickjacking prevent
+- **Strict-Transport-Security (HSTS):** HTTPS enforce
+- **X-XSS-Protection:** XSS filter
+- **X-Content-Type-Options:** MIME sniffing prevent
+- **Referrer-Policy:** Referrer leak prevent
+
+## Helmet.js Example
+```js
+const helmet = require('helmet');
+app.use(helmet());
+```
+
+## Custom Header Configuration
+```js
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", 'trusted.com'],
+  },
+}));
+```
+
+## Real World Example
+- **Banking:** CSP, HSTS, X-Frame-Options
+- **E-commerce:** Referrer-Policy, XSS Protection
+- **API:** X-Content-Type-Options
+
+## Best Practices
+- Helmet.js always use করুন
+- Custom header policy project need অনুযায়ী set করুন
+- HTTPS enforce করুন
+- Regular header audit করুন
+- Legacy app-এ header implement করুন
+
+## Performance Tips
+- Minimal header overhead
+- Header caching
+- Automated header test
+
+## Challenges
+- Legacy/third-party integration
+- Policy misconfiguration
+- Browser compatibility
+
+## উপসংহার
+
+Helmet.js ও security headers—Node.js-এ application security, privacy, এবং vulnerability mitigation-এর জন্য অপরিহার্য। Proper header, Helmet.js, এবং best practices follow করুন। পরবর্তী পাঠে OWASP Node.js checklist নিয়ে আলোচনা হবে।

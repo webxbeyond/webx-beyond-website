@@ -1,0 +1,88 @@
+---
+title: ইভেন্ট লুপ ডিপ ডাইভ (Phases, Micro/Macro Tasks)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এর "ইভেন্ট লুপ" হচ্ছে এর অ্যাসিনক্রোনাস পাওয়ারের মূল রহস্য। ইভেন্ট লুপের মাধ্যমে Node.js একাধিক অনুরোধ একসাথে, নন-ব্লকিংভাবে প্রসেস করতে পারে।
+
+## ইভেন্ট লুপ কী?
+
+ইভেন্ট লুপ হচ্ছে একটি মেকানিজম, যা অ্যাসিনক্রোনাস টাস্ক, I/O, Timer, Callback ইত্যাদি "ফেজ"-এ ভাগ করে প্রসেস করে।
+
+### রিয়েল লাইফ উদাহরণ
+ধরা যাক, আপনি একটি ব্যাংকে গেছেন। সেখানে একাধিক কাউন্টার আছে—কেউ টাকা তুলছে, কেউ জমা দিচ্ছে, কেউ চেক ক্লিয়ার করছে। ব্যাংকের ম্যানেজার (Event Loop) সবকিছু সমন্বয় করেন, যাতে কেউ "ব্লক" না হয়।
+
+## ইভেন্ট লুপের ফেজসমূহ
+
+Node.js-এর ইভেন্ট লুপ মূলত ৬টি ফেজে বিভক্ত:
+
+1. **Timers Phase:** `setTimeout`, `setInterval`-এর Callback প্রসেস হয়।
+2. **Pending Callbacks Phase:** কিছু I/O Callback এখানে প্রসেস হয়।
+3. **Idle, Prepare Phase:** ইন্টারনাল কাজের জন্য।
+4. **Poll Phase:** নতুন I/O ইভেন্ট প্রসেস হয়, Callback Queue-তে যায়।
+5. **Check Phase:** `setImmediate`-এর Callback প্রসেস হয়।
+6. **Close Callbacks Phase:** Socket close, `process.on('close')` ইত্যাদি।
+
+## Microtasks vs Macrotasks
+
+- **Macrotasks:** Timer, I/O, setImmediate, close callbacks
+- **Microtasks:** Promise, process.nextTick
+
+Microtasks সবসময় Macrotasks-এর পরে, কিন্তু একই ফেজে থাকলে Microtasks আগে প্রসেস হয়।
+
+### উদাহরণ:
+```js
+setTimeout(() => console.log('timeout'), 0);
+setImmediate(() => console.log('immediate'));
+Promise.resolve().then(() => console.log('promise'));
+process.nextTick(() => console.log('nextTick'));
+```
+
+**Output:**
+```
+nextTick
+promise
+timeout
+immediate
+```
+
+## ইভেন্ট লুপের ফ্লো
+
+1. Timer Queue চেক হয়
+2. Pending Callback Queue চেক হয়
+3. Poll Queue চেক হয়
+4. Check Queue চেক হয়
+5. Close Callback Queue চেক হয়
+6. প্রতিটি ফেজ শেষে Microtasks প্রসেস হয়
+
+## Performance Tips
+
+- **Avoid Blocking Code:** লুপ, বড় computation main thread-এ না রাখুন
+- **Use Worker Threads for Heavy Tasks**
+- **Use Async API**
+
+## ছোট্ট প্রজেক্ট উদাহরণ: ইভেন্ট লুপ Demo
+
+```js
+// event-loop-demo.js
+console.log('Start');
+setTimeout(() => console.log('Timeout'), 0);
+setImmediate(() => console.log('Immediate'));
+Promise.resolve().then(() => console.log('Promise'));
+process.nextTick(() => console.log('NextTick'));
+console.log('End');
+```
+
+**Output:**
+```
+Start
+End
+NextTick
+Promise
+Timeout
+Immediate
+```
+
+## উপসংহার
+
+ইভেন্ট লুপ Node.js-এর "হৃদপিণ্ড"। এর ফেজ, Micro/Macro Task, Callback Queue—সবকিছু মিলিয়ে Node.js অ্যাসিনক্রোনাস ও স্কেলেবল। পরবর্তী পাঠে মডিউল সিস্টেম নিয়ে আলোচনা হবে।

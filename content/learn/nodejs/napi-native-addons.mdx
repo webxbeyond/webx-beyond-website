@@ -1,0 +1,84 @@
+---
+title: Native Addons (N-API)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এর পারফরম্যান্স ও ফিচার extend করতে Native Addons ব্যবহার হয়। এগুলো C/C++ কোড Node.js-এ integrate করে, N-API দিয়ে।
+
+## Native Addon কী?
+
+Native Addon হচ্ছে C/C++-এ লেখা module, যা Node.js-এ JavaScript API হিসেবে expose হয়।
+
+### Real Life Analogy
+যেমন, JavaScript হচ্ছে গাড়ির ড্রাইভার, আর C++ হচ্ছে ইঞ্জিন—ড্রাইভার ইঞ্জিনের সাথে কথা বলে গাড়ি চালায়।
+
+## N-API Overview
+
+N-API (Node API) হচ্ছে Node.js-এর stable C API, যাতে Native Addon build করা যায়—Node.js version upgrade হলেও code break হয় না।
+
+## কেন Native Addon?
+- **High performance computation** (image processing, encryption)
+- **Reuse existing C/C++ libraries**
+- **Access low-level OS features**
+
+## Getting Started: Simple Addon
+
+### ১. Install node-addon-api
+```sh
+npm install node-addon-api
+```
+
+### ২. C++ Addon Code (addon.cc)
+```cpp
+#include <napi.h>
+Napi::String Hello(const Napi::CallbackInfo& info) {
+  return Napi::String::New(info.Env(), "Hello from C++!");
+}
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("hello", Napi::Function::New(env, Hello));
+  return exports;
+}
+NODE_API_MODULE(addon, Init)
+```
+
+### ৩. Binding.gyp
+```json
+{
+  "targets": [
+    {
+      "target_name": "addon",
+      "sources": [ "addon.cc" ]
+    }
+  ]
+}
+```
+
+### ৪. Build
+```sh
+node-gyp configure build
+```
+
+### ৫. Use in Node.js
+```js
+const addon = require('./build/Release/addon');
+console.log(addon.hello());
+```
+
+## Best Practices
+- **Use N-API, avoid direct V8 API**
+- **Handle memory management carefully**
+- **Validate input from JS side**
+- **Document C++ code for maintainability**
+
+## Real World Example
+- **bcrypt**: Password hashing (native C++ for speed)
+- **sharp**: Image processing (libvips C++ bindings)
+
+## Limitations
+- Debugging harder than JS
+- Platform-specific compilation issues
+- Async API integration complex
+
+## উপসংহার
+
+Native Addons (N-API) দিয়ে Node.js অ্যাপের পারফরম্যান্স ও capability বাড়ানো যায়। High performance, legacy library integration, ও low-level accessের জন্য Native Addon অপরিহার্য। Production-এ N-API ব্যবহার করুন, memory management ও error handlingে সতর্ক থাকুন। পরবর্তী মডিউলে Networking ও Protocol mastery নিয়ে আলোচনা হবে।

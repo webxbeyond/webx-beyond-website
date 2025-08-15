@@ -1,0 +1,57 @@
+---
+title: Blue-Green ও Canary Deployments
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ zero-downtime, risk-free, এবং safe deployment নিশ্চিত করতে Blue-Green ও Canary deployment strategy অপরিহার্য।
+
+## Blue-Green Deployment কী?
+- দুই environment—Blue (current), Green (new)
+- Deploy নতুন version Green-এ, test করুন
+- Switch traffic Blue থেকে Green-এ
+- Problem হলে Blue-তে rollback
+
+### Analogy
+"দুইটা রাস্তা—একটা দিয়ে গাড়ি চলছে (Blue), নতুন রাস্তা তৈরি (Green), সব ready হলে গাড়ি নতুন রাস্তায় চালানো শুরু।"
+
+## Canary Deployment কী?
+- নতুন version ছোট অংশ user-এ release
+- Gradually traffic increase
+- Issue detect হলে rollback
+
+### Analogy
+"নতুন খাবার আগে কয়েকজনকে খাওয়ানো (Canary), সবাই ঠিক থাকলে সবারে দেওয়া।"
+
+## Example (Blue-Green)
+- Two server/environment
+- Load balancer switch
+
+## Example (Canary)
+- 5% user new version, rest old
+- Gradual rollout
+
+## Real World Example
+- **E-commerce:** New feature deploy, rollback
+- **API:** Gradual version upgrade
+- **Microservices:** Safe rollout
+
+## Best Practices
+- Automated test, monitoring
+- Rollback strategy
+- Gradual traffic shift
+- Alert/notification setup
+- User feedback collect
+
+## Performance Tips
+- Minimal downtime
+- Efficient resource allocation
+- Automated switch
+
+## Challenges
+- Complex infrastructure
+- Data consistency
+- User session/state
+
+## উপসংহার
+
+Blue-Green ও Canary deployment—Node.js-এ zero-downtime, risk-free, এবং safe deployment নিশ্চিত করে। Proper strategy, monitoring, rollback, এবং best practices follow করুন।

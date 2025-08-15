@@ -1,0 +1,74 @@
+---
+title: লোড ও স্ট্রেস টেস্টিং প্র্যাকটিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application scalability, reliability ও performance validate করতে Load ও Stress Testing অপরিহার্য।
+
+## Load Testing কী?
+- Normal/expected user/request volume-এ system কেমন perform করে—তা test করা।
+
+## Stress Testing কী?
+- Extreme/high volume-এ system কেমন behave করে—limit, bottleneck, failure point detect করা।
+
+### Analogy
+"ব্রিজে প্রতিদিনের গাড়ি চলা (Load), হঠাৎ হাজার গাড়ি একসাথে উঠলে কী হয় (Stress)—দুইটা test।"
+
+## Load Testing Example (Artillery)
+```yaml
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+scenarios:
+  - flow:
+      - get:
+          url: "/api/data"
+```
+Run: `artillery run test.yml`
+```
+
+## Stress Testing Example (k6)
+```js
+import http from 'k6/http';
+import { sleep } from 'k6';
+export let options = {
+  stages: [
+    { duration: '30s', target: 100 },
+    { duration: '1m', target: 1000 },
+  ],
+};
+export default function () {
+  http.get('http://localhost:3000/api/data');
+  sleep(1);
+}
+```
+Run: `k6 run test.js`
+```
+
+## Real World Example
+- **E-commerce:** Sale time heavy traffic
+- **API:** Sudden spike, DDoS simulation
+- **Microservices:** Inter-service load
+
+## Best Practices
+- Production-like environment-এ test করুন
+- Bottleneck, latency, error log করুন
+- Resource utilization monitor করুন
+- Gradual ramp-up/ramp-down করুন
+- Automated test schedule করুন
+
+## Performance Tips
+- Test data realistic রাখুন
+- Monitoring tool integrate করুন
+- Result visualize করুন (Grafana)
+
+## Challenges
+- Environment mismatch
+- Data cleanup
+- Third-party rate limit
+
+## উপসংহার
+
+লোড ও স্ট্রেস টেস্টিং—Node.js-এ scalable, reliable, এবং resilient application নিশ্চিত করে। Bottleneck detect, resource optimize, এবং best practices follow করুন। পরবর্তী পাঠে TDD নিয়ে আলোচনা হবে।

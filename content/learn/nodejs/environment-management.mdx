@@ -1,0 +1,74 @@
+---
+title: Environment Segregation - Dev/Staging/Prod
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় স্কেল Node.js অ্যাপে stability, security ও smooth deployment নিশ্চিত করতে environment segregation অপরিহার্য।
+
+## Environment Segregation কী?
+
+Environment segregation মানে—development, staging, production environment আলাদা রাখা, যাতে code/test/deploy safe ও efficient হয়।
+
+### Analogy
+একই রান্না তিন রকম পরিবেশন—বাড়িতে (dev), রেস্টুরেন্টে (staging), পার্টিতে (prod)। প্রতিটা পরিবেশে আলাদা নিয়ম, আলাদা প্রস্তুতি।
+
+## কেন Environment Segregation?
+- Safe testing (dev/staging)
+- Production stability
+- Secret/config isolation
+- Deployment rollback
+
+## Common Environments
+- **Development:** Local coding/testing
+- **Staging:** Pre-production, integration test
+- **Production:** Live user-facing app
+
+## Node.js-এ Environment Management
+
+### ১. Environment Variable
+```sh
+NODE_ENV=development node app.js
+NODE_ENV=staging node app.js
+NODE_ENV=production node app.js
+```
+```js
+const env = process.env.NODE_ENV || 'development';
+```
+
+### ২. Config File per Environment
+```
+config/
+  dev.json
+  staging.json
+  prod.json
+```
+```js
+const config = require(`./config/${env}.json`);
+```
+
+### ৩. Feature Toggle
+- Certain feature শুধু dev/staging-এ enable করুন
+- Production-এ critical feature lock করুন
+
+### ৪. Secret Management
+- Dev/staging-এ dummy secret
+- Production-এ real secret (Vault, AWS Secret Manager)
+
+## Best Practices
+- Never use production secret in dev/staging
+- Automated deployment pipeline implement করুন
+- Staging-এ production-like data ব্যবহার করুন (anonymized)
+- Logging/monitoring environment-wise configure করুন
+
+## Real World Example
+- **CI/CD pipeline:** Dev → Staging → Prod
+- **Kubernetes:** Namespace per environment
+
+## Performance Tips
+- Resource allocation environment-wise optimize করুন
+- Error reporting dev/staging-এ verbose, prod-এ minimal
+- Dynamic config reload handle করুন
+
+## উপসংহার
+
+Environment segregation Node.js-এ safe, stable ও scalable deployment নিশ্চিত করে। Production-এ config, secret ও deployment pipeline best practices অনুসরণ করুন। পরবর্তী পাঠে Global Error Handling নিয়ে আলোচনা হবে।

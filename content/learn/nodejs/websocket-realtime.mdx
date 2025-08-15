@@ -1,0 +1,80 @@
+---
+title: WebSocket ও রিয়েল-টাইম কমিউনিকেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ WebSocket দিয়ে দুই-দিকের (bi-directional) রিয়েল-টাইম কমিউনিকেশন সহজে করা যায়। HTTP polling-এর তুলনায় WebSocket অনেক efficient ও responsive।
+
+## WebSocket কী?
+
+WebSocket হচ্ছে TCP-based protocol, যা persistent connection তৈরি করে—client ও server দুইদিকেই data পাঠাতে পারে।
+
+### Analogy
+HTTP হচ্ছে "চিঠি পাঠানো"—প্রতি বার নতুন connection। WebSocket হচ্ছে "ফোন কল"—একবার কল করলে দুইপাশে কথা চলতে থাকে।
+
+## কেন WebSocket?
+- Real-time chat, notification
+- Online gaming
+- Collaborative apps (Google Docs)
+- IoT device communication
+
+## Node.js-এ WebSocket ব্যবহার
+
+### Popular Library: `ws`
+```sh
+npm install ws
+```
+
+### Server Example
+```js
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', ws => {
+  ws.send('Welcome to WebSocket server!');
+  ws.on('message', msg => {
+    console.log('Received:', msg);
+    ws.send('Echo: ' + msg);
+  });
+});
+```
+
+### Client Example
+```js
+const WebSocket = require('ws');
+const ws = new WebSocket('ws://localhost:8080');
+ws.on('open', () => {
+  ws.send('Hello WebSocket!');
+});
+ws.on('message', msg => {
+  console.log('From server:', msg);
+});
+```
+
+## Real-time Communication Pattern
+- **Broadcast:** এক client থেকে message এলে, সব client-এ পাঠানো
+- **Rooms/Channels:** Group chat, gaming lobby
+- **Presence:** User online/offline status
+
+## Performance Tips
+- Connection limit handle করুন
+- Message size ও frequency control করুন
+- Heartbeat/ping ব্যবহার করুন connection alive রাখতে
+
+## Security Best Practices
+- Origin validation করুন
+- Message input sanitize করুন
+- Rate limiting ব্যবহার করুন
+
+## Real World Example
+- **Slack, Discord:** Real-time chat
+- **Online multiplayer game:** Fast data exchange
+
+## Advanced: Socket.io
+Socket.io WebSocket fallback সহ, room, broadcast, reconnect—সবকিছু সহজ করে।
+```sh
+npm install socket.io
+```
+
+## উপসংহার
+
+WebSocket দিয়ে Node.js-এ রিয়েল-টাইম, efficient ও scalable communication সম্ভব। Chat, game, IoT—সবকিছুতে WebSocket ব্যবহার করুন। Production-এ security ও performance tips অনুসরণ করুন। পরবর্তী পাঠে TLS/SSL নিয়ে আলোচনা হবে।

@@ -1,0 +1,88 @@
+---
+title: ইভেন্ট লুপ ব্লকিং ডিটেকশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এর ইভেন্ট লুপ ব্লক হলে অ্যাপ "unresponsive" বা "slow" হয়ে যায়। তাই ইভেন্ট লুপ ব্লকিং detect ও fix করা পারফরম্যান্সের জন্য critical।
+
+## ইভেন্ট লুপ ব্লকিং কী?
+
+ইভেন্ট লুপ ব্লক হয় যখন main thread-এ heavy computation, sync I/O, বা long-running task থাকে। ফলে নতুন request/process handle হয় না।
+
+### Common Causes
+- Large for/while loop
+- Sync file/database I/O
+- Heavy JSON parsing/stringifying
+- Blocking third-party library
+
+## Detection Techniques
+
+### ১. process.nextTick & setImmediate
+Heavy computation process.nextTick/setImmediate-এ দিলে delay detect করা যায়।
+
+### ২. Performance Hooks
+Node.js-এর `perf_hooks` module দিয়ে event loop delay measure করা যায়।
+
+```js
+const { monitorEventLoopDelay } = require('perf_hooks');
+const h = monitorEventLoopDelay();
+h.enable();
+setTimeout(() => {
+  console.log('Mean delay:', h.mean);
+  h.disable();
+}, 10000);
+```
+
+### ৩. clinic.js
+clinic.js দিয়ে event loop delay, bottleneck detect করা যায়।
+
+```sh
+npx clinic doctor -- node app.js
+```
+
+### ৪. DevTools
+Chrome DevTools-এ event loop profiling করা যায়।
+
+## Real Life Analogy
+ইভেন্ট লুপ ব্লকিং হচ্ছে "একটি রাস্তায় জ্যাম"—সব গাড়ি আটকে যায়, কেউ এগোতে পারে না।
+
+## Performance Tips
+
+- **Avoid sync I/O in main thread**
+- **Use worker threads/child process for heavy computation**
+- **Profile regularly for event loop delay**
+
+## Practical Example: Blocking vs Non-blocking
+
+```js
+// Blocking
+function heavyTask() {
+  let sum = 0;
+  for(let i=0; i<1e9; i++) sum += i;
+  return sum;
+}
+console.log(heavyTask()); // Blocks event loop
+
+// Non-blocking
+const { Worker } = require('worker_threads');
+const worker = new Worker('./heavy-worker.js');
+worker.on('message', res => console.log(res));
+```
+
+## Best Practices
+
+- **Monitor event loop delay in production**
+- **Move heavy tasks to background threads/processes**
+- **Use async APIs wherever possible**
+
+## Example: event-loop-block
+```js
+const blockedAt = require('blocked-at');
+blockedAt((time, stack) => {
+  console.log(`Blocked for ${time}ms, stack:`, stack);
+});
+```
+
+## উপসংহার
+
+ইভেন্ট লুপ ব্লকিং detect ও fix করলে Node.js অ্যাপ responsive, scalable ও efficient হয়। Regular profiling, async API, ও worker threads ব্যবহার করুন। পরবর্তী পাঠে Cluster Module ও Load Balancing নিয়ে আলোচনা হবে।

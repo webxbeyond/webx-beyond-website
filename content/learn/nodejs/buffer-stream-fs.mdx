@@ -1,0 +1,77 @@
+---
+title: Buffer, Stream ও File System API
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ Buffer, Stream ও File System API হচ্ছে ডাটা প্রসেসিং, ফাইল হ্যান্ডলিং ও পারফরম্যান্সের জন্য অপরিহার্য টুল।
+
+## Buffer
+
+Buffer হচ্ছে Raw Binary Data-এর জন্য Node.js-এর বিল্ট-ইন ক্লাস।
+
+- **Use Case:** Image, Video, File, Network Data
+- **Syntax:**
+
+```js
+const buf = Buffer.from('Hello');
+console.log(buf); // <Buffer 48 65 6c 6c 6f>
+console.log(buf.toString()); // Hello
+```
+
+## Stream
+
+Stream হচ্ছে ডাটা "চাঙ্ক" আকারে প্রসেস করার টেকনিক।
+
+- **Types:** Readable, Writable, Duplex, Transform
+- **Use Case:** File Read/Write, Network, HTTP Response
+
+### উদাহরণ:
+```js
+const fs = require('fs');
+const readStream = fs.createReadStream('bigfile.txt');
+readStream.on('data', chunk => {
+  console.log('Received:', chunk.length, 'bytes');
+});
+readStream.on('end', () => {
+  console.log('Read complete');
+});
+```
+
+## File System API
+
+Node.js-এর `fs` মডিউল দিয়ে ফাইল পড়া, লেখা, ডিলিট, রিনেম ইত্যাদি করা যায়।
+
+- **Sync API:** `fs.readFileSync`, `fs.writeFileSync`
+- **Async API:** `fs.readFile`, `fs.writeFile`, `fs.promises.readFile`
+
+### উদাহরণ:
+```js
+const fs = require('fs');
+fs.writeFile('test.txt', 'Hello Node.js!', err => {
+  if (err) throw err;
+  console.log('File written!');
+});
+```
+
+## Real Life Analogy
+
+Buffer হচ্ছে "বালতি"—ডাটা ধরে রাখে। Stream হচ্ছে "নালা"—ডাটা ধাপে ধাপে যায়। File System API হচ্ছে "গুদাম"—ডাটা সংরক্ষণ, পড়া, লেখা, ডিলিট করা যায়।
+
+## Performance Tips
+
+- **Use Stream for Large Files:** বড় ফাইল একবারে না পড়ে Stream ব্যবহার করুন
+- **Buffer Efficiently:** Binary Data প্রসেসিংয়ে Buffer ব্যবহার করুন
+- **Async API Preferable:** Non-blocking performance
+
+## ছোট্ট প্রজেক্ট উদাহরণ: Stream Copy
+
+```js
+const fs = require('fs');
+const readStream = fs.createReadStream('input.txt');
+const writeStream = fs.createWriteStream('output.txt');
+readStream.pipe(writeStream);
+```
+
+## উপসংহার
+
+Buffer, Stream ও File System API—Node.js-এর "ডাটা হাইওয়ে"। পারফরম্যান্স, স্কেল, ও রিয়েল-টাইম অ্যাপের জন্য এগুলো মাস্টার করুন। পরবর্তী পাঠে Timers, setImmediate ও process.nextTick নিয়ে আলোচনা হবে।

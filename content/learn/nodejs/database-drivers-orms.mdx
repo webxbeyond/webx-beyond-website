@@ -1,0 +1,81 @@
+---
+title: ডাটাবেস ড্রাইভার ও ORM বাছাই
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js অ্যাপে ডাটাবেস integration-এর জন্য ড্রাইভার ও ORM বাছাই critical—performance, maintainability ও scalability নির্ভর করে সঠিক choice-এর উপর।
+
+## ডাটাবেস ড্রাইভার কী?
+
+ড্রাইভার হচ্ছে low-level library, যা database-এর সাথে সরাসরি connect, query, transaction handle করে।
+
+### Analogy
+ড্রাইভার হচ্ছে "গাড়ির ইঞ্জিন"—সবকিছু manual, direct control।
+
+### Popular Drivers
+- **MongoDB:** `mongodb`
+- **PostgreSQL:** `pg`
+- **MySQL:** `mysql2`
+- **Redis:** `ioredis`
+
+### Example (MongoDB)
+```js
+const { MongoClient } = require('mongodb');
+const client = new MongoClient('mongodb://localhost:27017');
+await client.connect();
+const db = client.db('test');
+const users = await db.collection('users').find().toArray();
+```
+
+## ORM (Object-Relational Mapping) কী?
+
+ORM হচ্ছে high-level library, যা database table/collection-কে object/class হিসেবে map করে—query, relation, migration সহজ করে।
+
+### Analogy
+ORM হচ্ছে "গাড়ির অটো-গিয়ার"—manual কাজ automate, সহজ control।
+
+### Popular ORMs
+- **Sequelize:** SQL (Postgres, MySQL, SQLite)
+- **TypeORM:** SQL/NoSQL
+- **Prisma:** Modern SQL ORM
+- **Mongoose:** MongoDB ODM
+
+### Example (Sequelize)
+```js
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize('sqlite::memory:');
+const User = sequelize.define('User', { name: DataTypes.STRING });
+await sequelize.sync();
+await User.create({ name: 'Alice' });
+```
+
+## Comparison Table
+| Feature         | Driver    | ORM        |
+|----------------|-----------|------------|
+| Control        | High      | Medium     |
+| Abstraction    | Low       | High       |
+| Productivity   | Medium    | High       |
+| Performance    | High      | Medium     |
+| Migration      | Manual    | Automated  |
+| Relation       | Manual    | Automated  |
+
+## Best Practices
+- Small/simple app: Direct driver
+- Large/complex app: ORM
+- Performance critical: Driver
+- Rapid development: ORM
+- Always validate input/output
+
+## Real World Example
+- **Startup MVP:** Mongoose/Sequelize
+- **Enterprise app:** Prisma/TypeORM
+- **Analytics/streaming:** Direct driver
+
+## Performance Tips
+- Connection pool ব্যবহার করুন
+- Query optimize করুন
+- ORM-এর lazy loading/relations বুঝে ব্যবহার করুন
+
+## উপসংহার
+
+ডাটাবেস ড্রাইভার ও ORM—দুইটা আলাদা use-case, feature ও productivity দেয়। Requirement অনুযায়ী সঠিক library বাছাই করুন। Production-এ connection pool, query optimization ও validation best practices অনুসরণ করুন। পরবর্তী পাঠে Connection Pooling ও Query Optimization নিয়ে আলোচনা হবে।

@@ -1,0 +1,93 @@
+---
+title: লো-লেভেল নেটওয়ার্কিং - TCP/UDP (`net`, `dgram`)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ low-level networking মানে সরাসরি TCP/UDP socket handle করা। HTTP/HTTPS ছাড়াও custom protocol, real-time app, IoT, game server—সবকিছুতে low-level networking দরকার।
+
+## TCP vs UDP: মূল পার্থক্য
+
+| Feature      | TCP                | UDP                |
+|-------------|--------------------|--------------------|
+| Connection  | Reliable, ordered  | Unreliable, unordered |
+| Use-case    | Web, API, DB       | Streaming, gaming, DNS |
+| Node.js API | `net`              | `dgram`            |
+
+### Analogy
+TCP হচ্ছে "রেজিস্টার্ড পোস্ট"—প্রতি চিঠি পৌঁছায়, ট্র্যাকিং হয়। UDP হচ্ছে "খোলা চিঠি"—দ্রুত যায়, হারিয়ে যেতে পারে।
+
+## TCP: `net` Module
+
+TCP socket দিয়ে client-server communication করা যায়।
+
+### Server Example
+```js
+const net = require('net');
+const server = net.createServer(socket => {
+  socket.write('Welcome to TCP server!\n');
+  socket.on('data', data => {
+    console.log('Received:', data.toString());
+    socket.write('Echo: ' + data);
+  });
+});
+server.listen(9000, () => console.log('TCP server running'));
+```
+
+### Client Example
+```js
+const net = require('net');
+const client = net.createConnection({ port: 9000 }, () => {
+  client.write('Hello TCP!');
+});
+client.on('data', data => {
+  console.log('From server:', data.toString());
+});
+```
+
+## UDP: `dgram` Module
+
+UDP socket দিয়ে fast, connectionless communication করা যায়।
+
+### Server Example
+```js
+const dgram = require('dgram');
+const server = dgram.createSocket('udp4');
+server.on('message', (msg, rinfo) => {
+  console.log(`Received ${msg} from ${rinfo.address}:${rinfo.port}`);
+  server.send('Echo: ' + msg, rinfo.port, rinfo.address);
+});
+server.bind(41234);
+```
+
+### Client Example
+```js
+const dgram = require('dgram');
+const client = dgram.createSocket('udp4');
+client.send('Hello UDP!', 41234, 'localhost');
+client.on('message', msg => {
+  console.log('From server:', msg.toString());
+});
+```
+
+## Practical Use Cases
+- **TCP:** Chat server, database, file transfer
+- **UDP:** Real-time game, video/audio streaming, DNS
+
+## Performance Tips
+- TCP-তে backpressure handle করুন
+- UDP-তে packet loss tolerate করুন
+- Buffer size ও error handlingে সতর্ক থাকুন
+
+## Real World Example
+- **Redis:** TCP-based database
+- **DNS:** UDP-based query
+
+## Best Practices
+- Always validate input
+- Handle socket errors
+- Use async API for scalability
+- Monitor socket state (close, error)
+
+## উপসংহার
+
+TCP/UDP low-level networking Node.js-এ powerful, flexible ও efficient। Custom protocol, real-time app, IoT—সবকিছুতে socket API ব্যবহার করুন। পরবর্তী পাঠে WebSocket ও real-time communication নিয়ে আলোচনা হবে।

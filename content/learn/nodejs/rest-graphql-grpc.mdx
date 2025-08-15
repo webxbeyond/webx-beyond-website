@@ -1,0 +1,120 @@
+---
+title: REST বনাম GraphQL বনাম gRPC
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ API design-এর জন্য REST, GraphQL ও gRPC—তিনটি approach জনপ্রিয়। কোনটা কখন ব্যবহার করবেন, তা বুঝতে হলে feature, use-case ও analogy জানা জরুরি।
+
+## REST API
+
+### Key Features
+- Resource-based (URL endpoint)
+- HTTP methods (GET, POST, PUT, DELETE)
+- Text/JSON response
+- Stateless
+
+### Analogy
+REST হচ্ছে "রেস্টুরেন্টে মেনু দেখে অর্ডার"—যা আছে, তাই পাবেন।
+
+### Use Case
+- Public API
+- CRUD app
+- Simple, predictable structure
+
+### Node.js Example (Express)
+```js
+const express = require('express');
+const app = express();
+app.get('/user/:id', (req, res) => {
+  res.json({ id: req.params.id, name: 'Alice' });
+});
+app.listen(3000);
+```
+
+## GraphQL
+
+### Key Features
+- Query-based (client define data shape)
+- Single endpoint
+- Strongly typed schema
+- Over-fetching/under-fetching solve
+
+### Analogy
+GraphQL হচ্ছে "বুফে—যা চাই, তাই নিন"।
+
+### Use Case
+- Complex frontend (SPA, mobile)
+- Multiple data sources
+- Flexible query
+
+### Node.js Example (Apollo Server)
+```js
+const { ApolloServer, gql } = require('apollo-server');
+const typeDefs = gql`
+  type User { id: ID, name: String }
+  type Query { user(id: ID): User }
+`;
+const resolvers = {
+  Query: { user: (_, { id }) => ({ id, name: 'Alice' }) }
+};
+const server = new ApolloServer({ typeDefs, resolvers });
+server.listen();
+```
+
+## gRPC
+
+### Key Features
+- Binary protocol (Protocol Buffers)
+- Strongly typed contract
+- Fast, low-latency
+- Streaming support
+
+### Analogy
+gRPC হচ্ছে "ফোনে অর্ডার—কোডে নির্দিষ্ট ফরম্যাট"।
+
+### Use Case
+- Microservices
+- Real-time, high performance
+- Polyglot (multi-language)
+
+### Node.js Example (grpc-js)
+```js
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+const packageDef = protoLoader.loadSync('user.proto');
+const userProto = grpc.loadPackageDefinition(packageDef).user;
+const server = new grpc.Server();
+server.addService(userProto.UserService.service, {
+  GetUser: (call, callback) => {
+    callback(null, { id: call.request.id, name: 'Alice' });
+  }
+});
+server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
+  server.start();
+});
+```
+
+## Comparison Table
+| Feature         | REST      | GraphQL   | gRPC      |
+|----------------|-----------|-----------|-----------|
+| Protocol       | HTTP      | HTTP      | HTTP/2    |
+| Data Format    | JSON      | JSON      | Protobuf  |
+| Flexibility    | Low       | High      | Medium    |
+| Performance    | Medium    | Medium    | High      |
+| Streaming      | No        | Limited   | Yes       |
+| Language       | Any       | Any       | Multi     |
+
+## Best Practices
+- Public API: REST
+- Complex frontend: GraphQL
+- Microservices, high performance: gRPC
+- Always validate input/output
+
+## Real World Example
+- **GitHub API:** REST
+- **Shopify API:** GraphQL
+- **Google Cloud:** gRPC
+
+## উপসংহার
+
+REST, GraphQL, gRPC—প্রত্যেকটা আলাদা use-case, feature ও পারফরম্যান্স দেয়। Modern app-এ requirement অনুযায়ী API design করুন। Production-এ security, validation ও performance best practices অনুসরণ করুন। পরবর্তী মডিউলে বড় স্কেল অ্যাপ ডেভেলপমেন্ট নিয়ে আলোচনা হবে।

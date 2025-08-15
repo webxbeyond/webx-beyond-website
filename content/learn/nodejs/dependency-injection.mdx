@@ -1,0 +1,77 @@
+---
+title: Dependency Injection প্যাটার্ন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় স্কেল Node.js অ্যাপে maintainability, testability ও scalability বাড়াতে Dependency Injection (DI) pattern অপরিহার্য।
+
+## Dependency Injection কী?
+
+DI হচ্ছে এমন design pattern, যেখানে dependency (service/class/module) সরাসরি create না করে বাইরে থেকে inject করা হয়।
+
+### Analogy
+DI হচ্ছে "রেস্টুরেন্টে কাস্টমারকে খাবার পরিবেশন"—কাস্টমার নিজে রান্না করে না, waiter খাবার এনে দেয়।
+
+## কেন Dependency Injection?
+- Loose coupling
+- Easy testing (mock/stub)
+- Reusability
+- Configurable architecture
+
+## Node.js-এ DI Implement
+
+### Without DI
+```js
+class UserService {
+  constructor() {
+    this.db = new Database(); // Tight coupling
+  }
+}
+```
+
+### With DI
+```js
+class UserService {
+  constructor(db) {
+    this.db = db; // Injected dependency
+  }
+}
+const db = new Database();
+const userService = new UserService(db);
+```
+
+## DI Container Example
+
+Popular library: `awilix`, `inversify`
+```sh
+npm install awilix
+```
+
+```js
+const { createContainer, asClass } = require('awilix');
+const container = createContainer();
+container.register({
+  db: asClass(Database),
+  userService: asClass(UserService)
+});
+const userService = container.resolve('userService');
+```
+
+## Best Practices
+- Constructor injection prefer করুন
+- Service/interface contract follow করুন
+- DI container ব্যবহার করুন large app-এ
+- Test/mock সহজে implement করুন
+
+## Real World Example
+- **Express.js middleware:** DI pattern
+- **NestJS:** Built-in DI container
+
+## Performance Tips
+- Singleton service cache করুন
+- Circular dependency avoid করুন
+- Configuration/environment inject করুন
+
+## উপসংহার
+
+Dependency Injection pattern Node.js-এ scalable, testable ও maintainable architecture design করতে সাহায্য করে। Production-এ DI container, contract-based service ও testability best practices অনুসরণ করুন। পরবর্তী পাঠে Layered Architecture ও Domain-Driven Design নিয়ে আলোচনা হবে।

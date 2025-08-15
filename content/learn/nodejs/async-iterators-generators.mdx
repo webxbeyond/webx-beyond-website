@@ -1,0 +1,97 @@
+---
+title: Async Iterators ও Generators
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ Async Iterators ও Generators হচ্ছে অ্যাসিনক্রোনাস ডেটা প্রসেসিং, স্ট্রিমিং ও কাস্টম ইটারেশন প্যাটার্নের জন্য অত্যন্ত শক্তিশালী টুল।
+
+## Generators
+
+Generators হচ্ছে ফাংশন, যা `yield` keyword দিয়ে একাধিক value "pause" করে return করতে পারে।
+
+### Syntax:
+```js
+function* gen() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+const it = gen();
+console.log(it.next()); // { value: 1, done: false }
+console.log(it.next()); // { value: 2, done: false }
+```
+
+- **Use Case:** Custom iteration, lazy evaluation
+
+## Async Iterators
+
+Async Iterators হচ্ছে এমন ইটারেটর, যা অ্যাসিনক্রোনাসভাবে ডেটা প্রসেস করে।
+
+### Syntax:
+```js
+async function* asyncGen() {
+  yield await Promise.resolve(1);
+  yield await Promise.resolve(2);
+}
+for await (const val of asyncGen()) {
+  console.log(val);
+}
+```
+
+- **Use Case:** Streaming API, Network, File, Database
+
+## Real Life Analogy
+
+Generator হচ্ছে "বইয়ের পাতা উল্টানো"—একটা পাতা পড়ে থেমে যাওয়া। Async Iterator হচ্ছে "লাইভ নিউজ ফিড"—নতুন নিউজ আসলে পড়া যায়।
+
+## Practical Example: File Streaming
+
+```js
+const fs = require('fs');
+async function* readLines(path) {
+  const stream = fs.createReadStream(path, { encoding: 'utf8' });
+  let buffer = '';
+  for await (const chunk of stream) {
+    buffer += chunk;
+    let lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      yield line;
+    }
+  }
+  if (buffer) yield buffer;
+}
+for await (const line of readLines('bigfile.txt')) {
+  console.log('Line:', line);
+}
+```
+
+## Performance Tips
+
+- **Use Async Iterators for Streaming:** Memory efficient
+- **Use Generators for Lazy Evaluation:** Avoid loading all data at once
+
+## Best Practices
+
+- **Always Handle Errors in Async Iterators**
+- **Use for await...of for Async Iteration**
+
+## ছোট্ট প্রজেক্ট উদাহরণ: API Pagination
+
+```js
+async function* fetchPages() {
+  let page = 1;
+  while (page <= 3) {
+    const data = await fetch(`https://api.example.com/data?page=${page}`);
+    yield await data.json();
+    page++;
+  }
+}
+for await (const pageData of fetchPages()) {
+  console.log('Page:', pageData);
+}
+```
+
+## উপসংহার
+
+Async Iterators ও Generators—Node.js-এ অ্যাসিনক্রোনাস ডেটা প্রসেসিং, স্ট্রিমিং ও কাস্টম iteration mastering-এর জন্য অপরিহার্য। পরবর্তী পাঠে Worker Threads বনাম Child Processes নিয়ে আলোচনা হবে।

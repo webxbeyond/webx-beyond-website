@@ -1,0 +1,77 @@
+---
+title: Dockerizing Node.js অ্যাপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application portability, scalability, deployment automation—সবকিছু সহজ করতে Docker অপরিহার্য।
+
+## Docker কী?
+- Lightweight container—code, dependency, environment bundle করে run করা যায় যেকোনো server-এ।
+
+### Analogy
+"বড় মালবাহী কনটেইনার—ভেতরে সব জিনিস, যেকোনো দেশে, যেকোনো ট্রাকে, একইভাবে পৌঁছায়।"
+
+## Dockerfile Example
+```dockerfile
+# Base image
+FROM node:18-alpine
+# App directory
+WORKDIR /app
+# Dependency install
+COPY package*.json ./
+RUN npm install --production
+# App code copy
+COPY . .
+# Expose port
+EXPOSE 3000
+# Start app
+CMD ["node", "app.js"]
+```
+
+## Build & Run
+```bash
+docker build -t my-node-app .
+docker run -p 3000:3000 my-node-app
+```
+
+## Multi-stage Build
+- Smaller image, production-ready
+```dockerfile
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+RUN npm install --production
+EXPOSE 3000
+CMD ["node", "dist/app.js"]
+```
+
+## Real World Example
+- **Microservices:** Multiple container deploy
+- **CI/CD:** Automated build/test/deploy
+- **Cloud:** Kubernetes, AWS ECS
+
+## Best Practices
+- Minimal base image ব্যবহার করুন
+- .dockerignore file ব্যবহার করুন
+- Environment variable config করুন
+- Healthcheck implement করুন
+- Volume, network properly setup করুন
+
+## Performance Tips
+- Layer caching
+- Multi-stage build
+- Small image size
+
+## Challenges
+- Legacy app containerization
+- Persistent storage
+- Network config
+
+## উপসংহার
+
+Docker—Node.js-এ deployment, portability, scalability, এবং automation নিশ্চিত করে। Proper Dockerfile, best practices, এবং automation follow করুন। পরবর্তী পাঠে CI/CD pipeline নিয়ে আলোচনা হবে।

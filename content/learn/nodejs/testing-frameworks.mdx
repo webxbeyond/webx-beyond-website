@@ -1,0 +1,81 @@
+---
+title: Mocha, Jest, Tap - কোনটা কেন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ test automation-এর জন্য Mocha, Jest, Tap—তিনটি জনপ্রিয় framework।
+
+## Testing Framework কী?
+
+Testing framework—test লিখা, run, report, automation সহজ করে।
+
+### Analogy
+"একই recipe তিনভাবে রান্না—Mocha, Jest, Tap—সবাই নিজের style-এ, কিন্তু outcome একটাই: ভালো খাবার।"
+
+## Mocha
+- Flexible, minimal
+- Custom assertion, reporter
+- Async test সহজ
+- Example:
+```js
+const assert = require('assert');
+describe('Array', () => {
+  it('should return -1 if not found', () => {
+    assert.equal([1,2,3].indexOf(4), -1);
+  });
+});
+```
+
+## Jest
+- Zero config, batteries-included
+- Fast, parallel run
+- Snapshot, coverage, mocking built-in
+- Example:
+```js
+test('sum', () => {
+  expect(2 + 3).toBe(5);
+});
+```
+
+## Tap
+- Test Anything Protocol
+- CLI-friendly, streaming output
+- Minimal dependency
+- Example:
+```js
+const tap = require('tap');
+tap.test('sum', t => {
+  t.equal(2 + 3, 5);
+  t.end();
+});
+```
+
+## Framework Comparison
+| Feature         | Mocha      | Jest       | Tap        |
+|----------------|------------|------------|------------|
+| Config         | Manual     | Zero       | Minimal    |
+| Speed          | Medium     | Fast       | Fast       |
+| Mocking        | External   | Built-in   | External   |
+| Coverage       | External   | Built-in   | External   |
+| Community      | Large      | Largest    | Niche      |
+
+## Real World Example
+- **Mocha:** Custom test suite, legacy project
+- **Jest:** Modern app, React/Node fullstack
+- **Tap:** CLI tool, streaming test
+
+## Best Practices
+- Framework project need অনুযায়ী বাছাই করুন
+- Test automation করুন
+- Coverage report দেখুন
+- Mock/stub dependency
+- CI/CD integration করুন
+
+## Performance Tips
+- Parallel test run করুন (Jest)
+- Minimal dependency রাখুন (Tap)
+- Custom reporter ব্যবহার করুন (Mocha)
+
+## উপসংহার
+
+Mocha, Jest, Tap—Node.js-এ test automation-এর জন্য efficient, scalable, এবং maintainable solution দেয়। Project need অনুযায়ী framework বাছাই করুন, automation ও best practices follow করুন। পরবর্তী পাঠে async mocking/stubbing technique নিয়ে আলোচনা হবে।

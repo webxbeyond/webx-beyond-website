@@ -1,0 +1,61 @@
+---
+title: Edge Computing ইন Node.js
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Edge Computing—cloud থেকে data/process user-এর কাছে, latency কম, speed বেশি! Node.js-এ edge deployment cutting-edge solution।
+
+## Edge Computing কী?
+- Data/process user-এর কাছে
+- Latency কম, real-time response
+- Central server নয়, distributed edge node
+
+### Analogy
+"যেন বড় শহরের বদলে, প্রতিটা locality-তে mini-market—সবকিছু দ্রুত, কাছাকাছি!"
+
+## Node.js-এ Edge Computing কেন?
+- Real-time application (chat, gaming, IoT)
+- Geo-distributed user
+- Privacy/security
+- Bandwidth optimization
+
+## Example: Edge Function (Cloudflare Workers)
+```js
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+async function handleRequest(request) {
+  return new Response('Hello from the edge!')
+}
+```
+
+## Real Life Example
+- **CDN:** Static file serve user-এর কাছে
+- **IoT:** Sensor data process nearest node-এ
+- **Realtime Chat:** Local edge server
+
+## Best Practices
+- Stateless function design
+- Minimal dependency
+- Fast cold start
+- Security: validate input/output
+- Monitoring & logging
+
+## Performance Tips
+- Data locality
+- Caching strategy
+- Efficient resource allocation
+
+## Challenges
+- Debugging distributed node
+- Data consistency
+- Vendor lock-in
+
+## Future Possibilities
+- AI inference at edge
+- Multi-cloud edge deployment
+- Serverless edge microservices
+
+## উপসংহার
+
+Edge Computing—Node.js-এ latency কম, speed বেশি, এবং real-time experience। Distributed, efficient, এবং future-ready application build করুন। Experiment করুন, learn করুন, এবং next-gen solution তৈরি করুন।

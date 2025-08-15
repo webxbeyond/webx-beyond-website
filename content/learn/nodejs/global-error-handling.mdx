@@ -1,0 +1,72 @@
+---
+title: গ্লোবাল এরর হ্যান্ডলিং ও বাউন্ডারিজ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js অ্যাপে stability, security ও maintainability নিশ্চিত করতে global error handling ও error boundary অপরিহার্য।
+
+## Global Error Handling কী?
+
+Global error handling মানে—app-এর যেকোনো জায়গায় error হলে centralized ভাবে catch, log, respond করা।
+
+### Analogy
+Error boundary হচ্ছে "বাড়ির ফায়ার-এক্সিট"—যেখানেই আগুন লাগুক, exit দিয়ে সবাই নিরাপদে বের হতে পারে।
+
+## কেন Global Error Handling?
+- Prevent app crash
+- Proper error logging
+- User-friendly response
+- Security (hide internal error)
+
+## Node.js-এ Global Error Handling
+
+### ১. Uncaught Exception
+```js
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception:', err);
+  // Optional: graceful shutdown
+  process.exit(1);
+});
+```
+
+### ২. Unhandled Promise Rejection
+```js
+process.on('unhandledRejection', err => {
+  console.error('Unhandled Rejection:', err);
+  // Optional: graceful shutdown
+  process.exit(1);
+});
+```
+
+### ৩. Express.js Error Middleware
+```js
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
+```
+
+## Error Boundary Pattern
+- Module/service level try-catch
+- Async function error propagate করুন next/error middleware-এ
+- External API/database call error handle করুন
+
+## Best Practices
+- Never expose internal error to user
+- Use error code/message mapping
+- Centralized logging (Winston, Bunyan)
+- Graceful shutdown implement করুন
+- Alert/monitoring setup করুন
+
+## Real World Example
+- **Payment gateway:** Error boundary critical
+- **Microservices:** Centralized error logging
+
+## Performance Tips
+- Error log async করুন
+- Error response minimal রাখুন
+- Retry/backoff strategy implement করুন
+
+## উপসংহার
+
+Global error handling ও boundary Node.js-এ stable, secure ও maintainable app নিশ্চিত করে। Production-এ centralized error handler, logging ও graceful shutdown best practices অনুসরণ করুন। পরবর্তী মডিউলে ডাটাবেস ও ডাটা হ্যান্ডলিং নিয়ে আলোচনা হবে।
