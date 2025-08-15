@@ -1,0 +1,86 @@
+---
+title: PM2 দিয়ে প্রসেস ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ production-grade application run, monitor, restart, scale—সবকিছু সহজ করতে PM2 process manager অপরিহার্য।
+
+## PM2 কী?
+- Advanced, feature-rich Node.js process manager—auto-restart, monitoring, clustering, log management
+
+### Analogy
+"ফ্যাক্টরিতে supervisor—সব worker ঠিকমতো কাজ করছে, কেউ অসুস্থ হলে নতুন worker দিয়ে কাজ চালিয়ে নেয়।"
+
+## Key Features
+- Auto-restart on crash
+- Zero-downtime reload
+- Cluster mode (multi-core)
+- Log management
+- Monitoring dashboard
+
+## Basic Usage
+```bash
+npm install pm2 -g
+pm2 start app.js
+pm2 list
+pm2 logs
+pm2 restart app
+pm2 stop app
+pm2 delete app
+```
+
+## Cluster Mode
+- Multi-core utilization
+```bash
+pm2 start app.js -i max
+```
+
+## Ecosystem File
+- Advanced config, environment, script
+```js
+// ecosystem.config.js
+module.exports = {
+  apps: [
+    {
+      name: 'api',
+      script: 'app.js',
+      instances: 2,
+      exec_mode: 'cluster',
+      env: { NODE_ENV: 'production' }
+    }
+  ]
+};
+```
+Run: `pm2 start ecosystem.config.js`
+```
+
+## Monitoring
+```bash
+pm2 monit
+```
+
+## Real World Example
+- **E-commerce:** Auto-restart, cluster
+- **API:** Log management, monitoring
+- **Microservices:** Multiple app management
+
+## Best Practices
+- Ecosystem file ব্যবহার করুন
+- Log rotation/setup করুন
+- Monitoring dashboard ব্যবহার করুন
+- Zero-downtime deploy করুন
+- Resource utilization monitor করুন
+
+## Performance Tips
+- Cluster mode
+- Minimal log overhead
+- Auto-restart policy
+
+## Challenges
+- Legacy app integration
+- Resource contention
+- Log storage
+
+## উপসংহার
+
+PM2—Node.js-এ process management, monitoring, scaling, এবং reliability নিশ্চিত করে। Proper config, cluster, monitoring, এবং best practices follow করুন। পরবর্তী পাঠে Dockerizing Node.js app নিয়ে আলোচনা হবে।

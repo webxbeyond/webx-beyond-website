@@ -1,0 +1,72 @@
+---
+title: Transactions ও Data Consistency
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ ডাটাবেসে transaction ও data consistency critical—বিশেষ করে multiple operation বা concurrent request-এর ক্ষেত্রে।
+
+## Transaction কী?
+
+Transaction মানে—একাধিক ডাটাবেস অপারেশন একসাথে execute হবে, সব সফল হলে commit, না হলে rollback।
+
+### Analogy
+"বাজারে গিয়ে একসাথে সব জিনিস কিনে টাকা দেওয়া—একটা না পেলে পুরো লেনদেন বাতিল"।
+
+## কেন Transaction দরকার?
+- Data integrity
+- Partial update এড়ানো
+- Error হলে rollback
+- Concurrency control
+
+## ACID Principle
+- **Atomicity:** সব বা কিছুই না
+- **Consistency:** ডাটা valid থাকবে
+- **Isolation:** একাধিক transaction একে অপরকে affect করবে না
+- **Durability:** Commit হলে data safe
+
+## Node.js-এ Transaction Example (PostgreSQL)
+```js
+const { Client } = require('pg');
+const client = new Client();
+await client.connect();
+try {
+  await client.query('BEGIN');
+  await client.query('UPDATE accounts SET balance = balance - 100 WHERE id = 1');
+  await client.query('UPDATE accounts SET balance = balance + 100 WHERE id = 2');
+  await client.query('COMMIT');
+} catch (e) {
+  await client.query('ROLLBACK');
+  throw e;
+} finally {
+  await client.end();
+}
+```
+
+## Data Consistency
+
+Consistency মানে—ডাটাবেসে সবসময় valid, expected data থাকবে।
+
+### Types
+- **Strong Consistency:** সব node-এ একই data
+- **Eventual Consistency:** সময়ের সাথে sync হয়
+- **Read-after-write Consistency:** লিখার পরেই পড়লে update পাওয়া যাবে
+
+## Real World Example
+- **Bank transfer:** দুই অ্যাকাউন্টে balance update—একটা fail হলে rollback
+- **Order processing:** payment, inventory, shipment—একটা fail হলে সব revert
+
+## Best Practices
+- Always use transaction for multi-step DB operation
+- Proper error handling করুন
+- Isolation level বুঝে ব্যবহার করুন
+- Idempotency নিশ্চিত করুন
+- Distributed transaction হলে Saga/2PC pattern consider করুন
+
+## Performance Tips
+- Transaction ছোট রাখুন
+- Long-running transaction এড়ান
+- Deadlock handle করুন
+
+## উপসংহার
+
+Transaction ও Data Consistency Node.js-এ robust, reliable application-এর জন্য অপরিহার্য। ACID principle, proper error handling ও isolation level follow করুন। পরবর্তী পাঠে Event Sourcing pattern নিয়ে আলোচনা হবে।

@@ -1,0 +1,76 @@
+---
+title: প্রোফাইলিং, --inspect, DevTools, clinic.js
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js অ্যাপের পারফরম্যান্স, মেমরি, ও ইভেন্ট লুপ সমস্যা খুঁজে বের করার জন্য প্রোফাইলিং অপরিহার্য।
+
+## প্রোফাইলিং কী?
+
+প্রোফাইলিং হচ্ছে অ্যাপের CPU, মেমরি, ইভেন্ট লুপ, ও async অপারেশন মনিটরিং ও বিশ্লেষণ করার টেকনিক।
+
+## --inspect ও Chrome DevTools
+
+Node.js-এ `--inspect` ফ্ল্যাগ দিয়ে Chrome DevTools-এ debug/profiling করা যায়।
+
+### Usage:
+```sh
+node --inspect app.js
+```
+
+- Chrome-এ `chrome://inspect` গিয়ে অ্যাপ attach করুন
+- CPU Profile, Heap Snapshot, Allocation Timeline, Event Loop Delay দেখতে পারবেন
+
+## clinic.js
+
+clinic.js হচ্ছে Node.js-এর জন্য powerful profiling toolkit।
+
+- **clinic doctor:** Overall performance analysis
+- **clinic flame:** CPU flamegraph
+- **clinic bubbleprof:** Async operation visualization
+
+### Usage:
+```sh
+npx clinic doctor -- node app.js
+npx clinic flame -- node app.js
+npx clinic bubbleprof -- node app.js
+```
+
+## Real Life Analogy
+
+প্রোফাইলিং হচ্ছে "ডাক্তারের চেকআপ"—কোথায় সমস্যা, কোথায় bottleneck, সবকিছু খুঁজে বের করা।
+
+## Performance Tips
+
+- **Profile before production**
+- **Use flamegraph for CPU bottleneck**
+- **Use heap snapshot for memory leak**
+- **Monitor event loop delay**
+
+## Practical Example: CPU Profiling
+
+### Using DevTools
+1. `node --inspect app.js`
+2. Chrome DevTools-এ CPU Profile record করুন
+3. Bottleneck function, slow operation খুঁজে বের করুন
+
+### Using clinic flame
+```sh
+npx clinic flame -- node app.js
+```
+Flamegraph-এ কোন function বেশি CPU consume করছে দেখতে পারবেন
+
+## Best Practices
+
+- **Profile regularly**
+- **Fix bottlenecks before scaling**
+- **Monitor memory usage**
+
+## Example: process.memoryUsage()
+```js
+console.log(process.memoryUsage());
+```
+
+## উপসংহার
+
+প্রোফাইলিং, --inspect, DevTools, clinic.js—Node.js অ্যাপের পারফরম্যান্স, মেমরি, ও ইভেন্ট লুপ সমস্যা খুঁজে efficient, scalable অ্যাপ তৈরি করতে সাহায্য করে। পরবর্তী পাঠে Event Loop Blocking Detection নিয়ে আলোচনা হবে।

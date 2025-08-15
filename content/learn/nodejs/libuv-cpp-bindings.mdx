@@ -1,0 +1,81 @@
+---
+title: libuv ও C++ Bindings
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এর পারফরম্যান্স, নন-ব্লকিং I/O, এবং প্ল্যাটফর্ম ইন্টিগ্রেশনের মূল রহস্য libuv ও C++ Bindings।
+
+## libuv কী?
+
+libuv হচ্ছে C-তে লেখা একটি লাইব্রেরি, যা ইভেন্ট-ড্রিভেন, নন-ব্লকিং I/O, File System, TCP/UDP, DNS, Timer ইত্যাদি হ্যান্ডল করে।
+
+- **Cross-platform:** Windows, Linux, Mac
+- **Core Features:** Event Loop, Thread Pool, Async I/O
+
+### Real Life Analogy
+libuv হচ্ছে "অপারেশন টিম"—সব কাজ efficiently, asynchronously করে।
+
+## libuv Architecture
+
+- **Event Loop:** Main thread-এ ইভেন্ট প্রসেস
+- **Thread Pool:** Heavy I/O, DNS, File System
+- **Async I/O:** Non-blocking performance
+
+### Execution Flow
+1. JavaScript থেকে I/O request
+2. libuv event loop request queue-তে নেয়
+3. Thread pool-এ async I/O প্রসেস
+4. Callback trigger হয়
+
+## C++ Bindings
+
+Node.js-এর অনেক core module (fs, net, crypto) C++ দিয়ে লেখা। JavaScript থেকে C++ function call করা যায় Native Addon (N-API) দিয়ে।
+
+### উদাহরণ: Custom Native Addon
+```cpp
+// addon.cc
+#include <napi.h>
+Napi::Number Add(const Napi::CallbackInfo& info) {
+  double a = info[0].As<Napi::Number>();
+  double b = info[1].As<Napi::Number>();
+  return Napi::Number::New(info.Env(), a + b);
+}
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("add", Napi::Function::New(env, Add));
+  return exports;
+}
+NODE_API_MODULE(addon, Init)
+```
+
+```js
+// index.js
+const addon = require('./build/Release/addon');
+console.log(addon.add(2, 3)); // Output: 5
+```
+
+## Performance Tips
+
+- **Use Thread Pool for heavy I/O**
+- **Avoid blocking Event Loop**
+- **Profile Native Addons for memory leaks**
+
+## Best Practices
+
+- **Use N-API for Native Addons**
+- **Validate input in C++ code**
+- **Handle errors gracefully**
+
+## Practical Example: Async File Read (libuv)
+
+Node.js-এর fs.readFile() ভিতরে libuv ব্যবহার করে:
+```js
+const fs = require('fs');
+fs.readFile('file.txt', (err, data) => {
+  if (err) throw err;
+  console.log(data.toString());
+});
+```
+
+## উপসংহার
+
+libuv ও C++ Bindings—Node.js-এর পারফরম্যান্স, নন-ব্লকিং I/O, এবং প্ল্যাটফর্ম ইন্টিগ্রেশনের "গোপন শক্তি"। Efficient, scalable অ্যাপের জন্য এগুলো বুঝে ব্যবহার করুন। পরবর্তী পাঠে Garbage Collection ও Memory Management নিয়ে আলোচনা হবে।

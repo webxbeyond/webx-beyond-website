@@ -1,0 +1,91 @@
+---
+title: Process অবজেক্ট ও Environment Variables
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এর `process` অবজেক্ট হচ্ছে রানটাইমের "কন্ট্রোল রুম"। এর মাধ্যমে অ্যাপের স্টেট, কনফিগ, Environment Variables, এবং সিস্টেম ইন্টারঅ্যাকশন করা যায়।
+
+## process অবজেক্ট
+
+`process` Node.js-এর গ্লোবাল অবজেক্ট, যা অ্যাপের লাইফসাইকেল, স্টেট, এবং কনফিগ ম্যানেজ করে।
+
+### Key Properties & Methods
+- `process.pid`: প্রসেস আইডি
+- `process.cwd()`: কারেন্ট ওয়ার্কিং ডিরেক্টরি
+- `process.argv`: কমান্ড লাইন আর্গুমেন্ট
+- `process.env`: Environment Variables
+- `process.exit([code])`: প্রসেস বন্ধ করা
+- `process.uptime()`: কতক্ষণ চলছে
+
+### উদাহরণ:
+```js
+console.log('PID:', process.pid);
+console.log('CWD:', process.cwd());
+console.log('Args:', process.argv);
+console.log('Uptime:', process.uptime());
+```
+
+## Environment Variables
+
+Environment Variables হচ্ছে "কনফিগারেশন"—যা অ্যাপের বাইরের থেকে সেট করা যায়।
+
+### Accessing Env Vars
+```js
+console.log('DB_HOST:', process.env.DB_HOST);
+```
+
+### Setting Env Vars (Windows)
+```
+$env:DB_HOST="localhost"; node app.js
+```
+
+### Setting Env Vars (Linux/Mac)
+```
+DB_HOST=localhost node app.js
+```
+
+## Real Life Analogy
+
+process অবজেক্ট হচ্ছে "গাড়ির ড্যাশবোর্ড"—সব তথ্য, কনফিগ, কন্ট্রোল এক জায়গায়। Environment Variables হচ্ছে "গাড়ির চাবি"—বাইরে থেকে কনফিগ দেওয়া যায়।
+
+## Best Practices
+
+- **Never Hardcode Secrets:** Always use env vars
+- **Use dotenv for Local Dev:**
+
+```js
+require('dotenv').config();
+console.log(process.env.SECRET_KEY);
+```
+
+- **Validate Env Vars:**
+
+```js
+if (!process.env.DB_HOST) {
+  throw new Error('DB_HOST is required!');
+}
+```
+
+## Performance Tips
+
+- **Read Env Vars Once:** বারবার process.env থেকে পড়বেন না
+- **Use process.exit Carefully:** Abrupt exit production-এ এড়িয়ে চলুন
+
+## ছোট্ট প্রজেক্ট উদাহরণ: Env Config
+
+```js
+// config.js
+module.exports = {
+  dbHost: process.env.DB_HOST || 'localhost',
+  port: process.env.PORT || 3000
+};
+
+// app.js
+const config = require('./config');
+console.log('DB Host:', config.dbHost);
+console.log('Port:', config.port);
+```
+
+## উপসংহার
+
+process অবজেক্ট ও Environment Variables—Node.js অ্যাপের কনফিগ, স্টেট, এবং সিকিউরিটি ম্যানেজমেন্টের জন্য অপরিহার্য। পরবর্তী মডিউলে অ্যাসিনক্রোনাস প্যাটার্ন নিয়ে আলোচনা হবে।

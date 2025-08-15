@@ -1,0 +1,58 @@
+---
+title: স্ট্রাকচার্ড লগিং ও সেন্ট্রালাইজেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+Node.js-এ application debugging, monitoring, auditing—সবকিছু সহজ করতে structured logging ও centralization অপরিহার্য।
+
+## Structured Logging কী?
+- Log message fixed format/object—easy search, filter, analysis
+
+### Analogy
+"হাসপাতালের রোগীর তথ্য—একই format-এ, সব ডিপার্টমেন্টে, সহজে খুঁজে পাওয়া যায়।"
+
+## Example (winston)
+```js
+const winston = require('winston');
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'app.log' })
+  ]
+});
+logger.info({ event: 'user_signup', userId: 123 });
+```
+
+## Centralized Logging
+- Multiple app/server log collect, aggregate, visualize
+- Tools: ELK Stack (Elasticsearch, Logstash, Kibana), Graylog, Loki, Datadog
+
+## Example (Log aggregation)
+- Logstash collect, Elasticsearch store, Kibana visualize
+
+## Real World Example
+- **E-commerce:** Error, transaction log central
+- **API:** Request, response, error log
+- **Microservices:** Distributed log aggregation
+
+## Best Practices
+- Structured format (JSON)
+- Log level (info, warn, error)
+- Sensitive info avoid করুন
+- Centralized aggregation tool ব্যবহার করুন
+- Retention policy/setup করুন
+
+## Performance Tips
+- Async logging
+- Log rotation
+- Minimal log overhead
+
+## Challenges
+- Legacy log format
+- High volume log
+- Privacy/GDPR
+
+## উপসংহার
+
+Structured logging ও centralization—Node.js-এ debugging, monitoring, auditing, এবং compliance নিশ্চিত করে। Proper format, aggregation, retention, এবং best practices follow করুন। পরবর্তী পাঠে Observability নিয়ে আলোচনা হবে।

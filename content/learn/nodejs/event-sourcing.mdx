@@ -1,0 +1,70 @@
+---
+title: Event Sourcing প্যাটার্ন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Event Sourcing হচ্ছে—state পরিবর্তনের প্রতিটি event আলাদাভাবে সংরক্ষণ করা, সরাসরি current state না রেখে। এতে auditing, rollback, debugging, CQRS, এবং distributed consistency সহজ হয়।
+
+## Event Sourcing কী?
+
+Traditional approach-এ database-এ শুধু final/current state থাকে। Event Sourcing-এ প্রতিটি পরিবর্তন (event) log হয়—state reconstruct করা যায় event replay করে।
+
+### Analogy
+"বইয়ের হিসাব—প্রতিদিনের আয়-ব্যয় আলাদাভাবে লিখে রাখা, শেষে যোগ করে balance বের করা।"
+
+## কেন Event Sourcing?
+- Full audit trail
+- Easy rollback/replay
+- Debugging সহজ
+- Distributed consistency
+- CQRS implement সহজ
+
+## Node.js-এ Event Sourcing Example
+```js
+// Event log structure
+const events = [];
+function addEvent(type, payload) {
+  events.push({ type, payload, timestamp: Date.now() });
+}
+function getState() {
+  let state = {};
+  for (const event of events) {
+    // state reconstruct logic
+    if (event.type === 'deposit') {
+      state.balance = (state.balance || 0) + event.payload.amount;
+    } else if (event.type === 'withdraw') {
+      state.balance = (state.balance || 0) - event.payload.amount;
+    }
+  }
+  return state;
+}
+addEvent('deposit', { amount: 100 });
+addEvent('withdraw', { amount: 30 });
+console.log(getState()); // { balance: 70 }
+```
+
+## Real World Example
+- **Banking:** প্রতিটি transaction event log হয়
+- **E-commerce:** order, payment, shipment event log
+- **Microservices:** distributed event log
+
+## Best Practices
+- Event schema versioning করুন
+- Idempotency নিশ্চিত করুন
+- Event replay efficient করুন
+- Event store scalable রাখুন
+- Error handling ও validation করুন
+
+## Performance Tips
+- Snapshot strategy ব্যবহার করুন (periodically state save)
+- Async event processing করুন
+- Partitioned event store ব্যবহার করুন
+
+## Challenges
+- Event schema evolution
+- Large event log management
+- Event replay performance
+
+## উপসংহার
+
+Event Sourcing pattern Node.js-এ scalable, auditable, এবং distributed system design সহজ করে। CQRS, rollback, debugging, এবং consistency নিশ্চিত করতে event sourcing ব্যবহার করুন।

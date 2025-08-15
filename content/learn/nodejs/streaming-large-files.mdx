@@ -1,0 +1,85 @@
+---
+title: স্ট্রিমিং API দিয়ে বড় ফাইল ট্রান্সফার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ বড় ফাইল ট্রান্সফার efficient করতে স্ট্রিমিং API অপরিহার্য। Buffer-এ পুরো ফাইল না রেখে chunk-by-chunk পাঠানো যায়—memory ও performance দুইই optimal থাকে।
+
+## Streaming API কী?
+
+Streaming API data chunk-by-chunk process করে—read, write, transform, pipeline।
+
+### Analogy
+Buffer-based transfer হচ্ছে "একবারে পুরো ট্রাক ভর্তি মাল পাঠানো"—জ্যাম, delay, memory problem। Streaming হচ্ছে "ছোট ছোট ট্রাক একটার পর একটা পাঠানো"—fast, efficient, memory-friendly।
+
+## কেন Streaming?
+- Low memory usage
+- Fast response
+- Real-time processing
+- Large file transfer (video, backup)
+
+## Node.js-এ Streaming API
+
+### File Read & Write
+```js
+const fs = require('fs');
+const readStream = fs.createReadStream('large.mp4');
+const writeStream = fs.createWriteStream('copy.mp4');
+readStream.pipe(writeStream);
+```
+
+### HTTP File Download
+```js
+const http = require('http');
+const fs = require('fs');
+http.createServer((req, res) => {
+  const stream = fs.createReadStream('large.zip');
+  res.writeHead(200, { 'Content-Type': 'application/zip' });
+  stream.pipe(res);
+}).listen(8080);
+```
+
+## Transform Stream Example
+```js
+const { Transform } = require('stream');
+const upperCase = new Transform({
+  transform(chunk, enc, cb) {
+    cb(null, chunk.toString().toUpperCase());
+  }
+});
+process.stdin.pipe(upperCase).pipe(process.stdout);
+```
+
+## Performance Tips
+- Backpressure handle করুন (stream.pause/resume)
+- Error handling করুন (stream.on('error'))
+- HighWaterMark adjust করুন large file/fast networkে
+
+## Real World Example
+- **Video streaming:** YouTube, Netflix
+- **Backup/restore:** Database dump
+- **Log processing:** Real-time analytics
+
+## Best Practices
+- Always use stream for large file
+- Pipe chain ব্যবহার করুন (read → transform → write)
+- Resource cleanup করুন (stream.close)
+- Chunk size optimize করুন
+
+## Advanced: Pipeline API
+```js
+const { pipeline } = require('stream');
+pipeline(
+  fs.createReadStream('input.txt'),
+  upperCase,
+  fs.createWriteStream('output.txt'),
+  err => {
+    if (err) console.error('Pipeline failed:', err);
+    else console.log('Pipeline succeeded');
+  }
+);
+```
+
+## উপসংহার
+
+Streaming API দিয়ে বড় ফাইল ট্রান্সফার Node.js-এ efficient, scalable ও memory-friendly। Production-এ stream, pipeline ও error handling best practices অনুসরণ করুন। পরবর্তী পাঠে REST, GraphQL ও gRPC নিয়ে আলোচনা হবে।

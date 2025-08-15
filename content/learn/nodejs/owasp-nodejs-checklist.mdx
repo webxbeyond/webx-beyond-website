@@ -1,0 +1,64 @@
+---
+title: OWASP Node.js চেকলিস্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+OWASP (Open Web Application Security Project) Node.js-এর জন্য industry-standard security checklist—application vulnerability minimize ও best practices implement করতে অপরিহার্য।
+
+## OWASP Top Checklist
+1. **Input Validation & Sanitization**
+   - User input validate/sanitize করুন
+2. **Authentication & Session Management**
+   - Strong password, session timeout, token security
+3. **Access Control**
+   - Role-based, least privilege
+4. **Error Handling & Logging**
+   - Sensitive info leak prevent, proper log
+5. **Security Headers**
+   - Helmet.js, CSP, HSTS, X-Frame-Options
+6. **Rate Limiting & DoS Protection**
+   - express-rate-limit, resource quota
+7. **Dependency Management**
+   - Regular audit, update, remove vulnerable package
+8. **Data Protection**
+   - Encryption, secure storage
+9. **Secure Configuration**
+   - Environment variable, config file security
+10. **Monitoring & Alerting**
+    - Suspicious activity detect, alert setup
+
+### Analogy
+"বাড়ি নিরাপদ রাখতে তালা, গ্রিল, সিসিটিভি, গার্ড—OWASP checklist application security-এর জন্য।"
+
+## Example Implementation
+- Input validation: express-validator
+- Session: express-session/JWT
+- Header: Helmet.js
+- Rate limit: express-rate-limit
+- Audit: npm audit
+
+## Real World Example
+- **Banking:** Strong auth, encryption
+- **E-commerce:** Rate limit, header
+- **API:** Input validation, logging
+
+## Best Practices
+- Checklist follow করুন
+- Regular security audit করুন
+- Automated test implement করুন
+- Developer training করুন
+- Incident response plan রাখুন
+
+## Performance Tips
+- Minimal overhead
+- Automated scan
+- Efficient logging
+
+## Challenges
+- Legacy code
+- Third-party integration
+- Human error
+
+## উপসংহার
+
+OWASP Node.js checklist—application security, reliability, এবং compliance নিশ্চিত করে। Checklist follow, audit, training, এবং best practices implement করুন।

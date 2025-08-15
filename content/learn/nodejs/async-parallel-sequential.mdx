@@ -1,0 +1,85 @@
+---
+title: Parallel বনাম Sequential এক্সিকিউশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ অ্যাসিনক্রোনাস কোডের execution pattern দুই ধরনের: Parallel (একসাথে) ও Sequential (একটার পর একটা)। সঠিক pattern ব্যবহার করলে পারফরম্যান্স ও রিসোর্স management সহজ হয়।
+
+## Sequential Execution
+
+Sequential execution-এ টাস্কগুলো একটার পর একটা চলে, পরেরটা শুরু হয় আগেরটা শেষ হলে।
+
+### উদাহরণ:
+```js
+async function sequential() {
+  const a = await taskA();
+  const b = await taskB(a);
+  const c = await taskC(b);
+  return c;
+}
+```
+
+- **Use Case:** ডিপেন্ডেন্ট টাস্ক, ডেটা প্রসেসিং
+- **Performance:** ধীর, predictable
+
+## Parallel Execution
+
+Parallel execution-এ একাধিক টাস্ক একসাথে শুরু হয়, পরেরটা আগেরটার উপর নির্ভর করে না।
+
+### উদাহরণ:
+```js
+async function parallel() {
+  const [a, b, c] = await Promise.all([
+    taskA(),
+    taskB(),
+    taskC()
+  ]);
+  return [a, b, c];
+}
+```
+
+- **Use Case:** Independent টাস্ক, API calls, File read/write
+- **Performance:** দ্রুত, efficient
+
+## Real Life Analogy
+
+Sequential execution হচ্ছে "এক লাইনে দাঁড়িয়ে কাজ করা"—একজন শেষ হলে পরেরজন শুরু। Parallel execution হচ্ছে "একই সময়ে একাধিক কাউন্টার খোলা"—সবাই একসাথে কাজ করছে।
+
+## Performance Tips
+
+- **Use Parallel for Independent Tasks:** API, File, Network
+- **Use Sequential for Dependent Tasks:** ডেটা প্রসেসিং, ট্রান্সফর্ম
+- **Limit Parallelism:** অনেক টাস্ক একসাথে করলে memory/CPU overload হতে পারে
+
+## Practical Example: API Calls
+
+```js
+// Sequential
+async function getDataSequential() {
+  const user = await getUser();
+  const posts = await getPosts(user.id);
+  return { user, posts };
+}
+
+// Parallel
+async function getDataParallel() {
+  const [user, posts] = await Promise.all([
+    getUser(),
+    getPosts()
+  ]);
+  return { user, posts };
+}
+```
+
+## Library: p-map (Limit Parallelism)
+
+```js
+const pMap = require('p-map');
+const input = [1, 2, 3, 4, 5];
+const mapper = async x => await doAsyncTask(x);
+const result = await pMap(input, mapper, { concurrency: 2 });
+```
+
+## উপসংহার
+
+Parallel ও Sequential execution—Node.js অ্যাপের পারফরম্যান্স, স্কেল ও রিসোর্স management-এর জন্য critical। সঠিক pattern বেছে নিন, efficient অ্যাপ লিখুন। পরবর্তী পাঠে Async Iterators ও Generators নিয়ে আলোচনা হবে।

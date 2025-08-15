@@ -1,0 +1,74 @@
+---
+title: TLS/SSL কনফিগারেশন ও প্র্যাকটিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ secure communication নিশ্চিত করতে TLS/SSL অপরিহার্য। HTTPS, WebSocket, API—সবকিছুতে encryption, authentication ও data integrity দরকার।
+
+## TLS/SSL কী?
+
+TLS (Transport Layer Security) ও SSL (Secure Sockets Layer) হচ্ছে encryption protocol, যা data transmission secure করে। SSL পুরনো, TLS আধুনিক ও widely used।
+
+### Analogy
+HTTP হচ্ছে "খোলা চিঠি"—যে কেউ পড়ে ফেলতে পারে। HTTPS/TLS হচ্ছে "লকারে রাখা চিঠি"—শুধু প্রাপক পড়তে পারে।
+
+## কেন TLS/SSL?
+- Data encryption
+- Authentication (server/client)
+- Data integrity
+- Compliance (GDPR, PCI-DSS)
+
+## Node.js-এ TLS/SSL Server
+
+### Self-signed Certificate তৈরি
+```sh
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+```
+
+### HTTPS Server Example
+```js
+const https = require('https');
+const fs = require('fs');
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+https.createServer(options, (req, res) => {
+  res.writeHead(200);
+  res.end('Secure Hello!');
+}).listen(443);
+```
+
+## TLS/SSL Client Example
+```js
+const https = require('https');
+https.get('https://example.com', res => {
+  res.on('data', d => process.stdout.write(d));
+});
+```
+
+## Best Practices
+- **Use strong cipher suites**
+- **Always redirect HTTP to HTTPS**
+- **Renew certificates before expiry**
+- **Validate certificate chain**
+- **Disable SSLv2/v3, only use TLS 1.2/1.3**
+- **Use HSTS header**
+
+## Security Tips
+- Private key secure locationে রাখুন
+- Certificate authority (CA) থেকে signed cert ব্যবহার করুন
+- Self-signed cert শুধু development/test-এ
+- Perfect Forward Secrecy (PFS) enable করুন
+
+## Real World Example
+- **Express.js:** HTTPS server
+- **API Gateway:** TLS termination
+
+## Advanced: Mutual TLS (mTLS)
+- Client ও server দুইপাশে certificate verify করে
+- Highly secure API, B2B communication
+
+## উপসংহার
+
+TLS/SSL কনফিগারেশন Node.js-এ security, trust ও compliance নিশ্চিত করে। Production-এ strong cert, cipher, ও security best practices অনুসরণ করুন। পরবর্তী পাঠে Streaming API নিয়ে আলোচনা হবে।

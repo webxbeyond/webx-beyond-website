@@ -1,0 +1,61 @@
+---
+title: TDD ইন Node.js
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Test-Driven Development (TDD)—Node.js-এ robust, bug-free, maintainable code লিখার জন্য অত্যন্ত কার্যকরী।
+
+## TDD কী?
+- Test আগে লিখুন, তারপর code লিখুন—test pass না করা পর্যন্ত code change করুন।
+
+### Analogy
+"বাড়ি বানানোর আগে নকশা approve—নকশা অনুযায়ী কাজ না হলে বারবার ঠিক করা।"
+
+## TDD Cycle
+1. **Write test:** নতুন feature/function-এর জন্য test লিখুন
+2. **Run test:** test fail হবে (code নেই)
+3. **Write code:** test pass করার জন্য code লিখুন
+4. **Refactor:** code optimize করুন, test pass রাখুন
+
+## Example (Jest)
+```js
+// test.js
+test('sum', () => {
+  expect(sum(2, 3)).toBe(5);
+});
+// sum.js
+function sum(a, b) { return a + b; }
+module.exports = sum;
+```
+
+## TDD-এর সুবিধা
+- Bug early detect
+- Refactor সহজ
+- Documentation হিসেবে test
+- Confidence in deployment
+
+## Real World Example
+- **API development:** endpoint behavior test
+- **Library/package:** function contract test
+- **Refactoring:** old code change, test pass
+
+## Best Practices
+- Small, atomic test লিখুন
+- Coverage report দেখুন
+- Red-Green-Refactor cycle follow করুন
+- Mock/stub external dependency
+- CI/CD-তে test run করুন
+
+## Performance Tips
+- Fast test run করুন
+- Parallel test execution
+- Minimal dependency
+
+## Challenges
+- Initial time investment
+- Legacy code-এ TDD implement
+- Flaky test handle
+
+## উপসংহার
+
+TDD—Node.js-এ quality, reliability, এবং maintainability নিশ্চিত করে। Test আগে লিখুন, Red-Green-Refactor cycle follow করুন, এবং best practices implement করুন।

@@ -1,0 +1,94 @@
+---
+title: প্রজেক্ট স্ট্রাকচার - Monolith বনাম Microservices
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ বড় স্কেল অ্যাপ্লিকেশন design করতে project structure critical। Monolith ও Microservices—দুই approach-এর feature, use-case ও analogy জানা জরুরি।
+
+## Monolith Architecture
+
+### Key Features
+- Single codebase
+- Shared database
+- Tight coupling
+- Easy to develop/deploy (small team)
+
+### Analogy
+Monolith হচ্ছে "একটা বড় বিল্ডিং—সবকিছু এক জায়গায়"।
+
+### Use Case
+- Small/medium app
+- Rapid prototyping
+- Simple business logic
+
+### Example Structure
+```
+project/
+  controllers/
+  models/
+  routes/
+  services/
+  app.js
+```
+
+## Microservices Architecture
+
+### Key Features
+- Multiple independent services
+- Own database per service
+- Loose coupling
+- Scalable, resilient
+
+### Analogy
+Microservices হচ্ছে "একটা শহর—বিভিন্ন বিল্ডিং, আলাদা কাজ, আলাদা ঠিকানা"।
+
+### Use Case
+- Large scale app
+- Complex business logic
+- Multiple teams
+
+### Example Structure
+```
+project/
+  user-service/
+    controllers/
+    models/
+    routes/
+    app.js
+  order-service/
+    controllers/
+    models/
+    routes/
+    app.js
+  api-gateway/
+    routes/
+    app.js
+```
+
+## Comparison Table
+| Feature         | Monolith   | Microservices |
+|----------------|------------|--------------|
+| Codebase       | Single     | Multiple     |
+| Deployment     | One unit   | Many units   |
+| Scaling        | Vertical   | Horizontal   |
+| Fault Isolation| Low        | High         |
+| Team Structure | Small      | Large        |
+
+## Best Practices
+- Monolith: Modular code, clear separation (MVC)
+- Microservices: API gateway, service discovery, centralized logging
+- Use Docker/Kubernetes for microservices deployment
+- CI/CD pipeline implement করুন
+
+## Real World Example
+- **Monolith:** Early-stage startup app
+- **Microservices:** Netflix, Uber, Amazon
+
+## Transition Tips
+- Monolith থেকে Microservices-এ migrate করতে domain boundary define করুন
+- Shared database avoid করুন
+- Gradual migration করুন (Strangler pattern)
+
+## উপসংহার
+
+Monolith ও Microservices—দুইটা আলাদা project structure, use-case ও scalability দেয়। Requirement অনুযায়ী architecture design করুন। Production-এ best practices অনুসরণ করুন। পরবর্তী পাঠে Dependency Injection নিয়ে আলোচনা হবে।

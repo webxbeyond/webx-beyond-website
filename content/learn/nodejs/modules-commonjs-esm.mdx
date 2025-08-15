@@ -1,0 +1,96 @@
+---
+title: মডিউল সিস্টেম - CommonJS বনাম ES Modules
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ কোডকে "মডিউল" আকারে ভাগ করা হয়, যাতে কোড রিইউজ, মেইনটেন ও স্কেল করা সহজ হয়। Node.js-এ দুই ধরনের মডিউল সিস্টেম আছে: CommonJS ও ES Modules (ESM)।
+
+## CommonJS
+
+CommonJS Node.js-এর পুরনো ও ডিফল্ট মডিউল সিস্টেম।
+
+- **Syntax:** `require`, `module.exports`
+- **Synchronous Loading**
+- **File Extension:** `.js`
+
+### উদাহরণ:
+```js
+// math.js
+function add(a, b) { return a + b; }
+module.exports = { add };
+
+// app.js
+const math = require('./math');
+console.log(math.add(2, 3)); // Output: 5
+```
+
+## ES Modules (ESM)
+
+ES Modules হচ্ছে JavaScript-এর নতুন স্ট্যান্ডার্ড।
+
+- **Syntax:** `import`, `export`
+- **Asynchronous Loading**
+- **File Extension:** `.mjs` বা `"type": "module"` in package.json
+
+### উদাহরণ:
+```js
+// math.mjs
+export function add(a, b) { return a + b; }
+
+// app.mjs
+import { add } from './math.mjs';
+console.log(add(2, 3)); // Output: 5
+```
+
+## পার্থক্য
+
+| Feature            | CommonJS           | ES Modules (ESM)   |
+|--------------------|--------------------|--------------------|
+| Syntax             | require/module.exports | import/export   |
+| Loading            | Synchronous        | Asynchronous       |
+| File Extension     | .js                | .mjs/.js           |
+| Top-level await    | Not supported      | Supported          |
+| Static Analysis    | Limited            | Full               |
+| Tree Shaking       | No                 | Yes                |
+
+## Real Life Analogy
+
+CommonJS হচ্ছে পুরনো "চাবি"—সব দরজা খুলতে পারে, কিন্তু নতুন "কার্ড" (ESM) দিয়ে দরজা খুললে আরও ফিচার পাওয়া যায়।
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Legacy Project:** CommonJS
+- **Modern Project, Frontend + Backend:** ESM
+- **Library Development:** ESM (future-proof)
+
+## Interoperability
+
+CommonJS ও ESM একসাথে ব্যবহার করা যায়, কিন্তু কিছু সীমাবদ্ধতা আছে।
+- CommonJS থেকে ESM import করা যায় না সরাসরি
+- ESM থেকে CommonJS import করা যায় (dynamic import)
+
+### উদাহরণ:
+```js
+// ESM থেকে CommonJS
+import pkg from 'some-commonjs-package';
+```
+
+## Performance Tips
+
+- ESM asynchronous, তাই বড় অ্যাপের জন্য ভালো
+- Tree Shaking ও Static Analysis ESM-এ সহজ
+
+## ছোট্ট প্রজেক্ট উদাহরণ: ESM + CommonJS
+
+```js
+// legacy.js (CommonJS)
+module.exports = function() { return 'Legacy'; };
+
+// modern.mjs (ESM)
+import legacy from './legacy.js';
+console.log(legacy()); // Output: Legacy
+```
+
+## উপসংহার
+
+CommonJS Node.js-এর ভিত্তি, কিন্তু ESM হচ্ছে ভবিষ্যৎ। Modern JavaScript ও Node.js অ্যাপের জন্য ESM ব্যবহার করুন। পরবর্তী পাঠে Error Handling নিয়ে আলোচনা হবে।

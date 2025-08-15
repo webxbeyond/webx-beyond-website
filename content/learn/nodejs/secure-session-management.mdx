@@ -1,0 +1,75 @@
+---
+title: সিকিউর সেশন ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ authentication, authorization, এবং user privacy নিশ্চিত করতে secure session management অপরিহার্য।
+
+## Session Management কী?
+- User login-এর পর server-side user state/store handle করা।
+
+### Analogy
+"হোটেলে guest check-in করলে unique key দেওয়া হয়—guest শুধু নিজের রুমে ঢুকতে পারে।"
+
+## Session Threats
+- Session hijacking
+- Session fixation
+- CSRF
+
+## Secure Session Practice
+- Strong, random session ID
+- Session cookie secure, HttpOnly, SameSite
+- Session expiration/timeout
+- Regenerate session on privilege change/login
+
+## Example (express-session)
+```js
+const session = require('express-session');
+app.use(session({
+  secret: 'your-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    maxAge: 3600000 // 1 hour
+  }
+}));
+```
+
+## Token-based Session (JWT)
+- Stateless, scalable
+- Token sign, verify
+- Example:
+```js
+const jwt = require('jsonwebtoken');
+const token = jwt.sign({ userId: 1 }, 'secret', { expiresIn: '1h' });
+const decoded = jwt.verify(token, 'secret');
+```
+
+## Real World Example
+- **E-commerce:** User cart/session
+- **Banking:** Transaction session
+- **API:** Auth token/session
+
+## Best Practices
+- Session store encrypt করুন
+- Session timeout enforce করুন
+- Cookie attribute properly set করুন
+- Token blacklist/refresh implement করুন
+- Logout/session destroy করুন
+
+## Performance Tips
+- Redis/Memcached session store
+- Minimal session data
+- Token expiry optimize
+
+## Challenges
+- Distributed session sync
+- Token revocation
+- Legacy session migration
+
+## উপসংহার
+
+Secure session management—Node.js-এ authentication, authorization, এবং privacy নিশ্চিত করে। Proper cookie, token, session store, এবং best practices follow করুন। পরবর্তী পাঠে Rate Limiting ও DoS প্রতিরোধ নিয়ে আলোচনা হবে।

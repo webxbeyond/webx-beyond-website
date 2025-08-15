@@ -1,0 +1,71 @@
+---
+title: Serverless - AWS Lambda, Cloudflare Workers
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Serverless—code run হয়, server manage করতে হয় না! Node.js-এ serverless architecture—scalable, cost-effective, এবং lightning-fast deployment।
+
+## Serverless কী?
+- No server management
+- Auto-scaling
+- Pay-per-use
+- Function-as-a-Service (FaaS)
+
+### Analogy
+"যেন আপনি দোকান খুললেন, কিন্তু দোকানদার, গুদাম, বিদ্যুৎ—সব ready-made! শুধু পণ্য দিন, বিক্রি করুন।"
+
+## Node.js-এ Serverless কেন?
+- Rapid deployment
+- Cost optimization
+- Scalability
+- Event-driven architecture
+
+## Example: AWS Lambda (Node.js)
+```js
+exports.handler = async (event) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!'),
+  };
+};
+```
+
+## Example: Cloudflare Workers
+```js
+addEventListener('fetch', event => {
+  event.respondWith(new Response('Hello from Cloudflare Worker!'))
+})
+```
+
+## Real Life Example
+- **Image resize:** User upload, Lambda process
+- **API Gateway:** Serverless backend
+- **Edge logic:** Cloudflare Worker serve static/dynamic content
+
+## Best Practices
+- Stateless function design
+- Minimal cold start
+- Proper error handling
+- Secure environment variable usage
+- Monitoring & logging
+
+## Performance Tips
+- Optimize function size
+- Use async I/O
+- Avoid heavy dependencies
+- Efficient resource allocation
+
+## Challenges
+- Cold start latency
+- Limited execution time
+- Vendor lock-in
+- Debugging difficulty
+
+## Future Possibilities
+- Multi-cloud serverless
+- AI/ML inference
+- Real-time analytics
+
+## উপসংহার
+
+Serverless—Node.js-এ effortless, scalable, এবং efficient application build করুন। AWS Lambda, Cloudflare Workers—next-gen deployment, cost-saving, এবং lightning-fast solution। Experiment করুন, learn করুন, এবং future-ready architecture তৈরি করুন।

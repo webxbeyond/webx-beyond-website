@@ -1,0 +1,62 @@
+---
+title: রেট লিমিটিং ও DoS প্রতিরোধ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application security ও stability নিশ্চিত করতে Rate Limiting ও DoS (Denial of Service) প্রতিরোধ অপরিহার্য।
+
+## Rate Limiting কী?
+- নির্দিষ্ট সময়/interval-এ user/request-এর সংখ্যা সীমিত করা।
+
+## DoS Attack কী?
+- Excessive request/send করে server/resource unavailable/slow করে দেওয়া।
+
+### Analogy
+"বাজারে একসাথে হাজার লোক ঢুকলে দোকানদার সবারে সার্ভ করতে পারে না—rate limit দরকার।"
+
+## Rate Limiting Example (express-rate-limit)
+```js
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+```
+
+## Advanced Rate Limiting (Redis)
+- Distributed, scalable
+- Example: `rate-limit-redis` package
+
+## DoS Prevention Techniques
+- Rate limiting
+- Resource quota
+- CAPTCHA
+- IP blacklist/whitelist
+- Load balancer
+
+## Real World Example
+- **API:** Excessive request block
+- **Login:** Brute-force prevent
+- **E-commerce:** Flash sale abuse prevent
+
+## Best Practices
+- Error message informative রাখুন
+- Rate limit policy clearly communicate করুন
+- Distributed rate limit implement করুন
+- Monitoring/alerting setup করুন
+- Suspicious activity log করুন
+
+## Performance Tips
+- In-memory store (small app)
+- Redis/Memcached (large app)
+- Adaptive rate limit
+
+## Challenges
+- Legitimate burst handle
+- Distributed sync
+- False positive
+
+## উপসংহার
+
+Rate Limiting ও DoS প্রতিরোধ—Node.js-এ security, stability, এবং reliability নিশ্চিত করে। Proper rate limit, resource quota, monitoring, এবং best practices follow করুন। পরবর্তী পাঠে Secure Headers নিয়ে আলোচনা হবে।

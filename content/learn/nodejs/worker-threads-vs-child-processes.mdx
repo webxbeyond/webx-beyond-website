@@ -1,0 +1,91 @@
+---
+title: Worker Threads বনাম Child Processes
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ CPU-intensive কাজ, heavy computation, বা parallel processing-এর জন্য দুইটি প্রধান টুল আছে: Worker Threads ও Child Processes।
+
+## Worker Threads
+
+Worker Threads Node.js v10.5+ থেকে এসেছে। এগুলো একই process-এর মধ্যে multiple threads চালাতে পারে।
+
+- **Use Case:** CPU-intensive task, image processing, cryptography
+- **Shared Memory:** ArrayBuffer, MessageChannel
+- **Communication:** postMessage
+
+### উদাহরণ:
+```js
+const { Worker, isMainThread, parentPort } = require('worker_threads');
+if (isMainThread) {
+  const worker = new Worker(__filename);
+  worker.on('message', msg => console.log('From worker:', msg));
+  worker.postMessage('Hello Worker');
+} else {
+  parentPort.on('message', msg => {
+    parentPort.postMessage(msg + ' World!');
+  });
+}
+```
+
+## Child Processes
+
+Child Processes Node.js-এর পুরনো টুল, যা নতুন process (OS-level) তৈরি করে।
+
+- **Use Case:** External command, heavy computation, process isolation
+- **Communication:** IPC (Inter-Process Communication)
+- **Methods:** spawn, fork, exec
+
+### উদাহরণ:
+```js
+const { fork } = require('child_process');
+const child = fork('child.js');
+child.on('message', msg => console.log('From child:', msg));
+child.send('Hello Child');
+```
+
+## তুলনা
+
+| Feature         | Worker Threads      | Child Processes     |
+|----------------|--------------------|--------------------|
+| Memory         | Shared             | Isolated           |
+| Communication  | MessageChannel     | IPC                |
+| Overhead       | Low                | High               |
+| Use Case       | CPU-intensive      | External command   |
+| Crash Impact   | Whole process      | Only child         |
+
+## Real Life Analogy
+
+Worker Threads হচ্ছে "একই অফিসে একাধিক কর্মী"—সবাই একই রিসোর্স শেয়ার করে। Child Processes হচ্ছে "আলাদা অফিসে কর্মী"—নিজস্ব রিসোর্স, আলাদা address।
+
+## Performance Tips
+
+- **Use Worker Threads for heavy JS computation**
+- **Use Child Processes for process isolation, external command**
+- **Limit number of threads/processes**
+
+## Practical Example: Parallel Computation
+
+```js
+// worker.js
+const { parentPort } = require('worker_threads');
+parentPort.on('message', num => {
+  let result = num * 2;
+  parentPort.postMessage(result);
+});
+
+// main.js
+const { Worker } = require('worker_threads');
+const worker = new Worker('./worker.js');
+worker.on('message', res => console.log('Result:', res));
+worker.postMessage(21);
+```
+
+## Best Practices
+
+- **Always handle errors in threads/processes**
+- **Clean up resources after exit**
+- **Use thread/process pool for large scale**
+
+## উপসংহার
+
+Worker Threads ও Child Processes—Node.js-এ parallelism, heavy computation ও process isolation-এর জন্য অপরিহার্য। সঠিক টুল বেছে efficient, scalable অ্যাপ লিখুন। পরবর্তী পাঠে IPC ও Message Passing নিয়ে আলোচনা হবে।

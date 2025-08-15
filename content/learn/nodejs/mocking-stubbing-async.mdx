@@ -1,0 +1,71 @@
+---
+title: Async কোড মকিং/স্টাবিং টেকনিক
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ async function, API call, database query—test করতে mocking/stubbing অপরিহার্য।
+
+## Mocking vs Stubbing
+- **Mocking:** আসল object/function-এর behavior emulate করা, call/response track করা
+- **Stubbing:** নির্দিষ্ট input/output return করা, আসল logic execute না করে
+
+### Analogy
+"পরীক্ষায় dummy answer script ব্যবহার—আসল student না, কিন্তু examiner check করতে পারে।"
+
+## কেন দরকার?
+- External dependency isolate
+- Fast, reliable test
+- Error scenario simulate
+
+## Async Function Mocking Example (Jest)
+```js
+const fetchData = async () => {
+  // real API call
+};
+test('fetchData mock', async () => {
+  const mockFetch = jest.fn().mockResolvedValue('data');
+  const result = await mockFetch();
+  expect(result).toBe('data');
+});
+```
+
+## Async Function Stubbing Example (Sinon)
+```js
+const sinon = require('sinon');
+const db = { get: async () => 'real' };
+sinon.stub(db, 'get').resolves('stubbed');
+(async () => {
+  const result = await db.get();
+  console.log(result); // 'stubbed'
+})();
+```
+
+## API Call Mocking (nock)
+```js
+const nock = require('nock');
+nock('https://api.example.com')
+  .get('/data')
+  .reply(200, { value: 42 });
+// Now HTTP GET will return mocked response
+```
+
+## Real World Example
+- **Database query:** Stubbed response
+- **HTTP API:** Mocked endpoint
+- **Third-party service:** Simulated error/success
+
+## Best Practices
+- Always restore original function after test
+- Error scenario test করুন
+- Async/await properly handle করুন
+- Coverage report দেখুন
+- External dependency isolate করুন
+
+## Performance Tips
+- Minimal mock/stub ব্যবহার করুন
+- Parallel test run করুন
+- Heavy dependency avoid করুন
+
+## উপসংহার
+
+Async mocking/stubbing technique—Node.js-এ fast, reliable, এবং isolated test নিশ্চিত করে। External dependency isolate, error scenario simulate, এবং best practices follow করুন। পরবর্তী পাঠে Load/Stress testing নিয়ে আলোচনা হবে।

@@ -1,0 +1,104 @@
+---
+title: HTTP/1.1, HTTP/2, HTTP/3—কখন কোনটা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ওয়েব অ্যাপের পারফরম্যান্স, স্কেলিং ও ফিচার নির্ভর করে HTTP protocol-এর version-এর উপর। Node.js-এ কোনটা কখন ব্যবহার করবেন, তা বুঝতে হলে evolution, feature ও use-case জানা জরুরি।
+
+## HTTP/1.1: The Classic
+
+### Key Features
+- Text-based protocol
+- One request per connection (keep-alive থাকলেও sequential)
+- Head-of-line blocking
+- Chunked transfer encoding
+
+### Analogy
+একটি এক-লাইনের টোল বুথ—এক গাড়ি গেলে পরেরটা যেতে পারে।
+
+### Use Case
+- Legacy systems
+- Simple API, low concurrency
+- Wide compatibility
+
+### Node.js Example
+```js
+const http = require('http');
+http.createServer((req, res) => {
+  res.end('Hello HTTP/1.1');
+}).listen(8080);
+```
+
+## HTTP/2: The Upgrade
+
+### Key Features
+- Binary protocol
+- Multiplexing: এক connection-এ একাধিক request
+- Header compression
+- Server push
+- Better performance for modern web
+
+### Analogy
+একটি মাল্টি-লেন টোল প্লাজা—একসাথে অনেক গাড়ি যেতে পারে।
+
+### Use Case
+- SPA, heavy asset loading
+- API gateway
+- Real-time apps
+
+### Node.js Example
+```js
+const http2 = require('http2');
+const server = http2.createSecureServer({
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+});
+server.on('stream', (stream, headers) => {
+  stream.respond({ ':status': 200 });
+  stream.end('Hello HTTP/2');
+});
+server.listen(8443);
+```
+
+## HTTP/3: The Future
+
+### Key Features
+- Built on QUIC (UDP-based)
+- Faster connection setup
+- Built-in encryption
+- Resistant to packet loss
+- Mobile-friendly
+
+### Analogy
+একটি ফ্লাইওভার—জ্যাম নেই, দ্রুত যাওয়া যায়, ছোট গাড়ি-বড় গাড়ি সব যায়।
+
+### Use Case
+- High-latency networks (mobile, wireless)
+- Streaming, gaming
+- Modern browsers
+
+### Node.js Status
+Node.js-এ HTTP/3 সরাসরি নেই, experimental support আছে (via third-party, e.g. Cloudflare, proxies)।
+
+## Comparison Table
+| Feature         | HTTP/1.1 | HTTP/2 | HTTP/3 |
+|----------------|----------|--------|--------|
+| Multiplexing   | No       | Yes    | Yes    |
+| Transport      | TCP      | TCP    | UDP/QUIC|
+| Encryption     | Optional | Required| Required|
+| Server Push    | No       | Yes    | Yes    |
+| Mobile Ready   | No       | Yes    | Yes    |
+
+## Best Practices
+- **API/SPA:** HTTP/2
+- **Legacy:** HTTP/1.1
+- **Mobile/Streaming:** HTTP/3 (via proxy/CDN)
+- **Always use TLS/SSL**
+
+## Real World Example
+- **Cloudflare, Google:** HTTP/3 production use
+- **Node.js API Gateway:** HTTP/2 for multiplexing
+
+## উপসংহার
+
+HTTP/1.1, HTTP/2, HTTP/3—প্রত্যেকটা আলাদা use-case, feature ও পারফরম্যান্স দেয়। Modern app-এ HTTP/2/3 ব্যবহার করুন, legacy app-এ HTTP/1.1। Node.js-এ protocol evolution বুঝে implementation করুন। পরবর্তী পাঠে TCP/UDP নিয়ে আলোচনা হবে।

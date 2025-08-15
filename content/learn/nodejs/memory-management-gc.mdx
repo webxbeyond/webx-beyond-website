@@ -1,0 +1,70 @@
+---
+title: গার্বেজ কালেকশন ও মেমরি ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ গার্বেজ কালেকশন (GC) ও মেমরি ম্যানেজমেন্ট হচ্ছে efficient, scalable, এবং bug-free অ্যাপের জন্য অপরিহার্য।
+
+## গার্বেজ কালেকশন (GC) কী?
+
+GC হচ্ছে এমন একটি মেকানিজম, যা অপ্রয়োজনীয় মেমরি (unused object, variable) "free" করে দেয়। Node.js-এ V8 ইঞ্জিনের GC ব্যবহৃত হয়।
+
+### GC Types
+- **Mark-and-Sweep:** Unreachable object চিহ্নিত করে মুছে ফেলা
+- **Reference Counting:** Reference না থাকলে মুছে ফেলা
+- **Generational GC:** Young, Old generation object আলাদা করে manage
+
+## মেমরি ম্যানেজমেন্ট
+
+- **Heap:** Object, variable store হয়
+- **Stack:** Function call, local variable store হয়
+- **Buffer:** Binary data store হয়
+
+### Real Life Analogy
+GC হচ্ছে "ঘর পরিষ্কার"—অপ্রয়োজনীয় জিনিস ফেলে দেওয়া। মেমরি ম্যানেজমেন্ট হচ্ছে "ঘর সাজানো"—সবকিছু ঠিকঠাক জায়গায় রাখা।
+
+## Memory Leak
+
+Memory leak হয় যখন অপ্রয়োজনীয় object, reference, event listener release না হয়।
+
+### Common Causes
+- Unremoved event listeners
+- Global variable
+- Large cache
+- Forgotten timers
+
+## Performance Tips
+
+- **Avoid Global Variables**
+- **Remove unused listeners/timers**
+- **Use WeakMap/WeakSet for cache**
+- **Profile memory usage regularly**
+
+## Practical Example: Memory Profiling
+
+### Using --inspect & DevTools
+```sh
+node --inspect app.js
+```
+Chrome DevTools-এ memory profile, heap snapshot, allocation tracking করা যায়।
+
+### Using clinic.js
+```sh
+npx clinic doctor -- node app.js
+```
+clinic.js দিয়ে memory leak, CPU bottleneck, event loop delay detect করা যায়।
+
+## Best Practices
+
+- **Always profile before production**
+- **Use process.memoryUsage() for monitoring**
+- **Handle large data with streams/buffer**
+
+## Example: Memory Usage
+```js
+console.log(process.memoryUsage());
+```
+
+## উপসংহার
+
+গার্বেজ কালেকশন ও মেমরি ম্যানেজমেন্ট—Node.js অ্যাপের পারফরম্যান্স, স্কেল, ও stability-এর জন্য critical। Efficient, scalable অ্যাপের জন্য memory leak, profiling ও best practices অনুসরণ করুন। পরবর্তী পাঠে Profiling, --inspect, DevTools, clinic.js নিয়ে আলোচনা হবে।

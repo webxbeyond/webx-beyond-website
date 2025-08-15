@@ -1,0 +1,71 @@
+---
+title: Observability - Prometheus/Grafana/OpenTelemetry
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ application health, performance, debugging, এবং reliability নিশ্চিত করতে observability অপরিহার্য।
+
+## Observability কী?
+- System-এর internal state external output (metrics, logs, traces) দিয়ে বুঝা, monitor করা।
+
+### Analogy
+"গাড়ির dashboard—speed, fuel, temperature—সবকিছু দেখা যায়, সমস্যা হলে দ্রুত action নেওয়া যায়।"
+
+## Key Components
+- **Metrics:** Performance data (CPU, memory, request rate)
+- **Logs:** Event, error, info
+- **Traces:** Request flow, latency, bottleneck
+
+## Tools
+- **Prometheus:** Metrics collect/store
+- **Grafana:** Visualization/dashboard
+- **OpenTelemetry:** Distributed tracing, metrics, logs
+
+## Example (Prometheus + Grafana)
+- Node.js app-এ prom-client দিয়ে metrics expose
+```js
+const client = require('prom-client');
+const express = require('express');
+const app = express();
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics();
+app.get('/metrics', (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(client.register.metrics());
+});
+```
+- Prometheus scrape, Grafana visualize
+
+## Example (OpenTelemetry)
+```js
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const provider = new NodeTracerProvider();
+provider.register();
+// Instrumentation, exporter setup
+```
+
+## Real World Example
+- **E-commerce:** Performance, error, transaction trace
+- **API:** Latency, throughput, error monitor
+- **Microservices:** Distributed trace, bottleneck detect
+
+## Best Practices
+- Metrics, logs, trace—সব implement করুন
+- Alert/notification setup করুন
+- Dashboard customize করুন
+- Bottleneck, anomaly detect করুন
+- Retention policy/setup করুন
+
+## Performance Tips
+- Minimal metric overhead
+- Efficient log/trace
+- Scalable storage
+
+## Challenges
+- Legacy app instrumentation
+- High volume data
+- Privacy/GDPR
+
+## উপসংহার
+
+Observability—Node.js-এ health, performance, debugging, এবং reliability নিশ্চিত করে। Proper metrics, logs, trace, tool integration, এবং best practices follow করুন। পরবর্তী পাঠে Scaling নিয়ে আলোচনা হবে।

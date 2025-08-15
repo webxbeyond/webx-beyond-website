@@ -1,0 +1,111 @@
+---
+title: Callback, Promise ও async/await - তুলনা ও পারফরম্যান্স
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ অ্যাসিনক্রোনাস কোড লেখার জন্য তিনটি প্রধান প্যাটার্ন আছে: Callback, Promise, এবং async/await। প্রতিটির নিজস্ব সুবিধা, অসুবিধা ও পারফরম্যান্স ইমপ্যাক্ট আছে।
+
+## Callback
+
+Callback হচ্ছে Node.js-এর "পুরনো" অ্যাসিনক্রোনাস প্যাটার্ন।
+
+- **Syntax:** Function parameter হিসেবে callback
+- **Problem:** Callback Hell, Pyramid of Doom
+
+### উদাহরণ:
+```js
+const fs = require('fs');
+fs.readFile('file.txt', (err, data) => {
+  if (err) return console.error(err);
+  console.log(data.toString());
+});
+```
+
+## Promise
+
+Promise হচ্ছে Callback-এর "পরবর্তী জেনারেশন"।
+
+- **Syntax:** `.then()`, `.catch()`
+- **Advantage:** Chaining, Error Handling সহজ
+
+### উদাহরণ:
+```js
+const fs = require('fs').promises;
+fs.readFile('file.txt')
+  .then(data => console.log(data.toString()))
+  .catch(err => console.error(err));
+```
+
+## async/await
+
+async/await হচ্ছে Promise-এর "সিনট্যাক্টিক সুগার"।
+
+- **Syntax:** `async` function, `await` keyword
+- **Advantage:** Synchronous style, Error Handling সহজ
+
+### উদাহরণ:
+```js
+const fs = require('fs').promises;
+async function readFile() {
+  try {
+    const data = await fs.readFile('file.txt');
+    console.log(data.toString());
+  } catch (err) {
+    console.error(err);
+  }
+}
+readFile();
+```
+
+## তুলনা
+
+| Feature         | Callback      | Promise        | async/await    |
+|----------------|--------------|---------------|---------------|
+| Syntax         | Nested       | Chained       | Linear        |
+| Error Handling | Manual       | .catch()      | try/catch     |
+| Readability    | Low          | Medium        | High          |
+| Performance    | Fast         | Fast          | Fast          |
+| Debugging      | Hard         | Easier        | Easiest       |
+
+## Real Life Analogy
+
+Callback হচ্ছে "রিলে রেস"—একজন শেষ হলে পরেরজন শুরু। Promise হচ্ছে "ট্রেন"—একটি স্টেশন শেষে পরের স্টেশন। async/await হচ্ছে "সোজা রাস্তা"—একটি কাজ শেষ হলে পরেরটা শুরু।
+
+## Performance
+
+তিনটি প্যাটার্নই পারফরম্যান্সে প্রায় সমান, কারণ সবই ইভেন্ট লুপে চলে। তবে async/await-এ Stack Trace ও Debugging সহজ, তাই বড় অ্যাপের জন্য ভালো।
+
+## Best Practices
+
+- **Avoid Callback Hell:** Promise/async/await ব্যবহার করুন
+- **Always Handle Errors:** try/catch বা .catch() ব্যবহার করুন
+- **Use async/await for Readability**
+
+## ছোট্ট প্রজেক্ট উদাহরণ: তিনটি প্যাটার্ন
+
+```js
+// Callback
+fs.readFile('file.txt', (err, data) => {
+  if (err) return console.error('Callback:', err);
+  console.log('Callback:', data.toString());
+});
+
+// Promise
+fs.promises.readFile('file.txt')
+  .then(data => console.log('Promise:', data.toString()))
+  .catch(err => console.error('Promise:', err));
+
+// async/await
+(async () => {
+  try {
+    const data = await fs.promises.readFile('file.txt');
+    console.log('Async/Await:', data.toString());
+  } catch (err) {
+    console.error('Async/Await:', err);
+  }
+})();
+```
+
+## উপসংহার
+
+Callback, Promise, async/await—Node.js অ্যাসিনক্রোনাস কোডের তিনটি স্তম্ভ। Readability, Error Handling ও Maintainability-তে async/await সেরা। পরবর্তী পাঠে Parallel বনাম Sequential Execution নিয়ে আলোচনা হবে।

@@ -1,0 +1,67 @@
+---
+title: Native ES Modules ও Top-Level Await
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ Native ES Modules (ESM) ও Top-Level Await—modern JavaScript development-এর নতুন যুগ! Cleaner syntax, better interoperability, এবং async power—সব developer-এর জন্য must-know।
+
+## Native ES Modules (ESM) কী?
+- Official JavaScript module system
+- `import`/`export` syntax
+- `.mjs` extension বা `type: module` in package.json
+
+### Analogy
+"CommonJS ছিল পুরনো চাবি, ESM হলো স্মার্ট লক—এক ক্লিকে খুলে যায়, নিরাপদ ও দ্রুত!"
+
+## Top-Level Await কী?
+- Module scope-এ সরাসরি `await` ব্যবহার
+- Async initialization সহজ
+- No need for wrapper function
+
+## Example: ESM Import/Export
+```js
+// math.mjs
+export function add(a, b) { return a + b; }
+// app.mjs
+import { add } from './math.mjs';
+console.log(add(2, 3));
+```
+
+## Example: Top-Level Await
+```js
+// fetch-data.mjs
+const response = await fetch('https://api.example.com/data');
+const data = await response.json();
+console.log(data);
+```
+
+## Real Life Example
+- **Async config load:** Startup-এ database connect
+- **Dynamic import:** Feature-based module load
+- **Microservices:** Service discovery async
+
+## Best Practices
+- Use ESM for new project
+- Minimal CommonJS interop
+- Proper error handling with await
+- Use `type: module` in package.json
+- Avoid circular dependency
+
+## Performance Tips
+- Lazy loading with dynamic import
+- Async initialization
+- Minimal blocking
+
+## Challenges
+- Legacy CommonJS compatibility
+- Tooling maturity
+- Debugging async module
+
+## Future Possibilities
+- Full ESM ecosystem
+- Advanced async patterns
+- Seamless browser-server code sharing
+
+## উপসংহার
+
+Native ES Modules ও Top-Level Await—Node.js-এ modern, efficient, এবং async power unlock করে। Cleaner code, better performance, এবং future-ready architecture build করুন। Experiment করুন, learn করুন, এবং next-gen solution তৈরি করুন।

@@ -1,0 +1,92 @@
+---
+title: Timers, setImmediate ও process.nextTick
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ Timers, setImmediate ও process.nextTick হচ্ছে ইভেন্ট লুপের "মাস্টার কন্ট্রোল"। এদের মাধ্যমে অ্যাসিনক্রোনাস কোডের এক্সিকিউশন অর্ডার, পারফরম্যান্স ও রেসপন্সিভনেস নিয়ন্ত্রণ করা যায়।
+
+## Timers
+
+- **setTimeout(fn, ms):** নির্দিষ্ট সময় পরে Callback এক্সিকিউট হয়
+- **setInterval(fn, ms):** নির্দিষ্ট সময় পরপর Callback এক্সিকিউট হয়
+
+### উদাহরণ:
+```js
+setTimeout(() => console.log('Timeout!'), 1000);
+setInterval(() => console.log('Interval!'), 2000);
+```
+
+## setImmediate
+
+- **setImmediate(fn):** Poll Phase শেষে, Check Phase-এ Callback এক্সিকিউট হয়
+- **Use Case:** I/O শেষে দ্রুত Callback এক্সিকিউট করতে
+
+### উদাহরণ:
+```js
+setImmediate(() => console.log('Immediate!'));
+```
+
+## process.nextTick
+
+- **process.nextTick(fn):** Current Phase শেষ হওয়ার আগেই Callback এক্সিকিউট হয়
+- **Use Case:** Critical Task, Error Handling, Microtask
+
+### উদাহরণ:
+```js
+process.nextTick(() => console.log('NextTick!'));
+```
+
+## Execution Order
+
+- **process.nextTick** > **Promise Microtask** > **setTimeout/setInterval** > **setImmediate**
+
+### উদাহরণ:
+```js
+setTimeout(() => console.log('Timeout'), 0);
+setImmediate(() => console.log('Immediate'));
+Promise.resolve().then(() => console.log('Promise'));
+process.nextTick(() => console.log('NextTick'));
+```
+
+**Output:**
+```
+NextTick
+Promise
+Timeout
+Immediate
+```
+
+## Real Life Analogy
+
+process.nextTick হচ্ছে "VIP Pass"—সবকিছু আগে হয়। setImmediate হচ্ছে "Express Lane"—I/O শেষে দ্রুত। setTimeout হচ্ছে "Scheduled Task"—নির্দিষ্ট সময় পরে।
+
+## Performance Tips
+
+- **Avoid Infinite nextTick Loop:** Event Loop block হতে পারে
+- **Use setImmediate for I/O Callback**
+- **Use setTimeout for Delay**
+
+## ছোট্ট প্রজেক্ট উদাহরণ: Execution Order Demo
+
+```js
+console.log('Start');
+setTimeout(() => console.log('Timeout'), 0);
+setImmediate(() => console.log('Immediate'));
+Promise.resolve().then(() => console.log('Promise'));
+process.nextTick(() => console.log('NextTick'));
+console.log('End');
+```
+
+**Output:**
+```
+Start
+End
+NextTick
+Promise
+Timeout
+Immediate
+```
+
+## উপসংহার
+
+Timers, setImmediate ও process.nextTick—Node.js-এর অ্যাসিনক্রোনাস execution mastering-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে পারফরম্যান্স ও রেসপন্সিভনেস বাড়ে। পরবর্তী পাঠে Process অবজেক্ট ও Environment Variables নিয়ে আলোচনা হবে।

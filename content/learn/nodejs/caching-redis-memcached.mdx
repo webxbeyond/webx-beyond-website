@@ -1,0 +1,62 @@
+---
+title: ক্যাশিং স্ট্র্যাটেজি - Redis/Memcached
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js অ্যাপে performance, scalability ও latency কমাতে caching strategy অপরিহার্য। Redis ও Memcached—দুইটা জনপ্রিয় caching solution।
+
+## ক্যাশিং কী?
+
+Caching মানে—frequently used data memory-তে store করা, যাতে বারবার database/file থেকে না পড়ে দ্রুত response দেওয়া যায়।
+
+### Analogy
+Caching হচ্ছে "রেস্টুরেন্টে ready-made খাবার"—অর্ডার দিলেই সঙ্গে সঙ্গে পরিবেশন, রান্না করতে সময় লাগে না।
+
+## Popular Caching Solutions
+- **Redis:** In-memory data store, persistence, pub/sub, advanced data structure
+- **Memcached:** Simple in-memory key-value store, super fast
+
+## Redis Example
+```js
+const Redis = require('ioredis');
+const redis = new Redis();
+await redis.set('user:1', JSON.stringify({ name: 'Alice' }), 'EX', 60);
+const user = JSON.parse(await redis.get('user:1'));
+```
+
+## Memcached Example
+```js
+const Memcached = require('memcached');
+const memcached = new Memcached('localhost:11211');
+memcached.set('user:1', { name: 'Alice' }, 60, err => {});
+memcached.get('user:1', (err, data) => {
+  console.log(data);
+});
+```
+
+## Caching Strategies
+- **Read-through:** Cache miss হলে DB থেকে পড়ে cache-এ store
+- **Write-through:** DB-তে write হলে cache-এও update
+- **Cache Aside:** App নিজে cache manage করে
+- **TTL (Time to Live):** Expiry set করুন stale data avoid করতে
+
+## Best Practices
+- Sensitive data cache করবেন না
+- TTL set করুন
+- Cache invalidation strategy implement করুন
+- Cache hit/miss monitor করুন
+- Distributed cache ব্যবহার করুন large scale-এ
+
+## Real World Example
+- **E-commerce:** Product list cache
+- **API rate limiting:** Redis
+- **Session management:** Redis/Memcached
+
+## Performance Tips
+- Cache size optimize করুন
+- Network latency minimize করুন
+- Redis cluster/sharding ব্যবহার করুন
+
+## উপসংহার
+
+Caching strategy (Redis/Memcached) Node.js-এ fast, scalable ও efficient app নিশ্চিত করে। Production-এ TTL, invalidation, monitoring ও distributed cache best practices অনুসরণ করুন। পরবর্তী পাঠে বড় ডাটাসেট স্ট্রিমিং নিয়ে আলোচনা হবে।

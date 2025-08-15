@@ -1,0 +1,95 @@
+---
+title: IPC (Inter-Process Communication) ও Message Passing
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js-এ IPC (Inter-Process Communication) ও Message Passing হচ্ছে একাধিক process/thread-এর মধ্যে ডেটা আদান-প্রদানের জন্য অপরিহার্য টুল।
+
+## IPC কী?
+
+IPC হচ্ছে একাধিক process-এর মধ্যে ডেটা, কমান্ড, বা সিগন্যাল আদান-প্রদানের টেকনিক। Node.js-এ Child Process, Cluster, Worker Thread—সবখানে IPC ব্যবহৃত হয়।
+
+## Message Passing
+
+Message Passing হচ্ছে process/thread-এর মধ্যে "message" পাঠানো ও গ্রহণ করার পদ্ধতি।
+
+### Child Process-এ Message Passing
+```js
+// parent.js
+const { fork } = require('child_process');
+const child = fork('child.js');
+child.on('message', msg => console.log('From child:', msg));
+child.send('Hello Child');
+
+// child.js
+process.on('message', msg => {
+  process.send(msg + ' World!');
+});
+```
+
+### Worker Thread-এ Message Passing
+```js
+const { Worker, isMainThread, parentPort } = require('worker_threads');
+if (isMainThread) {
+  const worker = new Worker(__filename);
+  worker.on('message', msg => console.log('From worker:', msg));
+  worker.postMessage('Hello Worker');
+} else {
+  parentPort.on('message', msg => {
+    parentPort.postMessage(msg + ' World!');
+  });
+}
+```
+
+## Cluster Module-এ IPC
+
+Cluster module-এ master ও worker-এর মধ্যে IPC হয়।
+
+```js
+const cluster = require('cluster');
+if (cluster.isMaster) {
+  const worker = cluster.fork();
+  worker.on('message', msg => console.log('From worker:', msg));
+  worker.send('Hello Cluster');
+} else {
+  process.on('message', msg => {
+    process.send(msg + ' World!');
+  });
+}
+```
+
+## Real Life Analogy
+
+IPC হচ্ছে "ইন্টারকম"—একাধিক রুমে বসে থাকা মানুষ একে অপরকে বার্তা পাঠায়। Message Passing হচ্ছে "চিঠি"—একজন লিখে পাঠায়, অন্যজন পড়ে উত্তর দেয়।
+
+## Performance Tips
+
+- **Use JSON for Message Format**
+- **Limit Message Size**
+- **Handle Message Errors**
+
+## Best Practices
+
+- **Validate Incoming Messages**
+- **Avoid Blocking Main Thread**
+- **Clean up listeners after exit**
+
+## Practical Example: Parallel Computation with IPC
+
+```js
+// parent.js
+const { fork } = require('child_process');
+const child = fork('child.js');
+child.send({ num: 21 });
+child.on('message', res => console.log('Result:', res));
+
+// child.js
+process.on('message', msg => {
+  let result = msg.num * 2;
+  process.send(result);
+});
+```
+
+## উপসংহার
+
+IPC ও Message Passing—Node.js-এ parallelism, distributed computation ও process/thread communication-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে efficient, scalable অ্যাপ তৈরি করা যায়। পরবর্তী পাঠে EventEmitter Pattern ও Pitfalls নিয়ে আলোচনা হবে।
