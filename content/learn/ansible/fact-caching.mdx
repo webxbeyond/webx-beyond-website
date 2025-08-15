@@ -1,0 +1,69 @@
+---
+title: Fact Caching (Redis, JSON, memory)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় আকারের ইনফ্রায় দ্রুত ও কার্যকরী অটোমেশন করতে আনসিবলের Fact Caching অত্যন্ত গুরুত্বপূর্ণ।
+
+## Fact কী?
+Fact হচ্ছে হোস্টের বিভিন্ন তথ্য (OS, IP, RAM, Disk, ইত্যাদি) যা আনসিবল গ্যাদার করে।
+
+## Fact Gathering
+প্রতিবার প্লেবুক রান করলে আনসিবল হোস্ট থেকে Fact সংগ্রহ করে।
+
+## Fact Caching কী?
+Fact Caching মানে একবার গ্যাদার করা Fact বারবার ব্যবহার করা, বারবার সংগ্রহ না করা। এতে করে প্লেবুক রান দ্রুত হয়।
+
+## Fact Caching Backend
+- **Memory**: ডিফল্ট, প্লেবুক রান শেষ হলে মুছে যায়
+- **JSON file**: Local ফাইলে Fact সংরক্ষণ
+- **Redis**: External Redis server-এ Fact সংরক্ষণ
+
+## Config location
+- `/etc/ansible/ansible.cfg`
+- অথবা প্রজেক্টের `ansible.cfg`
+
+### Memory Backend
+```ini
+[defaults]
+fact_caching = memory
+```
+
+### JSON Backend
+```ini
+[defaults]
+fact_caching = jsonfile
+fact_caching_connection = /tmp/ansible_facts
+```
+
+### Redis Backend
+```ini
+[defaults]
+fact_caching = redis
+fact_caching_connection = localhost:6379:0
+```
+
+## বাস্তব উদাহরণ
+ধরা যাক, ১০০টি হোস্টে প্লেবুক রান করতে হবে। প্রতিবার Fact গ্যাদার করলে latency বাড়ে। Fact Caching enable করলে একবার Fact গ্যাদার করে পরবর্তী টাস্কে ব্যবহার করা যায়, ফলে সময় কম লাগে।
+
+## Analogy: "একবার তথ্য লিখে বারবার পড়া"
+যেমন একবার ডায়েরিতে তথ্য লিখে রাখলে বারবার জিজ্ঞাসা করতে হয় না, তেমনি Fact Caching enable করলে বারবার হোস্টে গিয়ে তথ্য নিতে হয় না।
+
+## কখন Fact Caching ব্যবহার করবেন?
+- বড় ইনভেন্টরি
+- দ্রুত অটোমেশন দরকার
+- একই Fact বারবার ব্যবহার করতে হবে
+
+## Best Practices
+- Redis backend ব্যবহার করলে performance বেশি
+- JSON backend সহজ ও portable
+- Fact Caching enable করলে প্লেবুক rerun দ্রুত হয়
+- Sensitive তথ্য cache করবেন না
+
+## Performance Optimization Tips
+- Fact Caching enable করুন
+- Redis backend ব্যবহার করুন
+- Fact gathering limit করুন (gather_subset)
+
+## উপসংহার
+Fact Caching enable করলে আনসিবল দিয়ে বড় আকারের ইনফ্রায় দ্রুত ও স্কেলেবল অটোমেশন সম্ভব। "একবার তথ্য লিখে বারবার পড়া"-এর মতো efficiency বাড়ে, তবে sensitive তথ্য cache করার সময় সতর্ক থাকুন।

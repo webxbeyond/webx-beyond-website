@@ -1,0 +1,146 @@
+---
+title: Azure প্রভিশনিং - VM, Storage, Networking
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্লাউড অটোমেশনে Microsoft Azure অটোমেটেডভাবে VM, স্টোরেজ, নেটওয়ার্ক তৈরি ও ম্যানেজ করা অত্যন্ত গুরুত্বপূর্ণ। আনসিবল দিয়ে VM, Storage, Networking—সবকিছু কোড দিয়ে তৈরি, কনফিগার ও ম্যানেজ করা যায়।
+
+## অ্যানালজি: স্মার্ট অফিস বিল্ডিং
+
+ধরা যাক, আপনি একটি স্মার্ট অফিস বিল্ডিংয়ের ম্যানেজার। নতুন অফিস রুম, স্টোরেজ, ইন্টারনেট—সবকিছু অটোমেটেডভাবে তৈরি ও নিয়ন্ত্রণ করতে হয়। যদি প্রতিবার ম্যানুয়ালি করেন, সময় ও ভুলের সম্ভাবনা বাড়ে। কিন্তু অটোমেটেড সিস্টেমে এক ক্লিকেই সবকিছু তৈরি হয়ে যায়।
+
+Azure প্রভিশনিংও ঠিক এমন—আনসিবল দিয়ে কোড লিখে VM, Storage, Networking তৈরি ও কনফিগার করা যায়।
+
+## Azure-এ আনসিবল ব্যবহার করার জন্য প্রস্তুতি
+
+- Azure account ও service principal credentials
+- `azure-cli` ও `msrestazure` Python লাইব্রেরি
+- আনসিবল Azure collection: `azure.azcollection`
+
+### ইনস্টলেশন:
+```bash
+pip install azure-cli msrestazure
+ansible-galaxy collection install azure.azcollection
+```
+
+## VM Provisioning
+
+**playbook-vm.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create Azure VM
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: my-rg
+        name: my-vm
+        admin_username: azureuser
+        admin_password: MyPassword123!
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 18.04-LTS
+          version: latest
+        vm_size: Standard_B1s
+        location: eastus
+        network_interfaces: my-nic
+      register: vm
+    - name: Show VM info
+      debug:
+        var: vm
+```
+
+## Storage Provisioning
+
+**playbook-storage.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create storage account
+      azure.azcollection.azure_rm_storageaccount:
+        resource_group: my-rg
+        name: mystorageacc
+        location: eastus
+        account_type: Standard_LRS
+      register: storage
+    - name: Show storage info
+      debug:
+        var: storage
+```
+
+## Networking Provisioning
+
+**playbook-network.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create virtual network
+      azure.azcollection.azure_rm_virtualnetwork:
+        resource_group: my-rg
+        name: my-vnet
+        address_prefixes: 10.0.0.0/16
+        location: eastus
+      register: vnet
+    - name: Show vnet info
+      debug:
+        var: vnet
+```
+
+## Credentials ব্যবস্থাপনা
+
+- Service principal credentials নিরাপদে vault বা environment variable-এ রাখুন
+- Automation pipeline-এ credentials এনক্রিপ্ট করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Resource naming convention স্পষ্ট রাখুন
+- Resource tagging ব্যবহার করুন
+- Error handling ও rollback যুক্ত করুন
+- Documentation রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি VM, Storage, VNet—all একসাথে তৈরি করতে চান।
+
+**playbook-all.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create Azure VM
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: my-rg
+        name: my-vm
+        admin_username: azureuser
+        admin_password: MyPassword123!
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 18.04-LTS
+          version: latest
+        vm_size: Standard_B1s
+        location: eastus
+        network_interfaces: my-nic
+    - name: Create storage account
+      azure.azcollection.azure_rm_storageaccount:
+        resource_group: my-rg
+        name: mystorageacc
+        location: eastus
+        account_type: Standard_LRS
+    - name: Create virtual network
+      azure.azcollection.azure_rm_virtualnetwork:
+        resource_group: my-rg
+        name: my-vnet
+        address_prefixes: 10.0.0.0/16
+        location: eastus
+```
+
+## উপসংহার
+
+আনসিবল দিয়ে Azure VM, Storage, Networking—সবকিছু অটোমেটেডভাবে, নিরাপদে ও স্কেলেবলভাবে তৈরি ও ম্যানেজ করা যায়। ক্লাউড অটোমেশনে এটি মাস্টার করার মতো একটি স্কিল।
+
+---
+
+**পরবর্তী পাঠ:** [হাইব্রিড ও মাল্টি-ক্লাউড স্ট্রাটেজি](/ansible/multi-cloud)

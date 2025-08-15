@@ -1,0 +1,156 @@
+---
+title: GCP প্রভিশনিং - Compute Engine, IAM, Networking
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্লাউড অটোমেশনে Google Cloud Platform (GCP) অটোমেটেডভাবে VM, ইউজার, নেটওয়ার্ক তৈরি ও ম্যানেজ করা অত্যন্ত গুরুত্বপূর্ণ। আনসিবল দিয়ে Compute Engine, IAM, Networking—সবকিছু কোড দিয়ে তৈরি, কনফিগার ও ম্যানেজ করা যায়।
+
+## অ্যানালজি: স্মার্ট সিটি ম্যানেজমেন্ট
+
+ধরা যাক, আপনি একটি স্মার্ট সিটির ম্যানেজার। নতুন বিল্ডিং, রাস্তা, ইউজার, নিরাপত্তা—সবকিছু অটোমেটেডভাবে তৈরি ও নিয়ন্ত্রণ করতে হয়। যদি প্রতিবার ম্যানুয়ালি করেন, সময় ও ভুলের সম্ভাবনা বাড়ে। কিন্তু অটোমেটেড সিস্টেমে এক ক্লিকেই সবকিছু তৈরি হয়ে যায়।
+
+GCP প্রভিশনিংও ঠিক এমন—আনসিবল দিয়ে কোড লিখে VM, ইউজার, নেটওয়ার্ক তৈরি ও কনফিগার করা যায়।
+
+## GCP-তে আনসিবল ব্যবহার করার জন্য প্রস্তুতি
+
+- GCP account ও service account credentials (JSON key)
+- `google-auth` ও `google-api-python-client` Python লাইব্রেরি
+- আনসিবল GCP collection: `google.cloud`
+
+### ইনস্টলেশন:
+```bash
+pip install google-auth google-api-python-client
+ansible-galaxy collection install google.cloud
+```
+
+## Compute Engine VM Provisioning
+
+**playbook-gce.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create GCP VM
+      google.cloud.gcp_compute_instance:
+        name: my-vm
+        machine_type: e2-medium
+        zone: asia-south1-a
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+        disks:
+          - auto_delete: true
+            boot: true
+            initialize_params:
+              source_image: projects/debian-cloud/global/images/family/debian-11
+        network_interfaces:
+          - network: default
+            access_configs:
+              - name: External NAT
+                type: ONE_TO_ONE_NAT
+      register: gce
+    - name: Show VM info
+      debug:
+        var: gce
+```
+
+## IAM User Provisioning
+
+**playbook-iam.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create IAM user
+      google.cloud.gcp_iam_service_account:
+        name: my-user
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+      register: iam
+    - name: Show IAM info
+      debug:
+        var: iam
+```
+
+## Networking Provisioning
+
+**playbook-network.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create VPC network
+      google.cloud.gcp_compute_network:
+        name: my-vpc
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+        auto_create_subnetworks: true
+      register: vpc
+    - name: Show VPC info
+      debug:
+        var: vpc
+```
+
+## Credentials ব্যবস্থাপনা
+
+- Service account JSON key নিরাপদে vault বা environment variable-এ রাখুন
+- Automation pipeline-এ credentials এনক্রিপ্ট করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Resource naming convention স্পষ্ট রাখুন
+- Resource tagging ব্যবহার করুন
+- Error handling ও rollback যুক্ত করুন
+- Documentation রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি VM, IAM user, VPC—all একসাথে তৈরি করতে চান।
+
+**playbook-all.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create GCP VM
+      google.cloud.gcp_compute_instance:
+        name: my-vm
+        machine_type: e2-medium
+        zone: asia-south1-a
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+        disks:
+          - auto_delete: true
+            boot: true
+            initialize_params:
+              source_image: projects/debian-cloud/global/images/family/debian-11
+        network_interfaces:
+          - network: default
+            access_configs:
+              - name: External NAT
+                type: ONE_TO_ONE_NAT
+    - name: Create IAM user
+      google.cloud.gcp_iam_service_account:
+        name: my-user
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+    - name: Create VPC network
+      google.cloud.gcp_compute_network:
+        name: my-vpc
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+        auto_create_subnetworks: true
+```
+
+## উপসংহার
+
+আনসিবল দিয়ে GCP VM, IAM, Networking—সবকিছু অটোমেটেডভাবে, নিরাপদে ও স্কেলেবলভাবে তৈরি ও ম্যানেজ করা যায়। ক্লাউড অটোমেশনে এটি মাস্টার করার মতো একটি স্কিল।
+
+---
+
+**পরবর্তী পাঠ:** [Azure প্রভিশনিং - VM, Storage, Networking](/ansible/azure-provisioning)

@@ -1,0 +1,55 @@
+---
+title: ansible-pull দিয়ে স্কেলিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় আকারের ইনফ্রায় স্কেলেবল অটোমেশন করতে আনসিবলের `ansible-pull` কমান্ড অত্যন্ত কার্যকরী।
+
+## ansible-pull কী?
+`ansible-pull` হলো আনসিবলের একটি কমান্ড, যা ক্লায়েন্ট মেশিন থেকে প্লেবুক "pull" করে রান করে। সাধারণত `ansible` বা `ansible-playbook` দিয়ে সার্ভার থেকে ক্লায়েন্টে "push" করা হয়, কিন্তু `ansible-pull` দিয়ে ক্লায়েন্ট নিজেই প্লেবুক "pull" করে রান করতে পারে।
+
+## বাস্তব উদাহরণ
+ধরা যাক, আপনার কাছে ৫০০টি IoT ডিভাইস আছে, যেগুলোতে SSH access নেই বা firewall issue আছে। প্রতিটি ডিভাইসে `ansible-pull` সেটআপ করলে, ডিভাইস নিজেই GitHub/GitLab থেকে প্লেবুক pull করে রান করতে পারে।
+
+## Analogy: "নিজে রান্না করা"
+যেমন কেউ নিজে রান্না করে খায়, তেমনি `ansible-pull` দিয়ে ক্লায়েন্ট নিজেই প্লেবুক রান করে। এতে করে central server থেকে push করার দরকার হয় না।
+
+## ansible-pull কমান্ড
+```bash
+ansible-pull -U https://github.com/your-org/your-repo.git -C main site.yml
+```
+- `-U`: Git repo URL
+- `-C`: branch
+- `site.yml`: প্লেবুক ফাইল
+
+## Automation & Cron
+`ansible-pull` কে cron job হিসেবে সেটআপ করলে, নির্দিষ্ট সময় পরপর ক্লায়েন্ট নিজেই প্লেবুক রান করতে পারে।
+
+```bash
+*/30 * * * * ansible-pull -U https://github.com/your-org/your-repo.git -C main site.yml
+```
+
+## কখন ansible-pull ব্যবহার করবেন?
+- Decentralized environment
+- Firewall/SSH limitation
+- Large scale IoT/Edge device
+- Self-service automation
+
+## Best Practices
+- Git repo secure রাখুন
+- Playbook idempotent করুন
+- Logging enable করুন
+- Cron job error notification সেট করুন
+
+## Performance Optimization Tips
+- Repo ছোট রাখুন
+- Playbook modular করুন
+- Fact caching enable করুন
+
+## Limitations
+- Centralized reporting নেই
+- Inventory management সীমিত
+- Security policy ঠিক রাখতে হবে
+
+## উপসংহার
+`ansible-pull` দিয়ে স্কেলিং করলে decentralized, self-service automation সহজ হয়। "নিজে রান্না"-এর মতো, ক্লায়েন্ট নিজেই প্লেবুক রান করে, ফলে বড় environment-এ স্কেলিং সহজ হয়। তবে security, logging ও error management ঠিক রাখতে হবে।

@@ -1,0 +1,56 @@
+---
+title: Dry Run ও Check Mode
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুক রান করার আগে অনেক সময় জানতে হয়—কী পরিবর্তন হবে, কোন টাস্ক চলবে, কোনটা স্কিপ হবে। এজন্য Dry Run ও Check Mode ব্যবহার করা হয়। এতে প্লেবুক আসলেই রান হয় না, শুধু দেখায় কী কী পরিবর্তন হবে।
+
+## অ্যানালজি: পরীক্ষার আগের মক টেস্ট
+
+ধরা যাক, আপনি পরীক্ষার আগে মক টেস্ট দেন। এতে আসল পরীক্ষা হয় না, শুধু বোঝা যায়—কোন প্রশ্ন আসতে পারে, কোথায় ভুল হচ্ছে। Dry Run/Check Mode হচ্ছে সেই মক টেস্ট।
+
+## Dry Run ও Check Mode কী?
+
+- **Check Mode:** `--check` ফ্ল্যাগ দিয়ে প্লেবুক রান করলে, কোনো পরিবর্তন হয় না—শুধু দেখায় কী কী পরিবর্তন হবে
+- **Diff Mode:** `--diff` ফ্ল্যাগ দিলে, কোন ফাইলে কী পরিবর্তন হবে—diff দেখায়
+
+## Dry Run/Check Mode ব্যবহার
+
+### প্লেবুক রান:
+```bash
+ansible-playbook playbook.yml --check
+```
+
+### Diff Mode:
+```bash
+ansible-playbook playbook.yml --check --diff
+```
+
+## কোন টাস্কে Check Mode সাপোর্ট করে?
+
+- কিছু module (copy, template, file, yum, apt) check mode সাপোর্ট করে
+- কিছু module (command, shell) সাপোর্ট করে না
+- `check_mode: yes/no` দিয়ে টাস্কে forced check mode চালানো যায়
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি production server-এ প্লেবুক রান করার আগে check mode দিয়ে dry run করতে চান:
+
+```bash
+ansible-playbook playbook.yml -i inventory/prod --check --diff
+```
+
+## বেস্ট প্র্যাকটিস
+
+- Production-এ প্লেবুক রান করার আগে check mode দিয়ে dry run করুন
+- Sensitive change (file, config, package) আগে dry run করুন
+- Automation pipeline-এ test stage-এ check mode চালান
+- Documentation-এ dry run command উল্লেখ করুন
+
+## উপসংহার
+
+Dry Run ও Check Mode ব্যবহার করলে আনসিবল প্লেবুক আরও নিরাপদ, নির্ভরযোগ্য ও মেইনটেনেবল হয়। production-এ ভুল কম হয়, automation pipeline আরও robust হয়।
+
+---
+
+**পরবর্তী পাঠ:** [debug মডিউল ও Verbose Mode](/ansible/debug-verbose)

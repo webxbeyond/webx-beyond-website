@@ -1,0 +1,107 @@
+---
+title: Jenkins এর সাথে আনসিবল ইন্টিগ্রেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আধুনিক DevOps ও অটোমেশন ওয়ার্কফ্লোতে Jenkins ও Ansible একসাথে ব্যবহার করা হয়—কোড বিল্ড, টেস্ট, ডেপ্লয়, কনফিগারেশন সবকিছু অটোমেটেডভাবে চালাতে। Jenkins pipeline থেকে Ansible playbook রান করে ইন্সট্রাকচার, অ্যাপ্লিকেশন, কনফিগারেশন সবকিছু অটোমেটেড করা যায়।
+
+## অ্যানালজি: ফ্যাক্টরি কন্ট্রোল রুম
+
+ধরা যাক, আপনি একটি ফ্যাক্টরির কন্ট্রোল রুমে বসে আছেন। এক জায়গা থেকে সব মেশিন, অর্ডার, ডেলিভারি—সবকিছু নিয়ন্ত্রণ করছেন। Jenkins কন্ট্রোল রুম, Ansible মেশিন চালায়।
+
+## কেন Jenkins-Ansible ইন্টিগ্রেশন?
+
+- Continuous Integration/Continuous Deployment (CI/CD)
+- Infrastructure as Code (IaC)
+- Automated testing, deployment, rollback
+
+## Integration Flow
+
+1. Developer কোড push করে
+2. Jenkins job trigger হয়
+3. Jenkins build/test করে
+4. Jenkins থেকে Ansible playbook রান হয়
+5. Infrastructure/App ডেপ্লয় হয়
+
+## Jenkins থেকে Ansible playbook রান করার নিয়ম
+
+### ১. Shell Step
+
+Jenkins pipeline বা freestyle job-এ shell step দিয়ে Ansible playbook রান করা যায়:
+
+```bash
+ansible-playbook playbook.yml -i inventory/hosts
+```
+
+### ২. Jenkinsfile (Declarative Pipeline)
+
+**Jenkinsfile**
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'ansible-playbook playbook.yml -i inventory/hosts'
+            }
+        }
+    }
+}
+```
+
+### ৩. Ansible Plugin
+
+Jenkins-এ Ansible plugin ইনস্টল করে playbook রান করা যায়।
+
+- Manage Jenkins > Plugins > Ansible
+- Build step: "Invoke Ansible Playbook"
+
+## Credentials ও Security
+
+- Vault দিয়ে সিক্রেট এনক্রিপ্ট করুন
+- Jenkins credentials store ব্যবহার করুন
+- Sensitive data pipeline log-এ না দেখান
+
+## বেস্ট প্র্যাকটিস
+
+- Pipeline-as-code (Jenkinsfile) ব্যবহার করুন
+- Error handling ও rollback যুক্ত করুন
+- Playbook idempotent রাখুন
+- Build/Test/Deploy stage আলাদা রাখুন
+- Automation pipeline version control এ রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি Jenkins pipeline থেকে Ansible playbook দিয়ে AWS EC2 ডেপ্লয় করতে চান।
+
+**Jenkinsfile**
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Deploy EC2') {
+            steps {
+                sh 'ansible-playbook playbook-ec2.yml -i inventory/aws_ec2.yml'
+            }
+        }
+    }
+}
+```
+
+## উপসংহার
+
+Jenkins-Ansible ইন্টিগ্রেশন করলে DevOps workflow আরও অটোমেটেড, স্কেলেবল ও রিলায়েবল হয়। Continuous deployment, automated rollback, IaC—সবকিছু সহজে বাস্তবায়ন করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [GitHub Actions দিয়ে ডেপ্লয়মেন্ট](/ansible/github-actions)

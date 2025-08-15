@@ -1,0 +1,131 @@
+---
+title: Ansible দিয়ে Docker ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+কনটেইনার অটোমেশনে Docker অত্যন্ত জনপ্রিয়। আনসিবল দিয়ে Docker container, image, network, volume—সবকিছু অটোমেটেডভাবে তৈরি, কনফিগার ও ম্যানেজ করা যায়।
+
+## অ্যানালজি: কিচেন অটোমেশন
+
+ধরা যাক, আপনি একটি বড় রেস্টুরেন্টের কিচেন ম্যানেজার। প্রতিদিন নতুন রেসিপি, কুক, স্টোরেজ, পরিবেশন—সবকিছু অটোমেটেডভাবে নিয়ন্ত্রণ করতে হয়। Docker কিচেন, Ansible শেফ।
+
+## কেন Ansible-Docker ইন্টিগ্রেশন?
+
+- Infrastructure as Code (IaC)
+- Automated container deployment
+- Configuration management
+- Multi-host orchestration
+
+## Docker ম্যানেজমেন্টের জন্য প্রস্তুতি
+
+- Docker host (Linux/Windows)
+- Python Docker লাইব্রেরি: `docker`
+- আনসিবল Docker collection: `community.docker`
+
+### ইনস্টলেশন:
+```bash
+pip install docker
+ansible-galaxy collection install community.docker
+```
+
+## Docker Container Provisioning
+
+**playbook-container.yml**
+```yaml
+- hosts: docker-hosts
+  tasks:
+    - name: Run nginx container
+      community.docker.docker_container:
+        name: nginx
+        image: nginx:latest
+        state: started
+        ports:
+          - "80:80"
+      register: nginx
+    - name: Show container info
+      debug:
+        var: nginx
+```
+
+## Docker Image Management
+
+**playbook-image.yml**
+```yaml
+- hosts: docker-hosts
+  tasks:
+    - name: Pull custom image
+      community.docker.docker_image:
+        name: myapp:latest
+        source: pull
+        repository: myrepo/myapp
+      register: image
+    - name: Show image info
+      debug:
+        var: image
+```
+
+## Docker Network & Volume Management
+
+**playbook-network-volume.yml**
+```yaml
+- hosts: docker-hosts
+  tasks:
+    - name: Create network
+      community.docker.docker_network:
+        name: my-net
+        state: present
+    - name: Create volume
+      community.docker.docker_volume:
+        name: my-vol
+        state: present
+```
+
+## Multi-host Orchestration
+
+- inventory ফাইলে একাধিক Docker host যুক্ত করুন
+- Playbook-এ `hosts: docker-hosts` ব্যবহার করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Container naming convention স্পষ্ট রাখুন
+- Sensitive data vault দিয়ে এনক্রিপ্ট করুন
+- Error handling ও rollback যুক্ত করুন
+- Automation pipeline version control এ রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি একসাথে nginx container, custom image, network, volume—all তৈরি করতে চান।
+
+**playbook-all.yml**
+```yaml
+- hosts: docker-hosts
+  tasks:
+    - name: Run nginx container
+      community.docker.docker_container:
+        name: nginx
+        image: nginx:latest
+        state: started
+        ports:
+          - "80:80"
+    - name: Pull custom image
+      community.docker.docker_image:
+        name: myapp:latest
+        source: pull
+        repository: myrepo/myapp
+    - name: Create network
+      community.docker.docker_network:
+        name: my-net
+        state: present
+    - name: Create volume
+      community.docker.docker_volume:
+        name: my-vol
+        state: present
+```
+
+## উপসংহার
+
+আনসিবল দিয়ে Docker container, image, network, volume—সবকিছু অটোমেটেডভাবে, নিরাপদে ও স্কেলেবলভাবে তৈরি ও ম্যানেজ করা যায়। কনটেইনার অটোমেশনে এটি মাস্টার করার মতো একটি স্কিল।
+
+---
+
+**পরবর্তী পাঠ:** [Infrastructure as Code বেস্ট প্র্যাকটিস](/ansible/iac-best-practices)

@@ -1,0 +1,66 @@
+---
+title: Webhook ও API ইন্টিগ্রেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+AWX/Tower-এর Webhook ও REST API ফিচার দিয়ে অটোমেশন pipeline আরও ফ্লেক্সিবল, ইন্টিগ্রেটেড ও এক্সটার্নাল টুলের সাথে কানেক্টেড করা যায়। GitHub, GitLab, Jenkins, Slack—সবকিছু AWX-এর সাথে ইন্টিগ্রেট করা যায়।
+
+## অ্যানালজি: Doorbell ও Remote Control
+
+ধরা যাক, আপনার বাড়িতে Doorbell বাজলে অটোমেটেডভাবে দরজা খুলে যায়, আবার Remote Control দিয়ে লাইট, ফ্যান চালু করেন। Webhook হচ্ছে Doorbell, API হচ্ছে Remote Control।
+
+## ১. Webhook ইন্টিগ্রেশন
+
+- Job template-এ Webhook enable করুন—GitHub, GitLab
+- Web UI > Templates > Job Template > Enable Webhook
+- Webhook URL ও Credential কনফিগার করুন
+- External tool থেকে push/pull হলে job trigger হবে
+
+## ২. REST API ইন্টিগ্রেশন
+
+- AWX/Tower-এর REST API দিয়ে project, inventory, job template, job launch—সবকিছু automate করা যায়
+- API endpoint: `/api/v2/`
+- Token-based authentication
+- External tool থেকে API call করে job launch, status check, result fetch করুন
+
+## ৩. Notification ও Callback
+
+- Job success/failure হলে Webhook দিয়ে external system-এ notification পাঠান
+- Callback credential দিয়ে external trigger চালান
+
+## ৪. Security ও Access Control
+
+- Webhook ও API credential vault-এ রাখুন
+- RBAC policy enforced করুন
+- Audit log enable করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Webhook URL ও credential গোপন রাখুন
+- API token periodic rotate করুন
+- Automation pipeline version control এ রাখুন
+- Documentation রাখুন—কোন Webhook/API কোথায়, কী কাজে
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি GitHub থেকে push হলে AWX job template trigger করতে চান।
+
+- Job Template: Enable Webhook (GitHub)
+- GitHub repo: Webhook URL সেট করুন
+- AWX: Job template trigger হবে
+
+API দিয়ে job launch:
+```bash
+curl -X POST -H "Authorization: Bearer <token>" \
+     -H "Content-Type: application/json" \
+     -d '{"inventory":1,"credential":1,"job_template":1}' \
+     http://awx.example.com/api/v2/job_templates/1/launch/
+```
+
+## উপসংহার
+
+AWX/Tower-এর Webhook ও API ইন্টিগ্রেশন দিয়ে অটোমেশন pipeline আরও এক্সটার্নাল টুলের সাথে কানেক্টেড, ফ্লেক্সিবল ও স্কেলেবল হয়। Continuous integration, notification, remote control—সবকিছু সহজে বাস্তবায়ন করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Dry Run ও Check Mode](/ansible/check-mode)

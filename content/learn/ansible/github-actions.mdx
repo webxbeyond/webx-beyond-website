@@ -1,0 +1,114 @@
+---
+title: GitHub Actions দিয়ে ডেপ্লয়মেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আধুনিক DevOps ও অটোমেশন ওয়ার্কফ্লোতে GitHub Actions ও Ansible একসাথে ব্যবহার করা হয়—কোড বিল্ড, টেস্ট, ডেপ্লয়, কনফিগারেশন সবকিছু অটোমেটেডভাবে চালাতে। GitHub repository-তে push হলেই Actions trigger হয়ে Ansible playbook রান করে ইন্সট্রাকচার, অ্যাপ্লিকেশন, কনফিগারেশন সবকিছু অটোমেটেড করা যায়।
+
+## অ্যানালজি: রোবটিক ফ্যাক্টরি
+
+ধরা যাক, আপনি একটি রোবটিক ফ্যাক্টরির মালিক। অর্ডার আসলেই রোবট অটোমেটেডভাবে প্রোডাক্ট তৈরি, প্যাকেজ, ডেলিভারি—সবকিছু করে। GitHub Actions রোবট, Ansible মেশিন চালায়।
+
+## কেন GitHub Actions-Ansible ইন্টিগ্রেশন?
+
+- Continuous Integration/Continuous Deployment (CI/CD)
+- Infrastructure as Code (IaC)
+- Automated testing, deployment, rollback
+- Cloud-native workflow
+
+## Integration Flow
+
+1. Developer কোড push করে
+2. GitHub Actions trigger হয়
+3. Actions build/test করে
+4. Actions থেকে Ansible playbook রান হয়
+5. Infrastructure/App ডেপ্লয় হয়
+
+## GitHub Actions থেকে Ansible playbook রান করার নিয়ম
+
+### ১. Workflow YAML
+
+**.github/workflows/deploy.yml**
+```yaml
+name: Deploy with Ansible
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Ansible
+        run: |
+          pip install ansible
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook playbook.yml -i inventory/hosts
+```
+
+### ২. Secrets ব্যবস্থাপনা
+
+- GitHub repository > Settings > Secrets
+- API key, password, vault password—সব Secret হিসেবে রাখুন
+- Workflow-এ `${{ secrets.SECRET_NAME }}` দিয়ে ব্যবহার করুন
+
+### ৩. Automation Pipeline
+
+- Build, test, deploy stage আলাদা রাখুন
+- Error handling ও rollback যুক্ত করুন
+- Playbook idempotent রাখুন
+
+## বেস্ট প্র্যাকটিস
+
+- Workflow YAML version control এ রাখুন
+- Sensitive data Secret হিসেবে রাখুন
+- Automation pipeline ডকুমেন্ট করুন
+- Resource naming convention স্পষ্ট রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি GitHub Actions থেকে Ansible playbook দিয়ে AWS EC2 ডেপ্লয় করতে চান।
+
+**.github/workflows/deploy-ec2.yml**
+```yaml
+name: Deploy EC2 with Ansible
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Ansible & AWS modules
+        run: |
+          pip install ansible boto3 botocore
+          ansible-galaxy collection install amazon.aws
+      - name: Run Ansible Playbook
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          ansible-playbook playbook-ec2.yml -i inventory/aws_ec2.yml
+```
+
+## উপসংহার
+
+GitHub Actions-Ansible ইন্টিগ্রেশন করলে DevOps workflow আরও অটোমেটেড, স্কেলেবল ও রিলায়েবল হয়। Continuous deployment, automated rollback, IaC—সবকিছু সহজে বাস্তবায়ন করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Ansible দিয়ে Docker ম্যানেজমেন্ট](/ansible/docker-management)
