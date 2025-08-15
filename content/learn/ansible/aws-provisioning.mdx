@@ -1,0 +1,149 @@
+---
+title: AWS প্রভিশনিং - EC2, S3, Security Groups
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্লাউড অটোমেশনের যুগে AWS ইন্সট্রাকচার অটোমেটেডভাবে তৈরি ও ম্যানেজ করা অত্যন্ত গুরুত্বপূর্ণ। আনসিবল দিয়ে EC2 instance, S3 bucket, Security Group—সবকিছু কোড দিয়ে তৈরি, কনফিগার ও ম্যানেজ করা যায়।
+
+## অ্যানালজি: ফ্যাক্টরি অটোমেশন
+
+ধরা যাক, আপনি একটি ফ্যাক্টরির ম্যানেজার। প্রতিদিন নতুন মেশিন, স্টোরেজ, নিরাপত্তা ব্যবস্থা লাগছে। যদি প্রতিবার ম্যানুয়ালি অর্ডার দেন, সময় ও ভুলের সম্ভাবনা বাড়ে। কিন্তু যদি অটোমেটেড অর্ডারিং সিস্টেম থাকে, এক ক্লিকেই সবকিছু তৈরি হয়ে যায়।
+
+AWS প্রভিশনিংও ঠিক এমন—আনসিবল দিয়ে কোড লিখে EC2, S3, Security Group তৈরি ও কনফিগার করা যায়।
+
+## AWS-এ আনসিবল ব্যবহার করার জন্য প্রস্তুতি
+
+- AWS account ও credentials (Access Key, Secret Key)
+- `boto3` ও `botocore` Python লাইব্রেরি
+- আনসিবল AWS collection: `amazon.aws`
+
+### ইনস্টলেশন:
+```bash
+pip install boto3 botocore
+ansible-galaxy collection install amazon.aws
+```
+
+## EC2 Instance Provisioning
+
+**playbook-ec2.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        key_name: my-key
+        instance_type: t2.micro
+        image_id: ami-0abcdef1234567890
+        region: ap-south-1
+        security_group: my-sg
+        wait: yes
+      register: ec2
+    - name: Show instance info
+      debug:
+        var: ec2
+```
+
+## S3 Bucket Provisioning
+
+**playbook-s3.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create S3 bucket
+      amazon.aws.s3_bucket:
+        name: my-ansible-bucket
+        state: present
+        region: ap-south-1
+    - name: Show bucket info
+      debug:
+        msg: "Bucket created: my-ansible-bucket"
+```
+
+## Security Group Provisioning
+
+**playbook-sg.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create security group
+      amazon.aws.ec2_group:
+        name: my-sg
+        description: "Allow SSH & HTTP"
+        region: ap-south-1
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+    - name: Show SG info
+      debug:
+        msg: "Security group created: my-sg"
+```
+
+## Credentials ব্যবস্থাপনা
+
+- AWS credentials `~/.aws/credentials` ফাইলে রাখতে পারেন
+- অথবা environment variable ব্যবহার করুন
+- অথবা ansible-vault দিয়ে এনক্রিপ্ট করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Resource naming convention স্পষ্ট রাখুন
+- Automation pipeline-এ credentials এনক্রিপ্ট করুন
+- Resource tagging ব্যবহার করুন
+- Error handling ও rollback যুক্ত করুন
+- Documentation রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি EC2 instance, S3 bucket, Security Group—all একসাথে তৈরি করতে চান।
+
+**playbook-all.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        key_name: my-key
+        instance_type: t2.micro
+        image_id: ami-0abcdef1234567890
+        region: ap-south-1
+        security_group: my-sg
+        wait: yes
+      register: ec2
+    - name: Create S3 bucket
+      amazon.aws.s3_bucket:
+        name: my-ansible-bucket
+        state: present
+        region: ap-south-1
+    - name: Create security group
+      amazon.aws.ec2_group:
+        name: my-sg
+        description: "Allow SSH & HTTP"
+        region: ap-south-1
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+```
+
+## উপসংহার
+
+আনসিবল দিয়ে AWS EC2, S3, Security Group—সবকিছু অটোমেটেডভাবে, নিরাপদে ও স্কেলেবলভাবে তৈরি ও ম্যানেজ করা যায়। ক্লাউড অটোমেশনে এটি মাস্টার করার মতো একটি স্কিল।
+
+---
+
+**পরবর্তী পাঠ:** [GCP প্রভিশনিং - Compute Engine, IAM, Networking](/ansible/gcp-provisioning)

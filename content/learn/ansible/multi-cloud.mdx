@@ -1,0 +1,117 @@
+---
+title: হাইব্রিড ও মাল্টি-ক্লাউড স্ট্রাটেজি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আজকের এন্টারপ্রাইজে একাধিক ক্লাউড (AWS, Azure, GCP) ও অন-প্রিমিস ইনফ্রাস্ট্রাকচার একসাথে ব্যবহৃত হয়। এই পরিবেশকে বলে হাইব্রিড ও মাল্টি-ক্লাউড। আনসিবল দিয়ে এসব পরিবেশ অটোমেটেডভাবে, এক প্লেবুকে, একসাথে ম্যানেজ করা যায়।
+
+## অ্যানালজি: মাল্টি-শাখা ব্যাংক
+
+ধরা যাক, আপনি একটি ব্যাংকের মাল্টিপল শাখার ম্যানেজার। কিছু শাখা শহরে, কিছু গ্রামে, কিছু অনলাইনে। সব শাখার হিসাব, নিরাপত্তা, ট্রান্সফার—সবকিছু একসাথে ম্যানেজ করতে হয়।
+
+হাইব্রিড ও মাল্টি-ক্লাউড স্ট্রাটেজিও ঠিক এমন—বিভিন্ন ক্লাউড ও অন-প্রিমিস রিসোর্স একসাথে অটোমেটেডভাবে ম্যানেজ করা যায়।
+
+## হাইব্রিড ও মাল্টি-ক্লাউড স্ট্রাটেজি কী?
+
+- **হাইব্রিড ক্লাউড**: ক্লাউড + অন-প্রিমিস একসাথে
+- **মাল্টি-ক্লাউড**: একাধিক ক্লাউড (AWS, Azure, GCP) একসাথে
+
+## আনসিবলে মাল্টি-ক্লাউড ম্যানেজমেন্ট
+
+- একাধিক inventory ফাইল/প্লাগইন ব্যবহার
+- এক প্লেবুকে একাধিক ক্লাউড টাস্ক
+- Role ও variable দিয়ে environment-specific কনফিগ
+
+## বাস্তব উদাহরণ
+
+**inventory/aws_ec2.yml**
+```yaml
+plugin: aws_ec2
+regions:
+  - ap-south-1
+```
+
+**inventory/azure.yml**
+```yaml
+plugin: azure_rm
+resource_groups:
+  - my-rg
+```
+
+**inventory/gcp.yml**
+```yaml
+plugin: gcp_compute
+projects:
+  - my-gcp-project
+```
+
+**playbook-multi-cloud.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Launch AWS EC2
+      amazon.aws.ec2_instance:
+        key_name: my-key
+        instance_type: t2.micro
+        image_id: ami-0abcdef1234567890
+        region: ap-south-1
+    - name: Create Azure VM
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: my-rg
+        name: my-vm
+        admin_username: azureuser
+        admin_password: MyPassword123!
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 18.04-LTS
+          version: latest
+        vm_size: Standard_B1s
+        location: eastus
+        network_interfaces: my-nic
+    - name: Create GCP VM
+      google.cloud.gcp_compute_instance:
+        name: my-vm
+        machine_type: e2-medium
+        zone: asia-south1-a
+        project: my-gcp-project
+        auth_kind: serviceaccount
+        service_account_file: /path/to/key.json
+        disks:
+          - auto_delete: true
+            boot: true
+            initialize_params:
+              source_image: projects/debian-cloud/global/images/family/debian-11
+        network_interfaces:
+          - network: default
+            access_configs:
+              - name: External NAT
+                type: ONE_TO_ONE_NAT
+```
+
+## Variable ও Role ব্যবস্থাপনা
+
+- environment-specific variable ব্যবহার করুন
+- Role structure environment অনুযায়ী ভাগ করুন
+- Vault দিয়ে credentials এনক্রিপ্ট করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Inventory ও credentials version control এ রাখুন
+- Resource naming convention স্পষ্ট রাখুন
+- Error handling ও rollback যুক্ত করুন
+- Documentation রাখুন
+
+## চ্যালেঞ্জ ও সমাধান
+
+- API rate limit, credentials management, network latency—এসব চ্যালেঞ্জ
+- Automation pipeline ও monitoring টুল ব্যবহার করুন
+
+## উপসংহার
+
+আনসিবল দিয়ে হাইব্রিড ও মাল্টি-ক্লাউড স্ট্রাটেজি বাস্তবায়ন করলে এন্টারপ্রাইজ ইনফ্রাস্ট্রাকচার আরও ফ্লেক্সিবল, স্কেলেবল ও অটোমেটেড হয়।
+
+---
+
+**পরবর্তী পাঠ:** [Jenkins এর সাথে আনসিবল ইন্টিগ্রেশন](/ansible/jenkins-integration)

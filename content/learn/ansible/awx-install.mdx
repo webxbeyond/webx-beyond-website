@@ -1,0 +1,78 @@
+---
+title: AWX / Tower ইন্সটলেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এন্টারপ্রাইজ অটোমেশনে Ansible Tower (AWX) একটি শক্তিশালী Web UI, RBAC, ও সেন্ট্রালাইজড অটোমেশন টুল। CLI ছাড়াও গ্রাফিকাল ইন্টারফেস, জব টেমপ্লেট, ক্রেডেনশিয়াল, ইনভেন্টরি—সবকিছু সহজে ম্যানেজ করা যায়। AWX হচ্ছে Tower-এর ওপেন সোর্স ভার্সন।
+
+## অ্যানালজি: কন্ট্রোল টাওয়ার
+
+ধরা যাক, আপনি একটি বিমানবন্দরের কন্ট্রোল টাওয়ারে বসে আছেন। সব ফ্লাইট, রানওয়ে, নিরাপত্তা—সবকিছু এক জায়গা থেকে নিয়ন্ত্রণ করছেন। AWX/Tower হচ্ছে Ansible অটোমেশনের কন্ট্রোল টাওয়ার।
+
+## AWX / Tower ইন্সটলেশন
+
+### ১. Docker Compose দিয়ে AWX ইন্সটল
+
+AWX সহজে Docker Compose দিয়ে ইন্সটল করা যায়।
+
+**প্রয়োজনীয়তা:**
+- Docker, Docker Compose
+- 4GB+ RAM
+
+**স্টেপস:**
+1. GitHub থেকে AWX repo ক্লোন করুন:
+   ```bash
+   git clone https://github.com/ansible/awx.git
+   cd awx/installer
+   ```
+2. `inventory` ফাইল কনফিগার করুন (password, port, etc)
+3. Docker Compose দিয়ে ডিপ্লয় করুন:
+   ```bash
+   ansible-playbook -i inventory install.yml
+   ```
+4. Web UI খুলুন: `http://localhost:80`
+
+### ২. Kubernetes / OpenShift-এ AWX
+
+বড় স্কেলে AWX Kubernetes বা OpenShift-এ ডিপ্লয় করা যায়।
+- Helm chart, Operator ব্যবহার করুন
+- Persistent storage, external DB কনফিগার করুন
+
+### ৩. Ansible Tower ইন্সটলেশন
+
+Tower (AWX-এর এন্টারপ্রাইজ ভার্সন) Red Hat subscription দিয়ে ইন্সটল করা যায়।
+- Official installer script ব্যবহার করুন
+- License ও subscription লাগবে
+
+## Initial Setup
+
+- Admin user/password সেট করুন
+- Organization, inventory, project, credential কনফিগার করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Production-এ external DB ব্যবহার করুন
+- SSL/TLS enable করুন
+- RBAC policy কনফিগার করুন
+- Backup ও disaster recovery প্ল্যান রাখুন
+- Automation pipeline version control এ রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি Docker Compose দিয়ে AWX ইন্সটল করতে চান।
+
+```bash
+git clone https://github.com/ansible/awx.git
+cd awx/installer
+ansible-playbook -i inventory install.yml
+```
+
+Web UI খুলুন: `http://localhost:80`
+
+## উপসংহার
+
+AWX/Tower ইন্সটল করলে Ansible অটোমেশন আরও সেন্ট্রালাইজড, স্কেলেবল ও সিকিউর হয়। Web UI, RBAC, job template—সবকিছু সহজে ম্যানেজ করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [প্রজেক্ট, ইনভেন্টরি ও ক্রেডেনশিয়াল সেটআপ](/ansible/awx-setup)

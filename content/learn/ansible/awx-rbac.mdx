@@ -1,0 +1,63 @@
+---
+title: RBAC (Role-Based Access Control)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এন্টারপ্রাইজ অটোমেশনে নিরাপত্তা ও কন্ট্রোলের জন্য RBAC (Role-Based Access Control) অত্যন্ত গুরুত্বপূর্ণ। AWX/Tower-এ RBAC দিয়ে কে কোন রিসোর্সে, কোন অ্যাকশন নিতে পারবে—সবকিছু নিয়ন্ত্রণ করা যায়।
+
+## অ্যানালজি: অফিসের চাবি ও অনুমতি
+
+ধরা যাক, আপনি একটি অফিসের ম্যানেজার। কিছু চাবি শুধু অ্যাডমিনের কাছে, কিছু চাবি শুধু HR-এর কাছে, কিছু চাবি সবাই ব্যবহার করতে পারে। RBAC হচ্ছে সেই চাবি ও অনুমতির নিয়ম।
+
+## RBAC কী?
+
+- **Role:** নির্দিষ্ট permission-এর সেট (admin, auditor, operator)
+- **User/Team:** কে কোন role পাবে
+- **Resource:** কোন project, inventory, credential, job template
+
+## AWX/Tower-এ RBAC কনফিগার
+
+### ১. Organization ও Team
+- Organization তৈরি করুন—বিভিন্ন টিম/ডিপার্টমেন্ট
+- Team তৈরি করুন—একাধিক user group
+
+### ২. Role Assignment
+- User/Team-কে role assign করুন—admin, execute, read, update
+- Resource-ভিত্তিক role—project, inventory, credential, job template
+
+### ৩. Custom Role
+- Custom role তৈরি করুন—specific permission set
+- Web UI > Access > Roles > Add
+
+### ৪. Permission Matrix
+- Web UI-তে resource-wise permission matrix দেখুন
+- কে কোন resource-এ কি করতে পারবে—read, write, execute
+
+### ৫. Audit ও Monitoring
+- Job history, user activity, permission change—সবকিছু audit log-এ সংরক্ষণ করুন
+- Security compliance নিশ্চিত করুন
+
+## বেস্ট প্র্যাকটিস
+
+- Principle of least privilege—যত কম permission, তত বেশি security
+- Sensitive resource-এ admin-only access দিন
+- Team-based role assignment করুন
+- Audit log enable ও review করুন
+- Automation pipeline version control এ রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি "DevOps Team"-কে "deploy" role, "QA Team"-কে "read" role, "Admin"-কে "admin" role দিতে চান—project: "aws-deploy", inventory: "aws-prod"
+
+- Organization: "Enterprise IT"
+- Team: "DevOps", "QA", "Admin"
+- Role Assignment: DevOps (deploy), QA (read), Admin (admin)
+- Resource: Project: "aws-deploy", Inventory: "aws-prod"
+
+## উপসংহার
+
+AWX/Tower-এ RBAC কনফিগার করলে অটোমেশন pipeline আরও সিকিউর, কন্ট্রোলড ও কমপ্লায়েন্ট হয়। কে কী করতে পারবে—সবকিছু নিয়ন্ত্রণ করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Webhook ও API ইন্টিগ্রেশন](/ansible/awx-webhook-api)

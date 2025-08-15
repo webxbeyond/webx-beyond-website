@@ -1,0 +1,118 @@
+---
+title: Ansible Vault দিয়ে সিক্রেট ম্যানেজমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় প্রজেক্টে পাসওয়ার্ড, API key, SSH key, টোকেন—এসব সিক্রেট তথ্য প্লেবুক বা ইনভেন্টরি ফাইলে রাখতে হয়। কিন্তু এগুলো যদি প্লেইন টেক্সটে থাকে, তাহলে নিরাপত্তা ঝুঁকি বাড়ে। এই সমস্যা সমাধানে Ansible Vault ব্যবহার করা হয়, যা সিক্রেট তথ্য এনক্রিপ্ট করে রাখে।
+
+## অ্যানালজি: লকারে টাকা রাখা
+
+ধরা যাক, আপনি ব্যাংকে টাকা রাখেন। টাকা খোলা জায়গায় রাখলে চুরি হওয়ার ভয় থাকে। কিন্তু ব্যাংকের লকারে রাখলে শুধু অনুমোদিত ব্যক্তিই খুলতে পারে।
+
+Ansible Vault ঠিক এমনই—সিক্রেট তথ্য এনক্রিপ্টেড লকারে রাখে, শুধু Vault password জানা থাকলেই খুলতে পারবেন।
+
+## Vault কী?
+
+- **Ansible Vault**: একটি টুল, যা YAML/টেক্সট ফাইল এনক্রিপ্ট ও ডিক্রিপ্ট করে।
+- **Vault password**: Vault ফাইল খুলতে প্রয়োজনীয় পাসওয়ার্ড।
+
+## Vault দিয়ে ফাইল এনক্রিপ্ট করা
+
+### নতুন Vault ফাইল তৈরি
+```bash
+ansible-vault create secrets.yml
+```
+
+এতে পাসওয়ার্ড চাইবে, তারপর YAML ফাইল লিখতে পারবেন।
+
+### বিদ্যমান ফাইল এনক্রিপ্ট করা
+```bash
+ansible-vault encrypt group_vars/prod.yml
+```
+
+### Vault ফাইল খুলে এডিট করা
+```bash
+ansible-vault edit secrets.yml
+```
+
+### Vault ফাইল ডিক্রিপ্ট করা
+```bash
+ansible-vault decrypt secrets.yml
+```
+
+## প্লেবুকে Vault ফাইল ব্যবহার
+
+Vault ফাইলের ভেরিয়েবল প্লেবুকে ব্যবহার করতে চাইলে:
+
+**group_vars/prod.yml** (Vault দিয়ে এনক্রিপ্ট)
+```yaml
+api_key: "supersecretapikey"
+```
+
+**playbook.yml**
+```yaml
+- hosts: prod
+  tasks:
+    - name: Show API key
+      debug:
+        msg: "API key is {{ api_key }}"
+```
+
+### প্লেবুক রান করার সময় পাসওয়ার্ড দেওয়া
+```bash
+ansible-playbook playbook.yml --ask-vault-pass
+```
+
+অথবা, পাসওয়ার্ড ফাইল ব্যবহার:
+```bash
+ansible-playbook playbook.yml --vault-password-file vault_pass.txt
+```
+
+## একাধিক Vault ফাইল ও ID
+
+বড় প্রজেক্টে একাধিক Vault ফাইল ও ID ব্যবহার করা যায়।
+
+**encrypt করার সময়:**
+```bash
+ansible-vault encrypt --vault-id dev@prompt dev.yml
+ansible-vault encrypt --vault-id prod@prompt prod.yml
+```
+
+**প্লেবুক রান:**
+```bash
+ansible-playbook playbook.yml --vault-id dev@prompt --vault-id prod@prompt
+```
+
+## বেস্ট প্র্যাকটিস
+
+- Vault password version control এ রাখবেন না
+- Vault ফাইলের নাম ও লোকেশন স্পষ্ট রাখুন
+- Sensitive data শুধু Vault ফাইলে রাখুন
+- Vault password শেয়ার করার সময় সতর্ক থাকুন
+- Automation pipeline-এ vault-password-file ব্যবহার করুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনার প্লেবুকে ডাটাবেস পাসওয়ার্ড লাগবে।
+
+**group_vars/db.yml** (Vault দিয়ে এনক্রিপ্ট)
+```yaml
+db_password: "mysecretpass"
+```
+
+**playbook.yml**
+```yaml
+- hosts: db
+  tasks:
+    - name: Show DB password
+      debug:
+        msg: "DB password is {{ db_password }}"
+```
+
+## উপসংহার
+
+Ansible Vault ব্যবহার করলে সিক্রেট তথ্য নিরাপদ, এনক্রিপ্টেড ও কন্ট্রোলডভাবে ম্যানেজ করা যায়। বড় প্রজেক্টে এটি মাস্টার করার মতো একটি টুল।
+
+---
+
+**পরবর্তী পাঠ:** [AWS প্রভিশনিং - EC2, S3, Security Groups](/ansible/aws-provisioning)

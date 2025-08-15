@@ -1,0 +1,64 @@
+---
+title: প্রজেক্ট, ইনভেন্টরি ও ক্রেডেনশিয়াল সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+AWX/Tower ইন্সটল করার পর প্রথম কাজ—প্রজেক্ট, ইনভেন্টরি, ক্রেডেনশিয়াল কনফিগার করা। Web UI থেকে সহজেই সবকিছু সেটআপ করা যায়, যাতে অটোমেশন pipeline আরও সেন্ট্রালাইজড, সিকিউর ও স্কেলেবল হয়।
+
+## অ্যানালজি: অফিসের রেজিস্টার
+
+ধরা যাক, আপনি একটি অফিসের রেজিস্টার ম্যানেজ করছেন। কোন ফাইল কোথায়, কোন লোক কোন ডিপার্টমেন্টে, কোন চাবি কার কাছে—সবকিছু রেজিস্টারে লিখে রাখেন। AWX/Tower-এ প্রজেক্ট, ইনভেন্টরি, ক্রেডেনশিয়াল হচ্ছে সেই রেজিস্টার।
+
+## ১. প্রজেক্ট সেটআপ
+
+- **Project:** Source code (playbook, role) কোথা থেকে আসবে—Git, SVN, local
+- Web UI > Projects > Add
+- Name, SCM type, URL, credential দিন
+
+## ২. ইনভেন্টরি সেটআপ
+
+- **Inventory:** কোন হোস্টে প্লেবুক রান হবে
+- Web UI > Inventories > Add
+- Name, organization, inventory file/source দিন
+- Group, host, variable কনফিগার করুন
+
+## ৩. ক্রেডেনশিয়াল সেটআপ
+
+- **Credential:** SSH key, password, cloud API key, vault password
+- Web UI > Credentials > Add
+- Name, type, input fields দিন
+- Credential type: Machine, Source Control, Vault, Cloud
+
+## ৪. Organization ও User Management
+
+- Organization তৈরি করুন—বিভিন্ন টিম/ডিপার্টমেন্ট
+- User ও Team যোগ করুন—RBAC policy কনফিগার করুন
+
+## ৫. Project Sync ও Inventory Update
+
+- Project sync করলে SCM থেকে কোড আপডেট হয়
+- Inventory update করলে dynamic inventory refresh হয়
+
+## বেস্ট প্র্যাকটিস
+
+- Credential vault ব্যবহার করুন
+- Inventory ও project naming convention স্পষ্ট রাখুন
+- RBAC policy enforced করুন
+- Automation pipeline version control এ রাখুন
+- Documentation রাখুন—কোন credential কোথায়, কোন inventory কী
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি GitHub থেকে playbook, AWS inventory, vault credential—all AWX-এ কনফিগার করতে চান।
+
+- Project: Name: "aws-deploy", SCM: Git, URL: https://github.com/example/aws-playbook.git
+- Inventory: Name: "aws-prod", Source: aws_ec2.yml
+- Credential: Name: "aws-key", Type: Cloud, Fields: Access Key, Secret Key
+
+## উপসংহার
+
+AWX/Tower-এ project, inventory, credential সঠিকভাবে কনফিগার করলে অটোমেশন pipeline আরও সিকিউর, স্কেলেবল ও মেইনটেনেবল হয়।
+
+---
+
+**পরবর্তী পাঠ:** [জব টেমপ্লেট ও সিডিউলিং](/ansible/awx-job-templates)

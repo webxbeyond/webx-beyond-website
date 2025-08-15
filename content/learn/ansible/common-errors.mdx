@@ -1,0 +1,169 @@
+---
+title: সাধারণ এরর ও সমাধান
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল ব্যবহার করতে গিয়ে নতুন ও অভিজ্ঞ উভয় ইউজারই বিভিন্ন ধরনের এরর বা সমস্যা সম্মুখীন হন। এই টিউটোরিয়ালে আমরা সবচেয়ে কমন কিছু এরর, তাদের কারণ, এবং সহজ সমাধান নিয়ে আলোচনা করব।
+
+## ১. YAML Syntax Error
+
+**উদাহরণ:**
+```yaml
+- name: Install package
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+```
+
+**কমন ভুল:**
+- স্পেসিং ভুল
+- কলন (:) এর পরে স্পেস না দেয়া
+- ইন্ডেন্টেশন মিসম্যাচ
+
+**সমাধান:**
+- YAML লিন্টার ব্যবহার করুন (`yamllint`)
+- Visual Studio Code বা অন্য IDE-তে YAML extension ব্যবহার করুন
+
+**Analogy:**
+যেমন বাংলা বানান ভুলে অর্থ বদলে যায়, YAML-এ স্পেসিং ভুলে প্লেবুক কাজ করবে না।
+
+---
+
+## ২. "UNREACHABLE" Error
+
+**কারণ:**
+- টার্গেট হোস্টে SSH কানেকশন হচ্ছে না
+- Firewall, Network Issue
+- Wrong username/password
+
+**সমাধান:**
+- `ansible -m ping all` দিয়ে কানেকশন টেস্ট করুন
+- SSH key, username, port ঠিক আছে কিনা চেক করুন
+- Inventory ফাইল ঠিক আছে কিনা দেখুন
+
+**Real Life Example:**
+যেমন ফোনে ব্যাটারি না থাকলে কল করা যায় না, তেমনি SSH না হলে আনসিবল কাজ করবে না।
+
+---
+
+## ৩. "FAILED" Error
+
+**কারণ:**
+- Module/Task-এ ভুল প্যারামিটার
+- Package/Service নেই
+- Permission denied
+
+**সমাধান:**
+- Task-এর আউটপুট দেখুন, কোন লাইনে ভুল হয়েছে
+- `become: yes` দিয়ে root privilege দিন
+- Package/Service ইনস্টল আছে কিনা চেক করুন
+
+**Analogy:**
+যেমন ভুল রেসিপি দিলে রান্না নষ্ট হয়, তেমনি ভুল প্যারামিটার দিলে টাস্ক ফেল করবে।
+
+---
+
+## ৪. Variable Not Defined
+
+**কারণ:**
+- Variable ডিক্লেয়ার করা হয়নি
+- Typo
+- Scope mismatch
+
+**সমাধান:**
+- Variable spelling চেক করুন
+- Group_vars/host_vars ঠিক আছে কিনা দেখুন
+- Debug module দিয়ে variable value দেখুন
+
+**Example:**
+```yaml
+- debug:
+    var: my_var
+```
+
+---
+
+## ৫. "Permission Denied" Error
+
+**কারণ:**
+- User-এ যথেষ্ট privilege নেই
+- File/Directory permission issue
+
+**সমাধান:**
+- `become: yes` ব্যবহার করুন
+- File permission ঠিক করুন (`chmod`, `chown`)
+
+---
+
+## ৬. "No Hosts Matched" Error
+
+**কারণ:**
+- Inventory-তে host/group নেই
+- Typo
+- Host pattern mismatch
+
+**সমাধান:**
+- Inventory ফাইল চেক করুন
+- Host/group spelling ঠিক করুন
+
+---
+
+## ৭. "Missing Dependencies" Error
+
+**কারণ:**
+- Python module/package নেই
+- OS package নেই
+
+**সমাধান:**
+- `pip install` বা `apt/yum install` দিয়ে dependency ইনস্টল করুন
+- Requirements.txt বা playbook-এর dependency section চেক করুন
+
+---
+
+## ৮. "Idempotency" Issue
+
+**কারণ:**
+- Task বারবার রান হলে পরিবর্তন আসে
+- State parameter ঠিক নেই
+
+**সমাধান:**
+- State parameter (`present`, `absent`, `started`) ঠিকভাবে ব্যবহার করুন
+- Playbook rerun করে দেখুন পরিবর্তন আসে কিনা
+
+---
+
+## ৯. "Template Error"
+
+**কারণ:**
+- Jinja2 syntax ভুল
+- Variable নেই
+
+**সমাধান:**
+- Template ফাইল চেক করুন
+- Variable value আছে কিনা দেখুন
+- Debug module দিয়ে value দেখুন
+
+---
+
+## ১০. "Vault Password Required" Error
+
+**কারণ:**
+- Vault-encrypted variable/playbook রান করার সময় password দেয়া হয়নি
+
+**সমাধান:**
+- `--ask-vault-pass` ফ্ল্যাগ ব্যবহার করুন
+- Vault password ফাইল configure করুন
+
+---
+
+## Best Practices
+- প্লেবুক/রোল লেখার সময় ছোট ছোট টাস্কে ভাগ করুন
+- Debug module দিয়ে intermediate value দেখুন
+- Error message পড়ে কারণ খুঁজুন
+- Version compatibility চেক করুন
+- Documentation পড়ুন
+
+## উপসংহার
+
+আনসিবল ব্যবহার সহজ, কিন্তু এরর হলে দ্রুত সমাধান জানা থাকলে কাজ অনেক সহজ হয়। উপরের কমন এরর ও সমাধানগুলো মনে রাখুন, এবং "ভুল করলে শিখুন"—এই নীতিতে এগিয়ে যান।

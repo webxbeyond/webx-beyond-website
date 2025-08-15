@@ -1,0 +1,62 @@
+---
+title: Persistent SSH কানেকশন ও Pipelining
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় আকারের ইনফ্রায় দ্রুত ও কার্যকরী অটোমেশন করতে আনসিবলের SSH কানেকশন ও Pipelining কনফিগারেশন অত্যন্ত গুরুত্বপূর্ণ।
+
+## Persistent SSH Connection (ControlPersist)
+
+আনসিবল প্রতিটি টাস্কের জন্য আলাদা SSH কানেকশন খুললে সময় বেশি লাগে। Persistent SSH কানেকশন মানে একবার কানেকশন খুলে সেটি বারবার ব্যবহার করা।
+
+**Config location:**
+- `/etc/ansible/ansible.cfg`
+- অথবা প্রজেক্টের `ansible.cfg`
+
+```ini
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+```
+
+- `ControlMaster=auto`: একাধিক SSH session একই কানেকশন ব্যবহার করবে
+- `ControlPersist=60s`: কানেকশন ৬০ সেকেন্ড পর্যন্ত খোলা থাকবে
+
+## বাস্তব উদাহরণ
+ধরা যাক, ১০০টি হোস্টে টাস্ক রান করতে হবে। প্রতিবার নতুন SSH কানেকশন খুললে latency বাড়বে। Persistent SSH কানেকশন ব্যবহার করলে একবার কানেকশন খুলে বারবার ব্যবহার করা যায়, ফলে সময় কম লাগে।
+
+## Analogy: "একবার দরজা খুলে বারবার যাতায়াত"
+যেমন একবার দরজা খুলে বারবার যাতায়াত করলে সময় বাঁচে, তেমনি Persistent SSH কানেকশন latency কমায়।
+
+---
+
+## SSH Pipelining
+
+Pipelining মানে আনসিবল টাস্ক রান করার সময় SSH-তে কমান্ড একসাথে পাঠানো। এতে করে temp ফাইল কপি করার overhead কমে যায়।
+
+**Config location:**
+```ini
+[ssh_connection]
+pipelining = True
+```
+
+## কখন Pipelining ব্যবহার করবেন?
+- অনেক টাস্ক/হোস্ট
+- দ্রুত অটোমেশন দরকার
+- temp ফাইল কপি overhead কমাতে চান
+
+## সতর্কতা
+- Pipelining ব্যবহার করলে `requiretty` অপশন disable থাকতে হবে (CentOS/RHEL)
+- Security policy অনুযায়ী ব্যবহার করুন
+
+## Performance Optimization Tips
+- Persistent SSH কানেকশন enable করুন
+- pipelining = True করুন
+- Monitoring করুন (latency, resource usage)
+
+## Best Practices
+- Production-এ আগে টেস্ট করুন
+- SSH config ও security policy চেক করুন
+- ansible.cfg-তে comments দিয়ে রাখুন
+
+## উপসংহার
+Persistent SSH কানেকশন ও Pipelining enable করলে আনসিবল দিয়ে বড় আকারের ইনফ্রায় দ্রুত ও স্কেলেবল অটোমেশন সম্ভব। "একবার দরজা খুলে বারবার যাতায়াত"-এর মতো efficiency বাড়ে, তবে security ও config ঠিক রাখতে হবে।

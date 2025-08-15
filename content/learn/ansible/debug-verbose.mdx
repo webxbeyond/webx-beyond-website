@@ -1,0 +1,72 @@
+---
+title: debug মডিউল ও Verbose Mode
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুক ডিবাগ ও ট্রাবলশুটিংয়ের জন্য debug মডিউল ও Verbose Mode অত্যন্ত গুরুত্বপূর্ণ। প্লেবুক রান করার সময় কোন ভেরিয়েবল, কোন আউটপুট, কোন error—সবকিছু সহজে দেখতে ও বুঝতে debug ও verbose ব্যবহার করা হয়।
+
+## অ্যানালজি: গাড়ির ড্যাশবোর্ড ও মেকানিক
+
+ধরা যাক, আপনি গাড়ি চালাচ্ছেন। ড্যাশবোর্ডে স্পিড, ফুয়েল, তাপমাত্রা—সবকিছু দেখেন। সমস্যা হলে মেকানিক ডিটেইল দেখে ঠিক করেন। debug হচ্ছে ড্যাশবোর্ড, verbose হচ্ছে মেকানিকের ডিটেইল রিপোর্ট।
+
+## debug মডিউল
+
+- প্লেবুকে debug টাস্ক দিয়ে ভেরিয়েবল, আউটপুট, মেসেজ দেখানো যায়
+- `msg`, `var`—দুইভাবে debug করা যায়
+
+### উদাহরণ:
+```yaml
+- name: Show variable value
+  debug:
+    var: my_var
+
+- name: Show custom message
+  debug:
+    msg: "Deployment started on {{ inventory_hostname }}"
+```
+
+## Verbose Mode
+
+- প্লেবুক রান করার সময় `-v`, `-vv`, `-vvv`, `-vvvv` ফ্ল্যাগ দিলে আরও ডিটেইল আউটপুট পাওয়া যায়
+- Error, warning, changed, skipped—সবকিছু ডিটেইল দেখা যায়
+
+### উদাহরণ:
+```bash
+ansible-playbook playbook.yml -i inventory/hosts -v
+ansible-playbook playbook.yml -i inventory/hosts -vvv
+```
+
+## কখন debug ও verbose ব্যবহার করবেন?
+
+- প্লেবুক ডেভেলপমেন্ট ও টেস্টিংয়ে
+- Error, unexpected result, variable value দেখতে
+- Production issue ট্রাবলশুটিংয়ে
+
+## বেস্ট প্র্যাকটিস
+
+- Sensitive data debug-এ না দেখান
+- Debug টাস্ক শেষে remove/comment করুন
+- Verbose mode শুধু ডেভেলপমেন্ট/ডিবাগিংয়ে ব্যবহার করুন
+- Automation pipeline-এ debug log সংরক্ষণ করুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি প্লেবুক ডেভেলপ করছেন—debug দিয়ে variable value, verbose দিয়ে error trace দেখছেন:
+
+```yaml
+- name: Show API key
+  debug:
+    var: api_key
+```
+
+```bash
+ansible-playbook playbook.yml -i inventory/hosts -vvv
+```
+
+## উপসংহার
+
+debug মডিউল ও Verbose Mode ব্যবহার করলে আনসিবল প্লেবুক আরও নির্ভরযোগ্য, ট্রাবলশুটেবল ও মেইনটেনেবল হয়। সমস্যা দ্রুত সমাধান করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Molecule দিয়ে লোকাল টেস্টিং](/ansible/molecule-testing)

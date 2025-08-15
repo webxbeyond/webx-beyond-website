@@ -1,0 +1,107 @@
+---
+title: Infrastructure as Code বেস্ট প্র্যাকটিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আধুনিক DevOps ও ক্লাউড অটোমেশনে Infrastructure as Code (IaC) একটি অপরিহার্য কনসেপ্ট। আনসিবল দিয়ে IaC বাস্তবায়ন করলে ইনফ্রাস্ট্রাকচার অটোমেটেড, রিপ্রোডিউসেবল, স্কেলেবল ও সিকিউর হয়। কিন্তু সঠিক বেস্ট প্র্যাকটিস না মানলে কোড জটিল, অনিরাপদ ও অপ্রয়োজনীয় হয়ে যেতে পারে।
+
+## অ্যানালজি: ব্লুপ্রিন্ট দিয়ে বাড়ি তৈরি
+
+ধরা যাক, আপনি বাড়ি তৈরি করছেন। যদি ব্লুপ্রিন্ট ছাড়া কাজ করেন, প্রতিবার নতুন ডিজাইন, নতুন ভুল, নতুন সমস্যা হবে। কিন্তু ব্লুপ্রিন্ট থাকলে, একই ডিজাইন বারবার, কম ভুল, দ্রুত কাজ। IaC হচ্ছে ইনফ্রাস্ট্রাকচারের ব্লুপ্রিন্ট।
+
+## IaC বেস্ট প্র্যাকটিস
+
+### ১. কোড রিপ্রোডিউসেবল ও আইডেমপোটেন্ট রাখুন
+- একই কোড বারবার রান করলে একই ফলাফল আসবে
+- আনসিবল প্লেবুক, রোল, টাস্ক আইডেমপোটেন্ট রাখুন
+
+### ২. মডুলার ও রিইউজেবল ডিজাইন
+- রোল, টাস্ক, ভেরিয়েবল ভাগ করুন
+- কমন কনফিগ আলাদা ফাইলে রাখুন
+
+### ৩. Version Control ব্যবহার করুন
+- Git-এ সব কোড, ইনভেন্টরি, প্লেবুক রাখুন
+- Pull request, code review চালু রাখুন
+
+### ৪. Automated Testing
+- Molecule দিয়ে প্লেবুক/রোল টেস্ট করুন
+- CI/CD pipeline-এ test stage রাখুন
+
+### ৫. Documentation
+- প্লেবুক, রোল, ইনভেন্টরি—সবকিছুর ডকুমেন্টেশন রাখুন
+- README, comment, usage example দিন
+
+### ৬. Security
+- Sensitive data vault দিয়ে এনক্রিপ্ট করুন
+- Access control, credential management
+- Automation pipeline-এ secret leak checker ব্যবহার করুন
+
+### ৭. Resource Naming Convention
+- স্পষ্ট, ইউনিক, environment-specific নাম ব্যবহার করুন
+
+### ৮. Error Handling ও Rollback
+- failed_when, ignore_errors, rescue block ব্যবহার করুন
+- Automation pipeline-এ rollback step রাখুন
+
+### ৯. Resource Tagging
+- Cloud resource-এ tag ব্যবহার করুন—owner, environment, purpose
+
+### ১০. Scalability ও Maintainability
+- কোড সহজে স্কেল ও মেইনটেন করা যায় এমনভাবে লিখুন
+- Variable, role, inventory structure পরিষ্কার রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি AWS EC2, S3, Security Group—all IaC best practices মেনে তৈরি করতে চান।
+
+**playbook.yml**
+```yaml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        key_name: my-key
+        instance_type: t2.micro
+        image_id: ami-0abcdef1234567890
+        region: ap-south-1
+        security_group: my-sg
+        tags:
+          owner: devops
+          environment: production
+        wait: yes
+      register: ec2
+    - name: Create S3 bucket
+      amazon.aws.s3_bucket:
+        name: my-ansible-bucket
+        state: present
+        region: ap-south-1
+        tags:
+          owner: devops
+          environment: production
+    - name: Create security group
+      amazon.aws.ec2_group:
+        name: my-sg
+        description: "Allow SSH & HTTP"
+        region: ap-south-1
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+        tags:
+          owner: devops
+          environment: production
+```
+
+## উপসংহার
+
+IaC best practices মেনে আনসিবল দিয়ে ইনফ্রাস্ট্রাকচার অটোমেটেড, সিকিউর, স্কেলেবল ও মেইনটেনেবল হয়। এন্টারপ্রাইজ অটোমেশনে এটি মাস্টার করার মতো একটি স্কিল।
+
+---
+
+**পরবর্তী পাঠ:** [AWX / Tower ইন্সটলেশন](/ansible/awx-install)

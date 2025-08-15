@@ -1,0 +1,63 @@
+---
+title: জব টেমপ্লেট ও সিডিউলিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+AWX/Tower-এর সবচেয়ে শক্তিশালী ফিচার—জব টেমপ্লেট ও সিডিউলিং। Web UI থেকে প্লেবুক, ইনভেন্টরি, ক্রেডেনশিয়াল, ভেরিয়েবল—all কনফিগার করে এক ক্লিকে অটোমেশন চালানো যায়। সিডিউলিং দিয়ে নির্দিষ্ট সময়ে, নির্দিষ্ট ফ্রিকোয়েন্সিতে জব রান করা যায়।
+
+## অ্যানালজি: অ্যালার্ম ক্লক ও রেসিপি বুক
+
+ধরা যাক, আপনি প্রতিদিন সকালে অ্যালার্ম দিয়ে রান্না শুরু করেন। কোন রেসিপি, কোন উপকরণ, কখন রান্না—সবকিছু অ্যালার্ম ও রেসিপি বুকে লিখে রাখেন। AWX/Tower-এ জব টেমপ্লেট হচ্ছে রেসিপি, সিডিউলিং হচ্ছে অ্যালার্ম।
+
+## ১. জব টেমপ্লেট তৈরি
+
+- Web UI > Templates > Add > Job Template
+- Name, inventory, project, playbook, credential, extra variables দিন
+- Job type: Run/Check
+- Prompt on launch: variable, credential, inventory
+
+## ২. Workflow টেমপ্লেট
+
+- Multiple job template একসাথে চেইন করে workflow template তৈরি করা যায়
+- Web UI > Templates > Add > Workflow Template
+- Success/failure branch, approval, manual step যুক্ত করুন
+
+## ৩. সিডিউলিং
+
+- Web UI > Templates > Job Template > Schedules > Add
+- Start time, frequency (daily, weekly, cron) কনফিগার করুন
+- Timezone, repeat, end date দিন
+
+## ৪. Job Launch ও Monitoring
+
+- Job template থেকে playbook রান করুন
+- Live output, log, status Web UI-তে দেখুন
+- Job history, result, artifact সংরক্ষণ করুন
+
+## ৫. Notification ও Callback
+
+- Job success/failure হলে email, webhook, Slack notification পাঠান
+- Callback credential দিয়ে external trigger চালান
+
+## বেস্ট প্র্যাকটিস
+
+- Job template naming convention স্পষ্ট রাখুন
+- Sensitive variable prompt on launch করুন
+- Workflow template দিয়ে complex automation chain করুন
+- Notification ও monitoring enable করুন
+- Automation pipeline version control এ রাখুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি "Deploy EC2" নামে job template তৈরি করতে চান—inventory: aws-prod, playbook: deploy-ec2.yml, credential: aws-key, schedule: daily 10AM
+
+- Job Template: Name: "Deploy EC2", Inventory: "aws-prod", Playbook: "deploy-ec2.yml", Credential: "aws-key"
+- Schedule: Daily, 10AM
+
+## উপসংহার
+
+AWX/Tower-এ job template ও scheduling ব্যবহার করলে অটোমেশন pipeline আরও ফ্লেক্সিবল, স্কেলেবল ও রিলায়েবল হয়। Web UI থেকে এক ক্লিকে, নির্দিষ্ট সময়ে, নির্ভরযোগ্যভাবে অটোমেশন চালানো যায়।
+
+---
+
+**পরবর্তী পাঠ:** [RBAC (Role-Based Access Control)](/ansible/awx-rbac)
