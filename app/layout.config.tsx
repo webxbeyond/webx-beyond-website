@@ -3,6 +3,7 @@ import Image from "next/image";
 import { LinkItemType } from "fumadocs-ui/layouts/links";
 import { Book, ComponentIcon, Layout, Pencil, Server, Newspaper } from "lucide-react";
 import Img from "./(home)/img.png";
+import { Iconify } from '@/components/iconify';
 
 /**
  * Shared layout configurations
@@ -47,13 +48,24 @@ export const baseOptions: BaseLayoutProps = {
         transparentMode: 'top',
     },
     links: [
-        { type: 'menu', text: 'চলো শুরু করি', url: '/#select-topics', items: [] },
-        { type: 'menu', text: 'এআই ডিরেক্টরি', url: 'https://ai.webxbeyond.com/', items: [] },
         {
-            type: 'menu',
-            text: 'টেক নিউজ',
-            url: 'https://webxnewz.com',
-            items: []
+            text: 'চলো শুরু করি',
+            url: '/#select-topics',
+            active: 'url',
+            icon: <Iconify icon="material-symbols:step-rounded" />
+        },
+        {
+            text: 'এআই ডিরেক্টরি',
+            url: 'https://ai.webxbeyond.com/',
+            active: 'url',
+            external: true,
+            icon: <Iconify icon="eos-icons:ai" />
+        },
+        {
+            text: 'নিউজ',
+            url: 'https://webxnewz.com/',
+            external: true,
+            icon: <Iconify icon="mdi:newspaper-variant-outline" />
         },
         ...linkItems,
     ],
