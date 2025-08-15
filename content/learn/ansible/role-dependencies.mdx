@@ -1,0 +1,46 @@
+---
+title: রোল ডিপেন্ডেন্সি ব্যবস্থাপনা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল-এ বড় প্রজেক্টে একাধিক রোল একে অপরের উপর নির্ভরশীল হতে পারে। এই ডিপেন্ডেন্সি সহজে manage করতে meta/main.yml ফাইলে dependency define করা হয়। এই পাঠে আমরা রোল ডিপেন্ডেন্সি, meta/main.yml, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. রোল ডিপেন্ডেন্সি কী?
+
+একটি রোলের কাজ শুরু করার আগে অন্য রোল রান করা দরকার হলে dependency define করতে হয়।
+
+## ২. meta/main.yml ফাইলে ডিপেন্ডেন্সি
+
+প্রতিটি রোলের meta/main.yml ফাইলে dependencies define করা যায়।
+
+### উদাহরণ:
+```yaml
+# roles/webserver/meta/main.yml
+---
+dependencies:
+  - role: common
+  - role: firewall
+    vars:
+      allow_ports:
+        - 80
+        - 443
+```
+
+এতে webserver রোল রান করার আগে common ও firewall রোল রান হবে।
+
+## ৩. বাস্তব উদাহরণ
+
+আপনি চান, database রোল রান করার আগে user রোল রান হবে—meta/main.yml-এ dependency define করুন।
+
+## ৪. অ্যানালজি
+
+রোল ডিপেন্ডেন্সি হলো, শিক্ষক গণিত পড়ানোর আগে ছাত্রদের basic arithmetic শেখান—step by step।
+
+## ৫. সংক্ষেপে
+
+- **meta/main.yml:** dependency define
+- **vars:** dependency রোলে variable pass
+
+রোল ডিপেন্ডেন্সি ব্যবস্থাপনা দিয়ে বড় প্রজেক্টকে step by step, automate ও error-free করুন।
+
+পরবর্তী পাঠে বড় প্রজেক্টে বেস্ট প্র্যাকটিস নিয়ে আলোচনা হবে।

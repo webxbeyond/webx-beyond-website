@@ -1,0 +1,98 @@
+---
+title: প্লেবুকের গঠন - প্লে, হোস্ট ও টাস্ক
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকের মূল কাঠামো—প্লে, হোস্ট ও টাস্ক। এই পাঠে আমরা প্লেবুকের গঠন, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. প্লে (Play)
+
+প্লে হলো প্লেবুকের একেকটি সেকশন, যেখানে নির্দিষ্ট হোস্টে নির্দিষ্ট টাস্ক রান হয়। একাধিক প্লে থাকতে পারে।
+
+### উদাহরণ:
+```yaml
+- name: Web server setup
+  hosts: web
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, web গ্রুপের সব সার্ভারে Apache install হবে—একটি প্লে লিখে automate করা যায়।
+
+### অ্যানালজি:
+
+প্লে হলো, শিক্ষক "দশম শ্রেণির ছাত্ররা গণিত পড়ো" বলেন—শুধু দশম শ্রেণির ছাত্ররা গণিত পড়ে।
+
+## ২. হোস্ট (Hosts)
+
+হোস্ট হলো inventory-তে লেখা সার্ভার/গ্রুপ, যেখানে টাস্ক রান হবে।
+
+### উদাহরণ:
+```yaml
+hosts: web
+```
+
+### বাস্তব উদাহরণ:
+
+আপনার inventory-তে web, db, cache—তিনটি গ্রুপ আছে। প্লেবুকে "hosts: db" লিখলে শুধু db গ্রুপে টাস্ক রান হবে।
+
+### অ্যানালজি:
+
+হোস্ট হলো, শিক্ষক "রোল নম্বর ১-১০ ছাত্ররা বই খুলো" বলেন—শুধু ওই ছাত্ররা বই খোলে।
+
+## ৩. টাস্ক (Tasks)
+
+টাস্ক হলো প্লে-র ভিতরে একেকটি কাজ—install, configure, start, copy, user add ইত্যাদি।
+
+### উদাহরণ:
+```yaml
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, web গ্রুপে Nginx install ও start হবে—দুটি টাস্ক লিখে automate করা যায়।
+
+### অ্যানালজি:
+
+টাস্ক হলো, শিক্ষক "বই খুলো", "নোট লেখো", "উঠো"—একেকটি নির্দেশ।
+
+## ৪. প্লেবুকের পূর্ণ উদাহরণ
+
+```yaml
+- name: Web server setup
+  hosts: web
+  become: yes
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+    - name: Start Apache
+      service:
+        name: apache2
+        state: started
+```
+
+## ৫. সংক্ষেপে
+
+- **প্লে:** নির্দিষ্ট হোস্টে নির্দিষ্ট টাস্ক
+- **হোস্ট:** inventory-র গ্রুপ/সার্ভার
+- **টাস্ক:** একেকটি automate কাজ
+
+প্লেবুকের কাঠামো বুঝে, environment অনুযায়ী automate করুন।
+
+পরবর্তী পাঠে YAML ডিপ ডাইভ ও ansible-lint নিয়ে আলোচনা হবে।

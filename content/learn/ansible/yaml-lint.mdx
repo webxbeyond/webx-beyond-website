@@ -1,0 +1,85 @@
+---
+title: YAML ডিপ ডাইভ ও ansible-lint ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুক লেখার জন্য YAML ফরম্যাট ব্যবহার হয়। YAML-এর ডিটেইলস জানা ও ansible-lint দিয়ে কোড চেক করা—দুইটাই প্রফেশনাল প্লেবুক লেখার জন্য জরুরি।
+
+## ১. YAML ডিপ ডাইভ
+
+### Structure
+- Indentation (space) দিয়ে structure define হয়
+- Key-value pair
+- List, Dictionary
+
+### উদাহরণ:
+```yaml
+- name: Install Apache
+  apt:
+    name: apache2
+    state: present
+
+- name: Start Apache
+  service:
+    name: apache2
+    state: started
+```
+
+### List & Dictionary
+```yaml
+vars:
+  users:
+    - rakib
+    - tanvir
+  config:
+    port: 80
+    root: /var/www/html
+```
+
+### Common Mistakes
+- Tab ব্যবহার করবেন না, শুধু space
+- Indentation mismatch হলে error
+- Key-value ভুল হলে error
+
+### বাস্তব উদাহরণ:
+
+আপনি একটি প্লেবুক লিখলেন, যেখানে ৫টি টাস্ক আছে—install, configure, start, enable, test। YAML-এ সহজে, সুন্দরভাবে সব টাস্ক লিখে automate করা যায়।
+
+### অ্যানালজি:
+
+YAML হলো, শিক্ষক ছাত্রদের নাম, রোল, ক্লাস—সবকিছু সুন্দরভাবে সাজিয়ে লিখে রাখেন। JSON-এর মতো জটিল bracket নেই, সহজে পড়া যায়।
+
+## ২. ansible-lint ব্যবহার
+
+ansible-lint হলো একটি টুল, যা প্লেবুকের কোড স্টাইল, best practice, error, warning—সবকিছু চেক করে।
+
+### Install:
+```bash
+pip install ansible-lint
+```
+
+### Usage:
+```bash
+ansible-lint site.yaml
+```
+
+### Output:
+- Error, warning, suggestion দেখাবে
+- কোন লাইনে সমস্যা, কী ঠিক করতে হবে—সব দেখাবে
+
+### বাস্তব উদাহরণ:
+
+আপনি একটি বড় প্লেবুক লিখেছেন। ansible-lint দিয়ে চেক করলে ভুল, best practice, deprecated syntax—সবকিছু আগে থেকেই ঠিক করতে পারবেন।
+
+### অ্যানালজি:
+
+ansible-lint হলো, শিক্ষক পরীক্ষার আগে নোট চেক করেন—ভুল, বানান, গ্যাপ ঠিক করেন।
+
+## ৩. সংক্ষেপে
+
+- **YAML:** সহজ, human-readable, indentation-sensitive
+- **ansible-lint:** কোড চেক, best practice, error/warning
+
+প্রফেশনাল প্লেবুক লেখার জন্য YAML structure ও ansible-lint ব্যবহার করুন।
+
+পরবর্তী পাঠে বিল্ট-ইন মডিউল নিয়ে আলোচনা হবে।

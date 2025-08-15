@@ -1,0 +1,102 @@
+---
+title: ইনস্টলেশন ও কনফিগারেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল ব্যবহার শুরু করতে হলে প্রথমেই সেটি ইনস্টল ও কনফিগার করতে হবে। এই পাঠে আমরা Windows, Linux এবং Cloud-এ আনসিবল ইনস্টলেশন, SSH কনফিগারেশন, এবং বেসিক সেটআপ নিয়ে বিস্তারিত আলোচনা করব।
+
+## ১. Linux-এ আনসিবল ইনস্টলেশন
+
+### Ubuntu/Debian:
+```bash
+sudo apt update
+sudo apt install ansible
+```
+
+### CentOS/RHEL:
+```bash
+sudo yum install epel-release
+sudo yum install ansible
+```
+
+### Fedora:
+```bash
+sudo dnf install ansible
+```
+
+## ২. Windows-এ আনসিবল
+
+Windows-এ সরাসরি আনসিবল রান করা যায় না, তবে WSL (Windows Subsystem for Linux) ব্যবহার করে সহজেই ইনস্টল করা যায়।
+
+### WSL-এ ইনস্টলেশন:
+1. Windows-এ WSL Enable করুন
+2. Ubuntu ইনস্টল করুন
+3. Ubuntu-তে উপরের Ubuntu কমান্ডগুলো রান করুন
+
+## ৩. Python দিয়ে ইনস্টল
+
+Python pip দিয়েও আনসিবল ইনস্টল করা যায়:
+```bash
+pip install ansible
+```
+
+## ৪. SSH কনফিগারেশন
+
+আনসিবল agentless, তাই SSH দিয়ে টার্গেট মেশিনে কানেক্ট করে।
+
+### SSH Key Generate:
+```bash
+ssh-keygen -t rsa -b 4096
+```
+
+### Key Copy:
+```bash
+ssh-copy-id user@target-server
+```
+
+### বাস্তব উদাহরণ:
+
+ধরা যাক, আপনার ৫টি সার্ভার আছে। একবার SSH key copy করে নিলেই আনসিবল দিয়ে সব সার্ভারে একসাথে কাজ করতে পারবেন।
+
+## ৫. আনসিবল কনফিগারেশন ফাইল
+
+আনসিবল কনফিগারেশন সাধারণত `/etc/ansible/ansible.cfg` বা প্রজেক্ট ফোল্ডারে `ansible.cfg` নামে থাকে।
+
+### সাধারণ সেটিংস:
+```ini
+[defaults]
+inventory = ./inventory
+remote_user = ubuntu
+host_key_checking = False
+```
+
+## ৬. ইনভেন্টরি ফাইল
+
+ইনভেন্টরি ফাইল-এ কোন কোন সার্ভারে কাজ হবে তা লেখা হয়।
+
+### উদাহরণ:
+```ini
+[web]
+192.168.1.10
+192.168.1.11
+
+[db]
+192.168.1.20
+```
+
+## অ্যানালজি:
+
+ধরা যাক, আপনি একটি স্কুলের শিক্ষক। ছাত্রদের নাম, রোল, ক্লাস—সবকিছু একটি রেজিস্টারে লিখে রাখেন। আনসিবল ইনভেন্টরি ফাইলও ঠিক তেমন—কোন কোন সার্ভারে কাজ হবে, তা এখানে লেখা থাকে।
+
+## ৭. Quick Test
+
+ইনস্টল ও কনফিগার শেষে, নিচের কমান্ড দিয়ে টেস্ট করুন:
+```bash
+ansible all -m ping -i inventory
+```
+
+## সংক্ষেপে
+
+আনসিবল ইনস্টল ও কনফিগার করা খুবই সহজ। Linux, Windows (WSL), Python pip—সবখানেই সহজে সেটআপ করা যায়। SSH key দিয়ে agentless কানেকশন, inventory ও config ফাইল দিয়ে environment তৈরি—সবকিছু সহজ ও দ্রুত।
+
+পরবর্তী পাঠে আমরা স্ট্যাটিক ও ডাইনামিক ইনভেন্টরি নিয়ে আলোচনা করব।

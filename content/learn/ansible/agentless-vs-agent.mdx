@@ -1,0 +1,52 @@
+---
+title: Agentless আর্কিটেকচার বনাম Agent-based টুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আইটি অটোমেশনের জগতে "agentless" ও "agent-based"—এই দুই ধরনের টুলের মধ্যে পার্থক্য বোঝা খুবই গুরুত্বপূর্ণ। আনসিবল agentless, আর Chef, Puppet, SaltStack ইত্যাদি agent-based।
+
+## Agentless কী?
+
+Agentless টুলে টার্গেট মেশিনে কোনো সফটওয়্যার (agent) ইনস্টল করতে হয় না। শুধু SSH (Linux) বা WinRM (Windows) কানেকশন থাকলেই কাজ হয়। আনসিবল এই ক্যাটাগরিতে পড়ে।
+
+### বাস্তব উদাহরণ:
+
+ধরা যাক, আপনার ১০০টি সার্ভার আছে। Agentless টুল দিয়ে আপনি শুধু একবার SSH access দিয়ে সব সার্ভার কনফিগার করতে পারবেন। কোনো agent ইনস্টল, আপডেট, বা মেইনটেন করতে হবে না।
+
+### অ্যানালজি:
+
+Agentless টুলকে ভাবুন একজন শিক্ষক, যিনি ক্লাসে এসে সরাসরি ছাত্রদের পড়ান। কোনো মিডলম্যান নেই। Agent-based টুল হলো, শিক্ষক আগে নোট একজন সহকারীকে দেন, সহকারী পরে ছাত্রদের দেয়।
+
+## Agent-based কী?
+
+Agent-based টুলে প্রতিটি টার্গেট মেশিনে একটি agent সফটওয়্যার ইনস্টল করতে হয়। এই agent মূল টুলের সাথে কমিউনিকেশন করে, কাজগুলো এক্সিকিউট করে।
+
+### বাস্তব উদাহরণ:
+
+Chef বা Puppet ব্যবহার করলে, প্রতিটি সার্ভারে agent ইনস্টল করতে হবে। Main server থেকে agent নিয়মিত ইনস্ট্রাকশন নেয়, কাজ করে, রিপোর্ট পাঠায়।
+
+### অ্যানালজি:
+
+Agent-based টুলকে ভাবুন, শিক্ষক নোট একজন সহকারীকে দেন, সহকারী ছাত্রদের দেয়। যদি সহকারী অসুস্থ হয়, ছাত্ররা নোট পাবে না।
+
+## তুলনামূলক সুবিধা ও অসুবিধা
+
+| বৈশিষ্ট্য            | Agentless (Ansible) | Agent-based (Chef, Puppet) |
+|----------------------|---------------------|----------------------------|
+| Setup                | সহজ, agent লাগে না | agent ইনস্টল করতে হয়      |
+| Maintenance          | কম                  | agent আপডেট, মেইনটেনেন্স   |
+| Security             | SSH/WinRM ভিত্তিক  | agent security risk         |
+| Scalability          | বড় স্কেলে সহজ      | বড় স্কেলে agent deploy      |
+| Real-time Execution  | Yes                 | Pull-based, delay হতে পারে |
+| Resource Usage       | কম                  | agent background process    |
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Agentless (Ansible):** দ্রুত, ছোট/মাঝারি বা বড় স্কেলে, কমপ্লেক্সিটি কম, agentless environment
+- **Agent-based:** বড়, distributed environment, continuous config enforcement দরকার হলে
+
+## সংক্ষেপে
+
+Agentless টুল (Ansible) সহজ, দ্রুত, কম maintenance, security-friendly। Agent-based টুল (Chef, Puppet) বেশি কাস্টমাইজেশন, continuous enforcement, কিন্তু setup ও maintenance বেশি।
+
+পরবর্তী পাঠে আনসিবল ইনস্টলেশন ও কনফিগারেশন নিয়ে বিস্তারিত আলোচনা হবে।

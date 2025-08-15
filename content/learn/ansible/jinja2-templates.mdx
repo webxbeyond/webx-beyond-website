@@ -1,0 +1,69 @@
+---
+title: Jinja2 টেমপ্লেট সিনট্যাক্স ও ফিল্টার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল-এ ডাইনামিক কনফিগারেশন, ফাইল, স্ক্রিপ্ট, প্লেবুক তৈরির জন্য Jinja2 টেমপ্লেট ব্যবহার হয়। এতে সিনট্যাক্স, ফিল্টার, লজিক—সবকিছু সহজে, সুন্দরভাবে লেখা যায়। এই পাঠে আমরা Jinja2 টেমপ্লেট, সিনট্যাক্স, ফিল্টার, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. Jinja2 টেমপ্লেট কী?
+
+Jinja2 হলো একটি powerful templating engine, যা আনসিবল-এ variable, loop, condition, filter—সবকিছু ব্যবহার করতে দেয়। `.j2` extension-এ template file লেখা হয়।
+
+## ২. সিনট্যাক্স (Syntax)
+
+- Variable: `{{ variable }}`
+- Loop: `{% for item in list %} ... {% endfor %}`
+- Condition: `{% if condition %} ... {% endif %}`
+- Filter: `{{ variable | filter }}`
+
+### উদাহরণ:
+```jinja
+server_name {{ inventory_hostname }};
+port {{ app_port }};
+
+{% if enable_ssl %}
+ssl on;
+{% endif %}
+
+users:
+{% for user in users %}
+  - {{ user }}
+{% endfor %}
+```
+
+## ৩. ফিল্টার (Filters)
+
+Jinja2-তে variable-এর মান modify করতে filter ব্যবহার হয়।
+
+### Common Filters:
+- `default`: Default value set
+- `upper`, `lower`: Case change
+- `replace`: Value replace
+- `length`: List length
+- `join`: List join
+
+### উদাহরণ:
+```jinja
+{{ username | upper }}
+{{ users | length }}
+{{ path | default('/tmp') }}
+{{ name | replace('old', 'new') }}
+```
+
+## ৪. বাস্তব উদাহরণ
+
+আপনি চান, environment অনুযায়ী config file ডাইনামিক হবে—Jinja2 template দিয়ে variable, loop, condition, filter ব্যবহার করে automate করা যায়।
+
+## ৫. অ্যানালজি
+
+Jinja2 template হলো, শিক্ষক ছাত্রদের নাম, রোল, ক্লাস—সবকিছু ডাইনামিকভাবে সাজিয়ে নোট তৈরি করেন।
+
+## ৬. সংক্ষেপে
+
+- **Jinja2:** ডাইনামিক template engine
+- **Syntax:** variable, loop, condition, filter
+- **Filter:** মান modify, format
+
+Jinja2 template দিয়ে আনসিবল প্লেবুক, config, স্ক্রিপ্ট—সবকিছু ডাইনামিক ও customize করুন।
+
+পরবর্তী পাঠে লুপ নিয়ে আলোচনা হবে।

@@ -1,0 +1,75 @@
+---
+title: কন্ডিশনাল ও when স্টেটমেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকে কন্ডিশনাল লজিক যোগ করতে when স্টেটমেন্ট ব্যবহার হয়। environment, variable, facts—সবকিছু অনুযায়ী টাস্ক রান/skip করা যায়। এই পাঠে আমরা কন্ডিশনাল, when, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. when স্টেটমেন্ট
+
+when দিয়ে টাস্ক, হ্যান্ডলার, প্লে—সবকিছু নির্দিষ্ট condition-এ রান করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Install Apache only on Ubuntu
+  apt:
+    name: apache2
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: Start service if enabled
+  service:
+    name: app
+    state: started
+  when: enable_service
+```
+
+## ২. Multiple Conditions
+
+and/or/not দিয়ে একাধিক condition যোগ করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Install Nginx only on CentOS and version 7
+  yum:
+    name: nginx
+    state: present
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+```
+
+## ৩. Loop-এর সাথে when
+
+loop-এর প্রতিটি আইটেমে condition চেক করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Add users only if not admin
+  user:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - rakib
+    - tanvir
+    - admin
+  when: item != "admin"
+```
+
+## ৪. বাস্তব উদাহরণ
+
+আপনি চান, শুধু Ubuntu server-এ Apache install হবে, CentOS server-এ Nginx—when দিয়ে automate করা যায়।
+
+## ৫. অ্যানালজি
+
+when হলো, শিক্ষক বলেন "যদি রাকিব উপস্থিত, তাহলে তাকে নোট দাও"—শুধু রাকিব উপস্থিত থাকলে নোট দেয়া হয়।
+
+## ৬. সংক্ষেপে
+
+- **when:** conditionally টাস্ক/হ্যান্ডলার/প্লে রান
+- **Multiple condition:** and/or/not
+- **Loop-এর সাথে:** প্রতিটি আইটেমে condition
+
+when স্টেটমেন্ট দিয়ে আনসিবল প্লেবুককে environment-aware, efficient ও automate করুন।
+
+পরবর্তী পাঠে এরর হ্যান্ডলিং নিয়ে আলোচনা হবে।

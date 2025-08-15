@@ -1,0 +1,62 @@
+---
+title: গ্যালাক্সি রোল ইন্সটল ও ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Ansible Galaxy হলো community-driven রোলের হাব, যেখানে হাজার হাজার রেডি রোল পাবেন। গ্যালাক্সি রোল ইন্সটল ও ব্যবহার করলে প্লেবুক লেখা দ্রুত, সহজ ও best practice অনুযায়ী হয়। এই পাঠে আমরা গ্যালাক্সি রোল ইন্সটল, ব্যবহার, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. গ্যালাক্সি রোল ইন্সটল
+
+`ansible-galaxy install` কমান্ড দিয়ে রোল ইন্সটল করা যায়।
+
+### Usage:
+```bash
+ansible-galaxy install geerlingguy.apache
+```
+
+এতে `roles/` ফোল্ডারে geerlingguy.apache রোল ইন্সটল হবে।
+
+## ২. requirements.yml দিয়ে একাধিক রোল ইন্সটল
+
+requirements.yml ফাইলে রোলের লিস্ট লিখে একবারেই সব ইন্সটল করা যায়।
+
+### উদাহরণ:
+```yaml
+- src: geerlingguy.apache
+- src: geerlingguy.mysql
+```
+
+### Usage:
+```bash
+ansible-galaxy install -r requirements.yml
+```
+
+## ৩. গ্যালাক্সি রোল ব্যবহার
+
+ইন্সটল করা রোল প্লেবুকে `roles:` সেকশনে ব্যবহার করা যায়।
+
+### উদাহরণ:
+```yaml
+- hosts: web
+  roles:
+    - geerlingguy.apache
+    - geerlingguy.mysql
+```
+
+## ৪. বাস্তব উদাহরণ
+
+আপনি চান, Apache, MySQL, Redis—সবকিছু community-tested রোল দিয়ে automate করতে। গ্যালাক্সি থেকে রোল ইন্সটল করে, প্লেবুকে যোগ করুন।
+
+## ৫. অ্যানালজি
+
+গ্যালাক্সি রোল হলো, শিক্ষক বাজার থেকে রেডি নোট কিনে ছাত্রদের দেন—নিজে লিখতে হয় না, সময় বাঁচে।
+
+## ৬. সংক্ষেপে
+
+- **install:** `ansible-galaxy install <role>`
+- **requirements.yml:** একাধিক রোল ইন্সটল
+- **use:** roles: সেকশনে যোগ
+
+গ্যালাক্সি রোল ব্যবহার করে প্লেবুককে দ্রুত, best practice ও community-tested করুন।
+
+পরবর্তী পাঠে রোল ডিপেন্ডেন্সি ব্যবস্থাপনা নিয়ে আলোচনা হবে।

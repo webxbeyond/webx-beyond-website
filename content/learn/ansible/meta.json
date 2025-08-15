@@ -1,0 +1,10 @@
+{
+  "title": "অ্যানসিবল (Ansible)",
+  "description": "অ্যানসিবল (Ansible) -এর সহজ পাঠ",
+  "icon": "hugeicons:ansible",
+  "root": true,
+  "pages": [
+    "index",
+    "..."
+  ]
+}

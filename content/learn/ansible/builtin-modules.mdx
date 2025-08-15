@@ -1,0 +1,143 @@
+---
+title: বিল্ট-ইন মডিউল ব্যবহার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল-এর সবচেয়ে শক্তিশালী দিক—বিল্ট-ইন মডিউল। এগুলো দিয়ে সার্ভার, ফাইল, ইউজার, প্যাকেজ, সার্ভিস—সবকিছু automate করা যায়। এই পাঠে আমরা গুরুত্বপূর্ণ বিল্ট-ইন মডিউল, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. apt/yum/dnf (Package Management)
+
+### উদাহরণ:
+```yaml
+- name: Install Apache (Debian/Ubuntu)
+  apt:
+    name: apache2
+    state: present
+
+- name: Install Nginx (CentOS/RHEL)
+  yum:
+    name: nginx
+    state: present
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, ১০০টি সার্ভারে Apache/Nginx install হবে—apt/yum module দিয়ে automate করা যায়।
+
+## ২. service (Service Management)
+
+### উদাহরণ:
+```yaml
+- name: Start Apache
+  service:
+    name: apache2
+    state: started
+```
+
+### বাস্তব উদাহরণ:
+
+Install শেষে service start, stop, restart—সব automate করা যায়।
+
+## ৩. user (User Management)
+
+### উদাহরণ:
+```yaml
+- name: Create user
+  user:
+    name: devuser
+    state: present
+```
+
+### বাস্তব উদাহরণ:
+
+নতুন user add, password set, group assign—সব automate করা যায়।
+
+## ৪. copy/template (File Management)
+
+### উদাহরণ:
+```yaml
+- name: Copy config file
+  copy:
+    src: config.conf
+    dest: /etc/app/config.conf
+
+- name: Deploy config from template
+  template:
+    src: config.j2
+    dest: /etc/app/config.conf
+```
+
+### বাস্তব উদাহরণ:
+
+Config file, template deploy—copy/template module দিয়ে automate করা যায়।
+
+## ৫. shell/command (Custom Command)
+
+### উদাহরণ:
+```yaml
+- name: Run custom shell command
+  shell:
+    cmd: echo "Hello World" > /tmp/hello.txt
+```
+
+### বাস্তব উদাহরণ:
+
+কোনো custom command, script রান—shell/command module দিয়ে automate করা যায়।
+
+## ৬. ping (Connectivity Test)
+
+### উদাহরণ:
+```yaml
+- name: Test connectivity
+  ping:
+```
+
+### বাস্তব উদাহরণ:
+
+সব host online আছে কিনা—ping module দিয়ে চেক করা যায়।
+
+## ৭. file (File/Directory Management)
+
+### উদাহরণ:
+```yaml
+- name: Create directory
+  file:
+    path: /var/www/html
+    state: directory
+```
+
+### বাস্তব উদাহরণ:
+
+নতুন ফোল্ডার, ফাইল create, permission set—file module দিয়ে automate করা যায়।
+
+## ৮. debug (Debugging)
+
+### উদাহরণ:
+```yaml
+- name: Show variable value
+  debug:
+    var: app_version
+```
+
+### বাস্তব উদাহরণ:
+
+Playbook run-এর সময় variable, message, info—debug module দিয়ে print করা যায়।
+
+## ৯. অ্যানালজি
+
+বিল্ট-ইন মডিউলগুলো হলো, শিক্ষক ক্লাসে "বই খুলো", "নোট লেখো", "উঠো"—একেকটি নির্দেশ। apt, yum, service, user, copy—সব module একেকটি automate কাজের জন্য।
+
+## ১০. সংক্ষেপে
+
+- **apt/yum/dnf:** Package install/remove
+- **service:** Service start/stop/restart
+- **user:** User add/remove/manage
+- **copy/template:** File deploy/manage
+- **shell/command:** Custom command/script
+- **ping:** Connectivity test
+- **file:** File/folder create/manage
+- **debug:** Info print/debug
+
+বিল্ট-ইন মডিউল ব্যবহার করে আনসিবল প্লেবুককে শক্তিশালী, দ্রুত ও পুনঃব্যবহারযোগ্য করুন।
+
+পরবর্তী পাঠে ভেরিয়েবল ও ফ্যাক্টস ব্যবস্থাপনা নিয়ে আলোচনা হবে।

@@ -1,0 +1,94 @@
+---
+title: হ্যান্ডলার ও নোটিফিকেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকের গুরুত্বপূর্ণ কনসেপ্ট—হ্যান্ডলার ও নোটিফিকেশন। এগুলো দিয়ে কন্ডিশনাল কাজ, যেমন config পরিবর্তন হলে service restart, automate করা যায়। এই পাঠে আমরা হ্যান্ডলার, নোটিফিকেশন, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. হ্যান্ডলার (Handler)
+
+হ্যান্ডলার হলো বিশেষ টাস্ক, যা তখনই রান হয় যখন কোনো টাস্ক "notify" করে। সাধারণত সার্ভিস restart, reload ইত্যাদির জন্য ব্যবহৃত হয়।
+
+### উদাহরণ:
+```yaml
+- name: Change config file
+  copy:
+    src: config.conf
+    dest: /etc/app/config.conf
+  notify: Restart app
+
+handlers:
+  - name: Restart app
+    service:
+      name: app
+      state: restarted
+```
+
+### বাস্তব উদাহরণ:
+
+Config file পরিবর্তন হলে, app restart করতে হবে—হ্যান্ডলার দিয়ে automate করা যায়।
+
+### অ্যানালজি:
+
+হ্যান্ডলার হলো, শিক্ষক বলেন "যদি কেউ দেরি করে, তাকে নোট দিতে হবে"—শুধু দেরি করলে নোট দেয়া হয়।
+
+## ২. নোটিফিকেশন (Notification)
+
+নোটিফিকেশন হলো, টাস্ক থেকে হ্যান্ডলারকে "notify" করা—যদি টাস্কে পরিবর্তন হয়, তখনই হ্যান্ডলার রান হবে।
+
+### উদাহরণ:
+```yaml
+- name: Update config
+  template:
+    src: config.j2
+    dest: /etc/app/config.conf
+  notify: Reload app
+
+handlers:
+  - name: Reload app
+    service:
+      name: app
+      state: reloaded
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, config file update হলে app reload হবে—নোটিফিকেশন দিয়ে automate করা যায়।
+
+### অ্যানালজি:
+
+নোটিফিকেশন হলো, শিক্ষক বলেন "যদি কেউ প্রশ্ন করে, তখনই উত্তর দেয়া হবে"—শুধু প্রশ্ন করলে উত্তর দেয়া হয়।
+
+## ৩. Multiple Handlers
+
+একাধিক টাস্ক থেকে একই হ্যান্ডলারকে notify করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Update config
+  copy:
+    src: config.conf
+    dest: /etc/app/config.conf
+  notify: Restart app
+
+- name: Update script
+  copy:
+    src: script.sh
+    dest: /usr/local/bin/script.sh
+  notify: Restart app
+
+handlers:
+  - name: Restart app
+    service:
+      name: app
+      state: restarted
+```
+
+## ৪. সংক্ষেপে
+
+- **হ্যান্ডলার:** notify হলে বিশেষ টাস্ক রান
+- **নোটিফিকেশন:** টাস্ক থেকে হ্যান্ডলারকে trigger
+
+হ্যান্ডলার ও নোটিফিকেশন দিয়ে আনসিবল প্লেবুককে কন্ডিশনাল, efficient ও automate করুন।
+
+পরবর্তী পাঠে ট্যাগ ও সিলেক্টিভ এক্সিকিউশন নিয়ে আলোচনা হবে।

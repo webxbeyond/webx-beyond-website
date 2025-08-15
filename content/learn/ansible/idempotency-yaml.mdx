@@ -1,0 +1,65 @@
+---
+title: ইডেমপোটেন্সি ও YAML বেসিক
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল-এর অন্যতম শক্তিশালী বৈশিষ্ট্য—ইডেমপোটেন্সি (Idempotency)। আর YAML হলো আনসিবল প্লেবুক লেখার সহজ, পাঠযোগ্য ফরম্যাট। এই পাঠে আমরা দুইটি বিষয় সহজ বাংলায় উদাহরণ ও অ্যানালজি দিয়ে ব্যাখ্যা করব।
+
+## ১. ইডেমপোটেন্সি (Idempotency)
+
+ইডেমপোটেন্সি মানে—একই টাস্ক বারবার রান করলে environment-এর অবস্থা একই থাকবে, বাড়তি পরিবর্তন হবে না।
+
+### উদাহরণ:
+
+আপনি একটি টাস্ক লিখলেন, "user add rakib"। যদি rakib user আগে থেকেই থাকে, আনসিবল কিছুই করবে না—কোনো error, duplicate, বা বাড়তি কাজ হবে না।
+
+### বাস্তব উদাহরণ:
+
+ধরা যাক, আপনি ১০০টি সার্ভারে Apache install করতে চান। যদি কোনো সার্ভারে Apache আগে থেকেই install থাকে, আনসিবল আবার install করবে না—time, resource, error কমে যায়।
+
+### অ্যানালজি:
+
+ইডেমপোটেন্সি হলো, শিক্ষক ক্লাসে এসে বলেন "যাদের বই আছে, তারা বই খুলে বসো"। যাদের বই আগে থেকেই খোলা, তারা কিছুই করবে না।
+
+## ২. YAML বেসিক
+
+YAML (YAML Ain't Markup Language) হলো সহজ, human-readable ফরম্যাট, যা আনসিবল প্লেবুক লেখার জন্য ব্যবহৃত হয়।
+
+### YAML Structure:
+- Indentation (space) দিয়ে structure define হয়
+- Key-value pair
+- List, Dictionary
+
+### উদাহরণ:
+```yaml
+- name: Install Apache
+  apt:
+    name: apache2
+    state: present
+
+- name: Start Apache
+  service:
+    name: apache2
+    state: started
+```
+
+### Common Mistakes:
+- Tab ব্যবহার করবেন না, শুধু space
+- Indentation mismatch হলে error
+
+### বাস্তব উদাহরণ:
+
+আপনি একটি প্লেবুক লিখলেন, যেখানে ৫টি টাস্ক আছে—install, configure, start, enable, test। YAML-এ সহজে, সুন্দরভাবে সব টাস্ক লিখে automate করা যায়।
+
+### অ্যানালজি:
+
+YAML হলো, শিক্ষক ছাত্রদের নাম, রোল, ক্লাস—সবকিছু সুন্দরভাবে সাজিয়ে লিখে রাখেন। JSON-এর মতো জটিল bracket নেই, সহজে পড়া যায়।
+
+## ৩. সংক্ষেপে
+
+- **ইডেমপোটেন্সি:** বারবার রান করলেও environment অপরিবর্তিত
+- **YAML:** সহজ, human-readable ফরম্যাট
+
+আনসিবল প্লেবুকের repeatability, reliability ও readability—সবকিছু নিশ্চিত করে এই দুইটি কনসেপ্ট।
+
+পরবর্তী মডিউলে প্লেবুক লেখা ও রান নিয়ে আলোচনা হবে।

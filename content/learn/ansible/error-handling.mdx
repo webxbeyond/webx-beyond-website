@@ -1,0 +1,69 @@
+---
+title: এরর হ্যান্ডলিং - ignore_errors, failed_when
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকে error handling খুবই গুরুত্বপূর্ণ। টাস্ক fail হলে, automate flow ঠিক রাখতে ignore_errors, failed_when—এই দুইটি কনসেপ্ট ব্যবহার হয়। এই পাঠে আমরা error handling, ignore_errors, failed_when, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. ignore_errors
+
+ignore_errors দিয়ে কোনো টাস্ক fail হলেও প্লেবুক execution চলতে থাকে।
+
+### উদাহরণ:
+```yaml
+- name: Try to install package
+  apt:
+    name: notapackage
+    state: present
+  ignore_errors: yes
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, কোনো package install fail হলেও পরের টাস্কগুলো চলবে—ignore_errors দিয়ে automate করা যায়।
+
+### অ্যানালজি:
+
+ignore_errors হলো, শিক্ষক বলেন "যদি কেউ ভুল করে, তাকে বাদ দিয়ে বাকিরা পড়ো"।
+
+## ২. failed_when
+
+failed_when দিয়ে custom condition set করা যায়—কখন টাস্ক fail হবে।
+
+### উদাহরণ:
+```yaml
+- name: Check disk space
+  shell: df -h / | awk 'NR==2 {print $4}'
+  register: disk_space
+  failed_when: disk_space.stdout | int < 10
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, disk space 10GB-এর কম হলে টাস্ক fail হবে—failed_when দিয়ে automate করা যায়।
+
+### অ্যানালজি:
+
+failed_when হলো, শিক্ষক বলেন "যদি রাকিবের নম্বর ৪০-এর কম, তাহলে সে fail"।
+
+## ৩. changed_when
+
+changed_when দিয়ে custom condition set করা যায়—কখন টাস্ক changed status দেখাবে।
+
+### উদাহরণ:
+```yaml
+- name: Check config
+  shell: cat /etc/app/config.conf
+  register: config_out
+  changed_when: config_out.stdout != "expected_value"
+```
+
+## ৪. সংক্ষেপে
+
+- **ignore_errors:** টাস্ক fail হলেও execution চলবে
+- **failed_when:** custom condition-এ টাস্ক fail
+- **changed_when:** custom condition-এ changed status
+
+error handling দিয়ে আনসিবল প্লেবুককে robust, efficient ও automate করুন।
+
+পরবর্তী মডিউলে রোল ও বেস্ট প্র্যাকটিস নিয়ে আলোচনা হবে।
