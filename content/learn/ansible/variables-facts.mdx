@@ -1,0 +1,68 @@
+---
+title: ভেরিয়েবল ও ফ্যাক্টস ব্যবস্থাপনা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুককে ডাইনামিক, পুনঃব্যবহারযোগ্য ও environment-specific করতে ভেরিয়েবল ও ফ্যাক্টস ব্যবস্থাপনা খুবই গুরুত্বপূর্ণ। এই পাঠে আমরা ভেরিয়েবল, ফ্যাক্টস, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. ভেরিয়েবল (Variables)
+
+ভেরিয়েবল দিয়ে প্লেবুকে ডাইনামিক মান ব্যবহার করা যায়—host, user, path, version ইত্যাদি।
+
+### উদাহরণ:
+```yaml
+vars:
+  app_version: 2.0
+
+- name: Install app
+  apt:
+    name: myapp-{{ app_version }}
+    state: present
+```
+
+### Group/Host Variables
+- group_vars/host_vars ফোল্ডারে YAML/INI ফাইল রেখে environment-specific variable set করা যায়।
+
+### বাস্তব উদাহরণ:
+
+dev server-এ app v1.0, prod server-এ v2.0 install—ভেরিয়েবল দিয়ে manage করা যায়।
+
+### অ্যানালজি:
+
+ভেরিয়েবল হলো, শিক্ষক ছাত্রদের নাম ধরে ডাকেন—"রাকিব, বই খুলো"।
+
+## ২. ফ্যাক্টস (Facts)
+
+ফ্যাক্টস হলো আনসিবল রান করার সময় টার্গেট মেশিন থেকে সংগ্রহ করা অটোমেটিক তথ্য—OS, IP, RAM, CPU, disk, user ইত্যাদি।
+
+### উদাহরণ:
+```yaml
+- name: Show OS info
+  debug:
+    var: ansible_distribution
+```
+
+### Custom Facts
+- `/etc/ansible/facts.d/` ফোল্ডারে custom fact YAML/INI/JSON ফাইল রেখে নিজের তথ্য যোগ করা যায়।
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, শুধু CentOS server-এ নির্দিষ্ট টাস্ক রান হবে—facts দিয়ে automate করা যায়।
+
+### অ্যানালজি:
+
+ফ্যাক্টস হলো, শিক্ষক ছাত্রদের উপস্থিতি, ক্লাস, রোল, গ্রুপ—সব তথ্য আগে থেকেই জানেন।
+
+## ৩. Variable Precedence
+
+ভেরিয়েবল কোথায় define করলে কোনটা আগে কাজ করবে—এই নিয়ম বুঝতে হবে।
+- Playbook vars > Role vars > group_vars/host_vars > inventory vars > facts
+
+## ৪. সংক্ষেপে
+
+- **ভেরিয়েবল:** ডাইনামিক মান, environment-specific
+- **ফ্যাক্টস:** অটোমেটিক তথ্য, টার্গেট মেশিন থেকে
+
+ভেরিয়েবল ও ফ্যাক্টস ব্যবস্থাপনা দিয়ে আনসিবল প্লেবুককে শক্তিশালী, পুনঃব্যবহারযোগ্য ও environment-aware করুন।
+
+পরবর্তী পাঠে হ্যান্ডলার ও নোটিফিকেশন নিয়ে আলোচনা হবে।

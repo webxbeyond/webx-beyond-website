@@ -1,0 +1,71 @@
+---
+title: ট্যাগ ও সিলেক্টিভ এক্সিকিউশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকের টাস্ক, হ্যান্ডলার, প্লে—সবকিছুতে ট্যাগ ব্যবহার করে selective execution করা যায়। বড় প্লেবুক, environment-specific কাজ, debugging—সবকিছুতে ট্যাগ খুবই গুরুত্বপূর্ণ। এই পাঠে আমরা ট্যাগ, selective execution, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. ট্যাগ (Tags)
+
+ট্যাগ হলো, টাস্ক/হ্যান্ডলার/প্লে-তে label দেয়া, যাতে নির্দিষ্ট ট্যাগ দিয়ে শুধু সেই অংশ রান করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Install Apache
+  apt:
+    name: apache2
+    state: present
+  tags:
+    - web
+    - install
+
+- name: Configure Firewall
+  ufw:
+    rule: allow
+    port: 80
+  tags:
+    - firewall
+```
+
+## ২. Selective Execution
+
+Playbook রান করার সময় `--tags` বা `--skip-tags` দিয়ে নির্দিষ্ট ট্যাগের টাস্ক/হ্যান্ডলার/প্লে রান/skip করা যায়।
+
+### Usage:
+```bash
+ansible-playbook site.yaml --tags "web"
+ansible-playbook site.yaml --skip-tags "firewall"
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি চান, শুধু web server setup হবে—`--tags "web"` দিয়ে শুধু সেই টাস্ক রান হবে।
+
+### অ্যানালজি:
+
+ট্যাগ হলো, শিক্ষক "শুধু দশম শ্রেণির ছাত্ররা গণিত পড়ো" বলেন—শুধু ওই ছাত্ররা পড়ে।
+
+## ৩. Multiple Tags
+
+একাধিক ট্যাগ দিয়ে টাস্ক/হ্যান্ডলার/প্লে-কে গ্রুপ করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+  tags:
+    - web
+    - nginx
+    - install
+```
+
+## ৪. সংক্ষেপে
+
+- **ট্যাগ:** টাস্ক/হ্যান্ডলার/প্লে-তে label
+- **Selective Execution:** নির্দিষ্ট ট্যাগ দিয়ে রান/skip
+
+বড় প্লেবুক, environment-specific কাজ, debugging—সবকিছুতে ট্যাগ ব্যবহার করুন।
+
+পরবর্তী মডিউলে টেমপ্লেট, লুপ ও কন্ডিশনাল নিয়ে আলোচনা হবে।

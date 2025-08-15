@@ -1,0 +1,58 @@
+---
+title: লার্জ প্রজেক্টে বেস্ট প্র্যাকটিস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+বড় আনসিবল প্রজেক্টে maintainability, scalability, security ও efficiency নিশ্চিত করতে কিছু বেস্ট প্র্যাকটিস অনুসরণ করা জরুরি। এই পাঠে আমরা বড় প্রজেক্টে বেস্ট প্র্যাকটিস, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. রোল ও প্লেবুক মডুলার করুন
+- প্রতিটি কাজের জন্য আলাদা রোল/প্লেবুক লিখুন
+- কোড পুনঃব্যবহারযোগ্য ও সহজে manage করুন
+
+## ২. group_vars ও host_vars ব্যবহার করুন
+- environment-specific variable/fact আলাদা ফাইলে রাখুন
+- dev/prod/test environment সহজে manage করুন
+
+## ৩. version control (Git) ব্যবহার করুন
+- সব প্লেবুক, রোল, config Git-এ রাখুন
+- change tracking, rollback, collaboration সহজ হবে
+
+## ৪. ansible-lint ও YAML validator ব্যবহার করুন
+- কোডে error, warning, deprecated syntax চেক করুন
+- best practice নিশ্চিত করুন
+
+## ৫. secret management (Vault) ব্যবহার করুন
+- sensitive data (password, API key) Vault-এ encrypt করুন
+- প্লেবুকে সরাসরি secret রাখবেন না
+
+## ৬. documentation ও comment লিখুন
+- প্রতিটি রোল, প্লেবুক, টাস্কে comment ও README রাখুন
+- নতুন সদস্য সহজে বুঝতে পারবে
+
+## ৭. tag ও selective execution ব্যবহার করুন
+- বড় প্লেবুকে tag দিয়ে নির্দিষ্ট অংশ রান/skip করুন
+- debugging ও environment-specific কাজ সহজ হবে
+
+## ৮. dependency ও meta/main.yml ঠিক রাখুন
+- রোলের dependency meta/main.yml-এ define করুন
+- step by step execution নিশ্চিত করুন
+
+## ৯. test automation (Molecule) ব্যবহার করুন
+- প্লেবুক, রোল local/test environment-এ test করুন
+- error-free deployment নিশ্চিত করুন
+
+## ১০. security ও access control
+- SSH key, Vault, RBAC, AWX/Tower ব্যবহার করুন
+- unauthorized access, data leak রোধ করুন
+
+## ১১. অ্যানালজি
+
+বড় প্রজেক্টে বেস্ট প্র্যাকটিস মানে, শিক্ষক প্রতিটি বিষয়, নোট, প্রশ্ন—সবকিছু আলাদা ফাইলে, সুন্দরভাবে সাজিয়ে রাখেন। সবাই সহজে পড়তে, বুঝতে, পরিবর্তন করতে পারে।
+
+## ১২. সংক্ষেপে
+
+- **মডুলার কোড, version control, lint, vault, documentation, tag, dependency, test, security**—সবকিছু follow করুন
+
+বড় আনসিবল প্রজেক্টে বেস্ট প্র্যাকটিস মানলে maintainability, scalability, security ও efficiency নিশ্চিত হবে।
+
+পরবর্তী মডিউলে advanced inventory management নিয়ে আলোচনা হবে।

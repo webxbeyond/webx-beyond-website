@@ -1,0 +1,73 @@
+---
+title: লুপ - loop, with_items, with_dict
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল প্লেবুকে একাধিক আইটেম, ইউজার, ফাইল, প্যাকেজ—সবকিছু automate করতে লুপ ব্যবহার হয়। loop, with_items, with_dict—সবকিছু দিয়ে প্লেবুককে ডাইনামিক ও পুনঃব্যবহারযোগ্য করা যায়। এই পাঠে আমরা লুপ, সিনট্যাক্স, উদাহরণ, বাস্তব ব্যবহার ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. loop
+
+loop দিয়ে একাধিক আইটেমের উপর টাস্ক রান করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Install multiple packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nginx
+    - apache2
+    - mysql-server
+```
+
+## ২. with_items
+
+with_items হলো loop-এর পুরনো সিনট্যাক্স, এখন loop ব্যবহার বেশি হয়।
+
+### উদাহরণ:
+```yaml
+- name: Create multiple users
+  user:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rakib
+    - tanvir
+    - sumon
+```
+
+## ৩. with_dict
+
+with_dict দিয়ে dictionary-এর key-value pair নিয়ে টাস্ক রান করা যায়।
+
+### উদাহরণ:
+```yaml
+- name: Create users with groups
+  user:
+    name: "{{ item.key }}"
+    groups: "{{ item.value }}"
+    state: present
+  with_dict:
+    rakib: admin
+    tanvir: dev
+    sumon: qa
+```
+
+## ৪. বাস্তব উদাহরণ
+
+আপনি চান, ১০টি package install, ৫টি user add, ৩টি config file copy—loop দিয়ে automate করা যায়।
+
+## ৫. অ্যানালজি
+
+লুপ হলো, শিক্ষক "সব ছাত্ররা বই খুলো" বলেন—সবাই একসাথে বই খোলে।
+
+## ৬. সংক্ষেপে
+
+- **loop:** একাধিক আইটেমে টাস্ক
+- **with_items:** পুরনো সিনট্যাক্স, loop-এর মতো
+- **with_dict:** key-value pair নিয়ে টাস্ক
+
+লুপ ব্যবহার করে আনসিবল প্লেবুককে ডাইনামিক, দ্রুত ও পুনঃব্যবহারযোগ্য করুন।
+
+পরবর্তী পাঠে কন্ডিশনাল নিয়ে আলোচনা হবে।

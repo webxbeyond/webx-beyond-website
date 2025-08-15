@@ -1,0 +1,81 @@
+---
+title: Ansible CLI বেসিক - ansible বনাম ansible-playbook
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আনসিবল-এ দুটি প্রধান CLI টুল আছে—`ansible` ও `ansible-playbook`। এই পাঠে আমরা তাদের পার্থক্য, ব্যবহার, কমান্ড, বাস্তব উদাহরণ ও অ্যানালজি নিয়ে আলোচনা করব।
+
+## ১. ansible কমান্ড
+
+`ansible` কমান্ড দিয়ে আপনি ad-hoc (একবারের জন্য) টাস্ক রান করতে পারেন। এটি সাধারণত ছোট কাজ, টেস্ট, বা দ্রুত কিছু এক্সিকিউট করার জন্য ব্যবহৃত হয়।
+
+### উদাহরণ:
+```bash
+ansible all -m ping -i inventory
+ansible web -m shell -a 'uptime' -i inventory
+```
+
+### বাস্তব উদাহরণ:
+
+ধরা যাক, আপনার ১০টি সার্ভার আছে। আপনি দ্রুত চেক করতে চান, সব সার্ভার অনলাইন আছে কিনা—`ansible all -m ping` দিয়ে একবারেই চেক করতে পারবেন।
+
+### অ্যানালজি:
+
+`ansible` কমান্ড হলো, শিক্ষক ক্লাসে এসে সবাইকে একবারে "উঠো" বলে চেক করেন—সবাই জেগে আছে কিনা।
+
+## ২. ansible-playbook কমান্ড
+
+`ansible-playbook` কমান্ড দিয়ে YAML ফরম্যাটে লেখা প্লেবুক রান করা হয়। প্লেবুক-এ একাধিক টাস্ক, হ্যান্ডলার, ভেরিয়েবল, কন্ডিশন, লুপ—সবকিছু একসাথে automate করা যায়।
+
+### উদাহরণ:
+```bash
+ansible-playbook site.yaml -i inventory
+ansible-playbook deploy.yaml --tags "web" -i inventory
+```
+
+### বাস্তব উদাহরণ:
+
+আপনি একটি প্লেবুক লিখেছেন, যেখানে Apache install, user add, firewall configure—সব automate। `ansible-playbook site.yaml` দিয়ে একবারেই সব কাজ হয়ে যাবে।
+
+### অ্যানালজি:
+
+`ansible-playbook` হলো, শিক্ষক ক্লাসে এসে সিলেবাস অনুযায়ী ধাপে ধাপে পড়ান—প্রথমে গণিত, পরে বিজ্ঞান, পরে ইংরেজি। সবকিছু প্ল্যানমাফিকভাবে হয়।
+
+## ৩. পার্থক্য
+
+| বৈশিষ্ট্য         | ansible (ad-hoc) | ansible-playbook (YAML) |
+|-------------------|------------------|-------------------------|
+| Use-case          | Quick, single    | Complex, multi-step     |
+| Syntax            | CLI              | YAML file               |
+| Repeatability     | কম               | বেশি                    |
+| Debugging         | সহজ              | বিস্তারিত                |
+| Automation Level  | কম               | বেশি                    |
+
+## ৪. Common CLI Options
+
+- `-i inventory` : কোন inventory ফাইল ব্যবহার হবে
+- `-m module` : কোন module ব্যবহার হবে (ping, shell, copy, yum)
+- `-a arguments` : module-এ কি argument যাবে
+- `--tags` : নির্দিষ্ট টাস্ক/গ্রুপ রান করতে
+- `--check` : dry-run/test mode
+- `-v/-vvv` : verbose/debug mode
+
+## ৫. Quick Reference
+
+### ansible:
+```bash
+ansible all -m ping -i inventory
+ansible web -m shell -a 'df -h' -i inventory
+```
+
+### ansible-playbook:
+```bash
+ansible-playbook site.yaml -i inventory
+ansible-playbook deploy.yaml --tags "db" -i inventory
+```
+
+## সংক্ষেপে
+
+`ansible` কমান্ড দ্রুত, ছোট কাজের জন্য; `ansible-playbook` বড়, automate, repeatable কাজের জন্য। দুইটা বুঝে, environment অনুযায়ী ব্যবহার করুন।
+
+পরবর্তী পাঠে টাস্ক, হ্যান্ডলার, ভেরিয়েবল ও মডিউল নিয়ে আলোচনা হবে।
