@@ -1,0 +1,122 @@
+---
+title: হায়ার অর্ডার ফাংশন ও কলব্যাক থেকে Async/Await পর্যন্ত
+slug: function-patterns
+---
+
+জাভাস্ক্রিপ্টে ফাংশন শুধু "কাজ" নয়, ডাটা হিসেবেও ব্যবহার হয়। হায়ার অর্ডার ফাংশন, কলব্যাক, এবং Async/Await—এই তিনটি কনসেপ্ট আধুনিক জাভাস্ক্রিপ্টের প্রাণ। এই পাঠে আমরা দেখব কীভাবে ফাংশনকে ডাটা হিসেবে ব্যবহার, কলব্যাকের সমস্যা, এবং Async/Await দিয়ে সমাধান।
+
+## ১. হায়ার অর্ডার ফাংশন (Higher Order Function)
+
+- ফাংশন, যা অন্য ফাংশন নেয় বা ফেরত দেয়
+
+```js
+function greet(name) {
+  return "Hello, " + name;
+}
+function processUser(fn) {
+  const user = "Anis";
+  return fn(user);
+}
+console.log(processUser(greet)); // "Hello, Anis"
+```
+
+### Array Methods (map, filter, reduce)
+
+```js
+const nums = [1, 2, 3];
+const doubled = nums.map(n => n * 2); // [2, 4, 6]
+const even = nums.filter(n => n % 2 === 0); // [2]
+const sum = nums.reduce((acc, n) => acc + n, 0); // 6
+```
+
+## ২. কলব্যাক ফাংশন (Callback)
+
+- ফাংশন, যা অন্য ফাংশনে "পাস" হয়
+- Asynchronous কাজের জন্য
+
+```js
+function fetchData(callback) {
+  setTimeout(() => {
+    callback("Data loaded");
+  }, 1000);
+}
+fetchData(data => {
+  console.log(data); // "Data loaded"
+});
+```
+
+### Callback Hell
+
+- Nested callback structure
+
+```js
+getUser(id, user => {
+  getPosts(user, posts => {
+    getComments(posts, comments => {
+      // ...
+    });
+  });
+});
+```
+
+## ৩. প্রমিজ ও Async/Await
+
+### Promise
+
+```js
+function fetchData() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("Data loaded");
+    }, 1000);
+  });
+}
+fetchData().then(data => {
+  console.log(data);
+});
+```
+
+### Async/Await
+
+- Asynchronous কোডকে "সিনক্রোনাস" দেখায়
+
+```js
+async function load() {
+  const data = await fetchData();
+  console.log(data);
+}
+load();
+```
+
+## ৪. বাস্তব উদাহরণ ও Analogies
+
+- **হায়ার অর্ডার ফাংশন = "রেসিপি বইয়ে রেসিপি যোগ করা"**
+- **কলব্যাক = "কাজ শেষ হলে ডাক দেওয়া"**
+- **Async/Await = "অপেক্ষা করে কাজ করা"**
+
+## ৫. সাধারণ ভুল ও সমাধান
+
+- **Callback hell**: Nested structure, কোড জটিল
+- **Promise না রিটার্ন করা**: then/catch কাজ করবে না
+- **Async function-এ await ছাড়া Promise ব্যবহার**
+
+## ৬. চ্যালেঞ্জ
+
+```js
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function run() {
+  await delay(1000);
+  console.log("1 second later");
+}
+run();
+```
+
+## উপসংহার
+
+হায়ার অর্ডার ফাংশন, কলব্যাক, এবং Async/Await আয়ত্ত করলে, জাভাস্ক্রিপ্টে ডাটা প্রসেসিং, অ্যাসিঙ্ক্রোনাস কাজ, এবং কোডিং আরও সহজ ও শক্তিশালী হয়।
+
+---
+
+পরবর্তী পাঠ: [অবজেক্ট বেসিকস: লিটারালস, কনস্ট্রাক্টর, প্রপার্টি ম্যানিপুলেশন](/js/object-basics)

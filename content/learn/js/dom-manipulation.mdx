@@ -1,0 +1,123 @@
+---
+title: "DOM ম্যানিপুলেশন - এলিমেন্ট তৈরি, স্টাইল পরিবর্তন, ক্লাস ম্যানেজমেন্ট"
+icon: proicons:javascript
+---
+
+ওয়েব ডেভেলপমেন্টে DOM ম্যানিপুলেশন মানে—পেজের কন্টেন্ট, স্টাইল, এবং স্ট্রাকচারকে "জীবন্ত" করে তোলা। এই পাঠে আমরা শিখব, কীভাবে জাভাস্ক্রিপ্ট দিয়ে নতুন এলিমেন্ট তৈরি, স্টাইল পরিবর্তন, এবং ক্লাস ম্যানেজমেন্ট করা যায়।
+
+---
+
+## ১. এলিমেন্ট তৈরি ও DOM-এ যোগ
+
+### উদাহরণ:
+```js
+const newPara = document.createElement('p');
+newPara.textContent = "নতুন প্যারাগ্রাফ!";
+document.body.appendChild(newPara);
+```
+
+#### অ্যানালজি:
+এটা অনেকটা খালি কাগজে নতুন বাক্য লিখে বইয়ে যোগ করার মতো।
+
+### আরও উদাহরণ:
+```js
+const list = document.createElement('ul');
+const item = document.createElement('li');
+item.textContent = "লিস্ট আইটেম";
+list.appendChild(item);
+document.body.appendChild(list);
+```
+
+---
+
+## ২. এলিমেন্ট রিমুভ ও রিপ্লেস
+
+### রিমুভ:
+```js
+const para = document.querySelector('p');
+para.remove();
+```
+
+### রিপ্লেস:
+```js
+const oldItem = document.querySelector('.old');
+const newItem = document.createElement('div');
+newItem.textContent = "নতুন ডিভ";
+oldItem.replaceWith(newItem);
+```
+
+---
+
+## ৩. স্টাইল পরিবর্তন
+
+### ইনলাইন স্টাইল:
+```js
+const box = document.querySelector('.box');
+box.style.backgroundColor = 'skyblue';
+box.style.padding = '20px';
+```
+
+#### অ্যানালজি:
+এটা অনেকটা কাগজে রং করা বা হাইলাইটার দিয়ে মার্ক করার মতো।
+
+### ডাইনামিক স্টাইল:
+ইউজার ইন্টারঅ্যাকশনে স্টাইল পরিবর্তন:
+```js
+const btn = document.querySelector('button');
+btn.addEventListener('click', () => {
+  btn.style.border = '2px solid green';
+});
+```
+
+---
+
+## ৪. ক্লাস ম্যানেজমেন্ট
+
+### ক্লাস যোগ/মুছে ফেলা/টগল:
+```js
+const card = document.querySelector('.card');
+card.classList.add('active'); // যোগ
+card.classList.remove('active'); // মুছে ফেলা
+card.classList.toggle('highlight'); // টগল
+```
+
+#### অ্যানালজি:
+এটা অনেকটা বইয়ের পাতায় স্টিকার লাগানো বা তুলে নেওয়ার মতো—যখন দরকার, তখন লাগান, আবার তুলে নেন।
+
+---
+
+## ৫. অ্যাট্রিবিউট ম্যানিপুলেশন
+
+### অ্যাট্রিবিউট সেট/গেট/রিমুভ:
+```js
+const img = document.querySelector('img');
+img.setAttribute('alt', 'নতুন ছবি');
+console.log(img.getAttribute('src'));
+img.removeAttribute('width');
+```
+
+---
+
+## ৬. ব্যবহারিক উদাহরণ
+
+### ১. টুডু লিস্ট অ্যাপ:
+- ইউজার ইনপুট নিয়ে নতুন টাস্ক DOM-এ যোগ
+- টাস্ক ডিলিট করলে DOM থেকে এলিমেন্ট রিমুভ
+- টাস্ক কমপ্লিট হলে ক্লাস যোগ/মুছে ফেলা
+
+### ২. ডাইনামিক স্টাইলিং:
+- ডার্ক/লাইট মোড টগল
+- ইউজার ক্লিক করলে বক্সের কালার পরিবর্তন
+
+---
+
+## ৭. চ্যালেঞ্জ
+
+- একটি বাটন ক্লিক করলে নতুন এলিমেন্ট DOM-এ যোগ করুন।
+- ইউজার ইন্টারঅ্যাকশনে এলিমেন্টের স্টাইল ও ক্লাস পরিবর্তন করুন।
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[ইভেন্ট হ্যান্ডলিং - ইনলাইন বনাম addEventListener, বুবলিং, ক্যাপচারিং](/js/events)

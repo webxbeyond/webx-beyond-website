@@ -1,0 +1,127 @@
+---
+title: "ফর্ম ও ইউজার ইন্টারঅ্যাকশন হ্যান্ডলিং"
+icon: proicons:javascript
+---
+
+ওয়েব অ্যাপ্লিকেশনে ফর্ম ও ইউজার ইন্টারঅ্যাকশন মানে—ইউজার কীভাবে ডাটা ইনপুট দেয়, এবং সেই ডাটা কীভাবে প্রসেস ও ভ্যালিডেট করা হয়। এই পাঠে আমরা শিখব, কীভাবে জাভাস্ক্রিপ্ট দিয়ে ফর্ম হ্যান্ডলিং, ইনপুট ভ্যালিডেশন, এবং ইউজার ইন্টারঅ্যাকশন নিয়ন্ত্রণ করা যায়।
+
+---
+
+## ১. ফর্ম সাবমিশন ও ইভেন্ট হ্যান্ডলিং
+
+### উদাহরণ:
+```html
+<form id="signup">
+  <input type="text" name="username" required />
+  <input type="password" name="password" required />
+  <button type="submit">Sign Up</button>
+</form>
+```
+```js
+const form = document.getElementById('signup');
+form.addEventListener('submit', function(e) {
+  e.preventDefault(); // ডিফল্ট সাবমিট বন্ধ
+  const username = form.username.value;
+  const password = form.password.value;
+  alert(`ইউজার: ${username}, পাসওয়ার্ড: ${password}`);
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা ব্যাংকের ফর্ম—ইউজার ডাটা দেয়, ক্লার্ক চেক করে, তারপর প্রসেস করে।
+
+---
+
+## ২. ইনপুট ভ্যালিডেশন
+
+### বেসিক ভ্যালিডেশন:
+```js
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (form.username.value.length < 3) {
+    alert('ইউজারনেম কমপক্ষে ৩ অক্ষর হতে হবে');
+    return;
+  }
+  // আরও প্রসেসিং
+});
+```
+
+### রিয়েল-টাইম ভ্যালিডেশন:
+```js
+form.username.addEventListener('input', function() {
+  if (this.value.length < 3) {
+    this.style.border = '2px solid red';
+  } else {
+    this.style.border = '2px solid green';
+  }
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা ATM-এ PIN ইনপুট—ভুল দিলে সাথে সাথে সতর্কতা আসে।
+
+---
+
+## ৩. ইউজার ইন্টারঅ্যাকশন: ফোকাস, ব্লার, চেঞ্জ
+
+### উদাহরণ:
+```js
+form.username.addEventListener('focus', function() {
+  this.style.backgroundColor = 'lightyellow';
+});
+form.username.addEventListener('blur', function() {
+  this.style.backgroundColor = '';
+});
+```
+
+### চেঞ্জ ইভেন্ট:
+```js
+form.username.addEventListener('change', function() {
+  alert('ইউজারনেম পরিবর্তন হয়েছে');
+});
+```
+
+---
+
+## ৪. ডাইনামিক ফর্ম ফিল্ডস
+
+ইউজার চাহিদা অনুযায়ী নতুন ইনপুট ফিল্ড যোগ/মুছে ফেলা যায়।
+
+### উদাহরণ:
+```js
+const addBtn = document.getElementById('addEmail');
+addBtn.addEventListener('click', function() {
+  const newInput = document.createElement('input');
+  newInput.type = 'email';
+  newInput.name = 'email';
+  form.appendChild(newInput);
+});
+```
+
+---
+
+## ৫. ব্যবহারিক উদাহরণ
+
+### ১. সাইনআপ ফর্ম:
+- ইউজার ইনপুট ভ্যালিডেশন
+- সফল সাবমিশনে ডাটা প্রসেস
+
+### ২. সার্চ বক্স:
+- ইনপুটে টাইপ করলে রিয়েল-টাইম রেজাল্ট দেখানো
+
+### ৩. ডাইনামিক ফিল্ডস:
+- ইউজার চাইলে নতুন ফিল্ড যোগ/মুছে ফেলা
+
+---
+
+## ৬. চ্যালেঞ্জ
+
+- একটি ফর্ম তৈরি করুন—ইউজারনেম ও ইমেইল ইনপুট।
+- ইনপুট ভ্যালিডেশন যোগ করুন—ইউজারনেম কমপক্ষে ৩ অক্ষর, ইমেইল '@' থাকতে হবে।
+- সাবমিট হলে ডাটা alert-এ দেখান।
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[লিগেসি অ্যাসিঙ্ক: কলব্যাক ও কলব্যাক হেল](/js/callbacks)

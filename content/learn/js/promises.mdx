@@ -1,0 +1,104 @@
+---
+title: "প্রমিজ - then, catch, finally, চেইনিং"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে অ্যাসিঙ্ক্রোনাস কোডিং সহজ ও readable করার জন্য প্রমিজ (Promise) এসেছে—এটি callback hell-এর সমাধান। এই পাঠে আমরা প্রমিজের মূল ধারণা, then/catch/finally, চেইনিং, এবং বাস্তব উদাহরণ শিখব।
+
+---
+
+## ১. প্রমিজ কী?
+
+প্রমিজ হলো—একটি অবজেক্ট, যা ভবিষ্যতে কোনো অ্যাসিঙ্ক কাজের success/failure জানাবে।
+
+### উদাহরণ:
+```js
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('ডেটা লোড হয়েছে');
+    // অথবা: reject('লোডিংয়ে সমস্যা');
+  }, 1000);
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—আপনি কাউকে বললেন, "কাজ শেষ হলে আমাকে জানাবে"। সে কাজ শেষ হলে আপনাকে জানাবে (resolve) বা সমস্যা হলে জানাবে (reject)।
+
+---
+
+## ২. then, catch, finally
+
+- `then`: কাজ সফল হলে
+- `catch`: কাজ ব্যর্থ হলে
+- `finally`: যেকোনো ফলাফলে
+
+### উদাহরণ:
+```js
+promise
+  .then(result => {
+    console.log('Success:', result);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  })
+  .finally(() => {
+    console.log('সবশেষে cleanup');
+  });
+```
+
+---
+
+## ৩. চেইনিং
+
+একাধিক অ্যাসিঙ্ক কাজ ধারাবাহিকভাবে করতে হলে—প্রমিজ চেইনিং ব্যবহার করুন।
+
+### উদাহরণ:
+```js
+getUser()
+  .then(user => getPosts(user.id))
+  .then(posts => getComments(posts[0].id))
+  .then(comments => {
+    console.log('Comments:', comments);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একজন কাজ শেষ করে পরের জনকে জানায়, এভাবে লাইন ধরে কাজ এগোয়।
+
+---
+
+## ৪. Error Handling
+
+- প্রতিটি then/catch-এ error handle করুন
+- Unhandled rejection হলে warning আসতে পারে
+
+### উদাহরণ:
+```js
+fetch('https://api.example.com/data')
+  .then(res => res.json())
+  .catch(err => {
+    alert('ডেটা লোডিংয়ে সমস্যা');
+  });
+```
+
+---
+
+## ৫. Security & Best Practices
+- Sensitive data fetch করলে HTTPS ব্যবহার করুন
+- Error message ইউজারকে না দেখিয়ে, লগ করুন
+- Promise chain-এ সব error handle করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- একটি প্রমিজ চেইন লিখুন, যেখানে তিনটি then আছে—প্রতিটি ধাপে ডেটা প্রসেস করুন
+- একটি প্রমিজে error simulate করে catch/finally ব্যবহার করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[Async/Await: প্রমিজকে সহজ সিনট্যাক্সে রূপান্তর](/js/async-await)

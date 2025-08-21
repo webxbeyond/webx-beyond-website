@@ -1,0 +1,114 @@
+---
+title: this কীওয়ার্ড - লিগেসি সমস্যা থেকে আধুনিক অ্যারো ফাংশন
+slug: this-keyword
+---
+
+জাভাস্ক্রিপ্টে `this` কীওয়ার্ড অনেকের জন্য বিভ্রান্তিকর। এটি নির্ভর করে ফাংশন কীভাবে কল হচ্ছে, কোথায় ডিক্লেয়ার হচ্ছে, এবং কোন কনটেক্সটে চলছে। এই পাঠে আমরা দেখব `this` কী, এর সমস্যা, এবং অ্যারো ফাংশন কীভাবে সমাধান দেয়।
+
+## ১. `this` কী?
+
+- `this` মানে "বর্তমান কনটেক্সট" বা "কে কল করছে"
+- অবজেক্ট, ফাংশন, ক্লাস—সব জায়গায় ব্যবহার হয়
+
+### উদাহরণ:
+
+```js
+const person = {
+  name: "Anis",
+  greet: function() {
+    console.log("Hello, " + this.name);
+  }
+};
+person.greet(); // "Hello, Anis"
+```
+
+## ২. লিগেসি সমস্যা: ফাংশন কনটেক্সট
+
+- ফাংশন আলাদাভাবে কল হলে, `this` হারিয়ে যায়
+
+```js
+const person = {
+  name: "Rahim",
+  greet: function() {
+    console.log(this.name);
+  }
+};
+const greetFunc = person.greet;
+greetFunc(); // undefined
+```
+
+### সমাধান: `bind`, `call`, `apply`
+
+```js
+const greetFunc = person.greet.bind(person);
+greetFunc(); // "Rahim"
+```
+
+## ৩. অ্যারো ফাংশন ও `this`
+
+- অ্যারো ফাংশন নিজের `this` তৈরি করে না, বাইরের `this` ধরে রাখে
+
+```js
+const person = {
+  name: "Karim",
+  greet: () => {
+    console.log("Hi, " + this.name);
+  }
+};
+person.greet(); // undefined (global `this`)
+```
+
+### কোথায় ব্যবহার?
+- ইভেন্ট হ্যান্ডলার, কলব্যাক, ক্লাস মেথডে সাবধান
+- সাধারণত অবজেক্ট মেথডে অ্যারো ফাংশন ব্যবহার না করাই ভালো
+
+## ৪. ক্লাসে `this`
+
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+  greet() {
+    console.log("Hello, " + this.name);
+  }
+}
+const u = new User("Anis");
+u.greet(); // "Hello, Anis"
+```
+
+## ৫. বাস্তব উদাহরণ ও Analogies
+
+- **`this` = "আমি কে?"**: কোন কনটেক্সটে "আমি" বলা হচ্ছে
+- **bind/call/apply = "নাম ট্যাগ লাগানো"**: ঠিক করে দেওয়া কে "আমি"
+- **Arrow function = "বাইরের ঘরের নাম ধরে রাখা"**
+
+## ৬. সাধারণ ভুল ও সমাধান
+
+- **অবজেক্ট মেথডে অ্যারো ফাংশন ব্যবহার**: `this` কাজ করবে না
+- **ফাংশন আলাদাভাবে কল**: `this` হারিয়ে যায়
+
+## ৭. চ্যালেঞ্জ
+
+```js
+const obj = {
+  value: 10,
+  show: function() {
+    setTimeout(function() {
+      console.log(this.value); // undefined
+    }, 100);
+    setTimeout(() => {
+      console.log(this.value); // 10
+    }, 100);
+  }
+};
+obj.show();
+```
+
+## উপসংহার
+
+`this` কীওয়ার্ড আয়ত্ত করলে, জাভাস্ক্রিপ্টে অবজেক্ট, ক্লাস, এবং ফাংশন আরও ভালোভাবে বোঝা যায়।
+
+---
+
+পরবর্তী পাঠ: [হায়ার অর্ডার ফাংশন ও কলব্যাক থেকে Async/Await পর্যন্ত](/js/function-patterns)

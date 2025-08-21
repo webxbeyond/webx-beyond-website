@@ -1,0 +1,100 @@
+---
+title: "ইটারেটর ও জেনারেটর - কাস্টম ইটারেটর, function*"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে ইটারেটর ও জেনারেটর—ডাটা স্ট্রাকচারকে আরও flexible ও powerful করে তোলে। এগুলো দিয়ে আপনি কাস্টম iteration behavior তৈরি করতে পারেন, lazy computation করতে পারেন, এবং asynchronous flow সহজ করতে পারেন।
+
+---
+
+## ১. ইটারেটর: ডাটা একটার পর একটা বের করা
+
+ইটারেটর হলো—একটি object, যেটা `next()` মেথড দিয়ে ডাটা একটার পর একটা দেয়।
+
+### উদাহরণ:
+```js
+const arr = [10, 20, 30];
+const it = arr[Symbol.iterator]();
+console.log(it.next()); // { value: 10, done: false }
+console.log(it.next()); // { value: 20, done: false }
+console.log(it.next()); // { value: 30, done: false }
+console.log(it.next()); // { value: undefined, done: true }
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি বইয়ের পাতা উল্টানো, প্রতিবার `next()` দিলে নতুন পাতা আসে।
+
+---
+
+## ২. কাস্টম ইটারেটর: নিজের মতো করে iteration
+
+আপনি চাইলে নিজের ডাটা স্ট্রাকচারের জন্য ইটারেটর বানাতে পারেন।
+
+### উদাহরণ:
+```js
+const range = {
+  start: 1,
+  end: 5,
+  [Symbol.iterator]() {
+    let current = this.start;
+    return {
+      next: () => {
+        if (current <= this.end) {
+          return { value: current++, done: false };
+        }
+        return { done: true };
+      }
+    };
+  }
+};
+for (const num of range) {
+  console.log(num); // 1, 2, 3, 4, 5
+}
+```
+
+---
+
+## ৩. জেনারেটর: function* দিয়ে সহজ ইটারেটর
+
+জেনারেটর হলো—একটি special function, যেটা `function*` দিয়ে declare হয় এবং `yield` keyword দিয়ে ডাটা দেয়।
+
+### উদাহরণ:
+```js
+function* idGenerator() {
+  let id = 1;
+  while (true) {
+    yield id++;
+  }
+}
+const gen = idGenerator();
+console.log(gen.next().value); // 1
+console.log(gen.next().value); // 2
+```
+
+#### অ্যানালজি:
+জেনারেটর অনেকটা—একটি পানির কল, যতবার চাইবেন ততবার পানি (ডাটা) পাবেন, বন্ধ করলে আর আসবে না।
+
+---
+
+## ৪. Practical Tips
+- for...of loop শুধু ইটারেবল ডাটা স্ট্রাকচারে কাজ করে
+- কাস্টম ইটারেটর দিয়ে complex iteration logic সহজ করুন
+- জেনারেটর দিয়ে lazy computation, async flow, state machine তৈরি করুন
+
+---
+
+## ৫. Security & Performance
+- ইটারেটর/জেনারেটর দিয়ে বড় ডাটা lazy iterate করলে memory consumption কমে
+- জেনারেটর function-এ sensitive state leak এড়াতে scope ঠিক রাখুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- কাস্টম ইটারেটর দিয়ে ১ থেকে ১০ পর্যন্ত সংখ্যা বের করুন
+- জেনারেটর দিয়ে Fibonacci সিরিজ তৈরি করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[মডিউল সিস্টেম: IIFE, CommonJS, ES6 Modules](/js/modules)

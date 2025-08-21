@@ -1,0 +1,116 @@
+---
+title: "লিগেসি অ্যাসিঙ্ক - কলব্যাক ও কলব্যাক হেল"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে অ্যাসিঙ্ক্রোনাস কোডিং মানে—একই সময়ে একাধিক কাজ করা, যেমন ডেটা লোড, ইউজার ইন্টারঅ্যাকশন, API কল। প্রমিজ ও async/await আসার আগে, কলব্যাকই ছিল অ্যাসিঙ্ক্রোনাস কাজের প্রধান উপায়।
+
+---
+
+## ১. কলব্যাক কী?
+
+কলব্যাক হলো—একটি ফাংশন, যেটি অন্য ফাংশনের আর্গুমেন্ট হিসেবে পাঠানো হয় এবং নির্দিষ্ট কাজ শেষে এক্সিকিউট হয়।
+
+### উদাহরণ:
+```js
+function fetchData(callback) {
+  setTimeout(() => {
+    callback('ডেটা লোড হয়েছে');
+  }, 1000);
+}
+
+fetchData(function(result) {
+  console.log(result);
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—আপনি কাউকে বললেন, "কাজ শেষ হলে আমাকে ফোন দিও"। কাজ শেষ হলে সে আপনাকে ফোন করে জানায়।
+
+---
+
+## ২. অ্যাসিঙ্ক্রোনাস কাজের জন্য কলব্যাক
+
+### File Read (Node.js):
+```js
+const fs = require('fs');
+fs.readFile('data.txt', 'utf8', function(err, data) {
+  if (err) {
+    console.error('Error:', err);
+    return;
+  }
+  console.log('File data:', data);
+});
+```
+
+### Event Handling:
+```js
+document.getElementById('btn').addEventListener('click', function() {
+  alert('Button clicked!');
+});
+```
+
+---
+
+## ৩. Callback Hell: সমস্যা ও সমাধান
+
+### Callback Hell কী?
+
+যখন একাধিক অ্যাসিঙ্ক কাজ একে অপরের মধ্যে nested হয়, তখন কোড পড়া, ডিবাগ, ও মেইনটেইন করা কঠিন হয়ে যায়—এটাই "callback hell"।
+
+### উদাহরণ:
+```js
+getUser(function(user) {
+  getPosts(user.id, function(posts) {
+    getComments(posts[0].id, function(comments) {
+      // আরও nested callback
+    });
+  });
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একজনকে ফোন দিয়ে, সে আরেকজনকে ফোন দেয়, সে আবার আরেকজনকে ফোন দেয়—শেষে কে কী বলল, খুঁজে পাওয়া কঠিন!
+
+### Callback Hell-এর সমস্যা:
+- কোড পড়া কঠিন
+- ডিবাগিং জটিল
+- Error handling জটিল
+- Scalability কম
+
+---
+
+## ৪. Callback Hell এড়ানোর উপায়
+
+- Named function ব্যবহার করুন:
+```js
+function handleComments(comments) {
+  // ...
+}
+function handlePosts(posts) {
+  getComments(posts[0].id, handleComments);
+}
+getUser(function(user) {
+  getPosts(user.id, handlePosts);
+});
+```
+- Error-first callback pattern অনুসরণ করুন
+- Promises ও async/await ব্যবহার করুন (পরবর্তী পাঠে)
+
+---
+
+## ৫. Security & Best Practices
+- Callback-এ sensitive data leak না হয়, সতর্ক থাকুন
+- Error handling সব জায়গায় করুন
+- Third-party callback ব্যবহার করলে trusted source নিশ্চিত করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- একটি অ্যাসিঙ্ক ফাংশন লিখুন, যেখানে তিনটি nested callback আছে—এরপর named function দিয়ে কোড readable করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[প্রমিজ: then, catch, finally, চেইনিং](/js/promises)

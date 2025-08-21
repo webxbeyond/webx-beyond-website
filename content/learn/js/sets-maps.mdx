@@ -1,0 +1,103 @@
+---
+title: "সেট ও ম্যাপ - Set, WeakSet, Map, WeakMap"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে ডাটা স্ট্রাকচার হিসেবে Set ও Map অত্যন্ত গুরুত্বপূর্ণ—এগুলো অ্যারে/অবজেক্টের সীমাবদ্ধতা দূর করে, efficient ও unique ডাটা ম্যানেজমেন্ট সহজ করে।
+
+---
+
+## ১. Set: ইউনিক ভ্যালু সংগ্রহ
+
+Set হলো—একটি collection, যেখানে প্রতিটি ভ্যালু ইউনিক (ডুপ্লিকেট নেই)।
+
+### উদাহরণ:
+```js
+const ids = new Set([1, 2, 3, 2, 1]);
+console.log(ids); // Set { 1, 2, 3 }
+ids.add(4);
+ids.delete(2);
+console.log(ids.has(3)); // true
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ঝাঁঝরি, যেখানে শুধু ইউনিক দানা থাকে, ডুপ্লিকেট বাদ পড়ে।
+
+---
+
+## ২. WeakSet: মেমরি অপ্টিমাইজড ইউনিক সেট
+
+WeakSet-এ শুধু অবজেক্ট রাখা যায়, এবং এগুলো garbage collection-এর জন্য eligible হয়—memory leak কমাতে সাহায্য করে।
+
+### উদাহরণ:
+```js
+const obj1 = { name: 'A' };
+const obj2 = { name: 'B' };
+const ws = new WeakSet([obj1, obj2]);
+ws.add({ name: 'C' });
+// ws.has(obj1) => true
+```
+
+---
+
+## ৩. Map: Key-Value ডাটা স্টোর
+
+Map হলো—একটি collection, যেখানে key-value pair থাকে, এবং key হিসেবে যেকোনো ডাটা (object, function, etc.) ব্যবহার করা যায়।
+
+### উদাহরণ:
+```js
+const scores = new Map();
+scores.set('Anis', 95);
+scores.set('Rafi', 88);
+console.log(scores.get('Anis')); // 95
+scores.delete('Rafi');
+console.log(scores.size); // 1
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডিকশনারি, যেখানে প্রতিটি শব্দের মান (value) আছে।
+
+---
+
+## ৪. WeakMap: মেমরি অপ্টিমাইজড Key-Value
+
+WeakMap-এ শুধু object key রাখা যায়, এবং এগুলো garbage collection-এর জন্য eligible—memory leak কমাতে সাহায্য করে।
+
+### উদাহরণ:
+```js
+const wm = new WeakMap();
+const obj = {};
+wm.set(obj, 'secret');
+console.log(wm.get(obj)); // 'secret'
+```
+
+---
+
+## ৫. Practical Tips
+- Set দিয়ে ডুপ্লিকেট অ্যারে থেকে ইউনিক ভ্যালু বের করুন:
+```js
+const arr = [1, 2, 2, 3];
+const unique = [...new Set(arr)]; // [1, 2, 3]
+```
+- Map দিয়ে দ্রুত key-value lookup করুন
+- WeakSet/WeakMap ব্যবহার করুন large object reference management-এর জন্য
+
+---
+
+## ৬. Security & Performance
+- Sensitive ডাটা WeakMap-এ রাখলে garbage collection সুবিধা পাবেন
+- Map/Set বড় হলে iteration performance impact হতে পারে
+- WeakSet/WeakMap-এ reference leak এড়াতে object lifecycle ঠিক রাখুন
+
+---
+
+## ৭. চ্যালেঞ্জ
+- একটি অ্যারে থেকে ইউনিক ভ্যালু বের করুন (Set)
+- Map দিয়ে ইউজার স্কোর স্টোর ও রিট্রিভ করুন
+- WeakMap দিয়ে sensitive ডাটা ম্যানেজ করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[ইটারেটর ও জেনারেটর: কাস্টম ইটারেটর, function*](/js/iterators-generators)

@@ -1,0 +1,110 @@
+---
+title: "আধুনিক সিনট্যাক্স - টেমপ্লেট লিটারাল, ডেস্ট্রাকচারিং, স্প্রেড/রেস্ট"
+icon: proicons:javascript
+---
+
+ES6 থেকে জাভাস্ক্রিপ্টে এসেছে কিছু আধুনিক সিনট্যাক্স—যা কোডকে আরও readable, concise ও powerful করে তোলে।
+
+---
+
+## ১. টেমপ্লেট লিটারাল
+
+টেমপ্লেট লিটারাল হলো—backtick (`) দিয়ে লেখা string, যেখানে `${}` দিয়ে variable/expression embed করা যায়।
+
+### উদাহরণ:
+```js
+const name = 'Anis';
+const msg = `Hello, ${name}!`; // Hello, Anis!
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ফরম, যেখানে ফাঁকা ঘরে নিজের তথ্য বসিয়ে দেয়া যায়।
+
+**ব্যবহার:**
+- Multi-line string
+- Expression embed
+
+---
+
+## ২. ডেস্ট্রাকচারিং
+
+ডেস্ট্রাকচারিং—array/object থেকে value সহজে extract করার shorthand।
+
+### Array Destructuring:
+```js
+const arr = [1, 2, 3];
+const [a, b, c] = arr;
+console.log(a, b, c); // 1 2 3
+```
+
+### Object Destructuring:
+```js
+const user = { name: 'Rafi', age: 22 };
+const { name, age } = user;
+console.log(name, age); // Rafi 22
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি বাক্স থেকে নির্দিষ্ট জিনিসগুলো আলাদা করে বের করা।
+
+**ব্যবহার:**
+- Function parameter destructuring
+- Nested destructuring
+
+---
+
+## ৩. স্প্রেড ও রেস্ট
+
+### স্প্রেড (...)
+স্প্রেড—array/object-এর value অন্য array/object-এ copy/merge করার shorthand।
+
+```js
+const arr1 = [1, 2];
+const arr2 = [...arr1, 3, 4]; // [1, 2, 3, 4]
+
+const obj1 = { a: 1 };
+const obj2 = { ...obj1, b: 2 }; // { a: 1, b: 2 }
+```
+
+### রেস্ট (...)
+রেস্ট—function parameter বা destructuring-এ multiple value collect করার shorthand।
+
+```js
+function sum(...nums) {
+  return nums.reduce((a, b) => a + b, 0);
+}
+console.log(sum(1, 2, 3)); // 6
+
+const [first, ...rest] = [10, 20, 30];
+console.log(rest); // [20, 30]
+```
+
+#### অ্যানালজি:
+স্প্রেড—একটি থালা থেকে খাবার ছড়িয়ে দেয়া, রেস্ট—একটি থালা থেকে বাকি খাবার একসাথে তুলে নেয়া।
+
+---
+
+## ৪. Practical Tips
+- টেমপ্লেট লিটারাল দিয়ে multi-line ও dynamic string লিখুন
+- ডেস্ট্রাকচারিং nested object/array থেকে value সহজে বের করুন
+- স্প্রেড দিয়ে array/object merge করুন, রেস্ট দিয়ে multiple argument handle করুন
+
+---
+
+## ৫. Security & Performance
+- ডেস্ট্রাকচারিং-এ undefined/null handle করুন
+- স্প্রেড বড় array/object-এ performance impact ফেলতে পারে
+- রেস্ট parameter-এ sensitive ডাটা leak এড়াতে validate করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- টেমপ্লেট লিটারাল দিয়ে greeting message তৈরি করুন
+- ডেস্ট্রাকচারিং দিয়ে user object থেকে name, age বের করুন
+- স্প্রেড দিয়ে দুই array merge করুন, রেস্ট দিয়ে function argument collect করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[আধুনিক API: fetch, localStorage, IndexedDB, Clipboard](/js/modern-apis)

@@ -1,0 +1,88 @@
+---
+title: লিগেসি OOP - কনস্ট্রাক্টর ফাংশন ও prototype
+slug: legacy-oop
+---
+
+জাভাস্ক্রিপ্টে ক্লাসিক্যাল OOP-এর মতো "ক্লাস" নেই, কিন্তু কনস্ট্রাক্টর ফাংশন ও `prototype` দিয়ে অবজেক্ট-ওরিয়েন্টেড প্রোগ্রামিং করা যায়। এই পাঠে আমরা দেখব কনস্ট্রাক্টর ফাংশন, প্রোটোটাইপ, এবং ইনহেরিটেন্সের পুরনো পদ্ধতি।
+
+## ১. কনস্ট্রাক্টর ফাংশন
+
+- ফাংশন, যা `new` দিয়ে কল করলে অবজেক্ট তৈরি হয়
+
+```js
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+const p1 = new Person("Anis", 22);
+console.log(p1.name); // "Anis"
+```
+
+## ২. `prototype` দিয়ে মেথড যোগ
+
+- কনস্ট্রাক্টর ফাংশনের `prototype`-এ মেথড যোগ করলে, সব অবজেক্টে পাওয়া যায়
+
+```js
+Person.prototype.greet = function() {
+  console.log("Hello, " + this.name);
+};
+p1.greet(); // "Hello, Anis"
+```
+
+## ৩. ইনহেরিটেন্স (Inheritance)
+
+- এক কনস্ট্রাক্টর থেকে অন্য কনস্ট্রাক্টরে "পুনঃব্যবহার"
+
+```js
+function Student(name, age, roll) {
+  Person.call(this, name, age); // Parent constructor
+  this.roll = roll;
+}
+Student.prototype = Object.create(Person.prototype);
+Student.prototype.constructor = Student;
+
+const s1 = new Student("Rahim", 20, 101);
+s1.greet(); // "Hello, Rahim"
+console.log(s1.roll); // 101
+```
+
+## ৪. বাস্তব উদাহরণ ও Analogies
+
+- **কনস্ট্রাক্টর = "ফর্ম পূরণ করে নতুন ফাইল তৈরি"**
+- **prototype = "সব ফাইলে সাধারণ নিয়ম যোগ"**
+- **Inheritance = "পুরনো ফাইল থেকে নতুন ফাইল তৈরি"**
+
+## ৫. সাধারণ ভুল ও সমাধান
+
+- **constructor property ভুলভাবে সেট**
+- **Parent constructor call না করলে property missing**
+- **prototype chain ভুল হলে method পাওয়া যায় না**
+
+## ৬. চ্যালেঞ্জ
+
+```js
+function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function() {
+  console.log(this.name + " makes a sound");
+};
+function Dog(name) {
+  Animal.call(this, name);
+}
+Dog.prototype = Object.create(Animal.prototype);
+Dog.prototype.constructor = Dog;
+Dog.prototype.speak = function() {
+  console.log(this.name + " barks");
+};
+const d = new Dog("Tommy");
+d.speak(); // "Tommy barks"
+```
+
+## উপসংহার
+
+লিগেসি OOP আয়ত্ত করলে, জাভাস্ক্রিপ্টে ক্লাসিক্যাল ইনহেরিটেন্স, কোড পুনঃব্যবহার, এবং মডেলিং সহজ হয়।
+
+---
+
+পরবর্তী পাঠ: [আধুনিক OOP - `class`, `extends`, `super`, প্রাইভেট ফিল্ডস](/js/es6-classes)
