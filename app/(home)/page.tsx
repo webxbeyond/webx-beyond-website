@@ -275,29 +275,34 @@ function SelectTopics() {
   const cards: {
     title: string; description: string; icon: string; href: string; badge?: { text: string; variant: 'progress' | 'soon' }; progress?: number;
   }[] = [
-    // Beginner step-by-step order:
+    // Fundamentals & Programming
     { title: 'প্রোগ্রামিং বেসিক', description: 'প্রোগ্রামিংয়ের মূল ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও ভাষা তুলনা—সব এক জায়গায়। একদম শুরু থেকে অ্যাডভান্সড পর্যন্ত।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'জাভাস্ক্রিপ্ট', description: 'জাভাস্ক্রিপ্টের বেসিক, সিনট্যাক্স, ডাটা টাইপ, ফাংশন, DOM, ইভেন্ট, অ্যাসিনক্রোনাস, মডিউল, বেস্ট প্র্যাকটিস ও আধুনিক ফ্রেমওয়ার্ক—সবকিছু বাংলায়।', icon: 'famicons:logo-nodejs', href: '/js', badge: { text: 'চলমান', variant: 'progress' } },
-  { title: 'পাইথন', description: 'পাইথনের বেসিক, সিনট্যাক্স, ডাটা টাইপ, ফাংশন, লাইব্রেরি, অটোমেশন, স্ক্রিপ্টিং ও রিয়েল-ওয়ার্ল্ড প্রজেক্ট—সব বাংলায়।', icon: 'logos:python', href: '/python', badge: { text: 'চলমান', variant: 'progress' } },
-  { title: 'PyTorch', description: 'ডিপ লার্নিং, নিউরাল নেটওয়ার্ক, টেনসর, মডেল ট্রেনিং, ইমেজ ও টেক্সট প্রসেসিং—PyTorch দিয়ে হাতে-কলমে শেখা।', icon: 'logos:pytorch', href: '/pytorch', badge: { text: 'চলমান', variant: 'progress' } },
-    { title: 'সিস্টেম ডিজাইন', description: 'স্কেলেবল অ্যাপ, আর্কিটেকচার, ডেটাবেস, API, ক্যাশিং, লোড ব্যালান্সিং, মাইক্রোসার্ভিস—ইন্ডাস্ট্রি রেডি সিস্টেম ডিজাইন বাংলায়।', icon: 'material-symbols:architecture', href: '/system-design', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'পাইথন', description: 'পাইথনের বেসিক, সিনট্যাক্স, ডাটা টাইপ, ফাংশন, লাইব্রেরি, অটোমেশন, স্ক্রিপ্টিং ও রিয়েল-ওয়ার্ল্ড প্রজেক্ট—সব বাংলায়।', icon: 'logos:python', href: '/python', badge: { text: 'চলমান', variant: 'progress' } },
+    // Web & Backend
+    { title: 'নোড জেএস', description: 'জাভাস্ক্রিপ্ট সার্ভার সাইডে—API, CLI, লাইব্রেরি, ডিপ্লয়মেন্ট ও পারফরম্যান্স টিউনিংসহ আধুনিক Node.js ডেভেলপমেন্ট।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, REST, GraphQL, টেস্টিং ও ইন্টিগ্রেশন—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+    // DevOps, Cloud, Linux
     { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক, ব্রাঞ্চিং, মার্জিং ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুলের হাতে-কলমে গাইড।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'লিনাক্স', description: 'কমান্ড লাইন, সার্ভার, ক্লাস্টার, শেল স্ক্রিপ্টিং ও ওপেন সোর্স—বাংলায় লিনাক্স মাস্টারি, হাতে-কলমে প্র্যাকটিস ও বাস্তব উদাহরণ।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
-    { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, REST, GraphQL, টেস্টিং ও ইন্টিগ্রেশন—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
-    { title: 'নোড জেএস', description: 'জাভাস্ক্রিপ্ট সার্ভার সাইডে—API, CLI, লাইব্রেরি, ডিপ্লয়মেন্ট ও পারফরম্যান্স টিউনিংসহ আধুনিক Node.js ডেভেলপমেন্ট।', icon: 'famicons:logo-nodejs', href: '/nodejs', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'ডেভঅপস', description: 'CI/CD, কনটেইনার, ক্লাউড, মনিটরিং, অটোমেশন—সফটওয়্যার ডেভেলপমেন্ট ও অপারেশনের সংযোগস্থলে আধুনিক টুল ও কৌশল।', icon: 'lets-icons:terminal', href: '/dev-ops', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'অ্যানসিবল (Ansible)', description: 'ইনফ্রা অটোমেশন, কনফিগ ম্যানেজমেন্ট, ক্লাউড, ডেভঅপস, টেস্টিং ও স্কেলিং—বাংলায় মাস্টার ইন আনসিবল সিরিজ।', icon: 'cib:ansible', href: '/ansible', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
-    { title: 'নেটওয়ার্কিং', description: 'কম্পিউটার নেটওয়ার্ক, প্রোটোকল, ট্রাবলশুটিং, নিরাপত্তা ও বাস্তবিক উদাহরণ—নেটওয়ার্কিংয়ের বেসিক থেকে অ্যাডভান্সড।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'সেলফ হোস্টিং ও হোম সার্ভার', description: 'নিজস্ব সার্ভার সেটআপ, ওপেন-সোর্স সফটওয়্যার চালানো, ফাইল শেয়ারিং, স্ট্রিমিং, ব্যাকআপ, রিভার্স প্রক্সি, মনিটরিং ও সিকিউরিটি—ব্যক্তিগত ক্লাউড ও হোস্টিংয়ের জন্য।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' } },
+    // Networking & Security
+    { title: 'নেটওয়ার্কিং', description: 'কম্পিউটার নেটওয়ার্ক, প্রোটোকল, ট্রাবলশুটিং, নিরাপত্তা ও বাস্তবিক উদাহরণ—নেটওয়ার্কিংয়ের বেসিক থেকে অ্যাডভান্সড।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+    { title: 'মাইক্রোটিক', description: 'রাউটার, নেটওয়ার্কিং, ISP, VPN, ফায়ারওয়াল, অটোমেশন—বাংলায় সম্পূর্ণ মাইক্রোটিক মাস্টারি সিরিজ।', icon: 'solar:wi-fi-router-bold', href: '/learn/mikrotik', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+    // AI, Data, Performance
     { title: 'এআই (AI)', description: 'এআই টুল, মডেল ইন্টিগ্রেশন, প্রম্পটিং, অটোমেশন—বাস্তব ওয়ার্কফ্লোতে কৃত্রিম বুদ্ধিমত্তার ব্যবহার ও কৌশল।', icon: 'eos-icons:ai', href: '/ai', badge: { text: 'চলমান', variant: 'progress' } },
-    { title: 'মাইক্রোটিক', description: 'রাউটার, নেটওয়ার্কিং, ISP, VPN, ফায়ারওয়াল, অটোমেশন—বাংলায় সম্পূর্ণ মাইক্রোটিক মাস্টারি সিরিজ।', icon: 'solar:wi-fi-router-bold', href: '/learn/mikrotik', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
-    { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'প্রোগ্রামিং, টুলিং ও ডেভঅপসের জন্য দ্রুত রেফারেন্স—কমান্ড, সিনট্যাক্স, কনফিগ ও শর্টকাট।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'PyTorch', description: 'ডিপ লার্নিং, নিউরাল নেটওয়ার্ক, টেনসর, মডেল ট্রেনিং, ইমেজ ও টেক্সট প্রসেসিং—PyTorch দিয়ে হাতে-কলমে শেখা।', icon: 'logos:pytorch', href: '/pytorch', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং, অ্যানালিটিক্স ও ডেটা ইঞ্জিনিয়ারিংয়ের আধুনিক ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'soon' } },
+    // Blockchain & Advanced
+    { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত প্রযুক্তি, স্মার্ট কন্ট্রাক্ট, ক্রিপ্টোকারেন্সি ও নিরাপদ তথ্য সংরক্ষণের আধুনিক পদ্ধতি।', icon: 'icon-park-twotone:blockchain', href: '/blockchain', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
+    { title: 'সিস্টেম ডিজাইন', description: 'স্কেলেবল অ্যাপ, আর্কিটেকচার, ডেটাবেস, API, ক্যাশিং, লোড ব্যালান্সিং, মাইক্রোসার্ভিস—ইন্ডাস্ট্রি রেডি সিস্টেম ডিজাইন বাংলায়।', icon: 'material-symbols:architecture', href: '/system-design', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'পারফরম্যান্স অপ্টিমাইজেশন', description: 'ওয়েব অ্যাপের লোড টাইম, বান্ডেল সাইজ, ল্যাটেন্সি, কোর ওয়েব ভাইটাল ও টিউনিং—পারফরম্যান্স বুস্টের কৌশল।', icon: 'tabler:chart-line', href: '/#select-topics', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড, ক্লাউড রিসোর্স ম্যানেজমেন্ট ও অটোমেশন—Terraform ও IaC-এর হাতে-কলমে গাইড।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'প্রোগ্রামিং, টুলিং ও ডেভঅপসের জন্য দ্রুত রেফারেন্স—কমান্ড, সিনট্যাক্স, কনফিগ ও শর্টকাট।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' } },
     // Upcoming and advanced topics
-    { title: 'ব্লকচেইন', description: 'বিকেন্দ্রীভূত প্রযুক্তি, স্মার্ট কন্ট্রাক্ট, ক্রিপ্টোকারেন্সি ও নিরাপদ তথ্য সংরক্ষণের আধুনিক পদ্ধতি।', icon: 'icon-park-twotone:blockchain', href: '/blockchain', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল, নিরাপত্তা টেস্টিং, সাইবার থ্রেট ও ডিফেন্স—নিজেকে ও অন্যকে নিরাপদ রাখার জন্য।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
-    { title: 'ডাটা ইঞ্জিনিয়ারিং', description: 'ইটিএল পাইপলাইন, ডাটা মডেলিং, স্ট্রিম প্রসেসিং, অ্যানালিটিক্স ও ডেটা ইঞ্জিনিয়ারিংয়ের আধুনিক ফাউন্ডেশন।', icon: 'ph:database-duotone', href: '/#select-topics', badge: { text: 'চলমান', variant: 'soon' } },
     { title: 'গো (Go)', description: 'পারফরম্যান্ট, কনকারেন্ট সার্ভার ও টুলিং নির্মাণের জন্য গো ল্যাঙ্গ—ব্যবহারিক উদাহরণ ও বেস্ট প্র্যাকটিস।', icon: 'logos:go', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     { title: 'রাস্ট (Rust)', description: 'মেমরি সেফটি, হাই পারফরম্যান্স ও সিস্টেম লেভেল প্রোগ্রামিংয়ের জন্য আধুনিক ভাষা—Rust শেখার পথ।', icon: 'logos:rust', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
     { title: 'অবজারভেবিলিটি', description: 'মেট্রিক্স, লগ, ট্রেস, অ্যালার্টিং ও মনিটরিং—সিস্টেমের স্বচ্ছতা ও নির্ভরযোগ্যতার জন্য।', icon: 'ph:waveform-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' } },
