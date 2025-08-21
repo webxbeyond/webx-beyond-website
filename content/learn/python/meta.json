@@ -4,10 +4,7 @@
   "icon": "hugeicons:html-5",
   "root": true,
   "pages": [
-    "---টিউটোরিয়াল---",
     "index",
-    "css-circular-animation",
-    "glowing-button",
     "..."
   ]
 }

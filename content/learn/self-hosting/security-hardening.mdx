@@ -3,19 +3,38 @@ title: সিকিউরিটি হার্ডেনিং
 icon: ph:shield-check-duotone
 ---
 
-
 প্রোডাকশন সার্ভার নিরাপদ রাখতে শুধু ফায়ারওয়াল বা SSH কনফিগ যথেষ্ট নয়—OS, ইউজার, নেটওয়ার্ক, অ্যাপ, কন্টেইনার, সিক্রেট, মনিটরিং—সব স্তরে হার্ডেনিং দরকার। এই অধ্যায়ে ধাপে ধাপে সিকিউরিটি বেস্ট প্র্যাকটিস শিখবেন।
 
 ## মূল লক্ষ্য
 - Attack Surface কমানো
 - অননুমোদিত অ্যাক্সেস শনাক্ত ও প্রতিরোধ
 - দ্রুত রেসপন্স ও রিকভারি
+- কমপ্লায়েন্স (GDPR, HIPAA) মেনটেইন
+
+## তুলনা (হার্ডেনিং টুলস)
+| টুল | সহজ | স্কেল | ফিচার |
+|------|------|------|--------|
+| Fail2Ban | হ্যাঁ | ছোট-মিড | Brute-force ব্লক, লগ মনিটর |
+| UFW | হ্যাঁ | ছোট | সিম্পল ফায়ারওয়াল |
+| AppArmor/SELinux | না | বড় | Mandatory Access Control |
+| ClamAV | হ্যাঁ | মিড | Antivirus/ম্যালওয়্যার স্ক্যান |
+| AWS GuardDuty | না | বড় | অটো থ্রেট ডিটেকশন, ML-ভিত্তিক |
+| GCP Security Command Center | না | বড় | ভালনারেবিলিটি স্ক্যান, অ্যালার্ট |
 
 ## OS হার্ডেনিং
 - নিয়মিত আপডেট: `apt update && apt upgrade -y`
 - অটো আপডেট: `unattended-upgrades` প্যাকেজ
+```bash
+apt install unattended-upgrades
+dpkg-reconfigure unattended-upgrades
+```
 - অপ্রয়োজনীয় প্যাকেজ/সার্ভিস রিমুভ: `apt purge`
 - Time sync: `systemctl enable --now systemd-timesyncd`
+- Kernel hardening: `/etc/sysctl.conf` → `net.ipv4.tcp_syncookies=1`, `kernel.printk=3 4 1 3`
+```bash
+sysctl -p
+```
+- Filesystem hardening: `/etc/fstab` → `noexec,nosuid,nodev` for /tmp, /var/tmp
 
 ## ইউজার ও SSH
 - রুট লগইন নিষ্ক্রিয়: `/etc/ssh/sshd_config` → `PermitRootLogin no`
@@ -26,11 +45,20 @@ icon: ph:shield-check-duotone
 apt install -y fail2ban
 systemctl enable --now fail2ban
 ```
+জেল কনফিগ উদাহরণ (`/etc/fail2ban/jail.local`):
+```
+[sshd]
+enabled = true
+maxretry = 3
+bantime = 1h
+```
 - 2FA (Google Authenticator, optional):
 ```bash
 apt install libpam-google-authenticator
 google-authenticator
 ```
+`/etc/pam.d/sshd` → `@include common-auth` পরে `auth required pam_google_authenticator.so` যোগ করুন।
+- sudoers hardening: `/etc/sudoers` → `Defaults passwd_tries=3, insults`
 
 ## ফায়ারওয়াল ও নেটওয়ার্ক
 - UFW (Ubuntu):
@@ -45,6 +73,15 @@ ufw enable
 `/etc/ssh/sshd_config` → `Port 2222`
 - GeoIP/IP allowlist (advanced):
 Cloudflare Proxy, VPN, বা security group
+- nftables (অ্যাডভান্সড ফায়ারওয়াল):
+```bash
+apt install nftables
+nft add table inet filter
+nft add chain inet filter input { type filter hook input priority 0 \; policy drop \; }
+nft add rule inet filter input tcp dport {22,80,443} accept
+systemctl enable nftables
+```
+- DDoS প্রোটেকশন: Cloudflare, AWS Shield
 
 ## কন্টেইনার ও অ্যাপ হার্ডেনিং
 - Docker: সর্বদা লেটেস্ট ইমেজ টানুন
@@ -53,23 +90,86 @@ Cloudflare Proxy, VPN, বা security group
 - Read-only ফাইলসিস্টেম: `read_only: true`
 - সিক্রেট/এনভ ফাইল bind-mount, ইমেজে নয়
 - Public port expose এড়িয়ে proxy/networks ব্যবহার
+- Docker Bench Security: `docker run -it --net host --pid host --userns host --cap-add audit_control -v /etc:/etc:ro -v /usr/bin/containerd:/usr/bin/containerd:ro -v /usr/bin/runc:/usr/bin/runc:ro -v /usr/lib/systemd:/usr/lib/systemd:ro -v /var/lib:/var/lib:ro -v /var/run/docker.sock:/var/run/docker.sock:ro --label docker_bench_security docker/docker-bench-security`
+- AppArmor for Docker: `/etc/docker/daemon.json` → `"default-profile": "docker-default"`
+- Trivy স্ক্যান: `trivy image myimage` (ভালনারেবিলিটি চেক)
 
 ## সিক্রেট ও এনভায়রনমেন্ট
 - `.env`/config ফাইল 600 পারমিশন
 - গিটে সিক্রেট না রাখুন (git-crypt, sops, vault)
 - API key/token রোটেট ও মনিটর করুন
+- HashiCorp Vault ইন্টিগ্রেশন: অ্যাপ থেকে টোকেন ফেচ
+- Kubernetes RBAC: Pod-এ শুধু দরকারি অ্যাক্সেস দিন
 
 ## লগিং ও মনিটরিং
 - SSH, sudo, auth log মনিটর করুন
 - Prometheus alert: SSH login spike, container restart
 - Fail2Ban log → email/Discord alert
 - Loki/Grafana: ERROR, WARNING, 5xx spike
+- OSSEC বা Falco: ইনট্রুশন ডিটেকশন
+```bash
+apt install ossec-hids
+```
+- ClamAV: ম্যালওয়্যার স্ক্যান
+```bash
+apt install clamav
+freshclam
+clamscan -r /path
+```
 
 ## অডিট ও ইনসিডেন্ট রেসপন্স
 - `last`, `who`, `journalctl -u ssh`
 - `rkhunter`, `chkrootkit` (রুটকিট স্ক্যান)
+```bash
+apt install rkhunter chkrootkit
+rkhunter --update && rkhunter --check
+```
 - ব্যাকআপ থেকে দ্রুত রিস্টোর প্রস্তুতি
-- Incident response plan লিখে রাখুন
+- Incident response plan লিখে রাখুন: Detection → Containment → Eradication → Recovery → Lessons Learned
+- Lynis অডিট: `lynis audit system`
+
+## ক্লাউড-ভিত্তিক হার্ডেনিং (AWS, GCP)
+### AWS
+- Security Groups: শুধু দরকারি পোর্ট ওপেন
+- IAM Least Privilege: Roles দিয়ে অ্যাক্সেস দিন
+- GuardDuty এনাবল: থ্রেট ডিটেকশন
+- Config Rules: কমপ্লায়েন্স চেক
+```bash
+aws ec2 describe-security-groups
+```
+
+### GCP
+- Firewall Rules: Deny-all default
+- IAM Policies: প্রিন্সিপাল অফ লিস্ট প্রিভিলেজ
+- Security Command Center: ভালনারেবিলিটি স্ক্যান
+- OS Login: SSH কী ম্যানেজ
+```bash
+gcloud compute firewall-rules list
+```
+
+## ডায়াগ্রাম (সিকিউরিটি লেয়ারস)
+```
+┌───────────────────┐
+│   Network (FW)    │
+├───────────────────┤
+│   OS/User/SSH     │
+├───────────────────┤
+│   Container/App   │
+├───────────────────┤
+│   Secrets/Env     │
+├───────────────────┤
+│   Monitoring/Log  │
+└───────────────────┘
+```
+
+## Production টিপস
+- SELinux/AppArmor এনফোর্স মোডে চালান
+- WAF (ModSecurity, Cloudflare) যোগ করুন
+- Regular penetration testing (Nessus, OpenVAS)
+- Zero Trust মডেল: সবকিছু ভেরিফাই করুন
+- Backup encryption: `restic` বা `duplicity`
+- Certificate management: Let's Encrypt auto-renew
+- Disable IPv6 if not needed: `/etc/sysctl.conf` → `net.ipv6.conf.all.disable_ipv6=1`
 
 ## সাধারণ সমস্যা ও সমাধান
 | সমস্যা | কারণ | সমাধান |
@@ -78,6 +178,9 @@ Cloudflare Proxy, VPN, বা security group
 | Port scan | 22/80/443 ছাড়া সব deny | ufw, security group |
 | Container escape | root ইউজার | user: non-root, cap_drop |
 | Secret leak | config গিটে | .gitignore, git-crypt |
+| Malware infection | আপডেট না করা | ClamAV, auto-updates |
+| DDoS attack | No protection | Cloudflare, AWS Shield |
+| Log overflow | No rotation | logrotate config চেক |
 
 ## চেকলিস্ট
 - [ ] SSH only-key, root login off
@@ -88,7 +191,39 @@ Cloudflare Proxy, VPN, বা security group
 - [ ] Regular updates enabled
 - [ ] Monitoring/alerts configured
 - [ ] Restore/incident plan documented
+- [ ] Antivirus/IDS installed
+- [ ] Cloud security rules checked
+- [ ] Audit tools run monthly
+
+## অ্যাডভান্সড টপিকস
+### Mandatory Access Control (MAC)
+- AppArmor: `aa-status`, profiles লোড করুন
+- SELinux: `sestatus`, enforcing মোডে সেট করুন
+```bash
+setenforce 1
+```
+
+### Web Application Firewall (WAF)
+- ModSecurity: Nginx/Apache-এ ইনস্টল
+```bash
+apt install libapache2-mod-security2
+a2enmod security2
+```
+- OWASP CRS rules ডাউনলোড
+
+### Automated Scanning
+- Nikto: Web server স্ক্যান `nikto -h host`
+- ZAP: অটোমেটেড পেনটেস্ট
+
+### ক্রিপ্টোকারেন্সি/ব্লকচেইন সিকিউরিটি (যদি প্রযোজ্য)
+- Wallet hardening: Hardware wallet, multi-sig
+- Smart contract audit: Slither, Mythril
+
+## পরবর্তী
+মনিটরিং ও অ্যালার্টিং: Prometheus, Grafana, Loki → [/self-hosting/monitoring-alerting](/self-hosting/monitoring-alerting)
 
 <Callout type="info">সিকিউরিটি একবারের কাজ নয়—নিয়মিত অডিট, আপডেট ও মনিটরিং চালু রাখুন।</Callout>
 
 <Callout type="success">আপনার সার্ভার এখন প্রোডাকশন-রেডি সিকিউরিটি বেস্ট প্র্যাকটিসে হার্ডেনড।</Callout>
+
+<Callout type="warning">সবসময় least privilege প্রিন্সিপাল ফলো করুন—শুধু যা দরকার তাই অ্যাক্সেস দিন।</Callout>
