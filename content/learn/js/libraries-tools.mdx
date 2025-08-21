@@ -1,0 +1,131 @@
+---
+title: জনপ্রিয় জাভাস্ক্রিপ্ট লাইব্রেরি ও টুলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট ডেভেলপমেন্টে কিছু লাইব্রেরি ও টুলস industry-standard হয়ে গেছে। এই পাঠে Lodash, Moment.js, Axios, ESLint, Prettier—ব্যবহার, সুবিধা, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. Lodash
+
+### কী?
+- Utility library—array/object/string manipulation সহজ করে
+
+### উদাহরণ:
+```js
+import _ from 'lodash';
+const arr = [1, 2, 3, 4];
+const evens = _.filter(arr, n => n % 2 === 0); // [2, 4]
+```
+
+### সুবিধা:
+- Deep clone, debounce, throttle, merge
+- Performance boost
+
+---
+
+## ২. Moment.js
+
+### কী?
+- Date/time manipulation সহজ করে
+
+### উদাহরণ:
+```js
+import moment from 'moment';
+const now = moment().format('YYYY-MM-DD');
+```
+
+### সুবিধা:
+- Parse, format, calculate date/time
+- Human readable output
+
+**Note:** Moment.js deprecated—date-fns, Day.js modern alternative
+
+---
+
+## ৩. Axios
+
+### কী?
+- Promise-based HTTP client—API call সহজ
+
+### উদাহরণ:
+```js
+import axios from 'axios';
+axios.get('https://api.example.com/data')
+  .then(res => console.log(res.data));
+```
+
+### সুবিধা:
+- Request/response interceptors
+- Error handling সহজ
+- Supports async/await
+
+---
+
+## ৪. ESLint
+
+### কী?
+- Linting tool—code quality, bug prevention
+
+### উদাহরণ:
+```bash
+npx eslint yourfile.js
+```
+
+### সুবিধা:
+- Style guide enforce
+- Error/warning highlight
+- Custom rules
+
+---
+
+## ৫. Prettier
+
+### কী?
+- Code formatter—consistent style
+
+### উদাহরণ:
+```bash
+npx prettier --write yourfile.js
+```
+
+### সুবিধা:
+- Auto-format code
+- Team collaboration সহজ
+- Integrate with ESLint
+
+---
+
+## ৬. Real-life Example
+- Production project-এ Lodash দিয়ে data process করুন
+- API fetch-এ Axios ব্যবহার করুন
+- Team project-এ ESLint/Prettier দিয়ে code style maintain করুন
+
+---
+
+## ৭. Analogies
+- Lodash: সুইস আর্মি knife—সব কাজের জন্য
+- Axios: courier service—data আনা-নেয়া
+- ESLint: grammar checker—ভুল ধরার জন্য
+- Prettier: automatic brush—code সুন্দর রাখে
+
+---
+
+## ৮. Security & Performance
+- API call-এ error handling করুন
+- Linting/formatting দিয়ে bug/security issue কমান
+- Deprecated library এড়িয়ে চলুন
+
+---
+
+## ৯. Tips
+- Always check library docs
+- Modern alternative ব্যবহার করুন (e.g., date-fns)
+- VSCode extension install করুন—ESLint, Prettier
+
+---
+
+## ১০. পরবর্তী পাঠ
+
+[Performance tuning ও bundle optimization](/js/performance-tuning)

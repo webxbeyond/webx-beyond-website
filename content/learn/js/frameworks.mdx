@@ -1,0 +1,133 @@
+---
+title: "ফ্রেমওয়ার্কস ওভারভিউ - jQuery থেকে React/Vue/Angular/Svelte"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট ফ্রেমওয়ার্ক—বড়, দ্রুত, ও maintainable অ্যাপ্লিকেশন বানানোর জন্য industry-standard solution। এখানে jQuery, React, Vue, Angular, Svelte নিয়ে সংক্ষিপ্ত ও তুলনামূলক আলোচনা করা হয়েছে।
+
+---
+
+## ১. jQuery
+
+### বৈশিষ্ট্য:
+- DOM manipulation সহজ
+- AJAX, animation, event handling
+- Legacy project-এ বেশি
+
+#### উদাহরণ:
+```js
+$('#btn').click(function() {
+  $('#msg').text('Clicked!');
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি সরল টুলবক্স, যেখানে হাতের কাছে সব টুল আছে।
+
+---
+
+## ২. React
+
+### বৈশিষ্ট্য:
+- Component-based architecture
+- Virtual DOM
+- State management
+- Ecosystem: Redux, Next.js
+
+#### উদাহরণ:
+```jsx
+function App() {
+  const [count, setCount] = React.useState(0);
+  return <button onClick={() => setCount(count+1)}>{count}</button>;
+}
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—লেগো ব্লক, ছোট ছোট অংশ জোড়া দিয়ে বড় structure বানানো।
+
+---
+
+## ৩. Vue
+
+### বৈশিষ্ট্য:
+- Reactive data binding
+- Component-based
+- Simple syntax
+
+#### উদাহরণ:
+```html
+<div id="app">{{ count }}</div>
+<script>
+new Vue({
+  el: '#app',
+  data: { count: 0 }
+});
+</script>
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি সহজ কিট, যেখানে দ্রুত UI বানানো যায়।
+
+---
+
+## ৪. Angular
+
+### বৈশিষ্ট্য:
+- Full-featured framework
+- TypeScript-based
+- Dependency injection
+- Two-way data binding
+
+#### উদাহরণ:
+```ts
+@Component({ selector: 'app-root', template: '<h1>{{title}}</h1>' })
+class AppComponent { title = 'Hello Angular'; }
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি বড় ফ্যাক্টরি, যেখানে সবকিছু built-in আছে।
+
+---
+
+## ৫. Svelte
+
+### বৈশিষ্ট্য:
+- Compile-time framework
+- Minimal runtime
+- Simple syntax
+
+#### উদাহরণ:
+```svelte
+<script>
+  let count = 0;
+</script>
+<button on:click={() => count++}>{count}</button>
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ম্যাজিক কিট, যেখানে কোড কম, পারফরম্যান্স বেশি।
+
+---
+
+## ৬. Practical Tips
+- Project scope অনুযায়ী framework বাছাই করুন
+- React/Vue/Svelte ছোট/মাঝারি app-এ, Angular বড় app-এ
+- Legacy project-এ jQuery
+
+---
+
+## ৭. Security & Performance
+- Framework-এ security best practices অনুসরণ করুন
+- Performance optimize করতে lazy loading, code splitting ব্যবহার করুন
+
+---
+
+## ৮. চ্যালেঞ্জ
+- React/Vue/Svelte-এ simple counter app বানান
+- Angular-এ basic component তৈরি করুন
+
+---
+
+## ৯. পরবর্তী পাঠ
+
+[ফর্ম ভ্যালিডেশন প্রজেক্ট](/js/project-form-validation)

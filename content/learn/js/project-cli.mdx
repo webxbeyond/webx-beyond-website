@@ -1,0 +1,65 @@
+---
+title: "Node.js CLI টুল"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js CLI টুল—automation, custom command, ও utility tool বানানোর জন্য অত্যন্ত কার্যকর। এখানে একটি বাস্তব CLI টুল উদাহরণ, অ্যানালজি, ও সিকিউরিটি টিপস দেয়া হয়েছে।
+
+---
+
+## ১. CLI টুল কী?
+
+CLI (Command Line Interface) টুল—কমান্ড দিয়ে কাজ করানো যায়, যেমন ফাইল read/write, ডাটা প্রসেস, API call ইত্যাদি।
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি রোবট, যাকে কমান্ড দিলে নির্দিষ্ট কাজ করে দেয়।
+
+---
+
+## ২. Basic CLI টুল উদাহরণ
+
+```js
+// greet.js
+const name = process.argv[2];
+console.log(`Hello, ${name || 'User'}!`);
+// Run: node greet.js Anis
+```
+
+---
+
+## ৩. Multiple Argument ও Option
+
+```js
+// math.js
+const [,, op, a, b] = process.argv;
+if (op === 'add') console.log(Number(a) + Number(b));
+if (op === 'sub') console.log(Number(a) - Number(b));
+// Run: node math.js add 5 3
+```
+
+---
+
+## ৪. Practical Tips
+- Argument validation করুন
+- Help message দেখান
+- Async operation (file, API) handle করুন
+
+---
+
+## ৫. Security & Performance
+- User input sanitize করুন
+- Sensitive ডাটা CLI-তে log করবেন না
+- Error handle করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- CLI টুলে multiple command (add, sub, mul, div) যোগ করুন
+- File read/write CLI implement করুন
+- API call CLI implement করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ইন্টারভিউ প্রশ্ন ও উত্তর](/js/interview-questions)

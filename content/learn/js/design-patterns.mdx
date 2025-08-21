@@ -1,0 +1,120 @@
+---
+title: "ডিজাইন প্যাটার্নস - Singleton, Factory, Observer, Proxy"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে ডিজাইন প্যাটার্নস—কোডকে maintainable, scalable, ও reusable করার জন্য industry-standard solution। এখানে Singleton, Factory, Observer, Proxy নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. Singleton Pattern
+
+Singleton—একটি class/object-এর একটাই instance থাকে, বারবার নতুন instance তৈরি হয় না।
+
+### উদাহরণ:
+```js
+class Database {
+  constructor() {
+    if (Database.instance) return Database.instance;
+    Database.instance = this;
+    this.data = [];
+  }
+}
+const db1 = new Database();
+const db2 = new Database();
+console.log(db1 === db2); // true
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি স্কুলে একটাই প্রধান শিক্ষক, সবাই তার কাছে যায়।
+
+---
+
+## ২. Factory Pattern
+
+Factory—একটি function/class, যেটা বিভিন্ন type-এর object তৈরি করে দেয়, details hide করে।
+
+### উদাহরণ:
+```js
+function createUser(type) {
+  if (type === 'admin') return { role: 'admin', access: 'all' };
+  if (type === 'guest') return { role: 'guest', access: 'limited' };
+  return { role: 'user', access: 'basic' };
+}
+const admin = createUser('admin');
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি কারখানা, যেখানে order দিলে বিভিন্ন পণ্য তৈরি হয়।
+
+---
+
+## ৩. Observer Pattern
+
+Observer—একটি object-এর state change হলে, subscribed object-গুলোকে notify করা হয়।
+
+### উদাহরণ:
+```js
+class Subject {
+  constructor() { this.observers = []; }
+  subscribe(fn) { this.observers.push(fn); }
+  notify(data) { this.observers.forEach(fn => fn(data)); }
+}
+const news = new Subject();
+news.subscribe(msg => console.log('Received:', msg));
+news.notify('Breaking News!');
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি রেডিও স্টেশন, announcer কিছু বললে সবাই শুনতে পায়।
+
+---
+
+## ৪. Proxy Pattern
+
+Proxy—একটি object-এর access/control/intercept করার জন্য intermediary object ব্যবহার করা।
+
+### উদাহরণ:
+```js
+const user = { name: 'Anis', age: 22 };
+const proxy = new Proxy(user, {
+  get(target, prop) {
+    if (prop === 'age') return 'Secret';
+    return target[prop];
+  }
+});
+console.log(proxy.name); // Anis
+console.log(proxy.age); // Secret
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি দারোয়ান, যিনি দরজা খুলে দেয়া/বাধা দেন।
+
+---
+
+## ৫. Practical Tips
+- Singleton দিয়ে global state/manage করুন
+- Factory দিয়ে object creation logic hide করুন
+- Observer দিয়ে event-driven architecture তৈরি করুন
+- Proxy দিয়ে sensitive data/control করুন
+
+---
+
+## ৬. Security & Performance
+- Proxy দিয়ে sensitive property protect করুন
+- Observer-এ memory leak এড়াতে unsubscribe করুন
+- Factory/Singelton-এ unnecessary instance creation এড়ান
+
+---
+
+## ৭. চ্যালেঞ্জ
+- Singleton class লিখুন
+- Factory function দিয়ে user তৈরি করুন
+- Observer দিয়ে event notify করুন
+- Proxy দিয়ে property protect করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[মেমরি ম্যানেজমেন্ট ও পারফরম্যান্স অপ্টিমাইজেশন](/js/performance)
