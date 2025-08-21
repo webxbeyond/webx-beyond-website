@@ -1,0 +1,78 @@
+---
+title: সিকিউর কোডিং প্র্যাকটিস
+icon: tabler:lock
+---
+
+# নিরাপদ ব্লকচেইন ও স্মার্ট কন্ট্র্যাক্ট
+
+নিরাপদ ব্লকচেইন অ্যাপ ও স্মার্ট কন্ট্র্যাক্ট তৈরি করতে হলে কিছু গুরুত্বপূর্ণ সিকিউর কোডিং প্র্যাকটিস অনুসরণ করা জরুরি। এই পাঠে আমরা সিকিউরিটি বেস্ট প্র্যাকটিস, সাধারণ ভুল, এবং প্রতিরোধমূলক কৌশল জানব।
+
+## কেন সিকিউর কোডিং?
+
+- **ফান্ড সুরক্ষা:** স্মার্ট কন্ট্র্যাক্টে ভুল থাকলে ফান্ড চুরি হতে পারে
+- **কমিউনিটি ট্রাস্ট:** নিরাপদ কোড কমিউনিটির আস্থা বাড়ায়
+- **রেগুলেশন:** আইনগত বাধা এড়াতে সিকিউরিটি দরকার
+
+## সিকিউর কোডিং-এর মূল নীতিমালা
+
+1. **State Update আগে, External Call পরে:**
+   - রিএন্ট্রান্সি রোধে state update আগে করুন
+2. **Input Validation:**
+   - ইউজার ইনপুট, অ্যাড্রেস, পরিমাণ—সব যাচাই করুন
+3. **Use Latest Solidity Version:**
+   - নতুন ভার্সনে built-in overflow/underflow চেক
+4. **Limit Gas Usage:**
+   - অপ্রয়োজনীয় লুপ, recursion এড়ান
+5. **Access Control:**
+   - `onlyOwner`, `require(msg.sender == admin)` ব্যবহার করুন
+6. **Fail-Safe Defaults:**
+   - ভুল হলে ট্রান্সাকশন revert করুন
+7. **Use Libraries:**
+   - OpenZeppelin, SafeMath, Ownable ইত্যাদি
+8. **Test & Audit:**
+   - ইউনিট টেস্ট, অডিট টুল, peer review
+
+## বাস্তব উদাহরণ ও এনালজি
+
+- **ব্যাংক চেক:** চেক লেখার আগে সাইন, অ্যামাউন্ট যাচাই—কোডেও ইনপুট যাচাই
+- **দরজা লক:** দরজা বন্ধ করার আগে লক—state update আগে
+
+## Solidity কোড ডেমো: সিকিউর ফাংশন
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract SecureFund is Ownable {
+    mapping(address => uint) public balances;
+
+    function deposit() public payable {
+        require(msg.value > 0, "Zero deposit");
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount; // State update আগে
+        (bool sent, ) = msg.sender.call{value: amount}("");
+        require(sent, "Failed");
+    }
+
+    function emergencyWithdraw() public onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
+}
+```
+
+## পারফরম্যান্স ও সিকিউরিটি টিপস
+
+- সর্বদা ইউনিট টেস্ট ও peer review করুন
+- OpenZeppelin লাইব্রেরি ব্যবহার করুন
+- ইনপুট, অ্যাড্রেস, পরিমাণ যাচাই করুন
+- অডিট টুল (Slither, MythX) ব্যবহার করুন
+
+## পরবর্তী পাঠ
+
+[OpenZeppelin লাইব্রেরি](/blockchain/openzeppelin)

@@ -1,0 +1,56 @@
+---
+title: মেইননেটে ডিপ্লয়মেন্ট
+icon: tabler:rocket
+---
+
+Testnet-এ অ্যাপ তৈরি ও পরীক্ষা করার পর, চূড়ান্ত ধাপ হচ্ছে—Mainnet-এ ডিপ্লয়মেন্ট। Mainnet হচ্ছে "রিয়েল" ব্লকচেইন, যেখানে আসল টোকেন, ইউজার, ও ট্রান্সাকশন চলে।
+
+## Mainnet Deployment-এর ধাপ
+
+1. **Smart Contract Audit:** কোডে কোনো vulnerability আছে কি না, তা যাচাই করুন।
+2. **Testnet Validation:** Testnet-এ সব ফিচার, ট্রান্সাকশন, ও ইন্টিগ্রেশন ঠিকভাবে কাজ করছে কি না, নিশ্চিত করুন।
+3. **Gas Optimization:** স্মার্ট কন্ট্র্যাক্টে অপ্রয়োজনীয় লুপ, স্টোরেজ, ও computation কমিয়ে গ্যাস ফি কমান।
+4. **Deployment Preparation:** Mainnet-এর জন্য RPC, Wallet, ও Deployment Script প্রস্তুত করুন।
+5. **Deploy:** স্মার্ট কন্ট্র্যাক্ট Mainnet-এ ডিপ্লয় করুন।
+6. **Verify Contract:** Etherscan বা সংশ্লিষ্ট explorer-এ কন্ট্র্যাক্ট verify করুন।
+7. **Announce & Monitor:** ইউজারদের জানিয়ে দিন, এবং contract/activity মনিটর করুন।
+
+## Deployment Tools
+
+- **Remix IDE:** সহজভাবে contract deploy করা যায়।
+- **Hardhat/Truffle:** Professional workflow, script-based deployment, verification, monitoring।
+- **Ethers.js/Web3.js:** Custom deployment ও interaction script লিখতে পারেন।
+
+### Solidity Deployment (Hardhat Example)
+
+```javascript
+// deploy.js
+const { ethers } = require("hardhat");
+async function main() {
+  const Contract = await ethers.getContractFactory("MyContract");
+  const contract = await Contract.deploy();
+  await contract.deployed();
+  console.log("Contract deployed at:", contract.address);
+}
+main();
+```
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- **Private Key Security:** Mainnet-এ deploy করার সময় private key leak হলে বড় ক্ষতি হতে পারে। Hardware wallet ব্যবহার করুন।
+- **Gas Fee Calculation:** Mainnet-এ গ্যাস ফি বেশি হতে পারে, তাই deploy করার আগে estimate করুন।
+- **Contract Verification:** Contract verify করলে transparency বাড়ে, ইউজার আস্থা পায়।
+- **Monitoring:** Contract deploy করার পর activity, logs, ও events মনিটর করুন।
+
+## বাস্তব উদাহরণ ও Analogies
+
+- **Testnet vs Mainnet = Practice Match vs International Match:** Testnet-এ সবকিছু পরীক্ষা, Mainnet-এ "আসল খেলা"।
+- **App Launch:** যেমন Play Store-এ অ্যাপ লঞ্চ করার আগে beta test হয়, তেমনি Mainnet-এ deploy করার আগে Testnet-এ পরীক্ষা করা হয়।
+
+## ভবিষ্যৎ
+
+Mainnet-এ deploy করার আগে security, optimization, ও user experience নিশ্চিত করুন। ভবিষ্যতে deployment আরও সহজ, automated, ও secure হবে।
+
+---
+
+**পরবর্তী পাঠ:** [ডিসেন্ট্রালাইজড স্টোরেজে ফ্রন্টএন্ড হোস্টিং (IPFS, Arweave, Fleek)](/blockchain/decentralized-hosting)

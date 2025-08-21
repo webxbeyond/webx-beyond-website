@@ -1,0 +1,55 @@
+---
+title: "স্মার্ট কন্ট্র্যাক্ট অডিটিং টুলস: Slither, MythX"
+icon: tabler:search
+---
+
+নিরাপদ স্মার্ট কন্ট্র্যাক্ট তৈরি করতে অডিটিং টুল ব্যবহার করা অত্যন্ত গুরুত্বপূর্ণ। Slither ও MythX হচ্ছে দুইটি জনপ্রিয়, শক্তিশালী অডিটিং টুল, যা স্মার্ট কন্ট্র্যাক্টের ভলনারেবিলিটি, বাগ, এবং নিরাপত্তা সমস্যা খুঁজে বের করতে সাহায্য করে।
+
+## Slither কী?
+
+- **Static Analysis Tool:** Solidity কোড অ্যানালাইসিস করে
+- **ভলনারেবিলিটি ডিটেকশন:** রিএন্ট্রান্সি, ওভারফ্লো, ফ্রন্টরানিং, অপ্রয়োজনীয় লুপ ইত্যাদি
+- **রিপোর্ট:** সহজে পড়া যায় এমন রিপোর্ট তৈরি করে
+- **ইনস্টল:**
+  ```bash
+  pip install slither-analyzer
+  ```
+- **রান:**
+  ```bash
+  slither contracts/MyContract.sol
+  ```
+
+## MythX কী?
+
+- **Cloud-based Security Analysis:** Solidity কোডের জন্য
+- **ভলনারেবিলিটি স্ক্যান:** রিএন্ট্রান্সি, ওভারফ্লো, ফ্রন্টরানিং, access control ইত্যাদি
+- **API ও IDE Integration:** Remix, Truffle, Hardhat-এ ইন্টিগ্রেট করা যায়
+- **রান:**
+  - Remix IDE-তে MythX plugin ব্যবহার করুন
+  - Truffle/Hardhat-এ MythX integration
+
+## বাস্তব উদাহরণ ও এনালজি
+
+- **Antivirus Scan:** যেমন কম্পিউটারে ভাইরাস স্ক্যান করা হয়, স্মার্ট কন্ট্র্যাক্টে Slither/MythX দিয়ে ভলনারেবিলিটি স্ক্যান
+- **গাড়ির ইন্সপেকশন:** গাড়ি চালানোর আগে ইন্সপেকশন—কোড ডিপ্লয় করার আগে অডিট
+
+## পারফরম্যান্স ও সিকিউরিটি টিপস
+
+- ডিপ্লয় করার আগে সর্বদা অডিট টুল দিয়ে কোড স্ক্যান করুন
+- Slither দিয়ে স্ট্যাটিক অ্যানালাইসিস, MythX দিয়ে ডিপ স্ক্যান করুন
+- রিপোর্ট পড়ে ফিক্স করুন, peer review করুন
+- অডিট রিপোর্ট সংরক্ষণ করুন—কমিউনিটির আস্থা বাড়াতে
+
+## Python কোড ডেমো: Slither রান
+
+```python
+import subprocess
+
+# Solidity কন্ট্র্যাক্ট অডিট
+result = subprocess.run(["slither", "contracts/MyContract.sol"], capture_output=True, text=True)
+print(result.stdout)
+```
+
+## পরবর্তী পাঠ
+
+[ব্লকচেইন প্রাইভেসি: zk-SNARKs, zk-STARKs](/blockchain/privacy)

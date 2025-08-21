@@ -1,0 +1,75 @@
+---
+title: ডিসেন্ট্রালাইজড স্টোরেজে ফ্রন্টএন্ড হোস্টিং (IPFS, Arweave, Fleek)
+icon: tabler:cloud-upload
+---
+
+ব্লকচেইন অ্যাপ্লিকেশন শুধু স্মার্ট কন্ট্র্যাক্ট নয়—ফ্রন্টএন্ডও ইউজারদের জন্য গুরুত্বপূর্ণ। সাধারণত ফ্রন্টএন্ড হোস্টিং হয় সেন্ট্রালাইজড সার্ভারে (যেমন—AWS, Netlify)। কিন্তু ডিসেন্ট্রালাইজড স্টোরেজে ফ্রন্টএন্ড হোস্ট করলে censorship-resistance, security, ও availability বাড়ে।
+
+## ডিসেন্ট্রালাইজড স্টোরেজ কী?
+
+- **IPFS (InterPlanetary File System):** Peer-to-peer ফাইল স্টোরেজ, যেখানে ফাইলের content hash দিয়ে access হয়।
+- **Arweave:** "Permaweb"—একবার ফাইল আপলোড করলে চিরকাল থাকবে।
+- **Fleek:** IPFS/Arweave-এর উপর সহজ ও automated হোস্টিং প্ল্যাটফর্ম।
+
+## IPFS-এ ফ্রন্টএন্ড হোস্টিং
+
+1. **Build Project:** React/Vue/Next.js অ্যাপ build করুন।
+2. **Install IPFS CLI:**
+   ```bash
+   npm install -g ipfs
+   ```
+3. **Initialize IPFS Node:**
+   ```bash
+   ipfs init
+   ipfs daemon
+   ```
+4. **Add Files:**
+   ```bash
+   ipfs add -r build/
+   ```
+5. **Get CID:** CID (Content Identifier) পাবেন, সেটি দিয়ে অ্যাপ access করা যাবে।
+
+## Arweave-এ ফ্রন্টএন্ড হোস্টিং
+
+1. **Build Project:** অ্যাপ build করুন।
+2. **Use Arweave Deploy Tools:**
+   ```bash
+   npm install -g arweave-deploy
+   arweave-deploy build/
+   ```
+3. **Permaweb:** একবার আপলোড করলে ফাইল চিরকাল থাকবে।
+
+## Fleek-এ ফ্রন্টএন্ড হোস্টিং
+
+- Fleek-এ GitHub repo connect করুন, build settings দিন, IPFS/Arweave-এ deploy করুন।
+- Custom domain, SSL, ও continuous deployment সুবিধা পাবেন।
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- **Immutable Hosting:** IPFS/Arweave-এ ফাইল একবার আপলোড হলে পরিবর্তন করা যায় না—নতুন version আপলোড করতে হয়।
+- **Pinning:** IPFS-এ ফাইল pin না করলে garbage collection-এ মুছে যেতে পারে। Pinning service ব্যবহার করুন।
+- **Gateway:** IPFS gateway (ipfs.io, cloudflare-ipfs.com) দিয়ে ইউজাররা সহজে access করতে পারে।
+- **Performance:** CDN বা gateway cache ব্যবহার করুন, যাতে লোডিং দ্রুত হয়।
+
+## বাস্তব উদাহরণ ও Analogies
+
+- **Google Drive vs IPFS:** Google Drive-এ ফাইল সেন্ট্রাল সার্ভারে, IPFS-এ peer-to-peer নেটওয়ার্কে।
+- **Permanent Library:** Arweave-এ ফাইল একবার আপলোড করলে "permanent library"-এর মতো চিরকাল থাকবে।
+
+## Python-অনুরূপ IPFS Add
+
+```python
+def ipfs_add(file):
+    cid = hash(file)
+    print(f"File added to IPFS with CID: {cid}")
+
+ipfs_add("index.html")
+```
+
+## ভবিষ্যৎ
+
+ডিসেন্ট্রালাইজড স্টোরেজে ফ্রন্টএন্ড হোস্টিং—ওয়েবের ভবিষ্যৎ। censorship-resistance, security, ও global availability নিশ্চিত হবে।
+
+---
+
+**পরবর্তী পাঠ:** [ENS ডোমেইন ব্যবহার](/blockchain/ens)

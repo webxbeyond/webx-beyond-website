@@ -1,0 +1,61 @@
+---
+title: ENS ডোমেইন ব্যবহার
+icon: tabler:world
+---
+
+Ethereum Name Service (ENS) হচ্ছে ব্লকচেইনের "ডোমেইন নাম" সিস্টেম। ঠিক যেমন www.example.com সহজে মনে রাখা যায়, তেমনি ENS-এ আপনি আপনার Ethereum address-এর জন্য সহজ নাম (যেমন—anis.eth) ব্যবহার করতে পারেন।
+
+## ENS কীভাবে কাজ করে?
+
+- **Mapping:** ENS smart contract Ethereum address-এর সাথে human-readable নাম ম্যাপ করে।
+- **Resolution:** কেউ anis.eth লিখলে, ENS contract থেকে সংশ্লিষ্ট address বের করে দেয়।
+- **Subdomain:** ENS-এ subdomain (blog.anis.eth) তৈরি করা যায়।
+
+## ENS ডোমেইন কেন ব্যবহার করবেন?
+
+- **User Friendly:** Ethereum address অনেক বড় ও জটিল—ENS নাম সহজে মনে রাখা যায়।
+- **Branding:** dApp, wallet, বা NFT collection-এর জন্য ব্র্যান্ডেড নাম ব্যবহার করা যায়।
+- **Interoperability:** ENS নাম wallet, dApp, exchange—সব জায়গায় ব্যবহার করা যায়।
+
+## ENS ডোমেইন কিভাবে কিনবেন?
+
+1. **Visit app.ens.domains:** ENS-এর অফিসিয়াল dApp-এ যান।
+2. **Search Name:** আপনার পছন্দের নাম খুঁজুন (যেমন—anis.eth)।
+3. **Register:** Wallet connect করে, গ্যাস ফি দিয়ে নাম রেজিস্টার করুন।
+4. **Set Address:** ENS contract-এ আপনার Ethereum address সেট করুন।
+
+## ENS ডোমেইন ব্যবহার
+
+- **Wallet Receive:** anis.eth-এ ETH, ERC-20, NFT পাঠানো যায়।
+- **dApp Integration:** dApp-এ ENS নাম দিয়ে লগইন, ট্রান্সফার, বা contract interaction করা যায়।
+- **Website Hosting:** ENS নাম দিয়ে IPFS-এ হোস্ট করা ওয়েবসাইট access করা যায়।
+
+### ENS Resolution (Python-অনুরূপ কোড)
+
+```python
+def ens_resolve(name):
+    ens_map = {"anis.eth": "0x1234...abcd"}
+    return ens_map.get(name, "Not found")
+
+address = ens_resolve("anis.eth")
+print(f"Address for anis.eth: {address}")
+```
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- **Renewal:** ENS নাম renew করতে ভুলবেন না—expire হলে অন্য কেউ নিতে পারে।
+- **Phishing:** ENS নামের বানান ভুল হলে ফিশিং address হতে পারে—সতর্ক থাকুন।
+- **Ownership:** ENS contract-এ owner address verify করুন।
+
+## বাস্তব উদাহরণ ও Analogies
+
+- **Phonebook:** ENS হচ্ছে Ethereum-এর phonebook—নাম দিয়ে address খুঁজে পাওয়া যায়।
+- **Website Domain:** যেমন example.com, তেমনি anis.eth—ব্র্যান্ডিং ও সহজ ব্যবহার।
+
+## ভবিষ্যৎ
+
+ENS ডোমেইন—ওয়েব৩-এর পরিচয়, ব্র্যান্ডিং, ও ইউজার এক্সপেরিয়েন্সের ভবিষ্যৎ। dApp, wallet, ও decentralized web-এ ENS নামের ব্যবহার বাড়বে।
+
+---
+
+**পরবর্তী পাঠ:** [ইউজার অনবোর্ডিং ও ট্রান্সাকশন অপটিমাইজেশন](/blockchain/user-onboarding)

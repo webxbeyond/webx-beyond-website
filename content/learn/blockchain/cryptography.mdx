@@ -1,0 +1,76 @@
+---
+title: "ক্রিপ্টোগ্রাফি বেসিকস: হ্যাশ, কী, সিগনেচার"
+icon: tabler:blocks
+---
+
+ব্লকচেইন নিরাপত্তার মূল—cryptography। এই পাঠে হ্যাশ, কী, ও ডিজিটাল সিগনেচার কীভাবে কাজ করে, কেন গুরুত্বপূর্ণ, এবং বাস্তব উদাহরণ ও analogy দিয়ে ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ১. হ্যাশ (Hash)
+- Input data থেকে fixed-length output (hash)
+- One-way—input থেকে output, output থেকে input সম্ভব নয়
+- Example: SHA-256, SHA-3
+
+### উদাহরণ:
+- Bitcoin block-এর hash
+- Password hash—database-এ store
+
+---
+
+## ২. কী (Key)
+- Public key: সবাই দেখতে পারে
+- Private key: শুধু owner জানে
+- Asymmetric cryptography—public/private key pair
+- Example: RSA, ECDSA
+
+### উদাহরণ:
+- Bitcoin/Ethereum address—public key
+- Wallet—private key দিয়ে sign
+
+---
+
+## ৩. ডিজিটাল সিগনেচার (Digital Signature)
+- Private key দিয়ে data sign
+- Public key দিয়ে verify
+- Authenticity, integrity, non-repudiation
+
+### উদাহরণ:
+- Transaction sign—owner ছাড়া কেউ পাঠাতে পারে না
+- Smart contract deploy—owner verify
+
+---
+
+## ৪. Analogy: তালা ও চাবি
+- Hash: তালা—একবার লাগালে খোলা যায় না
+- Public key: তালার অবস্থান—সবাই দেখতে পারে
+- Private key: চাবি—শুধু মালিক জানে
+- Signature: চাবি দিয়ে তালা খোলা—owner ছাড়া কেউ পারে না
+
+---
+
+## ৫. Security & Impact
+- Hash—tamper-proof, data integrity
+- Key—ownership, authentication
+- Signature—proof of action
+
+---
+
+## ৬. Visualization
+```
+Data → Hash → Blockchain
+Data + Private Key → Signature → Verify (Public Key)
+```
+
+---
+
+## ৭. Tips
+- Private key কখনো শেয়ার করবেন না
+- Strong password/hash algorithm ব্যবহার করুন
+- Signature verify করুন—transaction, contract
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[পাবলিক বনাম প্রাইভেট ব্লকচেইন](/blockchain/public-vs-private)

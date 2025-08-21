@@ -1,0 +1,90 @@
+---
+title: "কমন ভলনারেবিলিটি: রিএন্ট্রান্সি, ওভারফ্লো, ফ্রন্টরানিং"
+icon: tabler:shield-off
+---
+
+ব্লকচেইন ও স্মার্ট কন্ট্র্যাক্টে কিছু সাধারণ নিরাপত্তা দুর্বলতা (vulnerability) আছে, যেগুলো না বুঝলে বড় ক্ষতি হতে পারে। এই পাঠে আমরা তিনটি গুরুত্বপূর্ণ ভলনারেবিলিটি—রিএন্ট্রান্সি, ওভারফ্লো, ফ্রন্টরানিং—বিস্তারিতভাবে জানব।
+
+## ১. রিএন্ট্রান্সি (Reentrancy)
+
+- **কি:** একটি ফাংশন একাধিকবার (recursively) এক্সিকিউট হয়, ফলে ফান্ড চুরি হতে পারে।
+- **বাস্তব উদাহরণ:** DAO Hack (2016)—$60M চুরি হয়েছিল।
+- **এনালজি:** কাউকে টাকা দিতে গিয়ে বারবার একই রিকোয়েস্টে টাকা পাঠানো—ব্যাংক অ্যাকাউন্টে বারবার ডেবিট।
+- **কোড ডেমো:**
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Vulnerable {
+    mapping(address => uint) public balances;
+
+    function withdraw() public {
+        uint amount = balances[msg.sender];
+        if (amount > 0) {
+            (bool sent, ) = msg.sender.call{value: amount}("");
+            require(sent, "Failed");
+            balances[msg.sender] = 0; // Vulnerable: state update after external call
+        }
+    }
+}
+```
+
+- **সমাধান:** state update আগে করুন, external call পরে।
+
+## ২. ওভারফ্লো (Overflow)
+
+- **কি:** ভেরিয়েবল সীমা ছাড়িয়ে গেলে ভুল মান তৈরি হয়, ফলে ফান্ড চুরি বা ভুল হিসাব হতে পারে।
+- **বাস্তব উদাহরণ:** Parity Multisig Bug (2017)
+- **এনালজি:** ক্যালকুলেটরে ৯৯৯৯৯৯৯৯৯ + ১ দিলে আবার ০ হয়ে যায়।
+- **কোড ডেমো:**
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract OverflowDemo {
+    uint8 public value = 255;
+    function add(uint8 x) public {
+        value += x; // 255 + 1 = 0 (overflow)
+    }
+}
+```
+
+- **সমাধান:** Solidity 0.8+ এ overflow/underflow অটো চেক হয়। পুরনো ভার্সনে SafeMath ব্যবহার করুন।
+
+## ৩. ফ্রন্টরানিং (Frontrunning)
+
+- **কি:** কেউ আপনার ট্রান্সাকশন ব্লকে যোগ হওয়ার আগে নিজের ট্রান্সাকশন পাঠিয়ে লাভবান হয়।
+- **বাস্তব উদাহরণ:** DEX-এ ট্রেডিং, NFT মিন্টিং—বট আগে ট্রান্সাকশন পাঠিয়ে লাভ করে।
+- **এনালজি:** দোকানে কেউ আগে লাইনে এসে সস্তা পণ্য কিনে নেয়।
+- **কোড ডেমো:**
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Auction {
+    uint public highestBid;
+    address public winner;
+
+    function bid() public payable {
+        require(msg.value > highestBid, "Low bid");
+        highestBid = msg.value;
+        winner = msg.sender;
+    }
+}
+```
+
+- **সমাধান:** commit-reveal, randomization, gas fee optimization ব্যবহার করুন।
+
+## পারফরম্যান্স ও সিকিউরিটি টিপস
+
+- external call করার আগে state update করুন
+- Solidity 0.8+ ব্যবহার করুন—overflow/underflow অটো চেক
+- ফ্রন্টরানিং রোধে commit-reveal, randomization, এবং gas fee optimization ব্যবহার করুন
+- OpenZeppelin লাইব্রেরি ও অডিট টুল ব্যবহার করুন
+
+## পরবর্তী পাঠ
+
+[সিকিউর কোডিং প্র্যাকটিস](/blockchain/secure-coding)

@@ -1,0 +1,61 @@
+---
+title: Proof of Authority (PoA)
+icon: tabler:certificate
+---
+
+Proof of Authority (PoA) হল ব্লকচেইনের একটি কনসেনসাস অ্যালগরিদম, যেখানে নির্দিষ্ট কিছু "authority" বা বিশ্বাসযোগ্য ব্যক্তি/সংস্থা ব্লক তৈরি ও ভেরিফাই করার ক্ষমতা পায়। Private, consortium, ও permissioned ব্লকচেইনে PoA বেশি ব্যবহৃত হয়।
+
+## PoA কী?
+
+PoA-তে ব্লক তৈরি ও যাচাই করার জন্য নির্দিষ্ট কিছু "authority node" নির্বাচন করা হয়। এরা পরিচিত, বিশ্বাসযোগ্য, ও নিয়মিত যাচাই করা হয়।
+
+- **Authority node:** নির্দিষ্ট ব্যক্তি/সংস্থা
+- **Permissioned network:** সবাই ব্লক তৈরি করতে পারে না
+- **ফাস্ট ও স্কেলেবল:** কম সময়ে বেশি ট্রান্সাকশন
+
+## PoA-এর ধাপসমূহ
+
+1. **Authority নির্বাচন:** পরিচিত ও বিশ্বাসযোগ্য ব্যক্তি/সংস্থা
+2. **ব্লক প্রপোজাল:** Authority node ব্লক তৈরি করে
+3. **ভেরিফিকেশন:** অন্য authority node যাচাই করে
+4. **রিওয়ার্ড:** Authority node পুরস্কার পায়
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, একটি ব্যাংকে শুধু নির্দিষ্ট কর্মকর্তারা চেক সাইন করতে পারেন। সাধারণ গ্রাহক চেক সাইন করতে পারে না—এটাই "authority"।
+
+## PoA-এর সুবিধা
+
+- **ফাস্ট ব্লক টাইম**
+- **স্কেলেবিলিটি**
+- **কম এনার্জি খরচ**
+- **নিয়ন্ত্রিত ও নিরাপদ**
+
+## PoA-এর অসুবিধা
+
+- **কেন্দ্রীকরণ ঝুঁকি**
+- **বিশ্বাসযোগ্যতার উপর নির্ভরতা**
+- **কম ডিসেন্ট্রালাইজেশন**
+
+## কোড উদাহরণ: PoA ব্লক ভেরিফিকেশন
+
+```python
+# PoA ব্লক ভেরিফিকেশন
+authority_nodes = ['Bank1', 'Bank2', 'Bank3']
+
+block_proposer = 'Bank2'
+if block_proposer in authority_nodes:
+    print(f"Block accepted from {block_proposer}")
+else:
+    print("Block rejected: Not an authority node")
+```
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- Authority node নির্বাচন স্বচ্ছ ও নিয়মিত করুন
+- Permissioned নেটওয়ার্কে access control বজায় রাখুন
+- কেন্দ্রীকরণ এড়াতে multiple authority node ব্যবহার করুন
+
+## পরবর্তী পাঠ
+
+[Byzantine Fault Tolerance (BFT)](/blockchain/bft)
