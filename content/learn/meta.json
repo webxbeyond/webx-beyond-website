@@ -1,7 +1,10 @@
 {
   "pages": [
-    "html-css",
+    "js",
     "git",
+    "system-design",
+    "python",
+    "pytorch",
     "cheatsheet",
     "nodejs",
     "api",
