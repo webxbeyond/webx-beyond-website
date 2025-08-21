@@ -1,0 +1,121 @@
+---
+title: আধুনিক OOP - class, extends, super, প্রাইভেট ফিল্ডস
+slug: es6-classes
+---
+
+ES6 থেকে জাভাস্ক্রিপ্টে এসেছে আধুনিক OOP—`class`, `extends`, `super`, এবং প্রাইভেট ফিল্ডস। এই পাঠে আমরা দেখব কীভাবে ক্লাস তৈরি, ইনহেরিটেন্স, এবং ডাটা নিরাপদ রাখা যায়।
+
+## ১. `class` সিনট্যাক্স
+
+- ক্লাস দিয়ে অবজেক্টের "ব্লুপ্রিন্ট" তৈরি
+
+```js
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  greet() {
+    console.log(`Hello, ${this.name}`);
+  }
+}
+const p1 = new Person("Anis", 22);
+p1.greet(); // "Hello, Anis"
+```
+
+## ২. ইনহেরিটেন্স: `extends` ও `super`
+
+- এক ক্লাস থেকে অন্য ক্লাস "পুনঃব্যবহার"
+
+```js
+class Student extends Person {
+  constructor(name, age, roll) {
+    super(name, age); // Parent constructor
+    this.roll = roll;
+  }
+  showRoll() {
+    console.log(`Roll: ${this.roll}`);
+  }
+}
+const s1 = new Student("Rahim", 20, 101);
+s1.greet(); // "Hello, Rahim"
+s1.showRoll(); // "Roll: 101"
+```
+
+## ৩. প্রাইভেট ফিল্ডস
+
+- `#` দিয়ে প্রাইভেট ফিল্ড
+- বাইরে থেকে অ্যাক্সেস করা যায় না
+
+```js
+class BankAccount {
+  #balance = 0;
+  constructor(owner) {
+    this.owner = owner;
+  }
+  deposit(amount) {
+    this.#balance += amount;
+  }
+  getBalance() {
+    return this.#balance;
+  }
+}
+const acc = new BankAccount("Anis");
+acc.deposit(500);
+console.log(acc.getBalance()); // 500
+// console.log(acc.#balance); // Error
+```
+
+## ৪. স্ট্যাটিক মেথড ও ফিল্ড
+
+- ক্লাসের জন্য, অবজেক্টের জন্য নয়
+
+```js
+class MathUtil {
+  static add(a, b) {
+    return a + b;
+  }
+}
+console.log(MathUtil.add(2, 3)); // 5
+```
+
+## ৫. বাস্তব উদাহরণ ও Analogies
+
+- **class = "ফ্যাক্টরি ব্লুপ্রিন্ট"**
+- **extends = "পুরনো ব্লুপ্রিন্ট থেকে নতুন তৈরি"**
+- **super = "পুরনো ফ্যাক্টরির কাজ ডাকা"**
+- **প্রাইভেট ফিল্ড = "ফ্যাক্টরির গোপন ঘর"**
+
+## ৬. সাধারণ ভুল ও সমাধান
+
+- **super() না কল করলে parent property missing**
+- **প্রাইভেট ফিল্ডে বাইরে থেকে অ্যাক্সেস**
+- **স্ট্যাটিক মেথডে this ব্যবহার** (স্ট্যাটিকে this ক্লাসকে নির্দেশ করে)
+
+## ৭. চ্যালেঞ্জ
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a sound`);
+  }
+}
+class Dog extends Animal {
+  speak() {
+    console.log(`${this.name} barks`);
+  }
+}
+const d = new Dog("Tommy");
+d.speak(); // "Tommy barks"
+```
+
+## উপসংহার
+
+আধুনিক OOP আয়ত্ত করলে, জাভাস্ক্রিপ্টে ক্লাসিক্যাল ও আধুনিক ইনহেরিটেন্স, ডাটা নিরাপত্তা, এবং কোড পুনঃব্যবহার সহজ হয়।
+
+---
+
+পরবর্তী পাঠ: [অবজেক্ট ইউটিলিটি মেথডস -`Object.assign`, ডেস্ট্রাকচারিং, স্প্রেড/রেস্ট](/js/object-utilities)

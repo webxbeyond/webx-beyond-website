@@ -1,0 +1,118 @@
+---
+title: "DOM ও BOM বেসিকস - লিগেসি বনাম আধুনিক API"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে ওয়েব পেজের সাথে ইন্টারঅ্যাক্ট করার জন্য সবচেয়ে গুরুত্বপূর্ণ দুটি টার্ম হলো DOM (Document Object Model) ও BOM (Browser Object Model)। এই পাঠে আমরা বুঝব, কীভাবে ব্রাউজার আমাদের কোডকে "জীবন্ত" করে তোলে, এবং কীভাবে DOM ও BOM ব্যবহার করে পেজের কন্টেন্ট ও ব্রাউজার ফিচার নিয়ন্ত্রণ করা যায়।
+
+---
+
+## ১. DOM (Document Object Model) কী?
+
+DOM হলো ব্রাউজার দ্বারা তৈরি একটি "ট্রি" স্ট্রাকচার, যেখানে প্রতিটি HTML এলিমেন্ট একটি "নোড" হিসেবে থাকে। আপনি DOM ব্যবহার করে পেজের যেকোনো অংশ পড়তে, পরিবর্তন করতে, বা নতুন কিছু যোগ করতে পারেন।
+
+### উদাহরণ:
+```html
+<body>
+  <h1>স্বাগতম!</h1>
+  <p>এটি একটি ডেমো পেজ।</p>
+</body>
+```
+
+এই HTML-এর DOM tree:
+- Document
+  - Body
+    - H1
+    - P
+
+### কোড:
+```js
+const heading = document.querySelector('h1');
+heading.textContent = "জাভাস্ক্রিপ্টে স্বাগতম!";
+```
+
+#### অ্যানালজি:
+DOM অনেকটা লাইব্রেরির বইয়ের ক্যাটালগের মতো—যেখানে প্রতিটি বই (এলিমেন্ট) খুঁজে পাওয়া যায়, পড়া যায়, এমনকি নতুন বই যোগ করা যায়।
+
+---
+
+## ২. BOM (Browser Object Model) কী?
+
+BOM হলো ব্রাউজারের "বাইরের" ফিচার—যেমন window, navigator, location, history ইত্যাদি। DOM শুধু পেজের কন্টেন্ট নিয়ন্ত্রণ করে, BOM দিয়ে আপনি ব্রাউজারের ফিচার নিয়ন্ত্রণ করতে পারেন।
+
+### উদাহরণ:
+```js
+// Window size
+console.log(window.innerWidth, window.innerHeight);
+
+// URL location
+console.log(window.location.href);
+
+// Browser info
+console.log(navigator.userAgent);
+```
+
+#### অ্যানালজি:
+BOM অনেকটা বাসার বাইরের পরিবেশ—যেখানে আপনি দরজা খুলে বাইরে যেতে পারেন, ঠিকানা দেখতে পারেন, বা ইতিহাস জানতে পারেন।
+
+---
+
+## ৩. লিগেসি বনাম আধুনিক API
+
+### লিগেসি API:
+আগে DOM ম্যানিপুলেশনের জন্য `getElementById`, `getElementsByClassName`, `getElementsByTagName` ব্যবহার হতো।
+
+```js
+const para = document.getElementById('myPara');
+```
+
+### আধুনিক API:
+এখন `querySelector` ও `querySelectorAll` ব্যবহার করা হয়—এগুলো CSS সিলেক্টরের মতো কাজ করে।
+
+```js
+const para = document.querySelector('#myPara');
+const allParas = document.querySelectorAll('p');
+```
+
+#### পার্থক্য:
+- লিগেসি API শুধু নির্দিষ্ট টাইপের এলিমেন্ট খুঁজে পায়।
+- আধুনিক API দিয়ে যেকোনো CSS সিলেক্টর ব্যবহার করা যায়, কোড সংক্ষিপ্ত ও শক্তিশালী হয়।
+
+---
+
+## ৪. DOM ও BOM-এর ব্যবহারিক দিক
+
+### DOM:
+- কন্টেন্ট পড়া/পরিবর্তন: `element.textContent`, `element.innerHTML`
+- এলিমেন্ট তৈরি/মুছে ফেলা: `document.createElement`, `element.remove()`
+- ক্লাস/স্টাইল পরিবর্তন: `element.classList`, `element.style`
+
+### BOM:
+- পেজ রিডাইরেক্ট: `window.location.href = 'https://example.com'`
+- ব্রাউজার ইতিহাস: `window.history.back()`
+- ব্রাউজার ডায়ালগ: `window.alert('Hello!')`
+
+---
+
+## ৫. রিয়েল লাইফ উদাহরণ
+
+### ১. DOM দিয়ে টুডু লিস্ট অ্যাপ:
+- ইউজার ইনপুট নিয়ে নতুন টাস্ক DOM-এ যোগ করা
+- টাস্ক ডিলিট করলে DOM থেকে এলিমেন্ট রিমুভ
+
+### ২. BOM দিয়ে ইউজার লোকেশন চেক:
+- ইউজার কোন পেজে আছে, তা BOM দিয়ে জানা
+- ইউজার ব্রাউজার/ডিভাইস চেক করে কাস্টম ফিচার দেখানো
+
+---
+
+## ৬. চ্যালেঞ্জ
+
+- একটি বাটন ক্লিক করলে পেজের ব্যাকগ্রাউন্ড কালার DOM দিয়ে পরিবর্তন করুন।
+- BOM ব্যবহার করে ইউজারের ব্রাউজার নাম দেখান।
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[DOM ম্যানিপুলেশন - এলিমেন্ট তৈরি, স্টাইল পরিবর্তন, ক্লাস ম্যানেজমেন্ট](/js/dom-manipulation)

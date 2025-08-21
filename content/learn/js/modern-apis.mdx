@@ -1,0 +1,122 @@
+---
+title: "আধুনিক API - fetch, localStorage, IndexedDB, Clipboard"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে আধুনিক API—ব্রাউজার ও অ্যাপ্লিকেশনকে আরও শক্তিশালী ও ইন্টারঅ্যাকটিভ করে তোলে। এখানে fetch, localStorage, IndexedDB, Clipboard API নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. fetch API
+
+fetch API দিয়ে সহজেই HTTP request পাঠানো যায়—AJAX-এর আধুনিক বিকল্প।
+
+### উদাহরণ:
+```js
+fetch('https://api.example.com/data')
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডাকপিয়ন, যাকে ঠিকানা দিলে সে তথ্য নিয়ে আসে।
+
+**ব্যবহার:**
+- API call
+- Data fetch
+- File upload/download
+
+---
+
+## ২. localStorage
+
+localStorage—ব্রাউজারে key-value pair হিসেবে ডাটা স্টোর করে, page reload হলেও ডাটা থাকে।
+
+### উদাহরণ:
+```js
+localStorage.setItem('theme', 'dark');
+const theme = localStorage.getItem('theme');
+localStorage.removeItem('theme');
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ছোট ডায়েরি, যেখানে তথ্য লিখে রাখা যায়, browser বন্ধ হলেও থাকে।
+
+**ব্যবহার:**
+- User preference
+- Session management
+
+---
+
+## ৩. IndexedDB
+
+IndexedDB—ব্রাউজারে বড় ও complex ডাটা স্টোর করার জন্য database API।
+
+### উদাহরণ:
+```js
+const request = indexedDB.open('myDB', 1);
+request.onupgradeneeded = event => {
+  const db = event.target.result;
+  db.createObjectStore('users', { keyPath: 'id' });
+};
+request.onsuccess = event => {
+  const db = event.target.result;
+  // transaction, add/get data
+};
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি লাইব্রেরি, যেখানে বই (ডাটা) index করে রাখা যায়, দ্রুত খুঁজে পাওয়া যায়।
+
+**ব্যবহার:**
+- Offline app
+- Large data storage
+
+---
+
+## ৪. Clipboard API
+
+Clipboard API দিয়ে ব্রাউজার থেকে copy/paste করা যায়—user interaction সহজ হয়।
+
+### উদাহরণ:
+```js
+navigator.clipboard.writeText('Hello World');
+navigator.clipboard.readText().then(text => console.log(text));
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি clipboard, যেখানে কপি/পেস্ট করা যায়।
+
+**ব্যবহার:**
+- Copy button
+- Paste automation
+
+---
+
+## ৫. Practical Tips
+- fetch দিয়ে async/await ব্যবহার করুন
+- localStorage-এ sensitive ডাটা রাখবেন না
+- IndexedDB asynchronous, error handling ভালোভাবে করুন
+- Clipboard API-তে user permission লাগতে পারে
+
+---
+
+## ৬. Security & Performance
+- fetch-এ CORS, authentication, error handling ঠিক রাখুন
+- localStorage/IndexedDB-এ sensitive ডাটা encrypt করুন
+- Clipboard API-তে user consent নিন
+
+---
+
+## ৭. চ্যালেঞ্জ
+- fetch দিয়ে API call করুন
+- localStorage-এ theme preference রাখুন
+- IndexedDB-তে user ডাটা স্টোর করুন
+- Clipboard API দিয়ে কপি/পেস্ট button তৈরি করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[এররের ধরন: SyntaxError, TypeError, ReferenceError](/js/errors)

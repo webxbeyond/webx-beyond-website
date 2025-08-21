@@ -1,0 +1,104 @@
+---
+title: "আধুনিক এরর হ্যান্ডলিং - try...catch, কাস্টম এরর"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে এরর হ্যান্ডলিং—কোডে ভুল হলে graceful ভাবে manage করার জন্য অপরিহার্য। এতে ইউজার experience ভালো হয়, bug খুঁজে বের করা সহজ হয়।
+
+---
+
+## ১. try...catch
+
+try...catch দিয়ে কোডের risky অংশকে "try" ব্লকে রাখা হয়, আর এরর হলে "catch" ব্লকে handle করা হয়।
+
+### উদাহরণ:
+```js
+try {
+  const result = riskyFunction();
+  console.log(result);
+} catch (error) {
+  console.error('Error occurred:', error.message);
+}
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ছাতা নিয়ে বের হওয়া, বৃষ্টি হলে ছাতা দিয়ে নিজেকে বাঁচানো।
+
+**ব্যবহার:**
+- API call
+- JSON.parse
+- DOM manipulation
+
+---
+
+## ২. finally
+
+finally ব্লক—try/catch শেষে সবসময় execute হয়, error হোক বা না হোক।
+
+### উদাহরণ:
+```js
+try {
+  // code
+} catch (e) {
+  // error handling
+} finally {
+  console.log('Always runs');
+}
+```
+
+---
+
+## ৩. কাস্টম এরর
+
+নিজের মতো error class বানিয়ে, specific error handle করা যায়।
+
+### উদাহরণ:
+```js
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+function validateAge(age) {
+  if (age < 0) throw new ValidationError('Age cannot be negative');
+  return age;
+}
+
+try {
+  validateAge(-5);
+} catch (e) {
+  if (e instanceof ValidationError) {
+    console.error('Validation failed:', e.message);
+  }
+}
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—নিজের মতো warning/alert বানানো, যাতে নির্দিষ্ট ভুল সহজে ধরা যায়।
+
+---
+
+## ৪. Practical Tips
+- try...catch শুধু risky কোডে ব্যবহার করুন
+- কাস্টম এরর দিয়ে specific error handle করুন
+- finally ব্লকে cleanup/close resource করুন
+
+---
+
+## ৫. Security & Performance
+- Error message-এ sensitive ডাটা leak এড়ান
+- Proper error handling performance boost দেয়
+
+---
+
+## ৬. চ্যালেঞ্জ
+- try...catch দিয়ে JSON.parse error handle করুন
+- কাস্টম error class বানিয়ে validate করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ডিবাগিং টুলস: কনসোল API, DevTools, Node.js Debugger](/js/debugging)

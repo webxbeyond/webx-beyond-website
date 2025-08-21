@@ -1,0 +1,112 @@
+---
+title: অবজেক্ট বেসিকস - লিটারালস, কনস্ট্রাক্টর, প্রপার্টি ম্যানিপুলেশন
+slug: object-basics
+---
+
+জাভাস্ক্রিপ্টে অবজেক্ট হলো ডাটা ও ফাংশনের "প্যাকেজ"। অবজেক্ট দিয়ে ডাটা স্ট্রাকচার, মডেল, এবং ফাংশনালিটি একত্রে রাখা যায়। এই পাঠে আমরা দেখব অবজেক্ট লিটারাল, কনস্ট্রাক্টর, এবং প্রপার্টি ম্যানিপুলেশন।
+
+## ১. অবজেক্ট লিটারাল
+
+- সরাসরি `{}` দিয়ে অবজেক্ট তৈরি
+
+```js
+const person = {
+  name: "Anis",
+  age: 22,
+  greet: function() {
+    console.log("Hello, " + this.name);
+  }
+};
+person.greet(); // "Hello, Anis"
+```
+
+## ২. অবজেক্ট কনস্ট্রাক্টর
+
+- `new Object()` দিয়ে অবজেক্ট তৈরি
+
+```js
+const car = new Object();
+car.brand = "Toyota";
+car.year = 2020;
+```
+
+### কাস্টম কনস্ট্রাক্টর ফাংশন
+
+```js
+function Student(name, age) {
+  this.name = name;
+  this.age = age;
+}
+const s1 = new Student("Rahim", 20);
+console.log(s1.name); // "Rahim"
+```
+
+## ৩. প্রপার্টি ম্যানিপুলেশন
+
+- **Add:**
+
+```js
+person.country = "Bangladesh";
+```
+
+- **Update:**
+
+```js
+person.age = 23;
+```
+
+- **Delete:**
+
+```js
+delete person.greet;
+```
+
+- **Check:**
+
+```js
+"name" in person; // true
+```
+
+## ৪. অবজেক্ট মেথডস
+
+- **Object.keys(obj):** সব কী
+- **Object.values(obj):** সব ভ্যালু
+- **Object.entries(obj):** কী-ভ্যালু পেয়ার
+
+```js
+const keys = Object.keys(person); // ["name", "age", "country"]
+const values = Object.values(person); // ["Anis", 23, "Bangladesh"]
+```
+
+## ৫. বাস্তব উদাহরণ ও Analogies
+
+- **অবজেক্ট = "ফাইল ক্যাবিনেট"**: ডাটা ও ফাংশন একসাথে
+- **লিটারাল = "তালিকা লিখে রাখা"**
+- **কনস্ট্রাক্টর = "ফর্ম পূরণ করে নতুন ফাইল তৈরি"**
+
+## ৬. সাধারণ ভুল ও সমাধান
+
+- **প্রপার্টি অ্যাক্সেস ভুল:** person["name"] vs person.name
+- **delete ভুলভাবে ব্যবহার:** delete person["name"]
+- **কনস্ট্রাক্টর ফাংশন-এ new না দিলে:** this কাজ করবে না
+
+## ৭. চ্যালেঞ্জ
+
+```js
+const book = {
+  title: "JS Mastery",
+  author: "Anis",
+  year: 2025
+};
+book.pages = 300;
+delete book.year;
+console.log(Object.keys(book)); // ["title", "author", "pages"]
+```
+
+## উপসংহার
+
+অবজেক্ট লিটারাল, কনস্ট্রাক্টর, এবং প্রপার্টি ম্যানিপুলেশন আয়ত্ত করলে, জাভাস্ক্রিপ্টে ডাটা মডেলিং, স্ট্রাকচার, এবং ফাংশনালিটি সহজ হয়।
+
+---
+
+পরবর্তী পাঠ: [প্রোটোটাইপ ও ইনহেরিটেন্স: প্রোটোটাইপ চেইন, `Object.create()`](/js/prototypes)

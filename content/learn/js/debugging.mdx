@@ -1,0 +1,96 @@
+---
+title: "ডিবাগিং টুলস - কনসোল API, DevTools, Node.js Debugger"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে ডিবাগিং—বাগ খুঁজে বের করা, কোডের flow বোঝা, ও সমস্যা দ্রুত সমাধান করার জন্য অপরিহার্য। এখানে কনসোল API, ব্রাউজার DevTools, ও Node.js Debugger নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. কনসোল API
+
+কনসোল API—কোডে log, warn, error, info, table ইত্যাদি দেখানোর জন্য ব্যবহৃত হয়।
+
+### উদাহরণ:
+```js
+console.log('Hello World');
+console.warn('Warning!');
+console.error('Error!');
+console.table([{name: 'Anis', age: 22}, {name: 'Rafi', age: 21}]);
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডায়েরি, যেখানে প্রতিটি ঘটনা লিখে রাখা হয়, পরে দেখে সমস্যা খুঁজে বের করা যায়।
+
+**ব্যবহার:**
+- Variable value check
+- Error trace
+- Data visualization
+
+---
+
+## ২. ব্রাউজার DevTools
+
+DevTools—ব্রাউজারে built-in tool, যেখানে কোড inspect, break, step-by-step execute, network, performance, memory, element, source code debug করা যায়।
+
+### Key Features:
+- Elements panel: DOM inspect/change
+- Console panel: JS log/error
+- Sources panel: Breakpoint, step-through
+- Network panel: API call trace
+- Performance panel: Speed analysis
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি এক্স-রে মেশিন, যেখানে কোডের ভিতরের অবস্থা দেখা যায়।
+
+**ব্যবহার:**
+- Breakpoint দিয়ে কোড থামানো
+- Call stack trace
+- Variable value live check
+
+---
+
+## ৩. Node.js Debugger
+
+Node.js Debugger—server-side JS debug করার জন্য powerful tool।
+
+### Usage:
+```bash
+node --inspect app.js
+```
+
+- Chrome DevTools দিয়ে remote debug
+- Breakpoint, step, watch, call stack
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি মেকানিক, যিনি ইঞ্জিন খুলে প্রতিটি পার্ট পরীক্ষা করেন।
+
+**ব্যবহার:**
+- Server-side bug trace
+- Async code debug
+
+---
+
+## ৪. Practical Tips
+- console.log দিয়ে কোডের flow বুঝুন
+- DevTools-এ breakpoint দিয়ে সমস্যা খুঁজুন
+- Node.js Debugger-এ async code step-by-step trace করুন
+
+---
+
+## ৫. Security & Performance
+- Sensitive ডাটা console-এ log করবেন না
+- DevTools-এ performance panel দিয়ে slow code খুঁজুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- console.table দিয়ে data visualize করুন
+- DevTools-এ breakpoint দিয়ে bug ধরুন
+- Node.js Debugger দিয়ে async bug trace করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ফাংশনাল প্রোগ্রামিং: ইমিউটেবিলিটি, কারিয়িং, কম্পোজিশন](/js/functional-programming)

@@ -1,0 +1,70 @@
+---
+title: Fail2Ban - সেলফ-হোস্টিং ও নিরাপত্তা
+icon: ph:shield
+---
+
+Fail2Ban হলো Linux সার্ভারের জন্য একটি জনপ্রিয় ওপেন-সোর্স intrusion prevention tool, যা SSH brute-force, bot, ও অন্যান্য সন্দেহজনক login-attempt ব্লক করতে ব্যবহৃত হয়।
+
+## ১. কেন Fail2Ban?
+- SSH brute-force, dictionary attack, bot login থেকে সুরক্ষা
+- অটোমেটিক IP ban (firewall rules)
+- Lightweight, widely supported
+
+## ২. ইনস্টলেশন (Ubuntu/Debian)
+```bash
+sudo apt update && sudo apt install fail2ban
+```
+
+## ৩. বেসিক কনফিগারেশন
+- Default config: `/etc/fail2ban/jail.conf` (এডিট না করে কপি করুন)
+```bash
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+```
+- তারপর `/etc/fail2ban/jail.local` এডিট করুন:
+```ini
+[sshd]
+enabled = true
+port    = ssh
+filter  = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 1h
+findtime = 10m
+```
+- `maxretry`: কতবার ভুল পাসওয়ার্ড দিলে ban হবে
+- `bantime`: কতক্ষণ ban থাকবে
+- `findtime`: কত সময়ের মধ্যে maxretry count হবে
+
+## ৪. Fail2Ban চালু ও status
+```bash
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+sudo systemctl status fail2ban
+```
+
+## ৫. Ban status ও লগ চেক
+```bash
+sudo fail2ban-client status
+sudo fail2ban-client status sshd
+sudo tail -f /var/log/fail2ban.log
+```
+
+## ৬. Unban IP
+```bash
+sudo fail2ban-client set sshd unbanip <IP_ADDRESS>
+```
+
+## ৭. Security Best Practices
+- SSH port change করলে jail.local-এ port update করুন
+- Strong password/SSH key ব্যবহার করুন
+- Firewall (UFW) enable রাখুন
+- Fail2Ban notifications (email) enable করতে `[sshd]` jail-এ `action = %(action_mwl)s` যোগ করুন
+- Docker/Cloud server হলে log path ও jail config adjust করুন
+
+## ৮. Common Issues
+- Log path mismatch: `/var/log/auth.log` vs `/var/log/secure` (CentOS/RHEL)
+- Docker container হলে host log expose করতে হবে
+
+## ৯. Resources
+- [Fail2Ban Docs](https://www.fail2ban.org/wiki/index.php/Main_Page)
+- [Ubuntu Security Guide](https://ubuntu.com/server/docs/security-fail2ban)

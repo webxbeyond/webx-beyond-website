@@ -1,0 +1,102 @@
+---
+title: "মডিউল সিস্টেম - IIFE, CommonJS, ES6 Modules"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে মডিউল সিস্টেম—বড় কোডকে ছোট, manageable অংশে ভাগ করার জন্য অপরিহার্য। এতে কোড রিইউজ, স্কোপিং, ও ডিপেন্ডেন্সি ম্যানেজমেন্ট সহজ হয়।
+
+---
+
+## ১. IIFE (Immediately Invoked Function Expression)
+
+IIFE হলো—একটি ফাংশন, যেটা ডিক্লারেশনের সাথে সাথে এক্সিকিউট হয়।
+
+### উদাহরণ:
+```js
+(function() {
+  var secret = 'hidden';
+  console.log('IIFE running!');
+})();
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি রান্না, যেটা রান্নাঘরে ঢুকেই শুরু হয়ে যায়, আলাদা কিছু করতে হয় না।
+
+**ব্যবহার:**
+- Variable scope isolate করা
+- Legacy JS-এ module pattern
+
+---
+
+## ২. CommonJS (Node.js)
+
+CommonJS হলো—Node.js-এর module system, যেখানে `require` ও `module.exports` ব্যবহার হয়।
+
+### উদাহরণ:
+```js
+// math.js
+function add(a, b) { return a + b; }
+module.exports = { add };
+
+// app.js
+const math = require('./math');
+console.log(math.add(2, 3)); // 5
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি দোকান, যেখানে পণ্য (function/object) export করে, আর অন্য দোকান থেকে import করে ব্যবহার করা যায়।
+
+**ব্যবহার:**
+- Node.js server-side কোড
+- Synchronous loading
+
+---
+
+## ৩. ES6 Modules (import/export)
+
+ES6 Modules হলো—আধুনিক JS-এর module system, যেখানে `import` ও `export` ব্যবহার হয়।
+
+### উদাহরণ:
+```js
+// utils.js
+export function greet(name) { return `Hello, ${name}`; }
+
+// app.js
+import { greet } from './utils.js';
+console.log(greet('Anis')); // Hello, Anis
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি লাইব্রেরি, যেখানে বই (function/object) export করা হয়, আর অন্য লাইব্রেরি থেকে import করে পড়া যায়।
+
+**ব্যবহার:**
+- Modern JS (browser, Node.js with transpiler)
+- Static analysis, tree-shaking
+- Asynchronous loading
+
+---
+
+## ৪. Practical Tips
+- IIFE শুধু scope isolate করতে ব্যবহার করুন
+- CommonJS server-side, ES6 Modules client-side/modern JS-এ ব্যবহার করুন
+- ES6 Modules-এ named vs default export বুঝে ব্যবহার করুন
+
+---
+
+## ৫. Security & Performance
+- Module system দিয়ে sensitive code isolate করুন
+- ES6 Modules-এ tree-shaking performance boost দেয়
+- CommonJS synchronous, ES6 asynchronous—performance impact বুঝে ব্যবহার করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- IIFE দিয়ে একটি scope isolate করুন
+- CommonJS module লিখে import/export করুন
+- ES6 module লিখে import/export করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[আধুনিক সিনট্যাক্স: টেমপ্লেট লিটারাল, ডেস্ট্রাকচারিং, স্প্রেড/রেস্ট](/js/modern-syntax)

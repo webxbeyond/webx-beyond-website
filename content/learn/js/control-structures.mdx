@@ -1,0 +1,133 @@
+---
+title: কন্ট্রোল স্ট্রাকচার - if, switch, for, while, আধুনিক লুপস
+slug: control-structures
+---
+
+জাভাস্ক্রিপ্টে কন্ট্রোল স্ট্রাকচার মানে কোডের "নির্দেশনা"। এগুলো দিয়ে সিদ্ধান্ত, পুনরাবৃত্তি, এবং শর্ত নির্ধারণ করা হয়। এই পাঠে আমরা দেখব প্রধান কন্ট্রোল স্ট্রাকচার, তাদের ব্যবহার, এবং বাস্তব উদাহরণ।
+
+## ১. `if` স্টেটমেন্ট
+
+- শর্ত অনুযায়ী কোড চালানো
+
+```js
+let age = 18;
+if (age >= 18) {
+  console.log("Adult");
+} else {
+  console.log("Minor");
+}
+```
+
+## ২. `switch` স্টেটমেন্ট
+
+- একাধিক শর্তের জন্য
+
+```js
+let color = "red";
+switch (color) {
+  case "red":
+    console.log("Color is red");
+    break;
+  case "blue":
+    console.log("Color is blue");
+    break;
+  default:
+    console.log("Unknown color");
+}
+```
+
+## ৩. লুপ: `for`, `while`, `do...while`
+
+### `for` লুপ
+
+```js
+for (let i = 0; i < 5; i++) {
+  console.log(i);
+}
+```
+
+### `while` লুপ
+
+```js
+let n = 0;
+while (n < 3) {
+  console.log(n);
+  n++;
+}
+```
+
+### `do...while` লুপ
+
+```js
+let x = 0;
+do {
+  console.log(x);
+  x++;
+} while (x < 2);
+```
+
+## ৪. আধুনিক লুপ: `for...of`, `for...in`
+
+### `for...of` (Array, Iterable)
+
+```js
+let arr = ["a", "b", "c"];
+for (let item of arr) {
+  console.log(item);
+}
+```
+
+### `for...in` (Object, Property)
+
+```js
+let obj = { name: "Anis", age: 22 };
+for (let key in obj) {
+  console.log(key, obj[key]);
+}
+```
+
+## ৫. লুপ কন্ট্রোল: `break`, `continue`
+
+- **`break`**: লুপ থামায়
+- **`continue`**: পরবর্তী ইটারেশনে যায়
+
+```js
+for (let i = 0; i < 5; i++) {
+  if (i === 3) break;
+  if (i === 1) continue;
+  console.log(i);
+}
+```
+
+## ৬. বাস্তব উদাহরণ ও Analogies
+
+- **`if` = "যদি বৃষ্টি হয়, ছাতা নাও"**
+- **`switch` = "রেস্টুরেন্টে মেনু দেখে খাবার বাছাই"**
+- **`for` = "একই কাজ বারবার করা"**
+- **`for...of` = "বইয়ের প্রতিটি পৃষ্ঠা পড়া"**
+- **`for...in` = "বইয়ের প্রতিটি অধ্যায়ের নাম দেখা"**
+
+## ৭. সাধারণ ভুল ও সমাধান
+
+- **`break`/`continue` ভুল জায়গায় ব্যবহার**
+- **`for...in` দিয়ে Array ইটারেট করা** (Object-এর জন্য)
+- **Infinite loop**: শর্ত ভুল হলে
+
+## ৮. চ্যালেঞ্জ
+
+```js
+// ১ থেকে ১০ পর্যন্ত শুধু জোড় সংখ্যা প্রিন্ট করুন
+for (let i = 1; i <= 10; i++) {
+  if (i % 2 === 0) {
+    console.log(i);
+  }
+}
+```
+
+## উপসংহার
+
+কন্ট্রোল স্ট্রাকচার আয়ত্ত করলে, জাভাস্ক্রিপ্টে সিদ্ধান্ত, পুনরাবৃত্তি, এবং ডাটা প্রসেসিং সহজ হয়।
+
+---
+
+পরবর্তী পাঠ: [ফাংশন বেসিকস - ডিক্লারেশন বনাম এক্সপ্রেশন, ডিফল্ট প্যারামিটার](/js/functions-basics)

@@ -1,0 +1,92 @@
+---
+title: "এররের ধরন - SyntaxError, TypeError, ReferenceError"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে এরর—কোডে ভুল হলে, অপ্রত্যাশিত কিছু ঘটলে, বা ভুল টাইপ/রেফারেন্স ব্যবহার করলে দেখা দেয়। এখানে তিনটি প্রধান এরর টাইপ নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. SyntaxError
+
+SyntaxError—কোডের সিনট্যাক্স ভুল হলে হয়।
+
+### উদাহরণ:
+```js
+if (true) {
+  console.log('Hello')
+// } // বন্ধ না করলে SyntaxError
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি বাক্য, যেখানে গ্রামার ভুল হলে অর্থ বোঝা যায় না।
+
+**কখন হয়:**
+- Bracket/parenthesis mismatch
+- ভুল variable declaration
+- Unexpected token
+
+---
+
+## ২. TypeError
+
+TypeError—ভুল টাইপের ডাটা/অপারেশন হলে হয়।
+
+### উদাহরণ:
+```js
+const num = 5;
+num.toUpperCase(); // TypeError: num.toUpperCase is not a function
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি চামচ দিয়ে পানি খাওয়ার চেষ্টা, কাজ করবে না।
+
+**কখন হয়:**
+- undefined/null property access
+- ভুল method call
+- incompatible type operation
+
+---
+
+## ৩. ReferenceError
+
+ReferenceError—অস্তিত্বহীন variable/function ব্যবহার করলে হয়।
+
+### উদাহরণ:
+```js
+console.log(x); // ReferenceError: x is not defined
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ফোন নম্বর ডায়াল করা, যেটা এক্সিস্ট করে না।
+
+**কখন হয়:**
+- Variable/function scope ভুল
+- Typo
+- Hoisting issue
+
+---
+
+## ৪. Practical Tips
+- SyntaxError এড়াতে editor/linter ব্যবহার করুন
+- TypeError এড়াতে type validation করুন
+- ReferenceError এড়াতে variable/function scope ঠিক রাখুন
+
+---
+
+## ৫. Security & Performance
+- Error handling না করলে sensitive ডাটা leak হতে পারে
+- Proper error handling performance boost দেয়
+
+---
+
+## ৬. চ্যালেঞ্জ
+- SyntaxError intentionally তৈরি করুন ও fix করুন
+- TypeError intentionally তৈরি করুন ও fix করুন
+- ReferenceError intentionally তৈরি করুন ও fix করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[আধুনিক এরর হ্যান্ডলিং: try...catch, কাস্টম এরর](/js/error-handling)

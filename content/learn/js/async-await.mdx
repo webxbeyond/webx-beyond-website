@@ -1,0 +1,100 @@
+---
+title: "Async/Await - প্রমিজকে সহজ সিনট্যাক্সে রূপান্তর"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টে অ্যাসিঙ্ক্রোনাস কোডিংকে আরও সহজ, readable ও maintainable করার জন্য এসেছে async/await। এটি প্রমিজের ওপর ভিত্তি করে কাজ করে, কিন্তু কোড দেখতে অনেকটা synchronous-এর মতো।
+
+---
+
+## ১. Async/Await কী?
+
+- `async` ফাংশন: ফাংশনের আগে async লিখলে, সে ফাংশন সবসময় প্রমিজ রিটার্ন করে
+- `await`: শুধু async ফাংশনের ভেতরে ব্যবহার করা যায়; এটি প্রমিজ resolve না হওয়া পর্যন্ত অপেক্ষা করে
+
+### উদাহরণ:
+```js
+async function fetchData() {
+  const res = await fetch('https://api.example.com/data');
+  const data = await res.json();
+  return data;
+}
+
+fetchData().then(data => {
+  console.log(data);
+});
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—আপনি কাউকে বললেন, "তুমি কাজ শেষ না করা পর্যন্ত আমি অপেক্ষা করব"।
+
+---
+
+## ২. Error Handling
+
+- try...catch ব্লক ব্যবহার করুন
+- await-এ error হলে catch ব্লকে যাবে
+
+### উদাহরণ:
+```js
+async function getUser() {
+  try {
+    const res = await fetch('https://api.example.com/user');
+    if (!res.ok) throw new Error('User not found');
+    const user = await res.json();
+    return user;
+  } catch (err) {
+    console.error('Error:', err);
+    return null;
+  }
+}
+```
+
+---
+
+## ৩. Multiple Await
+
+একাধিক async কাজ ধারাবাহিকভাবে করতে হলে—await একাধিকবার ব্যবহার করুন:
+```js
+async function process() {
+  const user = await getUser();
+  const posts = await getPosts(user.id);
+  const comments = await getComments(posts[0].id);
+  return comments;
+}
+```
+
+---
+
+## ৪. Parallel Await (Promise.all)
+
+একাধিক async কাজ একসাথে করতে হলে:
+```js
+async function loadAll() {
+  const [user, posts] = await Promise.all([
+    getUser(),
+    getPosts()
+  ]);
+  // ...
+}
+```
+
+---
+
+## ৫. Security & Best Practices
+- Sensitive data fetch করলে HTTPS ব্যবহার করুন
+- Error handling সব async ফাংশনে করুন
+- Await-এর পরে null/undefined চেক করুন
+- Unhandled rejection এড়াতে try...catch ব্যবহার করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- একটি async ফাংশন লিখুন, যেখানে তিনটি await আছে—প্রতিটি ধাপে ডেটা প্রসেস করুন
+- একটি async ফাংশনে error simulate করে try...catch ব্যবহার করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ইভেন্ট লুপ ও টাস্ক কিউ: মাইক্রোটাস্ক বনাম ম্যাক্রোটাস্ক](/js/event-loop)

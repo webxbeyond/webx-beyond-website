@@ -1,0 +1,83 @@
+---
+title: "ইভেন্ট লুপ ও টাস্ক কিউ - মাইক্রোটাস্ক বনাম ম্যাক্রোটাস্ক"
+icon: proicons:javascript
+---
+
+জাভাস্ক্রিপ্টের অ্যাসিঙ্ক্রোনাস execution-এর মূল রহস্য হলো ইভেন্ট লুপ। এটি বুঝলে—কেন setTimeout, Promise, DOM ইভেন্ট, ইত্যাদি আলাদা behave করে—তা পরিষ্কার হবে।
+
+---
+
+## ১. ইভেন্ট লুপ কী?
+
+ইভেন্ট লুপ হলো—জাভাস্ক্রিপ্ট ইঞ্জিনের একটি মেকানিজম, যা main thread-এ টাস্কগুলো execute করে এবং অ্যাসিঙ্ক্রোনাস কাজগুলো queue থেকে নিয়ে sequentially চালায়।
+
+#### অ্যানালজি:
+এটা অনেকটা—একজন রিসেপশনিস্ট, যিনি টেবিলে রাখা কাজগুলো একে একে করেন, আর নতুন কাজ এলে লিস্টে যোগ করেন।
+
+---
+
+## ২. টাস্ক কিউ ও মাইক্রোটাস্ক কিউ
+
+- **ম্যাক্রোটাস্ক কিউ:**
+  - setTimeout, setInterval, DOM ইভেন্ট, I/O
+- **মাইক্রোটাস্ক কিউ:**
+  - Promise, MutationObserver
+
+### Execution Order:
+1. Main code (call stack)
+2. Microtask queue (Promises)
+3. Macrotask queue (setTimeout, I/O)
+
+---
+
+## ৩. উদাহরণ: Execution Order
+
+```js
+console.log('A');
+setTimeout(() => console.log('B'), 0);
+Promise.resolve().then(() => console.log('C'));
+console.log('D');
+```
+**Output:**
+A
+D
+C
+B
+
+#### ব্যাখ্যা:
+- Main code: A, D
+- Microtask: C (Promise)
+- Macrotask: B (setTimeout)
+
+---
+
+## ৪. কেন Microtask আগে?
+
+Microtask queue (Promise) main code শেষ হলে সাথে সাথে execute হয়, তাই setTimeout-এর চেয়েও আগে চলে।
+
+---
+
+## ৫. Practical Impact
+
+- Heavy computation main thread-এ করলে UI freeze হতে পারে
+- Promise chain দ্রুত execute হয়
+- setTimeout/setInterval delay-এ browser minimum enforced delay থাকতে পারে
+
+---
+
+## ৬. Security & Best Practices
+- Long-running task main thread-এ না রাখুন
+- Web Worker ব্যবহার করুন heavy computation-এর জন্য
+- Unhandled Promise rejection handle করুন
+
+---
+
+## ৭. চ্যালেঞ্জ
+- একটি কোড লিখুন, যেখানে Promise, setTimeout, এবং main code আছে—output order explain করুন
+- Web Worker দিয়ে heavy computation offload করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[অ্যারে মেথডস: map, filter, reduce, স্প্রেড/ডেস্ট্রাকচারিং](/js/arrays)

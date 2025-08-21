@@ -1,0 +1,95 @@
+---
+title: প্রোটোটাইপ ও ইনহেরিটেন্স - প্রোটোটাইপ চেইন, Object.create()
+slug: prototypes
+---
+
+জাভাস্ক্রিপ্টে প্রোটোটাইপ ও ইনহেরিটেন্স হলো কোড "পুনঃব্যবহার" ও "সম্পর্ক" তৈরির মূল কৌশল। এই পাঠে আমরা দেখব প্রোটোটাইপ কী, কিভাবে চেইন কাজ করে, এবং `Object.create()` দিয়ে ইনহেরিটেন্স কিভাবে হয়।
+
+## ১. প্রোটোটাইপ কী?
+
+- প্রতিটি অবজেক্টের একটি "প্রোটোটাইপ" থাকে
+- প্রোটোটাইপে থাকা প্রপার্টি/মেথড অবজেক্টে পাওয়া যায়
+
+```js
+const person = {
+  greet: function() {
+    console.log("Hello!");
+  }
+};
+const student = Object.create(person);
+student.name = "Anis";
+student.greet(); // "Hello!" (person থেকে পেয়েছে)
+```
+
+## ২. প্রোটোটাইপ চেইন
+
+- অবজেক্টে কিছু না পেলে, প্রোটোটাইপে খোঁজে
+- চেইন ধরে ধরে উপরে যায়
+
+```js
+console.log(student.hasOwnProperty("name")); // true
+console.log(student.hasOwnProperty("greet")); // false
+console.log("greet" in student); // true (প্রোটোটাইপে আছে)
+```
+
+## ৩. কনস্ট্রাক্টর ফাংশন ও প্রোটোটাইপ
+
+```js
+function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function() {
+  console.log(this.name + " says hi!");
+};
+const cat = new Animal("Tom");
+cat.speak(); // "Tom says hi!"
+```
+
+## ৪. `Object.create()` দিয়ে ইনহেরিটেন্স
+
+- নতুন অবজেক্ট তৈরি, পুরনো অবজেক্টকে প্রোটোটাইপ হিসেবে সেট
+
+```js
+const base = {
+  type: "base",
+  showType: function() {
+    console.log(this.type);
+  }
+};
+const derived = Object.create(base);
+derived.type = "derived";
+derived.showType(); // "derived"
+```
+
+## ৫. বাস্তব উদাহরণ ও Analogies
+
+- **প্রোটোটাইপ = "বাবার কাছ থেকে গুণ পাওয়া"**
+- **চেইন = "বংশপরম্পরা"**
+- **Object.create = "পুরনো ফাইল কপি করে নতুন ফাইল তৈরি"**
+
+## ৬. সাধারণ ভুল ও সমাধান
+
+- **প্রোটোটাইপে কিছু না পেলে undefined**
+- **hasOwnProperty vs in**: hasOwnProperty শুধু নিজের, in চেইন ধরে দেখে
+- **কনস্ট্রাক্টর ফাংশন-এ new না দিলে:** this কাজ করবে না
+
+## ৭. চ্যালেঞ্জ
+
+```js
+const vehicle = {
+  move: function() {
+    console.log("Moving...");
+  }
+};
+const car = Object.create(vehicle);
+car.brand = "Toyota";
+car.move(); // "Moving..."
+```
+
+## উপসংহার
+
+প্রোটোটাইপ ও ইনহেরিটেন্স আয়ত্ত করলে, জাভাস্ক্রিপ্টে কোড পুনঃব্যবহার, সম্পর্ক, এবং মডেলিং সহজ হয়।
+
+---
+
+পরবর্তী পাঠ: [লিগেসি OOP: কনস্ট্রাক্টর ফাংশন ও `prototype`](/js/legacy-oop)
