@@ -1,0 +1,131 @@
+---
+title: সিস্টেম ডিজাইন সিলেবাস
+icon: carbon:ibm-cloud-transit-gateway
+---
+
+## মডিউল ১: সিস্টেম ডিজাইন পরিচিতি
+
+**লক্ষ্য:** সিস্টেম ডিজাইন কী, কেন প্রয়োজন, এবং ইন্টারভিউ ও বাস্তব জীবনে এর গুরুত্ব বোঝা
+
+### পাঠসমূহ:
+1. [সিস্টেম ডিজাইন কী? ইন্টারভিউ বনাম রিয়েল-ওয়ার্ল্ড](/system-design/what-is-system-design)
+2. [মৌলিক কনসেপ্ট: Scalability, Reliability, Maintainability](/system-design/basics)
+3. [High-level vs Low-level ডিজাইন](/system-design/levels)
+4. [সিস্টেম ডিজাইন প্রসেস ও অ্যাপ্রোচ](/system-design/process)
+
+---
+
+## মডিউল ২: ফান্ডামেন্টাল বিল্ডিং ব্লকস
+
+**লক্ষ্য:** সিস্টেমের বেসিক কম্পোনেন্ট ও আর্কিটেকচারাল প্যাটার্ন বোঝা
+
+### পাঠসমূহ:
+1. [Client-Server Architecture](/system-design/client-server)
+2. [Load Balancers ও Reverse Proxies](/system-design/load-balancers)
+3. [Caching Basics: CDN, Redis, Memcached](/system-design/caching)
+4. [Database Basics: SQL বনাম NoSQL](/system-design/databases)
+5. [Horizontal vs Vertical Scaling](/system-design/scaling)
+
+---
+
+## মডিউল ৩: ডাটাবেজ ডিজাইন
+
+**লক্ষ্য:** ডাটা স্টোরেজ, কুয়েরি অপ্টিমাইজেশন ও ডিজাইন টেকনিক শেখা
+
+### পাঠসমূহ:
+1. [Relational Databases ও Normalization](/system-design/rdbms)
+2. [Indexing ও Query Optimization](/system-design/indexing)
+3. [NoSQL মডেল: Document, Key-Value, Columnar, Graph](/system-design/nosql)
+4. [Sharding, Partitioning ও Replication](/system-design/sharding-replication)
+5. [CAP Theorem ও Consistency Models](/system-design/cap-theorem)
+
+---
+
+## মডিউল ৪: স্কেলেবিলিটি ও পারফরম্যান্স
+
+**লক্ষ্য:** স্কেলযোগ্য ও হাই-পারফরম্যান্স সিস্টেম ডিজাইন করা
+
+### পাঠসমূহ:
+1. [Horizontal Scaling: Stateless Services, Auto-scaling](/system-design/horizontal-scaling)
+2. [Caching স্ট্রাটেজি: Write-through, Write-back, Write-around](/system-design/caching-strategies)
+3. [Rate Limiting ও Throttling](/system-design/rate-limiting)
+4. [Content Delivery Networks (CDN)](/system-design/cdn)
+5. [Performance Monitoring ও Observability](/system-design/observability)
+
+---
+
+## মডিউল ৫: মেসেজিং ও কমিউনিকেশন
+
+**লক্ষ্য:** অ্যাসিঙ্ক্রোনাস প্রসেসিং ও ডিস্ট্রিবিউটেড কমিউনিকেশন আয়ত্ত করা
+
+### পাঠসমূহ:
+1. [Synchronous বনাম Asynchronous কমিউনিকেশন](/system-design/sync-vs-async)
+2. [Message Queues: Kafka, RabbitMQ, SQS](/system-design/message-queues)
+3. [Publish/Subscribe Pattern](/system-design/pub-sub)
+4. [Event-driven Architecture](/system-design/event-driven)
+5. [Stream Processing Systems](/system-design/stream-processing)
+
+---
+
+## মডিউল ৬: ডিস্ট্রিবিউটেড সিস্টেম কনসেপ্টস
+
+**লক্ষ্য:** ফান্ডামেন্টাল ডিস্ট্রিবিউটেড সিস্টেম কনসেপ্টস বোঝা
+
+### পাঠসমূহ:
+1. [Consensus Algorithms: Paxos, Raft](/system-design/consensus)
+2. [Leader Election ও Failover Strategies](/system-design/leader-election)
+3. [Distributed Transactions ও 2PC/3PC](/system-design/distributed-transactions)
+4. [Eventual Consistency বনাম Strong Consistency](/system-design/consistency-models)
+5. [Clock Synchronization ও Vector Clocks](/system-design/vector-clocks)
+
+---
+
+## মডিউল ৭: সিকিউরিটি ও রিলায়াবিলিটি
+
+**লক্ষ্য:** সিস্টেমকে নিরাপদ ও নির্ভরযোগ্য করা
+
+### পাঠসমূহ:
+1. [Authentication বনাম Authorization](/system-design/authentication)
+2. [OAuth, JWT ও আধুনিক Auth প্যাটার্নস](/system-design/oauth-jwt)
+3. [Data Encryption: At rest ও In transit](/system-design/encryption)
+4. [Fault Tolerance ও Disaster Recovery](/system-design/fault-tolerance)
+5. [Design for High Availability (HA)](/system-design/high-availability)
+
+---
+
+## মডিউল ৮: মাইক্রোসার্ভিসেস ও মডার্ন আর্কিটেকচার
+
+**লক্ষ্য:** মডার্ন সিস্টেম ডিজাইন আর্কিটেকচার শেখা
+
+### পাঠসমূহ:
+1. [Monolith বনাম Microservices Architecture](/system-design/monolith-vs-microservices)
+2. [Service Discovery ও API Gateway](/system-design/service-discovery)
+3. [gRPC বনাম REST বনাম GraphQL](/system-design/api-design)
+4. [Containerization: Docker, Kubernetes](/system-design/containerization)
+5. [Observability: Logging, Tracing, Metrics](/system-design/observability-advanced)
+
+---
+
+## মডিউল ৯: কেস স্টাডি ও প্র্যাকটিস সিস্টেম ডিজাইন
+
+**লক্ষ্য:** জনপ্রিয় সিস্টেমগুলোর ডিজাইন শেখা ও প্র্যাকটিস করা
+
+### পাঠসমূহ:
+1. [URL Shortener (Bitly, TinyURL)](/system-design/url-shortener)
+2. [Designing Instagram-like Feed](/system-design/instagram-feed)
+3. [Designing WhatsApp/Chat Application](/system-design/chat-app)
+4. [Designing YouTube/Video Streaming Service](/system-design/video-streaming)
+5. [Designing Uber/Real-time Ride Sharing System](/system-design/ride-sharing)
+
+---
+
+## মডিউল ১০: মাস্টারি ও বিয়ন্ড
+
+**লক্ষ্য:** সিস্টেম ডিজাইনের গভীর ও আধুনিক টপিকসে দক্ষ হওয়া
+
+### পাঠসমূহ:
+1. [Geo-Distributed Systems ও Multi-Region Deployments](/system-design/geo-distributed)
+2. [Edge Computing ও Serverless Architectures](/system-design/serverless-edge)
+3. [Advanced Caching Techniques ও Tiered Storage](/system-design/advanced-caching)
+4. [Machine Learning Systems Design (Recommendation Engines, Ranking Systems)](/system-design/ml-systems)
+5. [সিস্টেম ডিজাইনে ফিউচার ট্রেন্ডস ও Career Roadmap](/system-design/future-trends)

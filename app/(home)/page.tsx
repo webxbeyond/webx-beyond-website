@@ -277,7 +277,10 @@ function SelectTopics() {
   }[] = [
     // Beginner step-by-step order:
     { title: 'প্রোগ্রামিং বেসিক', description: 'প্রোগ্রামিংয়ের মূল ধারণা, সিনট্যাক্স, ডাটা স্ট্রাকচার, প্যারাডাইম, বেস্ট প্র্যাকটিস ও ভাষা তুলনা—সব এক জায়গায়। একদম শুরু থেকে অ্যাডভান্সড পর্যন্ত।', icon: 'solar:code-bold-duotone', href: '/learn/programming', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
-    { title: 'HTML ও CSS', description: 'ওয়েবসাইটের ভিত্তি—HTML, CSS, রেসপনসিভ ডিজাইন, ইউআই কম্পোনেন্ট ও পারফরম্যান্স বেস্ট প্র্যাকটিস।', icon: 'famicons:logo-nodejs', href: '/html-css', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'জাভাস্ক্রিপ্ট', description: 'জাভাস্ক্রিপ্টের বেসিক, সিনট্যাক্স, ডাটা টাইপ, ফাংশন, DOM, ইভেন্ট, অ্যাসিনক্রোনাস, মডিউল, বেস্ট প্র্যাকটিস ও আধুনিক ফ্রেমওয়ার্ক—সবকিছু বাংলায়।', icon: 'famicons:logo-nodejs', href: '/js', badge: { text: 'চলমান', variant: 'progress' } },
+  { title: 'পাইথন', description: 'পাইথনের বেসিক, সিনট্যাক্স, ডাটা টাইপ, ফাংশন, লাইব্রেরি, অটোমেশন, স্ক্রিপ্টিং ও রিয়েল-ওয়ার্ল্ড প্রজেক্ট—সব বাংলায়।', icon: 'logos:python', href: '/python', badge: { text: 'চলমান', variant: 'progress' } },
+  { title: 'PyTorch', description: 'ডিপ লার্নিং, নিউরাল নেটওয়ার্ক, টেনসর, মডেল ট্রেনিং, ইমেজ ও টেক্সট প্রসেসিং—PyTorch দিয়ে হাতে-কলমে শেখা।', icon: 'logos:pytorch', href: '/pytorch', badge: { text: 'চলমান', variant: 'progress' } },
+    { title: 'সিস্টেম ডিজাইন', description: 'স্কেলেবল অ্যাপ, আর্কিটেকচার, ডেটাবেস, API, ক্যাশিং, লোড ব্যালান্সিং, মাইক্রোসার্ভিস—ইন্ডাস্ট্রি রেডি সিস্টেম ডিজাইন বাংলায়।', icon: 'material-symbols:architecture', href: '/system-design', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'গিট (Git)', description: 'ভার্সন কন্ট্রোল, টিমওয়ার্ক, ব্রাঞ্চিং, মার্জিং ও ওপেন সোর্স কন্ট্রিবিউশনের জন্য অপরিহার্য টুলের হাতে-কলমে গাইড।', icon: 'mdi:git', href: '/git', badge: { text: 'চলমান', variant: 'progress' } },
     { title: 'লিনাক্স', description: 'কমান্ড লাইন, সার্ভার, ক্লাস্টার, শেল স্ক্রিপ্টিং ও ওপেন সোর্স—বাংলায় লিনাক্স মাস্টারি, হাতে-কলমে প্র্যাকটিস ও বাস্তব উদাহরণ।', icon: 'ph:linux-logo-duotone', href: '/learn/linux', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
     { title: 'এপিআই', description: 'API কী, কিভাবে কাজ করে, REST, GraphQL, টেস্টিং ও ইন্টিগ্রেশন—সবকিছু এক জায়গায়।', icon: 'mdi:api', href: '/api', badge: { text: 'সম্পূর্ণ', variant: 'progress' } },
