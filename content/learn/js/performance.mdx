@@ -1,0 +1,89 @@
+---
+title: "মেমরি ম্যানেজমেন্ট ও পারফরম্যান্স অপ্টিমাইজেশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে মেমরি ম্যানেজমেন্ট ও পারফরম্যান্স—বড় অ্যাপ্লিকেশন, দ্রুত লোডিং, ও resource-efficient কোডের জন্য অপরিহার্য। এখানে memory leak, garbage collection, optimization techniques নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. মেমরি ম্যানেজমেন্ট
+
+### Garbage Collection
+জাভাস্ক্রিপ্টে unused object/variable নিজে থেকেই মুছে ফেলা হয়—এটা garbage collection।
+
+#### উদাহরণ:
+```js
+let obj = { name: 'Anis' };
+obj = null; // garbage collector মেমরি free করে
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ঘর পরিষ্কার করা, অপ্রয়োজনীয় জিনিস ফেলে দেয়া।
+
+### Memory Leak
+Memory leak—unused reference থেকে মেমরি release না হলে হয়।
+
+#### উদাহরণ:
+```js
+let arr = [];
+function add() {
+  arr.push(new Array(1000000)); // বড় array বারবার push
+}
+// arr clear না করলে memory leak
+```
+
+---
+
+## ২. পারফরম্যান্স অপ্টিমাইজেশন
+
+### Efficient Loops
+- for loop, forEach, map—proper use
+- বড় array-তে for loop fastest
+
+### Debouncing/Throttling
+- Rapid event (scroll, resize) optimize করতে debounce/throttle ব্যবহার করুন
+
+#### উদাহরণ:
+```js
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+```
+
+### Lazy Loading
+- Image/component/data—প্রয়োজন হলে load করুন
+
+### Code Splitting
+- বড় অ্যাপ—multiple bundle, dynamic import
+
+---
+
+## ৩. Practical Tips
+- Unused variable/object null করুন
+- Event listener remove করুন
+- Large data structure optimize করুন
+- Network request minimize করুন
+
+---
+
+## ৪. Security & Performance
+- Memory leak sensitive ডাটা leak করতে পারে
+- Optimization security vulnerability কমাতে সাহায্য করে
+
+---
+
+## ৫. চ্যালেঞ্জ
+- Memory leak intentionally তৈরি করুন ও fix করুন
+- Debounce function লিখুন
+- Lazy loading ও code splitting implement করুন
+
+---
+
+## ৬. পরবর্তী পাঠ
+
+[টাইপ সেফটি: JSDoc, TypeScript ইন্ট্রোডাকশন](/js/types)

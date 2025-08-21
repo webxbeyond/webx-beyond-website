@@ -1,0 +1,108 @@
+---
+title: "ব্রাউজার প্রজেক্ট - টুডু অ্যাপ, ওয়েদার অ্যাপ"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট শেখার সেরা উপায়—বাস্তব প্রজেক্ট বানানো। এখানে দুইটি জনপ্রিয় ব্রাউজার প্রজেক্ট: টুডু অ্যাপ ও ওয়েদার অ্যাপ নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. টুডু অ্যাপ
+
+### ফিচার:
+- টাস্ক যোগ/মুছা/কমপ্লিট
+- localStorage-এ ডাটা সংরক্ষণ
+- Responsive UI
+
+### উদাহরণ:
+```html
+<input id="taskInput" type="text" placeholder="নতুন টাস্ক লিখুন">
+<button onclick="addTask()">যোগ করুন</button>
+<ul id="taskList"></ul>
+<script>
+function addTask() {
+  const input = document.getElementById('taskInput');
+  const task = input.value;
+  if (!task) return;
+  let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  tasks.push({ text: task, done: false });
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+  input.value = '';
+  renderTasks();
+}
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  list.innerHTML = '';
+  tasks.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.textContent = t.text + (t.done ? ' ✔️' : '');
+    li.onclick = () => {
+      tasks[i].done = !tasks[i].done;
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderTasks();
+    };
+    list.appendChild(li);
+  });
+}
+renderTasks();
+</script>
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—নিজের কাজের তালিকা, যেখানে প্রতিদিন টাস্ক যোগ/কমপ্লিট/মুছা যায়।
+
+---
+
+## ২. ওয়েদার অ্যাপ
+
+### ফিচার:
+- শহরের নাম দিয়ে আবহাওয়া দেখুন
+- fetch API দিয়ে data
+- Simple UI
+
+### উদাহরণ:
+```html
+<input id="cityInput" type="text" placeholder="শহরের নাম লিখুন">
+<button onclick="getWeather()">খুঁজুন</button>
+<div id="weather"></div>
+<script>
+function getWeather() {
+  const city = document.getElementById('cityInput').value;
+  fetch(`https://wttr.in/${city}?format=3`)
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('weather').textContent = data;
+    });
+}
+</script>
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি জানালা, যেখানে বাইরে তাকিয়ে আবহাওয়া দেখা যায়।
+
+---
+
+## ৩. Practical Tips
+- localStorage দিয়ে ডাটা persist করুন
+- fetch API দিয়ে external data আনুন
+- Simple UI/UX রাখুন
+
+---
+
+## ৪. Security & Performance
+- User input validate করুন
+- API error handle করুন
+- localStorage-এ sensitive ডাটা রাখবেন না
+
+---
+
+## ৫. চ্যালেঞ্জ
+- টুডু অ্যাপে edit/delete ফিচার যোগ করুন
+- ওয়েদার অ্যাপে error message দেখান
+
+---
+
+## ৬. পরবর্তী পাঠ
+
+[Node.js দিয়ে ফাইল সিস্টেম, CLI টুল, HTTP সার্ভার](/js/node-projects)

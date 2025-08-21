@@ -1,0 +1,111 @@
+---
+title: "NPM, Yarn, PNPM ব্যবহারের গাইড"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট ডেভেলপমেন্টে প্যাকেজ ম্যানেজার অত্যন্ত গুরুত্বপূর্ণ। NPM, Yarn, PNPM—তিনটি টুলের ব্যবহার, পার্থক্য, এবং রিয়েল-ওয়ার্ল্ড টিপস নিয়ে এই পাঠ।
+
+---
+
+## ১. NPM (Node Package Manager)
+
+### কী?
+- Node.js-এর default package manager
+- `npm install <package>` দিয়ে dependency install
+
+### উদাহরণ:
+```bash
+npm init -y
+npm install express
+npm run start
+```
+
+### সুবিধা:
+- Largest ecosystem
+- Scripts, versioning, lockfile
+
+---
+
+## ২. Yarn
+
+### কী?
+- Facebook তৈরি করেছে—fast, secure, deterministic
+- `yarn add <package>` দিয়ে dependency install
+
+### উদাহরণ:
+```bash
+yarn init -y
+yarn add react
+yarn start
+```
+
+### সুবিধা:
+- Faster install
+- Better caching
+- Workspaces support
+
+---
+
+## ৩. PNPM
+
+### কী?
+- Performance ও disk efficiency—symlink-based
+- `pnpm add <package>` দিয়ে dependency install
+
+### উদাহরণ:
+```bash
+pnpm init
+pnpm add lodash
+pnpm start
+```
+
+### সুবিধা:
+- Very fast
+- Minimal disk usage
+- Monorepo-friendly
+
+---
+
+## ৪. পার্থক্য ও তুলনা
+| Feature         | NPM         | Yarn        | PNPM        |
+|----------------|-------------|-------------|-------------|
+| Speed          | Medium      | Fast        | Fastest     |
+| Disk Usage     | High        | Medium      | Low         |
+| Monorepo       | Basic       | Good        | Best        |
+| Lockfile       | package-lock| yarn.lock   | pnpm-lock   |
+| CLI Simplicity | Easy        | Easy        | Easy        |
+
+---
+
+## ৫. Real-life Example
+
+- Team project-এ monorepo হলে PNPM ব্যবহার করুন
+- Legacy project-এ NPM/Yarn
+- Dependency conflict হলে lockfile delete করে reinstall করুন
+
+---
+
+## ৬. Analogies
+- NPM: পুরনো, reliable গাড়ি
+- Yarn: স্পোর্টস কার—fast, efficient
+- PNPM: electric car—eco-friendly, cutting-edge
+
+---
+
+## ৭. Security & Performance
+- Always update dependencies
+- Audit command (`npm audit`, `yarn audit`, `pnpm audit`) দিয়ে vulnerability check করুন
+- Lockfile commit করুন—dependency consistency
+
+---
+
+## ৮. Tips
+- Global install কম ব্যবহার করুন
+- Monorepo হলে workspace feature enable করুন
+- Scripts automate করুন
+
+---
+
+## ৯. পরবর্তী পাঠ
+
+[Popular JS libraries/tools: Lodash, Moment.js, Axios, ESLint, Prettier](/js/libraries-tools)

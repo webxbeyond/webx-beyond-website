@@ -1,0 +1,95 @@
+---
+title: জাভাস্ক্রিপ্ট সিকিউরিটি - XSS, CSRF, Content Security Policy
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ওয়েব অ্যাপ্লিকেশন নিরাপদ রাখতে XSS, CSRF, এবং Content Security Policy (CSP) অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে core concepts, বাস্তব উদাহরণ, analogy, এবং industry best practices নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. XSS (Cross-Site Scripting)
+
+### কী?
+- Malicious script user input থেকে inject হয়
+- User data leak, cookie theft, phishing
+
+### উদাহরণ:
+```js
+// Unsafe
+const name = getUserInput();
+document.body.innerHTML = `<h1>${name}</h1>`;
+```
+
+### সমাধান:
+- Input sanitize/escape করুন
+- innerText ব্যবহার করুন
+- CSP enable করুন
+
+---
+
+## ২. CSRF (Cross-Site Request Forgery)
+
+### কী?
+- User authentication context-এ attacker malicious request পাঠায়
+- User data change, transaction execute
+
+### উদাহরণ:
+```html
+<img src="https://bank.com/transfer?amount=1000&to=attacker" />
+```
+
+### সমাধান:
+- CSRF token ব্যবহার করুন
+- SameSite cookie enable করুন
+- Sensitive action-এ re-authentication
+
+---
+
+## ৩. Content Security Policy (CSP)
+
+### কী?
+- Browser-এ resource load policy set করা
+- XSS, data injection block
+
+### উদাহরণ:
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+```
+
+### সুবিধা:
+- Only trusted source থেকে script/style load
+- Inline script/style block
+
+---
+
+## ৪. Real-life Example
+- User input sanitize করুন (DOMPurify)
+- API endpoint-এ CSRF token check করুন
+- Production app-এ CSP header set করুন
+
+---
+
+## ৫. Analogies
+- XSS: দরজা খোলা রেখে চোর ঢুকে পড়া
+- CSRF: অন্য কেউ আপনার নামে cheque জমা দেয়া
+- CSP: বাড়ির গেটে whitelist/security guard
+
+---
+
+## ৬. Security & Performance
+- Third-party script কম ব্যবহার করুন
+- HTTPS enable করুন
+- Security audit করুন (OWASP ZAP, Lighthouse)
+
+---
+
+## ৭. Tips
+- Always validate/sanitize user input
+- Cookie-তে HttpOnly, Secure, SameSite flag enable করুন
+- Security header (CSP, X-Frame-Options) set করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[Open source contribution ও JS style guides](/js/community)

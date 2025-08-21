@@ -1,0 +1,86 @@
+---
+title: "Node.js দিয়ে ফাইল সিস্টেম, CLI টুল, HTTP সার্ভার"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Node.js—জাভাস্ক্রিপ্টকে ব্রাউজার ছাড়াও server-side, automation, ও tool development-এর জন্য ব্যবহার করা যায়। এখানে ফাইল সিস্টেম, CLI টুল, ও HTTP সার্ভার নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. ফাইল সিস্টেম (File System)
+
+Node.js-এর fs module দিয়ে file read/write/delete/manage করা যায়।
+
+### উদাহরণ:
+```js
+const fs = require('fs');
+fs.writeFileSync('hello.txt', 'Hello World!');
+const data = fs.readFileSync('hello.txt', 'utf-8');
+console.log(data); // Hello World!
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি অফিস, যেখানে ফাইল তৈরি/পড়া/মুছা যায়।
+
+---
+
+## ২. CLI টুল (Command Line Tool)
+
+Node.js দিয়ে automation, custom command, ও utility tool বানানো যায়।
+
+### উদাহরণ:
+```js
+// cli.js
+const name = process.argv[2];
+console.log(`Hello, ${name || 'User'}!`);
+// Run: node cli.js Anis
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি রোবট, যাকে কমান্ড দিলে কাজ করে দেয়।
+
+---
+
+## ৩. HTTP সার্ভার
+
+Node.js দিয়ে সহজেই HTTP server বানানো যায়—API, website, automation ইত্যাদির জন্য।
+
+### উদাহরণ:
+```js
+const http = require('http');
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello from Node.js server!');
+});
+server.listen(3000, () => console.log('Server running on port 3000'));
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডাকঘর, যেখানে চিঠি এলে উত্তর দেয়া হয়।
+
+---
+
+## ৪. Practical Tips
+- fs module async method ব্যবহার করুন
+- CLI টুলে argument validation করুন
+- HTTP server-এ error handle করুন
+
+---
+
+## ৫. Security & Performance
+- File read/write-এ path validation করুন
+- CLI টুলে user input sanitize করুন
+- HTTP server-এ rate limit, authentication ব্যবহার করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- ফাইল read/write/delete function লিখুন
+- CLI টুলে multiple argument handle করুন
+- HTTP server-এ JSON response দিন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ফ্রেমওয়ার্কস ওভারভিউ: jQuery থেকে React/Vue/Angular/Svelte](/js/frameworks)

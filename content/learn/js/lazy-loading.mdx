@@ -1,0 +1,92 @@
+---
+title: "Lazy loading ও code splitting"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট অ্যাপ্লিকেশনের পারফরম্যান্স বাড়াতে lazy loading ও code splitting অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে core concepts, বাস্তব উদাহরণ, analogy, এবং industry best practices নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. Lazy Loading
+
+### কী?
+- দরকার হলে তখনই resource/load করা
+- Initial load দ্রুত, user experience ভালো
+
+### উদাহরণ:
+```js
+// Image lazy loading
+<img src="image.jpg" loading="lazy" />
+
+// JS module lazy loading
+const Chart = await import('./Chart');
+```
+
+### সুবিধা:
+- Faster initial load
+- Bandwidth save
+- Mobile-friendly
+
+---
+
+## ২. Code Splitting
+
+### কী?
+- বড় bundle ছোট ছোট chunk-এ ভাগ করা
+- Route/component অনুযায়ী JS/CSS load
+
+### উদাহরণ:
+```js
+// React lazy loading
+const Profile = React.lazy(() => import('./Profile'));
+
+// Webpack config
+output: {
+  filename: '[name].bundle.js',
+  chunkFilename: '[name].chunk.js',
+}
+```
+
+### সুবিধা:
+- Faster navigation
+- Resource-efficient
+- Better caching
+
+---
+
+## ৩. Tooling
+- Webpack, Vite, Parcel—code splitting support
+- React/Vue/Angular—lazy loading built-in
+
+---
+
+## ৪. Real-life Example
+- SPA-তে route-based code splitting করুন
+- Image/video lazy load করুন
+- Third-party library lazy load করুন
+
+---
+
+## ৫. Analogies
+- Lazy loading মানে—বইয়ের পৃষ্ঠা তখনই পড়া, যখন দরকার
+- Code splitting মানে—বড় বই chapter-এ ভাগ করা
+
+---
+
+## ৬. Security & Performance
+- Unused chunk/remove করুন
+- Async chunk error handle করুন
+- CDN-এ chunk serve করুন
+
+---
+
+## ৭. Tips
+- Lighthouse দিয়ে lazy loading/code splitting audit করুন
+- Production build-এ chunk naming optimize করুন
+- User interaction অনুযায়ী resource load করুন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[Security: XSS, CSRF, Content Security Policy](/js/security)

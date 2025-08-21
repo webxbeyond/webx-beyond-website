@@ -1,0 +1,78 @@
+---
+title: "API fetch ও ডায়নামিক টেবিল"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে API fetch—external data আনতে, এবং ডায়নামিক টেবিল—data visualize করতে ব্যবহৃত হয়। এখানে একটি বাস্তব উদাহরণ, অ্যানালজি, ও পারফরম্যান্স/নিরাপত্তা টিপস দেয়া হয়েছে।
+
+---
+
+## ১. API fetch কী?
+
+API fetch—external server থেকে data আনতে ব্যবহৃত হয়।
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডাকপিয়ন, যাকে ঠিকানা দিলে সে তথ্য নিয়ে আসে।
+
+---
+
+## ২. ডায়নামিক টেবিল কী?
+
+ডায়নামিক টেবিল—data change হলে, টেবিলও সাথে সাথে update হয়।
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি scoreboard, যেখানে নতুন স্কোর এলে সাথে সাথে দেখা যায়।
+
+---
+
+## ৩. বাস্তব উদাহরণ: API fetch ও ডায়নামিক টেবিল
+
+```html
+<button onclick="loadUsers()">ইউজার লোড করুন</button>
+<table id="userTable" border="1">
+  <thead><tr><th>Name</th><th>Email</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script>
+function loadUsers() {
+  fetch('https://jsonplaceholder.typicode.com/users')
+    .then(res => res.json())
+    .then(users => {
+      const tbody = document.getElementById('userTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${u.name}</td><td>${u.email}</td>`;
+        tbody.appendChild(tr);
+      });
+    });
+}
+</script>
+```
+
+---
+
+## ৪. Practical Tips
+- fetch API async/await দিয়ে ব্যবহার করুন
+- Error handling করুন
+- Table update efficient রাখুন
+
+---
+
+## ৫. Security & Performance
+- API response validate করুন
+- Sensitive ডাটা table-এ দেখাবেন না
+- Large data paginate করুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- Table-এ search/filter যোগ করুন
+- API error হলে message দেখান
+- Pagination implement করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ড্র্যাগ-ড্রপ UI](/js/project-drag-drop)

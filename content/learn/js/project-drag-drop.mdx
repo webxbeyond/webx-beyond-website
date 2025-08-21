@@ -1,0 +1,70 @@
+---
+title: "ড্র্যাগ-ড্রপ UI"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে ড্র্যাগ-ড্রপ UI—ইউজার ইন্টারঅ্যাকশন, ফাইল আপলোড, এলিমেন্ট অর্ডার চেঞ্জ, ও ভিজ্যুয়াল ফিডব্যাকের জন্য জনপ্রিয়। এখানে একটি বাস্তব উদাহরণ, অ্যানালজি, ও সিকিউরিটি টিপস দেয়া হয়েছে।
+
+---
+
+## ১. ড্র্যাগ-ড্রপ কী?
+
+ইউজার মাউস দিয়ে একটি এলিমেন্ট ধরে অন্য জায়গায় নিয়ে যেতে পারে—drag & drop।
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ডেস্কে বই সরানো, যেখানে বই এক জায়গা থেকে অন্য জায়গায় রাখা যায়।
+
+---
+
+## ২. Basic ড্র্যাগ-ড্রপ উদাহরণ
+
+```html
+<ul id="list">
+  <li draggable="true">Item 1</li>
+  <li draggable="true">Item 2</li>
+  <li draggable="true">Item 3</li>
+</ul>
+<script>
+const list = document.getElementById('list');
+let dragged;
+list.addEventListener('dragstart', e => {
+  dragged = e.target;
+});
+list.addEventListener('dragover', e => {
+  e.preventDefault();
+});
+list.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.target.tagName === 'LI' && dragged !== e.target) {
+    list.insertBefore(dragged, e.target.nextSibling);
+  }
+});
+</script>
+```
+
+---
+
+## ৩. Practical Tips
+- Visual feedback (highlight, cursor change) দিন
+- Mobile support (touch event) যোগ করুন
+- Multiple item drag/drop handle করুন
+
+---
+
+## ৪. Security & Performance
+- File upload-এ type/size validate করুন
+- Dragged data sanitize করুন
+- Performance optimize করতে minimal DOM update করুন
+
+---
+
+## ৫. চ্যালেঞ্জ
+- Dragged item highlight করুন
+- File drag & drop upload implement করুন
+- Mobile touch drag/drop handle করুন
+
+---
+
+## ৬. পরবর্তী পাঠ
+
+[Node.js CLI টুল](/js/project-cli)

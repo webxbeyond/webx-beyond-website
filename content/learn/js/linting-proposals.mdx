@@ -1,0 +1,91 @@
+---
+title: লিন্টিং, ফরম্যাটিং, TC39 ও ECMAScript প্রপোজাল ট্র্যাকিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট কোডের মান বজায় রাখতে linting, formatting, এবং নতুন ফিচার/স্ট্যান্ডার্ড ট্র্যাক করা অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে core concepts, বাস্তব উদাহরণ, analogy, এবং industry best practices নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. Linting
+
+### কী?
+- Code error, bug, style issue detect করা
+- ESLint, JSHint—popular tool
+
+### উদাহরণ:
+```bash
+npx eslint yourfile.js
+```
+
+### সুবিধা:
+- Bug early detect
+- Team code style maintain
+- Custom rule set
+
+---
+
+## ২. Formatting
+
+### কী?
+- Code automatically সুন্দর ও consistent করা
+- Prettier—popular tool
+
+### উদাহরণ:
+```bash
+npx prettier --write yourfile.js
+```
+
+### সুবিধা:
+- Manual formatting headache কমে
+- Team collaboration সহজ
+
+---
+
+## ৩. TC39 ও ECMAScript Proposal Tracking
+
+### কী?
+- TC39: JS language evolution-এর committee
+- ECMAScript proposal: নতুন JS ফিচার/স্ট্যান্ডার্ড
+
+### উদাহরণ:
+- [TC39 Proposals](https://github.com/tc39/proposals)
+- Stage 0 → Stage 4: idea থেকে standard
+
+### Tracking Tips:
+- GitHub repo follow করুন
+- JS news/blog পড়ুন
+- VSCode extension ব্যবহার করুন
+
+---
+
+## ৪. Real-life Example
+- Production app-এ linting/formatting CI-তে automate করুন
+- New JS feature use করার আগে browser/node support চেক করুন
+
+---
+
+## ৫. Analogies
+- Linting: grammar checker—ভুল ধরার জন্য
+- Formatting: automatic brush—code সুন্দর রাখে
+- TC39: সংসদ—নতুন আইন পাশ হয়
+
+---
+
+## ৬. Security & Performance
+- Linting দিয়ে security issue detect করুন
+- Formatting দিয়ে code readable রাখুন
+- New feature use করার আগে performance impact দেখুন
+
+---
+
+## ৭. Tips
+- VSCode-এ ESLint/Prettier extension install করুন
+- Pre-commit hook-এ lint/format automate করুন
+- TC39 proposal-এ feedback দিন
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[JS বাংলা টিপস](/js/bangla-tips)

@@ -1,0 +1,68 @@
+---
+title: "ফর্ম ভ্যালিডেশন প্রজেক্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে ফর্ম ভ্যালিডেশন—ইউজার ইনপুট সঠিক কিনা যাচাই করার জন্য অপরিহার্য। এখানে একটি বাস্তব ফর্ম ভ্যালিডেশন প্রজেক্টের উদাহরণ, অ্যানালজি, ও সিকিউরিটি টিপস দেয়া হয়েছে।
+
+---
+
+## ১. ফর্ম ভ্যালিডেশন কী?
+
+ইউজার যখন ফর্মে ডাটা দেয়, সেটা সঠিক কিনা—যেমন ইমেইল, পাসওয়ার্ড, নাম—তা চেক করা হয়।
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি ব্যাংক ফর্ম, যেখানে ভুল তথ্য দিলে accept হয় না।
+
+---
+
+## ২. Basic ফর্ম ভ্যালিডেশন উদাহরণ
+
+```html
+<form id="signupForm">
+  <input id="email" type="email" placeholder="ইমেইল">
+  <input id="password" type="password" placeholder="পাসওয়ার্ড">
+  <button type="submit">সাবমিট</button>
+  <div id="error"></div>
+</form>
+<script>
+document.getElementById('signupForm').onsubmit = function(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  let error = '';
+  if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) error += 'ইমেইল সঠিক নয়। ';
+  if (password.length < 6) error += 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।';
+  document.getElementById('error').textContent = error;
+  if (!error) alert('Signup Success!');
+};
+</script>
+```
+
+---
+
+## ৩. Advanced Validation Tips
+- Multiple field validate করুন
+- Real-time validation (input event)
+- Custom error message দেখান
+- Success message/redirect
+
+---
+
+## ৪. Security & Performance
+- Client-side validation ছাড়াও server-side validation করুন
+- Sensitive ডাটা sanitize করুন
+- Error message-এ sensitive info দেখাবেন না
+
+---
+
+## ৫. চ্যালেঞ্জ
+- Name, phone, password field validate করুন
+- Password strength checker যোগ করুন
+- Success/error UI সুন্দর করুন
+
+---
+
+## ৬. পরবর্তী পাঠ
+
+[API fetch ও ডায়নামিক টেবিল](/js/project-api-table)

@@ -1,0 +1,86 @@
+---
+title: "Performance tuning ও bundle optimization"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট অ্যাপ্লিকেশন দ্রুত, স্মুথ, ও ইউজার-ফ্রেন্ডলি রাখতে পারফরম্যান্স টিউনিং ও বান্ডেল অপ্টিমাইজেশন অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে core concepts, বাস্তব উদাহরণ, analogy, এবং industry best practices নিয়ে আলোচনা করা হয়েছে।
+
+---
+
+## ১. Performance Tuning
+
+### কী?
+- কোড, ডাটা, ও UI দ্রুত কাজ করানো
+
+### টিপস:
+- Unused code/remove করুন
+- Loop optimization (for vs forEach)
+- Heavy computation web worker-এ পাঠান
+- Memory leak avoid করুন
+
+### উদাহরণ:
+```js
+// Loop optimization
+for(let i=0; i<arr.length; i++) {
+  // ...
+}
+```
+
+---
+
+## ২. Bundle Optimization
+
+### কী?
+- Final JS/CSS/asset bundle ছোট ও efficient করা
+
+### টিপস:
+- Tree shaking: unused export/remove
+- Minification: code ছোট করা
+- Code splitting: route/component অনুযায়ী bundle
+- Compression: gzip/brotli
+
+### উদাহরণ:
+```js
+// Dynamic import
+const Chart = await import('./Chart');
+```
+
+---
+
+## ৩. Tooling
+- Webpack, Vite, Parcel—modern bundler
+- Babel—transpile/optimize code
+- Terser—minify JS
+
+---
+
+## ৪. Real-life Example
+- Production app-এ lazy loading enable করুন
+- Lighthouse দিয়ে performance audit করুন
+- Bundle size monitor করুন (Webpack Bundle Analyzer)
+
+---
+
+## ৫. Analogies
+- Bundle optimization মানে—বইয়ের অপ্রয়োজনীয় পৃষ্ঠা ছেঁটে ফেলা
+- Performance tuning মানে—গাড়ির ইঞ্জিন টিউন করা
+
+---
+
+## ৬. Security & Performance
+- Third-party library কম ব্যবহার করুন
+- Dependency audit করুন
+- Async code optimize করুন
+
+---
+
+## ৭. Tips
+- Always profile code (DevTools)
+- Production build-এ minify করুন
+- CDN ব্যবহার করুন—asset delivery দ্রুত
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[Lazy loading ও code splitting](/js/lazy-loading)

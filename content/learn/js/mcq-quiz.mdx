@@ -1,0 +1,122 @@
+---
+title: "MCQ ও কুইজ"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ইন্টারভিউ, একাডেমিক, বা নিজে নিজে দক্ষতা যাচাইয়ের জন্য MCQ ও কুইজ অত্যন্ত কার্যকর। এখানে বেসিক থেকে অ্যাডভান্সড লেভেলের প্রশ্ন, উত্তর, এবং ব্যাখ্যা দেয়া হয়েছে।
+
+---
+
+## ১. বেসিক MCQ
+
+**প্রশ্ন ১:**
+জাভাস্ক্রিপ্টে কোনটি primitive data type?
+- a) Object
+- b) Array
+- c) String
+- d) Function
+
+**উত্তর:** c) String
+
+**ব্যাখ্যা:** String, Number, Boolean, Null, Undefined, Symbol—all are primitive types.
+
+---
+
+**প্রশ্ন ২:**
+`let x = 5; x = "hello";` — এখানে x-এর type কী?
+- a) Number
+- b) String
+- c) Object
+- d) Undefined
+
+**উত্তর:** b) String
+
+**ব্যাখ্যা:** জাভাস্ক্রিপ্টে variable type dynamically change হয়।
+
+---
+
+## ২. Intermediate MCQ
+
+**প্রশ্ন ৩:**
+`const arr = [1,2,3]; arr.push(4);` — কোনটি true?
+- a) Error হবে
+- b) arr-এর value change হবে
+- c) arr reassign করা যাবে না
+- d) arr immutable
+
+**উত্তর:** b) arr-এর value change হবে, c) arr reassign করা যাবে না
+
+**ব্যাখ্যা:** const reference change করা যায় না, কিন্তু array/object-এর content change করা যায়।
+
+---
+
+**প্রশ্ন ৪:**
+`typeof null` এর result কী?
+- a) "null"
+- b) "object"
+- c) "undefined"
+- d) "number"
+
+**উত্তর:** b) "object"
+
+**ব্যাখ্যা:** এটি জাভাস্ক্রিপ্টের একটি পুরনো bug।
+
+---
+
+## ৩. Advanced Quiz
+
+**প্রশ্ন ৫:**
+`function foo(){ return foo; }` — foo() call করলে কী হবে?
+- a) undefined
+- b) function itself
+- c) error
+- d) null
+
+**উত্তর:** b) function itself
+
+**ব্যাখ্যা:** function foo returns itself.
+
+---
+
+**প্রশ্ন ৬:**
+`Promise.resolve(5).then(console.log)` — output কী?
+- a) 5
+- b) undefined
+- c) Promise object
+- d) Error
+
+**উত্তর:** a) 5
+
+**ব্যাখ্যা:** Promise resolve হলে then-এর callback value পায়।
+
+---
+
+## ৪. Real-life Example Challenge
+
+**প্রশ্ন ৭:**
+একটি function লিখুন যা array-এর সব even number return করবে।
+
+```js
+function getEven(arr) {
+  return arr.filter(n => n % 2 === 0);
+}
+```
+
+---
+
+## ৫. Analogies & Tips
+- MCQ practice করলে concepts crystal clear হয়
+- Quiz-এ ভুল হলে explanation পড়ুন
+- Interview-এ tricky question আসতে পারে—calmly approach করুন
+
+---
+
+## ৬. Security & Performance
+- MCQ-তে security/performance question practice করুন
+- যেমন: XSS, memory leak, async pitfalls
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[Common pitfalls ও tricky JS questions](/js/pitfalls)

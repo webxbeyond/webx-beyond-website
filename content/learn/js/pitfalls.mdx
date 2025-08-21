@@ -1,0 +1,118 @@
+---
+title: "Common pitfalls ও tricky JS questions"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্ট শেখার সময় কিছু সাধারণ ভুল, edge case, ও tricky প্রশ্ন বারবার সামনে আসে। এই পাঠে সেগুলো ব্যাখ্যা, উদাহরণ, এবং সমাধান দেয়া হয়েছে—যাতে ইন্টারভিউ, রিয়েল-ওয়ার্ল্ড প্রজেক্ট, ও MCQ-তে confident থাকা যায়।
+
+---
+
+## ১. Type Coercion
+
+### উদাহরণ:
+```js
+console.log('5' + 2); // "52"
+console.log('5' - 2); // 3
+```
+**সমস্যা:** + অপারেটর string concat করে, - অপারেটর number coercion করে।
+
+**সমাধান:**
+- Type conversion বুঝে কোড লিখুন
+- Interview-এ "type coercion pitfalls" mention করুন
+
+---
+
+## ২. == vs ===
+
+### উদাহরণ:
+```js
+console.log(0 == false); // true
+console.log(0 === false); // false
+```
+**সমস্যা:** == implicit type conversion করে, === strict check করে।
+
+**সমাধান:**
+- সর্বদা === ব্যবহার করুন
+
+---
+
+## ৩. Variable Hoisting
+
+### উদাহরণ:
+```js
+console.log(a); // undefined
+var a = 5;
+```
+**সমস্যা:** var hoist হয়, let/const hoist হলেও initialize হয় না।
+
+**সমাধান:**
+- let/const ব্যবহার করুন
+- variable declare করার আগে ব্যবহার করবেন না
+
+---
+
+## ৪. Scope Confusion
+
+### উদাহরণ:
+```js
+for(var i=0; i<3; i++) {
+  setTimeout(() => console.log(i), 100);
+} // Output: 3, 3, 3
+```
+**সমস্যা:** var function scoped, let block scoped
+
+**সমাধান:**
+- let ব্যবহার করুন
+
+---
+
+## ৫. Floating Point Precision
+
+### উদাহরণ:
+```js
+console.log(0.1 + 0.2); // 0.30000000000000004
+```
+**সমস্যা:** JS-এ floating point math precision issue
+
+**সমাধান:**
+- Math.round, toFixed ব্যবহার করুন
+
+---
+
+## ৬. Tricky Interview Questions
+
+### প্রশ্ন: `typeof NaN` কী?
+**উত্তর:** "number"
+
+### প্রশ্ন: `[] == false` কী?
+**উত্তর:** true
+
+### প্রশ্ন: `typeof undefined` কী?
+**উত্তর:** "undefined"
+
+### প্রশ্ন: `typeof null` কী?
+**উত্তর:** "object" (bug)
+
+---
+
+## ৭. Real-life Analogy
+- JS-এর type coercion অনেকটা ক্যালকুলেটর-এর মতো—যেখানে input-এর type বুঝে result দেয়
+- Hoisting মানে—variable/function উপরে উঠে যায়, কিন্তু initialize না হলে undefined
+
+---
+
+## ৮. Security & Performance
+- Input validation না করলে XSS, CSRF হতে পারে
+- Memory leak, async pitfalls interview-এ আসতে পারে
+
+---
+
+## ৯. Tips
+- Interview-এ tricky question calmly handle করুন
+- MCQ-তে explanation পড়ে concept clear করুন
+
+---
+
+## ১০. পরবর্তী পাঠ
+
+[NPM, Yarn, PNPM ব্যবহারের গাইড](/js/package-managers)

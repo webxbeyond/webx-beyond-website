@@ -1,0 +1,97 @@
+---
+title: "ফাংশনাল প্রোগ্রামিং - ইমিউটেবিলিটি, কারিয়িং, কম্পোজিশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+জাভাস্ক্রিপ্টে ফাংশনাল প্রোগ্রামিং—কোডকে predictable, reusable, ও bug-free রাখার জন্য অত্যন্ত গুরুত্বপূর্ণ। এখানে ইমিউটেবিলিটি, কারিয়িং, ও কম্পোজিশন নিয়ে বিস্তারিত আলোচনা করা হয়েছে।
+
+---
+
+## ১. ইমিউটেবিলিটি (Immutability)
+
+ইমিউটেবিলিটি—একবার ডাটা তৈরি হলে, সেটা পরিবর্তন না করা। নতুন ডাটা তৈরি করে পরিবর্তন দেখানো হয়।
+
+### উদাহরণ:
+```js
+const arr = [1, 2, 3];
+const newArr = [...arr, 4]; // arr অপরিবর্তিত, newArr নতুন
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি কাগজে লিখে ফেলা, পরে নতুন কাগজে পরিবর্তন করা, পুরনোটা রেখে দেয়া।
+
+**ব্যবহার:**
+- Redux state management
+- Pure function
+
+---
+
+## ২. কারিয়িং (Currying)
+
+কারিয়িং—একটি ফাংশনকে এমনভাবে তৈরি করা, যাতে একাধিক আর্গুমেন্ট step-by-step দেয়া যায়।
+
+### উদাহরণ:
+```js
+function multiply(a) {
+  return function(b) {
+    return a * b;
+  };
+}
+const double = multiply(2);
+console.log(double(5)); // 10
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি মেশিনে প্রথমে কাঁচামাল ঢোকানো, পরে step-by-step প্রসেস করা।
+
+**ব্যবহার:**
+- Function factory
+- Partial application
+
+---
+
+## ৩. কম্পোজিশন (Composition)
+
+কম্পোজিশন—একাধিক ফাংশনকে একত্রে ব্যবহার করে নতুন ফাংশন তৈরি করা।
+
+### উদাহরণ:
+```js
+const add = x => x + 2;
+const square = x => x * x;
+const compose = (f, g) => x => f(g(x));
+const addThenSquare = compose(square, add);
+console.log(addThenSquare(3)); // (3+2)^2 = 25
+```
+
+#### অ্যানালজি:
+এটা অনেকটা—একটি রান্নার রেসিপি, যেখানে একাধিক ধাপ একত্রে করে চূড়ান্ত খাবার তৈরি হয়।
+
+**ব্যবহার:**
+- Data transformation pipeline
+- Reusable logic
+
+---
+
+## ৪. Practical Tips
+- ইমিউটেবিলিটি বজায় রাখতে spread/rest ব্যবহার করুন
+- কারিয়িং দিয়ে reusable function factory তৈরি করুন
+- কম্পোজিশন দিয়ে complex logic সহজ করুন
+
+---
+
+## ৫. Security & Performance
+- ইমিউটেবিলিটি performance boost দেয়, side-effect কমায়
+- কারিয়িং/কম্পোজিশন-এ sensitive ডাটা leak এড়াতে scope ঠিক রাখুন
+
+---
+
+## ৬. চ্যালেঞ্জ
+- ইমিউটেবল array/object তৈরি করুন
+- কারিয়িং ফাংশন লিখে partial application দেখান
+- কম্পোজিশন দিয়ে দুই ফাংশন একত্রে ব্যবহার করুন
+
+---
+
+## ৭. পরবর্তী পাঠ
+
+[ডিজাইন প্যাটার্নস: Singleton, Factory, Observer, Proxy](/js/design-patterns)
