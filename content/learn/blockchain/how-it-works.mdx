@@ -1,0 +1,73 @@
+---
+title: "ব্লকচেইন কিভাবে কাজ করে: ব্লক, চেইন, কনসেনসাস"
+icon: tabler:blocks
+---
+
+ব্লকচেইন প্রযুক্তির মূল—block, chain, এবং consensus। এই পাঠে সহজ ভাষায়, উদাহরণ ও analogy দিয়ে ব্লকচেইনের গঠন, কাজের পদ্ধতি, এবং consensus mechanism ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ১. Block: ডিজিটাল খাতা
+- প্রতিটি block-এ transaction, timestamp, hash, previous block hash
+- Block মানে—একটি page, যেখানে transaction লেখা হয়
+
+### উদাহরণ:
+- Bitcoin block explorer-এ block details দেখা
+- Block structure: header, body
+
+---
+
+## ২. Chain: Immutable Linking
+- প্রতিটি block আগের block-এর hash দিয়ে লিঙ্ক
+- Chain মানে—একটি খাতার page একটার পর একটা
+- Hash mismatch হলে chain invalid
+
+### উদাহরণ:
+- Tamper-proof ledger—একটা page পাল্টালে সব page invalid
+
+---
+
+## ৩. Consensus: Network Agreement
+- Network-এর সবাই একমত—কোন block valid
+- Proof of Work, Proof of Stake, BFT—বিভিন্ন consensus algorithm
+- Consensus মানে—কমিউনিটির সবাই মিলে সিদ্ধান্ত
+
+### উদাহরণ:
+- Bitcoin: Proof of Work—mining, difficulty
+- Ethereum: Proof of Stake—validators
+
+---
+
+## ৪. Analogy: খাতা, তালা, ও কমিটি
+- Block: খাতার page
+- Chain: তালা দিয়ে page গেঁথে রাখা
+- Consensus: কমিটি সবাই মিলে page approve করে
+
+---
+
+## ৫. Security & Impact
+- Tamper-proof: Hash chain, consensus
+- Decentralized: No single authority
+- Immutable: Transaction/history পরিবর্তন করা যায় না
+
+---
+
+## ৬. Visualization
+```
+Block 1 → Block 2 → Block 3 → ...
+   |         |         |
+  Hash     Hash      Hash
+```
+
+---
+
+## ৭. Tips
+- Block explorer-এ chain/history দেখুন
+- Consensus algorithm বুঝুন—security, scalability
+- Tamper-proof ledger—real-world analogy
+
+---
+
+## ৮. পরবর্তী পাঠ
+
+[ক্রিপ্টোগ্রাফি বেসিকস: হ্যাশ, কী, সিগনেচার](/blockchain/cryptography)

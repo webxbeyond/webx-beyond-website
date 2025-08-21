@@ -1,0 +1,60 @@
+---
+title: স্মার্ট কন্ট্র্যাক্টকে ওয়েব ফ্রন্টএন্ডের সাথে কানেক্ট করা
+icon: tabler:link
+---
+
+ড্যাপ (Decentralized App) তৈরি করতে হলে স্মার্ট কন্ট্র্যাক্টকে ওয়েব ফ্রন্টএন্ডের সাথে সংযুক্ত করতে হয়। Web3.js বা Ethers.js ব্যবহার করে React, Vue, বা অন্য ফ্রেমওয়ার্কে স্মার্ট কন্ট্র্যাক্টের সাথে ইন্টারঅ্যাক্ট করা যায়।
+
+## কীভাবে কানেক্ট করবেন?
+
+1. **MetaMask বা Wallet সংযোগ করুন**
+2. **Web3.js/Ethers.js দিয়ে Provider তৈরি করুন**
+3. **Contract ABI ও Address ব্যবহার করুন**
+4. **ফাংশন কল, ট্রান্সাকশন পাঠান, ইভেন্ট শুনুন**
+
+## React-এ উদাহরণ: Ethers.js
+
+```javascript
+import { ethers } from "ethers";
+
+const provider = new ethers.BrowserProvider(window.ethereum);
+const signer = await provider.getSigner();
+const contract = new ethers.Contract(
+  "CONTRACT_ADDRESS",
+  CONTRACT_ABI,
+  signer
+);
+
+// Read function
+const value = await contract.getData();
+
+// Write function
+await contract.setData(42);
+```
+
+## MetaMask ইন্টিগ্রেশন
+
+- ইউজারকে MetaMask ইনস্টল করতে বলুন
+- `window.ethereum` দিয়ে Provider তৈরি করুন
+- ইউজারকে "Connect" বাটন দিন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, স্মার্ট কন্ট্র্যাক্ট হল "ব্যাংক", আর ওয়েব ফ্রন্টএন্ড হল "ATM"—আপনি ATM-এ কার্ড ঢুকিয়ে টাকা তুলতে পারবেন, কিন্তু আসল টাকা ব্যাংকে থাকে।
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- Contract ABI ও Address সঠিকভাবে ব্যবহার করুন
+- Error handling ও Loading state দেখান
+- ইউজারকে ট্রান্সাকশন কনফার্মেশন দেখান
+- Sensitive data ফ্রন্টএন্ডে প্রকাশ করবেন না
+
+## ড্যাপ ডেভেলপমেন্টের সুবিধা
+
+- ইউজার ফ্রেন্ডলি ইন্টারফেস
+- রিয়েল-টাইম ইভেন্ট ও আপডেট
+- Blockchain-এর শক্তি ও Web-এর সহজলভ্যতা
+
+## পরবর্তী পাঠ
+
+[Proof of Work (PoW)](/blockchain/pow)

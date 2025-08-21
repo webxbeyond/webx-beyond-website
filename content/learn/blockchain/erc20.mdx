@@ -1,0 +1,96 @@
+---
+title: "ERC-20: Fungible টোকেন"
+icon: tabler:coin
+---
+
+ERC-20 হচ্ছে Ethereum ব্লকচেইনে ফাংজিবল (পরস্পর বিনিময়যোগ্য) টোকেন তৈরির জন্য সবচেয়ে জনপ্রিয় ও স্ট্যান্ডার্ড প্রোটোকল। এটি ডেভেলপারদের জন্য সহজ, নিরাপদ এবং ইন্টারঅ্যাক্টিভ টোকেন তৈরি ও ব্যবহারের সুযোগ দেয়।
+
+## ERC-20 টোকেন কী?
+
+- **ফাংজিবল:** প্রতিটি টোকেন একে অপরের সমান, যেমন টাকা বা কয়েন।
+- **স্ট্যান্ডার্ড:** নির্দিষ্ট ফাংশন ও ইভেন্টের মাধ্যমে টোকেন তৈরি, ট্রান্সফার, ব্যালেন্স চেক ইত্যাদি করা যায়।
+- **ইন্টারঅ্যাক্টিভ:** একাধিক অ্যাপ, এক্সচেঞ্জ, ওয়ালেট ERC-20 টোকেন সাপোর্ট করে।
+
+## বাস্তব উদাহরণ ও এনালজি
+
+- **টাকা:** ১০০ টাকার দুটি নোট—দুটিই সমান, বিনিময়যোগ্য।
+- **গেমের কয়েন:** প্রতিটি কয়েন সমান, যেকোনো জায়গায় ব্যবহার করা যায়।
+- **USDT, BUSD, DAI:** জনপ্রিয় ERC-20 টোকেন, এক্সচেঞ্জে সহজে ট্রেড হয়।
+
+## ERC-20 টোকেনের প্রধান ফাংশন
+
+- `totalSupply`: মোট টোকেন সংখ্যা
+- `balanceOf(address)`: নির্দিষ্ট অ্যাড্রেসে কত টোকেন আছে
+- `transfer(address, amount)`: টোকেন পাঠানো
+- `approve(address, amount)`: অন্য অ্যাড্রেসকে টোকেন ব্যবহারের অনুমতি
+- `transferFrom(address, amount)`: অনুমোদিত অ্যাড্রেস থেকে টোকেন পাঠানো
+- `allowance(owner, spender)`: কত টোকেন অনুমোদিত
+
+## ERC-20 টোকেনের সুবিধা
+
+- **ইন্টারঅপারেবিলিটি:** একাধিক অ্যাপ ও এক্সচেঞ্জে ব্যবহারযোগ্য
+- **সিকিউরিটি:** স্ট্যান্ডার্ড ফাংশন, কমন ভলনারেবিলিটি কম
+- **ডেভেলপার ফ্রেন্ডলি:** সহজে ডিপ্লয় ও কাস্টমাইজ করা যায়
+
+## চ্যালেঞ্জ ও সীমাবদ্ধতা
+
+- **ফি:** Ethereum নেটওয়ার্কে ট্রান্সফার ফি বেশি হতে পারে
+- **ভুল কোডিং:** ভুল ইমপ্লিমেন্টেশন হলে ভলনারেবিলিটি আসতে পারে
+- **ফাংজিবল:** NFT-এর মতো ইউনিক অ্যাসেট তৈরি করা যায় না
+
+## Solidity কোড ডেমো: ERC-20 টোকেন
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MyToken {
+    string public name = "MyToken";
+    string public symbol = "MTK";
+    uint8 public decimals = 18;
+    uint256 public totalSupply = 1000000 * (10 ** uint256(decimals));
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    constructor() {
+        balanceOf[msg.sender] = totalSupply;
+    }
+
+    function transfer(address to, uint256 value) public returns (bool) {
+        require(balanceOf[msg.sender] >= value, "Insufficient balance");
+        balanceOf[msg.sender] -= value;
+        balanceOf[to] += value;
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+
+    function approve(address spender, uint256 value) public returns (bool) {
+        allowance[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint256 value) public returns (bool) {
+        require(balanceOf[from] >= value, "Insufficient balance");
+        require(allowance[from][msg.sender] >= value, "Allowance exceeded");
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
+        allowance[from][msg.sender] -= value;
+        emit Transfer(from, to, value);
+        return true;
+    }
+}
+```
+
+## পারফরম্যান্স ও সিকিউরিটি টিপস
+
+- OpenZeppelin লাইব্রেরি ব্যবহার করুন—স্ট্যান্ডার্ড ও নিরাপদ ইমপ্লিমেন্টেশন
+- কোড অডিট করুন, রিএন্ট্রান্সি ও ওভারফ্লো চেক করুন
+- টেস্টনেটে ডিপ্লয় করে ভালোভাবে পরীক্ষা করুন
+
+## পরবর্তী পাঠ
+
+[ERC-721: NFT](/blockchain/erc721)

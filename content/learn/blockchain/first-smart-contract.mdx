@@ -1,0 +1,63 @@
+---
+title: প্রথম স্মার্ট কন্ট্র্যাক্ট লেখা ও ডিপ্লয়মেন্ট (Remix IDE)
+icon: tabler:rocket
+---
+
+এই পাঠে আপনি শিখবেন কীভাবে Solidity-তে প্রথম স্মার্ট কন্ট্র্যাক্ট লিখবেন এবং Remix IDE ব্যবহার করে সেটি টেস্টনেটে ডিপ্লয় করবেন।
+
+## Remix IDE কী?
+
+Remix IDE হল একটি ব্রাউজার-ভিত্তিক Solidity ডেভেলপমেন্ট টুল, যেখানে আপনি কোড লিখতে, কম্পাইল করতে, টেস্ট করতে এবং ডিপ্লয় করতে পারবেন।
+
+- **ব্রাউজারেই রান হয়**
+- **কোড, কম্পাইল, ডিপ্লয়, টেস্ট—all in one**
+
+## প্রথম স্মার্ট কন্ট্র্যাক্ট: Hello Blockchain
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloBlockchain {
+    string public message;
+
+    constructor(string memory _msg) {
+        message = _msg;
+    }
+
+    function setMessage(string memory _msg) public {
+        message = _msg;
+    }
+}
+```
+
+## ধাপে ধাপে ডিপ্লয়মেন্ট
+
+1. **Remix IDE-তে যান:** https://remix.ethereum.org
+2. **নতুন ফাইল তৈরি করুন:** `HelloBlockchain.sol`
+3. **কোড লিখুন ও সেভ করুন**
+4. **কম্পাইল করুন:** Solidity Compiler ট্যাবে যান, কম্পাইল করুন
+5. **ডিপ্লয় করুন:** Deploy & Run Transactions ট্যাবে যান, Environment হিসেবে "JavaScript VM" বা "Injected Web3" (MetaMask) নির্বাচন করুন
+6. **কন্ট্র্যাক্ট ডিপ্লয় করুন:** Constructor-এ মেসেজ দিন, Deploy ক্লিক করুন
+7. **ফাংশন টেস্ট করুন:** setMessage ও getMessage ব্যবহার করুন
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, আপনি একটি "ডিজিটাল চুক্তি" লিখলেন, যেখানে সবাই দেখতে পারে এবং নির্দিষ্ট নিয়মে কাজ করে।
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- টেস্টনেটে ডিপ্লয় করে পরীক্ষা করুন
+- Constructor ও ফাংশনের visibility ঠিকভাবে দিন
+- Remix-এর Static Analysis টুল ব্যবহার করুন
+- MetaMask দিয়ে টেস্টনেটের ফান্ড ব্যবহার করুন
+
+## Remix IDE-এর সুবিধা
+
+- কোনো সেটআপ ছাড়াই কোড লেখা ও টেস্ট
+- Solidity কম্পাইলার ও ডিপ্লয়মেন্ট সহজ
+- Debugging ও Static Analysis
+
+## পরবর্তী পাঠ
+
+[ইভেন্টস ও লগস](/blockchain/events-logs)

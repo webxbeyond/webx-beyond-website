@@ -1,0 +1,74 @@
+---
+title: OpenZeppelin লাইব্রেরি
+icon: tabler:package
+---
+
+# নিরাপদ স্মার্ট কন্ট্র্যাক্টের জন্য স্ট্যান্ডার্ড
+
+OpenZeppelin হচ্ছে Ethereum ও অন্যান্য ব্লকচেইনের জন্য সবচেয়ে জনপ্রিয়, নিরাপদ, এবং ওপেন-সোর্স স্মার্ট কন্ট্র্যাক্ট লাইব্রেরি। এটি ডেভেলপারদের জন্য স্ট্যান্ডার্ড, অডিটেড, এবং পুনঃব্যবহারযোগ্য কন্ট্র্যাক্ট সরবরাহ করে।
+
+## OpenZeppelin কী?
+
+- **লাইব্রেরি:** ERC-20, ERC-721, ERC-1155, Ownable, SafeMath, AccessControl—সব ধরনের কন্ট্র্যাক্ট
+- **নিরাপত্তা:** অডিটেড, কমন ভলনারেবিলিটি রোধে ডিজাইন
+- **ডেভেলপার ফ্রেন্ডলি:** সহজে ইমপোর্ট, কাস্টমাইজ, ও ডিপ্লয়
+
+## বাস্তব উদাহরণ ও এনালজি
+
+- **লেগো ব্লক:** যেমন লেগো ব্লক দিয়ে সহজে বড় স্ট্রাকচার বানানো যায়, OpenZeppelin দিয়ে নিরাপদ কন্ট্র্যাক্ট বানানো যায়
+- **বিল্ডিং কোড:** বিল্ডিং বানাতে স্ট্যান্ডার্ড কোড—কন্ট্র্যাক্ট বানাতে OpenZeppelin
+
+## OpenZeppelin-এর প্রধান কন্ট্র্যাক্ট
+
+- **ERC-20, ERC-721, ERC-1155:** টোকেন স্ট্যান্ডার্ড
+- **Ownable:** অ্যাডমিন/ওনারশিপ কন্ট্রোল
+- **AccessControl:** মাল্টি-রোল পারমিশন
+- **SafeMath:** overflow/underflow রোধ
+- **Pausable:** জরুরি অবস্থায় কন্ট্র্যাক্ট বন্ধ
+
+## ব্যবহার কিভাবে করবেন?
+
+1. **ইনস্টল করুন:**
+   ```bash
+   npm install @openzeppelin/contracts
+   ```
+2. **ইমপোর্ট করুন:**
+   ```solidity
+   import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+   import "@openzeppelin/contracts/access/Ownable.sol";
+   ```
+3. **ইনহেরিট করুন:**
+   ```solidity
+   contract MyToken is ERC20, Ownable {
+       constructor() ERC20("MyToken", "MTK") {
+           _mint(msg.sender, 1000 * 10 ** decimals());
+       }
+   }
+   ```
+
+## পারফরম্যান্স ও সিকিউরিটি টিপস
+
+- সর্বদা OpenZeppelin-এর সর্বশেষ ভার্সন ব্যবহার করুন
+- কন্ট্র্যাক্ট কাস্টমাইজ করার সময় অডিটেড ফাংশন ব্যবহার করুন
+- AccessControl, Pausable, Ownable—সঠিকভাবে ব্যবহার করুন
+- ইউনিট টেস্ট ও peer review করুন
+
+## Python কোড ডেমো: OpenZeppelin কন্ট্র্যাক্ট ইন্টারঅ্যাকশন (web3.py)
+
+```python
+from web3 import Web3
+
+# ERC-20 কন্ট্র্যাক্ট ABI ও অ্যাড্রেস
+abi = [...] # OpenZeppelin ERC-20 ABI
+address = "0x..."
+
+w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_PROJECT_ID"))
+contract = w3.eth.contract(address=address, abi=abi)
+
+balance = contract.functions.balanceOf("0xYourAddress").call()
+print("Token balance:", balance)
+```
+
+## পরবর্তী পাঠ
+
+[স্মার্ট কন্ট্র্যাক্ট অডিটিং টুলস: Slither, MythX](/blockchain/auditing-tools)

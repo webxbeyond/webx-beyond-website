@@ -1,0 +1,66 @@
+---
+title: Solidity পরিচিতি
+icon: tabler:brand-solidity
+---
+
+Solidity হল ইথেরিয়াম ও অন্যান্য ব্লকচেইনের জন্য স্মার্ট কন্ট্র্যাক্ট লেখার প্রধান ভাষা। এটি JavaScript, Python, এবং C++-এর মতো সিনট্যাক্স ব্যবহার করে, তাই নতুনদের জন্য শেখা সহজ।
+
+## Solidity কী?
+
+Solidity হল একটি "high-level" প্রোগ্রামিং ভাষা, যা EVM-এ রান করার জন্য কোড লিখতে দেয়।
+
+- **স্মার্ট কন্ট্র্যাক্ট:** ব্লকচেইনে স্বয়ংক্রিয়ভাবে চলা কোড
+- **EVM Bytecode:** Solidity কোড কম্পাইল হয়ে EVM-এ রান হয়
+
+## Solidity-এর বৈশিষ্ট্য
+
+- স্ট্যাটিক টাইপিং
+- ইনহেরিটেন্স
+- লাইব্রেরি ও ইন্টারফেস
+- ইভেন্ট ও লগ
+- অ্যারে, ম্যাপ, স্ট্রাক্ট
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, Solidity হল "চুক্তি লেখার ভাষা"—যেখানে আপনি শর্ত লিখে দেন, আর ব্লকচেইন সেই শর্ত মেনে কাজ করে।
+
+## Solidity কোড উদাহরণ
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SimpleStorage {
+    uint256 public data;
+
+    function setData(uint256 _data) public {
+        data = _data;
+    }
+
+    function getData() public view returns (uint256) {
+        return data;
+    }
+}
+```
+
+এই কন্ট্র্যাক্টে আপনি "data" সেট ও গেট করতে পারবেন।
+
+## Solidity ডেভেলপমেন্ট টুলস
+
+- **Remix IDE:** ব্রাউজারে Solidity কোড লিখে টেস্ট ও ডিপ্লয় করা যায়
+- **Hardhat, Truffle:** প্রফেশনাল ডেভেলপমেন্ট ও টেস্টিং
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- ফাংশনে `require` ও `assert` ব্যবহার করুন
+- Public/Private visibility ঠিকভাবে ব্যবহার করুন
+- Reentrancy, overflow ইত্যাদি ভলনারেবিলিটি এড়িয়ে চলুন
+- টেস্টনেটে ডিপ্লয় করে পরীক্ষা করুন
+
+## বাস্তব জীবনের তুলনা
+
+Solidity হল "নিয়মের বই"—যেখানে আপনি নিয়ম লিখে দেন, আর সবাই সেই নিয়ম মেনে চলে।
+
+## পরবর্তী পাঠ
+
+[প্রথম স্মার্ট কন্ট্র্যাক্ট লেখা ও ডিপ্লয়মেন্ট (Remix IDE)](/blockchain/first-smart-contract)

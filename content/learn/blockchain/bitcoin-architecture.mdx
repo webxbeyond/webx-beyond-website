@@ -1,0 +1,85 @@
+---
+title: "বিটকয়েন আর্কিটেকচার"
+icon: tabler:blocks
+---
+
+বিটকয়েন—প্রথম ব্লকচেইন—এর আর্কিটেকচার বুঝতে হলে block, transaction, network, mining, এবং security কিভাবে একসাথে কাজ করে তা জানতে হবে। এই পাঠে সহজ ভাষায়, উদাহরণ ও analogy দিয়ে বিটকয়েনের গঠন, কাজের পদ্ধতি, এবং প্রযুক্তিগত দিক ব্যাখ্যা করা হয়েছে।
+
+---
+
+## ১. Block Structure
+- Header: version, previous block hash, Merkle root, timestamp, difficulty, nonce
+- Body: transaction list
+- Merkle tree—transaction hash গেঁথে root তৈরি
+
+### Visualization:
+```
+Block Header
+  ├─ Version
+  ├─ Prev Block Hash
+  ├─ Merkle Root
+  ├─ Timestamp
+  ├─ Difficulty
+  └─ Nonce
+Block Body
+  └─ Transactions
+```
+
+---
+
+## ২. Transaction Model (UTXO)
+- Unspent Transaction Output (UTXO)—balance হিসাব
+- Input, output—address, amount, signature
+- Double spending prevent—UTXO spent once only
+
+### উদাহরণ:
+- Alice → Bob: 1 BTC, Bob → Carol: 0.5 BTC
+
+---
+
+## ৩. Peer-to-Peer Network
+- Nodes—full node, miner, lightweight node
+- Gossip protocol—transaction/block propagate
+- Decentralized—no central server
+
+---
+
+## ৪. Mining & Consensus
+- Proof of Work—block create, validate
+- Mining—new block add, reward earn
+- Difficulty adjust—network security
+
+---
+
+## ৫. Security Features
+- Cryptography—hash, digital signature
+- Immutable ledger—tamper-proof
+- 51% attack—network majority needed
+
+---
+
+## ৬. Analogy: খাতা, তালা, ও কমিটি
+- Block: খাতার page
+- Merkle tree: transaction bundle
+- Mining: নতুন page approve
+- Network: সবাই মিলে খাতা রাখে
+
+---
+
+## ৭. Impact & Use
+- Trustless money transfer
+- Global, censorship-resistant
+- Foundation for all modern blockchain
+
+---
+
+## ৮. Tips
+- Block explorer-এ block/transaction details দেখুন
+- UTXO model—balance, double spending বুঝুন
+- Mining/security—real-world analogy
+
+---
+
+## ৯. পরবর্তী পাঠ
+
+[প্রুফ অব ওয়ার্ক (PoW)](/blockchain/proof-of-work)

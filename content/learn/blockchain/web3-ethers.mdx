@@ -1,0 +1,74 @@
+---
+title: Web3.js ও Ethers.js লাইব্রেরি
+icon: tabler:brand-javascript
+---
+
+Web3.js ও Ethers.js হল দুটি জনপ্রিয় JavaScript লাইব্রেরি, যা দিয়ে আপনি Ethereum ব্লকচেইনের সাথে ইন্টারঅ্যাক্ট করতে পারবেন—ড্যাপ, ফ্রন্টএন্ড, ও স্ক্রিপ্টে।
+
+## Web3.js কী?
+
+Web3.js হল একটি পুরাতন ও শক্তিশালী লাইব্রেরি, যা দিয়ে:
+- স্মার্ট কন্ট্র্যাক্ট ডিপ্লয় ও কল
+- ট্রান্সাকশন পাঠানো
+- ইভেন্ট পড়া
+- অ্যাকাউন্ট, ব্যালেন্স, ব্লক তথ্য
+
+### Web3.js ইন্সটল ও ব্যবহার
+
+```bash
+npm install web3
+```
+
+```javascript
+const Web3 = require('web3');
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_PROJECT_ID');
+
+const balance = await web3.eth.getBalance('0xAddress');
+console.log(web3.utils.fromWei(balance, 'ether'));
+```
+
+## Ethers.js কী?
+
+Ethers.js হল একটি নতুন, লাইটওয়েট, ও মডুলার লাইব্রেরি, যা দিয়ে:
+- স্মার্ট কন্ট্র্যাক্ট ইন্টারঅ্যাকশন
+- ট্রান্সাকশন, সাইনিং
+- ইভেন্ট পড়া
+- HD Wallet, ENS
+
+### Ethers.js ইন্সটল ও ব্যবহার
+
+```bash
+npm install ethers
+```
+
+```javascript
+const { ethers } = require('ethers');
+const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/YOUR_PROJECT_ID');
+
+const balance = await provider.getBalance('0xAddress');
+console.log(ethers.formatEther(balance));
+```
+
+## তুলনা: Web3.js বনাম Ethers.js
+
+| ফিচার         | Web3.js         | Ethers.js       |
+|---------------|-----------------|----------------|
+| Size          | Heavy           | Lightweight    |
+| API           | Callback/Promise| Promise/Async  |
+| Docs          | Good            | Excellent      |
+| Wallet        | Basic           | HD Wallet      |
+| ENS           | No              | Yes            |
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, Web3.js হল "পুরাতন গাড়ি"—বিশ্বাসযোগ্য, শক্তিশালী, কিন্তু কিছুটা ভারী। Ethers.js হল "নতুন গাড়ি"—ফাস্ট, স্মার্ট, ও আধুনিক ফিচার।
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- API key/Private key কখনো প্রকাশ করবেন না
+- Rate limit ও error handling ব্যবহার করুন
+- Ethers.js-এ HD Wallet ও ENS ফিচার ব্যবহার করুন
+
+## পরবর্তী পাঠ
+
+[স্মার্ট কন্ট্র্যাক্টকে ওয়েব ফ্রন্টএন্ডের সাথে কানেক্ট করা](/blockchain/frontend-integration)

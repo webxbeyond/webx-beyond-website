@@ -1,0 +1,79 @@
+---
+title: Hardhat ও Truffle ফ্রেমওয়ার্ক
+icon: tabler:settings
+---
+
+Hardhat ও Truffle হল ইথেরিয়াম স্মার্ট কন্ট্র্যাক্ট ডেভেলপমেন্টের জন্য সবচেয়ে জনপ্রিয় ফ্রেমওয়ার্ক। এই টুলগুলো দিয়ে আপনি স্মার্ট কন্ট্র্যাক্ট লিখতে, টেস্ট করতে, ডিপ্লয় করতে, ও ডিবাগ করতে পারবেন।
+
+## Hardhat কী?
+
+Hardhat হল একটি আধুনিক ডেভেলপমেন্ট এনভায়রনমেন্ট, যেখানে:
+- লোকাল নেটওয়ার্ক (Hardhat Network)
+- প্লাগইন সাপোর্ট (Ethers.js, Waffle, Solidity Coverage)
+- টেস্টিং, ডিপ্লয়মেন্ট, ডিবাগিং
+
+### Hardhat ইন্সটল ও ব্যবহার
+
+```bash
+npm install --save-dev hardhat
+npx hardhat init
+```
+
+- `hardhat.config.js`-এ নেটওয়ার্ক, প্লাগইন, কন্ট্র্যাক্ট কনফিগার করুন
+- `npx hardhat test` দিয়ে টেস্ট চালান
+
+## Truffle কী?
+
+Truffle হল একটি পুরাতন ও জনপ্রিয় ফ্রেমওয়ার্ক, যেখানে:
+- লোকাল নেটওয়ার্ক (Ganache)
+- টেস্টিং (Mocha/Chai)
+- ডিপ্লয়মেন্ট স্ক্রিপ্ট
+- ফ্রন্টএন্ড ইন্টিগ্রেশন (Web3.js)
+
+### Truffle ইন্সটল ও ব্যবহার
+
+```bash
+npm install -g truffle
+truffle init
+```
+
+- `truffle-config.js`-এ নেটওয়ার্ক, কন্ট্র্যাক্ট কনফিগার করুন
+- `truffle test` দিয়ে টেস্ট চালান
+
+## Hardhat বনাম Truffle
+
+| ফিচার         | Hardhat         | Truffle         |
+|---------------|-----------------|----------------|
+| Network       | Hardhat Network | Ganache         |
+| Test          | Waffle/Mocha    | Mocha/Chai      |
+| Plugin        | Extensive       | Limited         |
+| Debug         | Built-in        | Basic           |
+| Coverage      | Yes             | Yes             |
+
+## বাস্তব উদাহরণ
+
+ধরা যাক, Hardhat হল "নতুন স্মার্টফোন"—বেশি ফিচার, ফাস্ট, কাস্টমাইজেবল। Truffle হল "পুরাতন স্মার্টফোন"—বিশ্বাসযোগ্য, সহজ, কিন্তু কিছু সীমাবদ্ধতা।
+
+## কোড উদাহরণ: Hardhat টেস্ট
+
+```javascript
+const { expect } = require("chai");
+describe("SimpleStorage", function () {
+  it("Should set and get data", async function () {
+    const SimpleStorage = await ethers.getContractFactory("SimpleStorage");
+    const contract = await SimpleStorage.deploy();
+    await contract.setData(42);
+    expect(await contract.getData()).to.equal(42);
+  });
+});
+```
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- Hardhat/Truffle-এ টেস্ট কভারেজ ব্যবহার করুন
+- লোকাল নেটওয়ার্কে ডিপ্লয় করে পরীক্ষা করুন
+- প্লাগইন ও স্ক্রিপ্ট দিয়ে ডেভেলপমেন্ট সহজ করুন
+
+## পরবর্তী পাঠ
+
+[Web3.js ও Ethers.js লাইব্রেরি](/blockchain/web3-ethers)

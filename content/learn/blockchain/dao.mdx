@@ -1,0 +1,74 @@
+---
+title: DAO বেসিকস
+icon: tabler:users-group
+---
+
+DAO (Decentralized Autonomous Organization) হচ্ছে এমন একটি ডিজিটাল সংগঠন, যেখানে সিদ্ধান্ত নেওয়া, ফান্ড ম্যানেজমেন্ট, ও গভারনেন্স—all কিছু স্মার্ট কন্ট্র্যাক্ট ও টোকেন-ভোটিংয়ের মাধ্যমে হয়। কোনো সেন্ট্রাল অথরিটি নেই, সবাই মিলে নিয়ম বানায় ও সিদ্ধান্ত নেয়।
+
+## DAO কীভাবে কাজ করে?
+
+- **Smart Contract:** DAO-এর নিয়ম, ভোটিং, ও ফান্ড ম্যানেজমেন্ট—all কিছু স্মার্ট কন্ট্র্যাক্টে লেখা থাকে।
+- **Token Voting:** সদস্যরা টোকেন ধরে রাখে, সেই টোকেন দিয়ে ভোট দেয়।
+- **Proposals:** কেউ নতুন আইডিয়া বা সিদ্ধান্ত নিতে চাইলে "Proposal" সাবমিট করে।
+- **Execution:** ভোটে পাশ হলে স্মার্ট কন্ট্র্যাক্ট সেই সিদ্ধান্ত এক্সিকিউট করে।
+
+## DAO-এর সুবিধা
+
+- **Decentralization:** কোনো একক ব্যক্তি বা গ্রুপ নিয়ন্ত্রণ করে না।
+- **Transparency:** সবকিছু ব্লকচেইনে, সবাই দেখতে পারে।
+- **Global Collaboration:** পৃথিবীর যেকোনো জায়গা থেকে সদস্য হতে পারে।
+
+## বাস্তব উদাহরণ
+
+- **MakerDAO:** DAI স্টেবলকয়েনের গভারনেন্স।
+- **Uniswap DAO:** Uniswap-এর ফিচার, ফান্ড, ও আপগ্রেডের সিদ্ধান্ত।
+- **Aave DAO:** DeFi লেন্ডিং প্ল্যাটফর্মের নিয়ম ও ফান্ড ম্যানেজমেন্ট।
+
+## DAO গঠন করার ধাপ
+
+1. **Smart Contract তৈরি:** Solidity বা অন্য ভাষায় DAO-এর নিয়ম লিখুন।
+2. **Token Issue:** সদস্যদের জন্য গভারনেন্স টোকেন তৈরি করুন।
+3. **Proposal System:** কেউ নতুন সিদ্ধান্ত নিতে চাইলে Proposal সাবমিট করতে পারবে এমন ব্যবস্থা করুন।
+4. **Voting Mechanism:** টোকেন ধরে রাখা সদস্যরা ভোট দিতে পারবে।
+5. **Execution Logic:** ভোটে পাশ হলে স্মার্ট কন্ট্র্যাক্ট সিদ্ধান্ত এক্সিকিউট করবে।
+
+### Python-অনুরূপ কোড (Simplified)
+
+```python
+class DAO:
+    def __init__(self):
+        self.proposals = []
+        self.votes = {}
+    def submit_proposal(self, proposal):
+        self.proposals.append(proposal)
+        self.votes[proposal] = 0
+    def vote(self, proposal, tokens):
+        self.votes[proposal] += tokens
+    def execute(self, proposal):
+        if self.votes[proposal] > 100:  # Threshold
+            print(f"Executing: {proposal}")
+
+dao = DAO()
+dao.submit_proposal("Fund new project")
+dao.vote("Fund new project", 120)
+dao.execute("Fund new project")
+```
+
+## নিরাপত্তা ও পারফরম্যান্স টিপস
+
+- **Smart Contract Audit:** DAO-এর স্মার্ট কন্ট্র্যাক্ট অবশ্যই অডিট করান।
+- **Sybil Attack Protection:** এক ব্যক্তি অনেক টোকেন কিনে ভোট নিয়ন্ত্রণ করতে পারে—"Quadratic Voting" বা "KYC" ব্যবহার করুন।
+- **Proposal Spam:** Proposal সাবমিটের জন্য ফি বা টোকেন স্টেকিং রাখুন।
+
+## Analogies
+
+- **Cooperative Society:** গ্রামের সমিতির মতো—সবাই মিলে সিদ্ধান্ত নেয়, সবাই মেম্বার।
+- **Online Forum Voting:** Reddit বা Stack Overflow-তে ভোটিংয়ের মতো, তবে এখানে টোকেনের ভিত্তিতে ভোটের ওজন।
+
+## ভবিষ্যৎ
+
+DAO ভবিষ্যতের সংগঠন—কোনো কোম্পানি, NGO, বা কমিউনিটি—সবকিছু DAO-তে রূপ নিতে পারে। গ্লোবাল, ট্রান্সপারেন্ট, ও অটোনোমাস।
+
+---
+
+**পরবর্তী পাঠ:** [সঠিক ব্লকচেইন প্ল্যাটফর্ম বাছাই](/blockchain/platform-selection)
