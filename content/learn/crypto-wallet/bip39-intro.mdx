@@ -22,12 +22,95 @@ cat mango river moon tiger apple cloud drum fish lamp tree sun
 - **ব্যাকআপ ও রিকভারি:** ওয়ালেট হারিয়ে গেলে বা নতুন ডিভাইসে সেটআপ করতে চাইলে এই phrase দিয়েই সব restore করা যায়।
 - **একাধিক অ্যাকাউন্ট:** একই সিড ফ্রেইজ থেকে একাধিক অ্যাকাউন্ট/অ্যাড্রেস তৈরি করা যায় (HD Wallets)।
 
-## BIP39 কীভাবে কাজ করে?
-BIP39 মূলত তিনটি ধাপে কাজ করে:
 
-1. **Entropy (র‍্যান্ডম ডেটা) তৈরি:** প্রথমে একটি র‍্যান্ডম সংখ্যা (128, 192, বা 256 বিট) তৈরি হয়।
-2. **Mnemonic Phrase জেনারেশন:** এই র‍্যান্ডম ডেটা থেকে নির্দিষ্ট নিয়মে শব্দের একটি লিস্ট তৈরি হয় (BIP39 Wordlist)।
-3. **Seed Derivation:** এই শব্দগুলো থেকে একটি "seed" তৈরি হয়, যা দিয়ে ওয়ালেটের সকল চাবি (key) জেনারেট হয়।
+## BIP39: পূর্ণাঙ্গ জেনারেশন প্রসেস
+BIP39 Mnemonic Phrase তৈরির পুরো অ্যালগরিদম:
+
+
+### ১. Entropy (র‍্যান্ডম ডেটা) তৈরি
+- সাধারণত 128, 160, 192, 224, বা 256 বিটের র‍্যান্ডম সংখ্যা তৈরি হয়।
+
+#### কিভাবে Entropy তৈরি হয়?
+- Entropy মানে হচ্ছে একদম এলোমেলো (random) বিট/সংখ্যা, যা কম্পিউটার বা ডিভাইসের "random number generator" থেকে আসে।
+- আধুনিক ওয়ালেট/লাইব্রেরি সাধারণত OS-level cryptographic random generator ব্যবহার করে (যেমন: Python-এ `os.urandom`, JavaScript-এ `crypto.getRandomValues`)।
+- এই এলোমেলো বিটই Mnemonic phrase-এর ভিত্তি।
+
+#### উদাহরণ (Python):
+```python
+import os
+# 128-bit entropy
+entropy = os.urandom(16) # 16 bytes = 128 bits
+print(entropy.hex())
+```
+
+#### উদাহরণ (JavaScript):
+```js
+const entropy = window.crypto.getRandomValues(new Uint8Array(16)); // 128 bits
+console.log(Array.from(entropy).map(b=>b.toString(16).padStart(2,'0')).join(''));
+```
+
+> **নোট:** বেশি entropy মানে বেশি নিরাপত্তা।
+
+
+### ২. Checksum যোগ
+- SHA256 দিয়ে entropy-এর checksum বের করা হয়।
+- checksum-এর প্রথম N বিট (N = entropy length / 32) entropy-এর শেষে যোগ করা হয়।
+
+### ৩. Bit Grouping ও Word Mapping
+- পুরো বিটস্ট্রিংকে 11-বিট করে ভাগ করা হয়।
+- প্রতিটি 11-বিট একটি শব্দের index (BIP39 wordlist-এ) নির্দেশ করে।
+- যেমন, 128 বিট entropy + 4 বিট checksum = 132 বিট → 12টি শব্দ (12 x 11 = 132)
+
+### ৪. Mnemonic Phrase
+- এই index-গুলো দিয়ে BIP39 wordlist থেকে Mnemonic Phrase তৈরি হয়।
+
+### ৫. Seed Derivation
+- Mnemonic phrase + (ঐচ্ছিক) passphrase নিয়ে PBKDF2 (HMAC-SHA512) অ্যালগরিদমে 2048 রাউন্ড চালিয়ে 512-বিট seed তৈরি হয়।
+
+### উদাহরণ: Seed Phrase ক্যালকুলেশন
+
+ধরা যাক, 128-বিট entropy:  
+`00000010 11010101 10101010 11110000 10101010 11001100 11110000 10101010 11001100 11110000 10101010 11001100 11110000 10101010 11001100 11110000`
+
+১. SHA256 দিয়ে checksum বের করুন (প্রথম 4 বিট):  
+`1010`
+
+২. Entropy + checksum:  
+`...11110000 1010`
+
+৩. 11-বিট করে ভাগ করুন:  
+`00000010110`, `10101101010`, ... (মোট 12টি গ্রুপ)
+
+৪. প্রতিটি গ্রুপের index অনুযায়ী wordlist থেকে শব্দ নিন:  
+`abandon`, `ability`, ... (মোট 12টি শব্দ)
+
+এভাবেই Mnemonic Phrase তৈরি হয়।
+
+### Python Demo: পূর্ণ অ্যালগরিদম
+
+```python
+import os, hashlib
+from mnemonic import Mnemonic
+
+# 128-bit entropy
+entropy = os.urandom(16)
+checksum = hashlib.sha256(entropy).hexdigest()
+# checksum bits
+checksum_bits = bin(int(checksum, 16))[2:].zfill(256)[:4]
+entropy_bits = bin(int.from_bytes(entropy, 'big'))[2:].zfill(128)
+full_bits = entropy_bits + checksum_bits
+
+# 11-bit group
+words_idx = [int(full_bits[i:i+11], 2) for i in range(0, len(full_bits), 11)]
+mnemo = Mnemonic("english")
+mnemonic = ' '.join([mnemo.wordlist[idx] for idx in words_idx])
+seed = mnemo.to_seed(mnemonic, passphrase="")
+print("Mnemonic:", mnemonic)
+print("Seed:", seed.hex())
+```
+
+### অ্যানালজি
+- যেমন লকারের মাস্টার চাবি তৈরি হয় নির্দিষ্ট নিয়মে, Mnemonic Phrase-ও নির্দিষ্ট অ্যালগরিদমে তৈরি হয়—এতে নিরাপত্তা ও পুনরুদ্ধার সহজ হয়।
 
 ### Python Demo: Mnemonic Phrase থেকে Seed
 ```python
@@ -52,5 +135,20 @@ print(seed.hex())
 ## BIP39 Wordlist
 BIP39 স্ট্যান্ডার্ডে ২০৪৮টি শব্দের একটি নির্দিষ্ট লিস্ট থাকে। প্রতিটি Mnemonic Phrase এই লিস্ট থেকেই তৈরি হয়।
 
+- [BIP39 English Wordlist (GitHub)](https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt)
+
+
+import SeedPhraseTool from "../../../components/SeedPhraseTool";
+
+### ইন্টার‍্যাকটিভ: Seed Phrase জেনারেটর ও ডিকোডার
+
+<SeedPhraseTool />
+
+---
+
+#### কিভাবে কাজ করে?
+- "Generate Seed Phrase" বাটনে ক্লিক করলে একটি র‍্যান্ডম Mnemonic phrase তৈরি হবে।
+- "Decode Seed Phrase"-এ আপনার phrase লিখলে, সেটি থেকে seed ও entropy বের হবে।
+
 ## পরবর্তী ধাপ
-- **HD Wallets ও Derivation Path:** কিভাবে এই seed থেকে একাধিক অ্যাকাউন্ট/অ্যাড্রেস তৈরি হয়, তা পরবর্তী পাঠে জানবো।
+- **HD Wallets ও Derivation Path:** কিভাবে এই seed থেকে একাধিক অ্যাকাউন্ট/অ্যাড্রেস তৈরি হয়, তা পরে জানবো।

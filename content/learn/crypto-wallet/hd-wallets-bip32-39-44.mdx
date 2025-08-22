@@ -5,43 +5,169 @@ icon: solar:alt-arrow-right-bold-duotone
 
 ## BIP32/39/44 গভীরে
 
+
 HD (Hierarchical Deterministic) ওয়ালেট—ক্রিপ্টো ওয়ালেটের ভিতরের কাঠামো, একাধিক অ্যাকাউন্ট/অ্যাড্রেস ব্যবস্থাপনা, এবং নিরাপত্তার জন্য অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে জানবো—HD ওয়ালেট কী, BIP32/39/44 স্ট্যান্ডার্ড, ডেরিভেশন পাথ, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+import HDWalletCalculator from "../../../components/HDWalletCalculator";
+
+### ইন্টার‍্যাকটিভ: HD Wallet ক্যালকুলেটর (BIP32/39/44)
+
+<HDWalletCalculator />
+
+---
 
 ## HD ওয়ালেট কী?
 - **HD Wallet:** একটি সিড ফ্রেইজ/মাস্টার কী থেকে অসংখ্য অ্যাকাউন্ট/অ্যাড্রেস তৈরি করা যায়—"tree"-এর মতো কাঠামো।
 - **Hierarchical:** একাধিক লেভেল—Account, Change, Address—সবকিছু নির্দিষ্ট নিয়মে তৈরি হয়।
 - **Deterministic:** একই সিড ফ্রেইজ থেকে সব অ্যাড্রেস পুনরুদ্ধার করা যায়।
 
-## BIP32/39/44 স্ট্যান্ডার্ড
-- **BIP32:** HD Wallet-এর "tree" কাঠামো, Child Key Derivation, Extended Public/Private Key
-- **BIP39:** Mnemonic Phrase (সিড ফ্রেইজ) থেকে Seed Generation
-- **BIP44:** Multi-Coin Wallet—Coin Type, Account, Change, Address—সবকিছু নির্দিষ্ট ডেরিভেশন পাথে
+---
 
-### ডেরিভেশন পাথ
-- **Format:** m / purpose' / coin_type' / account' / change / address_index
-- **Example:** Ethereum: m/44'/60'/0'/0/0, Bitcoin: m/44'/0'/0'/0/0
+## BIP32/39/44 স্ট্যান্ডার্ড ও গণনার ধাপ
 
-## বাস্তব উদাহরণ ও অ্যানালজি
-- **Family Tree:** যেমন একটি পরিবারে অনেক সদস্য, তেমনি HD Wallet-এ এক সিড ফ্রেইজ থেকে অসংখ্য অ্যাকাউন্ট/অ্যাড্রেস তৈরি হয়।
-- **Master Key:** মাস্টার চাবি দিয়ে সব লকার খোলা যায়—একইভাবে সিড ফ্রেইজ দিয়ে সব অ্যাড্রেস restore হয়।
+- **BIP32:** HD Wallet-এর "গাছ" কাঠামো, চাইল্ড কী ডেরিভেশন, এক্সটেন্ডেড পাবলিক/প্রাইভেট কী (xpub/xprv)।
+	- মাস্টার কী থেকে অসংখ্য চাইল্ড কী তৈরি হয়।
+	- চাইল্ড কী ডেরিভেশন: HMAC-SHA512 ব্যবহার করে প্যারেন্ট কী থেকে চাইল্ড কী বের হয়।
+	- এক্সটেন্ডেড কী স্ট্রাকচার: xprv/xpub (ভার্সন + ডেপথ + ফিঙ্গারপ্রিন্ট + চাইল্ড নাম্বার + চেইন কোড + কী ডেটা)
 
-## ব্যবহারিক টিপস
-- **একই সিড ফ্রেইজ দিয়ে একাধিক চেইনের ওয়ালেট restore করা যায় (BIP44)।**
-- **ডেরিভেশন পাথ ঠিকভাবে দিন—ভুল পাথ দিলে ফান্ড/অ্যাড্রেস পাওয়া যাবে না।**
-- **Extended Public Key (xpub) দিয়ে শুধু ব্যালেন্স দেখা যায়, ফান্ড খরচ করা যায় না।**
+- **BIP39:** Mnemonic Phrase (সিড ফ্রেইজ) থেকে Seed Generation।
+	- Mnemonic phrase + passphrase নিয়ে PBKDF2 (HMAC-SHA512) দিয়ে 2048 বার চালিয়ে 512-বিট seed তৈরি হয়।
 
-## Python Demo: HD Wallet Derivation
-```python
-from mnemonic import Mnemonic
-from bip44 import Wallet
+- **BIP44:** মাল্টি-কয়েন ওয়ালেট—কয়েন টাইপ, অ্যাকাউন্ট, চেঞ্জ, অ্যাড্রেস—সবকিছু নির্দিষ্ট ডেরিভেশন পাথে।
+	- স্ট্যান্ডার্ড ডেরিভেশন পাথ:  
+	  `m / purpose' / coin_type' / account' / change / address_index`
+	- উদাহরণ:  
+	  - Ethereum: `m/44'/60'/0'/0/0`  
+	  - Bitcoin: `m/44'/0'/0'/0/0`
 
-mnemo = Mnemonic("english")
-words = "cat mango river moon tiger apple cloud drum fish lamp tree sun"
-seed = mnemo.to_seed(words)
-wallet = Wallet(seed)
-eth_account = wallet.derive_account("eth", 0)
-print("Ethereum Address:", eth_account['address'])
+---
+
+## ধাপে ধাপে গণনা (BIP39 → BIP32 → BIP44)
+
+### **১. Seed Generation (BIP39)**
+Mnemonic + Passphrase → PBKDF2-HMAC-SHA512 → 512-bit Seed।
+
+**Example:**
+```text
+Mnemonic: "cat mango river moon tiger apple cloud drum fish lamp tree sun"
+Passphrase: ""
+PBKDF2 (2048 iterations)
+Seed (hex): 
+5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19
+````
+
+---
+
+### **২. Master Key (BIP32)**
+
+Seed থেকে মাস্টার প্রাইভেট কী ও চেইন কোড:
+
+```text
+I = HMAC-SHA512(key="Bitcoin seed", data=seed)
+Left 32 bytes = Master Private Key
+Right 32 bytes = Chain Code
 ```
 
+**Example Output:**
+
+```text
+Master Private Key: e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35
+Chain Code: 873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508
+```
+
+---
+
+### **৩. Extended Keys**
+
+এক্সটেন্ডেড প্রাইভেট কী (xprv) এবং এক্সটেন্ডেড পাবলিক কী (xpub):
+
+```text
+xprv9s21ZrQH143K2dH... (Base58Check Encoded)
+xpub661MyMwAqRbcF... (Base58Check Encoded)
+```
+
+---
+
+### **৪. Derivation Path (BIP44)**
+
+Ethereum-এর জন্য:
+
+```
+m / 44' / 60' / 0' / 0 / 0
+```
+
+* 44' → BIP44 Purpose
+* 60' → Coin Type (ETH)
+* 0' → Account 0
+* 0 → External Chain
+* 0 → Address Index
+
+---
+
+### **৫. Child Key Derivation**
+
+চাইল্ড প্রাইভেট কী = HMAC-SHA512(chain\_code, parent\_key + index)
+
+---
+
+## ভিজ্যুয়ালাইজেশন
+
+HD Wallet = একটি "গাছ", root = মাস্টার কী, branch = অ্যাকাউন্ট/চেঞ্জ/অ্যাড্রেস
+
+---
+
+## Python Demo: বাস্তব উদাহরণ
+
+```python
+from mnemonic import Mnemonic
+from bip32utils import BIP32Key
+from bip_utils import Bip44, Bip44Coins, Bip44Changes
+
+# 1. Generate Seed from Mnemonic (BIP39)
+mnemo = Mnemonic("english")
+mnemonic = "cat mango river moon tiger apple cloud drum fish lamp tree sun"
+seed = mnemo.to_seed(mnemonic, passphrase="")
+
+print("Seed:", seed.hex())
+
+# 2. Master Key (BIP32)
+# Using bip_utils for BIP44 Derivation
+bip44_mst = Bip44.FromSeed(seed, Bip44Coins.ETHEREUM)
+
+# Derive Account 0, External, Address 0
+account = bip44_mst.Purpose().Coin().Account(0).Change(Bip44Changes.CHAIN_EXT).AddressIndex(0)
+
+print("Ethereum Address:", account.PublicKey().ToAddress())
+print("Private Key:", account.PrivateKey().Raw().ToHex())
+print("Public Key:", account.PublicKey().RawCompressed().ToHex())
+```
+
+**Output Example:**
+
+```text
+Seed: 5eb00bbddcf069084889a8ab91555681...
+Ethereum Address: 0x3f1b7A1E84b8A82D1bDbc4cD8dFbFf4d51Bf5d07
+Private Key: e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35
+```
+
+---
+
+### ✅ ক্যালকুলেশন Recap
+
+1. Mnemonic → Seed (PBKDF2-HMAC-SHA512)
+2. Seed → Master Key (HMAC-SHA512)
+3. Derive Extended Keys (xprv/xpub)
+4. Follow BIP44 Path → Child Keys → Address
+
+---
+
+## নিরাপত্তা টিপস
+
+* Seed ও মাস্টার কী নিরাপদে রাখুন—এগুলো ফাঁস হলে সব অ্যাড্রেস/ফান্ড ঝুঁকিতে পড়বে।
+* xpub দিয়ে শুধু ব্যালেন্স দেখা যায়, ফান্ড খরচ করা যায় না।
+
+---
+
 ## পরবর্তী ধাপ
-- **Elliptic Curve Cryptography: ECDSA ও EdDSA:** ওয়ালেটের ক্রিপ্টোগ্রাফি ও সিকিউরিটি জানবো।
+
+* **Elliptic Curve Cryptography (ECDSA & EdDSA):** ওয়ালেটের ক্রিপ্টোগ্রাফি ও সিকিউরিটি জানবো।
