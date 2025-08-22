@@ -1,0 +1,42 @@
+---
+title: EVM কম্প্যাটিবিলিটি কী ও কেন গুরুত্বপূর্ণ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেট, dApp, এবং মাল্টি-চেইন ব্যবহারের ক্ষেত্রে EVM (Ethereum Virtual Machine) কম্প্যাটিবিলিটি একটি মৌলিক ধারণা। এই পাঠে জানবো—EVM কী, EVM-কম্প্যাটিবল চেইন কী, কেন এটি গুরুত্বপূর্ণ, বাস্তব উদাহরণ, অ্যানালজি, এবং ব্যবহারিক টিপস।
+
+## EVM কী?
+EVM (Ethereum Virtual Machine) হচ্ছে Ethereum ব্লকচেইনের "কম্পিউটার"—যেখানে স্মার্ট কন্ট্রাক্ট রান হয়। EVM-এর কোড, লজিক, এবং স্ট্যান্ডার্ড অনেক চেইনে ব্যবহার হয়।
+
+## EVM-কম্প্যাটিবল চেইন কী?
+- **EVM-কম্প্যাটিবল চেইন:** যেসব ব্লকচেইন Ethereum-এর মতো একই কোড, অ্যাড্রেস, এবং স্মার্ট কন্ট্রাক্ট স্ট্যান্ডার্ড (Solidity, ERC-20, ERC-721) সাপোর্ট করে—Polygon, BSC, Avalanche, Arbitrum, Optimism ইত্যাদি।
+- **MetaMask, Trust Wallet, Rabby:** এই ওয়ালেটগুলো EVM-কম্প্যাটিবল চেইনে একইভাবে কাজ করে।
+
+## কেন EVM কম্প্যাটিবিলিটি গুরুত্বপূর্ণ?
+- **মাল্টি-চেইন ইউজ:** এক ওয়ালেট দিয়ে একাধিক চেইনে ফান্ড, NFT, dApp ব্যবহার করা যায়।
+- **dApp ইকোসিস্টেম:** Uniswap, OpenSea, Aave, Curve—সব EVM-কম্প্যাটিবল চেইনে একইভাবে ব্যবহার করা যায়।
+- **কোড/ডেভেলপমেন্ট:** Solidity, ethers.js, web3.js—একই কোড/লাইব্রেরি দিয়ে একাধিক চেইনে ডেপ্লয়/ইন্টিগ্রেট করা যায়।
+- **নেটওয়ার্ক যোগ:** MetaMask-এ RPC, Chain ID, Currency যোগ করে Polygon, BSC, Arbitrum ইত্যাদি চেইন ব্যবহার করা যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Android Ecosystem:** যেমন Android OS-এ বিভিন্ন ব্র্যান্ডের ফোন চলে, তেমনি EVM-কম্প্যাটিবল চেইনে একই ওয়ালেট/অ্যাপ চলে।
+- **USB Standard:** যেমন USB পোর্টে বিভিন্ন ডিভাইস চলে, তেমনি EVM-কম্প্যাটিবল চেইনে একই dApp/ওয়ালেট চলে।
+
+## ব্যবহারিক টিপস
+- **MetaMask-এ Custom Network যোগ করুন:** Settings > Networks > Add Network
+- **dApp ব্যবহার করার আগে চেইন সিলেক্ট করুন:** ভুল চেইনে ট্রানজ্যাকশন করলে ফান্ড হারাতে পারেন।
+- **Contract Address Verify করুন:** EVM-কম্প্যাটিবল চেইনে contract address মিলিয়ে নিন।
+
+## Python Demo: EVM-কম্প্যাটিবল চেইনে ব্যালেন্স চেক
+```python
+from web3 import Web3
+
+# Polygon Mainnet
+w3 = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
+address = "0xYourAddress"
+balance = w3.eth.get_balance(address)
+print("MATIC Balance:", w3.fromWei(balance, 'ether'))
+```
+
+## পরবর্তী ধাপ
+- **কাস্টম নেটওয়ার্ক যোগ করা:** Polygon, Arbitrum, BSC ইত্যাদি চেইন MetaMask-এ কীভাবে যোগ করবেন, তা পরবর্তী পাঠে জানবো।

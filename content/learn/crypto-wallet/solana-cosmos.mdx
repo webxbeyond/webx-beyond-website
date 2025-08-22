@@ -1,0 +1,65 @@
+---
+title: Solana ও Cosmos ওয়ালেট ইকোসিস্টেম
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+EVM-কম্প্যাটিবল চেইনের বাইরে Solana ও Cosmos ব্লকচেইন—দ্রুত, স্কেলেবল, এবং আলাদা ওয়ালেট ইকোসিস্টেমের জন্য বিখ্যাত। এই পাঠে জানবো—Solana ও Cosmos কী, তাদের ওয়ালেট ইকোসিস্টেম, জনপ্রিয় ওয়ালেট, ব্যবহারিক টিপস, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## Solana ব্লকচেইন ও ওয়ালেট
+- **Solana:** দ্রুত, কম ফি, NFT ও DeFi-তে জনপ্রিয়।
+- **ওয়ালেট:** Phantom, Solflare, Glow, Backpack
+- **ব্যবহার:** NFT, DeFi, dApp, GameFi
+- **ফিচার:** Seed Phrase, SPL Token, Solana Address (base58)
+
+### Phantom Wallet
+- ব্রাউজার এক্সটেনশন ও মোবাইল অ্যাপ
+- Seed Phrase দিয়ে restore
+- NFT, Token, dApp সহজে ব্যবহার
+
+### Solflare
+- Web, Extension, Mobile
+- Staking, NFT, Token
+
+## Cosmos ব্লকচেইন ও ওয়ালেট
+- **Cosmos:** "Internet of Blockchains"—IBC (Inter-Blockchain Communication) দিয়ে একাধিক চেইন কানেক্ট
+- **ওয়ালেট:** Keplr, Cosmostation, Leap
+- **ব্যবহার:** ATOM, OSMO, JUNO, Secret Network
+- **ফিচার:** Seed Phrase, Cosmos Address (bech32), IBC Transfer
+
+### Keplr Wallet
+- Chrome Extension, Web, Mobile
+- IBC Transfer, Staking, dApp
+
+### Cosmostation
+- Mobile, Web
+- Staking, Governance
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Multiple SIM Card:** যেমন এক ফোনে একাধিক SIM, তেমনি এক ইউজার একাধিক চেইনের ওয়ালেট ব্যবহার করতে পারে।
+- **Bank Branch:** যেমন এক ব্যাংকের বিভিন্ন ব্রাঞ্চে আলাদা অ্যাকাউন্ট, তেমনি Solana/Cosmos-এ আলাদা ওয়ালেট লাগে।
+
+## ব্যবহারিক টিপস
+- **Seed Phrase নিরাপদে রাখুন:** Solana/Cosmos ওয়ালেটেও Seed Phrase দিয়ে restore হয়।
+- **Official Source থেকে ওয়ালেট ডাউনলোড করুন।**
+- **IBC Transfer করার সময় চেইন/Address ঠিকভাবে দিন।**
+- **dApp Permission সতর্কভাবে দিন।**
+
+## Python Demo: Solana ও Cosmos Address থেকে ব্যালেন্স চেক
+```python
+# Solana
+from solana.rpc.api import Client
+solana = Client("https://api.mainnet-beta.solana.com")
+address = "YourSolanaAddress"
+balance = solana.get_balance(address)
+print("SOL Balance:", balance['result']['value'] / 1e9)
+
+# Cosmos (ATOM)
+import requests
+address = "YourCosmosAddress"
+url = f"https://api.cosmos.network/bank/balances/{address}"
+resp = requests.get(url)
+print("ATOM Balance:", resp.json())
+```
+
+## পরবর্তী ধাপ
+- **ওয়ালেট অ্যাগ্রিগেটর: Rabby, XDEFI:** একাধিক চেইনের ওয়ালেট একসাথে ব্যবহারের জন্য পরবর্তী পাঠে জানবো।

@@ -1,0 +1,49 @@
+---
+title: DAO-তে অংশগ্রহণ ও ভোটিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DAO (Decentralized Autonomous Organization)—ক্রিপ্টো ইকোসিস্টেমে কমিউনিটি-চালিত, স্বয়ংক্রিয়, এবং ট্রান্সপারেন্ট সিদ্ধান্ত গ্রহণের প্ল্যাটফর্ম। এই পাঠে জানবো—DAO কী, কিভাবে অংশগ্রহণ ও ভোটিং করবেন, বাস্তব উদাহরণ, অ্যানালজি, এবং নিরাপত্তা টিপস।
+
+## DAO কী?
+- **DAO:** ব্লকচেইনে স্মার্ট কন্ট্রাক্ট দিয়ে পরিচালিত, কমিউনিটি-ভিত্তিক অর্গানাইজেশন—যেখানে সদস্যরা টোকেন/NFT দিয়ে সিদ্ধান্ত নেয়।
+- **Governance Token:** DAO-তে ভোটিং/প্রস্তাব করার জন্য টোকেন লাগে—COMP, UNI, AAVE, MKR ইত্যাদি।
+- **NFT DAO:** কিছু DAO-তে NFT দিয়ে সদস্য/ভোটিং হয়।
+
+## DAO-তে অংশগ্রহণ
+- **Wallet Connect:** MetaMask, Phantom, XDEFI—ওয়ালেট দিয়ে DAO-তে কানেক্ট করুন।
+- **Token/NFT Hold:** Governance Token/NFT ওয়ালেটে থাকলে ভোটিং/প্রস্তাব করতে পারবেন।
+- **dApp/Platform:** Snapshot, Tally, Aragon, DAOhaus—DAO-তে অংশগ্রহণের জন্য জনপ্রিয় প্ল্যাটফর্ম।
+
+### উদাহরণ
+- Uniswap DAO-তে UNI Token দিয়ে ভোটিং করা যায়।
+- ENS DAO-তে ENS Token দিয়ে প্রস্তাব/ভোটিং করা যায়।
+- Friends With Benefits DAO-তে NFT দিয়ে সদস্য হওয়া যায়।
+
+## ভোটিং ও প্রস্তাব
+- **Proposal:** নতুন ফিচার, ফান্ড, কমিউনিটি সিদ্ধান্ত—প্রস্তাব করা যায়।
+- **Voting:** Token/NFT দিয়ে ভোট দেওয়া যায়—"For", "Against", "Abstain"।
+- **Quorum:** নির্দিষ্ট সংখ্যক ভোট না হলে প্রস্তাব পাশ হয় না।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Cooperative Society:** যেমন সমবায় সমিতিতে সদস্যরা সিদ্ধান্ত নেয়, তেমনি DAO-তে কমিউনিটি সিদ্ধান্ত নেয়।
+- **Online Poll:** যেমন অনলাইনে ভোটিং হয়, তেমনি DAO-তে স্মার্ট কন্ট্রাক্টে ভোটিং হয়।
+
+## নিরাপত্তা টিপস
+- **Official DAO Platform ব্যবহার করুন:** Snapshot, Tally, Aragon—অফিসিয়াল লিঙ্ক ব্যবহার করুন।
+- **Token/NFT নিরাপদে রাখুন—ভোটিং/প্রস্তাবের জন্য।**
+- **Phishing/Scam থেকে সতর্ক থাকুন—ভুয়া DAO/Proposal এড়ান।
+- **Smart Contract Risk:** DAO Contract Bug/Hack হলে ফান্ড/ভোটিং ঝুঁকিতে পড়তে পারে।
+
+## Python Demo: DAO Voting
+```python
+# DAO Voting Example (Snapshot API)
+import requests
+url = "https://hub.snapshot.org/graphql"
+query = '{ proposals(space: "uniswap", first: 5) { title, state, scores } }'
+resp = requests.post(url, json={"query": query})
+print("Uniswap DAO Proposals:", resp.json())
+```
+
+## পরবর্তী ধাপ
+- **ব্রিজ ও ক্রস-চেইন সোয়াপ নিরাপদে করা:** মাল্টি-চেইন ফান্ড ট্রান্সফার ও সোয়াপের নিরাপত্তা জানবো।

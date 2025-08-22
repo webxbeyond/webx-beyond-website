@@ -1,0 +1,55 @@
+---
+title: Elliptic Curve Cryptography
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ECDSA ও EdDSA
+
+ক্রিপ্টো ওয়ালেটের নিরাপত্তা, সিগনেচার, এবং ফান্ড কন্ট্রোল—সবকিছুর মূল ভিত্তি হচ্ছে Elliptic Curve Cryptography (ECC)। এই পাঠে জানবো—ECC কী, ECDSA ও EdDSA কীভাবে কাজ করে, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## Elliptic Curve Cryptography (ECC) কী?
+- **ECC:** গণিতের "Elliptic Curve" ব্যবহার করে Public/Private Key, Signature, এবং Encryption তৈরি করা হয়।
+- **Security:** ছোট কী-তে বেশি নিরাপত্তা—RSA-এর তুলনায় দ্রুত ও কম ফি।
+
+## ECDSA (Elliptic Curve Digital Signature Algorithm)
+- **ECDSA:** Bitcoin, Ethereum, Solana—সবচেয়ে বেশি ব্যবহৃত Signature Algorithm।
+- **Usage:** Transaction Sign, Wallet Address Generation
+- **Curve:** secp256k1 (Bitcoin/Ethereum), ed25519 (Solana/Cosmos)
+
+## EdDSA (Edwards-curve Digital Signature Algorithm)
+- **EdDSA:** Solana, Cosmos, Cardano—নতুন, দ্রুত, এবং নিরাপদ Signature Algorithm।
+- **Curve:** ed25519
+- **Usage:** Transaction Sign, Wallet Address Generation
+
+## কীভাবে কাজ করে?
+- **Private Key:** র‍্যান্ডম সংখ্যা—"master key"
+- **Public Key:** Private Key থেকে গণিত দিয়ে তৈরি
+- **Signature:** Transaction/message-এ Private Key দিয়ে সাইন—Public Key দিয়ে ভেরিফাই
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Lock & Key:** Private Key হচ্ছে চাবি, Public Key হচ্ছে তালা—চাবি দিয়ে তালা খোলা যায়, তালা দেখে চাবি বানানো যায় না।
+- **Digital Signature:** যেমন কাগজে সিগনেচার দিয়ে অথেন্টিকেশন হয়, তেমনি Transaction-এ Digital Signature দিয়ে অথেন্টিকেশন হয়।
+
+## ব্যবহারিক টিপস
+- **Private Key নিরাপদে রাখুন—চুরি হলে ফান্ড হারাতে পারেন।**
+- **Public Key/Address শেয়ার করা নিরাপদ—ফান্ড রিসিভের জন্য।**
+- **Signature ভেরিফাই করুন—dApp/Contract-এ।**
+
+## Python Demo: ECDSA ও EdDSA Signature
+```python
+# ECDSA (secp256k1)
+from ecdsa import SigningKey, SECP256k1
+sk = SigningKey.generate(curve=SECP256k1)
+message = b"Hello, blockchain!"
+signature = sk.sign(message)
+print("ECDSA Signature:", signature)
+
+# EdDSA (ed25519)
+from nacl.signing import SigningKey as EdSigningKey
+ed_sk = EdSigningKey.generate()
+ed_signature = ed_sk.sign(message)
+print("EdDSA Signature:", ed_signature.signature)
+```
+
+## পরবর্তী ধাপ
+- **ডেরিভেশন পাথ ও অ্যাড্রেস ফরম্যাট (BTC/ETH/SOL):** অ্যাড্রেস কিভাবে তৈরি হয়, তা জানবো।

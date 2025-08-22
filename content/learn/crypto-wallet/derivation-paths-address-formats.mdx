@@ -1,0 +1,59 @@
+---
+title: ডেরিভেশন পাথ ও অ্যাড্রেস ফরম্যাট (BTC/ETH/SOL)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেটের ভিতরের কাঠামো, অ্যাড্রেস জেনারেশন, এবং মাল্টি-চেইন ব্যবস্থাপনায় ডেরিভেশন পাথ ও অ্যাড্রেস ফরম্যাট—অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে জানবো—ডেরিভেশন পাথ কী, BTC/ETH/SOL-এর অ্যাড্রেস ফরম্যাট, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## ডেরিভেশন পাথ কী?
+- **Derivation Path:** HD Wallet-এ সিড ফ্রেইজ থেকে অ্যাকাউন্ট/অ্যাড্রেস তৈরির নির্দিষ্ট "রোডম্যাপ"—m/44'/coin_type'/account'/change/address_index
+- **Purpose:** এক সিড ফ্রেইজ থেকে একাধিক চেইনের অ্যাড্রেস/অ্যাকাউন্ট তৈরি করা যায়।
+
+### উদাহরণ
+- **Ethereum:** m/44'/60'/0'/0/0
+- **Bitcoin:** m/44'/0'/0'/0/0
+- **Solana:** m/44'/501'/0'/0'
+
+## অ্যাড্রেস ফরম্যাট
+### Bitcoin
+- **Legacy (P2PKH):** 1xxxxxx
+- **SegWit (P2SH):** 3xxxxxx
+- **Native SegWit (Bech32):** bc1xxxxxx
+
+### Ethereum
+- **Hexadecimal:** 0x + 40 character (A-F, 0-9)
+- **Example:** 0x1234567890abcdef1234567890abcdef12345678
+
+### Solana
+- **Base58:** 44 character (A-Z, a-z, 1-9)
+- **Example:** 4Nd1mYw2... (Solana Address)
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **GPS Route:** যেমন GPS-এ নির্দিষ্ট রোডম্যাপ দিয়ে গন্তব্যে পৌঁছান, তেমনি ডেরিভেশন পাথ দিয়ে নির্দিষ্ট অ্যাড্রেস তৈরি হয়।
+- **Bank Account Number:** যেমন ব্যাংকে একাধিক অ্যাকাউন্ট থাকে, তেমনি এক সিড ফ্রেইজ থেকে একাধিক অ্যাড্রেস তৈরি হয়।
+
+## ব্যবহারিক টিপস
+- **ডেরিভেশন পাথ ঠিকভাবে দিন—ভুল পাথ দিলে ফান্ড/অ্যাড্রেস পাওয়া যাবে না।**
+- **Address Format চেইন অনুযায়ী চেক করুন—ভুল ফরম্যাটে ফান্ড পাঠালে হারাতে পারেন।**
+- **Explorer-এ Address Verify করুন—ফান্ড এসেছে কিনা।**
+
+## Python Demo: Address Generation
+```python
+from mnemonic import Mnemonic
+from bip44 import Wallet
+
+mnemo = Mnemonic("english")
+words = "cat mango river moon tiger apple cloud drum fish lamp tree sun"
+seed = mnemo.to_seed(words)
+wallet = Wallet(seed)
+
+btc_account = wallet.derive_account("btc", 0)
+eth_account = wallet.derive_account("eth", 0)
+sol_account = wallet.derive_account("sol", 0)
+print("BTC Address:", btc_account['address'])
+print("ETH Address:", eth_account['address'])
+print("SOL Address:", sol_account['address'])
+```
+
+## পরবর্তী ধাপ
+- **মাল্টিসিগ ও MPC ওয়ালেট আর্কিটেকচার:** ওয়ালেটের অ্যাডভান্সড সিকিউরিটি ও মাল্টি-ইউজার ব্যবস্থাপনা জানবো।

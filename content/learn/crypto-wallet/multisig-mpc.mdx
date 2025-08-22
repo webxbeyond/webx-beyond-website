@@ -1,0 +1,49 @@
+---
+title: মাল্টিসিগ ও MPC ওয়ালেট আর্কিটেকচার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+অ্যাডভান্সড ক্রিপ্টো ওয়ালেট নিরাপত্তা, মাল্টি-ইউজার কন্ট্রোল, এবং ইনোভেটিভ ফিচারের জন্য মাল্টিসিগ ও MPC (Multi-Party Computation) ওয়ালেট—খুবই গুরুত্বপূর্ণ। এই পাঠে জানবো—মাল্টিসিগ ও MPC কী, কিভাবে কাজ করে, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## মাল্টিসিগ ওয়ালেট কী?
+- **Multisig (Multi-Signature) Wallet:** একাধিক ইউজার/চাবি দিয়ে ফান্ড কন্ট্রোল—"n of m" সাইনেচার লাগবে (যেমন 2 of 3)।
+- **Usage:** DAO, কোম্পানি, ফ্যামিলি ফান্ড, ট্রাস্ট—যেখানে একাধিক মানুষের অনুমতি দরকার।
+- **Platforms:** Gnosis Safe (Ethereum), Electrum (Bitcoin), Solana Multisig
+
+### উদাহরণ
+- DAO-এর ফান্ড কন্ট্রোল করতে 3 জনের মধ্যে 2 জনের সাইন লাগবে।
+- কোম্পানির ফান্ড ট্রান্সফার করতে CFO ও CEO—দুজনের অনুমতি লাগবে।
+
+## MPC ওয়ালেট কী?
+- **MPC (Multi-Party Computation) Wallet:** একাধিক ডিভাইস/ইউজার—Private Key ভাগাভাগি করে, কেউই পুরো চাবি জানে না।
+- **Usage:** ইনস্টিটিউশনাল ফান্ড, Custody, Advanced Security
+- **Platforms:** Fireblocks, ZenGo, Coinbase WaaS
+
+### উদাহরণ
+- কোম্পানির ফান্ড কন্ট্রোল করতে CFO, CTO, Compliance Officer—তিনজনের ডিভাইসে Key Fragment থাকে, সবাই মিলে ট্রান্সফার করতে পারে।
+
+## মাল্টিসিগ vs MPC
+- **Multisig:** একাধিক চাবি, একাধিক সাইনেচার—সব চেইনে সহজে ইমপ্লিমেন্ট করা যায়।
+- **MPC:** Key Fragment, Advanced Security—Private Key কখনোই পুরোপুরি প্রকাশ হয় না।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Joint Bank Account:** যেমন একাধিক মানুষের সাইন ছাড়া টাকা তুলতে পারবেন না, তেমনি মাল্টিসিগে একাধিক অনুমতি লাগে।
+- **Puzzle Piece:** MPC-তে Private Key puzzle-এর টুকরো—সব টুকরো একসাথে হলে ফান্ড কন্ট্রোল হয়।
+
+## ব্যবহারিক টিপস
+- **Multisig Contract/Platform অফিসিয়াল সোর্স থেকে ব্যবহার করুন।**
+- **MPC Wallet-এ Key Fragment নিরাপদে রাখুন—ডিভাইস হারালে Backup/Recovery দরকার।**
+- **Transaction Approve করার সময় সবাই সতর্ক থাকুন—ফিশিং/স্ক্যাম এড়ান।**
+
+## Python Demo: Multisig Transaction
+```python
+# Multisig Transaction Example (Gnosis Safe API)
+import requests
+safe_address = "0xYourSafeAddress"
+url = f"https://safe-transaction.gnosis.io/api/v1/safes/{safe_address}/multisig-transactions/"
+resp = requests.get(url)
+print("Multisig Transactions:", resp.json())
+```
+
+## পরবর্তী ধাপ
+- **লাইব্রেরি: ethers.js, web3.js, @solana/web3.js:** ওয়ালেট ডেভেলপমেন্টের জন্য জনপ্রিয় লাইব্রেরি জানবো।

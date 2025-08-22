@@ -1,0 +1,62 @@
+---
+title: WalletConnect ইন্টিগ্রেশন গাইড
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+dApp ও ওয়ালেটের মধ্যে নিরাপদ, সহজ, এবং মাল্টি-চেইন কানেক্টিভিটির জন্য WalletConnect—সবচেয়ে জনপ্রিয় প্রোটোকল। এই পাঠে জানবো—WalletConnect কী, কীভাবে ইন্টিগ্রেট করবেন, বাস্তব উদাহরণ, অ্যানালজি, এবং কোড ডেমো।
+
+## WalletConnect কী?
+- **WalletConnect:** ওপেন-সোর্স প্রোটোকল—QR Code/Deep Link দিয়ে dApp ও ওয়ালেট কানেক্ট হয়।
+- **Multi-Chain Support:** Ethereum, Solana, Cosmos, Polygon, BSC—সব চেইনে কাজ করে।
+- **Security:** End-to-End Encryption, Session Approval
+
+## কীভাবে কাজ করে?
+- **dApp:** WalletConnect Button—QR Code/Link জেনারেট করে।
+- **Wallet:** QR Code স্ক্যান/Link ক্লিক—Session Approve করে।
+- **Transaction Sign:** dApp-এ Transaction/Message—Wallet-এ Approve/Signed হয়।
+
+## ইন্টিগ্রেশন ধাপ
+### ১. WalletConnect Library Install
+```bash
+npm install @walletconnect/web3-provider
+```
+
+### ২. Provider Setup (Ethereum/EVM)
+```javascript
+import WalletConnectProvider from "@walletconnect/web3-provider";
+const provider = new WalletConnectProvider({
+  rpc: {
+    1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+    137: "https://polygon-rpc.com"
+  }
+});
+await provider.enable();
+```
+
+### ৩. dApp-এ Connect Button
+- "Connect Wallet" বাটনে WalletConnect অপশন দিন।
+- QR Code/Link জেনারেট করুন—Wallet-এ স্ক্যান/ক্লিক করুন।
+
+### ৪. Transaction Sign
+- dApp-এ Transaction Initiate করুন—Wallet-এ Approve করুন।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Bluetooth Pairing:** যেমন Bluetooth-এ দুই ডিভাইস পেয়ার হয়, তেমনি WalletConnect-এ dApp ও Wallet পেয়ার হয়।
+- **QR Code Payment:** যেমন QR Code স্ক্যান করে পেমেন্ট হয়, তেমনি dApp-এ QR Code স্ক্যান করে Wallet কানেক্ট হয়।
+
+## ব্যবহারিক টিপস
+- **Session Approval সতর্কভাবে দিন—ভুয়া dApp এড়ান।**
+- **Session Disconnect করুন—কাজ শেষে।**
+- **Official WalletConnect Library ব্যবহার করুন।**
+- **Multi-Chain RPC ঠিকভাবে দিন—ভুল RPC দিলে ফান্ড হারাতে পারেন।**
+
+## Python Demo: WalletConnect API (Info)
+```python
+import requests
+url = "https://registry.walletconnect.com/api/v1/wallets"
+resp = requests.get(url)
+print("Supported Wallets:", resp.json())
+```
+
+## পরবর্তী ধাপ
+- **কোডে ট্রানজ্যাকশন/মেসেজ সাইনিং:** dApp-এ কীভাবে Transaction/Message সাইন করবেন, তা জানবো।

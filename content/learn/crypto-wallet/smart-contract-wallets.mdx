@@ -1,0 +1,93 @@
+---
+title: "স্মার্ট কন্ট্রাক্ট ওয়ালেট: Safe/Gnosis, Argent"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেটের ভবিষ্যৎ—স্মার্ট কন্ট্রাক্ট ওয়ালেট! এখানে আপনার ফান্ড, পারমিশন, রিকভারি, এমনকি সিকিউরিটি—সবকিছুই স্মার্ট কন্ট্রাক্ট দ্বারা নিয়ন্ত্রিত। এই পাঠে আমরা Safe (আগে Gnosis Safe) ও Argent-এর মতো জনপ্রিয় স্মার্ট কন্ট্রাক্ট ওয়ালেটের ধারণা, সুবিধা, ব্যবহার, এবং বাস্তব উদাহরণ নিয়ে আলোচনা করবো।
+
+---
+
+## স্মার্ট কন্ট্রাক্ট ওয়ালেট কী?
+
+স্মার্ট কন্ট্রাক্ট ওয়ালেট হচ্ছে এমন একটি ওয়ালেট, যার সমস্ত ফাংশন (ট্রানজ্যাকশন, অথোরাইজেশন, রিকভারি, মাল্টিসিগ) ব্লকচেইনের স্মার্ট কন্ট্রাক্টে লেখা। এখানে সাধারণ EOA (Externally Owned Account)-এর মতো শুধু প্রাইভেট কী নয়, বরং কাস্টম লজিক, মাল্টিসিগ, social recovery, automation—সবকিছুই সম্ভব।
+
+---
+
+## রিয়েল লাইফ অ্যানালজি
+
+ধরা যাক, আপনার ব্যাংক অ্যাকাউন্টে শুধু চাবি নয়, বরং "রুলস" সেট করা আছে—কেউ টাকা তুলতে চাইলে দুইজনের অনুমতি লাগবে, বা OTP ছাড়া টাকা যাবে না। স্মার্ট কন্ট্রাক্ট ওয়ালেট ঠিক এমনই: এখানে আপনার ফান্ডের ওপর কাস্টম রুলস, মাল্টিপল অথোরাইজার, এবং অটোমেটেড সিকিউরিটি।
+
+---
+
+## Safe (Gnosis Safe): মাল্টিসিগ ও মডিউলারিটি
+
+- **মাল্টিসিগ:** একাধিক সাইনার দরকার (যেমন: ৩ জনের মধ্যে ২ জন অনুমতি দিলে ট্রানজ্যাকশন হবে)।
+- **মডিউলার:** কাস্টম গার্ড, রিকভারি, ডেইলি লিমিট, social recovery—সবকিছু প্লাগইন হিসেবে যোগ করা যায়।
+- **DAO, কোম্পানি, টিম ফান্ড ম্যানেজমেন্টে জনপ্রিয়।**
+
+### কোড স্নিপেট: Safe SDK (JavaScript)
+```js
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
+import { ethers } from 'ethers';
+
+const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer });
+const safeSdk = await Safe.create({ ethAdapter, safeAddress });
+
+// ট্রানজ্যাকশন তৈরি ও একাধিক সাইনার দিয়ে অনুমোদন
+const tx = { to: '0x...', value: '1000000000000000000', data: '0x' };
+const safeTx = await safeSdk.createTransaction({ safeTransactionData: tx });
+await safeSdk.signTransaction(safeTx);
+await safeSdk.executeTransaction(safeTx);
+```
+
+---
+
+## Argent: Social Recovery ও Automation
+
+- **Social Recovery:** যদি আপনার ডিভাইস হারিয়ে যায়, "Guardian" (বিশ্বাসযোগ্য বন্ধু/ডিভাইস) দিয়ে অ্যাকাউন্ট রিকভার করা যায়।
+- **Automation:** Periodic payments, spending limits, dApp integration—সবকিছু স্মার্ট কন্ট্রাক্টে অটোমেটেড।
+- **User-friendly:** Seed phrase নেই, শুধু biometrics ও Guardians.
+
+### কোড স্নিপেট: Social Recovery (পিউডো-লজিক)
+```js
+// Guardian-দের লিস্ট
+const guardians = ['0xFriend1', '0xDevice2'];
+
+// রিকভারি রিকোয়েস্ট
+function requestRecovery(lostAccount, newOwner, guardians) {
+  // গার্ডিয়ানদের majority অনুমোদন লাগবে
+  if (getGuardianApprovals(lostAccount) > guardians.length / 2) {
+    transferOwnership(lostAccount, newOwner);
+  }
+}
+```
+
+---
+
+## সুবিধা ও চ্যালেঞ্জ
+
+### সুবিধা
+- মাল্টিসিগ, social recovery, automation
+- কাস্টম রুলস, প্লাগইন
+- DAO, কোম্পানি, টিম ফান্ডের জন্য আদর্শ
+- ফান্ড রিকভারি সহজ
+
+### চ্যালেঞ্জ
+- গ্যাস ফি বেশি (স্মার্ট কন্ট্রাক্ট ইন্টারঅ্যাকশন)
+- ডেভেলপমেন্ট জটিল
+- ইউজার এডুকেশন দরকার
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+- **Safe:** Uniswap, Aave, ENS—বড় বড় DAO-র ফান্ড ম্যানেজমেন্টে Safe ব্যবহার হয়।
+- **Argent:** সাধারণ ইউজারদের জন্য social recovery ও automation ফিচার জনপ্রিয়।
+
+---
+
+## চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. Safe-এ মাল্টিসিগ ওয়ালেট তৈরি করুন ও ট্রানজ্যাকশন একাধিক সাইনার দিয়ে অনুমোদন করুন।
+২. Argent-এর social recovery কনসেপ্ট নিয়ে ভাবুন—কীভাবে আপনার ওয়ালেট recover হবে?
+৩. স্মার্ট কন্ট্রাক্ট ওয়ালেটের সুবিধা ও চ্যালেঞ্জ লিখুন।

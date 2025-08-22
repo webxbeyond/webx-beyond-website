@@ -1,0 +1,62 @@
+---
+title: ওয়ালেট অ্যাগ্রিগেটর
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাল্টি-চেইন ব্যবহারের জন্য ওয়ালেট অ্যাগ্রিগেটর—যেমন Rabby, XDEFI—একাধিক চেইনের ওয়ালেট একসাথে ব্যবহারের সহজ ও নিরাপদ সমাধান। এই পাঠে জানবো—ওয়ালেট অ্যাগ্রিগেটর কী, Rabby ও XDEFI-এর বৈশিষ্ট্য, ব্যবহারিক টিপস, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## ওয়ালেট অ্যাগ্রিগেটর কী?
+- **ওয়ালেট অ্যাগ্রিগেটর:** একাধিক চেইনের (EVM, Solana, Cosmos, BTC, ইত্যাদি) ওয়ালেট, টোকেন, NFT, dApp একসাথে ব্যবহারের জন্য একটি প্ল্যাটফর্ম/এক্সটেনশন।
+- **Rabby, XDEFI:** জনপ্রিয় ওয়ালেট অ্যাগ্রিগেটর—MetaMask, Phantom, Keplr, Ledger/Trezor ইত্যাদি একসাথে কানেক্ট করা যায়।
+
+## Rabby Wallet
+- **EVM-কম্প্যাটিবল চেইন:** Ethereum, Polygon, BSC, Arbitrum, Optimism
+- **dApp Compatibility:** Uniswap, OpenSea, DeFi
+- **Security:** Transaction Simulation, Permission Control
+- **Multi-Wallet Support:** MetaMask, Ledger, Trezor
+- **UI:** ইউজার-ফ্রেন্ডলি, Network Auto-Switch
+
+## XDEFI Wallet
+- **Multi-Chain Support:** EVM, BTC, LTC, BCH, Cosmos, Solana
+- **NFT Management:** এক্সটেনশনেই NFT দেখা, ট্রান্সফার
+- **Swap Feature:** এক্সটেনশনেই চেইন-টু-চেইন Swap
+- **Security:** Seed Phrase, Hardware Wallet Integration
+- **dApp Compatibility:** DeFi, NFT, GameFi
+
+## ব্যবহারিক টিপস
+- **Official Source থেকে Extension/App ডাউনলোড করুন।**
+- **Seed Phrase/Private Key নিরাপদে রাখুন—অ্যাগ্রিগেটরেও।**
+- **dApp Permission সতর্কভাবে দিন—Transaction Simulation ব্যবহার করুন।**
+- **Network Auto-Switch ফিচার ব্যবহার করুন—ভুল চেইনে ট্রানজ্যাকশন এড়াতে।**
+- **Hardware Wallet Integration ব্যবহার করুন—নিরাপত্তা বাড়াতে।**
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Super App:** যেমন একটি অ্যাপে সব ব্যাংক/মোবাইল wallet থাকে, তেমনি Rabby/XDEFI-তে সব চেইনের ওয়ালেট একসাথে থাকে।
+- **Universal Remote:** যেমন এক রিমোট দিয়ে সব ডিভাইস চালানো যায়, তেমনি এক অ্যাগ্রিগেটর দিয়ে সব চেইনের ফান্ড/অ্যাপ ব্যবহার করা যায়।
+
+## Python Demo: Multi-Chain Address থেকে ব্যালেন্স চেক
+```python
+from web3 import Web3
+# EVM
+evm = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
+address = "0xYourAddress"
+balance = evm.eth.get_balance(address)
+print("Polygon MATIC:", evm.fromWei(balance, 'ether'))
+
+# Cosmos
+import requests
+cosmos_address = "YourCosmosAddress"
+url = f"https://api.cosmos.network/bank/balances/{cosmos_address}"
+resp = requests.get(url)
+print("ATOM Balance:", resp.json())
+
+# Solana
+from solana.rpc.api import Client
+solana = Client("https://api.mainnet-beta.solana.com")
+sol_address = "YourSolanaAddress"
+balance = solana.get_balance(sol_address)
+print("SOL Balance:", balance['result']['value'] / 1e9)
+```
+
+## পরবর্তী ধাপ
+- **স্টেকিং ও Yield Farming বেসিকস:** মাল্টি-চেইন ওয়ালেটে স্টেকিং ও Yield Farming জানবো।

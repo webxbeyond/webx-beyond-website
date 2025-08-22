@@ -1,0 +1,55 @@
+---
+title: এক্সচেঞ্জ/অ্যাকাউন্টে MFA/2FA সেটআপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো এক্সচেঞ্জ, ওয়ালেট, এবং গুরুত্বপূর্ণ অ্যাকাউন্টে অতিরিক্ত নিরাপত্তা যোগ করার সবচেয়ে কার্যকর উপায় হচ্ছে MFA (Multi-Factor Authentication) ও 2FA (Two-Factor Authentication)। এই পাঠে জানবো—MFA/2FA কী, কেন দরকার, সেটআপ গাইড, বাস্তব উদাহরণ, অ্যানালজি, এবং নিরাপত্তা টিপস।
+
+## MFA/2FA কী?
+- **2FA:** Two-Factor Authentication—পাসওয়ার্ডের পাশাপাশি দ্বিতীয় স্তরের নিরাপত্তা (OTP, Authenticator App, SMS)।
+- **MFA:** Multi-Factor Authentication—2FA ছাড়াও আরও স্তর (Email, Biometrics, Security Key)।
+
+## কেন MFA/2FA দরকার?
+- **হ্যাকিং/ফিশিং রোধ:** পাসওয়ার্ড চুরি হলেও OTP/Authenticator ছাড়া অ্যাক্সেস সম্ভব নয়।
+- **ফান্ড/ডেটা নিরাপত্তা:** এক্সচেঞ্জ, ওয়ালেট, ইমেইল—সবকিছুতে অতিরিক্ত নিরাপত্তা।
+- **স্ক্যাম/ফিশিং থেকে সুরক্ষা:** ভুয়া ওয়েবসাইটে পাসওয়ার্ড দিলে, OTP ছাড়া ফান্ড চুরি সম্ভব নয়।
+
+## সেটআপ গাইড
+### ১. Authenticator App (Google Authenticator, Authy)
+- এক্সচেঞ্জ/ওয়ালেটের Security Settings-এ যান।
+- "Enable 2FA" বা "Setup MFA" সিলেক্ট করুন।
+- QR Code স্ক্যান করুন—Authenticator App-এ কোড যোগ হবে।
+- Backup Code লিখে রাখুন—ফোন হারালে restore করতে পারবেন।
+
+### ২. SMS/Email OTP
+- Security Settings-এ "Enable SMS/Email OTP" সিলেক্ট করুন।
+- মোবাইল/ইমেইল ভেরিফাই করুন।
+- OTP কোড দিয়ে কনফার্ম করুন।
+
+### ৩. Security Key (YubiKey, Titan)
+- "Enable Security Key" সিলেক্ট করুন।
+- USB/Bluetooth দিয়ে Security Key কানেক্ট করুন।
+- Backup/Recovery অপশন লিখে রাখুন।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **ডাবল লক:** যেমন দরজায় দুইটা তালা দিলে নিরাপত্তা বাড়ে, তেমনি 2FA/MFA দিয়ে অ্যাকাউন্টে ডাবল লক হয়।
+- **ATM কার্ড + OTP:** ATM কার্ড দিয়ে টাকা তুলতে OTP লাগে—তেমনি এক্সচেঞ্জে ফান্ড তুলতে 2FA লাগে।
+
+## নিরাপত্তা টিপস
+- **Backup Code/Recovery Key নিরাপদ স্থানে রাখুন।**
+- **Authenticator App-এ অ্যাকাউন্ট export/backup করুন।**
+- **SMS OTP-এর চেয়ে Authenticator App বেশি নিরাপদ।**
+- **ফিশিং/স্ক্যাম থেকে সতর্ক থাকুন—OTP/Backup Code কাউকে দেবেন না।**
+
+## Python Demo: OTP Verification
+```python
+import pyotp
+
+secret = pyotp.random_base32()
+totp = pyotp.TOTP(secret)
+print("Current OTP:", totp.now())
+# ইউজারকে OTP ইনপুট দিয়ে ভেরিফাই করতে হবে
+```
+
+## পরবর্তী ধাপ
+- **EVM কম্প্যাটিবিলিটি কী ও কেন গুরুত্বপূর্ণ:** মাল্টি-চেইন ব্যবহারের জন্য EVM কম্প্যাটিবিলিটি জানবো।

@@ -1,0 +1,68 @@
+---
+title: লাইব্রেরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ethers.js, web3.js, @solana/web3.js
+
+ক্রিপ্টো ওয়ালেট, dApp, এবং ব্লকচেইন ডেভেলপমেন্টে সবচেয়ে জনপ্রিয় লাইব্রেরি—ethers.js, web3.js (Ethereum/EVM), এবং @solana/web3.js (Solana)। এই পাঠে জানবো—প্রতিটি লাইব্রেরির কাজ, ব্যবহার, উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## ethers.js
+- **Purpose:** Ethereum/EVM চেইনে ওয়ালেট, ট্রানজ্যাকশন, Contract Interaction
+- **Features:** Wallet Creation, Transaction Sign, Contract Deploy, Event Listen
+- **Usage:** dApp, Backend, Wallet App
+
+### উদাহরণ
+```javascript
+const { ethers } = require("ethers");
+const provider = new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID");
+const wallet = ethers.Wallet.createRandom();
+console.log("Address:", wallet.address);
+```
+
+## web3.js
+- **Purpose:** Ethereum/EVM চেইনে Contract Interaction, Wallet Management
+- **Features:** Transaction, Contract Call, Event Listen
+- **Usage:** dApp, Backend, Wallet App
+
+### উদাহরণ
+```javascript
+const Web3 = require("web3");
+const web3 = new Web3("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID");
+const account = web3.eth.accounts.create();
+console.log("Address:", account.address);
+```
+
+## @solana/web3.js
+- **Purpose:** Solana চেইনে Wallet, Transaction, Contract Interaction
+- **Features:** Wallet Creation, Transaction Sign, Send, Stake
+- **Usage:** dApp, Backend, Wallet App
+
+### উদাহরণ
+```javascript
+const solanaWeb3 = require("@solana/web3.js");
+const keypair = solanaWeb3.Keypair.generate();
+console.log("Solana Address:", keypair.publicKey.toBase58());
+```
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Toolbox:** যেমন টুলবক্সে বিভিন্ন টুল থাকে, তেমনি ব্লকচেইন ডেভেলপমেন্টে ethers.js, web3.js, @solana/web3.js—সবচেয়ে দরকারি টুল।
+- **Universal Remote:** যেমন এক রিমোট দিয়ে সব ডিভাইস চালানো যায়, তেমনি এই লাইব্রেরি দিয়ে সব চেইনে কাজ করা যায়।
+
+## ব্যবহারিক টিপস
+- **Official Documentation ব্যবহার করুন:** ethers.org, web3js.readthedocs.io, solana-labs.github.io/solana-web3.js
+- **API Key নিরাপদে রাখুন—Infura, Alchemy, QuickNode ইত্যাদি।**
+- **Testnet/Mainnet ঠিকভাবে সিলেক্ট করুন—ডেভেলপমেন্টে Testnet ব্যবহার করুন।**
+- **Error Handling ও Security Best Practices অনুসরণ করুন।**
+
+## Python Demo: Web3.py (Ethereum)
+```python
+from web3 import Web3
+w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"))
+address = "0xYourAddress"
+balance = w3.eth.get_balance(address)
+print("ETH Balance:", w3.fromWei(balance, 'ether'))
+```
+
+## পরবর্তী ধাপ
+- **WalletConnect ইন্টিগ্রেশন গাইড:** dApp-এ ওয়ালেট কানেক্ট করার জন্য WalletConnect ব্যবহার জানবো।

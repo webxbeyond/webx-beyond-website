@@ -1,0 +1,58 @@
+---
+title: NFT ওয়ালেট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## মিন্ট, স্টোরেজ, মার্কেটপ্লেস
+
+NFT (Non-Fungible Token) ক্রিপ্টো ইকোসিস্টেমে শিল্প, গেম, কালেক্টিবল, এবং ইউটিলিটি—সবকিছু বদলে দিয়েছে। NFT ব্যবহারের জন্য ওয়ালেট কনফিগার, মিন্ট, স্টোরেজ, এবং মার্কেটপ্লেসে ট্রেড—এই পাঠে জানবো।
+
+## NFT কী?
+- **NFT:** ব্লকচেইনে ইউনিক ডিজিটাল অ্যাসেট—ছবি, ভিডিও, গান, গেম আইটেম, টিকিট ইত্যাদি।
+- **ERC-721, SPL Token:** Ethereum-এ ERC-721, Solana-তে SPL Token—NFT স্ট্যান্ডার্ড।
+
+## NFT ওয়ালেট কী?
+- **MetaMask, Phantom, Solflare, XDEFI:** NFT ব্যবহারের জন্য জনপ্রিয় ওয়ালেট।
+- **NFT Storage:** ওয়ালেটে NFT দেখা, ট্রান্সফার, মিন্ট, মার্কেটপ্লেসে ট্রেড করা যায়।
+
+## NFT মিন্টিং
+- **Mint:** নতুন NFT তৈরি—dApp, মার্কেটপ্লেস, বা ওয়ালেট থেকে।
+- **Gas Fee:** মিন্টিংয়ে ফি লাগে—Ethereum-এ বেশি, Solana-তে কম।
+- **dApp:** OpenSea, Magic Eden, Rarible—মিন্টিং প্ল্যাটফর্ম।
+
+### উদাহরণ
+- OpenSea-তে ছবি আপলোড করে NFT মিন্ট করা যায়।
+- Magic Eden-এ Solana NFT মিন্ট করা যায়।
+
+## NFT স্টোরেজ
+- **On-Chain/Off-Chain:** NFT-এর মেটাডেটা ও ফাইল IPFS, Arweave, বা ব্লকচেইনে থাকে।
+- **Wallet View:** ওয়ালেটে NFT দেখা, ট্রান্সফার, গিফট করা যায়।
+
+## NFT মার্কেটপ্লেস
+- **OpenSea, Magic Eden, Rarible, Solanart:** NFT কেনা-বেচা, ট্রেড, বিড, Auction করা যায়।
+- **Wallet Connect:** ওয়ালেট কানেক্ট করে NFT ট্রেড করা যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Digital Gallery:** NFT ওয়ালেট হচ্ছে আপনার ডিজিটাল গ্যালারি—যেখানে ছবি, ভিডিও, গেম আইটেম থাকে।
+- **Bank Locker:** যেমন ব্যাংকে মূল্যবান জিনিস রাখেন, তেমনি NFT ওয়ালেটে ইউনিক অ্যাসেট রাখেন।
+
+## নিরাপত্তা টিপস
+- **Official Marketplace ব্যবহার করুন:** OpenSea, Magic Eden—অফিসিয়াল লিঙ্ক ব্যবহার করুন।
+- **dApp Permission সতর্কভাবে দিন:** NFT ট্রান্সফার/বেচার সময়।
+- **Seed Phrase/Private Key নিরাপদে রাখুন।**
+- **Phishing/Scam থেকে সতর্ক থাকুন—ভুয়া NFT/Marketplace এড়ান।
+
+## Python Demo: NFT Balance ও Metadata
+```python
+from web3 import Web3
+import json
+
+w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"))
+address = "0xYourAddress"
+nft_contract = w3.eth.contract(address="0xNFTContractAddress", abi=json.loads('[{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}]'))
+balance = nft_contract.functions.balanceOf(address).call()
+print("NFT Balance:", balance)
+```
+
+## পরবর্তী ধাপ
+- **DAO-তে অংশগ্রহণ ও ভোটিং:** NFT ওয়ালেট দিয়ে DAO-তে কিভাবে অংশগ্রহণ ও ভোটিং করবেন, তা পরবর্তী পাঠে জানবো।
