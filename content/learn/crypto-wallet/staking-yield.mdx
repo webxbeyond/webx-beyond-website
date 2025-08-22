@@ -1,0 +1,56 @@
+---
+title: স্টেকিং ও Yield Farming বেসিকস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেট ব্যবহারকারীদের জন্য স্টেকিং ও Yield Farming—ফান্ড থেকে অতিরিক্ত আয় করার জনপ্রিয় উপায়। এই পাঠে জানবো—স্টেকিং ও Yield Farming কী, কিভাবে কাজ করে, বাস্তব উদাহরণ, অ্যানালজি, এবং নিরাপত্তা টিপস।
+
+## স্টেকিং কী?
+- **স্টেকিং:** ব্লকচেইনে টোকেন "লক" করে নেটওয়ার্ক সিকিউর/ভ্যালিডেট করতে সাহায্য করা—এর বিনিময়ে রিওয়ার্ড পাওয়া যায়।
+- **PoS (Proof of Stake):** Ethereum, Solana, Cosmos, Polkadot ইত্যাদি চেইনে স্টেকিং হয়।
+- **Validator/Delegator:** নিজে Validator হলে নেটওয়ার্ক চালান, না হলে Validator-কে Delegate করে আয় পান।
+
+### উদাহরণ
+- Ethereum-এ ETH স্টেক করলে রিওয়ার্ড পাওয়া যায়।
+- Solana-তে SOL স্টেক করলে Validator-কে Delegate করে SOL আয় হয়।
+
+## Yield Farming কী?
+- **Yield Farming:** DeFi-তে টোকেন "লিকুইডিটি" হিসেবে দিয়ে সুদ/রিওয়ার্ড পাওয়া—Uniswap, Curve, PancakeSwap ইত্যাদি প্ল্যাটফর্মে।
+- **LP Token:** Liquidity Provide করলে LP Token পাওয়া যায়—যা Yield Farming-এ ব্যবহার হয়।
+- **APY (Annual Percentage Yield):** কত শতাংশ আয় হবে—বছরে।
+
+### উদাহরণ
+- Uniswap-এ ETH/USDC Liquidity দিলে LP Token পাওয়া যায়—যা Yield Farming-এ সুদ/রিওয়ার্ড দেয়।
+- PancakeSwap-এ BNB/CAKE Liquidity দিলে CAKE আয় হয়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Fixed Deposit:** যেমন ব্যাংকে টাকা "লক" করলে সুদ পাওয়া যায়, তেমনি স্টেকিং/Yield Farming-এ টোকেন "লক" করলে আয় হয়।
+- **Rent:** যেমন বাড়ি ভাড়া দিলে আয় হয়, তেমনি ফান্ড "লিকুইডিটি" হিসেবে দিলে রিওয়ার্ড পাওয়া যায়।
+
+## নিরাপত্তা টিপস
+- **Smart Contract Risk:** Yield Farming-এ Contract Bug/Hack হলে ফান্ড হারাতে পারেন।
+- **Impermanent Loss:** Liquidity Provide করলে টোকেনের দাম কম/বেশি হলে কিছু ফান্ড হারাতে পারেন।
+- **Validator Trust:** স্টেকিং-এ বিশ্বাসযোগ্য Validator-কে Delegate করুন।
+- **Official Platform ব্যবহার করুন:** Uniswap, Curve, PancakeSwap, Aave—অফিসিয়াল লিঙ্ক ব্যবহার করুন।
+
+## Python Demo: Staking ও Yield Farming
+```python
+# Staking Example (Cosmos)
+import requests
+address = "YourCosmosAddress"
+url = f"https://api.cosmos.network/staking/delegators/{address}/delegations"
+resp = requests.get(url)
+print("Staked Amount:", resp.json())
+
+# Yield Farming Example (Uniswap)
+from web3 import Web3
+w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"))
+address = "0xYourAddress"
+# LP Token Balance
+lp_token_address = "0xUniswapLPTokenAddress"
+balance = w3.eth.get_balance(lp_token_address)
+print("Uniswap LP Token Balance:", w3.fromWei(balance, 'ether'))
+```
+
+## পরবর্তী ধাপ
+- **NFT ওয়ালেট: মিন্ট, স্টোরেজ, মার্কেটপ্লেস:** NFT ব্যবহারের জন্য ওয়ালেট কনফিগার ও ব্যবহার জানবো।

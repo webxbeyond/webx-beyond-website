@@ -1,0 +1,81 @@
+---
+title: Social Recovery ডিজাইন প্যাটার্নস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেটের সবচেয়ে বড় চ্যালেঞ্জ—প্রাইভেট কী হারিয়ে গেলে ফান্ড রিকভার করা! Social Recovery ডিজাইন প্যাটার্নস এই সমস্যার আধুনিক সমাধান। এখানে আপনার বিশ্বাসযোগ্য বন্ধু, পরিবার, বা ডিভাইস "Guardian" হিসেবে কাজ করে, যারা আপনার অ্যাকাউন্ট রিকভার করতে সাহায্য করতে পারে। এই পাঠে আমরা Social Recovery-এর ধারণা, ডিজাইন প্যাটার্ন, বাস্তব উদাহরণ, এবং হাতে-কলমে লজিক দেখবো।
+
+---
+
+## Social Recovery কী?
+
+Social Recovery মানে হচ্ছে, আপনার ওয়ালেট রিকভার করার জন্য এক বা একাধিক "Guardian" নির্ধারণ করা। আপনি যদি অ্যাক্সেস হারান, Guardian-রা সম্মতি দিলে অ্যাকাউন্ট পুনরুদ্ধার করা যায়।
+
+---
+
+## রিয়েল লাইফ অ্যানালজি
+
+ধরা যাক, আপনার ব্যাংকের লকারের চাবি হারিয়ে গেছে। ব্যাংক, পরিবার, বা বন্ধুদের অনুমতি নিয়ে আপনি লকার খুলতে পারেন। Social Recovery-ও ঠিক এমন—বিশ্বাসযোগ্য Guardian-দের সম্মতি লাগবে।
+
+---
+
+## ডিজাইন প্যাটার্ন
+
+### ১. **Guardian List**
+- ইউজার নিজের Guardian-দের (বন্ধু, পরিবার, ডিভাইস) নির্ধারণ করে।
+
+### ২. **Recovery Request**
+- ইউজার অ্যাক্সেস হারালে Guardian-দের কাছে রিকভারি রিকোয়েস্ট পাঠায়।
+
+### ৩. **Approval Mechanism**
+- Majority বা নির্দিষ্ট সংখ্যক Guardian সম্মতি দিলে অ্যাকাউন্ট রিকভার হয়।
+
+### ৪. **Security Measures**
+- Guardian-দের পরিবর্তন, রিকভারি রিকোয়েস্ট, এবং অ্যাকাউন্ট ট্রান্সফার—সবকিছু লগ ও যাচাই করা হয়।
+
+---
+
+## কোড স্নিপেট: Social Recovery (পিউডো-লজিক)
+
+```js
+// Guardian-দের লিস্ট
+const guardians = ['0xFriend1', '0xDevice2', '0xFamily3'];
+
+// রিকভারি রিকোয়েস্ট
+function requestRecovery(lostAccount, newOwner, guardians) {
+  // গার্ডিয়ানদের majority অনুমোদন লাগবে
+  if (getGuardianApprovals(lostAccount) > guardians.length / 2) {
+    transferOwnership(lostAccount, newOwner);
+  }
+}
+```
+
+---
+
+## বাস্তব উদাহরণ
+
+- **Argent Wallet:** Social Recovery ফিচার—Guardian দিয়ে অ্যাকাউন্ট রিকভার করা যায়।
+- **Safe (Gnosis):** মাল্টিসিগ ও Social Recovery প্লাগইন সাপোর্ট।
+- **Ethereum ERC-4337:** Account Abstraction-এ Social Recovery ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## সুবিধা
+
+- Seed phrase হারালেও ফান্ড রিকভার করা যায়
+- ইউজার-ফ্রেন্ডলি, কম ঝামেলা
+- ফান্ড নিরাপত্তা বাড়ে
+
+## চ্যালেঞ্জ
+
+- Guardian-দের সঠিকভাবে নির্বাচন করা জরুরি
+- Guardian-দের সম্মতি না পেলে রিকভারি সম্ভব নয়
+- Privacy ও security risk (Guardian-দের বিশ্বাসযোগ্যতা)
+
+---
+
+## চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. Social Recovery লজিক লিখুন—কীভাবে Guardian-দের দিয়ে অ্যাকাউন্ট রিকভার করবেন?
+২. Guardian নির্বাচন ও approval mechanism কীভাবে ডিজাইন করবেন?
+৩. Social Recovery-এর সুবিধা ও চ্যালেঞ্জ লিখুন।

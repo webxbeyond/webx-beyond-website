@@ -1,0 +1,78 @@
+---
+title: কাস্টম নেটওয়ার্ক যোগ করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Polygon, Arbitrum, BSC
+
+MetaMask বা অন্য EVM-কম্প্যাটিবল ওয়ালেটে কাস্টম নেটওয়ার্ক যোগ করা—DeFi, NFT, এবং মাল্টি-চেইন ব্যবহারের জন্য অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে জানবো—কেন কাস্টম নেটওয়ার্ক দরকার, কীভাবে Polygon, Arbitrum, BSC যোগ করবেন, বাস্তব উদাহরণ, অ্যানালজি, এবং ব্যবহারিক টিপস।
+
+## কেন কাস্টম নেটওয়ার্ক যোগ করবেন?
+- **মাল্টি-চেইন ফান্ড ম্যানেজমেন্ট:** এক ওয়ালেটেই একাধিক চেইনের টোকেন, NFT, dApp ব্যবহার করা যায়।
+- **নতুন চেইন/প্রোজেক্ট:** Polygon, Arbitrum, BSC—সব EVM-কম্প্যাটিবল, কিন্তু আলাদা নেটওয়ার্ক।
+- **কম ফি/দ্রুত ট্রানজ্যাকশন:** Ethereum-এর তুলনায় Polygon, BSC-তে ফি কম, স্পিড বেশি।
+
+## MetaMask-এ কাস্টম নেটওয়ার্ক যোগ করার ধাপ
+### ১. Settings > Networks > Add Network
+- MetaMask খুলুন।
+- Settings-এ যান।
+- Networks-এ "Add Network" সিলেক্ট করুন।
+
+### ২. Network Details দিন
+#### Polygon
+- Network Name: Polygon Mainnet
+- RPC URL: https://polygon-rpc.com
+- Chain ID: 137
+- Currency Symbol: MATIC
+- Block Explorer: https://polygonscan.com
+
+#### Arbitrum
+- Network Name: Arbitrum One
+- RPC URL: https://arb1.arbitrum.io/rpc
+- Chain ID: 42161
+- Currency Symbol: ETH
+- Block Explorer: https://arbiscan.io
+
+#### BSC
+- Network Name: Binance Smart Chain
+- RPC URL: https://bsc-dataseed.binance.org
+- Chain ID: 56
+- Currency Symbol: BNB
+- Block Explorer: https://bscscan.com
+
+### ৩. Save করুন
+- "Save" বাটনে ক্লিক করুন—নতুন নেটওয়ার্ক যোগ হয়ে যাবে।
+- Networks-এ গিয়ে চেইন সিলেক্ট করুন—টোকেন, NFT, dApp ব্যবহার করুন।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **SIM Card:** যেমন এক ফোনে একাধিক SIM ব্যবহার করা যায়, তেমনি এক ওয়ালেটে একাধিক নেটওয়ার্ক যোগ করা যায়।
+- **Bank Account:** যেমন এক ব্যাংকে একাধিক অ্যাকাউন্ট থাকে, তেমনি এক ওয়ালেটে একাধিক চেইন থাকে।
+
+## ব্যবহারিক টিপস
+- **Official Source থেকে Network Details নিন:** ভুয়া RPC/Chain ID দিলে ফান্ড হারাতে পারেন।
+- **dApp ব্যবহার করার আগে চেইন সিলেক্ট করুন:** ভুল চেইনে ট্রানজ্যাকশন করলে ফান্ড হারাতে পারেন।
+- **Block Explorer ব্যবহার করুন:** ট্রানজ্যাকশন, টোকেন, NFT চেক করতে।
+
+## Python Demo: RPC URL দিয়ে ব্যালেন্স চেক
+```python
+from web3 import Web3
+
+# Polygon
+polygon = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
+address = "0xYourAddress"
+balance = polygon.eth.get_balance(address)
+print("Polygon MATIC:", polygon.fromWei(balance, 'ether'))
+
+# Arbitrum
+arbitrum = Web3(Web3.HTTPProvider("https://arb1.arbitrum.io/rpc"))
+balance = arbitrum.eth.get_balance(address)
+print("Arbitrum ETH:", arbitrum.fromWei(balance, 'ether'))
+
+# BSC
+bsc = Web3(Web3.HTTPProvider("https://bsc-dataseed.binance.org"))
+balance = bsc.eth.get_balance(address)
+print("BSC BNB:", bsc.fromWei(balance, 'ether'))
+```
+
+## পরবর্তী ধাপ
+- **Solana ও Cosmos ওয়ালেট ইকোসিস্টেম:** EVM ছাড়া অন্য চেইনের ওয়ালেট ব্যবহারের জন্য পরবর্তী পাঠে জানবো।

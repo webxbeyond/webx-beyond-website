@@ -1,0 +1,83 @@
+---
+title: Account Abstraction (ERC-4337) হ্যান্ডস-অন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ক্রিপ্টো ওয়ালেটের ভবিষ্যৎ—Account Abstraction! Ethereum-এ ERC-4337 স্ট্যান্ডার্ডের মাধ্যমে ওয়ালেটের ক্ষমতা, ফ্লেক্সিবিলিটি, এবং ইউজার এক্সপেরিয়েন্স এক নতুন উচ্চতায় পৌঁছেছে। এই পাঠে আমরা Account Abstraction-এর ধারণা, ERC-4337 কীভাবে কাজ করে, এবং হাতে-কলমে কোড উদাহরণসহ বাস্তব ব্যবহার দেখবো।
+
+---
+
+## Account Abstraction কী?
+
+Account Abstraction মানে হচ্ছে, ওয়ালেটের ফাংশনালিটি (ট্রানজ্যাকশন, অথেন্টিকেশন, রিকভারি, পেমেন্ট) কাস্টমাইজ করা যায়—যেমন স্মার্ট কন্ট্রাক্ট ওয়ালেট। এখানে EOA (Externally Owned Account) আর Contract Account-এর পার্থক্য ঘুচে যায়।
+
+---
+
+## রিয়েল লাইফ অ্যানালজি
+
+ধরা যাক, আপনার ব্যাংক অ্যাকাউন্টে শুধু চাবি নয়, বরং "রুলস" সেট করা আছে—কেউ টাকা তুলতে চাইলে OTP, spending limit, বা অটো-পেমেন্ট চালু করা যায়। Account Abstraction ঠিক এমনই: ইউজার নিজের মতো করে ওয়ালেটের রুলস, অথোরাইজেশন, automation সেট করতে পারে।
+
+---
+
+## ERC-4337: কীভাবে কাজ করে?
+
+- **UserOperation:** ইউজার ট্রানজ্যাকশন/অ্যাকশন "UserOperation" নামে সাবমিট করে।
+- **EntryPoint Contract:** সব UserOperation যাচাই ও এক্সিকিউট করে।
+- **Bundler:** অনেকগুলো UserOperation একসাথে "bundle" করে ব্লকচেইনে পাঠায়।
+- **Paymaster:** গ্যাস ফি পেমেন্ট কাস্টমাইজ করা যায় (যেমন: dApp স্পন্সর করে, ইউজার ফ্রি ট্রানজ্যাকশন পায়)।
+
+---
+
+## কোড উদাহরণ: ERC-4337 Wallet (JavaScript)
+
+```js
+import { SimpleAccountAPI } from '@account-abstraction/sdk';
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://rpc-url');
+const signer = new ethers.Wallet('YOUR_PRIVATE_KEY', provider);
+const accountApi = new SimpleAccountAPI({ provider, signer });
+
+// UserOperation তৈরি
+const userOp = await accountApi.createSignedUserOp({
+  target: '0xContractAddress',
+  data: '0x...',
+  value: ethers.parseEther('0.01'),
+});
+
+// EntryPoint-এ সাবমিট
+const txHash = await accountApi.sendUserOp(userOp);
+console.log('UserOperation Hash:', txHash);
+```
+
+---
+
+## সুবিধা
+
+- **Gasless Transactions:** dApp স্পন্সর করলে ইউজার ফ্রি ট্রানজ্যাকশন করতে পারে।
+- **Custom Authentication:** biometrics, social recovery, OTP—সবকিছু ইমপ্লিমেন্ট করা যায়।
+- **Automation:** periodic payments, spending limits, auto-approve—সবকিছু সম্ভব।
+- **Better UX:** seed phrase, private key ঝামেলা কমে যায়।
+
+---
+
+## চ্যালেঞ্জ
+
+- ডেভেলপমেন্ট তুলনামূলক জটিল
+- নতুন স্ট্যান্ডার্ড, তাই ইকোসিস্টেমে সাপোর্ট সীমিত
+- গ্যাস ফি ও সিকিউরিটি ইস্যু
+
+---
+
+## রিয়েল লাইফ উদাহরণ
+
+- **Safe, Candide, Stackup:** ERC-4337 ভিত্তিক ওয়ালেট ও bundler
+- **dApp Sponsorship:** গ্যাস ফি dApp পে করে, ইউজার ফ্রি ট্রানজ্যাকশন পায়
+
+---
+
+## চ্যালেঞ্জ: নিজে চেষ্টা করুন
+
+১. ERC-4337 SDK দিয়ে একটি UserOperation তৈরি করুন ও EntryPoint-এ সাবমিট করুন।
+২. Paymaster দিয়ে গ্যাস ফি স্পন্সর করার লজিক লিখুন।
+৩. Account Abstraction-এর সুবিধা ও চ্যালেঞ্জ লিখুন।

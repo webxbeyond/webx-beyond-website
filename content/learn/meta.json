@@ -17,6 +17,7 @@
     "terraform",
     "ansible",
     "blockchain",
+    "crypto-wallet",
     "ai"
   ]
 }

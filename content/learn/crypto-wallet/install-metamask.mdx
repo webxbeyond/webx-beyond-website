@@ -1,0 +1,62 @@
+---
+title: MetaMask ইন্সটল ও বেসিক সেটআপ (EVM)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+MetaMask হচ্ছে সবচেয়ে জনপ্রিয় Ethereum (EVM) ওয়ালেট, যা ব্রাউজার এক্সটেনশন ও মোবাইল অ্যাপ হিসেবে পাওয়া যায়। এই পাঠে জানবো—MetaMask কী, কেন ব্যবহার করবেন, কীভাবে ইন্সটল ও সেটআপ করবেন, এবং নিরাপত্তা টিপস।
+
+## MetaMask কী?
+MetaMask একটি সফটওয়্যার ওয়ালেট, যা Ethereum ও EVM-কম্প্যাটিবল চেইনে (Polygon, BSC, Arbitrum ইত্যাদি) টোকেন, NFT, dApp ব্যবহার, এবং ট্রানজ্যাকশন করার সুযোগ দেয়।
+
+## কেন MetaMask ব্যবহার করবেন?
+- **dApp ও DeFi ব্যবহার:** Uniswap, OpenSea, Aave, ইত্যাদি dApp-এ সহজে কানেক্ট করা যায়।
+- **NFT ও টোকেন ম্যানেজমেন্ট:** NFT, ERC-20 টোকেন সহজে স্টোর ও ট্রান্সফার করা যায়।
+- **মাল্টি-চেইন সাপোর্ট:** একাধিক চেইন যোগ করা যায়।
+
+## ইন্সটলেশন গাইড
+### ১. ব্রাউজার এক্সটেনশন
+- Chrome, Firefox, Brave, Edge—সব ব্রাউজারে MetaMask পাওয়া যায়।
+- [MetaMask Download](https://metamask.io/download.html) লিঙ্কে যান।
+- "Install MetaMask for Chrome" বা আপনার ব্রাউজার সিলেক্ট করুন।
+- এক্সটেনশন ইন্সটল করুন।
+
+### ২. মোবাইল অ্যাপ
+- Google Play Store বা Apple App Store-এ "MetaMask" সার্চ করুন।
+- অফিসিয়াল অ্যাপ ইন্সটল করুন।
+
+## বেসিক সেটআপ
+### ১. নতুন ওয়ালেট তৈরি
+- "Create a Wallet" সিলেক্ট করুন।
+- একটি শক্তিশালী পাসওয়ার্ড দিন।
+- সিড ফ্রেইজ (১২/২৪ শব্দ) লিখে নিরাপদ স্থানে রাখুন।
+- কনফার্ম করুন—সঠিকভাবে সিড ফ্রেইজ লিখেছেন।
+
+### ২. ওয়ালেট রিকভারি
+- "Import Wallet" সিলেক্ট করুন।
+- আপনার সিড ফ্রেইজ দিন—পুরনো ওয়ালেট restore হবে।
+
+### ৩. চেইন যোগ করা
+- "Add Network"-এ গিয়ে Polygon, BSC, Arbitrum ইত্যাদি চেইনের RPC, Chain ID, Currency যোগ করুন।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **ডিজিটাল পকেট:** MetaMask হচ্ছে আপনার ডিজিটাল পকেট—যেখানে টোকেন, NFT, dApp সব একসাথে থাকে।
+- **ব্রাউজার প্লাগইন:** যেমন AdBlock বা Grammarly প্লাগইন, তেমনি MetaMask প্লাগইন—কিন্তু এটি আপনার ফান্ডের গেটওয়ে।
+
+## নিরাপত্তা টিপস
+- **সিড ফ্রেইজ ও প্রাইভেট কী কখনো শেয়ার করবেন না।**
+- **ফিশিং ওয়েবসাইট/এক্সটেনশন থেকে সতর্ক থাকুন।**
+- **পাসওয়ার্ড শক্তিশালী রাখুন।**
+- **MetaMask-এ 2FA নেই—তাই সিড ফ্রেইজই একমাত্র ব্যাকআপ।**
+
+## Python Demo: MetaMask Address থেকে ব্যালেন্স চেক
+```python
+from web3 import Web3
+
+w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"))
+address = "0xYourMetaMaskAddress"
+balance = w3.eth.get_balance(address)
+print("ETH Balance:", w3.fromWei(balance, 'ether'))
+```
+
+## পরবর্তী ধাপ
+- **Phantom ইন্সটল (Solana):** Solana চেইনের জন্য ওয়ালেট ইন্সটল ও সেটআপ জানবো।

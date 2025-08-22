@@ -1,0 +1,47 @@
+---
+title: HD ওয়ালেট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## BIP32/39/44 গভীরে
+
+HD (Hierarchical Deterministic) ওয়ালেট—ক্রিপ্টো ওয়ালেটের ভিতরের কাঠামো, একাধিক অ্যাকাউন্ট/অ্যাড্রেস ব্যবস্থাপনা, এবং নিরাপত্তার জন্য অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে জানবো—HD ওয়ালেট কী, BIP32/39/44 স্ট্যান্ডার্ড, ডেরিভেশন পাথ, বাস্তব উদাহরণ, অ্যানালজি, এবং Python ডেমো।
+
+## HD ওয়ালেট কী?
+- **HD Wallet:** একটি সিড ফ্রেইজ/মাস্টার কী থেকে অসংখ্য অ্যাকাউন্ট/অ্যাড্রেস তৈরি করা যায়—"tree"-এর মতো কাঠামো।
+- **Hierarchical:** একাধিক লেভেল—Account, Change, Address—সবকিছু নির্দিষ্ট নিয়মে তৈরি হয়।
+- **Deterministic:** একই সিড ফ্রেইজ থেকে সব অ্যাড্রেস পুনরুদ্ধার করা যায়।
+
+## BIP32/39/44 স্ট্যান্ডার্ড
+- **BIP32:** HD Wallet-এর "tree" কাঠামো, Child Key Derivation, Extended Public/Private Key
+- **BIP39:** Mnemonic Phrase (সিড ফ্রেইজ) থেকে Seed Generation
+- **BIP44:** Multi-Coin Wallet—Coin Type, Account, Change, Address—সবকিছু নির্দিষ্ট ডেরিভেশন পাথে
+
+### ডেরিভেশন পাথ
+- **Format:** m / purpose' / coin_type' / account' / change / address_index
+- **Example:** Ethereum: m/44'/60'/0'/0/0, Bitcoin: m/44'/0'/0'/0/0
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Family Tree:** যেমন একটি পরিবারে অনেক সদস্য, তেমনি HD Wallet-এ এক সিড ফ্রেইজ থেকে অসংখ্য অ্যাকাউন্ট/অ্যাড্রেস তৈরি হয়।
+- **Master Key:** মাস্টার চাবি দিয়ে সব লকার খোলা যায়—একইভাবে সিড ফ্রেইজ দিয়ে সব অ্যাড্রেস restore হয়।
+
+## ব্যবহারিক টিপস
+- **একই সিড ফ্রেইজ দিয়ে একাধিক চেইনের ওয়ালেট restore করা যায় (BIP44)।**
+- **ডেরিভেশন পাথ ঠিকভাবে দিন—ভুল পাথ দিলে ফান্ড/অ্যাড্রেস পাওয়া যাবে না।**
+- **Extended Public Key (xpub) দিয়ে শুধু ব্যালেন্স দেখা যায়, ফান্ড খরচ করা যায় না।**
+
+## Python Demo: HD Wallet Derivation
+```python
+from mnemonic import Mnemonic
+from bip44 import Wallet
+
+mnemo = Mnemonic("english")
+words = "cat mango river moon tiger apple cloud drum fish lamp tree sun"
+seed = mnemo.to_seed(words)
+wallet = Wallet(seed)
+eth_account = wallet.derive_account("eth", 0)
+print("Ethereum Address:", eth_account['address'])
+```
+
+## পরবর্তী ধাপ
+- **Elliptic Curve Cryptography: ECDSA ও EdDSA:** ওয়ালেটের ক্রিপ্টোগ্রাফি ও সিকিউরিটি জানবো।

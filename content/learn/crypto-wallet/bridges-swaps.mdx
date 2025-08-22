@@ -1,0 +1,54 @@
+---
+title: ব্রিজ ও ক্রস-চেইন সোয়াপ নিরাপদে করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DeFi ও মাল্টি-চেইন ব্যবহারে ফান্ড এক চেইন থেকে অন্য চেইনে ট্রান্সফার বা সোয়াপ—ব্রিজ ও ক্রস-চেইন সোয়াপের মাধ্যমে—খুবই গুরুত্বপূর্ণ, কিন্তু নিরাপত্তার ঝুঁকি বেশি। এই পাঠে জানবো—ব্রিজ/ক্রস-চেইন সোয়াপ কী, কিভাবে নিরাপদে করবেন, বাস্তব উদাহরণ, অ্যানালজি, এবং নিরাপত্তা টিপস।
+
+## ব্রিজ কী?
+- **ব্রিজ:** এক ব্লকচেইন থেকে অন্য ব্লকচেইনে টোকেন/ফান্ড ট্রান্সফার করার প্রযুক্তি—Polygon ↔ Ethereum, BSC ↔ Arbitrum ইত্যাদি।
+- **Lock & Mint/Burn:** ফান্ড এক চেইনে "লক" হয়, অন্য চেইনে "মিন্ট"/"আনলক" হয়।
+- **Popular Bridges:** Wormhole, Multichain, Hop, Stargate, Portal
+
+## ক্রস-চেইন সোয়াপ কী?
+- **ক্রস-চেইন সোয়াপ:** এক চেইনের টোকেন অন্য চেইনের টোকেনে সোয়াপ—DEX, Aggregator, Bridge ব্যবহার করে।
+- **Aggregator:** 1inch, Li.Fi, Rango—একাধিক সোর্স থেকে সোয়াপ অফার দেয়।
+
+## নিরাপদে ব্রিজ/সোয়াপ করার ধাপ
+### ১. Official Bridge/DEX ব্যবহার করুন
+- Wormhole, Stargate, Portal—অফিসিয়াল লিঙ্ক ব্যবহার করুন।
+- DEX/Aggregator—1inch, Li.Fi, Rango
+
+### ২. Small Amount Test করুন
+- প্রথমে ছোট ফান্ড ট্রান্সফার/সোয়াপ করুন—সব ঠিক থাকলে বড় ফান্ড পাঠান।
+
+### ৩. Contract Address Verify করুন
+- ব্রিজ/DEX-এর contract address অফিসিয়াল সোর্স থেকে মিলিয়ে নিন।
+
+### ৪. Wallet Permission সতর্কভাবে দিন
+- Full Access/Unlimited Approval না দিয়ে, নির্দিষ্ট টোকেন/Amount approve করুন।
+
+### ৫. Network Fee ও Estimated Arrival Time চেক করুন
+- ফি, Arrival Time, Minimum Amount—সব চেক করুন।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+- **Bank Transfer:** যেমন এক ব্যাংক থেকে অন্য ব্যাংকে টাকা পাঠাতে Routing/Verification লাগে, তেমনি ব্রিজে ফান্ড "লক"/"মিন্ট" হয়।
+- **Currency Exchange:** যেমন এক মুদ্রা অন্য মুদ্রায় এক্সচেঞ্জ হয়, তেমনি ক্রস-চেইন সোয়াপে টোকেন সোয়াপ হয়।
+
+## নিরাপত্তা টিপস
+- **Phishing/Scam থেকে সতর্ক থাকুন—ভুয়া ব্রিজ/DEX এড়ান।**
+- **Smart Contract Risk:** ব্রিজ/DEX Bug/Hack হলে ফান্ড হারাতে পারেন।
+- **Official Source ব্যবহার করুন—Google Search থেকে সরাসরি ক্লিক করবেন না।**
+- **Transaction Status/Explorer চেক করুন—ফান্ড এসেছে কিনা।**
+
+## Python Demo: Bridge/Swap Status চেক
+```python
+import requests
+# Stargate Bridge API Example
+url = "https://api.stargate.finance/v1/transfer-status?txHash=YourTxHash"
+resp = requests.get(url)
+print("Bridge Transfer Status:", resp.json())
+```
+
+## পরবর্তী ধাপ
+- **HD ওয়ালেট: BIP32/39/44 গভীরে:** ওয়ালেটের ভিতরের কাঠামো ও ডেরিভেশন জানবো।
