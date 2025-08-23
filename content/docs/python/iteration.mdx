@@ -1,0 +1,99 @@
+---
+title: ইটারেশন - for, while, enumerate, zip
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ইটারেশন মানে হচ্ছে পুনরাবৃত্তি—একই কোড বারবার চালানো। পাইথনে ইটারেশন দিয়ে লিস্ট, টুপল, সেট, ডিকশনারি, রেঞ্জ ইত্যাদির উপর সহজে লুপ চালানো যায়।
+
+## for loop
+
+`for` লুপ দিয়ে iterable (যেমন: লিস্ট, টুপল, রেঞ্জ) এর প্রতিটি আইটেমের উপর কোড চালানো যায়।
+```python
+fruits = ["apple", "banana", "mango"]
+for fruit in fruits:
+    print(fruit)
+```
+
+## while loop
+
+`while` লুপ দিয়ে কোনো শর্ত সত্য থাকলে বারবার কোড চালানো যায়।
+```python
+count = 1
+while count <= 5:
+    print(count)
+    count += 1
+```
+
+## enumerate
+
+`enumerate` দিয়ে লিস্টের আইটেমের সাথে ইনডেক্সও পাওয়া যায়।
+```python
+names = ["Anis", "Bithi", "Rafi"]
+for idx, name in enumerate(names):
+    print(f"{idx}: {name}")
+# আউটপুট:
+# 0: Anis
+# 1: Bithi
+# 2: Rafi
+```
+
+## zip
+
+`zip` দিয়ে একাধিক লিস্ট একসাথে ইটারেট করা যায়।
+```python
+names = ["Anis", "Bithi", "Rafi"]
+scores = [90, 85, 88]
+for name, score in zip(names, scores):
+    print(f"{name}: {score}")
+```
+
+## বাস্তব উদাহরণ
+
+### ১. লিস্ট থেকে শুধু জোড় সংখ্যা প্রিন্ট
+```python
+numbers = [1, 2, 3, 4, 5, 6]
+for n in numbers:
+    if n % 2 == 0:
+        print(n)
+```
+
+### ২. while loop দিয়ে countdown
+```python
+n = 5
+while n > 0:
+    print(n)
+    n -= 1
+print("শেষ!")
+```
+
+### ৩. enumerate দিয়ে টেবিল
+```python
+items = ["pen", "book", "bag"]
+for i, item in enumerate(items, start=1):
+    print(f"{i}. {item}")
+```
+
+### ৪. zip দিয়ে দুই লিস্ট মেলানো
+```python
+rolls = [101, 102, 103]
+names = ["Anis", "Bithi", "Rafi"]
+for roll, name in zip(rolls, names):
+    print(f"Roll: {roll}, Name: {name}")
+```
+
+## ভুল ও সমাধান
+
+- ভুল: while loop-এ শর্ত ভুল হলে infinite loop
+- ভুল: zip-এ দুই লিস্টের দৈর্ঘ্য না মিললে ছোট লিস্ট পর্যন্ত ইটারেট হয়
+- ভুল: enumerate-এ start=0 না দিলে ইনডেক্স ০ থেকে শুরু
+
+## অনুশীলন
+
+১. ১ থেকে ১০ পর্যন্ত সংখ্যা প্রিন্ট করুন (for loop)।
+২. একটি লিস্ট থেকে শুধু বেজোড় সংখ্যা বের করুন (while loop)।
+৩. দুটি লিস্ট (নাম ও নম্বর) zip দিয়ে একসাথে প্রিন্ট করুন।
+৪. enumerate দিয়ে লিস্টের ইনডেক্সসহ আইটেম প্রিন্ট করুন।
+
+## উপসংহার
+
+ইটারেশন দিয়ে পাইথনে ডাটা প্রসেসিং, ফিল্টারিং, এবং টেবিল/রিপোর্ট তৈরি সহজ হয়। for, while, enumerate, zip—এই টুলগুলো ভালোভাবে আয়ত্ত করলে কোড আরও কার্যকর ও সংক্ষিপ্ত হবে। পরবর্তী মডিউলে অবজেক্ট-ওরিয়েন্টেড পাইথন নিয়ে আলোচনা করব।

@@ -1,0 +1,161 @@
+---
+title: টেস্টিং ও TDD (unittest, pytest)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+টেস্টিং হচ্ছে—কোড ঠিকভাবে কাজ করছে কিনা যাচাই করার পদ্ধতি। TDD (Test-Driven Development) মানে—প্রথমে টেস্ট লিখে, তারপর কোড লিখে, টেস্ট পাস করানো। পাইথনে unittest ও pytest—দুইটি জনপ্রিয় টেস্টিং ফ্রেমওয়ার্ক।
+
+ভাবুন, আপনি একটি গাড়ি বানাচ্ছেন—প্রতিটি পার্ট টেস্ট না করলে দুর্ঘটনা হতে পারে। ঠিক তেমন, কোড টেস্ট না করলে বাগ, ভুল, ও নিরাপত্তা সমস্যা হতে পারে।
+
+---
+
+## টেস্টিং কেন?
+
+- বাগ কমে
+- কোড রিফ্যাক্টর সহজ
+- নতুন ফিচার যোগে নিরাপত্তা
+- টিমওয়ার্কে সুবিধা
+
+### Analogy
+
+টেস্টিং-কে ভাবুন, পরীক্ষার খাতা—লেখা শেষে উত্তর যাচাই করা।
+
+---
+
+## unittest: পাইথনের বিল্ট-ইন টেস্টিং
+
+unittest দিয়ে টেস্ট ক্লাস, টেস্ট মেথড, assertion—সবকিছু সহজে করা যায়।
+
+### উদাহরণ
+
+```python
+import unittest
+
+def add(a, b):
+    return a + b
+
+class TestAdd(unittest.TestCase):
+    def test_add_positive(self):
+        self.assertEqual(add(2, 3), 5)
+    def test_add_negative(self):
+        self.assertEqual(add(-2, -3), -5)
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+---
+
+## pytest: সহজ ও শক্তিশালী টেস্টিং
+
+pytest দিয়ে ফাংশন, ক্লাস, ফিক্সচার, প্যারামিটারাইজড টেস্ট—সবকিছু সহজে করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install pytest
+```
+
+### উদাহরণ
+
+```python
+def add(a, b):
+    return a + b
+
+def test_add_positive():
+    assert add(2, 3) == 5
+
+def test_add_negative():
+    assert add(-2, -3) == -5
+```
+
+### pytest চালানো
+
+```bash
+pytest test_file.py
+```
+
+---
+
+## TDD: Test-Driven Development
+
+TDD-তে প্রথমে টেস্ট লিখে, তারপর কোড লিখে, টেস্ট পাস করানো হয়।
+
+১. টেস্ট লিখুন (যা ফেইল করবে)
+২. কোড লিখুন (টেস্ট পাস করাতে)
+৩. রিফ্যাক্টর করুন
+
+### উদাহরণ
+
+```python
+def test_add():
+    assert add(2, 3) == 5  # টেস্ট আগে লিখুন
+
+def add(a, b):
+    return a + b  # পরে কোড লিখুন
+```
+
+---
+
+## Assertion ও Coverage
+
+- **assertEqual, assertTrue, assertRaises**: unittest assertion
+- **assert**: pytest assertion
+- **Coverage**: কত শতাংশ কোড টেস্ট হয়েছে
+
+### Coverage টুল
+
+```bash
+pip install coverage
+coverage run -m pytest
+coverage report
+```
+
+---
+
+## Mocking ও ফিক্সচার
+
+- **Mocking:** বাইরের ডিপেন্ডেন্সি/ফাংশন "নকল" করা
+- **Fixture:** টেস্টের জন্য ডেটা/স্টেট প্রস্তুত করা
+
+### pytest fixture
+
+```python
+import pytest
+@pytest.fixture
+def sample_data():
+    return [1, 2, 3]
+
+def test_sum(sample_data):
+    assert sum(sample_data) == 6
+```
+
+---
+
+## বাস্তব উদাহরণ: ব্যাংক অ্যাপ টেস্টিং
+
+ধরা যাক, ব্যাংক অ্যাপে টাকা যোগ, বিয়োগ, ব্যালেন্স—সব ফাংশন টেস্ট না করলে ভুল হতে পারে।
+
+---
+
+## টেস্টিং ও TDD-এর সুবিধা
+
+- বাগ কম
+- কোড রিফ্যাক্টর সহজ
+- নতুন ফিচার যোগে নিরাপত্তা
+- টিমওয়ার্কে সুবিধা
+
+---
+
+## অনুশীলন
+
+১. unittest দিয়ে টেস্ট ক্লাস লিখুন
+২. pytest দিয়ে assertion ও fixture ব্যবহার করুন
+৩. TDD পদ্ধতিতে টেস্ট ও কোড লিখুন
+৪. Coverage টুল দিয়ে রিপোর্ট দেখুন
+
+---
+
+## উপসংহার
+
+টেস্টিং ও TDD—আধুনিক সফটওয়্যার ডেভেলপমেন্টে অপরিহার্য। unittest ও pytest—দুটোই শক্তিশালী টুল। টেস্টিং করলে কোড আরও নিরাপদ, স্কেলেবল, এবং টিম-ফ্রেন্ডলি হয়। পরবর্তী পাঠে প্যাকেজ পাবলিশিং ও ওপেন সোর্স কন্ট্রিবিউশন নিয়ে আলোচনা হবে।

@@ -1,0 +1,147 @@
+---
+title: ডিজাইন প্যাটার্নস ইন পাইথন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডিজাইন প্যাটার্নস হচ্ছে সফটওয়্যার ডেভেলপমেন্টে বারবার দেখা সমস্যার জন্য পরীক্ষিত সমাধান। এগুলো কোডকে আরও রিডেবল, মেইনটেনেবল, এবং স্কেলেবল করে তোলে। পাইথনে ডিজাইন প্যাটার্নস ব্যবহার করলে বড় প্রজেক্টে সমস্যা কমে, টিমওয়ার্ক সহজ হয়।
+
+ভাবুন, আপনি একটি বাড়ি বানাচ্ছেন—প্রতিবার নতুন ডিজাইন না করে, পরীক্ষিত নকশা ব্যবহার করলে কাজ দ্রুত, নিরাপদ, এবং সুন্দর হয়।
+
+---
+
+## ডিজাইন প্যাটার্নসের ধরন
+
+১. **Creational:** অবজেক্ট তৈরি
+২. **Structural:** অবজেক্টের গঠন
+৩. **Behavioral:** অবজেক্টের আচরণ
+
+---
+
+## Creational Patterns
+
+### Singleton
+একটি ক্লাসের একটাই অবজেক্ট থাকবে।
+
+```python
+class Singleton:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+```
+
+### Factory
+নতুন অবজেক্ট তৈরি করার জন্য ফ্যাক্টরি ফাংশন।
+
+```python
+def animal_factory(animal_type):
+    if animal_type == 'cat':
+        return Cat()
+    elif animal_type == 'dog':
+        return Dog()
+```
+
+---
+
+## Structural Patterns
+
+### Adapter
+দুইটি ভিন্ন ইন্টারফেসকে একসাথে কাজ করানো।
+
+```python
+class OldPrinter:
+    def print_old(self):
+        print('পুরনো প্রিন্টার')
+
+class PrinterAdapter:
+    def __init__(self, old_printer):
+        self.old_printer = old_printer
+    def print(self):
+        self.old_printer.print_old()
+```
+
+### Decorator
+অবজেক্টের ফিচার বাড়ানো।
+
+```python
+def bold_decorator(func):
+    def wrapper():
+        return '<b>' + func() + '</b>'
+    return wrapper
+
+@bold_decorator
+def greet():
+    return 'হ্যালো!'
+```
+
+---
+
+## Behavioral Patterns
+
+### Observer
+একটি অবজেক্টে পরিবর্তন হলে অন্যগুলোকে জানানো।
+
+```python
+class Subject:
+    def __init__(self):
+        self.observers = []
+    def attach(self, observer):
+        self.observers.append(observer)
+    def notify(self, msg):
+        for obs in self.observers:
+            obs.update(msg)
+
+class Observer:
+    def update(self, msg):
+        print('নোটিফিকেশন:', msg)
+```
+
+### Strategy
+বিভিন্ন অ্যালগরিদম/বিহেভিয়ার সহজে পরিবর্তন করা।
+
+```python
+class SortStrategy:
+    def sort(self, data):
+        pass
+class BubbleSort(SortStrategy):
+    def sort(self, data):
+        # Bubble sort
+        return sorted(data)
+class QuickSort(SortStrategy):
+    def sort(self, data):
+        # Quick sort
+        return sorted(data)
+
+def sort_data(strategy, data):
+    return strategy.sort(data)
+```
+
+---
+
+## বাস্তব উদাহরণ ও analogy
+
+ডিজাইন প্যাটার্নস-কে ভাবুন, রান্নার রেসিপি—একই উপাদান দিয়ে বিভিন্ন খাবার বানানো যায়, কিন্তু রেসিপি থাকলে কাজ সহজ হয়।
+
+---
+
+## ডিজাইন প্যাটার্নসের সুবিধা
+
+- কোড রিডেবল ও মেইনটেনেবল
+- টিমওয়ার্ক সহজ
+- বড় প্রজেক্টে সমস্যা কম
+- পুনরায় ব্যবহারযোগ্য সমাধান
+
+---
+
+## অনুশীলন
+
+১. Singleton, Factory, Decorator, Observer, Strategy—নিজে কোড লিখুন
+২. বড় প্রজেক্টে কোন প্যাটার্ন কোথায় ব্যবহার করবেন চিন্তা করুন
+৩. Structural ও Behavioral প্যাটার্নের পার্থক্য খুঁজুন
+
+---
+
+## উপসংহার
+
+ডিজাইন প্যাটার্নস সফটওয়্যার ডেভেলপমেন্টে অপরিহার্য। পাইথনে এগুলো ব্যবহার করলে কোড আরও শক্তিশালী, স্কেলেবল, এবং টিম-ফ্রেন্ডলি হয়। পরবর্তী পাঠে টেস্টিং ও TDD নিয়ে আলোচনা হবে।

@@ -1,0 +1,125 @@
+---
+title: DevOps/Cloud অটোমেশন স্ক্রিপ্টিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps ও Cloud অটোমেশন মানে—ইনফ্রাস্ট্রাকচার, ডিপ্লয়মেন্ট, মনিটরিং, ব্যাকআপ, স্কেলিং—সবকিছু কোডে স্বয়ংক্রিয়ভাবে করা। পাইথন দিয়ে DevOps ও Cloud-এ অটোমেশন স্ক্রিপ্ট লেখা যায়, যা সময়, শ্রম, এবং ভুল কমায়।
+
+ভাবুন, আপনি প্রতিদিন সার্ভার ডিপ্লয়, লগ মনিটর, ব্যাকআপ, বা ক্লাউড রিসোর্স তৈরি করতে চান—পাইথন দিয়ে একবার কোড লিখে, বাকিটা অটোমেটেড।
+
+---
+
+## DevOps অটোমেশন: কী ও কেন?
+
+DevOps অটোমেশন মানে—CI/CD, কনফিগ ম্যানেজমেন্ট, ইনফ্রা-প্রভিশনিং, মনিটরিং—সবকিছু স্ক্রিপ্টে করা।
+
+- **CI/CD:** কোড টেস্ট, বিল্ড, ডিপ্লয়
+- **Infrastructure as Code (IaC):** সার্ভার, নেটওয়ার্ক, ক্লাউড রিসোর্স কোডে তৈরি
+- **Monitoring:** সার্ভার, অ্যাপ, লগ মনিটর
+
+### Analogy
+
+DevOps অটোমেশন-কে ভাবুন, কারখানার রোবট—একবার নির্দেশ দিলে, নিজে নিজে কাজ করে যায়।
+
+---
+
+## পাইথন দিয়ে DevOps টাস্ক
+
+- **Server Automation:** SSH দিয়ে সার্ভারে কমান্ড চালানো
+- **File Automation:** ব্যাকআপ, লগ রোটেশন
+- **API Automation:** ক্লাউড API (AWS, Azure, GCP) দিয়ে রিসোর্স তৈরি/ডিলিট
+- **Monitoring:** সার্ভার/অ্যাপ স্ট্যাটাস চেক
+
+---
+
+## Cloud Automation: AWS, Azure, GCP
+
+পাইথন দিয়ে Cloud Provider-এর API ব্যবহার করে VM, Storage, Database, Network—সবকিছু অটোমেট করা যায়।
+
+### AWS উদাহরণ: boto3
+
+```python
+import boto3
+
+# S3-তে ফাইল আপলোড
+s3 = boto3.client('s3')
+s3.upload_file('backup.zip', 'my-bucket', 'backup.zip')
+```
+
+### Azure উদাহরণ: azure-mgmt
+
+```python
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.resource import ResourceManagementClient
+
+credential = DefaultAzureCredential()
+client = ResourceManagementClient(credential, 'SUBSCRIPTION_ID')
+
+# রিসোর্স গ্রুপ তৈরি
+client.resource_groups.create_or_update('my-group', {'location': 'eastus'})
+```
+
+### GCP উদাহরণ: google-cloud-storage
+
+```python
+from google.cloud import storage
+
+client = storage.Client()
+bucket = client.get_bucket('my-bucket')
+bucket.blob('backup.zip').upload_from_filename('backup.zip')
+```
+
+---
+
+## Infrastructure as Code (IaC)
+
+পাইথন দিয়ে Terraform, Ansible, Pulumi-এর মতো টুলে কোড লিখে ইনফ্রা তৈরি করা যায়।
+
+### Ansible উদাহরণ
+
+```yaml
+- name: Install nginx
+  hosts: web
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+```
+
+---
+
+## Monitoring ও Alert Automation
+
+পাইথন দিয়ে সার্ভার/অ্যাপ মনিটর, লগ চেক, ইমেইল/Slack অ্যালার্ট পাঠানো যায়।
+
+```python
+import psutil
+if psutil.cpu_percent() > 80:
+    print('High CPU usage!')
+```
+
+---
+
+## DevOps/Cloud অটোমেশনের সুবিধা
+
+- দ্রুত ও নির্ভুল কাজ
+- স্কেলিং ও ব্যাকআপ সহজ
+- Human error কম
+- রিপোর্ট, অ্যালার্ট, মনিটরিং
+
+---
+
+## অনুশীলন
+
+১. AWS S3-তে ফাইল আপলোড করুন
+২. Azure-তে রিসোর্স গ্রুপ তৈরি করুন
+৩. GCP-তে ফাইল আপলোড করুন
+৪. psutil দিয়ে মনিটরিং স্ক্রিপ্ট লিখুন
+৫. Ansible দিয়ে সার্ভার কনফিগার করুন
+
+---
+
+## উপসংহার
+
+DevOps ও Cloud অটোমেশন স্ক্রিপ্টিং—আধুনিক সফটওয়্যার ডেভেলপমেন্টে অপরিহার্য। পাইথন দিয়ে ইনফ্রা, ডিপ্লয়, মনিটরিং—সবকিছুই অটোমেট করা যায়। পরবর্তী পাঠে মাস্টারি ও বিয়ন্ড টপিক নিয়ে আলোচনা হবে।

@@ -1,0 +1,154 @@
+---
+title: REST API ডেভেলপমেন্ট (Flask/Django REST Framework)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+আজকের ওয়েব অ্যাপ্লিকেশন, মোবাইল অ্যাপ, ক্লাউড—সবখানে REST API অপরিহার্য। REST API দিয়ে ডেটা এক জায়গা থেকে অন্য জায়গায় সহজে আদান-প্রদান করা যায়। Flask ও Django REST Framework (DRF) দিয়ে পাইথনে REST API তৈরি করা খুবই সহজ।
+
+ভাবুন, আপনি একটি স্কুল অ্যাপ বানাচ্ছেন—ছাত্রদের তথ্য, রেজাল্ট, শিক্ষক—সব ডেটা মোবাইল অ্যাপে দেখাতে চান। REST API দিয়ে এই ডেটা সার্ভার থেকে ক্লায়েন্টে পাঠানো যায়।
+
+---
+
+## REST API কী?
+
+REST (Representational State Transfer) হচ্ছে একটি আর্কিটেকচার, যেখানে HTTP Method (GET, POST, PUT, DELETE) ব্যবহার করে ডেটা আদান-প্রদান হয়।
+
+- **GET:** ডেটা পড়া
+- **POST:** নতুন ডেটা তৈরি
+- **PUT/PATCH:** ডেটা আপডেট
+- **DELETE:** ডেটা মুছে ফেলা
+
+### Analogy
+
+REST API-কে ভাবুন, রেস্টুরেন্টের ওয়েটার—আপনি অর্ডার দেন (Request), ওয়েটার খাবার এনে দেন (Response)।
+
+---
+
+## Flask দিয়ে REST API
+
+Flask-এ REST API তৈরি করা খুবই সহজ।
+
+```python
+from flask import Flask, jsonify, request
+app = Flask(__name__)
+
+students = [
+    {'id': 1, 'name': 'রাহুল', 'grade': '১০'},
+    {'id': 2, 'name': 'সুমন', 'grade': '৯'}
+]
+
+@app.route('/students', methods=['GET'])
+def get_students():
+    return jsonify(students)
+
+@app.route('/students', methods=['POST'])
+def add_student():
+    data = request.get_json()
+    students.append(data)
+    return jsonify({'message': 'ছাত্র যোগ হয়েছে'}), 201
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+### ব্যাখ্যা
+- `/students` GET: সব ছাত্রের তথ্য দেখায়
+- `/students` POST: নতুন ছাত্র যোগ করে
+
+---
+
+## Django REST Framework (DRF) দিয়ে REST API
+
+Django REST Framework হচ্ছে Django-র জন্য শক্তিশালী API ফ্রেমওয়ার্ক। এতে Serializers, ViewSets, Authentication—সবকিছু সহজে করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install djangorestframework
+```
+
+### Model, Serializer, ViewSet
+
+`students/models.py`:
+```python
+from django.db import models
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    grade = models.CharField(max_length=10)
+```
+
+`students/serializers.py`:
+```python
+from rest_framework import serializers
+from .models import Student
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+```
+
+`students/views.py`:
+```python
+from rest_framework import viewsets
+from .models import Student
+from .serializers import StudentSerializer
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+```
+
+### URL Routing
+
+`students/urls.py`:
+```python
+from rest_framework import routers
+from .views import StudentViewSet
+
+router = routers.DefaultRouter()
+router.register(r'students', StudentViewSet)
+
+urlpatterns = router.urls
+```
+
+---
+
+## API টেস্টিং ও Tools
+
+API টেস্ট করার জন্য Postman, curl, বা Python-এর requests লাইব্রেরি ব্যবহার করা যায়।
+
+```python
+import requests
+response = requests.get('http://localhost:5000/students')
+print(response.json())
+```
+
+---
+
+## Authentication ও Security
+
+API-তে Authentication (Token, JWT) ও Security (CORS, Rate Limiting) গুরুত্বপূর্ণ। DRF-এ বিল্ট-ইন অথেন্টিকেশন আছে।
+
+---
+
+## REST API-এর সুবিধা
+
+- ডেটা সহজে শেয়ার
+- মোবাইল, ওয়েব, ক্লাউড—সবখানে ব্যবহারযোগ্য
+- স্কেলেবল ও ফ্লেক্সিবল
+
+---
+
+## অনুশীলন
+
+১. Flask দিয়ে CRUD REST API তৈরি করুন
+২. Django REST Framework দিয়ে Model, Serializer, ViewSet তৈরি করুন
+৩. Postman বা curl দিয়ে API টেস্ট করুন
+৪. Authentication যুক্ত করুন
+
+---
+
+## উপসংহার
+
+REST API দিয়ে ডেটা এক জায়গা থেকে অন্য জায়গায় সহজে আদান-প্রদান করা যায়। Flask ও Django REST Framework—দুটোই শক্তিশালী টুল। পরবর্তী পাঠে FastAPI ও Async API নিয়ে আলোচনা হবে।

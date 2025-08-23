@@ -1,0 +1,141 @@
+---
+title: FastAPI - Async ওয়েব অ্যাপ্লিকেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+FastAPI হচ্ছে পাইথনের আধুনিক, দ্রুত, এবং অ্যাসিঙ্ক্রোনাস ওয়েব ফ্রেমওয়ার্ক। API ডেভেলপমেন্ট, মাইক্রোসার্ভিস, রিয়েল-টাইম অ্যাপ—সবকিছুই FastAPI দিয়ে সহজে, দ্রুত, এবং টাইপ-সেফভাবে করা যায়।
+
+ভাবুন, আপনি একটি চ্যাট অ্যাপ বানাতে চান—যেখানে রিয়েল-টাইমে ডেটা আদান-প্রদান হয়। FastAPI-এর async ফিচার দিয়ে সহজেই এমন অ্যাপ তৈরি করা যায়।
+
+---
+
+## FastAPI কী?
+
+FastAPI হচ্ছে পাইথনের asynchronous (async) ওয়েব ফ্রেমওয়ার্ক, যা API ডেভেলপমেন্টে দ্রুততা, নিরাপত্তা, এবং টাইপ-চেকিং নিশ্চিত করে।
+
+### ইনস্টলেশন
+
+```bash
+pip install fastapi uvicorn
+```
+
+- `fastapi`: ফ্রেমওয়ার্ক
+- `uvicorn`: ASGI সার্ভার (চালানোর জন্য)
+
+---
+
+## FastAPI অ্যাপের বেসিক স্ট্রাকচার
+
+```python
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+async def home():
+    return {"message": "হ্যালো, FastAPI!"}
+```
+
+### চালানো
+
+```bash
+uvicorn main:app --reload
+```
+
+---
+
+## রাউটিং ও HTTP Methods
+
+FastAPI-তে GET, POST, PUT, DELETE—সব HTTP Method সহজে ব্যবহার করা যায়।
+
+```python
+@app.get("/students")
+async def get_students():
+    return [{"name": "রাহুল", "grade": "১০"}]
+
+@app.post("/students")
+async def add_student(student: dict):
+    # ডেটা প্রসেসিং
+    return {"message": "ছাত্র যোগ হয়েছে"}
+```
+
+---
+
+## প্যারামিটার, কুয়েরি, ও বডি
+
+FastAPI-তে path parameter, query parameter, এবং request body সহজে নেওয়া যায়।
+
+```python
+from fastapi import Query
+
+@app.get("/students/{student_id}")
+async def get_student(student_id: int, details: bool = Query(False)):
+    # student_id ও details ব্যবহার
+    return {"id": student_id, "details": details}
+```
+
+---
+
+## Pydantic Model: টাইপ-সেফ ডেটা
+
+FastAPI-তে ডেটা ভ্যালিডেশন ও টাইপ-চেকিংয়ের জন্য Pydantic Model ব্যবহার হয়।
+
+```python
+from pydantic import BaseModel
+
+class Student(BaseModel):
+    name: str
+    grade: str
+
+@app.post("/students")
+async def add_student(student: Student):
+    return student
+```
+
+---
+
+## Async ও Performance
+
+FastAPI-এর async ফিচার দিয়ে একসাথে অনেক রিকোয়েস্ট দ্রুত প্রসেস করা যায়।
+
+### Analogy
+
+FastAPI-কে ভাবুন, একসাথে অনেক কাস্টমারকে দ্রুত সার্ভিস দেওয়া সুপারফাস্ট কাউন্টার।
+
+---
+
+## Swagger UI ও API Docs
+
+FastAPI-তে বিল্ট-ইন Swagger UI আছে—API ডকুমেন্টেশন ও টেস্টিং একসাথে।
+
+- http://localhost:8000/docs
+- http://localhost:8000/redoc
+
+---
+
+## Authentication ও Security
+
+FastAPI-তে OAuth2, JWT, API Key—সব ধরনের অথেন্টিকেশন সহজে ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## FastAPI-এর সুবিধা
+
+- অত্যন্ত দ্রুত ও async
+- টাইপ-চেকিং ও ভ্যালিডেশন
+- বিল্ট-ইন API Docs
+- সহজ ডেভেলপমেন্ট ও টেস্টিং
+
+---
+
+## অনুশীলন
+
+১. FastAPI দিয়ে CRUD API তৈরি করুন
+২. Pydantic Model ব্যবহার করুন
+৩. Swagger UI দিয়ে API টেস্ট করুন
+৪. Async ফিচার ব্যবহার করুন
+
+---
+
+## উপসংহার
+
+FastAPI দিয়ে আধুনিক, দ্রুত, এবং টাইপ-সেফ ওয়েব API তৈরি করা যায়। Async ফিচার, Swagger UI, Security—সবকিছুই সহজে ইমপ্লিমেন্ট করা যায়। পরবর্তী পাঠে ডাটাবেজ ইন্টিগ্রেশন নিয়ে আলোচনা হবে।

@@ -1,0 +1,126 @@
+---
+title: ডেকোরেটরস ও হায়ার-অর্ডার ফাংশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+পাইথনের অ্যাডভান্সড ফিচারগুলোর মধ্যে ডেকোরেটরস ও হায়ার-অর্ডার ফাংশন অত্যন্ত শক্তিশালী। এগুলো কোডকে আরও ডায়নামিক, পুনঃব্যবহারযোগ্য ও পরিষ্কার করে তোলে। এই পাঠে আমরা জানবো:
+- ডেকোরেটর ও হায়ার-অর্ডার ফাংশন কী
+- কিভাবে কাজ করে ও ব্যবহার করবেন
+- রিয়েল-লাইফ উদাহরণ ও analogies
+- Best practices
+
+## ১. হায়ার-অর্ডার ফাংশন কী?
+
+হায়ার-অর্ডার ফাংশন হলো এমন ফাংশন, যা অন্য ফাংশনকে আর্গুমেন্ট হিসেবে নেয় বা রিটার্ন করে।
+
+### উদাহরণ:
+```python
+def shout(text):
+    return text.upper()
+
+def whisper(text):
+    return text.lower()
+
+def greet(func):
+    greeting = func("Hello, World!")
+    print(greeting)
+
+greet(shout)   # HELLO, WORLD!
+greet(whisper) # hello, world!
+```
+
+## ২. ডেকোরেটর কী?
+
+ডেকোরেটর হলো ফাংশন, যা অন্য ফাংশনের behavior পরিবর্তন/extend করে, অথচ মূল ফাংশনের কোড না বদলে।
+
+### উদাহরণ:
+```python
+def my_decorator(func):
+    def wrapper():
+        print("ফাংশন চালুর আগে...")
+        func()
+        print("ফাংশন শেষ!")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("হ্যালো!")
+
+say_hello()
+```
+
+## ৩. ডেকোরেটর কিভাবে কাজ করে?
+
+- ডেকোরেটর ফাংশন মূল ফাংশনকে আর্গুমেন্ট হিসেবে নেয়
+- wrapper ফাংশন তৈরি করে, যেখানে নতুন behavior যোগ হয়
+- @my_decorator দিয়ে ফাংশনের ওপর ডেকোরেটর প্রয়োগ হয়
+
+## ৪. ডেকোরেটরস: রিয়েল-লাইফ উদাহরণ
+
+### লগিং ডেকোরেটর
+```python
+def log_decorator(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"Finished {func.__name__}")
+        return result
+    return wrapper
+
+@log_decorator
+def add(a, b):
+    return a + b
+
+add(2, 3)
+```
+
+### অথেন্টিকেশন ডেকোরেটর (ওয়েব অ্যাপ)
+```python
+def require_login(func):
+    def wrapper(user):
+        if not user.is_authenticated:
+            print("লগইন প্রয়োজন!")
+            return None
+        return func(user)
+    return wrapper
+
+@require_login
+def view_profile(user):
+    print(f"Welcome, {user.name}")
+```
+
+## ৫. বিল্ট-ইন ডেকোরেটর: @staticmethod, @classmethod, @property
+
+```python
+class Person:
+    @staticmethod
+    def greet():
+        print("Hi!")
+
+    @classmethod
+    def create(cls):
+        return cls()
+
+    @property
+    def name(self):
+        return "Anis"
+```
+
+## ৬. Analogies: গিফট র‍্যাপিং
+
+ডেকোরেটরকে ভাবুন গিফট র‍্যাপিংয়ের মতো—মূল উপহার (ফাংশন) আগের মতোই থাকে, শুধু বাহিরে নতুন র‍্যাপিং (behavior) যোগ হয়।
+
+## ৭. Best Practices
+
+- wrapper ফাংশনে `*args, **kwargs` ব্যবহার করুন
+- functools.wraps দিয়ে মূল ফাংশনের metadata সংরক্ষণ করুন
+- ডেকোরেটরকে ছোট ও অর্থবহ রাখুন
+- ডকুমেন্টেশন লিখুন
+
+## ৮. সংক্ষেপে
+
+- হায়ার-অর্ডার ফাংশন ও ডেকোরেটর কোডকে ডায়নামিক ও পুনঃব্যবহারযোগ্য করে
+- @ ডেকোরেটর দিয়ে সহজে ফাংশনের behavior extend করা যায়
+- রিয়েল-লাইফ উদাহরণ ও analogies দিয়ে সহজে বুঝতে পারবেন
+
+এভাবেই পাইথনে ডেকোরেটরস ও হায়ার-অর্ডার ফাংশন ব্যবহার করে আপনার কোডকে আরও শক্তিশালী, পরিষ্কার ও মেইনটেনেবল করতে পারেন।

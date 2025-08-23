@@ -1,0 +1,112 @@
+---
+title: কনটেক্সট ম্যানেজার ও __enter__, __exit__
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+পাইথনের অ্যাডভান্সড কনসেপ্টে কনটেক্সট ম্যানেজার ও `__enter__`, `__exit__` মেথড অত্যন্ত গুরুত্বপূর্ণ। এগুলো রিসোর্স ব্যবস্থাপনা, ক্লিন-আপ, এবং এক্সসেপশন হ্যান্ডলিং সহজ করে তোলে। এই পাঠে আমরা জানবো:
+- কনটেক্সট ম্যানেজার কী, কেন দরকার
+- `__enter__`, `__exit__` কীভাবে কাজ করে
+- কাস্টম কনটেক্সট ম্যানেজার তৈরি
+- রিয়েল-লাইফ উদাহরণ ও analogies
+- Best practices
+
+## ১. কনটেক্সট ম্যানেজার কী?
+
+কনটেক্সট ম্যানেজার এমন অবজেক্ট, যা কোনো রিসোর্স ব্যবহারের আগে সেটআপ করে এবং পরে ক্লিন-আপ করে। উদাহরণ: ফাইল ওপেন করা, কাজ শেষে ফাইল বন্ধ করা।
+
+## ২. `__enter__`, `__exit__` মেথড কী?
+
+- `__enter__`: রিসোর্স প্রস্তুত/সেটআপ
+- `__exit__`: রিসোর্স ক্লিন-আপ, এক্সসেপশন হ্যান্ডল
+
+### উদাহরণ:
+```python
+class MyContext:
+    def __enter__(self):
+        print("রিসোর্স প্রস্তুত!")
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("রিসোর্স ক্লিন-আপ!")
+        if exc_type:
+            print(f"এক্সসেপশন: {exc_val}")
+        return False  # এক্সসেপশন propagate হবে
+
+with MyContext() as ctx:
+    print("কাজ চলছে...")
+    # raise ValueError("ভুল!")
+```
+
+## ৩. কাস্টম কনটেক্সট ম্যানেজার তৈরি
+
+কনটেক্সট ম্যানেজার ক্লাসে `__enter__` ও `__exit__` মেথড লিখে, with স্টেটমেন্টে ব্যবহার করা যায়।
+
+### ফাইল হ্যান্ডলিং উদাহরণ:
+```python
+class SafeFile:
+    def __init__(self, filename):
+        self.filename = filename
+    def __enter__(self):
+        self.file = open(self.filename, 'r')
+        return self.file
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.file.close()
+        if exc_type:
+            print("এক্সসেপশন ধরা পড়েছে:", exc_val)
+        return False
+
+with SafeFile('data.txt') as f:
+    print(f.read())
+```
+
+## ৪. contextlib দিয়ে সহজ কনটেক্সট ম্যানেজার
+
+`contextlib` মডিউল দিয়ে সহজে কনটেক্সট ম্যানেজার তৈরি করা যায়।
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def open_file(name):
+    f = open(name, 'r')
+    try:
+        yield f
+    finally:
+        f.close()
+
+with open_file('data.txt') as f:
+    print(f.read())
+```
+
+## ৫. রিয়েল-লাইফ উদাহরণ: ডাটাবেজ কানেকশন
+
+ধরা যাক, ডাটাবেজ কানেকশন ওপেন/ক্লোজ করতে চান:
+```python
+class DBConnection:
+    def __enter__(self):
+        print("ডাটাবেজ কানেকশন ওপেন!")
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("ডাটাবেজ কানেকশন ক্লোজ!")
+
+with DBConnection() as db:
+    print("কোয়েরি চলছে...")
+```
+
+## ৬. Analogies: হোটেল চেক-ইন/চেক-আউট
+
+কনটেক্সট ম্যানেজারকে ভাবুন হোটেল চেক-ইন/চেক-আউটের মতো। চেক-ইন করলে রুম প্রস্তুত হয় (`__enter__`), চেক-আউট করলে রুম পরিষ্কার হয় (`__exit__`)।
+
+## ৭. Best Practices
+
+- রিসোর্স ব্যবহারে সবসময় with স্টেটমেন্ট ব্যবহার করুন
+- কাস্টম কনটেক্সট ম্যানেজারে এক্সসেপশন হ্যান্ডল করুন
+- contextlib ব্যবহার করুন সহজ কনটেক্সট ম্যানেজারের জন্য
+- ডকুমেন্টেশন লিখুন
+
+## ৮. সংক্ষেপে
+
+- কনটেক্সট ম্যানেজার ও `__enter__`, `__exit__` রিসোর্স ব্যবস্থাপনা সহজ ও নিরাপদ করে
+- কাস্টম কনটেক্সট ম্যানেজার ও contextlib দিয়ে আরও শক্তিশালী ব্যবস্থাপনা সম্ভব
+- রিয়েল-লাইফ উদাহরণ ও analogies দিয়ে সহজে বুঝতে পারবেন
+
+এভাবেই পাইথনে কনটেক্সট ম্যানেজার ও `__enter__`, `__exit__` ব্যবহার করে আপনার কোডকে আরও নিরাপদ, পরিষ্কার ও মেইনটেনেবল করতে পারেন।

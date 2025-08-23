@@ -1,0 +1,122 @@
+---
+title: CSV, JSON ফাইল হ্যান্ডলিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডাটা প্রসেসিং ও অ্যানালাইসিসে CSV ও JSON ফাইলের ব্যবহার খুবই সাধারণ। পাইথনে এই দুই ধরনের ফাইল সহজেই পড়া, লেখা ও প্রসেস করা যায়।
+
+## CSV ফাইল কী?
+
+CSV (Comma Separated Values) হচ্ছে টেবিল ডাটা সংরক্ষণের সহজ ফরম্যাট—প্রতিটি লাইনে কমা দিয়ে আলাদা করা মান থাকে।
+
+### উদাহরণ:
+```
+name,age,city
+Anis,25,Dhaka
+Bithi,22,Chittagong
+```
+
+## পাইথনে CSV ফাইল পড়া
+
+`csv` মডিউল ব্যবহার করে CSV ফাইল পড়া যায়।
+```python
+import csv
+with open("data.csv", "r") as file:
+    reader = csv.reader(file)
+    for row in reader:
+        print(row)
+```
+
+### CSV ফাইল লেখা
+```python
+import csv
+with open("output.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["name", "age", "city"])
+    writer.writerow(["Anis", 25, "Dhaka"])
+    writer.writerow(["Bithi", 22, "Chittagong"])
+```
+
+### Dictionary দিয়ে CSV
+```python
+import csv
+with open("students.csv", "w", newline="") as file:
+    fieldnames = ["name", "score"]
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerow({"name": "Anis", "score": 90})
+    writer.writerow({"name": "Bithi", "score": 85})
+```
+
+## JSON ফাইল কী?
+
+JSON (JavaScript Object Notation) হচ্ছে ডাটা আদান-প্রদানের জন্য জনপ্রিয় ফরম্যাট—ডিকশনারি/অবজেক্টের মতো স্ট্রাকচার।
+
+### উদাহরণ:
+```json
+{
+  "name": "Anis",
+  "age": 25,
+  "skills": ["Python", "Data Science"]
+}
+```
+
+## পাইথনে JSON ফাইল পড়া
+
+`json` মডিউল ব্যবহার করে JSON ফাইল পড়া যায়।
+```python
+import json
+with open("data.json", "r") as file:
+    data = json.load(file)
+    print(data)
+```
+
+## JSON ফাইল লেখা
+```python
+import json
+data = {
+    "name": "Anis",
+    "age": 25,
+    "skills": ["Python", "Data Science"]
+}
+with open("output.json", "w") as file:
+    json.dump(data, file, indent=4)
+```
+
+## বাস্তব উদাহরণ
+
+### ১. CSV থেকে ডাটা পড়ে যোগফল বের করা
+```python
+import csv
+with open("numbers.csv", "r") as file:
+    reader = csv.reader(file)
+    total = 0
+    for row in reader:
+        total += int(row[0])
+print("যোগফল:", total)
+```
+
+### ২. JSON থেকে ইউজার লিস্ট পড়া
+```python
+import json
+with open("users.json", "r") as file:
+    users = json.load(file)
+    for user in users:
+        print(user["name"])
+```
+
+## ভুল ও সমাধান
+
+- ভুল: CSV/JSON ফাইল না থাকলে FileNotFoundError
+- ভুল: JSON ফাইলের ফরম্যাট ভুল হলে json.decoder.JSONDecodeError
+- ভুল: CSV ফাইলের লাইনে কমা কম/বেশি হলে ValueError
+
+## অনুশীলন
+
+১. একটি CSV ফাইল থেকে নাম ও স্কোর পড়ে, সর্বোচ্চ স্কোর বের করুন।
+২. একটি JSON ফাইলে ইউজার লিস্ট লিখুন এবং পরে সেই লিস্ট থেকে নির্দিষ্ট ইউজার খুঁজে বের করুন।
+৩. Dictionary দিয়ে CSV ফাইল লিখুন এবং পরে তা পড়ুন।
+
+## উপসংহার
+
+CSV ও JSON ফাইল হ্যান্ডলিং—ডাটা প্রসেসিং, রিপোর্টিং, ও API ইন্টিগ্রেশনে অপরিহার্য। পাইথনের `csv` ও `json` মডিউল ব্যবহার করে এগুলো সহজেই আয়ত্ত করা যায়। পরবর্তী পাঠে এরর ও এক্সসেপশন হ্যান্ডলিং নিয়ে আলোচনা করব।

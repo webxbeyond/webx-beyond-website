@@ -1,0 +1,168 @@
+---
+title: Matplotlib ও Seaborn দিয়ে ভিজুয়ালাইজেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+ডেটা বিশ্লেষণ শুধু সংখ্যার খেলা নয়—ডেটাকে চিত্রে রূপান্তর করলে বোঝা সহজ হয়। Matplotlib ও Seaborn পাইথনের দুইটি জনপ্রিয় লাইব্রেরি, যেগুলো দিয়ে ডেটা সহজে গ্রাফ, চার্ট, ও ভিজুয়ালাইজেশনে রূপান্তর করা যায়।
+
+ভাবুন, আপনি একজন শিক্ষক। ছাত্রদের নম্বরের তালিকা দেখে কে ভালো করছে, কে পিছিয়ে—তা বোঝা কঠিন। কিন্তু একটি বার চার্ট বা লাইন গ্রাফ দেখলে মুহূর্তেই বুঝতে পারবেন।
+
+---
+
+## Matplotlib: পাইথনের গ্রাফ আঁকার ক্যানভাস
+
+Matplotlib হচ্ছে পাইথনের সবচেয়ে পুরনো ও শক্তিশালী ভিজুয়ালাইজেশন লাইব্রেরি। এতে রয়েছে বার চার্ট, লাইন গ্রাফ, পাই চার্ট, হিস্টোগ্রাম—সবকিছু আঁকার টুল।
+
+### ইনস্টলেশন
+
+```bash
+pip install matplotlib
+```
+
+---
+
+## Matplotlib দিয়ে বেসিক গ্রাফ আঁকা
+
+### বার চার্ট
+
+```python
+import matplotlib.pyplot as plt
+
+names = ['রাহুল', 'সুমন', 'রিমা', 'তানিয়া']
+marks = [80, 45, 65, 30]
+
+plt.bar(names, marks)
+plt.xlabel('নাম')
+plt.ylabel('নম্বর')
+plt.title('ছাত্রদের নম্বর')
+plt.show()
+```
+
+### লাইন গ্রাফ
+
+```python
+plt.plot(names, marks, marker='o')
+plt.xlabel('নাম')
+plt.ylabel('নম্বর')
+plt.title('ছাত্রদের নম্বর (লাইন গ্রাফ)')
+plt.show()
+```
+
+### পাই চার্ট
+
+```python
+plt.pie(marks, labels=names, autopct='%1.1f%%')
+plt.title('নম্বরের অনুপাত')
+plt.show()
+```
+
+---
+
+## Seaborn: সুন্দর ও স্টাইলিশ গ্রাফ
+
+Seaborn হচ্ছে Matplotlib-এর উপর ভিত্তি করে তৈরি আরও উন্নত ও সুন্দর ভিজুয়ালাইজেশন লাইব্রেরি। এতে রয়েছে color palette, statistical plots, heatmap, boxplot ইত্যাদি।
+
+### ইনস্টলেশন
+
+```bash
+pip install seaborn
+```
+
+---
+
+## Seaborn দিয়ে বেসিক প্লট
+
+### Barplot
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+names = ['রাহুল', 'সুমন', 'রিমা', 'তানিয়া']
+marks = [80, 45, 65, 30]
+
+sns.barplot(x=names, y=marks)
+plt.title('ছাত্রদের নম্বর (Seaborn Barplot)')
+plt.show()
+```
+
+### Boxplot
+
+```python
+sns.boxplot(y=marks)
+plt.title('নম্বরের বিস্তার (Boxplot)')
+plt.show()
+```
+
+### Heatmap
+
+```python
+import numpy as np
+
+data = np.array([[80, 45], [65, 30]])
+sns.heatmap(data, annot=True)
+plt.title('নম্বরের Heatmap')
+plt.show()
+```
+
+---
+
+## বাস্তব উদাহরণ: ছাত্রদের পারফরম্যান্স
+
+ধরা যাক, ১০০ জন ছাত্রের নম্বর আছে। শুধু সংখ্যায় দেখলে বোঝা কঠিন, কিন্তু গ্রাফে দেখলে—কতজন ভালো করছে, কারা পিছিয়ে—সব সহজে বোঝা যায়।
+
+### Analogy
+
+Matplotlib ও Seaborn-কে ভাবুন, ডেটার জন্য রংতুলি। যেমন একজন শিল্পী ক্যানভাসে ছবি আঁকেন, আপনি ডেটা দিয়ে গ্রাফ আঁকেন।
+
+---
+
+## কাস্টমাইজেশন ও স্টাইল
+
+Matplotlib ও Seaborn-এ রয়েছে প্রচুর কাস্টমাইজেশন—রং, লেবেল, লেজেন্ড, গ্রিড, ফন্ট, ইত্যাদি।
+
+```python
+plt.bar(names, marks, color='skyblue')
+plt.grid(True)
+plt.legend(['নম্বর'])
+plt.show()
+```
+
+---
+
+## Pandas DataFrame থেকে সরাসরি গ্রাফ
+
+Pandas DataFrame-এর `.plot()` ফাংশন ব্যবহার করে সহজেই গ্রাফ আঁকা যায়।
+
+```python
+import pandas as pd
+
+data = {'নাম': names, 'নম্বর': marks}
+df = pd.DataFrame(data)
+df.plot(x='নাম', y='নম্বর', kind='bar')
+plt.show()
+```
+
+---
+
+## Matplotlib ও Seaborn-এর সুবিধা
+
+- ডেটা সহজে চিত্রে রূপান্তর
+- দ্রুত ও সুন্দর গ্রাফ
+- কাস্টমাইজেশন ও স্টাইল
+- ডেটা অ্যানালাইসিসে সহায়ক
+
+---
+
+## অনুশীলন
+
+১. নিজের ডেটা দিয়ে বার চার্ট, লাইন গ্রাফ, পাই চার্ট আঁকুন।
+২. Seaborn দিয়ে Boxplot ও Heatmap আঁকুন।
+৩. গ্রাফে কাস্টম রং, লেবেল, লেজেন্ড ব্যবহার করুন।
+৪. Pandas DataFrame থেকে সরাসরি গ্রাফ আঁকুন।
+
+---
+
+## উপসংহার
+
+Matplotlib ও Seaborn দিয়ে ডেটা ভিজুয়ালাইজেশন সহজ, সুন্দর ও শক্তিশালী। ডেটা বিশ্লেষণ, রিপোর্টিং, প্রেজেন্টেশন—সবখানে গ্রাফ অপরিহার্য। পরবর্তী পাঠে Jupyter Notebook ও Exploratory Data Analysis নিয়ে আলোচনা হবে।

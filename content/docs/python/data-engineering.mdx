@@ -1,0 +1,137 @@
+---
+title: Data Engineering with Airflow, Spark
+icon: solar:alt-arrow-right-bold-duotone
+---
+Data Engineering মানে—বড় ডেটা সংগ্রহ, প্রসেসিং, ট্রান্সফরমেশন, স্টোরেজ, অটোমেশন। পাইথনে Airflow ও Spark—দুইটি শক্তিশালী টুল, যেগুলো দিয়ে ডেটা পাইপলাইন, ETL, অটোমেশন, ও বিশ্লেষণ সহজে করা যায়।
+
+ভাবুন, আপনি একটি ব্যাংকের ডেটা ইঞ্জিনিয়ার—প্রতিদিন লাখ লাখ ট্রান্সাকশন প্রসেস, ক্লিন, রিপোর্ট তৈরি করতে হয়। Airflow দিয়ে অটোমেটেড পাইপলাইন, Spark দিয়ে দ্রুত ডেটা প্রসেসিং—সবকিছু সম্ভব।
+
+---
+
+## Data Engineering কী?
+
+- **ETL:** Extract, Transform, Load
+- **Pipeline:** ডেটা এক জায়গা থেকে অন্য জায়গায়, বিভিন্ন ধাপে প্রসেস
+- **Automation:** নির্দিষ্ট সময়/ইভেন্টে ডেটা প্রসেস
+
+### Analogy
+
+Data Engineering-কে ভাবুন, কারখানার কনভেয়ার বেল্ট—কাঁচামাল (ডেটা) বিভিন্ন মেশিনে (প্রসেস) গিয়ে, শেষে প্যাকেট (স্টোরেজ) হয়।
+
+---
+
+## Apache Airflow: Workflow Automation
+
+Airflow দিয়ে ডেটা পাইপলাইন, ETL, রিপোর্টিং—সবকিছু DAG (Directed Acyclic Graph) আকারে অটোমেট করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install apache-airflow
+```
+
+### DAG ও Task
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def extract():
+    print('ডেটা সংগ্রহ')
+
+def transform():
+    print('ডেটা প্রসেস')
+
+def load():
+    print('ডেটা স্টোর')
+
+dag = DAG('etl_pipeline', start_date=datetime(2023, 1, 1), schedule_interval='@daily')
+
+extract_task = PythonOperator(task_id='extract', python_callable=extract, dag=dag)
+transform_task = PythonOperator(task_id='transform', python_callable=transform, dag=dag)
+load_task = PythonOperator(task_id='load', python_callable=load, dag=dag)
+
+extract_task >> transform_task >> load_task
+```
+
+### Airflow UI
+
+- http://localhost:8080
+- DAG, Task Status, Logs, Trigger—all দেখা যায়
+
+---
+
+## Apache Spark: Big Data Processing
+
+Spark হচ্ছে—বড় ডেটা, দ্রুত প্রসেসিং, ডিস্ট্রিবিউটেড কম্পিউটিংয়ের জন্য পাইথনের শক্তিশালী টুল।
+
+### ইনস্টলেশন
+
+```bash
+pip install pyspark
+```
+
+### SparkContext ও DataFrame
+
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName('DataEngineering').getOrCreate()
+data = [('রাহুল', 80), ('সুমন', 45)]
+df = spark.createDataFrame(data, ['name', 'score'])
+df.show()
+```
+
+### Data Processing
+
+```python
+df.filter(df.score > 50).show()
+df.groupBy('name').avg('score').show()
+```
+
+---
+
+## Airflow + Spark: End-to-End Pipeline
+
+Airflow দিয়ে Spark Task ট্রিগার, মনিটর, অটোমেট করা যায়।
+
+```python
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
+spark_task = SparkSubmitOperator(
+    task_id='spark_job',
+    application='/path/to/spark_script.py',
+    dag=dag
+)
+```
+
+---
+
+## বাস্তব উদাহরণ: ব্যাংক রিপোর্ট পাইপলাইন
+
+প্রতিদিন ব্যাংকের ট্রান্সাকশন ডেটা Airflow দিয়ে অটোমেটেড ETL, Spark দিয়ে বিশ্লেষণ, শেষে রিপোর্ট তৈরি—সবকিছু পাইথনে করা যায়।
+
+---
+
+## Data Engineering-এর সুবিধা
+
+- বড় ডেটা দ্রুত প্রসেস
+- অটোমেটেড পাইপলাইন
+- স্কেলিং ও মনিটরিং সহজ
+- রিপোর্ট, অ্যানালাইসিস, ML-ready ডেটা
+
+---
+
+## অনুশীলন
+
+১. Airflow দিয়ে ETL পাইপলাইন তৈরি করুন
+২. Spark দিয়ে DataFrame প্রসেস করুন
+৩. Airflow থেকে Spark Task ট্রিগার করুন
+৪. পাইপলাইনের লগ ও স্ট্যাটাস মনিটর করুন
+
+---
+
+## উপসংহার
+
+Airflow ও Spark—Data Engineering-এ অপরিহার্য। পাইথনে ETL, অটোমেশন, বিশ্লেষণ—সবকিছুই স্কেলেবল ও দ্রুত। পরবর্তী পাঠে AI/ML Systems Design নিয়ে আলোচনা হবে।
