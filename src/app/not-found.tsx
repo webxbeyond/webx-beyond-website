@@ -1,9 +1,7 @@
-"use client"
 import { baseOptions } from '@/lib/layout.shared';
 import NotFoundGame from '@/components/not-found-game.client';
 import Link from 'next/link';
 import { HomeLayout } from 'fumadocs-ui/layouts/home';
-import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 export default function NotFound() {
   const base = baseOptions();
@@ -14,14 +12,14 @@ export default function NotFound() {
         {/* Fun mini-game */}
         <NotFoundGame />
 
-        <div className="text-center max-w-3xl px-4">
+        <div className="text-center max-w-lg px-4">
 
           <h1 className="text-4xl font-extrabold mb-4 ">৪০৪: পেজটি পাওয়া যায়নি</h1>
 
           <p className="text-lg mb-4 text-fd-muted-foreground">
             <span className="font-semibold">উফ!</span> আমাদের সার্ভার একটি
             <code className="bg-black text-green-400 px-1 mx-1 rounded">ReferenceError</code> পাঠিয়েছে:
-            <em>'Page is not defined'</em>।
+            <em>&apos;Page is not defined&apos;</em>।
             ভাবুন, আপনি এমন একটি কম্পোনেন্ট ইমপোর্ট করেছেন যা এখনও তৈরি হয়নি।
           </p>
 
