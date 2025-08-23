@@ -1,0 +1,381 @@
+---
+title: RouterOS স্ক্রিপ্টিং পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+মাইক্রোটিক RouterOS-এ স্ক্রিপ্টিং হলো অটোমেশন, কাস্টম টাস্ক এবং ডাইনামিক কনফিগারেশনের জন্য একটি শক্তিশালী টুল। এটির মাধ্যমে আপনি রাউটারের কাজ স্বয়ংক্রিয়ভাবে পরিচালনা করতে, কাস্টম লজিক ইমপ্লিমেন্ট করতে এবং নেটওয়ার্ক ম্যানেজমেন্ট সহজ করতে পারেন। এই টিউটোরিয়ালে আমরা RouterOS স্ক্রিপ্টিং-এর বেসিক, সিনট্যাক্স, উদাহরণ এবং বাস্তব কেস স্টাডি নিয়ে বিস্তারিত আলোচনা করব।
+
+---
+
+## স্ক্রিপ্টিং কী এবং কেন প্রয়োজন?
+
+RouterOS স্ক্রিপ্টিং আপনাকে এমন কমান্ডের সিকোয়েন্স লিখতে দেয় যা রাউটার স্বয়ংক্রিয়ভাবে কার্যকর করে। এটি ব্যাশ স্ক্রিপ্টিং-এর মতো, তবে মাইক্রোটিকের পরিবেশের জন্য তৈরি।
+
+- **রাউটারের কাজের অটোমেশন**: ব্যাকআপ, ইন্টারফেস ম্যানেজমেন্ট বা রুল আপডেটের মতো পুনরাবৃত্তিমূলক কাজ স্বয়ংক্রিয় করুন।
+- **কাস্টম টাস্ক, কনফিগারেশন এবং মনিটরিং**: নির্দিষ্ট প্রয়োজনের জন্য লজিক তৈরি করুন, যেমন ব্যর্থতার সময় সতর্কতা বা শর্তের উপর ভিত্তি করে সেটিংস সমন্বয়।
+- **স্কিডিউলড টাস্ক, নেটওয়াচ এবং ইভেন্ট-ভিত্তিক অটোমেশন**: নির্দিষ্ট সময়ে, ইভেন্টে (যেমন, ইন্টারফেস ডাউন) বা DHCP লিজের মতো ট্রিগারের মাধ্যমে স্ক্রিপ্ট চালান।
+
+বড় নেটওয়ার্কে যেখানে ম্যানুয়াল কনফিগারেশন অকার্যকর বা রিয়েল-টাইম প্রতিক্রিয়ার প্রয়োজন, সেখানে স্ক্রিপ্টিং অপরিহার্য।
+
+---
+
+## স্ক্রিপ্টিং সিনট্যাক্স এবং বেসিক
+
+RouterOS স্ক্রিপ্টিং CLI-এর মতো সিনট্যাক্স ব্যবহার করে এবং ভ্যারিয়েবল, লুপ, কন্ডিশন এবং ফাংশন সমর্থন করে। স্ক্রিপ্ট লাইন ধরে কার্যকর হয়, এবং ত্রুটি হলে কার্যকরণ বন্ধ হয়।
+
+### ভ্যারিয়েবল
+ভ্যারিয়েবল মান সংরক্ষণ করে এবং দুই ধরনের: লোকাল (স্কোপ-সীমিত) এবং গ্লোবাল (সব স্ক্রিপ্টে অ্যাক্সেসযোগ্য)।
+
+```bash
+:local myVar "Hello World";  # লোকাল ভ্যারিয়েবল
+:global globalVar 123;       # গ্লোবাল ভ্যারিয়েবল
+:log info $myVar;            # লগ করে "Hello World"
+:set myVar "Updated Value";  # ভ্যারিয়েবল আপডেট
+:put $globalVar;             # আউটপুট 123
+```
+
+ভ্যারিয়েবল মুছে ফেলতে (RouterOS v6.2+): `:set myVar;`।
+
+### If কন্ডিশন
+শর্ত চেক করে কোড কার্যকর করে।
+
+```bash
+:local status "up";
+:if ($status = "up") do={
+  :log info "ইন্টারফেস চালু আছে";
+} else={
+  :log info "ইন্টারফেস বন্ধ আছে";
+}
+```
+
+### For লুপ
+নির্দিষ্ট সংখ্যকবার পুনরাবৃত্তি করে।
+
+```bash
+:for i from=1 to=5 do={
+  :log info $i;  # ১ থেকে ৫ লগ করে
+}
+```
+
+### While লুপ
+শর্ত মিথ্যা না হওয়া পর্যন্ত চলে।
+
+```bash
+:local count 0;
+:while ($count < 3) do={
+  :log info $count;
+  :set count ($count + 1);
+}
+```
+
+### Foreach লুপ
+অ্যারে বা লিস্টের উপর পুনরাবৃত্তি করে।
+
+```bash
+:foreach i in=[/ip address find] do={
+  :local addr [/ip address get $i address];
+  :log info $addr;
+}
+```
+
+### ফাংশন
+পুনরায় ব্যবহারযোগ্য কোড ব্লক তৈরি করে (RouterOS v6.2+)।
+
+```bash
+:global addNumbers do={
+  :return ($a + $b);
+};
+:put [$addNumbers a=5 b=3];  # আউটপুট ৮
+```
+
+---
+
+## স্ক্রিপ্ট তৈরি এবং চালানো
+
+### ১. স্ক্রিপ্ট তৈরি
+CLI বা Winbox ব্যবহার করে স্ক্রিপ্ট যোগ করুন।
+
+```bash
+/system script add name=backup-script source=":log info 'ব্যাকআপ শুরু হয়েছে'; /system backup save name=auto.backup;";
+```
+
+### ২. স্ক্রিপ্ট চালানো
+ম্যানুয়ালি চালান।
+
+```bash
+/system script run backup-script;
+```
+
+### ৩. Winbox-এ ব্যবহার
+- **System > Scripts** এ যান।
+- **+** ক্লিক করে নতুন স্ক্রিপ্ট যোগ করুন, নাম এবং সোর্স দিন।
+- **Run Script** বাটনে ক্লিক করুন।
+
+স্ক্রিপ্ট স্কিডিউলার বা ইভেন্ট থেকেও চালানো যায়।
+
+---
+
+## স্কিডিউলড টাস্ক (Scheduler)
+
+নির্দিষ্ট সময়ে বা বিরতিতে স্ক্রিপ্ট চালান।
+
+### স্কিডিউলার উদাহরণ: দৈনিক ব্যাকআপ
+```bash
+/system scheduler add name=daily-backup interval=1d on-event=backup-script;
+```
+
+এটি প্রতি ২৪ ঘণ্টায় `backup-script` চালায়।
+
+আরেকটি উদাহরণ: প্রতি ৫ মিনিটে চালানো।
+
+```bash
+/system scheduler add name=monitor interval=5m on-event=":log info 'মনিটরিং...';";
+```
+
+---
+
+## স্ক্রিপ্টিং দ্বারা অটোমেশন এবং কাস্টম টাস্ক
+
+স্ক্রিপ্ট ব্যাকআপ, কনফিগ পরিবর্তন, সতর্কতা, ইন্টারফেস নিয়ন্ত্রণ এবং আরও অনেক কিছু পরিচালনা করতে পারে।
+
+### ইমেল সতর্কতা উদাহরণ
+ইভেন্টে ইমেল পাঠান (ইমেল টুল সেটআপ প্রয়োজন)।
+
+```bash
+/tool e-mail send to="admin@example.com" subject="সতর্কতা" body="ব্যাকআপ সম্পন্ন" server=mail.example.com from=router@example.com;
+```
+
+### ইন্টারফেস নিয়ন্ত্রণ উদাহরণ
+ইন্টারফেস গতিশীলভাবে সক্রিয়/নিষ্ক্রিয় করুন।
+
+```bash
+:if ([/interface get ether2 running] = false) do={
+  /interface enable эфир2;
+  :log info "ether2 সক্রিয় করা হয়েছে";
+}
+```
+
+### অতিরিক্ত অটোমেশন উদাহরণ
+
+#### আইপি পরিবর্তন চেক
+ডায়নামিক আইপির জন্য উপযোগী।
+
+```bash
+:global currentIP;
+:local newIP [/ip address get [find interface="ether1"] address];
+:if ($newIP != $currentIP) do={
+  :log warning "আইপি $currentIP থেকে $newIP তে পরিবর্তিত হয়েছে";
+  :set currentIP $newIP;
+  # এখানে ইমেল সতর্কতা যোগ করুন
+}
+```
+
+#### আইপি থেকে নেটমাস্ক অপসারণ
+ফায়ারওয়াল রুলের জন্য।
+
+```bash
+:global ipaddress "10.1.101.1/24";
+:for i from=([:len $ipaddress] - 1) to=0 do={
+  :if ([:pick $ipaddress $i] = "/") do={
+    :put [:pick $ipaddress 0 $i];
+  }
+}
+```
+
+#### ফাইলে তৈরি/যোগ করা
+ফাইল অপারেশনের জন্য ওয়ার্কআরাউন্ড।
+
+```bash
+/file print file=myFile.txt;
+/file set myFile.txt contents="";
+:local oldText [/file get myFile.txt contents];
+:local addText "নতুন লাইন";
+/file set myFile.txt contents=($oldText . "\n" . $addText);
+```
+
+---
+
+## বাস্তব কেস স্টাডি
+
+### কেস ১: রাউটারের নির্ধারিত ব্যাকআপ
+দৈনিক ব্যাকআপ অটোমেট করুন এবং ইমেল নিশ্চিতকরণ পাঠান।
+
+**পূর্ণ স্ক্রিপ্ট (backup-script):**
+```bash
+:log info "ব্যাকআপ শুরু হয়েছে";
+/system backup save name=("backup-" . [/system identity get name] . "-" . [:pick [/system clock get date] 0 11] . ".backup");
+/export file=("config-" . [/system identity get name] . "-" . [:pick [/system clock get date] 0 11] . ".rsc");
+/tool e-mail send to="admin@example.com" subject="ব্যাকআপ সম্পন্ন" body="[/system identity get name] এর জন্য ব্যাকআপ সম্পন্ন।";
+:log info "ব্যাকআপ সম্পন্ন";
+```
+
+**স্কিডিউলার:**
+```bash
+/system scheduler add name=daily-backup interval=1d start-time=02:00:00 on-event=backup-script;
+```
+
+বাস্তব ব্যবহার: একাধিক রাউটার পরিচালনাকারী ISP-এর জন্য তারিখভিত্তিক ব্যাকআপ ফাইল তৈরি এবং কনফিগ এক্সপোর্ট।
+
+### কেস ২: ইন্টারফেস ডাউন হলে ইমেল সতর্কতা
+নেটওয়াচ ব্যবহার করে মনিটরিং এবং সতর্কতার জন্য স্ক্রিপ্ট।
+
+**নেটওয়াচ সেটআপ:**
+```bash
+/tool netwatch add host=8.8.8.8 interval=10s up-script=":log info 'ইন্টারনেট চালু';" down-script="alert-down";
+```
+
+**স্ক্রিপ্ট (alert-down):**
+```bash
+:log warning "ইন্টারনেট সংযোগ বন্ধ!";
+/tool e-mail send to="admin@example.com" subject="সতর্কতা: ইন্টারফেস বন্ধ" body="[/system identity get name] এর ইন্টারনেট সংযোগ $[/system clock get time] এ বন্ধ।";
+# ঐচ্ছিক: ব্যাকআপ ইন্টারফেসে ফেইলওভার
+/interface disable ether1;
+/interface enable ether2;
+```
+
+বাস্তব ব্যবহার: হোম অফিসে WAN ব্যর্থ হলে অ্যাডমিনকে সতর্ক করা এবং সেলুলার ব্যাকআপে স্যুইচ।
+
+### কেস ৩: ফায়ারওয়াল রুল পরিবর্তন অটোমেশন
+সময় বা ইভেন্টের উপর ভিত্তি করে রুল গতিশীলভাবে যোগ/অপসারণ।
+
+**স্ক্রিপ্ট উদাহরণ: অফ-আওয়ারে ট্রাফিক ব্লক**
+```bash
+:local hour [/system clock get time];
+:local startHour 18:00:00;
+:local endHour 08:00:00;
+:if ($hour > $startHour || $hour < $endHour) do={
+  /ip firewall filter add chain=forward action=drop comment="অফ-আওয়ার ব্লক" place-before=0;
+  :log info "অফ-আওয়ারের জন্য ফায়ারওয়াল ব্লক সক্রিয়।";
+} else={
+  /ip firewall filter remove [find comment="অফ-আওয়ার ব্লক"];
+  :log info "ফায়ারওয়াল ব্লক নিষ্ক্রিয়।";
+}
+```
+
+প্রতি ঘণ্টায় চালানোর জন্য স্কিডিউল করুন। বাস্তব ব্যবহার: স্কুলে ক্লাস চলাকালীন সোশ্যাল মিডিয়া ব্লক।
+
+### অতিরিক্ত বাস্তব কেস
+
+#### কেস ৪: DHCP থেকে DNS সিঙ্ক
+DHCP লিজ থেকে DNS আপডেট অটোমেট করুন।
+
+**স্ক্রিপ্ট স্নিপেট (dhcp-to-dns):**
+```bash
+:foreach lease in=[/ip dhcp-server lease find] do={
+  :local hostname [/ip dhcp-server lease get $lease hostname];
+  :local ip [/ip dhcp-server lease get $lease address];
+  :if ($hostname != "") do={
+    /ip dns static add name=($hostname . ".local") address=$ip ttl=5m;
+  }
+}
+```
+
+প্রতি ৫ মিনিটে স্কিডিউল করুন। বাস্তব ব্যবহার: IoT ডিভাইস সহ হোম নেটওয়ার্কে নাম-ভিত্তিক অ্যাক্সেস।
+
+#### কেস ৫: সার্টিফিকেট চেক এবং রিনিউয়াল
+মেয়াদোত্তীর্ণ সার্টিফিকেট মনিটর এবং সতর্কতা।
+
+**স্ক্রিপ্ট (check-certificates):**
+```bash
+:foreach cert in=[/certificate find] do={
+  :local daysLeft [/certificate get $cert days-valid];
+  :if ($daysLeft < 30) do={
+    :log warning "সার্টিফিকেট $[/certificate get $cert name] $daysLeft দিনে মেয়াদ শেষ হবে!";
+    /tool e-mail send to="admin@example.com" subject="সার্টিফিকেট মেয়াদ শেষ" body="সার্টিফিকেট রিনিউ করুন: $[/certificate get $cert name]";
+  }
+}
+```
+
+দৈনিক স্কিডিউল করুন। বাস্তব ব্যবহার: নিরাপদ সংযোগের জন্য এন্টারপ্রাইজ VPN সেটআপ।
+
+#### কেস ৬: RouterOS আপডেট চেকার
+আপডেটের জন্য চেক এবং অবহিত করুন।
+
+**স্ক্রিপ্ট (check-routeros-update):**
+```bash
+/system package update check-for-updates;
+:delay 5s;
+:local chan [/system package update get channel];
+:local inst [/system package update get installed-version];
+:local lat [/system package update get latest-version];
+:if ($inst != $lat) do={
+  :log warning "আপডেট উপলব্ধ: $inst -> $lat ($chan)";
+  /tool e-mail send to="admin@example.com" subject="RouterOS আপডেট" body="$lat এর জন্য আপডেট উপলব্ধ।";
+}
+```
+
+দৈনিক চালান। বাস্তব ব্যবহার: রাউটার ফ্লিট আপডেট রাখার জন্য পরিচালিত পরিষেবা প্রদানকারী।
+
+#### কেস ৭: ফাইল থেকে PPP সিক্রেট পার্স
+VPN-এর জন্য ফাইল থেকে ব্যবহারকারী আমদানি।
+
+**স্ক্রিপ্ট:**
+```bash
+:global content [/file get test.txt contents];
+:global contentLen [:len $content];
+:global lineEnd 0;
+:global line "";
+:global lastEnd 0;
+:do {
+  :set lineEnd [:find $content "\r\n" $lastEnd];
+  :set line [:pick $content $lastEnd $lineEnd];
+  :set lastEnd ($lineEnd + 2);
+  :local tmpArray [:toarray $line];
+  :if ([:pick $tmpArray 0] != "") do={
+    /ppp secret add name=[:pick $tmpArray 0] password=[:pick $tmpArray 1] local-address=[:pick $tmpArray 2] remote-address=[:pick $tmpArray 3] profile=[:pick $tmpArray 4] service=[:pick $tmpArray 5];
+  }
+} while ($lineEnd < $contentLen);
+```
+
+বাস্তব ব্যবহার: CSV ফাইল থেকে গ্রাহক VPN অ্যাকাউন্ট বাল্ক যোগ করা ISP-এর জন্য।
+
+#### কেস ৮: কিউ স্ট্যাট ফাইলে লিখুন
+বিশ্লেষণের জন্য কিউ স্ট্যাট এক্সপোর্ট।
+
+**স্ক্রিপ্ট স্নিপেট:**
+```bash
+:local entriesPerFile 10;
+:local currentQueue 0;
+:local queuesInFile 0;
+:local fileContent "";
+:local numQueues [/queue simple print count-only];
+:local fileCount ($numQueues / $entriesPerFile);
+:if (($fileCount * $entriesPerFile) != $numQueues) do={ :set fileCount ($fileCount + 1); }
+/file remove [find name~"stats"];
+:for i from=1 to=$fileCount do={
+  /file print file="stats$i.txt";
+  /file set "stats$i.txt" contents="";
+  :while ($queuesInFile < $entriesPerFile) do={
+    :if ($currentQueue < $numQueues) do={
+      :set currentQueue ($currentQueue +1);
+      :local internalID [/queue simple find name~("\\.$currentQueue\$")];
+      :set fileContent ($fileContent . [/queue simple get $internalID target] . " " . [/queue simple get $internalID bytes] . "\r\n");
+    }
+    :set queuesInFile ($queuesInFile +1);
+  }
+  /file set "stats$i.txt" contents=$fileContent;
+  :set fileContent "";
+  :set queuesInFile 0;
+}
+```
+
+বাস্তব ব্যবহার: WISP-এ ব্যান্ডউইথ মনিটরিং, বিলিংয়ের জন্য ডেটা এক্সপোর্ট।
+
+---
+
+## টিপস এবং বেস্ট প্র্যাকটিস
+
+- **পুঙ্খানুপুঙ্খভাবে পরীক্ষা**: নিরাপদ পরিবেশে স্ক্রিপ্ট চালান; ডিবাগিংয়ের জন্য `:put` ব্যবহার করুন।
+- **স্কিডিউলার সেটিংস**: ওভারলোড এড়াতে উপযুক্ত বিরতি সেট করুন; অনুমানযোগ্যতার জন্য `start-time` ব্যবহার করুন।
+- **আউটপুট মনিটরিং**: ত্রুটির জন্য `/log` চেক করুন; স্ক্রিপ্টে লগিং সক্রিয় করুন।
+- **নিরাপত্তা**: পলিসির মাধ্যমে স্ক্রিপ্ট অ্যাক্সেস সীমিত করুন; সংবেদনশীল তথ্য হার্ডকোড করবেন না।
+- **স্কোপ ম্যানেজমেন্ট**: দ্বন্দ্ব এড়াতে লোকাল ভ্যারিয়েবল ব্যবহার করুন; গ্লোবাল সাবধানে ঘোষণা করুন।
+- **ত্রুটি হ্যান্ডলিং**: `:do { ... } on-error={ :log error "ব্যর্থ"; }` ব্যবহার করে মজবুত করুন।
+- **সংস্করণ সামঞ্জস্যতা**: `:return` এর মতো ফিচারের জন্য RouterOS সংস্করণ চেক করুন।
+- **পরিবর্তনের আগে ব্যাকআপ**: পরিবর্তন স্ক্রিপ্ট চালানোর আগে কনফিগ ব্যাকআপ করুন।
+
+---
+
+## উপসংহার
+
+RouterOS স্ক্রিপ্টিং আপনাকে আপনার নেটওয়ার্ক অটোমেট, কাস্টমাইজ এবং গতিশীলভাবে পরিচালনা করতে ক্ষমতা দেয়। স্কিডিউলার এবং নেটওয়াচের মতো বিল্ট-ইন টুল ব্যবহার করে আপনি বাস্তব জগতের চ্যালেঞ্জের জন্য দক্ষ সমাধান বাস্তবায়ন করতে পারেন। সাধারণ স্ক্রিপ্ট দিয়ে শুরু করুন এবং সর্বোত্তম নেটওয়ার্ক পারফরম্যান্সের জন্য জটিল অটোমেশনে এগিয়ে যান।

@@ -1,0 +1,196 @@
+---
+title: SSL / TLS অটোমেশন
+icon: ph:lock-key-duotone
+---
+
+এই অধ্যায়ে আপনার সার্ভিসগুলোর জন্য ফ্রি Let's Encrypt সার্টিফিকেট স্বয়ংক্রিয় ইস্যু, নবায়ন (renewal), নিরাপত্তা হেডার ও যাচাইকরণ কৌশল শিখবেন। পূর্বের অধ্যায়ে রিভার্স প্রক্সি (Traefik / Caddy / Nginx Proxy Manager) সেটআপ থেকে আমরা একটি এন্ট্রিপয়েন্ট তৈরি করেছি; এখন সেটিকে প্রডাকশন-গ্রেড TLS প্র্যাকটিসে উন্নীত করব।
+
+## মূল ধারণা (TLS সংক্ষেপ)
+| টার্ম | ব্যাখ্যা |
+|------|----------|
+| Certificate | আপনার ডোমেইনের পাবলিক ক্রেডেনশিয়াল (Pub Key + Subject + CA Chain) |
+| Private Key | গোপন কী, কখনোই গিট / পাবলিক জায়গায় নয় |
+| CA (Certificate Authority) | যে প্রতিষ্ঠানের উপর ব্রাউজার ট্রাস্ট করে (Let's Encrypt, ZeroSSL) |
+| ACME | অটোমেশনের প্রোটোকল (RFC 8555) যাতে Cert issue/renew হয় |
+| HTTP-01 | `http://yourdomain/.well-known/acme-challenge/...` ফাইল যাচাই |
+| DNS-01 | `_acme-challenge` TXT রেকর্ড দিয়ে যাচাই (Wildcard সম্ভব) |
+| ALPN-01 | 443 এ বিশেষ ALPN হ্যান্ডশেক (কিছু টুলে) |
+
+## কখন কোন চ্যালেঞ্জ
+| পরিস্থিতি | সেরা চয়ন |
+|-----------|-----------|
+| সাধারণ সাবডোমেইন (api.example.com) | HTTP-01 সহজ |
+| Wildcard (*.example.com) দরকার | DNS-01 বাধ্যতামূলক |
+| 80 পোর্ট বন্ধ / ফায়ারওয়াল সীমাবদ্ধ | DNS-01 |
+| লোকাল ল্যাব / নন-পাবলিক DNS | Self-signed (আলাদা অধ্যায়ে) |
+
+## স্টেজিং বনাম প্রোডাকশন
+Let's Encrypt প্রতি ডোমেইনে rate limit আছে। প্রথমে স্টেজিং (Fake CA) দিয়ে পরীক্ষা:
+```
+--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+```
+সব ঠিক থাকলে লাইনটি মুছে প্রোডাকশনে যান।
+
+## Traefik ACME (রিমাইন্ডার + DNS উদাহরণ)
+HTTP-01 আগের অধ্যায়ে করেছি। এবার Wildcard এর জন্য DNS-01 (Cloudflare উদাহরণ):
+`.env`:
+```
+CLOUDFLARE_DNS_API_TOKEN=cf_token_here
+```
+Traefik কমান্ড আর্গুমেন্টে যুক্ত করুন:
+```
+--certificatesresolvers.le-dns.acme.dnschallenge=true
+--certificatesresolvers.le-dns.acme.dnschallenge.provider=cloudflare
+--certificatesresolvers.le-dns.acme.email=you@example.com
+--certificatesresolvers.le-dns.acme.storage=/letsencrypt/acme-dns.json
+```
+Wildcard হোস্ট রুল লেবেল:
+```
+traefik.http.routers.app.rule=Host(`app.example.com`)
+traefik.http.routers.app.tls.certresolver=le-dns
+```
+Wildcard সার্ট জেনারেট করতে আলাদা ইনগ্রেসরুটে Host(`example.com`) & Host(`*.example.com`) ব্যবহার করা যেতে পারে।
+
+## Caddy অটো HTTPS
+Caddy স্বয়ংক্রিয়ভাবে সার্ট ইস্যু / রিনিউ করে যদি পাবলিক DNS → আপনার সার্ভার নির্দেশ করে। Wildcard DNS-01 এর জন্য `caddy-dns` প্লাগইন সহ কাস্টম বিল্ড প্রয়োজন (উন্নত)।
+
+`Caddyfile` (সিম্পল):
+
+```bash
+example.com, www.example.com {
+	encode gzip
+	reverse_proxy 127.0.0.1:3000
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		Referrer-Policy "no-referrer"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+	}
+}
+```
+
+## Nginx Proxy Manager (GUI)
+সরাসরি Dashboard → SSL Certificates → Add → Let's Encrypt। ইমেইল দিন, Agree, Force SSL বক্স টিক করে নিরাপদ রিডাইরেক্ট সক্ষম করুন।
+
+## Certbot (ম্যানুয়াল / রো সার্ভার)
+স্ট্যান্ডএলোন মোড (অস্থায়ী 80 bind):
+```bash
+apt update && apt install -y certbot
+systemctl stop nginx || true
+certbot certonly --standalone -d example.com -d www.example.com --agree-tos -m you@example.com --no-eff-email
+systemctl start nginx || true
+```
+`/etc/letsencrypt/live/example.com/` এ সার্ট ও কী থাকবে।
+
+Wildcard (DNS manual):
+```bash
+certbot -d example.com -d *.example.com --manual --preferred-challenges dns certonly
+```
+প্রম্পটে TXT রেকর্ড অ্যাড করুন → propagate → Enter। (অটো নয়; স্ক্রিপ্টেবল নয়)।
+
+### DNS API অটোমেশন (Cloudflare)
+```bash
+apt install -y python3-certbot-dns-cloudflare
+echo 'dns_cloudflare_api_token = CF_API_TOKEN_VALUE' > /root/.cloudflare.ini
+chmod 600 /root/.cloudflare.ini
+certbot certonly \
+	--dns-cloudflare \
+	--dns-cloudflare-credentials /root/.cloudflare.ini \
+	-d example.com -d '*.example.com' \
+	--agree-tos -m you@example.com --no-eff-email
+```
+
+## Renewal ভেরিফিকেশন
+Certbot সাধারণত `/etc/cron.d/certbot` বা systemd timer তৈরি করে। টেস্ট:
+```bash
+certbot renew --dry-run
+``` 
+Traefik / Caddy নিজে নিজে নবায়ন করে (আপনি শুধু ACME স্টোর পারমিশন ঠিক রাখুন)।
+
+## পারমিশন ও নিরাপত্তা
+| ফাইল | প্রস্তাবিত পারমিশন | কারণ |
+|------|---------------------|-------|
+| Private Key (`privkey.pem`) | 600 | লিক হলে MITM সম্ভাবনা |
+| ACME স্টোর (acme.json) | 600 | সার্ট+কী কনসোলিডেটেড |
+| সার্ভিস রানিং ইউজার | নন-রুট (সম্ভব হলে) | লিস্ট প্রিভিলেজ |
+
+## সার্ট রিলোড হুক (Nginx উদাহরণ)
+`/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh`:
+```bash
+#!/usr/bin/env bash
+systemctl reload nginx
+```
+এক্সিকিউটেবল করুন:
+```bash
+chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+```
+
+## HSTS & আধুনিক হেডার
+Strict-Transport-Security আপনার সাইট সবসময় HTTPS এ বাধ্য করে:
+```
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+```
+প্রথমে ১ সপ্তাহের ছোট মান দিয়ে টেস্ট করুন, ভুল কনফিগে লকডাউন এড়াতে।
+
+## Cipher Suite (ধারণাগত)
+আধুনিক TLS 1.2 / 1.3 যথেষ্ট। অনাবশ্যক পুরনো প্রোটোকল (TLS 1.0/1.1) অফ করুন।
+OpenSSL সাপোর্ট দেখতে:
+```bash
+openssl ciphers -v | grep TLSv1.3
+```
+
+## পরীক্ষণ কমান্ড
+```bash
+openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -noout -dates -issuer -subject
+curl -I https://example.com
+``` 
+SSL Labs (ব্রাউজার দিয়ে) → https://www.ssllabs.com/ssltest/
+
+## এক্সপায়ারি মনিটর স্ক্রিপ্ট
+`/usr/local/bin/check-cert-expiry.sh`:
+```bash
+#!/usr/bin/env bash
+DOMAIN=${1:-example.com}
+THRESHOLD_DAYS=${THRESHOLD_DAYS:-15}
+expiry_date=$(echo | openssl s_client -servername "$DOMAIN" -connect "$DOMAIN":443 2>/dev/null \
+	| openssl x509 -noout -enddate | cut -d= -f2)
+expiry_epoch=$(date -d "$expiry_date" +%s)
+now_epoch=$(date +%s)
+days_left=$(( (expiry_epoch - now_epoch) / 86400 ))
+if [ $days_left -le $THRESHOLD_DAYS ]; then
+	echo "[WARN] $DOMAIN cert expires in $days_left days" >&2
+else
+	echo "[OK] $DOMAIN cert valid ($days_left days left)"
+fi
+```
+```bash
+chmod +x /usr/local/bin/check-cert-expiry.sh
+```
+ক্রন (দৈনিক):
+```
+0 7 * * * /usr/local/bin/check-cert-expiry.sh example.com | mail -s "Cert Status" you@example.com
+```
+
+## সাধারণ সমস্যার তালিকা
+| লক্ষণ | কারণ | সমাধান |
+|-------|------|--------|
+| Rate limit hit | খুব বেশি রিকোয়েস্ট | স্টেজিং ব্যবহার, ১ ঘণ্টা অপেক্ষা |
+| Challenge failed (HTTP) | 80 পোর্ট ব্লক / DNS ভুল | ফায়ারওয়াল ও `dig` চেক |
+| DNS TXT দেখা যাচ্ছে না | প্রোপাগেশন বিলম্ব | 1-10 মিনিট অপেক্ষা, `dig TXT _acme-challenge.example.com` |
+| Permission denied acme.json | ভুল মালিকানা | `chown root:root` + `chmod 600` |
+| Mixed content warning | কিছু asset HTTP | সাইটে রিলেটিভ বা HTTPS ইউআরএল করুন |
+
+## চেকলিস্ট
+- [ ] স্টেজিং ACME দিয়ে সফল টেস্ট
+- [ ] প্রোডাকশন সার্ট ইস্যু & লগ OK
+- [ ] HSTS হেডার (ছোট max-age → বড়)
+- [ ] অটো রিনিউ dry-run পাস
+- [ ] Private key permission 600
+- [ ] মনিটরিং স্ক্রিপ্ট / অ্যালার্ট কনফিগ
+
+## পরবর্তী
+মনিটরিং স্ট্যাক: মেট্রিক্স, লগ, অ্যালার্ট (Prometheus, Loki, Grafana) → [/self-hosting/monitoring-stack](/self-hosting/monitoring-stack)
+
+<Callout type="info">Wildcard সার্ট ইস্যু ধীর (DNS propagation এর জন্য)। রিইস্যু করার আগে একটু অপেক্ষা করুন।</Callout>
+
+<Callout type="success">এখন আপনার ইনফ্রাতে TLS সম্পূর্ণ অটোমেটেড, সিকিউর হেডার ও মনিটরিং প্রস্তুতি হয়েছে।</Callout>

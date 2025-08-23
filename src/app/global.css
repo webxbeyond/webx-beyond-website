@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/ocean.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* Hide the built-in header's mobile menu trigger (chevron) on large screens.
+	 This forces the Toggle Menu button to be invisible at lg+ breakpoints while
+	 leaving the mobile behavior intact. Use a specific attribute selector to
+	 avoid changing other elements. */
+@media (min-width: 64rem) {
+  #nd-nav [aria-label="Toggle Menu"] {
+    display: none !important;
+  }
+}
+
+/* Stronger fallbacks: some environments may not evaluate the Tailwind "max-"
+	 variant media query the same way. Add explicit show/hide rules scoped under
+	 #nd-nav so the header shows only the intended controls per breakpoint.
+
+	 We escape the colons in the class names to match Tailwind's generated
+	 selectors (e.g. .lg\:hidden and .max-lg\:hidden). The !important flags
+	 ensure these rules win over library styles when necessary. */
+
+/* Mobile viewport: hide desktop-only controls (those carrying Tailwind's
+	 "max-lg:hidden" token) and ensure mobile controls are visible. */
+@media (max-width: 96rem) {
+  #nd-nav .max-lg\:hidden {
+    display: none !important;
+  }
+  #nd-nav .lg\:hidden {
+    display: flex !important;
+  }
+  /* Hide the desktop controls container on small screens. This targets the
+			 container that the compiled header uses for desktop controls which often
+			 includes `flex-1 max-lg:hidden`. This avoids hiding the entire header so
+			 the logo/brand and mobile controls remain visible. */
+  #nd-nav .flex-1.max-lg\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure elements that use Tailwind's `max-sm:hidden` are also hidden on
+    very small viewports (mobile). Some compiled CSS order can cause the
+    preflight to be overridden; add this explicit rule as a fallback. */
+}
+
+/* Very small viewports: ensure `max-sm:hidden` elements are hidden. */
+@media (max-width:64rem) {
+  #nd-nav .max-sm\:hidden {
+    display: none !important;
+  }
+}
+
+/* Desktop viewport: hide mobile-only controls (those carrying Tailwind's
+	 "lg:hidden" token) and ensure desktop controls are visible. */
+@media (min-width: 64rem) {
+  #nd-nav .lg\:hidden {
+    display: none !important;
+  }
+  #nd-nav .max-lg\:hidden {
+    display: flex !important;
+  }
+}
+
+/* Override prose link decoration thickness from fumadocs-ui / Tailwind prose.
+   This targets the same selector used by the prose styles and forces a thinner
+   underline for links inside .prose content. Adjust the value below if you
+   prefer a different thickness. */
+.prose :where(a:not([data-card])):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-decoration-thickness: 0.3px !important;
+}

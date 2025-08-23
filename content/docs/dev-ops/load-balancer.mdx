@@ -1,0 +1,93 @@
+---
+title: Load Balancer & Reverse Proxy (NGINX/HAProxy)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+DevOps-এ reliability, scalability, এবং security নিশ্চিত করতে Load Balancer ও Reverse Proxy অপরিহার্য। এই পাঠে আমরা NGINX ও HAProxy দিয়ে Load Balancing ও Reverse Proxy কনসেপ্ট, কনফিগারেশন, এবং বাস্তব উদাহরণ দেখব।
+
+## Load Balancer কী?
+
+Load Balancer হচ্ছে এমন একটি সার্ভার/ডিভাইস, যা একাধিক backend সার্ভারে ট্রাফিক ভাগ করে দেয়—তাতে সার্ভার overload হয় না, downtime কমে, এবং scalability বাড়ে।
+
+## Reverse Proxy কী?
+
+Reverse Proxy হচ্ছে এমন একটি সার্ভার, যা ক্লায়েন্টের request backend সার্ভারে ফরওয়ার্ড করে, এবং response ক্লায়েন্টে পাঠায়। এতে security, caching, SSL termination, এবং load balancing সহজ হয়।
+
+## NGINX দিয়ে Load Balancing
+
+### Basic Config:
+```nginx
+http {
+  upstream backend {
+    server 192.168.1.2;
+    server 192.168.1.3;
+  }
+  server {
+    listen 80;
+    location / {
+      proxy_pass http://backend;
+    }
+  }
+}
+```
+
+- `upstream backend`: backend সার্ভার লিস্ট
+- `proxy_pass`: request backend-এ ফরওয়ার্ড
+
+### Real-life Example:
+- Production web app—multiple app server, single NGINX load balancer
+
+## HAProxy দিয়ে Load Balancing
+
+### Basic Config:
+```bash
+frontend http_front
+  bind *:80
+  default_backend http_back
+backend http_back
+  balance roundrobin
+  server server1 192.168.1.2:80 check
+  server server2 192.168.1.3:80 check
+```
+
+- `balance roundrobin`: sequentially ট্রাফিক ভাগ
+- `check`: health check
+
+### Real-life Example:
+- High traffic API—multiple backend, HAProxy load balancer
+
+## Reverse Proxy Features
+
+- SSL termination
+- Caching
+- Security filtering
+- URL rewriting
+- WebSocket support
+
+## DevOps-এ Load Balancer/Reverse Proxy
+
+- Zero downtime deployment
+- Traffic distribution
+- Failover & redundancy
+- Security enhancement
+
+## Troubleshooting
+
+- Backend unreachable: IP/port ঠিক আছে কিনা চেক করুন
+- SSL error: certificate/config চেক করুন
+- Performance issue: caching, health check, logs দেখুন
+
+## Security Best Practices
+
+- Only required ports open করুন
+- SSL/TLS ব্যবহার করুন
+- Rate limiting/caching enable করুন
+- Regularly update NGINX/HAProxy
+
+## শেষ কথা
+
+Load Balancer ও Reverse Proxy DevOps-এর backbone—scalability, reliability, security, এবং zero downtime deployment নিশ্চিত করতে NGINX/HAProxy ব্যবহার করুন।
+
+---
+
+**পরবর্তী পাঠ:** [DNS, SSL/TLS & Firewall Rules](/dev-ops/dns-ssl-firewall)
