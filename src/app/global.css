@@ -67,3 +67,89 @@
 .prose :where(a:not([data-card])):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   text-decoration-thickness: 0.3px !important;
 }
+
+/* Hide scrollbars for the fumadocs navbar and tabs when using tabMode="navbar".
+   Keep native scrolling functional but remove visible scrollbar chrome. */
+#nd-subnav,
+#nd-subnav * {
+  /* allow scrolling but hide scrollbars */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* WebKit browsers */
+#nd-subnav::-webkit-scrollbar,
+#nd-subnav *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* If the layout tabs use overflow-auto, make sure the container still scrolls
+   but without visual scrollbars. The selectors target the LayoutTabs' root
+   which in compiled code uses overflow-auto. */
+.fd-notebook-layout .overflow-auto,
+.fd-notebook-layout .overflow-auto * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.fd-notebook-layout .overflow-auto::-webkit-scrollbar,
+.fd-notebook-layout .overflow-auto *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Ensure navbar tabs and other overflow areas under #nd-subnav remain
+   scrollable via mouse wheel, touch, and trackpad even when scrollbars are
+   visually hidden. This preserves horizontal panning on mobile (touch-action)
+   and smooth scrolling on iOS (-webkit-overflow-scrolling). */
+#nd-subnav .overflow-auto {
+  /* allow only horizontal scrolling for tabs area and ensure touch/trackpad
+    gestures pan horizontally. Hide vertical scroll and preserve smoothness. */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+  touch-action: pan-x; /* allow horizontal touch panning */
+  scroll-behavior: smooth;
+}
+
+#nd-subnav .overflow-auto::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+#nd-subnav .overflow-auto,
+#nd-subnav .overflow-auto * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Remove underlines on navbar links; active link should be distinguished by color only */
+#nd-subnav a,
+#nd-subnav a:link,
+#nd-subnav a:visited,
+#nd-subnav [data-active="true"],
+#nd-subnav [data-active="true"] a {
+  text-decoration: none !important;
+}
+
+/* The compiled LayoutTab uses a bottom border class when selected (border-fd-primary).
+   Override that so active tab is indicated by color only, not a visible border/underline. */
+#nd-subnav .border-fd-primary,
+#nd-subnav .border-fd-primary[data-active="true"],
+#nd-subnav .border-fd-primary[aria-current],
+#nd-subnav a.border-fd-primary {
+  border-bottom-width: 0 !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Ensure non-active tabs do not show any border (transparent) */
+#nd-subnav .border-transparent {
+  border-bottom-color: transparent !important;
+}
+
+/* Ensure tab items don't wrap and remain inline for horizontal scroll */
+#nd-subnav .text-nowrap,
+#nd-subnav .inline-flex {
+  white-space: nowrap !important;
+}

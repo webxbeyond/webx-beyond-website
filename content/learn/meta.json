@@ -1,11 +1,11 @@
 {
   "pages": [
+    "cheatsheet",
     "js",
     "git",
     "system-design",
     "python",
     "pytorch",
-    "cheatsheet",
     "nodejs",
     "api",
     "dev-ops",

@@ -8,6 +8,8 @@ import SearchDialog from '@/components/search';
 import OfflineProvider from '@/components/offline-provider';
 import OfflineToast from '@/components/offline-toast.client';
 import Loader from '@/components/loader.client';
+import CursorContext from '@/components/cursor-context.client';
+import NavbarScroll from '@/components/navbar-scroll.client';
 
 const tiroBangla = Tiro_Bangla({
   subsets: ["bengali", "latin", "latin-ext"],
@@ -61,6 +63,8 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           <OfflineProvider />
           <OfflineToast />
           <Loader />
+          <CursorContext />
+          <NavbarScroll />
           {children}
         </RootProvider>
       </body>

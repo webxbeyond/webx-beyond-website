@@ -8,6 +8,7 @@ import {
 // You can customise Zod schemas for frontmatter and `meta.json` here
 // see https://fumadocs.dev/docs/mdx/collections#define-docs
 export const docs = defineDocs({
+  dir: 'content/learn',
   docs: {
     schema: frontmatterSchema,
   },

@@ -115,15 +115,18 @@ export default function Loader() {
   // keep rendering hidden once not visible
   if (!visible) return null
 
+  const toBanglaDigits = (v: number | string) => {
+    const map = ['০','১','২','৩','৪','৫','৬','৭','৮','৯']
+    return String(v).replace(/\d/g, (d) => map[Number(d)])
+  }
+
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center backdrop-blur-sm bg-white/40 dark:bg-black/40 transition-opacity">
-      <div className="w-full max-w-2xl px-4">
-        <div className="mx-auto w-full rounded bg-white/60 dark:bg-black/60 p-4 shadow">
-          <div className="mb-2 text-center text-sm font-medium">লোড হচ্ছে — অনুগামীতা: {percent}%</div>
-          <div className="h-3 w-full rounded-full bg-gray-200 overflow-hidden">
+      <div className="w-full max-w-[360px] px-4">
+          <div className="mb-2 text-center text-sm font-medium">লোড হচ্ছে — অগ্রগতি: {toBanglaDigits(percent)}%</div>
+          <div className="h-1.5 max-w-[360px] rounded-full bg-gray-200 overflow-hidden">
             <div className="h-full bg-blue-600 transition-all" style={{ width: `${percent}%` }} />
           </div>
-        </div>
       </div>
     </div>
   )
