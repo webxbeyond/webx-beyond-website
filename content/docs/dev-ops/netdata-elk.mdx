@@ -1,0 +1,75 @@
+---
+title: Netdata / ELK Stack
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Netdata ও ELK Stack—modern DevOps-এ server, application, network monitoring ও log analysis-এর জন্য essential tool। এই টিউটোরিয়ালে concept, setup, integration, real-life example, এবং best practices দেখানো হয়েছে।
+
+## ১. Netdata কী?
+- Real-time monitoring tool
+- Lightweight, easy install
+- Server, app, network metrics visualize
+- Web dashboard, alert
+
+### Netdata Setup
+1. Linux-এ install:
+   ```bash
+   bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+   ```
+2. Web dashboard: `http://<server-ip>:19999`
+3. Custom alert configure
+
+## ২. ELK Stack কী?
+- Elasticsearch, Logstash, Kibana
+- Centralized log collection, storage, search, visualization
+- Scalable, powerful log analysis
+
+### ELK Stack Workflow
+1. Logstash—log collect, parse, transform
+2. Elasticsearch—log index, store, search
+3. Kibana—dashboard, visualization, alert
+
+### Example Logstash Config
+```bash
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    type => "nginx"
+  }
+}
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "nginx-logs"
+  }
+}
+```
+
+## ৩. Integration Workflow
+- Netdata—real-time server/app monitoring
+- ELK—centralized log analysis
+- Alert—error, anomaly detect হলে notification
+
+## ৪. Real-life Scenario
+- Server health, resource usage monitor (Netdata)
+- Application error, access log search (ELK)
+- Alert—high error rate হলে Slack/email
+
+## ৫. Best Practices
+- Retention policy configure করুন
+- Dashboard modular করুন
+- Alert rule tune করুন
+- Security (user access, data source)
+- Automated backup
+
+## ৬. Tool Integration
+- Jenkins pipeline monitoring
+- Cloud monitoring integration
+- Log aggregation with other tools (Fluentd, Loki)
+
+## সংক্ষেপে
+Netdata ও ELK Stack—real-time monitoring ও log analysis-এর foundation। Efficient troubleshooting, alert, dashboard—DevOps workflow আরও reliable ও scalable হয়।
+
+---
+
+**পরবর্তী টপিক:** [Alerting & Metrics](/dev-ops/alerting-metrics)
