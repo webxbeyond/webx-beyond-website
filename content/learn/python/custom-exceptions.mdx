@@ -1,0 +1,121 @@
+---
+title: কাস্টম এক্সসেপশন তৈরি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# কাস্টম এক্সসেপশন তৈরি
+
+পাইথনের বিল্ট-ইন এক্সসেপশন যেমন `ValueError`, `TypeError`, `ZeroDivisionError` আমাদের অনেক সমস্যার সমাধান দেয়। কিন্তু কখনো কখনো আমাদের নিজস্ব (কাস্টম) এক্সসেপশন তৈরি করতে হয়, যেন কোডে নির্দিষ্ট ভুল বা বিশেষ পরিস্থিতি সুন্দরভাবে হ্যান্ডল করা যায়।
+
+## ১. কাস্টম এক্সসেপশন কেন দরকার?
+
+ধরা যাক, আপনি একটি ব্যাংক অ্যাপ বানাচ্ছেন। সেখানে যদি কেউ নেগেটিভ অ্যামাউন্ট জমা দিতে চায়, তখন সাধারণ `ValueError` না দেখিয়ে, "NegativeDepositError" নামে কাস্টম এক্সসেপশন দেখানো ভালো। এতে কোড আরও অর্থবহ ও মেইনটেনেবল হয়।
+
+## ২. কিভাবে কাস্টম এক্সসেপশন তৈরি করবেন?
+
+পাইথনে কাস্টম এক্সসেপশন তৈরি করতে হলে, একটি নতুন ক্লাস লিখতে হয় যা `Exception` ক্লাস থেকে ইনহেরিট করে।
+
+### উদাহরণ:
+```python
+class NegativeDepositError(Exception):
+    """নেগেটিভ অ্যামাউন্ট জমা দিলে এই এক্সসেপশন উঠবে"""
+    pass
+```
+
+এখানে `NegativeDepositError` নামের নতুন এক্সসেপশন তৈরি হলো।
+
+## ৩. কাস্টম এক্সসেপশন ব্যবহার
+
+কাস্টম এক্সসেপশন তুলতে `raise` ব্যবহার করা হয়।
+
+```python
+def deposit(amount):
+    if amount < 0:
+        raise NegativeDepositError("নেগেটিভ অ্যামাউন্ট জমা দেওয়া যাবে না!")
+    print(f"{amount} টাকা জমা হয়েছে।")
+
+try:
+    deposit(-500)
+except NegativeDepositError as e:
+    print("এক্সসেপশন ধরা পড়েছে:", e)
+```
+
+## ৪. কাস্টম এক্সসেপশনে ডাটা ও মেসেজ
+
+কাস্টম এক্সসেপশন ক্লাসে চাইলে কনস্ট্রাক্টর (`__init__`) ব্যবহার করে ডাটা বা মেসেজ রাখতে পারেন।
+
+```python
+class InsufficientBalanceError(Exception):
+    def __init__(self, balance, amount):
+        super().__init__(f"ব্যালেন্স: {balance}, উত্তোলন: {amount}")
+        self.balance = balance
+        self.amount = amount
+
+def withdraw(balance, amount):
+    if amount > balance:
+        raise InsufficientBalanceError(balance, amount)
+    print(f"{amount} টাকা উত্তোলন সফল!")
+
+try:
+    withdraw(1000, 2000)
+except InsufficientBalanceError as e:
+    print("এক্সসেপশন:", e)
+```
+
+## ৫. কাস্টম এক্সসেপশন চেইনিং
+
+কখনো কখনো এক্সসেপশন চেইন করতে হয়, অর্থাৎ একটি এক্সসেপশন থেকে আরেকটি তুলতে হয়।
+
+```python
+class DatabaseError(Exception):
+    pass
+
+class DataNotFoundError(DatabaseError):
+    pass
+
+try:
+    raise DataNotFoundError("ডাটা পাওয়া যায়নি!")
+except DatabaseError as e:
+    print("ডাটাবেস সংক্রান্ত সমস্যা:", e)
+```
+
+## ৬. রিয়েল-লাইফ উদাহরণ: ATM
+
+ধরা যাক, ATM-এ টাকা তুলার সময় যদি কেউ ভুল পিন দেয়, তাহলে `InvalidPinError` নামে কাস্টম এক্সসেপশন তুলতে পারেন।
+
+```python
+class InvalidPinError(Exception):
+    def __init__(self, pin):
+        super().__init__(f"ভুল পিন: {pin}")
+        self.pin = pin
+
+def check_pin(pin):
+    correct_pin = "1234"
+    if pin != correct_pin:
+        raise InvalidPinError(pin)
+    print("পিন সঠিক!")
+
+try:
+    check_pin("0000")
+except InvalidPinError as e:
+    print("ATM এক্সসেপশন:", e)
+```
+
+## ৭. Analogies: ডাক্তার ও রোগ
+
+এক্সসেপশনকে ভাবুন রোগের মতো, আর কাস্টম এক্সসেপশন হলো নির্দিষ্ট রোগের নাম। যেমন, "জ্বর" সাধারণ, কিন্তু "ডেঙ্গু জ্বর" নির্দিষ্ট। কাস্টম এক্সসেপশন দিয়ে আপনি নির্দিষ্ট সমস্যার জন্য নির্দিষ্ট সমাধান দিতে পারেন।
+
+## ৮. Best Practices
+
+- কাস্টম এক্সসেপশন সবসময় `Exception` থেকে ইনহেরিট করুন।
+- অর্থবহ নাম ব্যবহার করুন (যেমন `NegativeDepositError`, `InvalidPinError`)।
+- প্রয়োজন হলে কনস্ট্রাক্টর দিয়ে ডাটা/মেসেজ যুক্ত করুন।
+- ডকস্ট্রিং লিখুন, যেন অন্যরা বুঝতে পারে এক্সসেপশন কখন তুলতে হবে।
+
+## ৯. সংক্ষেপে
+
+- কাস্টম এক্সসেপশন কোডকে আরও অর্থবহ ও মেইনটেনেবল করে।
+- নির্দিষ্ট ভুল বা পরিস্থিতি সুন্দরভাবে হ্যান্ডল করা যায়।
+- বড় প্রজেক্টে কাস্টম এক্সসেপশন ব্যবহার করা ভালো অভ্যাস।
+
+এভাবেই আপনি পাইথনে কাস্টম এক্সসেপশন তৈরি ও ব্যবহার করতে পারেন, যা আপনার কোডকে আরও শক্তিশালী ও ইউজার-ফ্রেন্ডলি করে তুলবে।

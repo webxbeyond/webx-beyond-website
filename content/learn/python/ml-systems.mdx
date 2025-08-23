@@ -1,0 +1,136 @@
+---
+title: AI/ML Systems Design with Python
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# পাইথন দিয়ে AI/ML সিস্টেম ডিজাইন: মাস্টারি গাইড
+
+পাইথন শুধু ডেটা প্রসেসিং বা মডেল ট্রেনিংয়ের জন্য নয়—এটি AI/ML সিস্টেম ডিজাইনের জন্যও সবচেয়ে জনপ্রিয় ভাষা। এই পাঠে আমরা শিখব কীভাবে পাইথন দিয়ে এন্ড-টু-এন্ড AI/ML সিস্টেম ডিজাইন, ডেপ্লয়, ও স্কেল করা যায়।
+
+## AI/ML সিস্টেম ডিজাইন কী?
+
+AI/ML সিস্টেম ডিজাইন মানে শুধু মডেল বানানো নয়—এর মধ্যে ডেটা সংগ্রহ, প্রসেসিং, মডেল ট্রেনিং, ইভ্যালুয়েশন, ডেপ্লয়মেন্ট, স্কেলিং, এবং মেইনটেন্যান্স সবই আছে।
+
+### রিয়েল লাইফ উদাহরণ:
+
+ধরা যাক, আপনি একটি ব্যাংকের জন্য ফ্রড ডিটেকশন সিস্টেম বানাচ্ছেন। এখানে শুধু মডেল বানালেই হবে না—ডেটা কোথা থেকে আসবে, কীভাবে প্রসেস হবে, রিয়েল-টাইমে কীভাবে প্রেডিকশন হবে, এবং কীভাবে সিস্টেম আপডেট হবে—সবকিছু ডিজাইন করতে হবে।
+
+## AI/ML সিস্টেমের কম্পোনেন্টস
+
+1. **ডেটা পাইপলাইন:** ডেটা সংগ্রহ, ক্লিনিং, ফিচার ইঞ্জিনিয়ারিং।
+2. **মডেল ট্রেনিং:** মডেল সিলেকশন, হাইপারপ্যারামিটার টিউনিং, ইভ্যালুয়েশন।
+3. **মডেল সার্ভিং:** API/Service হিসেবে মডেল ডেপ্লয় করা (Flask/FastAPI/Django REST)।
+4. **স্কেলিং ও অটোমেশন:** Docker, Kubernetes, CI/CD, ক্লাউড ডেপ্লয়মেন্ট।
+5. **মেইনটেন্যান্স:** মডেল মনিটরিং, ড্রিফট ডিটেকশন, অটো-রিট্রেনিং।
+
+## পাইথন টুলস ও লাইব্রেরি
+
+- **Data Pipeline:** Pandas, Airflow, Luigi
+- **Model Training:** Scikit-learn, TensorFlow, PyTorch
+- **Serving:** Flask, FastAPI, Django REST, MLflow
+- **Automation/Scaling:** Docker, Kubernetes, AWS/GCP SDK
+- **Monitoring:** Prometheus, MLflow, Seldon Core
+
+## ডিজাইন স্টেপ-বাই-স্টেপ
+
+### ১. ডেটা পাইপলাইন ডিজাইন
+
+- **Sources:** Database, API, CSV/JSON
+- **Processing:** Pandas দিয়ে ক্লিনিং, ফিচার ইঞ্জিনিয়ারিং
+- **Automation:** Airflow দিয়ে শিডিউলড ETL
+
+_উদাহরণ:_
+```python
+import pandas as pd
+# ডেটা লোড
+df = pd.read_csv('transactions.csv')
+# ক্লিনিং
+df = df.dropna()
+# ফিচার ইঞ্জিনিয়ারিং
+...
+```
+
+### ২. মডেল ট্রেনিং ও ইভ্যালুয়েশন
+
+- **Model Selection:** Logistic Regression, Random Forest, Neural Network
+- **Evaluation:** Accuracy, Precision, Recall
+- **Experiment Tracking:** MLflow
+
+_উদাহরণ:_
+```python
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+```
+
+### ৩. মডেল সার্ভিং
+
+- **API:** Flask/FastAPI দিয়ে REST API
+- **Serialization:** Pickle/Joblib দিয়ে মডেল সেভ
+- **Deployment:** Docker দিয়ে কনটেইনারাইজ
+
+_উদাহরণ:_
+```python
+from flask import Flask, request
+import pickle
+app = Flask(__name__)
+model = pickle.load(open('model.pkl', 'rb'))
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.json
+    prediction = model.predict([data['features']])
+    return {'prediction': int(prediction[0])}
+```
+
+### ৪. স্কেলিং ও অটোমেশন
+
+- **Docker:** কোড ও ডিপেন্ডেন্সি প্যাকেজিং
+- **Kubernetes:** অটো-স্কেলিং, লোড-ব্যালান্সিং
+- **CI/CD:** GitHub Actions/Jenkins দিয়ে অটোমেটেড ডেপ্লয়
+
+_উদাহরণ:_
+```dockerfile
+FROM python:3.10
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+```
+
+### ৫. মেইনটেন্যান্স ও মনিটরিং
+
+- **Model Drift Detection:** নতুন ডেটা আসলে মডেল আপডেট
+- **Monitoring:** Prediction accuracy, latency
+- **Auto Retraining:** Airflow/Seldon Core দিয়ে অটোমেটেড রিট্রেনিং
+
+## রিয়েল-ওয়ার্ল্ড সিস্টেম ডিজাইন
+
+### কেস স্টাডি: রিয়েল-টাইম ফ্রড ডিটেকশন
+
+1. **ডেটা স্ট্রিমিং:** Kafka দিয়ে ট্রানজাকশন ডেটা
+2. **Feature Engineering:** Spark/Pandas
+3. **Model Serving:** FastAPI/Docker
+4. **Monitoring:** Prometheus/MLflow
+
+### চ্যালেঞ্জ ও সলিউশন
+
+- **Latency:** FastAPI, async processing
+- **Scalability:** Kubernetes
+- **Security:** API authentication, data encryption
+
+## Analogies: AI/ML System as a Factory
+
+AI/ML সিস্টেমকে একটি ফ্যাক্টরি হিসেবে ভাবুন—ডেটা কাঁচামাল, প্রসেসিং মেশিন, মডেল হচ্ছে প্রোডাক্ট, আর সার্ভিং হচ্ছে ডেলিভারি। ফ্যাক্টরির মতোই, প্রতিটি স্টেজে কোয়ালিটি কন্ট্রোল, অটোমেশন, এবং স্কেলিং দরকার।
+
+## Best Practices
+
+- **Modular Design:** প্রতিটি কম্পোনেন্ট আলাদা রাখুন
+- **Version Control:** কোড ও মডেল ভার্সনিং
+- **Testing:** Unit, Integration, Load Testing
+- **Documentation:** API, Pipeline, Model
+
+## Conclusion
+
+AI/ML সিস্টেম ডিজাইন মাস্টারি মানে শুধু মডেল বানানো নয়—এন্ড-টু-এন্ড সলিউশন ডিজাইন, ডেপ্লয়, স্কেল, ও মেইনটেন্যান্স। পাইথন দিয়ে আপনি সহজেই এই পুরো প্রক্রিয়া মাস্টার করতে পারেন।
+
+_পরবর্তী ধাপে: নিজে একটি ছোট AI/ML সিস্টেম ডিজাইন ও ডেপ্লয় করার চেষ্টা করুন—ব্যাংক ফ্রড ডিটেকশন, চ্যাটবট, বা ইমেজ ক্লাসিফিকেশন!_

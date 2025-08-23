@@ -1,0 +1,113 @@
+---
+title: ইটারেটর ও জেনারেটর (yield)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ইটারেটর ও জেনারেটর (`yield`)
+
+পাইথনের অ্যাডভান্সড কনসেপ্টের মধ্যে ইটারেটর ও জেনারেটর অত্যন্ত গুরুত্বপূর্ণ। এগুলো ডাটা প্রসেসিং, মেমোরি ব্যবস্থাপনা, এবং পারফরম্যান্স বাড়াতে সাহায্য করে। এই পাঠে আমরা জানবো:
+- ইটারেটর ও জেনারেটর কী, পার্থক্য
+- কিভাবে কাজ করে ও ব্যবহার করবেন
+- `yield` কীভাবে কাজ করে
+- রিয়েল-লাইফ উদাহরণ ও analogies
+- Best practices
+
+## ১. ইটারেটর কী?
+
+ইটারেটর হলো এমন অবজেক্ট, যাকে একবারে একটি করে ডাটা আইটেম পাওয়া যায়। যেমন: লিস্ট, টুপল, সেট, ডিকশনারি—all are iterable, কিন্তু ইটারেটর হলে `next()` দিয়ে একে একে ডাটা পাওয়া যায়।
+
+### উদাহরণ:
+```python
+numbers = [1, 2, 3]
+iterator = iter(numbers)
+print(next(iterator))  # 1
+print(next(iterator))  # 2
+print(next(iterator))  # 3
+```
+
+## ২. কাস্টম ইটারেটর তৈরি
+
+ইটারেটর ক্লাসে `__iter__()` ও `__next__()` মেথড থাকতে হয়।
+
+```python
+class Counter:
+    def __init__(self, low, high):
+        self.current = low
+        self.high = high
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.current > self.high:
+            raise StopIteration
+        self.current += 1
+        return self.current - 1
+
+for num in Counter(1, 5):
+    print(num)
+```
+
+## ৩. জেনারেটর কী?
+
+জেনারেটর হলো এমন ফাংশন, যা `yield` ব্যবহার করে একবারে একটি করে ডাটা দেয়। এতে মেমোরি কম লাগে, পারফরম্যান্স বাড়ে।
+
+### উদাহরণ:
+```python
+def count_up_to(n):
+    i = 1
+    while i <= n:
+        yield i
+        i += 1
+
+for num in count_up_to(5):
+    print(num)
+```
+
+## ৪. yield কীভাবে কাজ করে?
+
+`yield` ফাংশনকে জেনারেটর বানায়। যখনই `yield` হয়, ফাংশন থেমে যায়, পরের বার আবার চালু হয়।
+
+### উদাহরণ:
+```python
+def simple_gen():
+    yield 'A'
+    yield 'B'
+    yield 'C'
+
+g = simple_gen()
+print(next(g))  # 'A'
+print(next(g))  # 'B'
+print(next(g))  # 'C'
+```
+
+## ৫. রিয়েল-লাইফ উদাহরণ: ফাইল প্রসেসিং
+
+ধরা যাক, বড় ফাইল থেকে একবারে একটি লাইন পড়তে চান—মেমোরি কম লাগবে।
+
+```python
+def read_large_file(filename):
+    with open(filename) as f:
+        for line in f:
+            yield line.strip()
+
+for line in read_large_file('big.txt'):
+    print(line)
+```
+
+## ৬. Analogies: পানির কল
+
+ইটারেটর/জেনারেটরকে ভাবুন পানির কলের মতো—প্রয়োজন হলে কল খুলে একবারে একটু পানি নেন, পুরো ট্যাংক একবারে খালি করেন না। এতে মেমোরি ও সময় বাঁচে।
+
+## ৭. Best Practices
+
+- বড় ডাটা প্রসেসিংয়ে জেনারেটর ব্যবহার করুন
+- `StopIteration` ঠিকভাবে হ্যান্ডল করুন
+- জেনারেটর একবারই ব্যবহারযোগ্য
+- কোডে ডকুমেন্টেশন লিখুন
+
+## ৮. সংক্ষেপে
+
+- ইটারেটর ও জেনারেটর ডাটা প্রসেসিং সহজ ও দ্রুত করে
+- `yield` দিয়ে মেমোরি-ইফিশিয়েন্ট কোড লেখা যায়
+- রিয়েল-লাইফ উদাহরণ ও analogies দিয়ে সহজে বুঝতে পারবেন
+
+এভাবেই পাইথনে ইটারেটর ও জেনারেটর ব্যবহার করে আপনার কোডকে আরও শক্তিশালী, দ্রুত ও মেইনটেনেবল করতে পারেন।

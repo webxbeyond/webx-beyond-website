@@ -1,0 +1,113 @@
+---
+title: অটোমেশন স্ক্রিপ্ট - API কল, JSON প্রসেসিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+পাইথন দিয়ে অটোমেশন স্ক্রিপ্ট মানে—কম্পিউটারে পুনরাবৃত্ত কাজ, ডেটা সংগ্রহ, API থেকে তথ্য আনা, JSON ডেটা প্রসেসিং—সবকিছু স্বয়ংক্রিয়ভাবে করা যায়। অফিস, ডেটা অ্যানালাইসিস, ক্লাউড—সবখানে API ও JSON অটোমেশন সময় ও শ্রম বাঁচায়।
+
+ভাবুন, আপনি প্রতিদিন একটি ওয়েব API থেকে আবহাওয়া, নিউজ, বা প্রোডাক্ট প্রাইস সংগ্রহ করতে চান—পাইথন দিয়ে এক ক্লিকে সব সম্ভব।
+
+---
+
+## API কল: Requests দিয়ে ডেটা আনা
+
+Requests লাইব্রেরি দিয়ে REST API-তে GET, POST, PUT, DELETE—সব ধরনের রিকোয়েস্ট পাঠানো যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install requests
+```
+
+### উদাহরণ: GET রিকোয়েস্ট
+
+```python
+import requests
+response = requests.get('https://jsonplaceholder.typicode.com/posts/1')
+print(response.json())
+```
+
+### উদাহরণ: POST রিকোয়েস্ট
+
+```python
+import requests
+url = 'https://jsonplaceholder.typicode.com/posts'
+data = {'title': 'নতুন পোস্ট', 'body': 'এটি একটি টেস্ট', 'userId': 1}
+response = requests.post(url, json=data)
+print(response.json())
+```
+
+---
+
+## JSON প্রসেসিং: ডেটা পার্স ও ম্যানিপুলেশন
+
+JSON (JavaScript Object Notation) হচ্ছে ডেটা আদান-প্রদানের জন্য সবচেয়ে জনপ্রিয় ফরম্যাট। পাইথনের `json` মডিউল দিয়ে JSON ডেটা পার্স, লিখা, ও পরিবর্তন করা যায়।
+
+### উদাহরণ: JSON পার্স
+
+```python
+import json
+json_data = '{"name": "রাহুল", "grade": "১০"}'
+data = json.loads(json_data)
+print(data['name'])
+```
+
+### উদাহরণ: JSON লেখা
+
+```python
+data = {'name': 'রাহুল', 'grade': '১০'}
+json_str = json.dumps(data, ensure_ascii=False)
+print(json_str)
+```
+
+---
+
+## API থেকে ডেটা এনে প্রসেস করা
+
+ধরা যাক, আপনি একটি API থেকে ছাত্রদের তথ্য আনলেন, তারপর JSON প্রসেস করে নাম ও গ্রেড দেখালেন।
+
+```python
+import requests
+response = requests.get('https://jsonplaceholder.typicode.com/users')
+users = response.json()
+for user in users:
+    print(user['name'], user['email'])
+```
+
+---
+
+## বাস্তব উদাহরণ: আবহাওয়া API
+
+প্রতিদিন আবহাওয়া API থেকে ডেটা এনে, JSON প্রসেস করে, রিপোর্ট তৈরি করা যায়।
+
+---
+
+## Analogy
+
+API-কে ভাবুন, রেস্টুরেন্টের ওয়েটার—আপনি অর্ডার দেন (Request), ওয়েটার খাবার এনে দেন (Response)। JSON-কে ভাবুন, ডেটার "বাক্স"—যেখানে তথ্য সাজানো থাকে।
+
+---
+
+## অটোমেশন স্ক্রিপ্টের সুবিধা
+
+- পুনরাবৃত্ত কাজ স্বয়ংক্রিয়
+- API থেকে দ্রুত ডেটা সংগ্রহ
+- JSON ডেটা সহজে প্রসেস
+- রিপোর্ট, অ্যালার্ট, ডেটা অ্যানালাইসিস
+
+---
+
+## অনুশীলন
+
+১. GET ও POST API কল করুন
+২. JSON ডেটা পার্স ও লেখা করুন
+৩. API থেকে ডেটা এনে ফিল্টার করুন
+৪. আবহাওয়া API থেকে রিপোর্ট তৈরি করুন
+
+---
+
+## উপসংহার
+
+পাইথন দিয়ে API কল ও JSON প্রসেসিং—দুটোই অটোমেশন স্ক্রিপ্টে অপরিহার্য। অফিস, ডেটা অ্যানালাইসিস, ক্লাউড—সবখানে API ও JSON অটোমেশন সময় ও শ্রম বাঁচায়। পরবর্তী পাঠে শিডিউলিং ও ক্রন জবস নিয়ে আলোচনা হবে।

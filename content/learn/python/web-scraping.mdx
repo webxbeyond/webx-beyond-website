@@ -1,0 +1,141 @@
+---
+title: ওয়েব স্ক্র্যাপিং (Requests, BeautifulSoup, Scrapy)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ওয়েব স্ক্র্যাপিং (Requests, BeautifulSoup, Scrapy)
+
+## ভূমিকা
+
+ওয়েব স্ক্র্যাপিং হচ্ছে ইন্টারনেট থেকে স্বয়ংক্রিয়ভাবে ডেটা সংগ্রহ করার পদ্ধতি। পাইথন দিয়ে ওয়েবসাইট থেকে তথ্য, টেবিল, ছবি, খবর—সবকিছু স্ক্র্যাপ করা যায়। অফিস, গবেষণা, ডেটা অ্যানালাইসিস—সবখানে ওয়েব স্ক্র্যাপিং সময় ও শ্রম বাঁচায়।
+
+ভাবুন, আপনি প্রতিদিন শত শত ওয়েবসাইট থেকে খবর, প্রোডাক্ট প্রাইস, বা ছাত্রদের রেজাল্ট সংগ্রহ করতে চান—পাইথন দিয়ে এক ক্লিকে সব সম্ভব।
+
+---
+
+## Requests: ওয়েব পেজ ডাউনলোড
+
+Requests হচ্ছে পাইথনের সবচেয়ে সহজ HTTP লাইব্রেরি, যা দিয়ে ওয়েব পেজ ডাউনলোড করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install requests
+```
+
+### উদাহরণ
+
+```python
+import requests
+response = requests.get('https://example.com')
+print(response.text)
+```
+
+---
+
+## BeautifulSoup: HTML থেকে তথ্য বের করা
+
+BeautifulSoup দিয়ে HTML পেজ থেকে নির্দিষ্ট তথ্য, ট্যাগ, টেবিল, লিঙ্ক—সবকিছু সহজে বের করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install beautifulsoup4
+```
+
+### উদাহরণ
+
+```python
+from bs4 import BeautifulSoup
+import requests
+
+url = 'https://example.com'
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# সব লিঙ্ক বের করা
+for link in soup.find_all('a'):
+    print(link.get('href'))
+
+# নির্দিষ্ট ট্যাগ
+title = soup.find('h1').text
+print('Title:', title)
+```
+
+---
+
+## Scrapy: বড় স্কেল ওয়েব স্ক্র্যাপিং
+
+Scrapy হচ্ছে পাইথনের শক্তিশালী ওয়েব স্ক্র্যাপিং ফ্রেমওয়ার্ক, যা দিয়ে হাজার হাজার পেজ, মাল্টিপল সাইট, ও ডেটা পাইপলাইন তৈরি করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install scrapy
+```
+
+### বেসিক Spider
+
+```python
+import scrapy
+
+class QuotesSpider(scrapy.Spider):
+    name = "quotes"
+    start_urls = ["http://quotes.toscrape.com/"]
+
+    def parse(self, response):
+        for quote in response.css('div.quote'):
+            yield {
+                'text': quote.css('span.text::text').get(),
+                'author': quote.css('span small.author::text').get(),
+            }
+```
+
+### রান করার কমান্ড
+
+```bash
+scrapy runspider quotes_spider.py -o quotes.json
+```
+
+---
+
+## বাস্তব উদাহরণ: খবর সংগ্রহ
+
+ধরা যাক, আপনি প্রতিদিন একটি নিউজ সাইট থেকে শিরোনাম ও লিঙ্ক সংগ্রহ করতে চান। Requests ও BeautifulSoup দিয়ে সহজেই করা যায়।
+
+---
+
+## Analogy
+
+ওয়েব স্ক্র্যাপিং-কে ভাবুন, ইন্টারনেটের "রোবট রিডার"—আপনার হয়ে ওয়েবসাইট ঘুরে তথ্য সংগ্রহ করে।
+
+---
+
+## স্ক্র্যাপিংয়ের চ্যালেঞ্জ ও সতর্কতা
+
+- ওয়েবসাইটের robots.txt ও Terms of Service মেনে চলুন
+- Rate Limiting ও IP Block এড়িয়ে চলুন
+- API থাকলে API ব্যবহার করুন
+
+---
+
+## Requests, BeautifulSoup, Scrapy-এর সুবিধা
+
+- দ্রুত ও সহজ ডেটা সংগ্রহ
+- বড় স্কেল ও মাল্টিপল সাইট স্ক্র্যাপিং
+- ডেটা প্রসেসিং ও পাইপলাইন
+
+---
+
+## অনুশীলন
+
+১. Requests দিয়ে ওয়েব পেজ ডাউনলোড করুন
+২. BeautifulSoup দিয়ে নির্দিষ্ট তথ্য বের করুন
+৩. Scrapy দিয়ে মাল্টিপল পেজ স্ক্র্যাপ করুন
+৪. robots.txt ও Terms of Service চেক করুন
+
+---
+
+## উপসংহার
+
+ওয়েব স্ক্র্যাপিং দিয়ে ইন্টারনেট থেকে স্বয়ংক্রিয়ভাবে ডেটা সংগ্রহ করা যায়। Requests, BeautifulSoup, Scrapy—তিনটি টুল দিয়ে ছোট থেকে বড় স্কেল স্ক্র্যাপিং সহজ। পরবর্তী পাঠে API অটোমেশন নিয়ে আলোচনা হবে।

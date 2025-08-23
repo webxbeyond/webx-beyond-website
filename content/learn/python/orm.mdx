@@ -1,0 +1,156 @@
+---
+title: ডাটাবেজ ইন্টিগ্রেশন (SQLAlchemy, Django ORM)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ডাটাবেজ ইন্টিগ্রেশন (SQLAlchemy, Django ORM)
+
+## ভূমিকা
+
+ওয়েব অ্যাপ্লিকেশনে ডেটা সংরক্ষণ, খোঁজা, আপডেট—সবকিছু ডাটাবেজে হয়। পাইথনে SQLAlchemy ও Django ORM—দুইটি শক্তিশালী টুল, যেগুলো দিয়ে ডাটাবেজ ইন্টিগ্রেশন সহজ, নিরাপদ, এবং স্কেলেবল হয়।
+
+ভাবুন, আপনি একটি স্কুল অ্যাপ বানাচ্ছেন—ছাত্রদের তথ্য, রেজাল্ট, শিক্ষক—সব ডেটা ডাটাবেজে রাখতে হবে। SQLAlchemy বা Django ORM দিয়ে কোডেই ডাটাবেজ টেবিল, রিলেশন, এবং CRUD অপারেশন করা যায়।
+
+---
+
+## ORM কী?
+
+ORM (Object Relational Mapper) হচ্ছে এমন একটি টুল, যা ডাটাবেজ টেবিলকে পাইথন ক্লাসে রূপান্তর করে। ফলে SQL না লিখেও ডাটাবেজে কাজ করা যায়।
+
+### Analogy
+
+ORM-কে ভাবুন, ডাটাবেজের জন্য "অনুবাদক"—আপনি পাইথন কোডে লিখেন, ORM সেটাকে SQL-এ অনুবাদ করে ডাটাবেজে পাঠায়।
+
+---
+
+## SQLAlchemy: পাইথনের জেনেরিক ORM
+
+SQLAlchemy দিয়ে MySQL, PostgreSQL, SQLite—সব ধরনের ডাটাবেজে কাজ করা যায়।
+
+### ইনস্টলেশন
+
+```bash
+pip install sqlalchemy
+```
+
+### বেসিক Model ও CRUD
+
+```python
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('sqlite:///school.db')
+Base = declarative_base()
+
+class Student(Base):
+    __tablename__ = 'students'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    grade = Column(String)
+
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Create
+student = Student(name='রাহুল', grade='১০')
+session.add(student)
+session.commit()
+
+# Read
+students = session.query(Student).all()
+for s in students:
+    print(s.name, s.grade)
+
+# Update
+student.grade = '৯'
+session.commit()
+
+# Delete
+session.delete(student)
+session.commit()
+```
+
+---
+
+## Django ORM: Django-র বিল্ট-ইন ORM
+
+Django ORM দিয়ে ডাটাবেজ টেবিল, রিলেশন, এবং CRUD—সবকিছুই সহজে করা যায়।
+
+### Model
+
+`students/models.py`:
+```python
+from django.db import models
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    grade = models.CharField(max_length=10)
+```
+
+### CRUD অপারেশন
+
+```python
+# Create
+student = Student.objects.create(name='রাহুল', grade='১০')
+
+# Read
+students = Student.objects.all()
+for s in students:
+    print(s.name, s.grade)
+
+# Update
+student.grade = '৯'
+student.save()
+
+# Delete
+student.delete()
+```
+
+---
+
+## রিলেশন: One-to-Many, Many-to-Many
+
+ORM-এ রিলেশন তৈরি করা যায়—যেমন, একজন শিক্ষক অনেক ছাত্র পড়াতে পারে (One-to-Many), বা একজন ছাত্র একাধিক ক্লাসে থাকতে পারে (Many-to-Many)।
+
+```python
+class Teacher(models.Model):
+    name = models.CharField(max_length=100)
+
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+```
+
+---
+
+## মাইগ্রেশন ও স্কিমা পরিবর্তন
+
+ORM দিয়ে ডাটাবেজ স্কিমা পরিবর্তন করলে মাইগ্রেশন করতে হয়।
+
+- Django: `python manage.py makemigrations` ও `python manage.py migrate`
+- SQLAlchemy: Alembic ব্যবহার করা যায়
+
+---
+
+## ডাটাবেজ ইন্টিগ্রেশনের সুবিধা
+
+- SQL না লিখেও CRUD
+- ডেটা ভ্যালিডেশন ও সিকিউরিটি
+- স্কেলেবল ও মেইনটেনেবল
+- রিলেশন ও মাইগ্রেশন সহজ
+
+---
+
+## অনুশীলন
+
+১. SQLAlchemy দিয়ে SQLite ডাটাবেজে CRUD করুন
+২. Django ORM দিয়ে Model ও CRUD অপারেশন করুন
+৩. One-to-Many রিলেশন তৈরি করুন
+৪. মাইগ্রেশন ও স্কিমা পরিবর্তন করুন
+
+---
+
+## উপসংহার
+
+SQLAlchemy ও Django ORM দিয়ে ডাটাবেজ ইন্টিগ্রেশন সহজ, নিরাপদ, এবং স্কেলেবল। ORM-এ পাইথন কোডেই ডাটাবেজের সব কাজ করা যায়। পরবর্তী পাঠে অটোমেশন ও স্ক্রিপ্টিং নিয়ে আলোচনা হবে।

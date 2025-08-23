@@ -1,0 +1,175 @@
+---
+title: Django বেসিকস - MVC (MTV), Models, Views, Templates
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+Django হচ্ছে পাইথনের সবচেয়ে জনপ্রিয় ওয়েব ফ্রেমওয়ার্ক, যা দিয়ে দ্রুত, নিরাপদ, এবং স্কেলেবল ওয়েব অ্যাপ্লিকেশন তৈরি করা যায়। Django-তে অনেক কিছু আগে থেকেই তৈরি—যেমন ইউজার অথেন্টিকেশন, অ্যাডমিন প্যানেল, ORM, ফর্ম, টেমপ্লেট—ফলে ডেভেলপারদের কাজ অনেক সহজ হয়।
+
+ভাবুন, আপনি একটি স্কুল ম্যানেজমেন্ট সিস্টেম বানাতে চান—ছাত্রদের তথ্য, রেজাল্ট, শিক্ষক, ক্লাস, রিপোর্ট—সবকিছু Django দিয়ে সহজে করা যায়।
+
+---
+
+## Django কী?
+
+Django হচ্ছে "batteries included" ফ্রেমওয়ার্ক—মানে, ওয়েব অ্যাপের জন্য প্রয়োজনীয় প্রায় সবকিছু Django-তে আগে থেকেই আছে।
+
+### ইনস্টলেশন
+
+```bash
+pip install django
+```
+
+---
+
+## Django-এর আর্কিটেকচার: MVC বনাম MTV
+
+Django-তে MVC (Model-View-Controller) কনসেপ্ট ব্যবহার হয়, তবে Django-তে একে বলা হয় MTV (Model-Template-View)।
+
+- **Model:** ডেটার স্ট্রাকচার (ডাটাবেজ টেবিল)
+- **Template:** ইউজার ইন্টারফেস (HTML)
+- **View:** বিজনেস লজিক (কোড)
+
+### Analogy
+
+MVC/MTV-কে ভাবুন, একটি রেস্টুরেন্ট:
+- Model: মেনুতে কী কী খাবার আছে
+- View: কিচেনে খাবার তৈরি হচ্ছে
+- Template: খাবার পরিবেশন করা হচ্ছে
+
+---
+
+## Django Project ও App
+
+Django-তে একটি Project-এর মধ্যে এক বা একাধিক App থাকতে পারে।
+
+```bash
+django-admin startproject school
+cd school
+django-admin startapp students
+```
+
+- **Project:** পুরো ওয়েবসাইট
+- **App:** নির্দিষ্ট ফিচার (যেমন students, teachers)
+
+---
+
+## Models: ডেটার স্ট্রাকচার
+
+Model হচ্ছে Django ORM-এর মাধ্যমে ডাটাবেজ টেবিল তৈরি করার উপায়।
+
+`students/models.py`:
+```python
+from django.db import models
+
+class Student(models.Model):
+    name = models.CharField(max_length=100)
+    roll = models.IntegerField()
+    grade = models.CharField(max_length=10)
+```
+
+### মাইগ্রেশন
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+---
+
+## Views: বিজনেস লজিক
+
+View হচ্ছে ফাংশন বা ক্লাস, যা ইউজার রিকোয়েস্ট পেলে কী রেসপন্স যাবে তা ঠিক করে।
+
+`students/views.py`:
+```python
+from django.shortcuts import render
+from .models import Student
+
+def student_list(request):
+    students = Student.objects.all()
+    return render(request, 'students/list.html', {'students': students})
+```
+
+---
+
+## Templates: HTML ও ডাইনামিক কনটেন্ট
+
+Template হচ্ছে HTML ফাইল, যেখানে Django টেমপ্লেট ল্যাঙ্গুয়েজ দিয়ে ডেটা দেখানো হয়।
+
+`students/templates/students/list.html`:
+```html
+<!DOCTYPE html>
+<html>
+<head><title>ছাত্র তালিকা</title></head>
+<body>
+    <h1>ছাত্র তালিকা</h1>
+    <ul>
+        {% for student in students %}
+            <li>{{ student.name }} (Roll: {{ student.roll }}, Grade: {{ student.grade }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+---
+
+## URL Routing
+
+`students/urls.py`:
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.student_list, name='student_list'),
+]
+```
+
+`school/urls.py`:
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('students/', include('students.urls')),
+]
+```
+
+---
+
+## Django Admin
+
+Django-তে বিল্ট-ইন অ্যাডমিন প্যানেল আছে, যেখানে ডেটা CRUD (Create, Read, Update, Delete) করা যায়।
+
+```bash
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+---
+
+## Django-এর সুবিধা
+
+- দ্রুত ডেভেলপমেন্ট
+- বিল্ট-ইন অথেন্টিকেশন, অ্যাডমিন
+- ORM দিয়ে ডাটাবেজ সহজ
+- স্কেলেবল ও নিরাপদ
+
+---
+
+## অনুশীলন
+
+১. Django Project ও App তৈরি করুন
+২. Model, View, Template তৈরি করুন
+৩. URL Routing যুক্ত করুন
+৪. Django Admin ব্যবহার করুন
+
+---
+
+## উপসংহার
+
+Django দিয়ে বড়, নিরাপদ, ও স্কেলেবল ওয়েব অ্যাপ্লিকেশন তৈরি করা যায়। Model, View, Template—সবকিছুই আলাদা, ফলে কোড মেইনটেন করা সহজ। পরবর্তী পাঠে REST API ও Django REST Framework নিয়ে আলোচনা হবে।
