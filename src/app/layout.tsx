@@ -5,6 +5,9 @@ import { Tiro_Bangla } from 'next/font/google';
 import { Viewport } from "next";
 import { baseUrl, createMetadata } from "@/lib/metadata";
 import SearchDialog from '@/components/search';
+import OfflineProvider from '@/components/offline-provider';
+import OfflineToast from '@/components/offline-toast.client';
+import Loader from '@/components/loader.client';
 
 const tiroBangla = Tiro_Bangla({
   subsets: ["bengali", "latin", "latin-ext"],
@@ -55,8 +58,11 @@ export default function Layout({ children }: LayoutProps<'/'>) {
             translations: fdTranslations['bn'],
           }}
         >
-      {children}
-    </RootProvider>
+          <OfflineProvider />
+          <OfflineToast />
+          <Loader />
+          {children}
+        </RootProvider>
       </body>
     </html>
   );
