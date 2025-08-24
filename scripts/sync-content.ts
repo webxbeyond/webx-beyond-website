@@ -19,10 +19,13 @@ const appId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 
 const apiKey = process.env.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY;
 const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME;
-console.log('ALGOLIA ENV:', { appId, apiKey, indexName });
+
+// console.log('ALGOLIA ENV:', { appId, apiKey, indexName });
+
 if (!appId || !apiKey || !indexName) {
   throw new Error('Algolia environment variables are missing. Check your .env.local file.');
 }
+
 const client = algoliasearch(appId, apiKey);
 
 // update the index settings and sync search indexes

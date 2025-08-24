@@ -284,8 +284,8 @@ function SelectTopics() {
 
   const [showAll, setShowAll] = React.useState(false);
   // Separate recommended (non-upcoming) and upcoming topics
-  const recommended = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(0, 8);
-  const rest = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(8);
+  const recommended = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(0, 16);
+  const rest = cards.filter(c => !c.badge || c.badge.variant !== 'soon').slice(16);
   const upcoming = cards.filter(c => c.badge?.variant === 'soon');
   return (
     <section id="select-topics" className=" pt-12  md:pt-16">
