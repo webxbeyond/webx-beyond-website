@@ -1,0 +1,153 @@
+---
+title: gRPC বনাম REST বনাম GraphQL
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+API ডিজাইনকে বুঝতে হলে তিনটি জনপ্রিয় প্যাটার্ন — REST, gRPC, ও GraphQL — কে তুলনামূলকভাবে বোঝা জরুরি। এই পাঠে আমরা প্রতিটির ধারণা, সুবিধা‑অসুবিধা, বাস্তব উদাহরণ, অপারেশনাল বিবেচনা এবং কখন কোনটি বেছে নিতে হবে তা বাংলায় সহজ ভাষায় তফসিলসহ আলোচনা করব।
+
+## চেকলিস্ট (আপনি যা জানতে পারবেন)
+
+- REST, gRPC, GraphQL প্রত্যেকের মূল ধারণা
+- পারফরম্যান্স, স্কেল, টাইপিং, ব্যাকওয়ার্ড কম্প্যাটিবিলিটি তুলনা
+- কনক্রিট ব্যবহার‑কেস: মোবাইল, ওয়েব‑ফ্রন্টএন্ড, ইন্টার‑সার্ভিস কমিউনিকেশন
+- অপারেবিলিটি: ডকুমেন্টেশন, টেস্টিং, মাইগ্রেশন
+- নির্বাচনের দ্রুত ফ্লো ও বাস্তব উদাহরণ
+
+---
+
+## ১) API ডিজাইন — একটি সরল রূপক
+
+ধরুন আপনি একটি রেস্তরাঁ চালান। গ্রাহকরা কীভাবে অর্ডার দেবেন? তিনটি বিকল্প আছে:
+
+- REST = মেনুতে প্রচলিত বিভাগভিত্তিক অর্ডার (appetite/item): স্থির, সহজ, প্রত্যেকের কাছে পরিচিত।
+- GraphQL = কাস্টমাইজড অর্ডার যেখানে গ্রাহক বলেন ঠিক কতটা কি চাই (ইচ্ছামত ফিল্ড নির্বাচন)।
+- gRPC = একটি দ্রুত এবং নির্ভুল কিচেন‑প্রটোকল যেখানে শেফ এবং সার্ভার মেশিন একে‑অন্যকে টাইপ‑চলিত রেসিপি পাঠায় — মেশিন‑টু‑মেশিনে টর্স্ট‑স্পিড।
+
+রূপকটি সাহায্য করবে পরে সিদ্ধান্ত নেওয়ার সময়ে—কনটেক্সট, latency, flexibility বিবেচনায় নিন।
+
+## ২) REST (Representational State Transfer)
+
+কী: HTTP verbs (GET/POST/PUT/DELETE) ও JSON payload‑ভিত্তিক অনুপম প্যাটার্ন।
+
+বৈশিষ্ট্য:
+- মানব পাঠ্য (JSON) ও ওয়েব‑প্রকৃতির জন্য সুবিধাজনক
+- HTTP caching (ETag, Cache‑Control) সহজ
+- নিজস্ব versioning প্যাটার্ন (URI versioning বা header)
+- বহু‑উপকরণে সহজ ইন্টিগ্রেশন (ব্রাউজার, curl)
+
+কখন ভালো:
+- public APIs যেখানে broad interoperability দরকার
+- simple CRUD apps, প্রোটোটাইপিং
+
+সীমাবদ্ধতা:
+- over/under‑fetching: endpoint একটি বড় JSON রিটার্ন করতে পারে যেখানে ক্লায়েন্টে দরকার কম
+- strict typing নেই (যদিও OpenAPI/JSON Schema ব্যবহার হয়)
+- microservice‑to‑microservice বেশি latency হতে পারে যদি multiple round trips লাগে
+
+## ৩) GraphQL
+
+কী: একটি single endpoint‑এ থেকে গ্রাহক কুয়েরি লিখে ঠিক কোন ফিল্ড লাগে তা নির্দিষ্ট করে। সার্ভার একটিমাত্র response দিয়ে থাকে যেটা ক্লায়েন্টের কুয়েরি অনুযায়ী shape নেয়।
+
+বৈশিষ্ট্য:
+- ক্লায়েন্ট নির্দিষ্ট করে data shape — overfetching কমে
+- ফ্রন্টএন্ড‑ড্রিভেন উন্নয়ন দ্রুত হয়
+- strong typing via GraphQL schema (SDL)
+- introspection দিয়ে automatic docs (GraphiQL, Playground)
+
+কখন ভালো:
+- জটিল UIs বা মোবাইল যেখানে bandwidth সংরক্ষণ দরকার
+- multiple microservices থেকে ডেটা aggregation প্রত্যাশা হলে
+
+সীমাবদ্ধতা:
+- caching কঠিন (বৈশিষ্ট্যগত HTTP cache‑based approaches কাজ করে না সরাসরি)
+- query complexity attacks — কুয়েরি প্রইটেকশন প্রয়োজন
+- নেস্টেড কুয়েরি হলে N+1 problem হতে পারে — dataloader pattern দরকার
+
+## ৪) gRPC
+
+কী: Google‑developed RPC framework; HTTP/2‑based, binary‑serialized (Protocol Buffers), strongly typed service contracts।
+
+বৈশিষ্ট্য:
+- binary serialization → network eficiency ও smaller payloads
+- HTTP/2 multiplexing, streaming (client/server/bi‑directional)
+- code‑generation for many languages (stubs and types)
+- ideal for inter‑service (service‑to‑service) communication
+
+কখন ভালো:
+- high‑performance internal APIs (microservices, IoT, real‑time)
+- streaming use‑cases (metrics, logs, voice/video signaling)
+
+সীমাবদ্ধতা:
+- browser support limited (need gRPC‑web or proxy)
+- human‑readability কম; debugging harder without tools
+- requires Protobuf schemas & codegen step (build complexity)
+
+## ৫) কার্যকারিতা ও অপারেশনাল তুলনা (সংক্ষেপে)
+
+- Latency: gRPC < JSON over HTTP (REST) < GraphQL (depends on backend aggregation)
+- Payload size: gRPC (binary, small) < GraphQL (single aggregated JSON) ≤ REST (varies)
+- Development speed (simple CRUD): REST সহজতর; UI‑driven: GraphQL দ্রুত; typed internal APIs: gRPC দ্রুত
+- Tooling & docs: GraphQL (introspection) ও REST (OpenAPI) ভালো; gRPC স্টাব‑জেনারেশন ভালো কিন্তু humans need tooling
+- Caching: REST excels (HTTP cache); GraphQL requires field/response caching strategies; gRPC relies on application caches or edge proxies
+
+## ৬) বাস্তব উদাহরণ — কখন কোনটি বেছে নেবেন
+
+1) Mobile app with slow network and lots of small views:
+   - GraphQL — because client can request exactly needed fields and reduce payloads.
+
+2) Public web API for third‑party developers:
+   - REST with OpenAPI (or GraphQL if you expect diverse, complex queries).
+
+3) High‑throughput internal microservices (metrics collection, auth token exchange):
+   - gRPC — for performance, streaming, and strict contracts.
+
+4) Hybrid approach:
+   - Use gRPC for east‑west internal comms; expose REST or GraphQL as north‑south public API. Many production systems use this mix.
+
+## ৭) Migration ও compatibility কনসাইডারেশন
+
+- Versioning REST: URI versioning (/v1/) বা header/version fields; maintain backward compatibility via additive changes
+- GraphQL: prefer deprecation of fields (mark deprecated in schema) — add new fields rather than change existing
+- gRPC: Protobuf supports backward/forward compatibility if rules মেনে (field numbers, reserved tags)
+
+## ৮) Security, observability ও testing
+
+- Authentication: OAuth/JWT common across all; gRPC supports mTLS easily
+- Authorization: field‑level auth needed in GraphQL (more granular)
+- Tracing: propagate trace ids across calls; instrument stubs & resolvers
+- Logging & monitoring: collect metrics per endpoint/handler; for GraphQL track heavy queries
+- Testing: contract tests — OpenAPI for REST, schema tests for GraphQL, protobuf contract tests for gRPC
+
+## ৯) Cost, operational overhead ও team impact
+
+- REST: lowest friction for teams used to HTTP/JSON. Wide ecosystem.
+- GraphQL: requires frontend-backend coordination and query cost management. Good for small teams aiming for rapid UI iterations.
+- gRPC: requires investment in code generation and language interoperability but pays off for large, performance‑sensitive backends.
+
+## ১০) নির্দেশিকাভিত্তিক সিদ্ধান্ত ফ্লো
+
+1. Is the API public and meant for third‑party developers? → Start with REST + OpenAPI (or GraphQL if you want flexible queries).
+2. Is it internal and latency/throughput critical? → gRPC.
+3. Do your clients need fine‑grained control over fields and avoid overfetching (mobile, SPA)? → GraphQL.
+4. Do you need streaming or bidirectional comms? → gRPC.
+5. Prefer minimal ops and simple caching? → REST.
+
+## ১১) ছোট রিয়েল‑ওয়ার্ল্ড আর্কিটেকচার উদাহরণ
+
+- Example A (Social feed): internal services communicate via gRPC for speed; public API exposes GraphQL for client flexibility and aggregated queries. Cache popular feed fragments at CDN/edge.
+
+- Example B (E‑commerce): product & inventory microservices use gRPC; storefront uses GraphQL to assemble product page; checkout and payment expose REST endpoints for third‑party integrations.
+
+## ১২) প্রাথমিক টেমপ্লেট ও পরবর্তী ধাপ
+
+আপনি চাইলে আমি নিম্নলিখিত সরবরাহ করব:
+
+- (A) Minimal Node.js Express REST + OpenAPI example (runnable)
+- (B) Small gRPC example (Go or Node) showing streaming and codegen
+- (C) Apollo GraphQL server example with dataloader and query cost limiting
+
+নির্বাচন বললে আমি সেই উদাহরণটি তৈরি করে runnable project ফাইল, README এবং দ্রুত smoke‑test রান করব।
+
+---
+
+এই পাতায় কোনো নির্দিষ্ট উদাহরণ বা runnable কোড চান কি? (A / B / C বা "None")

@@ -1,0 +1,164 @@
+---
+title: Designing YouTube / Video Streaming Service
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা একটি ভিডিও স্ট্রিমিং সার্ভিস (যেমন YouTube) কীভাবে ডিজাইন করা যায় তা বাংলা ভাষায় দেখে নেব। বিষয়গুলি কভার করা হবে: VOD বনাম Live, ingest→transcode→package→delivery পাথ, CDN ও edge caching, Adaptive Bitrate (ABR), storage ও metadata, DRM ও সিকিউরিটি, analytics এবং অপারেশনাল সিদ্ধান্তবিন্দু। বাস্তব উদাহরণ, রূপক এবং decision flow দেয়া আছে যাতে আপনি production‑grade আর্কিটেকচার বেছে নিতে পারেন।
+
+## চেকলিস্ট
+
+- VOD vs Live architectural differences
+- Ingest, transcoding, packaging (HLS/DASH) ও chunking
+- CDN/Edge caching এবং cache key design
+- Adaptive Bitrate streaming ও ABR ladder
+- Storage (object store, cold/hot tiers) ও metadata DB
+- DRM, tokenized URLs ও hotlink protection
+- Analytics pipeline (view events, QoE metrics)
+- Scaling, SLOs, monitoring, and operational runbooks
+
+---
+
+## ১) সমস্যা ও মৌলিক প্রয়োজনীয়তা
+
+Functional requirements:
+- Upload ও publish VOD (on‑demand) ভিডিও
+- Support live streams with low playback latency
+- Serve millions of concurrent viewers globally
+- Adaptive quality (ABR) to match client bandwidth
+- Analytics: views, watch time, QoE (startup time, rebuffer)
+
+Non‑functional requirements:
+- Low startup latency and high throughput
+- Cost‑efficient storage and egress
+- High availability and multi‑region delivery
+- Content protection (DRM) ও access control
+
+রূপক: ভাবুন ভিডিও হলো ভারি সামান্য বস্তু—আপনি আগাম করে ছোট ছোট টুকরো করে (chunks) রেখে দিলেন যাতে দর্শক সুবিধামত বিভিন্ন গতি ও জায়গা থেকে খুঁজে নিয়ে দেখতে পারে; CDN তা দ্রুত বিতরণ করে।
+
+## ২) High‑level pipeline
+
+1. Ingest: content upload or live RTMP/RTSP/QUIC ingest endpoints
+2. Transcode: multiple renditions (resolutions/bitrates) এবং encode to H.264/H.265/AV1
+3. Package: create HLS/DASH manifests + segment files (fMP4 or TS)
+4. Store: segments in object store (S3) and metadata in a DB
+5. CDN: edge caches segments and serves clients
+6. Playback: client ABR logic selects appropriate rendition
+7. Analytics: events emitted and processed asynchronously
+
+প্রত্যেক ধাপে latency, cost ও CPU/IO tradeoffs গুরুত্বপূর্ণ।
+
+## ৩) VOD vs Live
+
+VOD:
+- Transcoding কাজ আগে করা যায় (offline), multiple renditions precomputed
+- Low playback latency less critical; focus on storage cost and egress
+
+Live:
+- Realtime transcoding (chunking low latency), chunk arrival → segment creation → publish manifest
+- Latency targets drive protocol choice: HLS low‑latency variants, DASH Low Latency, or WebRTC for ultra‑low latency
+- Scalability: need ingest autoscaling, real‑time packagers, and CDN config for low‑latency cache refresh
+
+## ৪) Transcoding & packaging
+
+- Transcoding: CPU intensive. Use worker fleets (spot/auto‑scale) or managed services (AWS MediaConvert)
+- Multi‑bitrate ladder: e.g., 144p@200kbps, 360p@800kbps, 720p@2500kbps, 1080p@4500kbps
+- Packaging: generate manifest files (.m3u8/.mpd) and segment files (fMP4 preferred for CMAF compatibility)
+
+Operational tip: use multi‑stage pipelines — ingest → fast encode low‑latency preview + background higher quality encodes.
+
+## ৫) Adaptive Bitrate (ABR) ও client logic
+
+- Client measures buffer health and throughput; requests segments from appropriate rendition
+- ABR ladder design: discrete bitrate steps, overlap to avoid frequent quality shifts
+- Use CDN and HTTP/2 multiplexing to speed segment delivery
+
+## ৬) CDN ও edge caching
+
+- Serve static segments from CDN edge (CloudFront, Cloudflare, Fastly)
+- Cache keys: include rendition + segment number + token if using signed URLs
+- Cache invalidation: for VOD rarely needed; for live use short TTLs and manifest update strategies
+
+Edge strategies:
+- Push model: prepopulate edge with popular content
+- Pull model: CDN fetches from origin on first request
+
+## ৭) Storage ও metadata
+
+- Store segments in object store (hot vs cold tiers)
+- Store manifests & metadata in RDBMS/NoSQL for lookup and search
+- Archive originals (master files) in cheaper cold storage for re‑transcode if required
+
+Design for cost: keep frequently accessed renditions cached in edge; evict cold content to cold storage
+
+## ৮) DRM, access control ও security
+
+- DRM systems: Widevine, PlayReady, FairPlay — encrypt content and deliver licenses via license server
+- Tokenized signed URLs: short‑lived URLs to prevent hotlinking
+- Watermarking & forensic techniques for piracy tracing
+
+Tradeoff: stronger DRM increases complexity and may limit device compatibility
+
+## ৯) Analytics ও QoE (Quality of Experience)
+
+Collect events:
+- playback_start, first_frame_time, rebuffer_count, bitrate_switches, playback_errors
+
+Pipeline:
+- Client → collect events → stream to Kafka/PubSub → stream processing (Flink/Beam) → store aggregates in OLAP (ClickHouse)
+- Derive SLIs: startup_time_p95, rebuffer_rate_p99, average_bitrate_per_region
+
+Use exemplars or trace ids to link playback errors to origin/CDN traces.
+
+## ১০) Scaling ও cost optimization
+
+- Egress is major cost — use regional CDN POPs and peering
+- Transcoding cost: use spot instances and auto‑scale; pre‑transcode popular content
+- Use tiered caching (edge→regional edge→origin) to reduce origin load
+- For live spikes, rely on CDN to absorb sudden viewers; autoscale ingest/transcode layer
+
+## ১১) Monitoring, SLOs ও runbooks
+
+Key metrics:
+- egress_bytes, cache_hit_ratio, origin_requests, segment_generation_time
+- startup_time_p95, rebuffer_rate_p99, failed_segment_requests
+
+SLO examples:
+- p95 startup time < 3s
+- rebuffer_rate < 0.5% monthly
+
+Runbook snippets:
+- High rebuffer spikes → check CDN edge health & origin latency; inspect segment sizes and encoding bitrate ladder
+- Origin errors surge → check transcoder worker health and queue lag
+
+## ১২) Edge cases ও resilience
+
+- Manifest churn: use sliding window for live manifests and ensure clients respect discontinuity tags
+- Partial segment uploads: use atomic write + rename or write to temp path then move
+- Transcoder failure: fall back to lower quality stream or notify viewers
+
+## ১৩) Decision flow (সংক্ষেপে)
+
+1. Is ultra‑low latency (<1s) required? → consider WebRTC or LL‑HLS/DASH; higher complexity
+2. Is cost a primary concern for VOD? → pre‑transcode popular content, use cold storage for infrequent content
+3. Need DRM & wide device support? → choose DRM ecosystem and ensure CMAF compatibility
+4. Expect global scale? → use multi‑region origin + CDN, and global object storage or replication
+
+## ১৪) বাস্তব‑বিশেষ উদাহরণ (concise)
+
+- Example: VOD pipeline on AWS
+  - Upload → S3 (master) → AWS Lambda trigger → MediaConvert jobs → renditions → store segments in S3 + CloudFront distribution → player fetches manifests from CloudFront
+
+- Example: Live low‑latency
+  - Ingest (RTMP/QUIC) → real‑time packager/transcoder (CMAF) → origin with HLS LL manifests → CDN with cache settings tuned for live
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি runnable উদাহরণ যোগ করব:
+
+- (A) Minimal ffmpeg + nginx‑rtmp / nginx + HLS pipeline (Docker Compose) to produce HLS segments and serve via nginx
+- (B) Small Node.js packager example that accepts an uploaded master and runs ffmpeg jobs (Docker) and creates HLS manifests + a simple HTML player
+- (C) Infrastructure scaffold for AWS (S3 + MediaConvert + CloudFront) with Terraform snippets and a small CI script
+
+আপনি কোনটি চান? (A / B / C / None)

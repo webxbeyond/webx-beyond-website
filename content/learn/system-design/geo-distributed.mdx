@@ -1,0 +1,153 @@
+---
+title: Geo‑Distributed Systems ও Multi‑Region Deployments
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা geo‑distributed systems এবং multi‑region deployments‑এর মূল ধারণা, ডিজাইন প্যাটার্ন, ডেটা রিপ্লিকেশন ও কনসিসটেন্স কৌশল, ট্রাফিক ও DNS ম্যানেজমেন্ট, DR ও রিকভারি, অপারেশনাল চ্যালেঞ্জ এবং বাস্তব‑জীবনের সিদ্ধান্ত‑ফ্লো বাংলায় আলোচনা করব। উদাহরণ, রূপক ও অপারেশনাল runbook‑স্টাইল টিপস সরবরাহ করা হয়েছে যাতে production‑ready পরিকল্পনা করা যায়।
+
+## চেকলিস্ট (আপনি যা পাবেন)
+
+- Geo‑distributed systems কেন প্রয়োজন এবং ব্যাবহারিক লক্ষ্য
+- Deployment প্যাটার্ন: active‑active, active‑passive, read‑replicas, multi‑master
+- Latency, consistency ও CAP‑এর প্রভাব
+- ডেটা প্লেসমেন্ট: sharding, geo‑partitioning, affinity
+- Replication কৌশল: async vs sync, quorum, CRDTs
+- Traffic management: Anycast, DNS, global LB, geo‑routing
+- Disaster Recovery (RTO / RPO), failover কৌশল ও runbooks
+- Observability, testing (chaos), এবং compliance (data sovereignty)
+
+---
+
+## ১) কেন Geo‑Distributed? (উদ্দেশ্য ও ব্যবহারিক লক্ষ্য)
+
+কারণগুলো সাধারণত:
+- Latency কমানো: ব্যবহারকারীর নিকটস্থ region‑এ সার্ভ করা
+- Resilience: একাধিক region ব্যর্থ হলে সার্ভিস চলমান রাখা
+- Regulatory & data sovereignty: স্থানীয় ডেটা‑রক্ষণ প্রয়োজন
+- Scale: global traffic balancing এবং regional capacity
+
+রূপক: ভাবুন আপনি বহুরাষ্ট্রীয় দোকান চালান — প্রতিটি শহরে স্টক ও কাস্টমার সার্ভিস রাখা হলে ডেলিভারি দ্রুত হয় এবং স্থানীয় নিয়মও মেনে চলা সহজ হয়।
+
+## ২) Deployment প্যাটার্নস (সংক্ষেপে)
+
+- Active‑Active: প্রতিটি region লেখাপড়া ও পড়া করে; low latency reads, higher coordination cost
+- Active‑Passive: একটি primary region লিখে; অন্যগুলো standby/reads-only — সহজ কিন্তু failover latency থাকতে পারে
+- Primary‑read‑replicas: primary सर्वার সব লিখে; reads কতকে regional replicas থেকে সার্ভ করা হয়
+- Multi‑master: একাধিক region লিখে (conflict resolution দরকার)
+
+নির্বাচন নির্দেশিকা:
+- Strong consistency প্রয়োজন হলে sync replication (careful with latency) বা single writable primary
+- Low latency global reads প্রয়োজন হলে active‑active বা read replicas
+
+## ৩) Latency, Consistency ও CAP বিবেচনা
+
+CAP theorem স্মরণ: Network Partition হলে আপনাকে Availability এবং Consistency‑এর মধ্যে tradeoff নিতে হবে। Geo‑distributed world‑এ partitioning সবচেয়ে বাস্তবসম্মত চিন্তা।
+
+- সিঙ্ক্রোনাস replication (strong consistency): লেখার latency বাড়ে (cross‑region RTT)।
+- অ্যাসিঙ্ক্রোনাস replication: লিখা দ্রুত, কিন্তু replica reads stale হতে পারে (eventual consistency)।
+
+রিয়েল‑ওয়ার্ড প্যাটার্ন: অনেক সিস্টেমে reads eventual consistency‑তে রাখে কিন্তু critical writes (ফাইন্যান্স) single region বা global transactionে bound করে।
+
+## ৪) ডেটা প্লেসমেন্ট ও পার্টিশনিং
+
+- Geo‑partitioning (region affinity): user‑centric systems‑এ user data কে তাদের home region‑এ রাখুন (legal + latency)।
+- Functional partitioning: কিছু সার্ভিস region‑agnostic (public CDN), অন্যগুলো regional state রাখে
+- Sharding: consistent hashing বা application‑level partitioning; metadata store রেখে mapping track করুন
+
+টিপস:
+- Keep hot data near users (edge caches, regional DBs)
+- Cold archival centrally or in cheaper region
+
+## ৫) Replication কৌশল এবং conflict resolution
+
+- Synchronous replication: write waits for replicas → strong consistency, higher latency
+- Asynchronous replication: write returns immediately → lower latency, possible staleness
+- Quorum replication: write needs acknowledgement from majority → tradeoff between latency and durability
+
+Conflict resolution:
+- Last‑write‑wins (timestamp) — সহজ কিন্তু data loss risk
+- CRDTs (Conflict‑free Replicated Data Types) — commutative ops allow automatic merge (counters, sets)
+- Application‑specific merge (business rules) — safest for complex objects
+
+যুদ্ধনীতি: Use CRDTs for counters/collaborative state; use single master for money/transfers.
+
+## ৬) Traffic management ও global routing
+
+- Anycast + Global LB: route client to nearest POP (provider managed like GCP/Cloudflare)
+- DNS‑based geo‑routing: route based on client IP/EDNS; DNS TTL影响 cache behavior
+- Application‑level geo routing: client picks region via region discovery/ping and sticks to it
+
+Considerations:
+- DNS caching delays affect failover speed — set low TTL for critical endpoints
+- Use health checks across regions and weighted traffic shifting for deployments
+
+## ৭) Edge, CDN এবং caching
+
+- Static content/reads = CDN edge for latency & egress savings
+- Dynamic content: consider edge compute (functions at edge) for personalization or caching intermediate responses
+- Cache invalidation requires careful design in geo setups (use versioned keys)
+
+## ৮) Disaster Recovery (DR): RTO / RPO ও Failover কৌশল
+
+- RTO (Recovery Time Objective) ও RPO (Recovery Point Objective) নির্ধারণ করুন per service
+- Failover patterns:
+  - Automated cross‑region failover (fast, risky if not tested)
+  - Manual failover (slower, safer)
+  - Read‑only promotion & rewind strategies
+
+Runbook উদাহরণ (region outage):
+1. Trigger detection via multi-region health checks & synthetic tests
+2. Route traffic away using global LB / DNS weight shift
+3. Promote standby (if active‑passive) or allow reads from replicas
+4. Reconcile writes and repair replicas post‑recovery
+
+## ৯) Observability, testing ও chaos engineering
+
+Observability:
+- Global request heatmaps, cross‑region latency, replication lag, divergence counters
+- Synthetic tests from multiple regions (heartbeat probes)
+
+Testing:
+- Run failover drills and partial partition simulations
+- Chaos tests: kill region services, network partitions, and check automated recovery
+
+Metrics to watch:
+- replication_lag_seconds, region_request_latency_p99, cross_region_error_rate, cache_miss_rate
+
+## ১০) Compliance, data sovereignty ও legal concerns
+
+- Map regulations to data classification (PII residency)
+- Use geo‑partitioning to ensure data remains in allowed regions
+- Maintain audit trails and access controls per region
+
+## ১১) Cost এবং operational tradeoffs
+
+- Multi‑region increases cost (compute, storage, egress); balance with user experience gains
+- Strategies to reduce cost: regionalize selectively (hot markets), use CDN for static offload, prefer async replication where safe
+
+## ১২) Patterns & real‑world examples
+
+- Global DB + regional read replicas: writes in primary region, reads local — good for many apps
+- Active‑active with CRDTs: collaboration apps (counters, presence)
+- Multi‑master bounded by conflict resolution: e‑commerce inventory often single master per SKU region
+
+Concrete case: SaaS app with global users often uses single write region per customer (tenant affinity) to meet compliance and reduce cross‑region transactions.
+
+## ১৩) Decision flow (সংক্ষেপে)
+
+1. Do you need strong global consistency for this data? → avoid multi‑master; use single writable primary or quorum writes
+2. Is latency for reads critical globally? → use read replicas / CDN / edge compute
+3. Is data residency regulated? → place data in permitted regions and ensure controls
+4. Can you tolerate eventual consistency? → prefer async replication and lower cost
+
+---
+
+আপনি চাইলে আমি এই পাতায় runnable artifacts যোগ করব:
+
+- (A) Terraform scaffold for a simple multi‑region web service (load balancers, health checks, DNS weight shift)
+- (B) Small demo using CockroachDB (geo‑replicated) example with replication zones and a tiny Node.js app showing region affinity
+- (C) A chaos testing script (k6 + kubectl) that simulates region outage and measures failover latency
+
+কোনটি চান? (A / B / C / None)

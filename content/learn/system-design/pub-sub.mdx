@@ -1,0 +1,123 @@
+---
+title: Publish/Subscribe Pattern
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা Publish/Subscribe (Pub/Sub) প্যাটার্নের মৌলিক ধারণা, ব্রোকার-বেসড বনাম ব্রোকারলেস আর্কিটেকচার, টপিক/সাবস্ক্রিপশন মডেল, ফ্যান‑আউট, ডেলিভারি গ্যারান্টি, ordering ও partitioning কৌশল, durability ও persistence কনসিডারেশন, এবং অপারেশনাল বিষয়গুলো বিস্তারিতভাবে আলোচনা করব। বাস্তব জীবনের উদাহরণ, রূপক এবং সিদ্ধান্ত-নির্ভর চেকলিস্ট থাকবে।
+
+---
+
+## চেকলিস্ট
+
+- Pub/Sub সংজ্ঞা ও কোর কনসেপ্ট
+- Broker-based vs Brokerless (e.g., Kafka) পার্থক্য
+- Topic, Subscription, Fan-out, Durable Subscriptions
+- Delivery guarantees (at-least-once, at-most-once, exactly-once)
+- Ordering, partitioning ও key design
+- Backpressure, scaling এবং consumer lag
+- Dead-letter handling, retries ও DLQs
+- Monitoring, testing ও SLO পরামর্শ
+
+---
+
+## ১) Pub/Sub কী — সহজ ভাষায়
+
+Publish/Subscribe হল একটি মেসেজ‑ডেল যেখানে প্রোডিউসার (publisher) ইভেন্ট বা মেসেজ একটি টপিকে পাঠায় এবং এক বা একাধিক কনজিউমার (subscribers) ঐ টপিক সাবস্ক্রাইব করে মেসেজ পায়। Pub/Sub ডিক্লুপল করে সার্ভিসগুলো — producer কে অন্য সার্ভিসগুলোর অস্তিত্ব জানা লাগে না।
+
+রূপক: আপনি একটি সিটি‑ব্রডকাস্ট রেডিও স্টেশন চালান (টপিক), আর যেকেউ সেটি শুনতে চায় (subscriber) সেগুলো শুনতে পারে — আপনি প্রত্যেক শ্রোতার ঠিকানা জানেন না, শুধু ব্রডকাস্ট করেন।
+
+## ২) Broker-based vs Brokerless (Log-based) আর্কিটেকচার
+
+- Broker-based (RabbitMQ, Google Pub/Sub, AWS SNS): একটি কেন্দ্রীয় ব্রোকার মেসেজ গ্রহণ করে সাবস্ক্রাইবারদের কাছে পৌঁছে দেয়; routing, filtering ও delivery policy ব্রোকারে হয়ে থাকে।
+- Brokerless / Log-based (Kafka): একটি append-only log (topic with partitions) থাকে; producers লিখে রাখে, consumers নিজেই offsets পড়ে ও প্রসেস করে—replay ও retention সহজ।
+
+ট্রেড-অফ:
+- Broker-based সহজ ও ফিচার-রিচ (filtering, push delivery), কিন্তু বৃহৎ স্কেলিং‑এ অপারেশনাল ও performance overhead থাকতে পারে।
+- Log-based systems উচ্চ থ্রুপুট, retention ও replay সুবিধা দেয়, তবে consumer-offset management ও ordering per-partition চিন্তা করতে হয়।
+
+## ৩) Topic, Subscription, Fan-out
+
+- Topic: logical channel যেখানে messages প্রকাশ করা হয়
+- Subscription: subscriber‑side binding যা নির্দিষ্ট topic থেকে messages গ্রহণ করে
+- Fan-out: একটি topic থেকে একই মেসেজ বহু সাবস্ক্রাইবারকে পৌঁছানো — typical pub/sub use-case (e.g., notifications, metrics pipelines)
+
+Design note: fan-out বাড়লে broker/network pressure বাড়ে; use log-based replication or push/pull hybrids appropriately.
+
+## ৪) Delivery গ্যারান্টি এবং Idempotency
+
+- At-least-once: message কমপক্ষে একবার ডেলিভার হবে; duplicates সম্ভব → consumer‑side idempotency প্রয়োজন
+- At-most-once: message সর্বোচ্চ একবার চেষ্টা করা হবে; হারানো সম্ভব
+- Exactly-once: কঠিন; Kafka-এর transaction support নির্দিষ্ট ক্ষেত্রে সাহায্য করে
+
+Idempotency: subscribers‑কে প্রতিটি message‑এর একটি unique idempotency key ব্যবহার করে dedupe করার ব্যবস্থা রাখা উচিত, অথবা operations এমনভাবে ডিজাইন করতে হবে যাতে repeated processing safe হয় (CRDTs, upserts)।
+
+## ৫) Ordering ও Partitioning
+
+- Ordering important হলে per-key ordering রাখুন (partition by key, process partition sequentially)
+- Global ordering across whole topic expensive—prefer per-entity ordering (e.g., per-user)
+- Partition count defines parallelism in log-based systems (increase partitions → increase parallel consumers) — careful capacity planning needed
+
+## ৬) Durable Subscriptions ও Replay
+
+- Durable subscription: broker দায়িত্বে রেখে যে সাবস্ক্রাইবার অবাধে অফলাইন হলে পরে পুনরায় মেসেজ পায়
+- Replay: log-based systems (Kafka) retention‑এর মধ্যে history replay করার সুযোগ দেয়; useful for late-joining consumers or reprocessing with new logic
+
+## ৭) Backpressure, Fan-in এবং Scaling
+
+- Backpressure arise করলে consumers ধীর হয়ে যায় এবং queue/lag বাড়ে
+- Scaling approaches:
+  - scale consumers horizontally (increase replicas)
+  - increase partitions for more parallelism (Kafka)
+  - implement rate-limiting at publisher edge
+  - apply batching to reduce per-message overhead
+
+নোট: scaling consumers করে সব সমস্যা সমাধান হয় না—downstream IO বা DB may become the bottleneck; use circuit-breakers and throttles.
+
+## ৮) Retries, DLQ ও Poison Messages
+
+- Retries: exponential backoff + jitter preferred
+- DLQ: বারবার ব্যর্থ মেসেজগুলো DLQ-তে পাঠায় যাতে পরে ম্যানুয়ালি ইনস্পেক্ট বা রেপ্রোসেস করা যায়
+- Poison messages: malformed বা consistently failing messages—handle via validation, schema checks, and DLQ
+
+## ৯) Security, Schemas ও Compatibility
+
+- Use schema registry (Avro/Protobuf/JSON Schema) to enforce compatibility between producers and consumers
+- Authenticate/authorize publishers and subscribers (TLS, mTLS, IAM)
+- Evolve schema carefully (backward/forward compatibility)
+
+## ১০) Observability ও Metrics
+
+মূল মেট্রিক:
+- messages_published_total, messages_consumed_total
+- consumer_lag (log-end - consumer-offset)
+- processing_duration_histogram
+- DLQ rate, retry rate
+
+Traces: inject trace_id into message headers to link publish→consume traces and debug latencies
+
+## ১১) Testing ও Drills
+
+- Load tests with fan-out to mimic production fan-out ratios
+- Reprocessing tests: simulate replay and ensure idempotency
+- Consumer failure tests: simulate slow or crashed consumers and measure lag recovery
+
+## ১২) Real-world উদাহরণ
+
+1) Notification system: publish an "user_event" topic → notification service + analytics service subscribe separately (fan-out). Notification service ensures delivery (push to devices), analytics service stores events for aggregation.
+
+2) Audit & Compliance: all write operations publish audit events to a durable log (Kafka) allowing replay for audits and rebuilds.
+
+3) Webhook broadcasting: events published to topic and webhook dispatcher subscribes with retry + DLQ for failed endpoints.
+
+## ১৩) Decision flow (সংক্ষিপ্ত)
+
+1) Do you need replay and durable event store? Yes → Use log-based system (Kafka)
+2) Need complex routing or push semantics with rich filtering? Yes → Broker-based (RabbitMQ, managed Pub/Sub)
+3) Expect high fan-out with many subscribers? Consider broker scalability, use push vs pull trade-offs and evaluate cost
+4) Require strict ordering? Partition by key and design consumers accordingly
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি Mermaid টপোলজি ডায়াগ্রাম (publisher → broker → multiple subscribers), একটি Kafka consumer lag Grafana panel JSON, অথবা একটি small Pub/Sub code snippet (Node.js) যোগ করে দেব—কোনটি আগে যোগ করব?

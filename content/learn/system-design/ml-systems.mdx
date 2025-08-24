@@ -1,0 +1,182 @@
+---
+title: Machine Learning Systems Design (Recommendation Engines, Ranking Systems)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা recommendation ও ranking systems‑এর ইঞ্জিনিয়ারিং দিকটি বাংলায় বিস্তারিতভাবে দেখব — কেন এগুলো আলাদা ধরণের সিস্টেম, কিভাবে candidate generation ও ranking pipeline গঠন করা হয়, feature store, offline ও online pipelines, latency ও freshness‑এর trade‑offs, পর্যবেক্ষণ ও মেট্রিক্স, এবং production‑grade পরীক্ষণ ও রোলআউট কৌশল। বাস্তব উদাহরণ, রূপক এবং সিদ্ধান্ত‑ফ্লো দিয়ে শেষ করা হবে।
+
+## চেকলিস্ট (এই পাতায় যা পাবেন)
+
+- Recommendation vs ranking মানে কী এবং কবে কোনটি দরকার
+- সার্ভিসের কন্ট্রাক্ট: ইনপুট/আউটপুট, সাফল্য পরিমাপ, ব্যর্থতা মোড
+- Candidate generation (retrieval) ও ranking স্টেপস স্পষ্ট করা
+- Feature pipeline: offline feature computation, online features, feature store
+- Model training, validation, CI/CD ও deployment patterns
+- Latency, freshness ও consistency tradeoffs
+- Observability: business metrics (engagement), system metrics (latency, drift)
+- Edge cases (cold start, popularity bias, data drift, adversarial behavior)
+- দ্রুত সিদ্ধান্ত‑ফ্লো ও runnable example অপশন
+
+---
+
+## ১) কেন Recommendation/Ranking systems আলাদা?
+
+রূপক: একটি বড় বইয়ের দোকানে গ্রাহক‑অনুসারে কোন বইগুলো সামনে রাখা হবে সেটা ভাবুন — candidate সেট হলো সম্ভাব্য বইয়ের তালিকা, ranking হলো কোন অর্ডারে প্রদর্শন করা হবে। Recommendation systems একইভাবে প্রতিটি ব্যবহারকারীর জন্য বিশাল content pool থেকে ছোট, প্রাসঙ্গিক subset খুঁজে বের করে, তারপর ranking করে উপস্থাপন করে।
+
+মৌলিক জটিলতা:
+- বহুগুণ বড় candidate pool (milions)
+- latency requirement (UI needs results <100–300ms)
+- freshness: নতুন কনটেন্ট দ্রুত দেখা চাই
+- evaluation: online A/B tests প্রয়োজন
+
+## ২) ছোট “contract” (inputs/outputs, success criteria, error modes)
+
+- Inputs: user_id (বা session context), request context (device, locale), optional seed items
+- Outputs: ranked list of item_ids with scores and metadata (explanations optional)
+- Success criteria: engagement uplift (CTR, time_spent) vs baseline; p95 latency under threshold
+- Error modes: model unavailable → fallback to simple popularity list; feature store outage → degrade gracefully
+
+## ৩) উচ্চস্তরের আর্কিটেকচার
+
+১) Event ingestion (user events: impressions, clicks, conversions) → streaming platform (Kafka)
+
+২) Offline pipeline: batch ETL → feature computation, model training (Spark/Flink, Airflow)
+
+৩) Feature store: offline features (for training) এবং online features (low‑latency store like Redis)
+
+৪) Candidate generation (retrieval): inverted indexes, ANN (approx nearest neighbors), metadata filters, content‑based retrieval
+
+৫) Ranking service: per‑request scorer (lightweight model or ensemble) that re‑scores candidates and returns top‑K
+
+৬) Serving infra: low‑latency online model server (TF Serving, Triton, or simple microservice), caching layer for hot users
+
+৭) Monitoring & experimentation: metrics pipeline (ClickHouse/BigQuery), online experiments platform
+
+Diagram (conceptual): events → feature pipelines → model training → model registry → online serving + feature store → client
+
+## ৪) Candidate generation (retrieval) প্যাটার্নস
+
+- Heuristic / Business rules: quick filters (language, region, availability)
+- Popularity/time‑decay: global or local popular items
+- Collaborative filtering / embedding retrieval: ANN index (Faiss, Annoy, Milvus)
+- Content‑based retrieval: text/image similarity
+
+Design note: retrieval must be extremely fast and return a small candidate set (e.g., 100–1000) for ranking step.
+
+## ৫) Ranking stage — scoring models ও latency
+
+- Lightweight models (GBDT, logistic regression) are common for per‑request scoring due to low latency
+- Heavy models (deep ranking, contextual models) can be used in hybrid: precompute scores offline or in nearline for subset
+- Feature normalization, missing feature handling, and explainability signals are important
+
+Latency strategies:
+- Keep feature lookup cheap: online store (Redis) + batch populate
+- Use batching/multiplexing for model inference when possible
+- Cache per‑user or per‑segment results for short TTL
+
+## ৬) Feature store ও feature pipelines
+
+Two classes of features:
+- Offline features (for training): historical aggregates, user/item embeddings, global statistics
+- Online features (for serving): latest counters, session features, local cache
+
+Feature store responsibilities:
+- Single source of truth for feature definitions (schema, transformations)
+- Serve training data (materialized datasets) and online read API
+- Manage freshness guarantees and backfills
+
+Implementations: Feast, Hopsworks, custom in‑house stack with Kafka + DB + API
+
+## ৭) Training, validation ও CI/CD
+
+- Maintain reproducible training pipelines with artifact tracking (MLflow, DVC)
+- Model validation: offline metrics (AUC, precision@K) + sanity checks (feature importance, distribution drift)
+- Canary/Shadow deployments: serve model in shadow mode to compare outputs without affecting users
+- Gradual rollout with gated promotion after statistical significance in A/B tests
+
+Contract tests:
+- Model backward/forward compatibility (schema changes)
+- Input validation (feature ranges, missing values)
+
+## ৮) Freshness vs accuracy tradeoffs
+
+- Freshness needs: real‑time events (recent clicks) influence ranking; batch features lag
+- Techniques:
+  - Use hybrid features: batch aggregates + small realtime counters (Kafka → online store)
+  - Use short‑lived caches and event‑driven updates for critical features
+  - For ultra‑fresh signals, use streaming features (e.g., last 5min clicks) stored in fast KV
+
+## ৯) Evaluation: offline vs online
+
+Offline evaluation:
+- Holdout sets, time‑based splitting,Counterfactual policy evaluation for ranking
+
+Online evaluation:
+- A/B tests, interleaving, and multi‑armed bandits for exploration/exploitation
+- Monitor business metrics (CTR, conversion), downstream impact (revenue)
+
+Safety net: guardrail metrics (latency, error rate, revenue drop) with automated aborts
+
+## ১০) Observability ও ML‑specific metrics
+
+System metrics:
+- request_latency_p95, model_inference_time, feature_store_latency, cache_hit_rate
+
+Business metrics:
+- CTR@K, conversion rate, dwell time, revenue per user
+
+ML‑health metrics:
+- Feature distribution drift, training/serving skew, model score distribution
+
+Alerts:
+- Sudden drop in CTR or large feature drift → trigger investigation & rollback
+
+## ১১) Edge cases ও failure modes (Likely scenarios)
+
+1. Cold‑start users/items: use popularity, content features, or explore via bandit
+2. Data drift & feature schema changes: detect via distribution comparison and block training if severe
+3. Feature store outage: fallback to cached or default features; degrade gracefully
+4. Adversarial / spam behavior: detect via anomaly detection and throttle
+5. Model regression after deploy: automated rollback and canary thresholds
+
+Mitigations: robust logging, replayable event streams, conservative rollouts
+
+## ১২) Ethical considerations: fairness & privacy
+
+- Avoid reinforcing popularity bias; add exploration or diversity mechanisms
+- Respect privacy: PII handling, differential privacy or aggregation for sensitive signals
+- Provide explanations where possible and give users control (e.g., personalization opt‑out)
+
+## ১৩) Cost & operational tradeoffs
+
+- ANN indices & embeddings are memory/CPU heavy — shard and serve from dedicated nodes
+- Feature store/online cache cost scales with traffic; compute tradeoffs for precomputing vs online compute
+- Evaluate cost per incremental business metric (e.g., revenue per latency ms)
+
+## ১৪) Small real‑world example (concise)
+
+Flow:
+- Events → Kafka → streaming job computes recent counts → write online feature store (Redis)
+- Batch job computes user/item embeddings nightly → store in ANN index (Faiss)
+- Request: retrieval via ANN → candidate set → fetch online features → rank with GBDT model served via Triton → return top‑K
+
+## ১৫) Decision flow (সংক্ষেপে)
+
+1. Need real‑time personalization? → build streaming feature pipeline + online feature store
+2. Vast item pool and semantic similarity required? → use embeddings + ANN retrieval
+3. Tight latency SLOs? → precompute heavy parts and keep online serving light
+4. Safety / fairness concerns? → add exploratory logic and monitoring, consider human review for sensitive flows
+
+## ১৬) Runnable artifacts (আমি যা তৈরি করতে পারি)
+
+- (A) Minimal candidate+rank demo in Python: small dataset, Faiss ANN retrieval, scikit‑learn ranking, Flask serving, Dockerfile and smoke test
+- (B) Feature store demo with Feast: example pipeline that materializes batch features and serves online via Redis (includes Helm/compose snippets)
+- (C) End‑to‑end scaffold: Kafka events → Spark streaming feature aggregator → model training job (notebooks) → TF Serving microservice (CI scripts)
+
+আপনি কোনটি চান? (A / B / C / None)
+
+---
+
+এই পাতায় আমি recommendation ও ranking systems‑এর engineering ধারণা, trade‑offs এবং production‑grade পরীক্ষণ ও রোলআউট কৌশলগুলো কভার করেছি; আপনি runnable উদাহরণ চাইলে বলুন, আমি তৈরি করে smoke‑test চালিয়ে দেব।

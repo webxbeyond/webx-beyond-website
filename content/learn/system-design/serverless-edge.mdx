@@ -1,0 +1,151 @@
+---
+title: Edge Computing ও Serverless Architectures
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা Edge Computing ও Serverless আর্কিটেকচারের মূল ধারণা, প্রযোজ্য ইউজ‑কেস, ডিজাইন প্যাটার্ন, অপারেশনাল চ্যালেঞ্জ এবং সিদ্ধান্ত‑ফ্লো বাংলায় বিস্তারিতভাবে দেখব। বাস্তব উদাহরণ, রূপক এবং প্র্যাকটিক্যাল টিপস থাকবে যাতে শুরু থেকে production‑ready সিদ্ধান্ত নেওয়া সহজ হয়।
+
+## চেকলিস্ট
+
+- Edge vs Cloud কি এবং কখন কোনটি বেছে নেবেন
+- Serverless (Functions as a Service) মৌলিক ধারণা, cold start ও runtime tradeoffs
+- Edge runtimes: CDN workers (Cloudflare Workers, Fastly Compute), Lambda@Edge
+- Data locality, state management ও caching প্যাটার্ন
+- API design, batching, idempotency ও event‑driven patterns
+- Security, observability ও cost considerations
+- Decision flow: কোন workload edge‑এ চলে, কোনটা cloud‑এ
+
+---
+
+## ১) রূপক: কেন Edge এবং Serverless দরকার?
+
+রূপক: আপনি একটি বিশ্বব্যাপী খাবারের কেটারিং সার্ভিস চালান; কিছু কাজ (তরল পানীয় প্রদান) যেটা কাছাকাছি লোকজনই করতে পারে — এগুলোকে লোকাল কাউন্টার‑এ করে রাখলে দ্রুত মিলবে। অন্যদিকে, বড় রান্নার কাজ (বেকিং) কেন্দ্রীয় কিচেনে করা হয়। একইভাবে, latency‑sensitive এবং অন‑ডিস্ক্রিপশন ট্রাফিক edge‑এ রাখুন; heavy compute ও durable state cloud‑এ রাখুন।
+
+Edge স্থানীয়ভাবে compute প্রদান করে (ব্রাউজার কাছে), serverless ফাংশন জমাজমা করে কোড নির্বাহ করে—দুইটি মিলিয়ে আপনি দ্রুত, স্কেলেবল এবং কম অপারেশনাল ওভারহেড–সহ আর্কিটেকচার পেতে পারেন।
+
+## ২) Edge vs Cloud — কখন কোনটা?
+
+Edge ভাল যখন:
+- Latency‑sensitive UX (auth handshake, A/B tests, personalization)
+- Geo‑local logic (content localisation, legal rules)
+- Cheap, short‑lived compute near user (bot mitigation, HTML rewrites)
+
+Cloud দরকার যখন:
+- Heavy compute or long‑running jobs
+- Strong consistency and durable state
+- Complex workflows, data pipelines, ML training
+
+হাইব্রিড প্যাটার্ন সাধারণ: edge দ্রুত প্রিলিমিনারি কাজ করে, ট্রাস্টেড বা stateful কাজ cloud‑এ পাঠায়।
+
+## ৩) Serverless — ধারণা ও tradeoffs
+
+Serverless (FaaS): provider‑managed function runtime (AWS Lambda, Google Cloud Functions, Azure Functions) যেখানে আপনি কোড আপলোড করে event triggers দেখে execution পান।
+
+Advantages:
+- No server management, auto‑scale, pay‑per‑use
+- Fast developer iteration
+
+Challenges:
+- Cold start latency (language/runtime dependent)
+- Stateless by default; state must be externalized
+- Execution time / ephemeral resources limits
+
+Mitigations:
+- Minimize cold starts by using lightweight runtimes (V8 isolates), provisioned concurrency, or use edge workers which often have lower cold start cost
+- Keep functions small and idempotent
+
+## ৪) Edge runtimes ও ecosystem
+
+Popular options:
+- Cloudflare Workers (V8 isolates, JS/wasm) — fast cold starts, global POPs
+- Fastly Compute@edge — wasm‑centric, low latency
+- AWS Lambda@Edge / CloudFront Functions — integrate with CloudFront
+- Netlify Edge Functions / Vercel Edge — developer‑centric platforms
+
+Edge runtimes often run in sandboxed JS/wasm environments with limits (no long blocking I/O, limited CPU per request). Choose based on language support, latency, and vendor features (KV stores, durable objects, streaming).
+
+## ৫) State management at edge
+
+Edge is naturally stateless; common state approaches:
+- Edge KV stores (Cloudflare Workers KV) — eventual consistency, great for config and small objects
+- Durable Objects (Cloudflare) / stateful edge primitives — strong consistency for small, sharded state
+- Sticky routing to regional stateful services for session affinity
+- Hybrid: cache hot state at edge + authoritative state in cloud DB (Redis, DynamoDB)
+
+Design tips:
+- Keep authoritative state in cloud; use edge caches for performance
+- Be mindful of eventual consistency and design with idempotency and conflict resolution
+
+## ৬) Common edge patterns
+
+- CDN + Edge Logic: CDN serves static assets; edge functions perform A/B routing, authentication checks, HTML rewriting
+- Edge for auth & bot mitigation: validate tokens at edge to stop bad traffic early
+- Edge personalization: insert small, per‑user personalized snippets by reading edge KV and user cookie
+- Streaming responses: use streaming workers for SSR and faster TTFB (time to first byte)
+
+Example workflow: request → edge worker authenticates, checks KV for personalization, if cache miss fetch cloud API, cache result at edge, respond.
+
+## ৭) API design, batching ও event patterns
+
+- Prefer small, idempotent functions with clear input/output
+- Batch external calls at edge to reduce cold starts & network overhead
+- Use asynchronous events for heavy work: edge enqueues event to message bus (Pub/Sub) and immediately responds to client
+- Use retries with backoff and idempotency keys for safe retries
+
+## ৮) Security ও privacy
+
+- TLS everywhere; enforce mTLS where applicable
+- WAF rules at edge to block common attacks early
+- Protect secrets: never embed secrets in edge code; use short‑lived tokens or secret manager integrations
+- Data privacy: avoid moving sensitive PII to transient edge stores unless compliant
+
+## ৯) Observability ও debugging
+
+- Instrument edge functions with structured logs and correlation ids (trace ids)
+- Export metrics (invocations, error rate, latency p50/p95), and trace slow paths back to cloud services
+- Use synthetic checks at POP level to validate global health
+
+Challenges: distributed traces across many POPs; use central collector and sampling strategies
+
+## ১০) Cost considerations
+
+- Serverless cost model: pay per invocation and compute time; for edge, providers may charge egress + request units
+- Edge reduces egress to origin but may increase request counts; measure cost tradeoff
+- Use caching to reduce origin invocations and consider provisioned concurrency only where justified
+
+## ১১) Developer experience ও tooling
+
+- Local emulation & fast deploys are key (wrangler, miniflare, localstack for cloud lambdas)
+- CI/CD: build artifacts (wasm or JS), run tests, deploy to edge with versioned releases
+- Feature flags for gradual rollout; A/B testing at edge is cheap and fast
+
+## ১২) Limitations ও anti‑patterns
+
+- Heavy compute or long‑running tasks at edge → poor fit
+- Storing critical, high‑cardinality state at edge → cost & inconsistency issues
+- Tight coupling between edge and origin APIs → brittle; keep a clear contract
+
+## ১৩) Real‑world examples
+
+- Personalization: CDN + Worker inserts localized promos per region using KV and returns cached HTML for speed
+- Image optimization: Edge resizes and serves images in appropriate formats (webp/avif) on the fly
+- API gateway edge auth: validate JWTs at edge and only forward authorized requests to origin
+
+## ১৪) Decision flow (সংক্ষেপে)
+
+1. Is sub‑50ms latency for simple logic required? → consider edge
+2. Is the work short‑lived and stateless? → serverless/edge is a good fit
+3. Does the task need heavy compute or durable transactions? → use cloud services
+4. Is data residency a concern? → ensure edge locations comply or route to regional origins
+
+---
+
+আপনি চাইলে আমি এই পাতায় runnable উদাহরণ যোগ করব:
+
+- (A) Cloudflare Workers demo: simple edge function that does geo‑personalization + KV caching (runnable locally with Miniflare)
+- (B) Lambda@Edge example: CloudFront function + Lambda@Edge middleware scaffold (Terraform snippets)
+- (C) Image‑resize edge worker + Docker Compose local emulation and small test harness
+
+আপনি কোনটি চান? (A / B / C / None)

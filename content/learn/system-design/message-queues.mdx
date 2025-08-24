@@ -1,0 +1,140 @@
+---
+title: Message Queues - Kafka, RabbitMQ, SQS
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা message queue systems—প্রধানত Apache Kafka, RabbitMQ এবং AWS SQS—এর মৌলিক ধারণা, পার্থক্য, ব্যবহার‑কেস, ডেলিভারি semantics এবং অপারেশনাল দিকগুলো আলোচনা করব। বাস্তব উদাহরণ, রূপক ও ডিজাইন‑চেকলিস্ট থাকবে যাতে আপনি সিস্টেমের জন্য সঠিক queue নির্বাচন ও কনফিগারেশন করতে পারেন।
+
+## চেকলিস্ট
+
+- Kafka বনাম RabbitMQ বনাম SQS: আদর্শ ব্যবহার ক্ষেত্র
+- Ordering ও Partitioning: কীভাবে সামঞ্জস্য রাখবেন
+- Delivery semantics: at-most-once, at-least-once, exactly-once
+- Consumer groups, offset management, and scaling
+- Dead-letter queue (DLQ), retries, visibility timeout
+- Retention, compaction এবং storage considerations
+- Monitoring metrics ও health checks
+
+---
+
+## ১) Message queues—সংক্ষেপে কেন দরকার
+
+Message queues loose-coupling, asynchronous processing ও resilient retry patterns দেয়। তারা smoothing of traffic, work distribution, এবং event-driven architectures বাস্তবায়নে সহায়ক।
+
+রূপক: queue হলো পোস্ট অফিসের ডাক বাক্স—আপনি চিঠি ছেড়ে দেন, ডেলিভারি ব্যস্ত হলেও চিঠি সিস্টেমে থাকবে এবং পরে ডেলিভারি করা হবে।
+
+## ২) Kafka vs RabbitMQ vs SQS — high-level comparison
+
+- Apache Kafka: high-throughput, partitioned, append-only log; ideal for event streaming, durable storage, stream processing; retention-based storage and consumer-managed offsets. Strong for replay and long-term event stores.
+- RabbitMQ: broker-centric, supports AMQP semantics, routing (exchanges), flexible patterns (work-queue, pub/sub, RPC), lower latency for small message workloads; good for complex routing and short-lived messages.
+- AWS SQS: managed queue service, simple API, two flavors (Standard: at-least-once, unordered; FIFO: exactly-once semantics within group + ordering), handles operational overhead, integrates with AWS ecosystem.
+
+কখন কোনটা?
+- Event streaming, durable replay, high throughput → Kafka
+- Application messaging with complex routing, protocols → RabbitMQ
+- Managed, low‑ops queue for decoupling services → SQS (or other cloud queues)
+
+## ৩) Ordering, Partitioning ও key design
+
+Ordering goals determine partitioning:
+- Kafka partitions: messages with same partition key go to same partition—order per partition maintained
+- RabbitMQ: queue-level ordering (single consumer keeps order), but routing and prefetch/ack semantics can affect it
+- SQS FIFO: group ID keeps ordering per group; Standard SQS does not guarantee order
+
+Shard/shard-key নির্বাচন:
+- choose key with even distribution (high cardinality) but maintaining necessary locality (e.g., user_id for per-user ordering)
+
+## ৪) Delivery semantics ও offsets
+
+- At-most-once: producer sends and no retry—simplest, risk of loss
+- At-least-once: ensure message delivered but duplicates possible if consumer retries—idempotency required
+- Exactly-once: Kafka transactions + idempotent producers can provide exactly-once semantics for writes+consumers in limited contexts; generally expensive
+
+Offsets & commits (Kafka):
+- consumer polls, processes messages and commits offsets; commit timing affects semantics (commit before processing → at-most-once; after processing → at-least-once)
+
+RabbitMQ acknowledgements:
+- ack after processing to avoid loss; negative-ack (nack) for requeue or DLQ
+
+SQS visibility timeout:
+- message invisible for some time while processing; extend timeout for long tasks; if not deleted, it becomes visible again → at-least-once behavior
+
+## ৫) Dead-letter queues, retries ও poison messages
+
+Design patterns:
+- Retry with exponential backoff and jitter
+- Move repeatedly-failing messages to DLQ after N attempts for manual inspection
+- For Kafka use a separate 'dead-letter' topic; for RabbitMQ use DLX (dead-letter exchange); for SQS use DLQ configured with redrive policy
+
+Pitfall: consumer failures causing repeated reprocessing—guard with idempotency keys and visibility controls
+
+## ৬) Retention vs Compaction
+
+- Kafka retention: time-based or size-based retention; suitable for event replay
+- Kafka compaction: keep latest value per key (useful for changelog/topic storing current state)
+- RabbitMQ and SQS generally hold messages until consumed (or TTL), not long-term storage
+
+Decision: if you need durable event store with replay → Kafka retention; if you only need transient work queue → RabbitMQ or SQS
+
+## ৭) Scaling consumers & partitions
+
+- Kafka scaling: increase partitions to increase consumer parallelism (one consumer per partition in a consumer group)
+- RabbitMQ scaling: multiple queues or round-robin work queues; prefetch tuning for fair dispatch
+- SQS: workers can scale horizontally easily; for FIFO SQS throughput per group may be limited
+
+Important: partition count is a capacity planning decision for Kafka—cannot change without rebalancing
+
+## ৮) Transactions & exactly-once in Kafka
+
+Kafka supports idempotent producers and transactions for atomic writes across partitions and topics (producer transactions + consumer isolation.level). Use with caution: requires broker and client config and impacts latency.
+
+## ৯) Operational considerations
+
+Monitoring metrics to track:
+- broker health, controller status (Kafka)
+- partition under-replicated, ISR (in-sync replicas)
+- consumer lag (consumer_offset vs log_end_offset)
+- queue length, approximate number of messages, oldest message age (SQS)
+- message processing latency, DLQ counts
+
+Backups and disaster recovery:
+- Kafka: mirror-maker or cluster replication across regions (MirrorMaker 2, Confluent Replicator)
+- SQS: cross-region replication handled via producers or specialized tooling
+
+Security:
+- encryption in transit, ACLs, IAM (SQS), SASL/SSL for Kafka, RBAC for RabbitMQ
+
+## ১০) Monitoring & alerting
+
+Alerts suggestions:
+- consumer lag > threshold
+- under-replicated partitions > 0
+- DLQ message rate spike
+- broker CPU/memory saturation
+
+Visualization:
+- use Grafana dashboards with consumer lag heatmaps, per-partition throughput
+
+## ১১) Real-world examples
+
+1) Event sourcing & analytics pipeline: Kafka ingest → stream processing (Kafka Streams/Flink) → OLAP sinks
+2) Task queue for background jobs: RabbitMQ with workers and DLQ for failed jobs
+3) Serverless decoupling: SQS triggers Lambda/FaaS workers for scalable processing
+
+## ১২) Common pitfalls ও mitigation
+
+- Under-provisioning partitions → consumer under-utilization. Mitigate with capacity planning and re-partitioning strategies.
+- Forgetting idempotency → duplicate side-effects. Use idempotency keys or dedupe stores.
+- Monitoring only queue size, not consumer lag → blindspot. Monitor both producer and consumer metrics.
+
+## ১৩) Quick decision flow
+
+1) Need long-term replay or stream processing? → Kafka
+2) Need flexible routing, AMQP features or RPC? → RabbitMQ
+3) Want low-ops managed queue integrated with cloud? → SQS (or cloud equivalent)
+
+---
+
+আপনি চাইলে আমি একটি small Kafka producer/consumer code snippet (Java/Node), RabbitMQ routing example, অথবা SQS visibility+DLQ config snippet যোগ করে দেব—কোনটি আগে যোগ করব?

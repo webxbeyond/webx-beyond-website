@@ -1,0 +1,151 @@
+---
+title: Advanced Caching Techniques ও Tiered Storage
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই পাঠে আমরা কাচিং‑এর উন্নত ধারণা ও tiered storage ডিজাইন কিভাবে করবেন তা বাংলায় পাঠাব — cache hierarchies, cache coherence, eviction policies, multi‑tier architectures (L1/L2/archive), cache warming, write policies, এবং operational challenges। বাস্তব উদাহরণ ও decision flow‑ও থাকবে।
+
+## চেকলিস্ট
+
+- Cache hierarchies: L1 (in‑process), L2 (distributed), CDN edge
+- Eviction policies: LRU, LFU, ARC, size‑aware strategies
+- Write policies: write‑through, write‑back, write‑around
+- Cache coherence and invalidation strategies
+- Tiered storage: hot/warm/cold, lifecycle management, cost tradeoffs
+- Cache stampede mitigation (locks, probabilistic early recompute)
+- Observability & metrics for caching
+
+---
+
+## ১) কাচিং‑এর মৌলিক উদ্দেশ্য ও রূপক
+
+ধরুন আপনার বইয়ের লাইব্রেরি আছে। কিছু বই প্রচুর পঠিত (popular) — সেগুলো প্রধান বুকশেলফ‑এ রাখলে দ্রুত পাওয়া যাবে; কম‑পঠিত বই আর্কাইভে রাখা যায়। কাচিংও এভাবেই—কনটেন্ট‑এর temperature অনুযায়ী তাকে কাছে রাখুন।
+
+কাচিং‑এর লক্ষ্য: latency কমানো, DB/Ops load কমানো, cost optimization।
+
+## ২) Cache layers ও hierarchy
+
+- L0/L1: in‑process cache (e.g., local JVM/Go map) — extremely fast, per‑instance
+- L2: distributed cache (Redis, Memcached) — shared across instances
+- Edge/CDN: client‑facing caches for static assets and some dynamic content
+
+Patterns:
+- Read path: L1 → L2 → origin DB
+- Use TTLs & versioned keys to manage staleness
+
+Tradeoffs:
+- L1 low latency but cache duplication and cold start per process
+- L2 centralizes but network hop adds latency; use L1 for hottest objects
+
+## ৩) Eviction policies ও sizing
+
+Common policies:
+- LRU (Least Recently Used): simple, effective for recency workloads
+- LFU (Least Frequently Used): better for long‑term popularity
+- ARC (Adaptive Replacement Cache): combines recency & frequency
+
+Size‑aware strategies:
+- Use item size to evict large items first if memory constrained
+- Weighted LRU for items of different importance
+
+Sizing:
+- Measure hit ratio vs cache size; find knee point for marginal gains
+- Use telemetry to set target hit ratios per service
+
+## ৪) Write policies: write‑through, write‑back, write‑around
+
+- Write‑through: write to cache + origin synchronously → consistency but write latency high
+- Write‑back: write to cache, asynchronously flush to origin → low write latency, risk of data loss
+- Write‑around: write directly to origin, avoid caching on writes → good when writes rarely read soon after
+
+Choice depends on consistency needs and acceptable write latency
+
+## ৫) Cache coherence ও invalidation
+
+Invalidation strategies:
+- Time‑based TTL: simple but can be stale
+- Event‑based invalidation: publish change events to invalidate cache keys
+- Versioned keys: bump version on write and let old keys expire
+
+Strong consistency patterns:
+- Use single source of truth and synchronous invalidation in transaction flow
+- Use distributed locks cautiously to avoid contention
+
+## ৬) Cache stampede, thundering herd mitigation
+
+Problem: many clients request same missing key → overload origin
+Solutions:
+- Request coalescing (singleflight): first requester computes while others wait
+- Probabilistic early recompute: refresh hot keys before expiry randomly
+- Client‑side jitter & exponential backoff
+
+## ৭) Tiered storage (hot/warm/cold)
+
+- Hot: low latency stores (Redis, NVMe) for most frequently accessed data
+- Warm: object stores with caching (SSD backed) for moderate access
+- Cold: archival (S3 Glacier) for rare access, cheaper storage
+
+Lifecycle:
+- Define policies: move data based on access frequency and age
+- Automate via lifecycle rules and monitoring
+
+Tradeoffs:
+- Cost vs latency: hot tier expensive but fast
+- Migration & restore plans needed for cold data retrieval
+
+## ৮) Edge caching & CDN strategies
+
+- Cache key design: include relevant headers (Accept‑Encoding, device) to avoid wrong content
+- Use cacheability headers: Cache‑Control, ETag, Vary
+- Signed URLs for private content: short TTL + token validation
+
+Cache invalidation patterns:
+- Purge by path or versioned URLs
+- Use cache revalidation (If‑Modified‑Since, ETag)
+
+## ৯) Observability ও metrics
+
+Important metrics:
+- hit_ratio, miss_rate, eviction_rate, latency_p95 for cache reads
+- origin_requests_per_second, cache_fill_rate
+- memory_usage, key_count, replication_lag for distributed caches
+
+Dashboards & alerts:
+- Alert on sharp drop in hit_ratio or spike in origin traffic
+- Track cache usage per key prefix and per service
+
+## ১০) Consistency & correctness for caches
+
+- For critical business data, avoid serving stale cached data without validation
+- Use read‑through with validation (e.g., check version) for strong correctness needs
+- Use fallback strategies for cache miss spikes
+
+## ১১) Tools ও implementations
+
+- In‑process: Caffeine (Java), groupcache (Go)
+- Distributed: Redis (cluster, tiered), Memcached, Aerospike
+- Edge: Cloudflare CDN, Fastly
+- Tiered storage: S3 + lifecycle rules, local NVMe + object store
+
+## ১২) Examples ও patterns
+
+- Session store: L1 for session reference + L2 Redis for shared sessions
+- Leaderboard: use Redis sorted sets with periodic snapshot to durable store
+- Feature flags: KV store at edge + periodic sync
+
+## ১৩) Decision flow (সংক্ষেপে)
+
+1. Is latency critical and data hot? → use L1 + L2 with high hit ratio target
+2. Are reads >> writes and acceptable staleness? → use longer TTLs and asynchronous invalidation
+3. Do you expect spikes for a few keys? → implement request coalescing & early recompute
+4. Need cost control for archival data? → tiered storage with lifecycle policies
+
+---
+
+আপনি চাইলে আমি এই পাতায় runnable examples যোগ করব:
+
+- (A) Node.js + Caffeine‑like local cache + Redis L2 demo (Docker Compose)
+- (B) Redis cluster caching example with eviction policy experiments and scripts to measure hit ratios
+- (C) CDN invalidation & edge caching demo using Fastly/Cloudflare API examples (scripts)
+
+আপনি কোনটি চান? (A / B / C / None)

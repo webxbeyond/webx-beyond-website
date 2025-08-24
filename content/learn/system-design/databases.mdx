@@ -1,0 +1,179 @@
+---
+title: Database Basics - SQL বনাম NoSQL
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সংক্ষিপ্ত পরিকল্পনা ও চেকলিস্ট
+
+আজ আমরা ডাটাবেস ডিজাইনের মৌলিক ধারণা দেখব — কখন SQL (Relational) বেছে নিবেন, কখন NoSQL, এবং কীভাবে স্কিমা, ইন্ডেক্স, ট্রানজেকশন ও স্কেলিং সিদ্ধান্ত নেবেন। শুরুতে একটি ছোট চেকলিস্ট দেবো যাতে আপনি দ্রুত একটি সিস্টেমের জন্য ডাটাবেস ধরন নির্ধারণ করতে পারেন।
+
+চেকলিস্ট:
+- ক'টি রিড বনাম রাইট আছে? (read-heavy / write-heavy)
+- ডাটার কাঠামো কেমন? (strict schema vs flexible)
+- কি ধরনের কুয়েরি হবে? (joins, aggregations, graph traversals)
+- consistency/latency priorities কি? (strong vs eventual)
+- অপারেশনাল কনস্ট্রেইন্টস: 비용, 운영 দক্ষতা, 클াউড সার্ভিস উপলব্ধতা
+
+## ১) SQL (Relational) — সংজ্ঞা ও শক্তিগুলো
+
+সংক্ষেপে: Relational DBMS (PostgreSQL, MySQL, MariaDB, SQL Server) টেবিল-ভিত্তিক এবং ACID ট্রানজেকশন সংযুক্ত। এগুলোতে structured schema থাকে এবং powerful SQL ভাষা দিয়ে জটিল কুয়েরি করা যায়।
+
+শক্তি:
+- জটিল joins ও adhoc কুয়েরি সহজ
+- transaction guarantees (ACID) — অর্থবহ যখন correctness গুরুত্বপূর্ণ (payment, inventory)
+- mature ecosystem, tooling (migrations, ORMs, backups)
+
+সীমাবদ্ধতা:
+- হর্টিজন্টাল শার্ডিং জটিল (কিন্তু সম্ভব)
+- স্কেল-আউট কঠিন ও খরচসাপেক্ষ
+
+When to choose SQL:
+- strong consistency প্রয়োজন
+- complex relational queries/joins frequent
+- transactional integrity (financial systems, orders)
+
+## ২) NoSQL — ধরন ও ব্যবহারযোগ্যতা
+
+NoSQL একটি ছাতার মত—কয়েকটি আলাদা ধরনের ডাটাবেস আছে, প্রতিটির use-case ভিন্ন:
+
+- Key-Value Stores (Redis, DynamoDB (simple), Memcached):
+  - অতি দ্রুত get/put, সাধারণভাবে state/session, caches, rate-limiters।
+
+- Document Stores (MongoDB, Couchbase, DynamoDB as document):
+  - JSON-like ডকুমেন্ট; flexible schema; nested objects; good for product catalogs, user profiles।
+
+- Wide-column / Columnar (Cassandra, HBase):
+  - large write throughput, time-series বা event logs; predictable performance at scale; partitioned by key।
+
+- Graph Databases (Neo4j, JanusGraph):
+  - relationships-heavy data: social graphs, recommendations, fraud detection।
+
+প্রধান ট্রেড-অফ:
+- simplicity & scale vs query flexibility & strong consistency
+
+When to choose NoSQL:
+- schema flexibility প্রয়োজন
+- massive scale & partition-tolerance দরকার
+- simple access patterns (get by key, append-only logs)
+
+## ৩) Schema design & normalization vs denormalization
+
+Relational paradigm: normalize to avoid redundancy (3NF etc.). এটি ডাটা ইন্টিগ্রিটি বজায় রাখে কিন্তু joins বাড়ায়।
+
+NoSQL paradigm: denormalize for read performance—embed related objects inside documents।
+
+Guidelines:
+- যদি reads >> writes এবং latency-crucial হয়, consider denormalization + cache
+- যদি data correctness ও strong constraints দরকার, normalize এবং use foreign keys/transactions
+
+Example: E-commerce
+- Orders table (relational) good for transactions; product catalog could be in a document DB for flexible attributes and fast reads.
+
+## ৪) Transactions, Isolation Levels ও consistency
+
+SQL DBs typically provide ACID; NoSQL systems vary—some provide single-document ACID (MongoDB, DynamoDB), others eventual consistency (Cassandra).
+
+Isolation levels (SQL): Read Uncommitted, Read Committed, Repeatable Read, Serializable — higher isolation reduces anomalies but increases contention & latency.
+
+Practical tip: Use the weakest isolation that meets correctness to gain concurrency. For money transfers use SERIALIZABLE or explicit locking; for counters use atomic operations or optimistic concurrency.
+
+## ৫) Indexing ও কুয়েরি অপ্টিমাইজেশন
+
+Index হল DB-এ search দ্রুত করার জন্য structure—B-tree (range queries), hash indexes (exact match), inverted indexes (text search), and GIN/GIST (Postgres for arrays/geometries).
+
+Best practices:
+- Index columns used in WHERE, JOIN, ORDER BY
+- Avoid over-indexing (write penalty & memory cost)
+- Use composite indexes for multi-column filters
+- Monitor slow queries and add indexes after analysis
+
+Example: a users table with frequent lookup by email should have unique index on email.
+
+## ৬) Joins vs Precomputed / materialized views
+
+Joins are powerful but expensive at scale. Alternatives:
+- materialized views (periodically refreshed)
+- precomputed aggregates (OLAP pattern)
+- denormalized tables for read-heavy paths
+
+Use-case: analytics dashboards — precompute hourly aggregates & serve from OLAP store instead of running massive joins on OLTP DB.
+
+## ৭) Scaling patterns: Replication, Read Replicas, Sharding
+
+Replication:
+- Master-slave (primary-replica): writes to primary, reads from replicas. Improves read throughput and availability.
+- Multi-primary (multi-master): complex conflict resolution but allows local writes in multi-region setups.
+
+Sharding (Horizontal partitioning):
+- Partition data by key (user_id % N, or range-based). Important considerations: shard key selection, rebalancing strategy, cross-shard transactions complexity.
+
+When to shard: when single node cannot handle data size or write throughput even with replication and read-scaling.
+
+## ৮) Durability, backups ও disaster recovery
+
+- Regular backups (logical dumps, snapshots)
+- Point-in-time recovery (PITR) for databases that support it
+- Test restores frequently; backups are useless if restores fail
+- Cross-region replicas for regional failover
+
+## ৯) OLTP vs OLAP: transactional vs analytical stores
+
+- OLTP: many small transactions, low-latency, normalized (Postgres, MySQL)
+- OLAP: large analytical queries, columnar stores (ClickHouse, BigQuery, Redshift)
+
+Design practice: separate OLTP & OLAP—use ETL or change-data-capture (CDC) to stream OLTP changes into analytical store.
+
+## ১০) Choosing the right DB — a quick decision matrix
+
+- If strong consistency, complex transactions, relational queries → SQL (Postgres)
+- If massive write-scale & eventual consistency acceptable → wide-column (Cassandra)
+- If flexible schema & document model fits → document DB (MongoDB, DynamoDB)
+- If in-memory fast ops, counters, sessions → Redis
+- If relationship-heavy queries → Graph DB
+
+Consider costs, operational expertise, managed offerings (RDS, Aurora, Cloud Spanner, DynamoDB) vs self-hosting.
+
+## ১১) Migrations, schema evolution ও backward compatibility
+
+Principles:
+- use additive changes when possible (add columns, new tables)
+- avoid destructive migrations on hot tables; use two-phase rollout
+- version your APIs and DB contracts
+- use feature flags and blue-green deployments during schema changes
+
+## ১২) Observability, metrics ও testing
+
+Key DB metrics:
+- QPS (read/write), latency (P50/P95/P99), cache hit ratio, connection count, replication lag
+
+Testing:
+- load testing with realistic data shapes
+- chaos testing (simulate replica lag, primary failover)
+- run slow-query analysis and tune indexes
+
+## ১৩) Real-world examples
+
+1) E-commerce order processing
+- Use relational DB for orders & inventory with transactions; use Redis for cart/session and product cache; replicate DB for read scaling.
+
+2) Social feed
+- Use denormalized feeds in Redis or per-user documents; store events in append-only log (Kafka) and materialize feeds asynchronously.
+
+3) Metrics & analytics
+- Use time-series DB (InfluxDB) or columnar OLAP (ClickHouse) for fast aggregations over large datasets.
+
+## ১৪) Common pitfalls
+
+- Choosing a DB solely because it's trendy without matching access patterns
+- Not planning for schema evolution
+- Ignoring monitoring and backups
+- Premature sharding/complexity before actual need
+
+## ১৫) পরবর্তী ধাপ ও রিসোর্স
+
+- পরবর্তী পাঠ: [Horizontal vs Vertical Scaling](/system-design/scaling)
+- পড়ুন: Postgres official docs, DynamoDB design patterns, Cassandra architecture, Debezium CDC tutorials
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি ছোট Postgres schema উদাহরণ, migration steps, এবং একটি k6 বা pgbench টেস্ট স্ক্রিপ্ট যোগ করে দেব—কোনটা আগে দেখতে চান? 

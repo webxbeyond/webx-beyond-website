@@ -1,0 +1,132 @@
+---
+title: OAuth, JWT ও আধুনিক Auth প্যাটার্নস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা OAuth2, OpenID Connect, JWT ও আধুনিক authentication/authorization প্যাটার্নস নিয়ে কথা বলব — practical flows (Authorization Code + PKCE, Client Credentials), token design, signature choices, revocation strategies, and operational security. উদাহরণ, রূপক ও decision flow আছে যাতে আপনি সার্ভিস‑টু‑সার্ভিস এবং user‑facing auth সিস্টেম ডিজাইন করতে পারবেন।
+
+## চেকলিস্ট
+
+- OAuth2 ও OIDC মূল ধারণা ও ভিন্নতা
+- Authorization Code + PKCE, Client Credentials, Refresh Tokens
+- JWT internals: header.payload.signature, claims, alg choices
+- Token security: rotation, revocation, introspection
+- Token size, scope design আর audience claims
+- Token validation strategies (JWKS caching, key rollover)
+- Threat model: token theft, replay, alg none vulnerabilities
+- Example architectures: SPA + API, mobile app, service‑to‑service
+
+---
+
+## ১) OAuth2 ও OpenID Connect — সারাংশ
+
+- OAuth2: delegated authorization framework — allows clients to access resources on behalf of resource owners via access tokens
+- OpenID Connect (OIDC): identity layer on top of OAuth2 that returns information about authenticated user (id_token)
+
+Actors:
+- Resource Owner (user)
+- Client (web/mobile app)
+- Authorization Server (IdP)
+- Resource Server (API)
+
+OIDC adds standardized user info and ID token (JWT) so clients can authenticate user identity instead of just getting authorization.
+
+## ২) Common OAuth2 flows ও ব্যবহার
+
+- Authorization Code Flow (with PKCE for public clients): recommended for web and mobile. Client exchanges auth code for tokens.
+- Client Credentials Flow: machine‑to‑machine (no user)
+- Refresh Token: obtain new access token without user interaction; refresh tokens must be stored securely (rotate on use)
+- Implicit Flow: deprecated due to security concerns
+
+PKCE: Proof Key for Code Exchange — prevents interception of auth code by binding it to originating client using code challenge/verifier.
+
+## ৩) JWT internals ও নিরাপত্তা
+
+Structure: header.payload.signature (base64url)
+- Header: alg (RS256, ES256), typ
+- Payload: claims (iss, sub, aud, exp, iat, nbf, jti, scopes)
+- Signature: ensures token integrity and origin
+
+Signing options:
+- Symmetric (HS256): simple but requires sharing secret across verifiers — less ideal for distributed systems
+- Asymmetric (RS/ES): recommended for public verification — IdP signs with private key, services verify with public key via JWKS
+
+Validation checklist:
+- Verify signature and `alg` explicitly (avoid accepting alg=none)
+- Validate `iss`, `aud`, `exp`, `nbf`, and `iat` as per your policy
+- Check token revocation status if using opaque or introspection
+
+## ৪) Token revocation, rotation ও revocation lists
+
+- Stateless JWTs hard to revoke—use short-lived access tokens and long-lived refresh tokens with rotation
+- Rotation patterns: rotate refresh token on each use and revoke old one (rotating refresh tokens)
+- Revocation store / blacklist: maintain revoked jti list for tokens still valid by expiry (costly)
+- Introspection endpoint: resource servers call introspection to verify opaque tokens
+
+## ৫) JWKS, key rollover ও caching
+
+- Authorization server publishes JWKS (JSON Web Key Set) for public keys
+- Resource servers should cache JWKS and refresh periodically (and on signature failure)
+- Key rollover: IdP should publish new keys and support verification across old and new keys during transition
+- Use small cache TTL with backoff on failure and monitor key rotation events
+
+## ৬) Token best practices: scopes, audience, claims
+
+- Minimal scopes principle: only request and grant necessary scopes
+- Audience (`aud`) claim: ensure token intended for your service
+- Use `jti` claim (JWT ID) for one‑time token tracking if needed
+- Avoid putting sensitive PII in token payload; tokens can leak via logs
+
+## ৭) Architecture examples
+
+A) SPA + API Backend:
+- Use Authorization Code + PKCE; store refresh token in HTTP‑Only Secure cookie or secure storage
+- Access token short lived (minutes); use refresh token to get new access
+- Beware XSS; prefer cookies with SameSite flags
+
+B) Mobile App:
+- Authorization Code + PKCE + refresh token stored in secure enclave/keystore
+
+C) Service‑to‑Service:
+- Prefer Client Credentials or mTLS; use short‑lived tokens issued by token broker (STS)
+
+## ৮) Threat model & mitigations
+
+- Token theft: short lived tokens, refresh token rotation, audience checks
+- Replay: use `jti` + nonce for high‑sensitivity flows
+- Alg manipulation (accept none): strictly validate `alg` and reject unknown
+- Clock skew: accept small leeway in `exp/nbf` checks (e.g., 60s)
+
+## ৯) Logging, auditing ও compliance
+
+- Log token issuance, revocation, MFA events, but avoid logging raw tokens
+- Audit key rotations, JWKS changes and sensitive admin actions
+- For compliance, maintain retention and deletion policies for auth logs
+
+## ১০) Performance & scaling
+
+- Cache JWKS locally and use introspection sparingly
+- For high throughput, verify tokens locally using cached keys rather than introspection
+- Monitor token issuance rates, peak auth traffic, and refresh token storms
+
+## ১১) Testing & validation
+
+- Test code challenge/verifier PKCE flow
+- Test token expiry, revocation, signature verification, key rollover
+- Pen testing for XSS/CSRF/token theft paths
+
+## ১২) Developer ergonomics
+
+- Provide SDKs or middleware to validate tokens consistently across services
+- Centralize auth logic in API gateway or auth middleware to avoid duplicate code
+
+## ১৩) Runbooks & incident response
+
+- Key compromise: rotate signing keys, notify relying parties, support key rollover verification
+- IdP outage: have fallback plan — short cached token window, read‑only mode, or alternative IdP
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি runnable example যোগ করব: (A) Authorization Code + PKCE demo (Node.js + Express + simple IdP mock), (B) refresh token rotation example with tests, বা (C) JWKS key rollover demo with verification and fallback — কোনটি আগে যোগ করব?

@@ -1,0 +1,204 @@
+---
+title: Data Encryption - At rest ও In transit
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা ডাটা এনক্রিপশন‑এর দুইটি প্রধান দিক — "at rest" ও "in transit" — বিস্তারিতভাবে দেখব। পাশাপাশি আমরা কী ম্যানেজমেন্ট (KMS/HSM), envelope encryption, field‑level encryption, tokenization, TLS/mTLS, performance ও অপারেশনাল টিপস কভার করব। উদাহরণ ও রূপক ব্যবহার করে ব্যাখ্যা করা আছে যাতে আপনি নিরাপত্তা নকশা ও বাস্তবায়নে বিশ্বাসযোগ্য সিদ্ধান্ত নিতে পারবেন।
+
+## চেকলিস্ট
+
+- Encrypt in transit: TLS, certificate lifecycle, mTLS
+- Encrypt at rest: disk/block-level, filesystem-level, DB‑level, field-level
+- Envelope encryption এবং key hierarchy
+- Key Management: KMS, HSM, rotation, access policy, auditing
+- Tokenization vs encryption
+- Performance, backup & restore, key loss scenarios
+- Compliance ও legal considerations (PII, GDPR)
+- Testing, monitoring ও runbooks
+
+---
+
+## ১) কেন এনক্রিপশন দরকার? (রূপক)
+
+ডাটা এনক্রিপশন হলো তথ্যকে এমনভাবে রূপান্তর করা যাতে শুধুমাত্র অনুমোদিত পক্ষই তা পড়তে পারে।
+
+রূপক: আপনি একটি গুরুত্বপূর্ন চিঠি ডাকযোগে পাঠাচ্ছেন; এনক্রিপশন হলো চিঠি‑ভিত্তিক সিল করা খাম, আর কী হলো খামের চাবি। যদি খাম না থাকে, মধ্যপথে কেউ খুলে দেখতে পারে।
+
+দুইটি প্রধান উদ্দেশ্য:
+1. Confidentiality — ডাটা পড়া নয় এমন মানুষের হাত থেকে রক্ষা করা
+2. Defense in depth — যদি কোনো লেয়ার ভেঙে যায়, অন্য লেয়ার এখনও ডেটা সুরক্ষিত রাখে
+
+---
+
+## ২) Encrypt in transit — TLS ও mTLS
+
+Transport Layer Security (TLS) হচ্ছে ওয়েব‑এ ও সার্ভিস‑টু‑সার্ভিস কমিউনিকেশনে সর্বাধিক ব্যবহৃত প্রটোকল।
+
+কী বিষয়গুলো লক্ষ করবেন:
+- Use TLS 1.2+ (prefer 1.3) এবং শক্তিশালী সাইফার সুইটস
+- Redirect HTTP→HTTPS, HSTS স্ট্র্যাটেজি
+- Certificate lifecycle: issuance, rotation, revocation (OCSP/CRL)
+- Certificate pinning (mobile/native) — only with careful rollouts
+
+Mutual TLS (mTLS): দুই পক্ষই certificate validate করে — client ও server উভয়ই পরিচয় দেয়। যোগাযোগ এর ক্ষেত্রে strong service authentication দরকার হলে mTLS প্রয়োগ করুন (service‑to‑service auth in zero‑trust networks)।
+
+Operational tips:
+- Automate cert issuance & rotation (ACME, cert-manager in Kubernetes)
+- Monitor expiry and use alerts for impending expirations
+- Use short‑lived certs for services where possible
+
+Security notes:
+- Disable old protocols (SSLv3, TLS1.0/1.1) and weak ciphers
+- Validate TLS configuration with tools (e.g., SSL Labs) during design
+
+---
+
+## ৩) Encrypt at rest — স্তরভিত্তিক দৃষ্টি
+
+At‑rest encryption বিভিন্ন স্তরে কার্যকর করা যায়। প্রতিটি স্তরের tradeoffs আছে:
+
+1) Disk / Block‑level encryption (LUKS, dm‑crypt, cloud disk encryption)
+- Transparent to applications; protects data if disk stolen
+- Key material typically held by host or KMS; does not protect against compromised OS or privileged processes
+
+2) Filesystem / Volume encryption
+- Filesystem aware (e.g., eCryptfs, Windows EFS)
+- Can provide per‑file policy but still host‑centric
+
+3) Database encryption
+- Transparent Data Encryption (TDE) in RDBMS (SQL Server, Oracle, PostgreSQL TDE extensions)
+- Encrypts data files & backups, often with keys managed by KMS
+- Does not protect against SQL injection or compromised DB user with read privileges
+
+4) Application / Field‑level encryption
+- Encrypt specific sensitive columns (PII) before writing to DB
+- Offers fine‑grained control and protection from DB admins if keys not available to DB server
+- Requires application changes and careful indexing/search strategies (search on encrypted fields is hard)
+
+5) Tokenization
+- Replace sensitive value with a token stored in a vault; vault keeps mapping
+- Useful for payment card data (PCI DSS) to reduce scope
+
+Design advice:
+- Combine layers: use disk encryption + DB encryption + field encryption for defense in depth
+- Field encryption is best when you must limit exposure to DB admins or third‑party services
+
+---
+
+## ৪) Envelope encryption ও key hierarchy
+
+Envelope encryption প্যাটার্নে data encrypted by a data key (DEK), এবং DEK itself encrypted by a key encryption key (KEK) managed in KMS/HSM। এটি দ্রুত ইন‑প্রসেস encrypt/decrypt while keeping master keys protected.
+
+Benefits:
+- Efficient: large objects encrypted with symmetric DEK
+- Flexible: rotate KEK without re‑encrypting large datasets (rewrap DEKs)
+
+Practical flow:
+- Generate DEK (symmetric) per object or per bucket
+- Encrypt data with DEK
+- Encrypt DEK with KMS master key → store encrypted DEK alongside ciphertext
+- On read: fetch encrypted DEK → decrypt via KMS → use DEK to decrypt data
+
+---
+
+## ৫) Key Management (KMS, HSM, policies)
+
+Key life‑cycle elements:
+- generation, storage, access control, rotation, archival, destruction
+
+Options:
+- Cloud KMS (AWS KMS, GCP KMS, Azure Key Vault): managed, integrates with cloud services, supports envelope encryption and IAM policies
+- HSM (Hardware Security Module): FIPS 140‑2/3 certified, for highest assurance and on‑premise key custody
+- Self‑hosted KMS (Vault by HashiCorp): flexible policies, dynamic secrets
+
+Best practices:
+- Least privilege: restrict who/what can decrypt keys; use IAM roles or service identities
+- Audit access: enable key usage logs and monitor suspicious calls
+- Rotate keys: have rotation policy; use versioning and rewrap DEKs; avoid immediate mass re‑encrypts where possible
+- Backup keys securely (export only if policy allows) and plan for disaster recovery
+
+Key compromise scenarios:
+- If master key compromised → ciphertext may be at risk. Have incident runbook: rotate master key, rewrap DEKs, revoke access tokens, and assess exposure
+
+---
+
+## ৬) Tokenization vs Field Encryption — কখন কোনটি?
+
+- Tokenization replaces value with token and stores mapping in a secure vault. Good for PCI and reducing scope.
+- Field encryption keeps data in place but encrypted — easier for queries that can operate on encrypted data if supported, but reveals schema.
+
+Choose tokenization when you want to minimize data footprint in your systems and centralize sensitive operations; choose field encryption when you need to retain data within the DB but protect it from casual access.
+
+---
+
+## ৭) Backups, replication ও key availability
+
+- Backups must be encrypted and keys for decrypting backups must be available to restore — plan key access for DR teams
+- If keys are lost, data may become unrecoverable — design key backup & escrow carefully (with access controls)
+- Test restore frequently in staging to validate key + backup workflow
+
+Replication notes:
+- For replicated DBs, ensure all replicas have access to necessary keys or DEK rewraps are propagated
+- When rotating keys, ensure compatibility across replicas to avoid read failures
+
+---
+
+## ৮) Performance ও scaling considerations
+
+- Symmetric crypto (AES‑GCM) is fast and appropriate for bulk data
+- Asymmetric crypto (RSA/ECDSA) used for key wrapping and signatures; keep bulk operations symmetric
+- Use hardware acceleration (AES‑NI) and tuned libraries
+- Caching decrypted DEKs in memory for short durations reduces KMS calls but consider security tradeoffs
+
+Throughput patterns:
+- Offload encryption to worker processes for heavy workloads
+- For object storage, client‑side encryption can push CPU to clients and reduce server load
+
+---
+
+## ৯) Compliance, legal ও privacy considerations
+
+- PII/PHI may require encryption at rest and in transit per regulations (GDPR, HIPAA)
+- Maintain key access logs and prove encryption in audits
+- Consider data residency requirements; keys may need to reside in same region as data for legal compliance
+
+---
+
+## ১০) Testing, monitoring ও runbooks
+
+Testing:
+- Test encryption/decryption end‑to‑end (including backups and replica restores)
+- Test key rotation and rewrap flows in staging
+- Inject failure scenarios: KMS unavailable, key revoked, expired certs
+
+Monitoring:
+- key_usage_count, kms_errors, encryption_latency, certificate_expiry_days
+- Alert on KMS access anomalies or sudden spike in decryption failures
+
+Runbooks:
+- Lost key scenario: follow multi‑party key escrow and recovery plan; if not recoverable mark data unrecoverable and notify stakeholders
+- Compromised key: rotate keys, rewrap DEKs, invalidate tokens and certificates, and audit access
+- Expired certificate: have automated rotation & emergency manual replacement steps
+
+---
+
+## ১১) Practical examples ও recipes
+
+1) Web app: HTTPS + server‑side session store + DB TDE + field‑encrypt SSNs in application with DEK per customer + keys in KMS
+2) Service‑to‑service: mTLS for transport + request payload encrypted with DEK wrapped by KMS; service identity limited via IAM
+3) Client‑side encryption for object storage: client encrypts object using DEK, uploads ciphertext + encrypted DEK; server never sees plaintext
+
+---
+
+## ১২) Decision flow — Quick guide
+
+- Need to protect data during network transit → use TLS (1.3), pinning where applicable
+- Need to protect stolen disks or cloud volumes → enable disk/volume encryption + TDE on DB
+- Need to limit exposure to DB admins → apply field‑level encryption or tokenization with KEKs outside DB host
+- Need strong key custody & audit → use KMS/HSM and automate rotation
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি runnable example যোগ করে দিই: (A) envelope encryption demo (Node.js) showing KMS wrap/unwrap with a mock KMS and tests, (B) TLS/mTLS cert‑rotation demo in Kubernetes using cert‑manager, বা (C) a small runbook + Chaos job template to test key compromise/restore — কোনটা আগে যোগ করব?

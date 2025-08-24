@@ -1,0 +1,177 @@
+---
+title: Relational Databases ও Normalization
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## লক্ষ্য ও সংক্ষিপ্ত পরিকল্পনা
+
+এই পাঠে আমরা Relational Databases (RDBMS) — কী, কেন এবং কখন ব্যবহার করবেন — এবং Normalization (1NF, 2NF, 3NF, BCNF) কিভাবে কাজ করে তা বাস্তব উদাহরণ ও রূপক দিয়ে দেখাবো। শেষে স্কিমা ডিজাইন, ইনডেক্স, কনস্ট্রেইন্ট, ট্রানজেকশন ও মাইগ্রেশন-স্ট্র্যাটেজি নিয়ে প্রয়োগযোগ্য টিপস থাকবে।
+
+চেকলিস্ট
+- RDBMS মৌলিক ধারণা ও উপযুক্ততাসমূহ
+- Normal forms (1NF→BCNF) কি করে ডুপ্লিকেশন ও অ্যানোমালি কমায়
+- Schema design—relations, FK, constraints, এবং practical denormalization
+- Index design, query optimisation ও EXPLAIN ব্যবহার
+- Transactions, isolation levels ও concurrency control
+- Migrations, backward-compatible changes, এবং testing strategies
+
+---
+
+## ১) relational database — সহজ ভাষায়
+
+RDBMS হচ্ছে টেবিল-ভিত্তিক ডাটা স্টোর যেখানে ডাটা সারিবদ্ধভাবে স্টোর হয় এবং টেবিলগুলোর মধ্যে সম্পর্ক (foreign keys) থাকে। SQL ব্যবহার করে ডাটা অ্যাক্সেস ও ম্যানিপুলেট করা হয়।
+
+রূপক: একটি লাইব্রেরির ক্যাটালগ—প্রতিটি বই একটি রেকর্ড, বিভিন্ন টেবিল আছে (books, authors, borrowers) এবং রিলেশন আছে (কোন বই কারা ধারেছে) — আপনি জটিল প্রশ্ন যেমন "কোন লেখকের বই গত মাসে সবচেয়ে বেশি ধার হয়েছে" সহজে করতে পারেন।
+
+কেন RDBMS?
+- Strong consistency ও ACID ট্রানজেকশন দরকার হলে
+- Complex joins, aggregations, adhoc queries পাত্তা করলে
+- Mature tooling, migrations, security এবং বিশ্লেষণ প্রয়োজন হলে
+
+কখন NoSQL বিবেচনা করবেন? যখন schema flexible করতে হবে, write-scale অত্যধিক বেশি বা latency অত্যন্ত কম প্রয়োজন—তখন document/wide-column/key-value বেশি কার্যকর।
+
+## ২) Normalization — মূল উদ্দেশ্য ও সুবিধা
+
+Normalization হলো টেবিলগুলোকে এমনভাবে বিভক্ত করা যাতে ডাটা redundancy কমে, আপডেট/ইনসার্ট/ডিলিট অ্যানোমালি দূর হয়, এবং ডাটার ইন্টিগ্রিটি বজায় থাকে।
+
+প্রধান ফর্মগুলো (স্টেপ-বাই-স্টেপ):
+
+1NF (First Normal Form)
+- প্রতিটি কলাম atomic মান রাখবে (no repeating groups)
+- উদাহরণ: যদি products টেবিলে multiple tags থাকে, আলাদা ট্যাগ কলাম না রেখে tags টিভি একটি আলাদা টেবিলে রাখুন (product_tags)
+
+2NF (Second Normal Form)
+- 1NF পূরণ ও প্রতিটি non-key column সম্পূর্ণভাবে primary key-এর উপর নির্ভরশীল হতে হবে (partial dependencies রিমুভ)
+- যখন composite primary key থাকে, non-key অ্যাট্রিবিউটগুলো সেই পুরো কম্পোজিট কী-এ ডিপেন্ড করে কিনা দেখুন
+
+3NF (Third Normal Form)
+- 2NF পূরণ ও non-key attribute গুলো transitively dependent না থাকবে (A → B → C হলে C কে আলাদা টেবিলে বের করে দেয়)
+
+BCNF (Boyce-Codd Normal Form)
+- 3NF-র আরও শক্তিশালী রূপ—প্রতিটি determinant একটি candidate key হতে হবে।
+
+উদাহরণ (ইকমার্স):
+- ভুল স্কিমা: orders টেবিল-এ customer_address, customer_name নিয়ে রাখা—এতে একই কাস্টমারের জন্য অনেক ডুপ্লিকেট ডাটা থাকবে।
+- normalized: customers table (id, name, address) এবং orders references customer_id।
+
+লক্ষ্য: প্রথমে normalize করুন যাতে ডাটা ইন্টিগ্রিটি ভালো থাকে; পরে performance প্রয়োজন হলে selective denormalization করুন।
+
+## ৩) Practical denormalization & trade-offs
+
+কখন denormalize করবেন?
+- reads অনেক বেশি এবং আপনি latency কমাতে চান
+- joins cost বেশি এবং caching দিয়ে সমস্যা মেটানো যায় না
+
+কীভাবে denormalize করবেন নিরাপদভাবে?
+- Maintain clear ownership: কোন সার্ভিস/পদ্ধতি ডাটা আপডেট করবে
+- Use background jobs / event-driven updates to propagate changes
+- Use versioned fields or last-updated timestamps to detect drift
+
+Example: product card showing price & inventory—read-heavy page; keep price+inventory denormalized in a cache or in a fast read table updated asynchronously.
+
+## ৪) Keys, constraints ও referential integrity
+
+- Primary Key: row unique identifier (surrogate: auto-increment id, or natural key)
+- Foreign Key: referential integrity—ensure related row exists
+- Unique constraints: enforce business rules (unique email)
+- Check constraints: domain validations (age >= 0)
+
+Best practices:
+- Prefer surrogate primary keys for flexibility
+- Use unique constraints for business invariants instead of app-only checks
+- Implement cascading deletes carefully (ON DELETE CASCADE) — prefer soft delete for auditability
+
+## ৫) Indexing — কিভাবে ও কোথায়
+
+ইন্ডেক্স আপনার কুয়েরি দ্রুত করে; কিন্তু প্রতি ইনসার্ট/আপডেটে লিখতে গেলে খরচ বেড়ে যায়।
+
+প্রকার: B-tree (range, ORDER BY), Hash (exact match), GIN/GiST (Postgres: full-text, arrays), BRIN (large append-only tables)
+
+নির্দেশনা:
+- WHERE/ORDER BY/ JOIN column-এ index বিবেচনা করুন
+- Composite index: ক্রমানুসারে columns-এর ব্যবহার মনোযোগ রাখুন (left-most rule)
+- Covering index: index-only scans possible হলে performance ভাল
+- Avoid indexing low-cardinality boolean fields alone
+
+Debugging: use EXPLAIN (ANALYZE) to inspect query plan—look for seq scan vs index scan, estimated vs actual rows
+
+## ৬) Transactions & Isolation levels
+
+ACID সংজ্ঞা:
+- Atomicity: all-or-nothing
+- Consistency: DB রুলস বজায়
+- Isolation: concurrent transactions একে অন্যকে কিভাবে দেখেন
+- Durability: committed change ব্যর্থতা সত্ত্বেও টিকে থাকবে
+
+Isolation levels (SQL standard):
+- Read Uncommitted (dirty reads possible)
+- Read Committed (no dirty reads)
+- Repeatable Read (no non-repeatable reads)
+- Serializable (strictest, prevents anomalies)
+
+Practical tip: Serializable safest but slowest; choose minimal isolation that guarantees correctness and use explicit locking for critical sections (SELECT ... FOR UPDATE)
+
+Concurrency control: optimistic vs pessimistic locking—optimistic (version column) for low-conflict, pessimistic (row locks) for high conflict critical sections.
+
+## ৭) Query optimization workflow
+
+1) Reproduce slow query with realistic dataset
+2) Run EXPLAIN ANALYZE to see plan
+3) Add necessary indexes or rewrite query (avoid SELECT *)
+4) Consider materialized views or caching for expensive aggregations
+
+Example: slow query joining orders→order_items→products—ensure join columns indexed and filter pushed down early; use LIMIT with appropriate index to speed pagination
+
+## ৮) Schema migrations ও backward-compatible changes
+
+Principles:
+- Additive changes safe: add column nullable with default NULL, then backfill async, then make NOT NULL in phased rollout
+- Avoid dropping/renaming columns in one step on hot tables—use phased rename (create new column, copy, switch reads, drop old)
+- Use feature flags when changing behaviour depending on schema
+
+Tools: Flyway, Liquibase, Rails ActiveRecord migrations, alembic (Python) — use transactional migrations where possible
+
+## ৯) Testing, backups ও DR
+
+- Test restore procedures regularly
+- Use logical backups (pg_dump) and physical snapshots depending on RTO/RPO
+- For critical systems, point-in-time recovery (PITR) is essential
+- Use unit/integration tests for queries and migration tests in CI
+
+## ১০) Example schemas (short)
+
+E-commerce (simplified):
+
+users (id PK, email UNIQUE, name)
+products (id PK, sku UNIQUE, name, price)
+orders (id PK, user_id FK, status, created_at)
+order_items (id PK, order_id FK, product_id FK, qty, price)
+
+Notes: Index user_id on orders, index order_id on order_items; use transactions when creating order+items to ensure consistency.
+
+Bank transfer example (consistency critical):
+- accounts (id PK, balance)
+- transfers (id PK, from_account FK, to_account FK, amount, status)
+
+Use SERIALIZABLE or explicit locking + double-entry ledger pattern to avoid lost updates.
+
+## ১১) Performance patterns at scale
+
+- Read replicas for scale: direct readonly traffic to replicas; monitor replication lag
+- Partitioning (range or hash) for very large tables to avoid single-node IO hot-spots
+- Materialized views & OLAP offloading for heavy aggregations
+
+## ১২) Common mistakes & remedies
+
+- Over-normalizing early causing excessive joins—trade-off with denormalization
+- No indexing strategy—slow queries in prod
+- Schema changes without migration plan—causes downtime
+
+## ১৩) পরবর্তী পাঠ ও রিসোর্স
+
+- পরবর্তী: [Indexing ও Query Optimization](/system-design/indexing) এবং [Sharding, Partitioning ও Replication](/system-design/sharding-replication)
+- পড়ুন: PostgreSQL official docs, The Art of PostgreSQL, Designing Data-Intensive Applications (Martin Kleppmann)
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি ছোট Postgres schema ফাইল, migration উদাহরণ এবং একটি pgbench/k6 টেস্ট-স্ক্রিপ্ট যোগ করব—কোনটি আগে যোগ করব? 

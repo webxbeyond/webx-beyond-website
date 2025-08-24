@@ -1,0 +1,169 @@
+---
+title: Sharding, Partitioning ও Replication
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা Sharding, Partitioning ও Replication-এর মৌলিক ধারণা, তারা কখন প্রয়োজন, কীভাবে শার্ড কী বেছে নিবেন, রি-শার্ডিং ও রেপ্লিকেশন কনফিগারেশন, ও অপারেশনাল চ্যালেঞ্জ নিয়ে আলোচনা করব। বাস্তব উদাহরণ, রূপক, চেকলিস্ট এবং টেস্টিং/মনিটরিং গাইড থাকবে। লক্ষ্য: আপনি সিদ্ধান্ত-ভিত্তিকভাবে ডাটাবেস স্কেলিং পরিকল্পনা করতে পারবেন এবং রিকভারি ও রোলআউট পরিচালনা করতে সক্ষম হবেন।
+
+## চেকলিস্ট (এই পাঠ থেকে পাবেন)
+
+- Partitioning vs Sharding: সংজ্ঞা ও পার্থক্য
+- Shard key নির্বাচন: মূল্যায়ন মানদণ্ড ও উদাহরণ
+- Rebalancing, resharding প্যাটার্নস ও কৌশল
+- Replication types: synchronous vs asynchronous, single-primary vs multi-primary
+- Multi-region deployment ও consistency কনসিডারেশন
+- অপারেশন: backups, failover, monitoring, testing
+
+---
+
+## ১) Partitioning বনাম Sharding — স্পষ্ট পার্থক্য
+
+- Partitioning: সাধারণত একটি ডাটাবেজ সার্ভারের ভিতরে টেবিল ভাঙা (range/list/hash partition)। এটা single logical DB-এর ভেতর ডাটা ভাগ করা—ডাটাবেস engine-level।
+- Sharding (scale-out): ডাটাবেসকে একাধিক independent nodes-এ ভাগ করা—প্রতিটি শার্ড আলাদা instance/সার্ভারে চলে এবং মোটামুটি স্বাধীন।
+
+রূপক: Partitioning হলো একটি বড় কাগজের আলাদা ভাগগুলো করে ফাইলবক্সে রাখা; Sharding হলো ওই কাগজগুলো আলাদা আলাদা অফিস-শাখায় পাঠিয়ে রাখা যেখানে প্রতিটি শাখা নিজস্ব কাগজ রাখে।
+
+কেন Shard করবেন? যখন single-node কনসেপ্টিক্যাল সীমা ছাড়িয়ে যায়—ডাটা সাইজ বা write throughput একটি নোড সামলাতে পারে না।
+
+## ২) Shard key নির্বাচন — সবচেয়ে গুরুত্বপূর্ণ সিদ্ধান্ত
+
+ভাল shard key হলে balanced distribution, সহজ রেঞ্জ বা ইন্ডেক্সেড queries ও কম cross-shard operations পাওয়া যায়। খারাপ key হলে hot-keys ও skew হয়।
+
+মূল মানদণ্ড:
+- Cardinality: অনেক ভিন্ন মান (high cardinality) ভাল
+- Even distribution: requests evenly spread হবে
+- Query locality: সাধারণ কুয়েরিগুলো single-shard-এ সমাধান হবে
+- Rebalancing cost: নতুন node এ data movement কতটা সহজ হবে
+
+প্যাটার্নস ও উদাহরণ:
+- User-id hashing: user-centric workloads (social, profiles) → hash(user_id) % N — সহজ, balanced
+- Range-based (time series): created_at range → ভাল for range scans (but beware hotspots)
+- Composite keys: region + user_id — multi-dimensional partitioning
+
+ট্রেড-অফ:
+- Hashing → balanced but range queries across time expensive
+- Range → efficient range queries কিন্তু hotspot সম্ভাবনা
+
+চেকআপ (questions to ask):
+1) সবচেয়ে common query কী? single-user lookup, range scan, aggregation?
+2) workload কী ভাবে বাড়ে? more users vs more activity per user?
+3) কীভাবে rebalancing করবেন downtime ছাড়া?
+
+## ৩) Rebalancing ও Resharding কৌশল
+
+চ্যালেঞ্জ: যখন shard সংখ্যা পরিবর্তন করতে হয় (scale-up/scale-down), ডাটা মুভ করতে হয়—এটি expensive ও error-prone।
+
+মৌলিক প্যাটার্নস:
+- Client-side routing + consistent hashing: জোড়া মুদ্রার মত ring-based hashing (e.g., Ketama) ব্যবহার করলে node যোগ/বিয়োগে movement কমে।
+- Proxy/Router approach: একটি logical router (proxy) shard map জানে এবং live reconfiguration করে—এটি central point হতে পারে (Envoy, custom proxy)
+- Range reshards via splitter: split large ranges gradually and migrate subranges
+
+Zero-downtime resharding approach (high-level):
+1) Add new shard nodes
+2) Start background copy process moving a subset of keys (based on hash/range)
+3) Keep writes synchronous to primary shard and also write to destination (dual-write) or use change-data-capture (CDC) to replicate ongoing updates
+4) Switch routing for moved keys to new shard
+5) Clean up old data once safe
+
+মোটামুটি কৌশল: avoid full-table copy during peak; use throttled background migration & strong monitoring.
+
+## ৪) Replication — topologies ও trade-offs
+
+প্রকার:
+- Asynchronous replication: primary writes, replicas eventually catch up। latency কম কিন্তু replica lag থাকতে পারে।
+- Synchronous replication: primary waits for replica acknowledgement before commit — consistency ভালো, latency বাড়ে।
+
+Topology:
+- Primary-Replica (single-primary): সাধারণ, সহজ; failover require promotion
+- Multi-primary / Multi-master: লিখতে পারবেন অনেক nodes-এ; conflict resolution প্রয়োজন (last-write-wins, CRDTs, application logic)
+- Quorum-based replication (e.g., Raft, Paxos-backed): consensus ensures safety; used in distributed SQL (Cockroach, Spanner)
+
+Trade-offs:
+- Durability vs latency: synchronous replication improves durability but adds latency
+- Simplicity vs availability: multi-primary improves availability for writes but complex
+
+## ৫) Replication lag & monitoring
+
+Replica lag সমাধান ও পর্যবেক্ষণ:
+- Monitor replication lag (seconds behind primary), replay queue sizes
+- If lag grows, backpressure writes or redirect reads to closer replicas with acceptable staleness
+- For critical reads, use read-your-writes pinning to primary or track session's last write offset
+
+## ৬) Failover ও Recovery প্যাটার্ন
+
+- Automated failover: keep health checks & arbiter/election system (e.g., Patroni for Postgres, etcd+operator)
+- Manual promotion: operations team promote replica to primary after validation
+- Recovery: ensure backups + PITR (point-in-time recovery) and test restores regularly
+
+Best practices:
+- Automate failover but have human-in-the-loop for complex incidents
+- Use fencing/leader locks to avoid split-brain
+
+## ৭) Multi-region deployments ওConsistency considerations
+
+চাহিদা অনুযায়ী multi-region সুবিধা: latency reduction for geo users, regional compliance। কিন্তু consistency ও cost বাড়ে।
+
+প্যাটার্নস:
+- Active-passive (primary in one region, replicas in others): simple, but write-latency centralized
+- Active-active with conflict resolution (CRDTs or application-level merge): complex, good for low-conflict data
+- Spanner-like global consensus: True synchronous global transactions but high latency & complex
+
+Design tips:
+- For user-local workloads, geo-partition by region to keep writes local
+- For global leaderboards, use eventual consistency & background reconciliation
+
+## ৮) Operational concerns: backups, schema changes, migrations
+
+- Backups: snapshot + WAL shipping for PITR. Ensure backups per shard and test restorations per shard
+- Schema changes: perform rolling, additive changes per shard. Use feature flags & dual-read logic if needed
+- Migrations across shards: avoid cross-shard transactions during migration windows or use application-level coordination
+
+## ৯) Testing & validation
+
+Tests you must run:
+- Load tests that simulate skewed keys & spikes
+- Resharding drills: simulate node addition/removal and validate correctness
+- Failover drills: automated failover, promote replica, verify application behavior
+
+Tools: custom scripts, Jepsen-like testing for distributed correctness, chaos engineering (kill nodes, network partitions)
+
+## ১০) Monitoring & SLOs
+
+Key metrics:
+- Shard size & growth rate
+- Request distribution per shard (QPS)
+- Replica lag, replication errors
+- Rebalance progress & throughput during migration
+- Error rates, latency P95/P99 per shard
+
+Define SLOs: acceptable replication lag, max rebalancing window, mean time to recover per shard
+
+## ১১) Real-world examples
+
+1) User-profile sharding
+- Use user_id hash-based sharding for even distribution; design for cross-shard joins by avoiding them or fetching in parallel
+
+2) Multi-tenant SaaS
+- Sharding per-tenant (tenant_id) gives isolation; heavy tenants can be isolated to dedicated shards
+
+3) Time-series data (IoT)
+- Partition by time-range + device_id to keep recent data hot; archive old partitions to cheaper storage
+
+## ১২) Common pitfalls ও mitigation
+
+- Choosing poor shard key → hotspotting. Mitigation: re-evaluate, use composite key or add salting/randomization
+- Underestimating rebalancing cost → mitigation: test on staging, use throttled migration
+- Not monitoring replica lag → mitigation: implement alerts & circuit-breakers for stale reads
+
+## ১৩) Quick decision flow
+
+1) Is single-node hitting resource limits (CPU/IO/memory) or network? If not, optimize caching & queries first.
+2) Estimate whether read or write throughput is the bottleneck. For read-heavy, replication + caching; for write-heavy beyond node capacity, consider sharding.
+3) Choose shard key based on access-patterns and cardinality. Prototype in staging and run skew tests.
+4) Plan rebalancing & failover procedures and automate with tooling.
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি practical resharding example (step-by-step with CDC dual-write pattern) এবং একটি monitoring dashboard-টেমপ্লেট (Prometheus/Grafana metrics list) যোগ করে দেব—কোনটি আগে যোগ করব? 

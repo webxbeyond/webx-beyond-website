@@ -1,0 +1,149 @@
+---
+title: Stream Processing Systems
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## যতটা দরকার তাৎক্ষণিক সারাংশ
+
+এই পাঠে আমরা stream processing-এর মৌলিক ধারণা, কখন batch নয় বরং stream নির্বাচন করবেন, windowing, stateful processing, fault-tolerance (checkpointing) ও semantics (at-least-once, exactly-once), lateness ও watermarks, বাস্তব টুলিং (Kafka Streams, Apache Flink, Spark Structured Streaming, Kinesis) এবং অপারেশনাল গণনা কভার করব। উদাহরণ, রূপক, ডিকশেনারি‑স্টাইল সিদ্ধান্ত ফ্লো এবং টেস্টিং/মনিটরিং গাইড রাখা আছে। লক্ষ্য: আপনি প্রয়োজন অনুযায়ী stream প্যাঝা বেছে নিতে পারবেন এবং একটি ছোট প্রডাকশন-স্তরের pipeline ডিজাইন করতে পারবেন।
+
+## চেকলিস্ট (আপনার অনুরোধ অনুযায়ী)
+
+- Stream processing সংজ্ঞা ও batch থেকে পার্থক্য
+- Stateless vs stateful stream processing
+- Window types: tumbling, sliding, session
+- Watermarks, lateness ও late data handling
+- Consistency semantics: at-least-once, exactly-once, idempotency
+- Tool mapping: Kafka Streams, Flink, Spark, Kinesis
+- Checkpointing, state backend ও recovery
+- Testing, monitoring ও capacity planning
+
+---
+
+## ১) Stream processing: কেন এবং কখন
+
+Stream processing মানে data‑এ continuous computations চালানো — events আসার সাথে‑সাথে ফলাফল বের করা। যখন low-latency insight, real-time analytics, বা continuous ETL দরকার হয় তখন stream ব্যবহার করবেন।
+
+রূপক: Batch হচ্ছে দৈনিক নোটিশ বোর্ডে সারি করে আপডেট করা; Stream হচ্ছে লাইভ news‑ticker যা ইভেন্ট আসলেই আপডেট হয়।
+
+নির্বাচন নির্দেশিকা:
+- যদি latency tolerable এবং কাজ একবারে সব ডাটা নিয়ে করলে ভালো হয় → batch
+- যদি ফলাফল users বা downstream সিস্টেমে real-time দরকার → stream
+
+## ২) Stateless vs Stateful processing
+
+- Stateless: প্রতিটি event আলাদাভাবে প্রক্রিয়াকৃত হয় (e.g., filter, map). সহজ scale এবং fault-recovery।
+- Stateful: operator state ধরে রাখে (e.g., counts, aggregations, session windows)। state management, checkpointing ও backends দরকার।
+
+Example: per‑user click count → stateful; enrich each event with static lookup → stateless (if lookup external cached store)।
+
+## ৩) Windowing: tumbling, sliding, session
+
+- Tumbling window: non-overlapping fixed-size windows (e.g., প্রতি 1 মিনিটে বিল্ড) — সহজ
+- Sliding window: fixed-size windows that slide every S seconds, overlapping results useful for rolling aggregates
+- Session window: inactivity‑based grouping (user activity sessions) — dynamic size
+
+Design tip: choose window aligning with business need (minute granularity for dashboards; sessions for engagement metrics)
+
+## ৪) Watermarks ও late data
+
+- Watermark = event-time progress indicator estimating "no earlier events than T will arrive"।
+- Use watermark to trigger window emission while tolerating bounded lateness.
+- Late data strategies:
+  - Drop late events
+  - Send to side-output/late stream for special handling
+  - Recompute windows (if system supports updates) or maintain incremental update semantics
+
+Trade-offs: aggressive watermarks → lower latency but risk losing late events; lenient watermarks → higher correctness but higher latency and state retention.
+
+## ৫) Delivery semantics ও exactly-once
+
+- At-least-once: duplicates possible; simplest to implement with consumer commit after processing
+- Exactly-once: avoid duplicates even with retries; achievable in systems with transactional sinks or idempotent writes (Flink + Kafka transactions, Kafka Streams with EOS)
+
+Pragmatic approach:
+- Prefer at-least-once + idempotent sinks (DB upsert, dedupe keys) unless domain requires strict exactly-once (financial transfers)
+
+## ৬) State backends, checkpointing ও recovery
+
+- Checkpointing: runtime periodically snapshots operator state and progress (offsets) to durable storage (S3, HDFS, object store)
+- State backends: RocksDB (local embedded key-value store with snapshots) vs in-memory state
+- On failure: orchestrator restarts task and restores state from checkpoint → guarantees progress
+
+Operational tips:
+- Checkpoint interval trade-off: shorter → faster recovery but more IO overhead; longer → less IO but longer recovery
+- Monitor checkpoint duration & success rate
+
+## ৭) Tooling ও প্রযুক্তি ম্যাপ
+
+- Kafka Streams: lightweight, embedded in application JVM, good for simple stream transforms using Kafka as backbone; scales by consumer groups and partitions
+- Apache Flink: advanced event-time processing, low-latency stateful ops, strong exactly-once support, RocksDB backend
+- Spark Structured Streaming: micro-batch model with high-level APIs, good integration with Spark ecosystem and batch/stream unified code
+- AWS Kinesis Data Analytics / Kinesis Data Streams: managed streaming for AWS users
+
+সবকিছু মিলিয়ে সিদ্ধান্ত:
+- Need advanced windowing, low-latency stateful processing, exactly-once → Flink
+- Simple Kafka-native stream apps, embed in service → Kafka Streams
+- Batch + stream unification and heavier analytic workloads → Spark
+- Managed cloud integration and low‑ops → Kinesis or managed Kafka
+
+## ৮) Scaling ও partitioning
+
+- Partition by key to scale parallel processing; parallelism <= number of partitions
+- Stateful operators: key‑grouped state; when rebalancing increase parallelism requires state redistribution
+- Repartition (keyBy) expensive at runtime—plan partition strategy upfront
+
+Capacity planning:
+- Measure per‑partition throughput, state size per key, checkpoint snapshot size and time
+- For Flink, plan task slots, TaskManagers memory (RocksDB needs disk and memory tuning)
+
+## ৯) Late arrivals & window updates
+
+- Some systems support window updates (e.g., Flink updates aggregate results when late data arrives). UI layer should support idempotent updates (replace or patch old value).
+- Use incremental updates (upsert) in sinks to avoid full recomputation
+
+## ১০) Exactly-once sinks & transactional writes
+
+- Sink semantics matter: Kafka transactions, idempotent DB upserts, or two-phase commit (2PC) connectors provide stronger guarantees
+- Example: Flink Kafka Sink supports transactions to ensure events emitted by job are committed atomically
+
+## ১১) Testing & validation
+
+- Unit test operators with deterministic inputs (use test harnesses: Flink TestHarness, Kafka Streams TopologyTestDriver)
+- Integration tests with embedded brokers (Embedded Kafka, testcontainers)
+- End-to-end tests including failure injection and recovery
+
+## ১২) Monitoring ও observability
+
+Key metrics:
+- input/output throughput per partition
+- processing latency (event time vs processing time)
+- watermark progress and late event rate
+- checkpoint duration & success
+- state size per operator
+
+Traces: propagate trace_id in events for cross-service debugging
+
+## ১৩) Common pitfalls ও mitigation
+
+- Under-partitioning → hot partitions; mitigate by key-salting or re-partitioning with more partitions
+- Large state growth → use TTL, eviction, or externalize large blobs to object store
+- Long checkpoint times → tune RocksDB, increase parallelism for snapshotting, or use incremental checkpoints
+- Relying on processing-time instead of event-time for correctness → prefer event-time for real business timelines
+
+## ১৪) Real-world examples
+
+1) Real-time fraud detection: sliding windows of user transactions, pattern detection, immediate blocking action
+2) Metrics aggregation: per‑minute aggregates for dashboards, computed in tumbling windows and exported to OLAP
+3) Enrichment pipeline: join stream events with lookup tables (use async I/O or broadcast state for small reference datasets)
+
+## ১৫) Quick decision flow
+
+1) Need sub-second results + complex event-time semantics → Flink or Kafka Streams with careful design
+2) Need large-scale analytics with batch compatibility → Spark Structured Streaming
+3) Want managed services & low ops → Kinesis or managed Kafka
+4) Always design for idempotency and monitor checkpoint health
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি small Apache Flink windowing example (Java/Scala), Kafka Streams topology example (Java/Node) বা একটি Prometheus dashboard JSON for stream metrics যোগ করে দেব—কোনটি আগে যোগ করব?

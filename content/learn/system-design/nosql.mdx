@@ -1,0 +1,130 @@
+---
+title: NoSQL মডেল - Document, Key-Value, Columnar, Graph
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ ও কী শেখাবো
+
+এই পাঠে আমরা NoSQL জগতের প্রধান চারটি ডাটামডেল — Key-Value, Document, Columnar ও Graph — কীভাবে কাজ করে, কখন কোনটি বেছে নেবেন, এবং বাস্তবে কিভাবে ব্যবহার করবেন তা বাংলায় সহজভাবে ব্যাখ্যা করব। প্রতিটি মডেলের জন্য বাস্তব উদাহরণ, রূপক, আর্কিটেকচারাল কনসিডারেশন ও ট্রেড-অফ দেওয়া আছে।
+
+চেকলিস্ট
+- Key-Value, Document, Columnar, Graph মডেলের সংক্ষিপ্ত সংজ্ঞা
+- প্রতিটি মডেলের উপযুক্ত use-cases এবং সীমাবদ্ধতা
+- ডাটা মডেলিং টিপস ও প্রশ্ন-চেকলিস্ট (কীভাবে সিদ্ধান্ত নেবেন)
+- ইন্টারঅপারেশন: কখন NoSQL আর কখন SQL/হাইব্রিড উপযুক্ত
+- পরবর্তী ধাপ ও রিসোর্স
+
+---
+
+## ১) NoSQL কেন? (এক লাইন)
+
+যখন ডাটা খুব বড়, স্কেল-আউট দরকার, বা schema অত্যন্ত পরিবর্তনশীল—তখন NoSQL সুবিধা দেয়। এটা SQL-এর জায়গা নেয় না; বরং কিছু সমস্যা সমাধানে সহজতা ও পারফরম্যান্স দেয়।
+
+রূপক: SQL হলো একটি অফিস-ম্যানেজমেন্ট সিস্টেম যেখানে প্রতিটি কাগজের ধরন নির্দিষ্ট; NoSQL হলো ফাইল-ক্যাবিনেট যেখানে আপনি বিভিন্ন আলফা ফাইল, নোট অথবা ইমেজ দ্রুত রেখে নিতে পারেন—যেখানে কাঠামো পরিবর্তনশীল।
+
+## ২) Key-Value Stores (Redis, DynamoDB simple usage, etc.)
+
+সংজ্ঞা: Key-Value DB সবচেয়ে সরল—প্রতিটি key একটি opaque value-এর সাথে জোড়া থাকে। দ্রুত get/put অপারেশন, সাধারণত memory-backed।
+
+উপযোগী কাজ:
+- Session store, cache, feature flags, rate-limiter counters, simple lookup tables
+
+বিশেষ বৈশিষ্ট্য:
+- অতি-কম ল্যাটেন্সি, সহজ scale-out (ওই key-based partitioning দিয়ে)
+- সীমাবদ্ধ query: সাধারণত key-based access, secondary index কম থাকে
+
+উদাহরণ: আপনার অ্যাপ্লিকেশন একটি session ID দিয়ে ব্যবহারকারীর সেশনে জমা রাখে—Redis-এ session_id → JSON stored, TTL দিয়ে auto-expire।
+
+টিপস:
+- key-design গুরুত্বপূর্ণ (namespace prefix: session:{userId})
+- value structure compact রাখুন (msgpack/protobuf) যদি latency/serialization গুরুত্বপূর্ণ
+
+## ৩) Document Stores (MongoDB, Couchbase, DynamoDB document model)
+
+সংজ্ঞা: Document DB-তে JSON-like documents থাকে; প্রতিটি document nested structure থাকতে পারে। এটি flexible schema দেয়—নতুন fields যোগ করা সহজ।
+
+উপযোগী কাজ:
+- Product catalog, user profiles, CMS, event logs যেখানে ক্ষেত্র পরিবর্তনশীল
+
+বিশেষ বৈশিষ্ট্য:
+- rich queries on document fields, secondary indexes possible
+- single-document atomicity (many engines)
+
+উদাহরণ: ই-কমার্স প্রোডাক্ট ডকুমেন্ট
+
+{
+  "id": "p123",
+  "name": "T-shirt",
+  "variants": [{"size":"M","stock":10},{"size":"L","stock":5}],
+  "metadata": {"brand":"X","tags":["summer","sale"]}
+}
+
+টিপস:
+- access pattern নির্ধারণ করে ডকুমেন্ট structure ডিজাইন করুন (embed vs reference)
+- বড় nested arrays/objects বেশি হলে update cost বাড়ে—consider splitting
+
+ট্রেড-অফ:
+- flexible কিন্তু complex joins across collections ব্যর্থ হয়ে যায়—এক্ষেত্রে application-level joins বা denormalization দরকার
+
+## ৪) Columnar / Wide-column Stores (Cassandra, HBase, Bigtable)
+
+সংজ্ঞা: Columnar এবং wide-column DB গুলো large-scale write-heavy workloads ও time-series মতো sequential access-এর জন্য ডিজাইন করা। ডাটা row-wise নয় column-family-wise সাজানো থাকে এবং partition key-এ শার্ডিং সহজ।
+
+উপযোগী কাজ:
+- হার্ড-স্কেলিং টাইম-সিরিজ, event ingest, write-heavy workloads, large analytical tables (but for analytics columnar OLAP engines like ClickHouse are better)
+
+বিশেষ বৈশিষ্ট্য:
+- predictable performance at scale, eventual consistency সাধারণ
+- partition key selection critical: hot partitions সমস্যা হতে পারে
+
+উদাহরণ: IoT sensor data—partition by device_id, cluster by time-range; append-only writes, reads for recent ranges fast
+
+টিপস:
+- choose partition key to balance load and avoid hotspots
+- design queries around primary key patterns—secondary indexing expensive
+
+## ৫) Graph Databases (Neo4j, JanusGraph)
+
+সংজ্ঞা: Graph DB nodes ও edges-এ relationship-first design করে—relationship-heavy queries (shortest-path, traversals) অত্যন্ত দ্রুত।
+
+উপযোগী কাজ:
+- social graphs, recommendations, fraud detection, network analysis
+
+বিশেষ বৈশিষ্ট্য:
+- expressive graph traversals, algorithms (PageRank, community detection)
+- schema flexible—edges can have properties
+
+উদাহরণ: Social network — node: user, edge: follows → প্রশ্ন: suggest 2nd-degree friends বা mutual connections দ্রুত করা যায়
+
+টিপস:
+- model relationships explicitly; avoid trying to express deep traversals in SQL—performance will lag
+
+## ৬) Decision checklist — কখন কোনটা?
+
+1) Access pattern: key-only → Key-Value. Nested documents & flexible schema → Document. Time-series / write-heavy → Columnar/Wide-column. Heavy relationships & traversal → Graph.
+2) Consistency needs: strong consistency and multi-key transactions? → prefer SQL or document DBs that provide transactions. Eventual consistency acceptable? → wide-column/Key-Value ok.
+3) Query flexibility: ad-hoc joins & aggregations? → SQL/OLAP stack. Field-level queries inside JSON? → Document with secondary indexes.
+4) Scale & operational skill: managed services (DynamoDB, Cosmos) reduce ops but cost trade-offs.
+
+## ৭) Hybrid patterns ও integration
+
+- Polyglot persistence: একটি সিস্টেমে একাধিক DB টাইপ একসাথে ব্যবহার করা ভালো—যেমন product metadata in Document DB, inventory counters in Redis, analytics in ClickHouse
+- Event-driven architecture (Kafka) দিয়ে source-of-truth পরিবর্তনগুলো ডাটাস্টোরে propagate করুন (CQRS pattern useful)
+
+উদাহরণ আর্কিটেকচার:
+- Order placed → write to primary relational DB (ACID) → publish event → update read-models: product cache (Redis), analytics (ClickHouse), user-feed (MongoDB)
+
+## ৮) মডেলিং টিপস ও anti-patterns
+
+- Avoid modelling relational joins in document DB by deep nesting for volatile relationships—this causes update pain
+- Don't use key-value store as persistent primary store for critical data unless persistence guarantees exist (use Redis with AOF/RDB carefully)
+- Be careful with hot keys in wide-column stores—use composite partition keys or additional sharding
+
+## ৯) পরবর্তী ধাপ ও রিসোর্স
+
+- পরবর্তী: [Sharding, Partitioning ও Replication](/system-design/sharding-replication)
+- পড়ুন: DynamoDB design patterns, Cassandra data modeling, Neo4j tutorials, Designing Data-Intensive Applications (Kleppmann)
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি ছোট DynamoDB/MongoDB schema উদাহরণ, Kafka-driven sync pattern ও Mermaid ডায়াগ্রাম যোগ করে দেব—কোনটি আগে যোগ করব? 

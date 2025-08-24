@@ -1,0 +1,148 @@
+---
+title: Content Delivery Networks (CDN)
+icon: carbon:cloud
+---
+
+## সারাংশ
+
+এই পাঠে আমরা CDN কি, কীভাবে কাজ করে, কোন ক্ষেত্রে CDN ব্যবহার করা উচিত, cache-control হেডার কিভাবে লিখবেন, origin shielding, multi-CDN কৌশল, ও স্ট্র্যাটেজিক ডিজাইন সিদ্ধান্ত নিয়ে বিস্তারিত আলোচনা করব। বাস্তব উদাহরণ, অনুবরণযোগ্য কনফিগারেশন নির্দেশনা এবং অপারেশনাল টিপস থাকবে — শুরু থেকে ইন্টারমিডিয়েট পর্যন্ত উপযোগী।
+
+## চেকলিস্ট
+
+- CDN কী ও এর মৌলিক উপাদান
+- Pull vs Push CDN, Origin Shielding, POPs, Edge Caching
+- Cache-Control, ETag, Last-Modified, Cache Busting এবং স্ট্যাটেজি (stale-while-revalidate ইত্যাদি)
+- Purge/Invalidate প্যাটার্ন ও cache warm-up
+- Multi-CDN ও failover বিবেচনা
+- CDN metrics, testing ও SLOs
+
+---
+
+## ১) CDN — সহজ ভাষায়
+
+CDN হলো edge network যা ব্যবহারকারীর নিকটবর্তী PoP (Point of Presence) থেকে কনটেন্ট সার্ভ করে। উদ্দেশ্য: latency কমানো, ব্যান্ডউইথ সাশ্রয় করা, ও origin-এর লোড কমানো।
+
+রূপক: আপনি ধরে নিন আপনার শহরের লাইব্রেরিতে একটি জনপ্রিয় বই আছে; যদি সব পাঠক মূল লাইব্রেরা থেকে বই আনতে হয়, প্রচণ্ড ভিড় হবে। CDN হলো শহরের বিভিন্ন পয়েন্টে বইয়ের পপ-আপ কপি রাখা—পাঠকরা নিকটস্থ কপি নেবে।
+
+## ২) CDN উপাদান ও আর্কিটেকচার
+
+- PoP (Edge Location): ব্যবহারকারীর নিকটস্থ ক্যাশ করা সার্ভার
+- Origin: আপনার মূল সার্ভার (S3, application server)
+- Global Backbone: CDN-এর নেটওয়ার্ক যা PoP‑গুলোর মধ্যে কনটেন্ট রাউট করে
+- Control plane: CDN provider UI/API
+
+ডিপ্লয় প্যাটার্নস:
+- Pull (On-demand): Edge miss হলে origin থেকে টেনে আনা হয় — সহজ ও সাধারণ
+- Push (Pre-warm): কনটেন্ট origin থেকে CDN এ push করে রাখা হয় — বড় ফাইল বা ভিডিও জন্য উপকারি
+
+## ৩) Cache-Control ও HTTP হেডারস
+
+মূল হেডারস:
+- Cache-Control: max-age, public/private, s-maxage, must-revalidate, stale-while-revalidate, stale-if-error
+- ETag / Last-Modified: conditional requests (If-None-Match, If-Modified-Since)
+- Vary: vary by Accept-Encoding, User-Agent ইত্যাদি
+
+প্রাকটিক্যাল উদাহরণ:
+- Static assets (images, js, css): Cache-Control: public, max-age=31536000, immutable (বা use fingerprinting)
+- HTML: Cache-Control: public, max-age=60, stale-while-revalidate=30 (fast UX + background refresh)
+
+Cache-busting:
+- Fingerprinting (content-hash in filename) is the safest: deploys produce new filenames so CDN caches never serve stale app code
+- Query-string invalidation is less reliable across CDNs; prefer path-based versioning when possible
+
+## ৪) Purge / Invalidate strategies
+
+- On-demand purge: API call to CDN to invalidate specific paths — easy but costlier at scale
+- Time-based expiry (short TTL) + background warm-up: avoid frequent purges
+- Surrogate keys / tags: group resources under logical keys and purge by tag (fast & efficient)
+
+Practical rule: prefer immutable assets with long TTL + fingerprinting; use purge sparingly for dynamic content.
+
+## ৫) Origin Shielding ও Cache Hierarchy
+
+Origin Shield: একটি intermediate layer বা single PoP that fronts origin to reduce origin load during cache misses. Useful for global rollouts and mitigates origin storms.
+
+Benefits:
+- Reduces duplicate origin fetches during cache miss spikes
+- Simplifies rate limits and charge predictability
+
+## ৬) CDN for dynamic & API traffic
+
+- Not all API traffic is cacheable. But you can cache reverse-proxy responses for idempotent endpoints (GET) with proper cache keys.
+- Use CDN for TLS termination, TCP optimization, connection reuse, and for caching responses with Cache-Control: public, s-maxage to allow shared caches to serve
+- Edge logic (edge compute): perform light transforms, A/B tests, bot filtering, authentication tokens verification at edge
+
+Example: Edge can validate JWT signature and route to nearest origin while reducing origin auth load.
+
+## ৭) Multi-CDN এবং Failover
+
+কতটা বড় হলে Multi-CDN? — যখন latency SLAs across regions বা provider availability/resilience গুরুত্বপূর্ণ।
+
+Multi-CDN considerations:
+- DNS-based failover (GeoDNS with health checks)
+- Global Load Balancers (Route53, GSLB) or active-active multi-CDN with traffic steering
+- Consistency of feature set (TLS, headers, purge APIs) across providers
+
+Pitfalls:
+- Cache key normalization must be identical across CDNs
+- Purge semantics vary — central orchestration recommended
+
+## ৮) TLS, HTTP/2, HTTP/3 ও performance
+
+- CDN often provides TLS termination at edge, reducing TLS handshake RTTs
+- HTTP/2 multiplexing and HTTP/3 (QUIC) further reduce latency for many small requests
+- Brotli/Gzip compression at edge saves bandwidth and improves perf
+
+## ৯) Video, Range requests ও Byte-Serving
+
+- For large media, use range requests and byte-range caching; use signed URLs for protected content
+- Adaptive streaming (HLS/DASH) benefits from CDN edge caching of segments; origin needs to support high request rates for manifest updates
+
+## ১০) Edge compute ו Function-as-edge
+
+- Modern CDNs provide edge functions (Cloudflare Workers, AWS Lambda@Edge) to run JS/wasm for personalization, auth, or A/B tests at the edge
+- Trade-off: cost and complexity — move only low-latency, stateless logic to edge
+
+## ১১) Monitoring, metrics ও SLOs
+
+Key CDN metrics:
+- Cache hit ratio (per-path, per-region)
+- Origin traffic (bandwidth & requests)
+- Edge latency (TTFB), Time to First Byte
+- Error rate (4xx/5xx at edge and origin)
+- Purge rate and purge latency
+
+Sample SLOs:
+- 99th P95 edge TTFB < 200ms in target regions
+- Origin requests reduced by >= 80% after caching static assets
+
+## ১২) Testing ও validation
+
+Tests to run:
+- Cold cache vs warm cache load tests
+- Purge workflow tests (time-to-invalidate and stale window effects)
+- Multi-region performance tests using RUM (Real User Monitoring) and synthetic probes
+
+Tools: curl+range headers, k6 for load, synthetic monitoring (Pingdom, Uptrends), RUM (Boomerang, NewRelic Browser)
+
+## ১৩) Cost সিদ্ধান্ত ও trade-offs
+
+- CDN cost drivers: egress bandwidth, requests, invalidations, edge functions compute time
+- For heavy static content, CDN is almost always cost-effective vs origin egress and improves UX drastically
+
+## ১৪) Real-world 사례
+
+1) Static website: fingerprint assets, long TTLs, CDN handles 99% of traffic, origin receives very few requests
+2) Global web app: Cloudfront/Cloudflare with origin shield and regional caching for APIs + edge auth for JWT verification
+3) Video streaming: CDN for HLS segments, origin only for misses & manifest updates, signed URLs for access control
+
+## ১৫) Quick decision flow
+
+1) Are your users globally distributed? Yes → use CDN
+2) Are most resources static or cacheable? Yes → fingerprint + long TTL
+3) Need dynamic personalization? Use edge compute + cache key segmentation
+4) Expect frequent invalidations? Consider surrogate keys & warm-up strategy
+
+---
+
+আপনি চাইলে আমি একটি Cloudflare Workers উদাহরণ, CloudFront caching policy JSON, অথবা একটি small k6 script (cold vs warm cache) যোগ করে দিতে পারি—কোনটি আগে যোগ করব?

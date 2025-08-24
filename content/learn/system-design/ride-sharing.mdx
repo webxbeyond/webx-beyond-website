@@ -1,0 +1,218 @@
+---
+title: Designing Uber / Real-time Ride Sharing System
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা একটি রিয়েল‑টাইম ride‑sharing সার্ভিস (যেমন Uber, Bolt) কিভাবে ডিজাইন করবেন তা বাংলা ভাষায় ধাপে ধাপে দেখব — functional ও non‑functional requirements, matching ও dispatch আলগরিদম, geospatial indexing, ETA ও routing, surge pricing, ডেটা মডেল, স্কেলিং কৌশল, অপারেশনাল রোলআউট ও মনিটরিং। বাস্তব উদাহরণ ও রূপক ব্যবহার করে সিদ্ধান্ত নেয়ার ফ্লো দেব যাতে আপনি production‑grade সিস্টেম বসাতে পারেন।
+
+## চেকলিস্ট
+
+- প্রভাবিত functional requirements ও SLOs
+- Real‑time matching: push vs pull, greedy vs optimal matching
+- Geospatial indexing (geohash, quadtrees) ও proximity searches
+- ETA estimation, routing ও map APIs
+- Surge pricing, cancellation policies ও fraud control
+- Data model: trips, drivers, vehicles, fares, events
+- Scaling: regionalization, sharding, stateful vs stateless services
+- Observability, runbooks, load testing ও disaster recovery
+
+---
+
+## ১) সমস্যা বিবৃতি ও মূল চাহিদা
+
+প্রাথমিক ফাংশনাল: রাইড রিকোয়েস্ট নেওয়া, ড্রাইভারের খোঁজ ও অ্যাসাইন করা, রিয়েল‑টাইম ট্র্যাকিং, পেমেন্ট ও রেটিং।
+
+গুরুত্বপূর্ণ নন‑ফাংশনাল:
+- Low latency matching (sub‑second for good UX)
+- High throughput (সাত দিনের মধ্যে হাজার হাজার concurrent riders/drivers)
+- High availability ও multi‑AZ resilience
+- Accurate ETA—business trust এর জন্য জরুরি
+
+রূপক: ভাবুন একটি বড় ট্যাক্সি ডিসপ্যাচ রুম যেখানে একদিকে কল센터 থেকে রিকোয়েস্ট আসছে, অন্যদিকে সব ড্রাইভার লাইভ‑ম্যাপে দেখা যাচ্ছে — ডিসপ্যাচার বেছে নেয় সবচেয়ে উপযুক্ত ড্রাইভার। আমরা এখন এই ডিসপ্যাচারকে স্বয়ংক্রিয়ভাবে স্কেল করি এবং বাস্তবে latency ও fairness মেইনটেইন করব।
+
+## ২) প্রথম‑কোর্স আর্কিটেকচার — মৌলিক কম্পোনেন্ট
+
+- API Gateways: rider/drivers clients (mobile) থেকে অনুরোধ গ্রহণ করে
+- Location ingestion: drivers বিচক্ষণভাবে position আপডেট করে (Heartbeat / location sweep)
+- Matching/Dispatch service: proximity ও ETA দেখে driver select করে
+- Trip service: lifecycle (requested → accepted → pickup → enroute → completed)
+- Routing & ETA service: map provider integration (OSRM, GraphHopper, Google Maps)
+- Pricing & Billing: fare calculation, surge logic, payment gateway
+- Event bus / message queue: Kafka/Pulsar for decoupling real‑time events
+- Data stores: fast K/V for active drivers (Redis), durable DB for trips (Postgres/Cassandra)
+
+এইগুলি মাইক্রোসার্ভিস আর্কিটেকচারের প্রধান building blocks।
+
+## ৩) Driver discovery ও geospatial indexing
+
+Proximity search core problem: given rider location (lat,lon) and constraints (vehicle type, rating), find nearest available drivers quickly.
+
+Techniques:
+- Geohash / S2 cell tokenization: map lat/lon → cell id; query nearby cells for candidates
+- Quadtrees / R‑trees: spatial index structures (useful in DBs like PostGIS)
+- In‑memory spatial indexes (Redis GEO, custom kd‑tree) for low latency
+
+Pipeline:
+1. Map incoming lat/lon to cells
+2. Query cell neighbours for candidate driver ids from active driver K/V
+3. Filter by eligibility (status, battery, rating)
+4. Rank by ETA or distance and propose candidates to matching engine
+
+Design notes:
+- Geohash cell size selection is important — too large → many false positives; too small → many cells to query
+- Keep driver location updates frequent but rate‑limited to control write QPS
+
+## 4) Matching / dispatch strategies
+
+Push model (proactive dispatch):
+- Server selects best driver and pushes ride offer; driver accepts/declines
+- Good UX but requires low latency and quick response
+
+Pull model (driver picks):
+- Drivers poll available rides in their area and pick; simpler but slower and can be unfair
+
+Hybrid: push to best N drivers (ring‑based) with timeout; if no accept, expand radius — common in production.
+
+Matching algorithms:
+- Greedy nearest‑first: low compute, matches fast
+- Bipartite matching / Hungarian algorithm: optimal but heavy for large batches
+- Auction/market models: factor price & driver preferences
+
+Practical approach: use greedy + heuristics, reserve complex global optimization for scheduled/pooled rides
+
+## ৫) ETA ও routing considerations
+
+ETA importance: rider expectations & pricing. ETA depends on real‑time traffic, driver position, and routing algorithm.
+
+Components:
+- Routing engine (OSRM, GraphHopper) for shortest/fastest path
+- ML‑based ETA model that corrects routing prediction using historical traffic data (time of day, day of week)
+- Caching common route ETAs for popular corridors
+
+Tradeoffs:
+- Calling external map provider per candidate increases latency and cost — estimate distance first, then refine for top candidates
+- Use progressive refinement: approximate ETA by haversine/distance into higher accuracy for shortlisted drivers
+
+## ৬) Surge pricing ও matching economics
+
+Surge目的: balance supply & demand. Implementations:
+- Real‑time multiplier per region based on demand/supply ratio
+- Time‑decayed surge indicators to avoid oscillation
+
+Policy considerations:
+- Explainability to users (show surge reason)
+- Cap multipliers and use smoothing to prevent dramatic spikes
+- Protect drivers by guaranteeing minimum earnings or separate incentives
+
+Abuse prevention:
+- Detect fake demand patterns or driver collusion via analytics & anomaly detection
+
+## ৭) Trip lifecycle ও data model (simplified)
+
+Core entities:
+- drivers(driver_id, vehicle_id, status, location, rating)
+- riders(user_id, payment_method, rating)
+- trips(trip_id, rider_id, driver_id, state, fare, start_ts, end_ts, path)
+- offers(offer_id, driver_id, trip_id, expires_at)
+
+Storage patterns:
+- Active/ephemeral state (driver location, online status) in fast K/V (Redis)
+- Durable trip history in relational DB or wide‑column store for analytics
+- Events (location updates, state changes) into Kafka for downstream processing
+
+## ৮) Scaling & partitioning
+
+Regionalization first: partition world into regions (cities) and route requests to region‑specific clusters to reduce latency and legal constraints.
+
+Sharding strategies:
+- Hash by city/region or user id for trip state
+- Conversation/Trip id based sharding ensures single writer semantics for trip state
+
+Stateful services:
+- Keep connection servers (for real‑time sockets) stateful; make them horizontally scalable behind a gateway with sticky sessions or token‑based routing
+- Stateless services prefer autoscaling behind LB
+
+Resilience:
+- Use replication & leader election for critical state
+- For real‑time queues, monitor consumer lag and autoscale workers accordingly
+
+## ৯) Real‑time messaging & transport
+
+- Use persistent connections (WebSocket, MQTT) for driver/rider updates
+- For in‑app notifications, use push gateways (APNS/FCM) when offline
+- Event bus (Kafka) to decouple ingest from downstream analytics and billing
+
+Delivery guarantees:
+- Ensure at‑least‑once for critical events but implement idempotency in consumers
+- Use sequence numbers for trip updates to maintain ordering
+
+## ১০) Monitoring, SLOs ও runbooks
+
+Key metrics:
+- matching_latency_p50/p95, rate_of_successful_assignments
+- driver_response_time, offer_acceptance_rate
+- ETA_accuracy_p90, cancellation_rate
+- queue_lag for fan‑out workers, payment_failure_rate
+
+Example SLOs:
+- Match latency p95 < 1s in urban areas
+- Trip creation success 99.95% monthly
+
+Runbook examples:
+- Large matching latency spike → check region cluster health, geo index errors, and routing provider latency
+- Rapid cancellations → check cancellation UI bug, surge mispricing, or incentive changes
+
+## ১১) Testing, chaos & load testing
+
+- Load test location update ingestion and matching under realistic movement patterns
+- Chaos: simulate region network partition and verify graceful degradation (e.g., operate read‑only local state and queue events)
+- Replay logged events into staging to validate downstream analytics and surge logic
+
+## ১২) Payments, disputes ও compliance
+
+- Integrate payment gateways (Stripe/Adyen/local providers) and handle asynchronous payment flows
+- Record receipts and immutable trip records for disputes
+- Compliance: tax/reporting, driver onboarding KYC, local ride regulations consider
+
+## ১৩) Security ও fraud detection
+
+- Authenticate drivers and riders (device binding, multi‑factor for drivers)
+- Fraud detection pipelines: anomaly detection on trip patterns, payment flags, fake GPS
+- Prevent GPS spoofing: compare IMU/telemetry, improbable jumps, cross‑check with nearby drivers
+
+## ১৪) ML use‑cases
+
+- ETA prediction (model + feature store)
+- Matching ranking (probability driver accepts & ETA → maximize utility)
+- Fraud detection and dynamic pricing
+- Supply forecasting to allocate incentives
+
+## ১৫) Cost considerations ও optimizations
+
+- Reduce map provider calls via caching & approximation
+- Use regionally sized clusters to lower cross‑region traffic
+- Precompute common patterns (e.g., airport flows) to optimize matching
+
+## ১৬) Example production patterns (concise)
+
+- Ingress → API → Auth → Region router → Connection servers → Matching service → offer worker → driver app
+- Kafka streams for events → downstream billing, analytics, ML feature store
+- Persistent storage for trips & payments; Redis for active state
+
+## ১৭) Decision flow (সংক্ষেপে)
+
+1. Need sub‑second matching & global scale? → regionize + in‑memory geo index + push/hybrid matching
+2. Want simple MVP quickly? → use third‑party map APIs + simple greedy matching + rely on DB for state
+3. Expect very large scale with hotspots? → implement hybrid matching & background fan‑outs, and throttle heavy producers
+
+---
+
+আপনি চাইলে আমি এই পাতায় runnable artifacts যোগ করে দেবো:
+
+- (A) Minimal Node.js mock: driver simulator (WebSocket) + matching service + Redis for active drivers (Docker Compose)
+- (B) Kafka‑based dispatch simulator (Python) that publishes location streams and measures matching latency
+- (C) Terraform scaffold for regional cluster with autoscaling group templates and simple deploy scripts
+
+কোনটি চান? (A / B / C / None)

@@ -1,0 +1,235 @@
+---
+title: Designing Instagram‑like Feed
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## টাস্ক রিসিপ্ট ও উচ্চস্তরের পরিকল্পনা
+
+এই পাঠে আমি একটি production‑grade Instagram‑স্টাইল feed কিভাবে ডিজাইন করা যায় সেটা বাংলা ভাষায় ধাপে ধাপে ব্যাখ্যা করব — requirements, data model, feed generation strategies (fan‑out on write / fan‑out on read / hybrid), ranking ও personalization, caching, analytics, অপারেশনাল রুলস এবং decision flow। শেষে আমি runnable উদাহরণ যোগ করার অপশন দেবো।
+
+চেকলিস্ট (আপনি যা পাবেন):
+- functional ও non‑functional requirements স্পষ্টভাবে
+- feed generation প্যাটার্নগুলোর তুলনামূলক বিশ্লেষণ
+- data model, storage choices ও partitioning কৌশল
+- ranking ও personalization এর মৌলিক কাঠামো
+- caching, pagination, consistency ও latency tradeoffs
+- monitoring, SLO ও runbook পরামর্শ
+- সিদ্ধান্ত‑ফ্লো ও বাস্তব উদাহরণ
+
+---
+
+## দ্রুত সারাংশ
+
+Instagram‑ধাঁচের feed হলো একটি read‑heavy, personalized timeline যেখানে প্রতিটি user‑এর জন্য relevance‑ভিত্তিক post list দরকার। প্রধান চ্যালেঞ্জগুলো: low latency redirects for reads, personalization/ranking at scale, real‑time visibility of new posts, এবং cost control (writes vs reads tradeoff)।
+
+রূপক: ভাবুন প্রতিটি ইউজারের সামনে একটি নিউজ‑স্ট্যান্ড আছে যা সরাসরি তার পছন্দ অনুযায়ী কাগজ সজ্জা করে দেয় — কখনও স্ট্যান্ডে কাগজগুলো আগে থেকে সাজিয়ে রাখতে হয় (write‑time assembly), কখনও প্রত্যেক গ্রাহকের চাহিদা এলে পরে সাজাতে হয় (read‑time assembly)।
+
+## ১) Requirements সংক্ষেপে
+
+Functional:
+- post creation (images, caption, metadata)
+- follow/unfollow relationships
+- personalized feed (ranked)
+- pagination & infinite scroll
+- likes/comments/views/update visibility
+- real‑time updates (optional: push notifications / websockets)
+
+Non‑functional:
+- high read QPS (feed reads >> writes)
+- p95 read latency < 100ms (target varies)
+- high availability (multi‑AZ)
+- horizontal scalability for millions of users
+- affordable storage and compute cost
+
+## ২) প্রধান আর্কিটেকচারাল অপশন
+
+Three canonical strategies:
+
+A) Fan‑out on write (push model)
+- যখন user A পোস্ট করে, সার্ভিস সকল follower‑এর inbox/timeline tables‑এ সেই পোস্ট push করে
+- Read: simple lookup by user id → returns precomputed ordered list
+
+Pros:
+- reads খুব দ্রুত (single lookup)
+- ranking precomputed (simple)
+
+Cons:
+- heavy write amplification for users with large follower‑counts (celebrity problem)
+- storage duplication (same post stored across many timelines)
+- spikes when a hot user posts
+
+B) Fan‑out on read (pull model)
+- write: store post once in posts store with metadata
+- read: when user requests feed, system fetches recent posts from followed users and merges + ranks on the fly
+
+Pros:
+- writes cheap, storage efficient
+- no duplication
+
+Cons:
+- read latency higher (many reads + merges), inconsistent latency under heavy load
+- complex merging and rate limiting needed
+
+C) Hybrid (selective push)
+- push to timelines for regular users; for heavy hitters (celebs) keep in a separate hot store and pull during read
+- or maintain both a precomputed feed and on‑the‑fly additions (recent window)
+
+This hybrid is common in production: balance latency and cost.
+
+## ৩) Data model ও storage
+
+Core tables (conceptual):
+- users(user_id, profile, ...)
+- posts(post_id, author_id, created_at, media_ref, caption, visibility)
+- followers(user_id, follower_id) — or a follower list per author
+- timelines(user_id, post_id, score, created_at) — precomputed timeline entries (for push model)
+- interactions(post_id, user_id, type, ts) — likes/comments
+
+Storage choices:
+- Posts: object storage for media (S3) and metadata in a durable DB (Cassandra/DynamoDB/Postgres)
+- Timelines: wide‑row stores (Cassandra, Bigtable, DynamoDB) or Redis for hot windows
+- Followers graph: graph DB or denormalized lists in scalable datastore
+
+Partitioning:
+- Partition timelines by user_id (consistent hashing)
+- For Cassandra: design wide rows per user where columns are post entries sorted by time/score
+
+## ৪) Ranking ও personalization (high level)
+
+Ranking pipeline components:
+1. Candidate generation: pick a candidate set (recent posts from follows, recommended posts, ads)
+2. Scoring: apply heuristics/ML model to score candidates (recency, affinity, engagement probability)
+3. Re‑ranking & blending: apply business rules, diversity, and freshness
+
+Heuristics example:
+- score = w1*recency + w2*author_affinity + w3*engagement_history + w4*media_type_bonus
+
+Engineering notes:
+- Keep scoring fast — use feature caches (user affinity vectors, post embeddings)
+- Use online feature stores or Redis for hot features
+- For ML models: precompute features asynchronously and load model in scoring service; prefer lightweight models for per‑request scoring
+
+## ৫) Candidate generation strategies
+
+- Follow‑based candidates: recent posts by people user follows
+- Social signals: top posts in the user's network
+- Recommendation candidates: collaborative filtering / embeddings
+- Trending/ads: system level inserts
+
+Candidate set size: pick k (e.g., 500) and then score top N (e.g., 50) for the final feed
+
+## ৬) Read path examples
+
+Fan‑out write model (read):
+- Query timelines table for user_id → return ordered list → fetch post metadata (batch) → render
+
+Fan‑out read model (read):
+- Fetch followees list → parallel fetch recent posts per followee (bounded), merge & score → fetch metadata → render
+
+Hybrid read path:
+- Read precomputed timeline + merge recent pulled posts (from heavy followees) and recommendations
+
+Optimization tips:
+- Batch post metadata fetches
+- Use asynchronous image CDN signed URLs
+- Use HTTP/2 or multiplexed connections to parallelize backend calls
+
+## ৭) Caching ও pagination
+
+- Per‑user feed cache: store top N items per user in Redis with short TTL
+- Use cursor‑based pagination (created_at+post_id) to avoid offset scanning
+- For infinite scroll: warm next page proactively on idle
+
+Staleness strategy:
+- For push model, updates immediate; for pull/hybrid, accept eventual consistency for new posts
+- If strong freshness required (e.g., comments moderation), show "new posts" indicator and fetch delta
+
+## ৮) Handling heavy hitters এবং backpressure
+
+- For celebrity posts: avoid writing to millions of timelines synchronously — use background fan‑out and show partial result to followers with progressive updates
+- Rate limit long fan‑outs and apply queueing (Kafka) with backpressure, or use selective push (only followers with recent activity get push)
+- Provide read fallback: if timeline write not complete, fall back to pull model for that user
+
+## ৯) Real‑time updates (optional)
+
+- Use websockets / server‑sent events / push notifications to notify clients of new posts
+- Publish small presence events; avoid sending full feed on every new post
+- Client can fetch delta via API when notified
+
+Design consideration: keep push lightweight and rely on efficient fetch APIs for actual content
+
+## ১০) Analytics এবং AB testing
+
+- Event capture: publish interactions to event bus (Kafka) asynchronously
+- Stream processing: offline aggregates with Flink/FlinkSQL or Kafka Streams → populate feature stores and analytics DB (ClickHouse)
+- AB testing: route fractions of users to different ranking models; collect engagement metrics and compare
+
+## ১১) Consistency ও correctness
+
+- For likes/comments counters: use incremental counters (atomically in DB or via CRDTs / Redis counters with periodic reconciliation)
+- Delete/mute/block operations: ensure timeline entries reflect user visibility rules (filter at read time or remove from timeline store)
+- Idempotency: make post creation idempotent (client‑generated idempotency keys)
+
+## ১২) Monitoring, SLOs ও runbooks
+
+Key metrics:
+- feed_read_latency_p95, p99
+- feed_cache_hit_ratio
+- fanout_queue_lag, fanout_failures
+- candidate_gen_time, scoring_time
+
+SLO examples:
+- Feed read success 99.9% monthly
+- p95 feed latency < 200ms
+
+Runbook snippets:
+- High feed latency → check scoring service latency, cache hit ratio, and DB tail latencies
+- Fanout backlog growth → check consumer lag and scale worker pool
+
+## ১৩) Security ও moderation
+
+- Content moderation pipeline: async scanners (URL malware, NSFW detectors) before pushing to feeds
+- User reporting workflow: quick removal via flagging and propagation to timelines
+- Privacy rules: respect blocked/muted relationships at read time
+
+## ১৪) Cost considerations
+
+- Push model increases storage and write cost but lowers read compute
+- Pull model is storage efficient but increases read compute and latency
+- Hybrid model balances cost — use heuristics to decide where to push
+
+## ১৫) Deployment & operational patterns
+
+- Use feature flags for rolling out ranking models
+- Canary deployments for scoring service and background fan‑out workers
+- Use auto‑scaling based on queue lag and p95 latency
+- Backfill strategies: create jobs to retroactively populate timelines when changing push logic
+
+## ১৬) Real‑world concise architecture example
+
+- Ingress/API → Post Service (writes to posts store + publish to Kafka)
+- Fan‑out workers (consumers) → populate timelines table or push to Redis
+- Feed API (read) → read from timelines store, fallback to pull or recent posts; scoring service applies lightweight re‑ranking
+- Stream processor → compute features & aggregates → store in feature store for ranking
+- Client side uses websockets for new‑post notifications and CDN for media
+
+## ১৭) Decision flow (সংক্ষেপে)
+
+1. Are reads >> writes and low latency critical? → use push (fan‑out on write) for most users
+2. Do you have super‑nodes with millions of followers? → use hybrid: pull for followers of heavy hitters or background fan‑out
+3. Need strong personalization and fast model iteration? → maintain feature store + lightweight online scorer
+4. Want minimal ops? → start with pull model and move to hybrid when traffic grows
+
+## ১৮) ছোট বাস্তব উদাহরণ ও পরবর্তী ধাপ
+
+আপনি চাইলে আমি একটি runnable starter তৈরি করব:
+
+- (A) Minimal Node.js + Redis push model demo (Docker Compose): post → publish to Redis stream → worker writes timeline lists → read API returns precomputed feed
+- (B) Small Kafka + Node consumer example showing fan‑out worker and backfill script
+- (C) Simple pull model demo (Node.js) that fetches recent posts from followees and merges+sorts on read
+
+নির্বাচন বললে আমি সেই প্রজেক্টের সোর্স, README এবং দ্রুত smoke‑test তৈরি করে চালাবো।
+
+---
+
+এই পাঠে আমি feed‑generation প্যাটার্ন, ranking, caching, এবং অপারেশনাল দিকগুলো সংক্ষিপ্ত ও প্রায়োগিকভাবে কভার করেছি। কোন runnable উদাহরণ চান? (A / B / C / None)

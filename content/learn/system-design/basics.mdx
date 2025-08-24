@@ -1,0 +1,126 @@
+---
+title: মৌলিক কনসেপ্ট - Scalability, Reliability, Maintainability
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই পাঠে আমরা তিনটি সবচেয়ে গুরুত্বপূর্ণ নন-ফাংশনাল ধারণা — Scalability (স্কেলেবিলিটি), Reliability (রিলায়াবিলিটি), এবং Maintainability (মেইনটেইনেবিলিটি) — কে পরস্পরের সাথে সম্পর্কসহ ব্যাখ্যা করব। প্রতিটি অংশে বাস্তব উদাহরণ, মেট্রিক, ডিজাইন প্যাটার্ন এবং বাস্তব জগতের অভিজ্ঞতা ভিত্তিক টিপস দেব। লক্ষ্য: আপনি ইন্টারভিউতে পরিষ্কারভাবে ব্যাখ্যা করতে পারবেন এবং প্রকল্পে সিদ্ধান্ত নেয়ার সময় ব্যবহার করতে পারবেন।
+
+## ১. কন্ট্রাক্ট (এই পাঠের জন্য)
+
+- ইনপুট: একটি সিস্টেমের উচ্চ-স্তরের লোড বাজে (QPS, concurrent users), কনটেন্ট টাইপ (যেমন: small JSON, large video), ও ব্যবসায়িক গতি (growth rate)।
+- আউটপুট: ডিজাইন-শ্রেণিবদ্ধ স্ট্র্যাটেজি ও পরিমাপক বিধি (SLOs) যাতে সিস্টেম নির্দিষ্ট কন্ডিশনে কাজ চালিয়ে যেতে পারে।
+- সফলতা: latency, throughput ও error-rate-এর উপর নির্ধারিত SLO মেট হওয়া; পরিবর্তন সহজে ডিপ্লয় করা যায়; সিস্টেম ব্যর্থ হলে দ্রুত পুনরুদ্ধার সম্ভব।
+
+## ২. Scalability — কী, কেন, এবং কীভাবে
+
+সংজ্ঞা: Scalability হলো সিস্টেম কিভাবে বড় পরিমাণ ট্রাফিক বা ডাটা সামলায় তার ক্ষমতা।
+
+টাইপ:
+- Vertical scaling (scale-up): এক সার্ভারের ক্ষমতা বাড়ানো — CPU/RAM বাড়ানো। সুবিধা: সহজ, কনসিস্টেন্ট। সীমা: হেডরুম সীমাবদ্ধ এবং single point of failure থাকতে পারে।
+- Horizontal scaling (scale-out): একাধিক সার্ভার/ইনস্ট্যান্স যোগ করা। সুবিধা: উচ্চতর আউটপুট ও ফেল-রেজিস্ট্যান্স। বেশি জটিলতা: ডিস্ট্রিবিউশন, শেয়ারড স্টেট ম্যানেজমেন্ট।
+
+কৌশলসমূহ ও প্যাটার্ন:
+- Load Balancer: ট্রাফিক শেয়ারিং ও হেল্থ চেক।
+- Partitioning/Sharding: ডাটাকে ভাগ করে রাখা (user-id hashed partition)।
+- Replication: রিড স্কেল করার জন্য replicas ব্যবহার।
+- Caching: CDN বা ইন-মেমোরি (Redis) ব্যবহার করে latency কমানো।
+- Asynchronous Processing: ব্যাকগ্রাউন্ড জব (queues) দ্বারা লোড কমানো।
+
+মেট্রিকস (যেগুলো মনিটর করবেন): QPS, P95/P99 latency, throughput (requests/sec), error-rate, CPU/RAM ব্যবহার, connection count।
+
+নির্ধারণের নিয়ম (Rule-of-thumb): প্রথমে ব্যাটলনেক চিহ্নিত করুন (profiling/load-test), তারপর অলটেরনেটিভগুলি তুলনা করুন (cost, complexity, latency)।
+
+উদাহরণ (রিয়েল-ওয়ার্ল্ড): একটি ইকমার্স সাইটে ব্ল্যাক ফ্রাইডে ট্র্যাফিক হঠাৎ বেড়ে গেলে—শর্ট-টার্মে auto-scaling (scale-out) ও CDN দিয়ে লোড হ্যান্ডল করুন; লং-টার্মে DB শার্ডিং ও ক্যাশ টিউনিং প্রয়োজন হবে।
+
+## ৩. Reliability — রিপোর্ট, ব্যর্থতা এবং পুনরুদ্ধার
+
+সংজ্ঞা: Reliability মানে সিস্টেম কতটা নির্ভরযোগ্যভাবে কাজ করে — নিরবচ্ছিন্নতা, সঠিকতা ও পুনরুদ্ধারের সময়।
+
+কনসেপ্টস:
+- Redundancy: একাধিক নকল (replica) যাতে কোনো একটি ব্যর্থ হলে অন্যটি কাজ চালায়।
+- Failover & Leader Election: cluster-এ লিডার বদলানো।
+- Graceful degradation: পুরো সিস্টেম না চলে গেলেও গুরুত্বপূর্ণ অংশ চালু রাখা।
+- Circuit Breaker, Bulkhead: cascading failures রোধ করা।
+- Idempotency: রিকোয়েস্ট রিটি-রাইলে ডুপ্লিকেট ইফেক্ট রোধ করে।
+
+মেট্রিকস: MTTR (Mean Time To Recovery), MTTF, error budget, success-rate, incident frequency।
+
+পলিসি ও প্র্যাকটিস:
+- Retries with backoff + idempotency
+- Health checks & automated failover
+- Chaos engineering (সিমুলেটেড ফেইলিয়ার দিয়ে পরীক্ষা)
+- Backups, point-in-time recovery ও tested restore playbooks
+
+উদাহরণ: চ্যাট অ্যাপে মেসেজ লস হলে ব্যবহারকারীর অভিজ্ঞতা হারায়—মেসেজে acknowledgement, delivery receipts ও local queueing ব্যবহার করে reliability বাড়ানো যায়।
+
+## ৪. Maintainability — টেকসই ও দ্রুত পরিবর্তন যোগ্যতা
+
+সংজ্ঞা: Maintainability হলো কী সহজে কোড/আর্কিটেকচার পরিবর্তন, বাগ ঠিক করা, এবং নতুন ফিচার যোগ করা যায়।
+
+বেস্ট-প্র্যাকটিস:
+- Modularity: পরিষ্কার সার্ভিস-বাউন্ডারি ও সলিড API contracts।
+- Documentation & Runbooks: অপারেশনাল দিকের ডকুমেন্টেড স্টেপ।
+- Observability: logs, metrics, tracing যাতে দ্রুত root-cause analysis হয়।
+- Automated Tests & CI/CD: unit, integration ও e2e টেস্ট; কনফিগার্ড pipelines।
+- Feature Flags & Canary Releases: ধাপে ধাপে ডিপ্লয় করা যায়।
+
+কাজের পরিমাপে: বড় সিস্টেমে technical debt কমাতে regular refactoring, dependency updates ও API versioning অপরিহার্য।
+
+## ৫. trade-offs এবং কীভাবে সিদ্ধান্ত নেবেন
+
+স্কেলেবিলিটি, রিলায়াবিলিটি ও মেইনটেইনেবিলিটি প্রায়ই ট্রেড-অফে থাকে। উদাহরণ:
+- বেশি redundancy → বেশি cost।
+- strict consistency → latency বাড়ে।
+- modularization → প্রথমে বেশি ইঞ্জিনিয়ারিং খরচ, পরে তবেই দ্রুত ডেভেলপমেন্ট।
+
+ডিসিশন ফেমওয়ার্ক (শর্ট টেম্পলেট):
+1) প্রয়োজনীয়তা (business impact) নির্ধারণ করুন — SLO/SLA কি? 
+2) মেট্রিক দিয়ে অগ্রাধিকার দিন — কোন ফিচার সবচেয়ে বেশি ইউজার-ইমপ্যাক্ট করে?
+3) PoC বা load-test-run করে সতর্কতা যাচাই করুন।
+4) Implement minimal viable change, measure, iterate.
+
+## ৬. ছোট চেকলিস্ট (ইন্টারভিউ ও বাস্তবে ব্যবহারযোগ্য)
+
+- Assumptions: QPS, payload size, peak factors — সবসময় সপ্রসেস করুন।
+- Single point of failure আছে কিনা চেক করুন।
+- ডাটা লস ও restore পরিক্ষা করা আছে কিনা নিশ্চিত করুন।
+- Observability আছে কিনা (P95, error-rate, dashboards)।
+- Deployment strategy (canary, blue-green, rolling) আছে কিনা।
+
+## ৭. টেস্টিং ও ভ্যালিডেশন (Quality gates)
+
+- Load testing: gradual increase to target QPS and beyond; measure P95/P99 latency and errors.
+- Chaos tests: random instance kills, network partition simulation.
+- Integration tests for contracts (API schemas) ও backward-compatibility checks.
+
+## ৮. বাস্তব উদাহরণসমূহ (সংক্ষিপ্ত কেস স্টাডি)
+
+1) ভিডিও স্ট্রিমিং সার্ভিস
+- Scalability: CDN + edge caching, chunked uploads, adaptive bitrate।
+- Reliability: multi-region origin+replica, retries for manifests।
+- Maintainability: microservices for encoding, storage, CDN invalidation।
+
+2) অনলাইন চেকআউট (E-commerce)
+- Scalability: checkout service যাওয়ার আগে cart-cache & rate-limit।
+- Reliability: payment gateway retries, transactional outbox pattern।
+- Maintainability: clear API versions, feature flags for payment providers।
+
+3) রিয়েল-টাইম চ্যাট
+- Scalability: partition users by shard/key, use websocket clusters behind LB।
+- Reliability: ack-based delivery, message persistence, replay on reconnect।
+- Maintainability: separate presence, messaging ও storage সার্ভিস।
+
+## ৯. Edge cases ও সতর্কতা
+
+- Hot keys: একক key-heavy workloads বেশি চাপ তৈরি করে—special sharding or cache warming দরকার।
+- Dependency failures: external API slowdowns cascade করতে পারে—use timeouts, bulkheads।
+- Data migrations: schema changes runtime-এ সমস্যা করে—use backward-compatible changes ও rolling migrations।
+
+## ১০. পরবর্তী ধাপ ও রিডিং
+
+- পরবর্তী পাঠ: [High-level vs Low-level ডিজাইন](/system-design/levels)
+- পড়বেন: CAP theorem, Load Balancing patterns, Caching strategies, Message queue patterns, Observability practices।
+
+---
+
+সংক্ষেপে: ভালো ডিজাইন হচ্ছে ব্যবসায়িক উদ্দেশ্য এবং অপারেশনাল বাস্তবতার মধ্যে ভারসাম্য বজায় রাখা—স্কেল করা, নির্ভরযোগ্য রাখা, এবং সহজে বজায় রাখা। এই তিনটি ধারণা একসাথে নিয়ে চিন্তা করলে প্রকৃতপক্ষে টেকসই সিস্টেম বানানো যায়।

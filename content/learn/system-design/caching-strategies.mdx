@@ -1,0 +1,173 @@
+---
+title: Caching স্ট্রাটেজি - Write-through, Write-back, Write-around
+icon: solar:alt-arrow-right-bold-duotone
+---
+এই পাঠে আমরা বিভিন্ন cache স্ট্রাটেজি — Write-through, Write-back, Write-around (এছাড়াও Cache-aside ও Read-through) — বিশদভাবে দেখবো। লক্ষ্য: কখন কোন স্ট্রাটেজি ব্যবহার করবেন, কনসিস্টেন্সি/পারফরম্যান্স ট্রেড‑অফ কী, কিভাবে cache invalidation ও stampede প্রতিরোধ করবেন, এবং বাস্তব উদাহরণ (Redis/Memcached/CDN) দিয়ে একটি বাস্তবায়ন‑মাইন্ডসেট তৈরি করা।
+
+## চেকলিস্ট
+
+- Write-through, Write-back, Write-around, Cache-aside ও Read-through-এর সংজ্ঞা
+- প্রতিটি স্ট্রাটেজির সুবিধা ও অসুবিধা
+- Cache consistency ও invalidation প্যাটার্নস
+- Cache stampede, সম্ভব mitigation কৌশল
+- Eviction নীতিমালা (LRU, LFU, TTL) এবং sizing কৌশল
+- Monitoring/metrics ও testing পরামর্শ
+
+---
+
+## ১) কতটা cache দরকার এবং কেন
+
+Caching হলো latency কমানো ও backend load কমানোর সরাসরি উপায়। সাধারণত read-heavy workloads‑এ caching সবচেয়ে বেশি লাভ দেয়—উদাহরণ: user profile reads, product catalog, CDN asset caching।
+
+রূপক: cache হচ্ছে দোকানের সামান্য কাগজপত্রের কুটো — আপনি সবচেয়ে বেশি চাওয়া জিনিসগুলো সেখানে রাখেন যাতে বারবার মূল ওয়্যারহাউসে না যেতে হয়।
+
+## ২) স্ট্রাটেজি সংজ্ঞা
+
+1) Write-through
+- প্রতিটি write প্রথমে cache‑এ লিখে তারপর background বা synchronously backend DB‑এ লিখা হয় (বা উল্টোভাবে—DB লিখে cache invalidate/refresh)।
+- সুবিধা: read-এর সময় cache সর্বদা আপডেটেড থাকে → high read consistency
+- অসুবিধা: write latency বাড়ে (because cache + DB) এবং write throughput কমতে পারে
+
+2) Write-back (Write-behind)
+- write প্রথমে cache‑এ সেভ করে দ্রুত রেসপন্স দেয়; cache পরে background‑এ backend DB‑তে কমিট করে
+- সুবিধা: write latency কম, write throughput বাড়ে
+- অসুবিধা: durability risk (cache crash হলে ডাটা হারানো যেতে পারে) unless cache is durable/replicated; complexity in eviction and crash recovery
+
+3) Write-around
+- write সরাসরি DB‑তে যায় এবং cache update করা হয় না (বা পরে lazy invalidate)। ফলে write-heavy workloads‑এ cache churn কমে
+- সুবিধা: write bursts সময় cache churn কমে
+- অসুবিধা: যদি লেখার পরে একই data দ্রুত রিড হয়, তখন প্রথম রিডে cache miss হবে → higher latency
+
+4) Cache-aside (Lazy-loading)
+- application first checks cache: miss হলে DB থেকে নেয় এবং cache‑এ রাখে (application-managed caching)
+- সুবিধা: সহজ, control application‑level; eviction handled by cache engine
+- অসুবিধা: race conditions during high concurrency (stampede), need explicit invalidation on writes
+
+5) Read-through
+- cache engine handles load from DB on miss automatically (transparent to app)
+- সুবিধা: simplified app logic
+- অসুবিধা: depends on cache implementation (e.g., some managed caches provide this)
+
+## ৩) কোন স্ট্রাটেজি কখন বেছে নিবেন — decision guide
+
+- Read-heavy, strong read-consistency required → Write-through বা Read-through
+- Write-heavy, latency-sensitive writes, eventual durability acceptable (e.g., analytics buffers) → Write-back with durable queue/replication
+- Mixed workloads with occasional write bursts → Write-around বা Cache-aside
+- If you want maximum application control and easy invalidation → Cache-aside
+
+## ৪) Cache invalidation প্যাটার্নস
+
+- Explicit invalidate: write operation triggers cache delete/update for affected keys
+- Time-based expiry (TTL): simple & robust but may cause short inconsistent window
+- Versioning / cache key versioning: change key namespace on schema/logic change (e.g., product:v2:123)
+- Soft invalidate + background refresh: delete key and trigger async warm-up
+
+Best practice: "Invalidate early, rebuild lazily with read-through or background warm-up." Document invariants and own the invalidation pathways in application code.
+
+## ৫) Cache stampede এবং mitigation
+
+Stampede: অনেক concurrent requests same-miss সময় DB বা backend-এ একসাথে বেড়ে যায়।
+
+Mitigations:
+- Mutex per-key (distributed lock e.g., Redis SETNX): only one client populates cache, others wait or serve stale
+- Request coalescing / singleflight pattern (Go's singleflight): dedupe backend calls
+- Probabilistic early expiration (expire key slightly earlier than TTL using random jitter) to spread refresh load
+- Serve stale data while refresh in background (stale-while-revalidate)
+
+উদাহরণ (Redis mutex):
+- client tries SETNX lock:key (short TTL)
+- if succeeds → load from DB and populate cache, then DEL lock:key
+- otherwise wait short time and retry or return stale
+
+## ৬) Eviction নীতিমালা ও sizing
+
+- LRU (Least Recently Used): জনপ্রিয়; hot items ধরে রাখা
+- LFU (Least Frequently Used): frequency-based, ভাল for long-term popularity
+- TTL-based: predictable staleness
+
+Sizing কৌশল:
+- Measure average object size and working set size → set cache memory = working_set * factor (1.2–2x)
+- Monitor eviction rate: high eviction rate indicates undersized cache or poor key distribution
+
+## ৭) Consistency & Durability ট্রেড‑অফ
+
+- Write-back দ্রুত কিন্তু durability ঝুঁকি বাড়ে; mitigate with durable write-ahead queue or replicated cache
+- Write-through durable কিন্তু write latency বাড়ে
+- Cache-aside simplest but application must ensure invalidation on writes
+
+## ৮) CDN caching vs application cache
+
+- CDN: edge-caching for static assets (images, JS, CSS) and cacheable HTML (cache-control headers)
+- Application cache (Redis/Memcached): dynamic object caching, session stores, rate-limit counters
+
+Integration tip: set appropriate Cache-Control headers for CDN and honor origin cache TTL; use surrogate keys for mass invalidation
+
+## ৯) Monitoring ও metrics
+
+Key metrics:
+- Cache hit ratio (overall and per-endpoint)
+- Eviction rate
+- Miss latency (time to serve on miss)
+- Stampede events / backend QPS on cache misses
+- Memory usage and fragmentation
+
+Targets: aim for hit ratio > 90% on read-heavy endpoints but measure business impact (not all cache hits equal)
+
+## ১০) Testing ও drills
+
+- Load tests with cold cache, warm cache, and cache invalidation scenarios
+- Spike tests to reproduce stampede and measure mitigation
+- Consistency tests for read-after-write semantics (session-level tests)
+
+## ১১) Implementation examples (pseudo-code)
+
+Cache-aside (pseudo):
+
+1) read(key):
+- v = cache.get(key)
+- if v != null: return v
+- v = db.get(key)
+- cache.set(key, v, ttl)
+- return v
+
+2) write(key, value):
+- db.write(key, value)
+- cache.delete(key)  // explicit invalidation
+
+Write-through (pseudo):
+
+1) write(key, value):
+- cache.set(key, value, ttl)
+- db.write(key, value)
+
+Write-back (pseudo with durable queue):
+
+1) write(key, value):
+- cache.set(key, value, ttl)
+- enqueue(persistent_queue, {key, value})
+- background_worker consumes queue and writes DB
+
+Redis tips:
+- Use Redis as cache (volatile-lru) for small objects; enable AOF or RDB if using write-back and durability needed
+- Use Redlock or Redis SET with NX+PX for simple distributed locking
+
+## ১২) বাস্তব উদাহরণ ও কেস স্টাডি
+
+1) E-commerce product catalog
+- Read-heavy catalog: cache product objects with TTL 5–15 minutes. Use cache-aside for dynamic price updates and explicit invalidation on price change.
+
+2) Leaderboards / counters
+- Use write-back with periodic flush to DB or CRDT counters for aggregated counts. For strong durability, use DB as source-of-truth and periodic reconciliation.
+
+3) CDN + origin cache
+- Static assets on CDN with long TTL + cache-busting on deploy; HTML pages served with stale-while-revalidate for UX
+
+## ১৩) Quick decision flow
+
+1) Is write latency critical? Yes → Write-back (with durability controls) or write-around depending on read patterns
+2) Is read consistency critical? Yes → Write-through or strong invalidation on writes
+3) Do you control app logic easily? If yes → Cache-aside for flexibility; if not, Read-through for simplicity
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি small Redis-based cache-aside code snippet (Node.js) বা একটি k6 load-test (cold vs warm cache) যোগ করতে পারি—কোনটি আগে যোগ করব? 

@@ -1,0 +1,170 @@
+---
+title: Monolith বনাম Microservices Architecture
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা Monolith এবং Microservices আর্কিটেকচারের মৌলিক ধারণা, সুবিধা/অসুবিধা, কখন কোনটি বেছে নিবেন, কিভাবে সঠিকভাবে সার্ভিস বিভক্ত করবেন এবং migration‑এর বাস্তব কৌশল সম্বন্ধে আলোচনা করব। বাস্তব উদাহরণ, রূপক, মাইক্রোসার্ভিস ডিজাইন প্যাটার্নস, ডেটা স্ট্র্যাটেজি, অপারেশনাল চ্যালেঞ্জসমূহ ও টেস্টিং ও মনিটরিং গাইড দেওয়া আছে। লক্ষ্য: আপনি সঠিক আর্কিটেকচার পছন্দ করতে পারবেন এবং একটি বাস্তব‑জগতের রোডম্যাপ তৈরি করতে পারবেন।
+
+## চেকলিস্ট
+
+- Monolith ও Microservices সংজ্ঞা ও রূপক
+- Modular monolith ধারণা ও phased decomposition
+- Decomposition strategies (by business capability, by data, by nouns/verbs)
+- Communication patterns: synchronous vs asynchronous, API contracts
+- Data ownership: database per service, transactions, sagas
+- Observability, tracing, logging, and distributed metrics
+- Deployment, CI/CD, versioning ও backward‑compatibility
+- Team boundaries, organisation design ও Conway’s Law
+- Migration strategy ও anti‑patterns
+
+---
+
+## ১) রুপক দিয়ে শুরু: Monolith কী, Microservices কী
+
+রূপক: ভাবুন একটি রেস্তোরাঁ—Monolith হলো সব কাজ এক রান্নাঘরে করা: অর্ডার, রান্না, বিলিং, স্টক সব একই জায়গায়। Microservices হলো আলাদা কাঁটা‑ছুরি: রান্নাঘর, কুকিং স্টেশন, বিলিং কাউন্টার আলাদা; প্রতিটি নিজের কাজ করে এবং একে‑ই মেনুগুলোর মাধ্যমে সমন্বয় করে।
+
+- Monolith: single deployable application যেখানে সব মডিউল একই প্রক্রিয়ায় চলে
+- Microservices: ছোট, স্বতন্ত্র সার্ভিসগুলোর সেট যাদের নিজস্ব ডেটা ও ডিপ্লয়মেন্ট থাকে
+
+Monolith সাধারণত শুরুতে দ্রুত উন্নয়ন ও সহজ ডিবাগিং দেয়; Microservices বড় স্কেলে স্বাধীন স্কেলিং, আলাদা টিম ownership, এবং প্রযুক্তি হেটারোজিনিটি দেয়।
+
+## ২) Modular Monolith — অনেক ক্ষেত্রে ভাল প্রারম্ভ
+
+Modular monolith মানে কোড‑বেসে পরিষ্কার মডিউলারাইজেশন রেখে single deployable রয়ে যাওয়া।
+ফায়দা:
+- দ্রুত iteration, সহজ transactional guarantees
+- পরবর্তীতে সুনির্দিষ্ট সার্ভিসে বিভক্ত করা সহজ
+
+প্র্যাকটিস: শক্ত typed boundaries, explicit module APIs, and stable interfaces keep migration paths open.
+
+## ৩) ডিকোমপোজিশন কিভাবে করবেন
+
+কিছু জনপ্রিয় কৌশল:
+- By business capability / domain (recommended): Order service, Payment service, Inventory service
+- By subdomain (Domain‑Driven Design): bounded contexts guide service boundaries
+- By data ownership: service owns its data and schema
+- By transactionality and scaling needs: heavy write parts separated from read‑only parts
+
+Avoid splitting by technical layers only (e.g., UI service, DB service) as it increases coupling and coordination overhead.
+
+## ৪) Communication patterns
+
+- Synchronous HTTP/REST / gRPC: simple but introduces coupling and latency chains
+- Asynchronous messaging (Kafka, RabbitMQ): decouples producers/consumers, improves resilience and scalability
+
+Design rules:
+- Prefer async for eventual consistency flows and cross‑service notifications
+- Use sync for request‑reply where low latency and strong immediate consistency required
+- Define clear API contracts, version them and maintain backward compatibility
+
+Idempotency ও retry patterns:
+- Design APIs to be idempotent where retries are possible
+- Use request ids, dedupe caches, and hedged retries carefully
+
+## ৫) Data ownership ও consistency
+
+- Database per service: each service has its own schema to avoid tight coupling
+- Transactions across services: avoid distributed 2PC if possible; prefer sagas (orchestration/choreography)
+- Read models & CQRS: build denormalized read stores for query efficiency and scale
+
+Examples:
+- Payment needs atomicity: prefer co‑located data or external compensation patterns
+- Inventory: event‑driven updates with eventual consistency acceptable for many scenarios
+
+## ৬) Observability: tracing, logging, metrics
+
+Microservices require strong observability:
+- Distributed tracing (OpenTelemetry / Jaeger): trace requests across services using correlation IDs
+- Centralized logging (ELK / Loki): structured logs with trace_id and span_id
+- Metrics (Prometheus + Grafana): request rates, latency histograms, error rates per service
+
+Instrumentation rules:
+- propagate trace id and user context across async boundaries
+- set service SLIs and SLOs and monitor them
+
+## ৭) Testing ও CI/CD
+
+Testing pyramid adapts:
+- Unit tests per service
+- Contract tests (Pact) for service interactions to verify API contracts
+- Integration tests with test doubles or test environments
+- End‑to‑end tests sparingly (expensive and flaky)
+
+CI/CD practices:
+- Independent pipelines per service
+- Canary & blue/green deployments to reduce blast radius
+- Automated rollback on errors and health checks gating promotion
+
+## ৮) Deployment ও infra challenges
+
+- Service discovery: DNS, Consul, or platform (Kubernetes) native discovery
+- Configuration management: central config service or env‑based config with vault for secrets
+- Network concerns: circuit breakers, timeouts, retries; set sensible defaults per service
+
+Kubernetes tips:
+- Use readiness/liveness probes, PodDisruptionBudgets, resource requests/limits, and anti‑affinity for distribution
+
+## ৯) Versioning ও backward compatibility
+
+- Semantic versioning for APIs; include deprecation policy
+- Backward compatibility: support old API behavior for a period; use content negotiation or versioned endpoints
+- Data migrations: plan online schema changes (expand->backfill->remove)
+
+## ১০) Team boundaries ও Conway’s Law
+
+- Align service boundaries with team boundaries — small cross‑functional teams owning services end‑to‑end
+- Organization design affects architecture: prefer independent teams for independent deployability
+
+## ১১) Operational costs ও complexity
+
+Microservices introduce operational overhead: more services to monitor, CI/CD pipelines, network overhead, and distributed debugging. Balance benefits against these costs.
+
+Consider microservices when:
+- team size & domain complexity justify independent ownership
+- need independent scaling or polyglot stacks
+- business demands rapid autonomous delivery by multiple teams
+
+## ১২) Migration strategies (Monolith → Microservices)
+
+Common patterns:
+- Strangler Fig pattern: incrementally extract functionality into services and route traffic gradually
+- Anticorruption layer: create a façade that translates between monolith and new services
+- Extract read‑only services first (reporting, analytics) then write paths
+
+Phased approach:
+1. Modularize monolith and add interfaces
+2. Extract small, independent services (bounded contexts)
+3. Introduce async messaging for decoupling
+4. Iterate and fully decommission monolithic modules when stable
+
+Pitfalls to avoid:
+- Extracting too eagerly causing distributed monolith (tightly coupled services)
+- Not investing in observability and CI/CD before splitting
+
+## ১৩) Anti‑patterns
+
+- Distributed monolith: services that cannot deploy independently due to tight coupling
+- Service per team overfragmentation: too many tiny services increase coord cost
+- Shared database across services causing coupling
+
+## ১৪) Cost‑benefit decision flow
+
+- Start Monolith/Modular Monolith if early stage with small teams
+- Move to Microservices when:
+  - deployment velocity hampered by huge codebase
+  - teams need independent release cadences
+  - scaling requires separation of hot paths
+- Prefer hybrid: modular monolith + select microservices for high‑value boundaries
+
+## ১৫) Practical checklist before adopting microservices
+
+- Do you have automated CI/CD and infra automation? (Yes → continue)
+- Do you have observability & tracing in place? (Yes → continue)
+- Can your teams own full lifecycle of services? (Yes → continue)
+- Do you have clear service boundaries and domain knowledge? (Yes → proceed)
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি (A) runnable microservice template (Node.js + Express + Docker + basic CI), (B) Strangler Fig migration checklist + example router snippets, বা (C) Kubernetes manifest snippets ও best‑practice helm chart skeleton যোগ করে দিতে পারি—কোনটা আগে যোগ করব?

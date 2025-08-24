@@ -1,0 +1,208 @@
+---
+title: Designing WhatsApp/Chat Application
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## টাস্ক রিসিপ্ট ও ছোট পরিকল্পনা
+
+এই পাতায় আমি একটি WhatsApp‑ধাঁচের রিয়েল‑টাইম চ্যাট সিস্টেম কীভাবে ডিজাইন করবেন তা বাংলা ভাষায় ধাপে ধাপে ব্যাখ্যা করব — functional/ non‑functional requirements, architecture patterns, message delivery semantics, encryption, scaling, এবং অপারেশনাল টিপস সহ। শেষে runnable উদাহরণের অপশন দেবো।
+
+চেকলিস্ট (এই পাঠে যা পাবেন):
+- বাক্য সংক্ষেপে প্রয়োজনীয় ফিচার ও নন‑ফাংশনাল চাহিদা
+- ক্লায়েন্ট ও সার্ভার আর্কিটেকচার (WebSocket / MQTT / XMPP / gRPC)
+- Presence, typing indicators, read receipts ও delivery semantics
+- Storage: transient queues vs durable stores; message ordering ও idempotency
+- End‑to‑end encryption (E2EE) মূল ধারণা ও কী ম্যানেজমেন্ট
+- Scaling: sharding, fan‑out, fan‑in, backpressure, and offline delivery
+- Monitoring, SLOs এবং runbook pointers
+
+---
+
+## দ্রুত সারাংশ
+
+রিয়েল‑টাইম চ্যাট সিস্টেম হলো low‑latency, high‑availability ও user‑centric সার্ভিস যেখানে messages প্রায়ই ছোট, কিন্তু ordering, delivery guarantees, এবং privacy অত্যন্ত গুরুত্বপূর্ণ। WhatsApp‑এর মতো সার্ভিসে focus থাকে: instant delivery, offline persistence, lightweight clients, এবং strong privacy (E2EE)।
+
+রূপক: ভাবুন আপনি একটি পোস্ট অফিস চালান যেখানে কাগজ‑চিঠি (message) তাত্ক্ষণিকভাবে পৌঁছানো দরকার — কখনও কুরিয়ার কাছে চলছে (online), কখনও রাইক‑এ রেখে দিতে হবে (offline), এবং কখনও আপনাকে চিঠির আগমন ও পড়ার নিশ্চিতকরণও দিতে হবে (read receipts)।
+
+## ১) Requirements সংক্ষেপে
+
+Functional requirements:
+- 1:1 messaging (text, media)
+- Group messaging (small & large groups)
+- Presence (online/offline), typing indicators, read/delivery receipts
+- Offline delivery & sync across devices
+- Media upload/download (images, voice notes)
+- End‑to‑end encryption (optional/required)
+- Message search and history
+
+Non‑functional requirements:
+- p99 delivery latency < X ms for online recipients
+- High availability (multi‑AZ)
+- Horizontal scalability across millions of users
+- Low battery / bandwidth usage on mobile clients
+
+Constraints/assumptions:
+- Assume strong privacy needs (E2EE) may limit server‑side features
+- Read/write QPS ratio: reads (delivery, sync) >> writes (message send)
+
+## ২) High‑level components
+
+- Clients: mobile/web apps maintaining persistent connections
+- Gateway/Load Balancer: terminates TLS, routes to connection servers
+- Connection Servers (session layer): maintain WebSocket/long‑living connections and deliver messages
+- Message Broker / Queue: durable buffer for messages (Kafka, Pulsar, RabbitMQ)
+- Delivery Workers: perform delivery, retry, and offline persistence
+- Storage: metadata DB (users, contacts), message store (append‑only log or DB), media store (S3)
+- Push Service: APNS/FCM for mobile push when offline
+- Key Management Service: for E2EE key exchange & device management (minimal server knowledge)
+
+Architecture note: separate the connection/session plane from storage/processing plane for scale and isolation.
+
+## ৩) Transport choices: WebSocket vs XMPP vs MQTT vs gRPC
+
+- WebSocket: ubiquitous for web & mobile; full‑duplex over HTTP(S); easy with proxies
+- XMPP: mature protocol for chat with presence and many extensions
+- MQTT: lightweight publish/subscribe for constrained devices
+- gRPC stream: efficient binary protocol but browser support requires gRPC‑web
+
+কাছাকাছি নির্বাচন:
+- Consumer web + mobile: WebSocket common choice
+- Constrained IoT: MQTT
+- Enterprise chat with federation needs + rich features: XMPP
+
+## ৪) Message delivery semantics
+
+Key semantics:
+- At‑most‑once: simple, may lose messages
+- At‑least‑once: retries possible → duplicates must be handled by client/server idempotency
+- Exactly‑once (perceived): achieved via deduplication and idempotent processing (hard distributed guarantee)
+
+WhatsApp style: deliver message to each endpoint, use per‑device sequence numbers and ack flows. Typical flow:
+1. Client A sends message with client_message_id and timestamp to server
+2. Server persists (append to log), acknowledges receipt to A
+3. Server attempts deliver to recipient's connected devices; recipient acks delivery
+4. Server marks delivered; when recipient reads, another ack updates read receipts
+
+Idempotency: server uses client_message_id or dedupe set to avoid duplicates from retrying clients
+
+## ৫) Ordering & causal consistency
+
+- Per‑conversation ordering: preserve order per chat; use monotonic sequence numbers per conversation or logical clocks
+- For group chats: total ordering not required; causal ordering (via per‑sender sequence) and per‑conversation vector clocks optional
+
+Implementation patterns:
+- Single shard per conversation (room sharding) to guarantee ordering
+- Or append‑only log per conversation; consumers read sequentially
+- For cross‑shard groups, rely on timestamps + conflict resolution at client side
+
+## ৬) Offline delivery & multi‑device sync
+
+Offline handling:
+- Persist undelivered messages in durable store; on reconnect, connection server fetches pending messages and streams
+- Use per‑device read markers; resync only missing messages
+
+Multi‑device sync:
+- Each device has device id; server tracks per‑device delivery state
+- For E2EE, keys differ per device; sender encrypts message key for each recipient device (WhatsApp does per‑device key encrypt of message symmetric key)
+
+## ৭) Group messaging patterns
+
+Small groups (< few hundred): fan‑out to devices straightforward
+Large groups (thousands+): use server‑side fan‑out queues or multicast via specialized delivery systems; avoid writing to every timeline synchronously
+
+Optimization: for very large groups, use lazy fan‑out + push notifications with server‑side aggregation
+
+## ৮) Media handling
+
+- Media uploaded to object store (S3) with server generating expiring signed URLs for download
+- For privacy, media may be encrypted at rest with keys also protected by KMS or E2EE where necessary
+- Use CDN for media serving to reduce latency and egress cost
+
+## ৯) End‑to‑end encryption (E2EE) overview
+
+Core ideas (non‑exhaustive):
+- Use asymmetric keys per device; implement X3DH or similar for initial key agreement
+- Messages encrypted with symmetric message key; symmetric key encrypted for each recipient device
+- Server stores only ciphertext; cannot read plaintext
+- Handle key rotation, device add/remove, and forward secrecy (e.g., Double Ratchet)
+
+Operational implications:
+- Server cannot index message content → search & moderation limited
+- Backups of encrypted blobs need key management plan for recovery
+
+## ১০) Scaling: sharding, fan‑out, and backpressure
+
+Sharding strategies:
+- User‑based sharding: consistent hash on user_id or account_id
+- Conversation‑based sharding: hash conversation_id → single shard ensures ordering
+
+Fan‑out approaches:
+- Synchronous fan‑out for small groups/online devices
+- Asynchronous queue + worker pool for larger fan‑out; use partitioned topics by conversation id to preserve ordering
+
+Backpressure:
+- Apply per‑connection rate limits; use queues to smooth bursts
+- If delivery lag grows, throttle non‑interactive workloads (e.g., background sync)
+
+## ১১) Reliability, monitoring & SLOs
+
+Important signals:
+- connection_count, connection_errors
+- message_send_rate, message_delivery_latency_p95/p99
+- queue_lag, worker_failures
+- push_notification_failures, media_upload_failure_rate
+
+SLO examples:
+- Online message delivery success 99.9%
+- p99 delivery latency < 500ms for online recipients
+
+Runbook tips:
+- If queue lag increasing → scale workers, inspect downstream DB latency
+- If mass disconnects → check load balancer health and certificate expiry
+- If push failures spike → check APNS/FCM credentials and throttling
+
+## ১২) Security & abuse mitigation
+
+- Authentication: short lived tokens, device registration
+- Rate limiting: per user/device to prevent spam
+- Spam/abuse detection: heuristics + ML on metadata (message rate, account age)
+- Phishing/media scanning: server‑side scanning for links & attachments (limited with E2EE)
+- Key theft: device unlinking workflow and remote session revocation
+
+## ১৩) Testing & deployment patterns
+
+- Load test connection servers to expected concurrent connections per node
+- Chaos test network partitions and durable store failovers
+- Canary deployments for delivery workers and E2EE key flows
+- CI checks for backward compatibility of wire protocol and client SDKs
+
+## ১৪) Privacy & compliance
+
+- Store minimal metadata; purge per retention policies
+- For E2EE, legal access limited — design compliance workflows carefully
+- Provide exports and account deletion flows respecting GDPR/PDPA
+
+## ১৫) Real‑world concise architecture example
+
+- Ingress (TLS) → Connection servers (WebSocket) maintain sessions and route messages to partitioned Kafka topics keyed by conversation_id
+- Delivery workers consume partitioned topics, persist messages to message store, perform fan‑out via connection servers or push notifications for offline devices
+- Key server handles device keys and key exchange (minimal metadata storage)
+- Media uploaded to S3 + CDN; signed encrypted blobs for privacy
+
+## ১৬) Decision flow (সংক্ষেপে)
+
+1. Do you need E2EE? → add per‑device key management & limit server access to ciphertext
+2. Is ordering per‑conversation required? → use conversation‑based sharding or single‑shard queues
+3. Small groups & low scale? → synchronous fan‑out OK
+4. Large groups & high fan‑out? → asynchronous queued fan‑out with worker autoscaling
+5. Multi‑device sync required? → implement per‑device delivery state & device‑level keys
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি runnable উদাহরণ যোগ করব:
+
+- (A) Minimal Node.js WebSocket chat (single server) with message idempotency and reconnection handling (Docker Compose)
+- (B) Small scalable scaffold: Kafka topic per conversation + Node consumer worker + connection server mock (Docker Compose) and a small load script
+- (C) E2EE demo: simple Double Ratchet‑style key exchange demo (Node) showing per‑device encryption and decryption of messages (no production crypto claims)
+
+আপনি কোনটি চান? (A / B / C / None)

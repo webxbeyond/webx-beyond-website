@@ -1,0 +1,134 @@
+---
+title: High-level vs Low-level ডিজাইন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা High-level ও Low-level ডিজাইনের মধ্যে মৌলিক পার্থক্য, কখন কোন স্তরে কাজ করবেন, এবং একটি সমস্যা ধরে ধাপে ধাপে কিভাবে উভয় স্তরের ডিজাইন করবেন তা দেখব। উদাহরণ, রূপক এবং প্র্যাকটিক্যাল টেমপ্লেট আছে — টার্গেট পাঠক: beginner → intermediate।
+
+## চেকলিস্ট (এই পাঠ থেকে কী পাবেন)
+
+- High-level (HL) এবং Low-level (LL) ডিজাইনের সংজ্ঞা ও উদ্দেশ্য
+- HL ও LL-এর সাধারণ কম্পোনেন্ট ও আউটপুট
+- ইন্টারভিউ ও বাস্তবে HL/LL-এ কীভাবে ও কখন ফোকাস করবেন
+- একটি ছোট কেস স্টাডি: 'URL Shortener' — HL ডিজাইন এবং LL ডিজাইন (ডাটা মডেল ও API)
+- সাধারণ ভুল এবং দ্রুত টিপস
+
+---
+
+## ১) সংজ্ঞা — কি হলো HL ও LL
+
+- High-level ডিজাইন: সিস্টেমের ম্যাপ—কম্পোনেন্ট, তাদের রোল, ও কমিউনিকেশন। এটি আর্কিটেকচারাল সিদ্ধান্তগুলোর ক্ষেত্র—কোন সার্ভিস আছে, কোথায় ক্যাশ, ডেটাবেস টপলজি, আরিয়াসিক টেক্সট (regions), এবং স্কেল নীতি।
+- Low-level ডিজাইন: সেই HL ব্লকগুলোর ভিতরের কাজের কিভাবে বাস্তবে তৈরি করবেন—ক্লাস/মডিউল ডিজাইন, ডাটা স্ট্রাকচার, আলগরিদম, API contract, রিকোয়েস্ট ফ্লো, কনকরেন্সি কন্ট্রোল।
+
+রূপক: HL হলো শহরের মাস্টার প্ল্যান (কোথায় রাস্তাগুলো, পার্ক, বিদ্যুৎ প্ল্যান), LL হলো প্রতিটি বিল্ডিংয়ের ফ্লোরপ্ল্যান, ইলেকট্রিক্স ও পাইপিং ডিটেইল।
+
+## ২) আউটপুট-ভিত্তিক পার্থক্য
+
+- HL আউটপুট: ব্লক-ডায়াগ্রাম, সার্ভিস তালিকা, ডিপ্লয়মেন্ট রিজিওনস, SLO/SLAs, স্কেলিং স্ট্র্যাটেজি।
+- LL আউটপুট: API স্পেসিফিকেশন (ইনপুট/আউটপুট), ডাটা মডেল (স্কিমা), ক্লাস/মডিউল ডিজাইন, কনকারেন্ট এলগরিদম, কেস-ফ্লো ও কোড স্নিপেট।
+
+ইন্টারভিউ টিপ: রিক্রুটার সাধারণত 10–20 মিনিট HL চান (দেখাতে হবে system boundary), তারপর LL-এ একটি অংশ ডাইভ করতে বলেন—তাই প্রস্তুতি দুই-স্তরেরই রাখতে হবে।
+
+## ৩) কখন HL বেশি গুরুত্বপূর্ণ, কখন LL বেশি প্রয়োজন?
+
+- HL বেশি প্রয়োজন যখন: নতুন প্রোডাক্ট শুরু করছেন, আর্কিটেকচারাল রিফ্যাক্টর, বা সিস্টেম এই মুহূর্তে স্কেল বা রিজিওনাল ডিপ্লয়মেন্টে কাজ করবে।
+- LL বেশি প্রয়োজন যখন: পারফরম্যান্স বটলনেক, ডেটা কনসিস্টেন্সি বা কনকারেন্সি ইস্যু আছে, বা দ্রুত প্রোটোটাইপ/ইন্টারফেস তৈরি করতে হবে।
+
+নিয়ম (Rule-of-thumb): বড় সিদ্ধান্ত HL-এ, ছোট but ক্রিটিক্যাল অপ্টিমাইজেশন LL-এ।
+
+## ৪) ডিজাইন ওয়ার্কফ্লো — HL থেকে LL পর্যন্ত একটি অনুশীলনী প্রবাহ
+
+1) প্রাথমিক প্রশ্ন পরিষ্কার করুন — ইউজার, ডেটা ভলিউম, ল্যাটেন্সি প্রত্যাশা, কনস্ট্রেইন্টস।
+2) HL ব্লক-ডায়াগ্রাম আঁকুন — ক্লায়েন্ট, LB, সার্ভিস, DB, ক্যাশ, কিউ ইত্যাদি।
+3) Identify hotspots — কোথায় latency/bottleneck হতে পারে।
+4) LL-এ ডাইভ করুন — সেই হটস্পটের জন্য ডাটা মডেল, API এবং কনকারেন্সি কৌশল ডিজাইন করুন।
+5) Validate with metrics & tests — load-test, unit/integration tests।
+
+এই ওয়ার্কফ্লো ইন্টারভিউ-ওয়ার্ল্ডে দ্রুত বোঝাতে সাহায্য করে এবং প্রকল্পে system-to-code ধারাটি স্পষ্ট করে।
+
+## ৫) কেস স্টাডি: URL Shortener (HL → LL)
+
+HL ডিজাইন (কী প্রয়োজন):
+- Client: Browser/API কলকারী
+- API Gateway / Load Balancer
+- Shortening Service (Stateless app servers)
+- Storage: Key-Value DB (e.g., DynamoDB, Cassandra) বা RDBMS
+- Cache: CDN/edge cache বা Redis for hot redirects
+- Analytics service (optional)
+
+বেসিক HL ডায়াগ্রাম: Client -> LB -> Shortener Service -> (Cache) -> DB
+
+LL ডিজাইন: Data model & API
+
+- API: POST /shorten {"url":"https://..."} → {"short":"/abc123"}
+- Redirect: GET /abc123 → 302 Location: https://...
+
+ডাটা মডেল (simple key-value):
+
+{
+  "shortKey": "abc123",
+  "originalUrl": "https://example.com/very/long/path",
+  "createdAt": "2025-08-24T...",
+  "owner": "user-id",
+  "expiry": null
+}
+
+Key generation (LL concern): base62 encode of an incremental ID vs hash(random) — trade-offs:
+- incremental ID: সহজ, কোলিশন নেই, predictability সমস্যা (guessable URLs)
+- random+hash: unguessable, collision handling ও storage চাহে
+
+Concurrency concern: Race condition on unique key creation — সমাধান:
+- Use DB atomic insert with unique key constraint
+- Or use distributed ID generator (Snowflake) + base62
+
+Caching: redirect response cacheable at CDN level with long TTL for hot keys.
+
+Analytics: Async logging via message queue to avoid slowing redirect path.
+
+## ৬) HL ও LL ডিজাইনে সাধারণ প্যাটার্নস
+
+- API Gateway pattern (HL) — Rate limiting, auth, routing
+- Circuit Breaker / Bulkhead (LL implementable via library) — slow downstream protection
+- Cache-Aside (HL+LL) — HL সিদ্ধান্ত কোথায় ক্যাশ থাকবে; LL অংশে cache read/write sequence ও invalidation লজিক দেওয়া হয়
+- Sharding (HL) → LL-এ shard key selection, rehashing strategy, migration plan নির্ধারণ করা হয়
+
+## ৭) ইন্টারভিউ স্পেসিফিক কৌশল
+
+- শুরুতে 30–60 সেকেন্ডে HL overview দিন — বিভাজন দেখে ইন্টারভিউয়ার বুঝবে আপনি বর্ডার ড্র করছে
+- assumptions তালিকাভুক্ত করুন — QPS, payload size, latency target
+- তারপর একটি হটস্পট সিলেক্ট করে LL-এ ১১–১৫ মিনিট ডাইভ করুন (ডাটা স্ট্রাকচার, API, কনকারেন্সি)
+- শেষের ২–৩ মিনিটে উন্নয়ন/বর্ধিত সুযোগ (caching, replication, geo) উল্লেখ করুন
+
+## ৮) সাধারণ ভুল (avoid)
+
+- সরাসরি কোডে ঝাঁপিয়ে পড়া—ইন্টারভিউ-এ আগে HL ব্যাখ্যা করা জরুরি
+- HL ঠিক না করে LL গভীরে যাওয়া (আপনি ভুল প্রাধান্য দিচ্ছেন)
+- assumptions না বলাই — interviewer will challenge unstated assumptions
+
+## ৯) ছোট LL স্নিপেট — প্যাটার্ন দেখানোর জন্য (pseudo-code)
+
+// Shorten endpoint pseudo
+function shorten(url, userId) {
+  // validate URL
+  // generate candidate key
+  key = generateRandomKey()
+  success = db.insertIfNotExists(key, url, userId)
+  if (!success) { retry or generateAnother }
+  // async log analytics
+  return key
+}
+
+এই কোডটি LL ধারণা দেখায়: validation, key generation, atomic insert, retry logic, async logging।
+
+## ১০) পরিশেষে — সিদ্ধান্তের মানদণ্ড
+
+- HL সিদ্ধান্ত যাচাই: Does it meet business requirements? (SLO, cost budget, regional constraints)
+- LL সিদ্ধান্ত যাচাই: Is it performant? Testable? Maintainable? Backward-compatible?
+
+এই দুই স্তরের মধ্যে একটি পরিষ্কার contract তৈরি করা (interfaces, API specs, SLOs) সবচেয়ে গুরুত্বপূর্ণ — এটি দলকে আলাদা করে কাজ করতে দেয় এবং ভবিষ্যতে রিফ্যাক্টর সহজ করে।
+
+---
+
+যদি চান, আমি এই পাঠে Mermaid ডায়াগ্রাম যোগ করে HL ব্লক-ডায়াগ্রাম ও LL ফ্লো ভিসুয়ালাইজ করতে পারি, এবং URL Shortener-এর জন্য একটি ছোট unit-test ও integration-test উদাহরণ তৈরি করে দিতে পারি।

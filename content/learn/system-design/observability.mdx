@@ -1,0 +1,184 @@
+---
+title: Performance Monitoring ও Observability
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## কাজের গ্রহণ ও সংক্ষিপ্ত পরিকল্পনা
+
+এই পাঠে আমরা observability-এর মূল উপাদান — metrics, logs, traces — এবং কীভাবে তাদের একসাথে ব্যবহার করে প্রকৃত সমস্যার উৎস সনাক্ত করা যায় তা শিখব। পাশাপাশি SLI/SLO/SLAs, sampling নীতি, instrumentation প্যাটার্ন, alerting ও dashboard ডিজাইন নিয়ে বাস্তব পরামর্শ দেব। লক্ষ্য: আপনি একটি প্রোডাকশন সার্ভিসে কার্যকর মনিটরিং ও ত্রুটি-নির্ণয় সেটআপ করতে পারবেন।
+
+চেকলিস্ট
+- Observability কি এবং কেন তা আলাদা একটি কনসেপ্ট
+- Metrics, Logs, Traces পৃথকভাবে কী দেখায়
+- Histogram, summary, gauge, counter-এর ব্যবহার
+- Distributed tracing, context propagation ও correlation IDs
+- SLI/SLO/SLAs সেটআপ ও error budget ধারনা
+- Sampling, cardinality, instrumentation best practices
+- Tooling: Prometheus, Grafana, OpenTelemetry, Jaeger, ELK, Loki
+- Dashboards, alerts ও incident drills
+
+---
+
+## ১) Observability: সংজ্ঞা ও লক্ষ্যমাত্রা
+
+Observability মানে শুধু মেট্রিক দেখানো নয় — এটি হচ্ছে সিস্টেমকে এমনভাবে মাপা যাতে অনভিজ্ঞও ঘটনার কারণ (root cause) দ্রুত বোঝার মতো পর্যাপ্ত তথ্য পায়। Observability তিনটি স্তম্ভে কাজ করে: metrics, logs, traces।
+
+রূপক: সিস্টেম হলো একটি ইঞ্জিন; metrics হলো রপ্তানি করা gauges (তেল/তাপ), logs হলো ডায়াগনস্টিক নোটস, এবং traces হলো ইঞ্জিনে পাইপের মাধ্যমে প্রবাহিত জ্বালানির পথ দেখানো৷
+
+## ২) Metrics: দ্রুত-ফলো করার উপায়
+
+মেট্রিক ধরণ:
+- Counter: cumulative value (requests_total, errors_total)
+- Gauge: instantaneous value (memory_usage, active_connections)
+- Histogram: distribution of latencies (aggregation into buckets)
+- Summary: quantile estimation (client-side summaries can be costly at scale)
+
+প্রয়োগ কৌশল:
+- Latency measurement: instrument request durations into histogram with suitable buckets (e.g., [0.001,0.01,0.05,0.1,0.5,1,5] seconds)
+- Error rates: instrument per-endpoint error counters and group by status code and reason
+- Resource metrics: CPU, memory, IO per service + per-pod in k8s
+
+Metric naming conventions:
+- use dot-free, snake_case or prometheus style: service_name_operation_seconds_bucket
+- include labels for cardinal dimensions (service, endpoint, region) but limit high-cardinality labels (avoid user_id as label)
+
+## ৩) Logs: 구조কৃত ও কন্টেক্সচুয়াল
+
+Logging best practices:
+- Structured logs (JSON) with consistent fields: timestamp, level, service, instance_id, trace_id, span_id, message, error
+- Avoid logging PII; use redaction and consent-aware logging
+- Log level policy: DEBUG for development, INFO for normal ops, WARN/ERROR for incidents
+
+Correlation:
+- Always include trace_id and span_id in logs to correlate with traces
+
+Retention & cost:
+- Balance retention vs cost: hot retention for 7–30 days, long-term cold storage for audits
+
+## ৪) Traces: request-level causal path
+
+Distributed tracing shows the path of a request across services. Key ideas:
+- Spans, traces, parent-child relationships
+- Context propagation: inject/extract trace context into HTTP headers (W3C Trace Context)
+- Span attributes: method, url, status_code, db.statement (avoid full SQL text), error flag
+
+Sampling:
+- Head-based sampling: keep first N% of traces
+- Tail-based sampling: collect all traces, decide later which to index (better for rare errors)
+- Adaptive sampling: increase sample rate on error or latency spikes
+
+Tools: OpenTelemetry for instrumentation, Jaeger/Zipkin for backend tracing, Tempo/Cloud tracing for managed solutions
+
+## ৫) SLI / SLO / Error budget
+
+Definitions:
+- SLI (Service Level Indicator): measurable metric (e.g., request_latency_p95 < 300ms)
+- SLO (Service Level Objective): target for SLI (e.g., 99.9% success)
+- SLA (Service Level Agreement): contractual guarantee with penalties
+
+Error budget:
+- error_budget = 1 - SLO; use remaining budget to decide risk (deploy frequency, feature flags)
+- If budget exhausted → freeze risky releases and focus on reliability work
+
+Example:
+- SLI: successful_requests / total_requests over 30 days
+- SLO: 99.95% success → allowed downtime ~ 21.6 minutes/month
+
+## ৬) Instrumentation checklist (practical)
+
+Per-service:
+1) Export request counters and duration histograms per endpoint
+2) Export internal queue lengths, retry counts, and worker utilization
+3) Expose process metrics: GC pauses, file descriptors, threads
+4) Add logs with trace_id and error context
+5) Instrument external calls (DB, cache, downstream API) as spans
+
+Label strategy:
+- low-cardinality labels: environment, region, instance_class, endpoint; avoid user-specific labels
+
+## ৭) Alerting: principles & patterns
+
+Alert rules:
+- Use SLO-based alerts for on-call (page when SLO breaches imminent)
+- Use resource alerts for ops (e.g., node OOM rate high)
+- Use noisy-alert mitigation: multi-window suppression, runbooks, severity levels
+
+Alert content should include:
+- short summary, probable cause, affected services, dashboards links, runbook steps, rollback hints
+
+Example alert: p95_latency > 500ms for 5m → Severity P1, runbook: check database CPU, recent deploys, trace sample link
+
+## ৮) Dashboard design: top-down approach
+
+Top-level (service health) dashboard:
+- traffic, error rate, latency (p50/p95/p99), saturation (CPU/memory), SLO burn rate
+
+Drill-down dashboard (endpoint-level):
+- per-endpoint latency histogram, error breakdown, traces link, dependency map
+
+On-call dashboard:
+- recent alerts, current on-call, incident timeline, action checklist
+
+Design tips:
+- keep dashboards focused, avoid >10 charts per dashboard, include links to traces/logs
+
+## ৯) Sampling strategy & cardinality control
+
+Cardinality rules:
+- labels cardinality = ∏ unique values bounds memory; cap label domains
+- Use hashed IDs or bucketing for high-cardinality dimensions if you need aggregation but not exact values
+
+Sampling policy:
+- Always sample 100% of errors and high-latency traces; sample a portion of successes
+- Use tail-based sampling for better error visibility if tooling supports
+
+## ১০) Observability for Kubernetes & serverless
+
+Instrumentation differences:
+- K8s: export pod-level metrics (kube-state, cAdvisor), use serviceMonitors (Prometheus operator)
+- Serverless: rely more on traces and RUM; short-lived functions need fast instrumentation and push-based exporters
+
+Sidecar vs Library:
+- Sidecar (e.g., OpenTelemetry collector) centralizes telemetry, helps with batching and retry
+- Library instrumentation gives richer context (application labels) but increases code dependency
+
+## ১১) Real-world debugging workflow (example)
+
+Scenario: sudden P99 latency spike on /api/search
+1) Check service-level dashboard: confirm spike and affected regions
+2) Check dependency dashboards: DB CPU, cache hit rate, network errors
+3) Fetch sample traces for slow requests (use trace_id in logs)
+4) Inspect logs around trace spans for exceptions or retries
+5) If caused by a deploy, rollback or quick fix and monitor SLO
+
+## ১২) Tools & ecosystem
+
+- Metrics: Prometheus + Alertmanager
+- Dashboards: Grafana
+- Tracing: OpenTelemetry + Jaeger / Tempo / Cloud tracing
+- Logs: ELK (Elasticsearch+Logstash+Kibana), Loki for Grafana-native logs
+- Correlation: W3C Trace Context, B3 headers
+
+Managed offerings: Datadog, NewRelic, Honeycomb (high-cardinality analytics), Lightstep
+
+## ১৩) Testing, chaos & runbooks
+
+- Runbook practice: maintain reproducible runbooks and test them in game-day drills
+- Chaos experiments: simulate DB latency, network partition, or CPU spikes and verify observability coverage
+
+## ১৪) Privacy, compliance ও data governance
+
+- Avoid logging sensitive fields (PII, auth tokens)
+- Mask or hash IDs where necessary; document telemetry retention & access controls
+
+## ১৫) Quick decision flow
+
+1) Define SLOs for critical user journeys
+2) Instrument key metrics, logs with trace_id, and distributed traces
+3) Build a top-level health dashboard + per-service drill-downs
+4) Implement alerting based on SLO burn + resource saturation
+5) Run incident drills and iterate on runbooks
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি example Prometheus scrape job + Grafana dashboard JSON অথবা একটি OpenTelemetry instrumentation snippet (Node/Go) যোগ করে দেব—কোনটি আগে যোগ করব? 

@@ -1,0 +1,132 @@
+---
+title: CAP Theorem ও Consistency Models
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই পাতায় আমি CAP theorem-এর সংজ্ঞা, কেন এটা গুরুত্বপূর্ণ, এবং বিভিন্ন consistency models (Strong, Eventual, Causal, Read-your-writes ইত্যাদি) বিশদভাবে ব্যাখ্যা করব। বাস্তব জগতের উদাহরণ, রূপক, ডিল-ট্রেডঅফ ও অপারেশনাল গাইড থাকবে যাতে একজন ইঞ্জিনিয়ার সিদ্ধান্ত-নির্ভরভাবে consistency নির্বাচন করতে পারে।
+
+চেকলিস্ট (আপনার চাওয়া অনুযায়ী)
+- CAP theorem সংজ্ঞা ও উপাদানগুলো (Consistency, Availability, Partition tolerance)
+- Consistency model গুলো (strong, eventual, causal, session-level)
+- বাস্তব উদাহরণ ও সিস্টেম ম্যাপিং (RDBMS, Dynamo, Cassandra, Spanner, Redis, S3)
+- Trade-offs ও কবে কোন মডেল বেছে নিবেন
+- Testing, monitoring ও SLO পরামর্শ
+
+---
+
+## ১) CAP theorem: সংক্ষিপ্ত ও স্পষ্ট
+
+CAP theorem বলে যে একটি বিতরণকৃত সিস্টেম একই সময়ে একগুচ্ছ নোড বিভাজনের (Partition) সময়, পূর্ণ Consistency এবং পূর্ণ Availability — এ তিনটি একটি সাথে পূরণ করা সম্ভব নয়। বাস্তবে আপনাকে Partition tolerance (রিলেবল নেটওয়ার্ক না থাকার সম্ভাবনা) প্রায় সবসময় রাখতে হয়, তাই সাধারণত Consistency ও Availability-এর মধ্যে trade-off নিতে হয়।
+
+রূপক: আপনি ধরে নিন তিনজন অতিথি (নোড) একটি রেসিপি (ডাটা) শেয়ার করেন। হঠাৎ ফোন লাইন কেটে গেল (partition)। এখন আপনি চাইলে প্রত্যেককে অলাদা করে রেসিপি রাখাতে পারেন (availability) কিন্তু সেগুলো একসাথে মিলবে না (no global consistency)। অথবা আপনি সবাইকে অপেক্ষা করাতে পারেন যাতে সবাই একই সংস্করণ পায় (consistency) কিন্তু তখন কেউ রেসিপি পাবে না যতক্ষণ না লাইন ঠিক হয় (reduced availability)।
+
+কী জিনিসগুলো ব্যাখ্যা করে:
+- Consistency (C): সব রিড পরে/latest রাইট এর প্রতিফলন দেখবে—একটি single, global view
+- Availability (A): প্রতিটি রিকোয়েস্টের জন্য একটি response দেওয়া হবে (success বা failure), নোড ডাউন হলে ও
+- Partition Tolerance (P): নেটওয়ার্ক বিভাজন বা message loss সহ্য করা যাবে—distributed systems-এ প্রায় সবসময় P রাখতে হয়
+
+নোট: CAP theorem-কে বেশিরভাগ সিস্টেম 'eventual' বা 'session' consistency দিয়ে মোকাবিলা করে—অর্থাৎ, নেটওয়ার্ক ঠিক হলে ডাটা শেষ পর্যন্ত কনসিস্টেন্ট হবে।
+
+## ২) Consistency models — তালিকা ও ব্যাখ্যা
+
+1) Strong Consistency
+- প্রতিটি রিড সবসময় সবচেয়ে নতুন কমিট দেখায় (linearizability)। উদাহরণ: traditional single-node RDBMS বা globally-synchronized systems (Google Spanner-এর কিছু অপশন)।
+- ভালো যেখানে correctness অতি জরুরি: ব্যাংক ট্রান্সফার, অ্যাকাউন্ট ব্যালেন্স
+
+2) Sequential Consistency
+- অপারেশনগুলো এক নির্দিষ্ট ক্রমে সমস্ত নোডে প্রদর্শিত হবে, কিন্তু তা wall-clock time অনুযায়ী নাও হতে পারে।
+
+3) Causal Consistency
+- যদি অপারেশন A প্রভাব ফেলেছে B-এর উপর, তাহলে যেকোন রিড যে B দেখবে তার আগে A-ও দেখা যাবে। অপ্রাসঙ্গিক অপারেশনগুলোর ordering নিশ্চিত করা হয় না।
+- ভাল: collaborative apps (comments, threaded chats) যেখানে causality বজায় রাখা প্রয়োজন
+
+4) Eventual Consistency
+- যদি আর কোনো নতুন আপডেট না আসে, তাহলে সব রিপ্লিকা শেষ পর্যন্ত একই স্টেট পাবে। দ্রুত রাইট-লোড সহ distributed caches ও DNS-এর মতো সিস্টেমে প্রচলিত।
+
+5) Read-your-writes (Session) Consistency
+- একটি ব্যবহারকারীর সেশন একই সেশন-এ করা রাইট পরে সেই ব্যবহারকারীর রিড অবশ্যই নতুন মান দেখাবে। UX জন্য গুরুত্বপূর্ণ (নতুন পোস্ট তৈরির পরে পোস্ট করাকে দেখানো)
+
+6) Monotonic Reads, Monotonic Writes
+- Monotonic Reads: একই সেশন বা ক্লায়েন্টের রিড কখনো পুরোনো রেজাল্ট দেখাবে না
+- Monotonic Writes: একই ক্লায়েন্টের লেখা কখনো out-of-order প্রয়োগ হবে না
+
+## ৩) বাস্তব সিস্টেম মেপিং (কোন সিস্টেম কোন model ব্যবহার করে)
+
+- Traditional RDBMS (single primary): Strong consistency within a single node; distributed RDBMS may use consensus to extend this (Spanner, CockroachDB)
+- Dynamo-style stores (Amazon DynamoDB, Cassandra): Eventual consistency by default with configurable consistency per-request (quorum reads/writes)
+- Redis (standalone): Strong within a single instance; Redis Cluster provides sharding and eventual replica consistency unless using WAIT/p-sync
+- S3: Historically eventual consistency for overwrite PUTs in some models; newer S3 guarantees read-after-write for new objects in many regions — read provider docs
+- Google Spanner: external clock + Paxos+TrueTime to provide externally-consistent, strongly consistent transactions across regions
+
+## ৪) Quorum-based approaches ও tunable consistency
+
+Quorum reads/writes (R/W/N model): সমস্যা সমাধান করতে popular approach — N হলো replica গননা, W হলো required write acknowledgements, R হলো required read acknowledgements।
+
+- Safety rule: W + R > N ensures that read and write quorums overlap, ফলে latest write দেখা যাবে
+- উদাহরণ: N=3, W=2, R=2 → write acknowledged by 2 replicas, read queries 2 replicas → overlap exists
+
+Tunable consistency সুবিধা দেয়: একই সিস্টেমে লো-লেটেন্সি reads চাইলে R=1 (faster, possibly stale); critical reads হলে R=N বা R>=(N-W+1)
+
+## ৫) কবে কোন মডেল বেছে নিবেন — decision guide
+
+1) Data correctness critical? (banking, billing) → Strong consistency (or serializable transactions)
+2) Low-latency reads for global users, tolerable staleness? (social feeds, metrics) → Eventual/Quorum with background reconciliation
+3) Application requires causal ordering? (collaboration tools) → Causal or session consistency
+4) Mixed workloads? → Consider hybrid approaches: strong for critical metadata, eventual for bulk content. Use per-request tunable consistency if store supports it
+
+রূপক: বিবেচনা করুন যে আপনি লাইব্রেরির বই-লেন্দ রেখে দিয়েছেন—বইয়ের অবস্থা যে নিতে হবে তা critical হলে আপনি একটি single counter (strong) বজায় রাখবেন; কিন্তু যদি শুধু হিট কাউন্টার হয়, stale counts accepted হলে eventual সইবে।
+
+## ৬) Conflict resolution ও ক্রস-শর্ট স্ট্র্যাটেজি
+
+Conflict type:
+- Concurrent writes to different replicas → conflict
+
+Resolution methods:
+- Last-write-wins (LWW): সহজ; wall-clock অথবা logical timestamp ব্যবহার করা হয়; আদেশ থাকতে পারে কিন্তু তথ্য হারাতে পারে
+- Application-level merge: domain-specific merging (e.g., shopping-cart merge)
+- CRDTs (Conflict-free Replicated Data Types): commutative operations allow automatic merge without conflict (e.g., counters, sets)
+
+উদাহরণ: Dynamo-style systems সাধারণত vector clocks বা timestamps দিয়ে conflict detect করে; application-level merge করা প্রয়োজন হতে পারে (shopping cart)।
+
+## ৭) Testing, validation ও monitoring
+
+টেস্টিং:
+- Jepsen-style tests: network partitions, clock skew, node kills — correctness পরীক্ষার জন্য
+- Functional tests: session consistency (read-your-writes), monotonic reads/writes
+- Load tests: staleness under high write load, replica lag scenarios
+
+মনিটরিং মেট্রিক্স:
+- Operation latency (P50/P95/P99)
+- Staleness metric (seconds behind latest commit)
+- Success/error rates per consistency level
+- Replica lag, conflict rate, reconciliation throughput
+
+SLO উদাহরণ:
+- Critical reads: 99.9% reads must be linearizable within 200 ms
+- Replica lag: 95% of replicas must be within 2s of primary
+
+## ৮) অপারেশনাল কনসিডারেশন
+
+- Documentation: document which data uses which consistency model — devs mustn't assume uniform guarantees
+- Client libraries: expose session pins, consistency hints, or transaction APIs
+- Observability: surface consistency-level per-request in traces/metrics
+- Fall-back UX: when reads can be stale, show eventual UX (e.g., "আপডেট হচ্ছে...") or disable destructive actions until consistent
+
+## ৯) রিয়েল-ওয়ার্ল্ড কেস স্টাডি: Social Feed
+
+Problem: worldwide users, low read latency, writes frequent. Strong consistency for every feed item is expensive.
+
+Solution pattern:
+1) Use per-user timeline (sharded) with eventual consistency for feed propagation
+2) For important actions (delete, privacy changes), propagate synchronously to metadata store and ensure fan-out operations check metadata
+3) Offer per-session read-your-writes so the posting user sees their post immediately
+
+## ১০) Quick decision flow (সংক্ষিপ্ত)
+
+1) Critical correctness? → Strong
+2) Latency-sensitive, tolerant to staleness? → Eventual/Quorum
+3) Need ordering/causality? → Causal/Session
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি ছোট Jepsen-style পরীক্ষার স্ক্রিপ্ট (পাইথন বা Go) এবং একটি Prometheus/Grafana metrics শিট যোগ করে দেব—কোনটি আগে যোগ করব? অথবা একটি Mermaid টপোলজি ডায়াগ্রাম যোগ করতে চাইলে বিজোড় সেকশনও যোগ করব।

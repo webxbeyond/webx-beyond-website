@@ -1,0 +1,135 @@
+---
+title: Event-driven Architecture
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## টাস্ক গ্রহণ ও সংক্ষিপ্ত পরিকল্পনা
+
+এই পাতায় আমি Event-driven Architecture (EDA) কি, কখন ব্যবহার করবেন, প্রধান প্যাটার্ন (Event Sourcing, CQRS, Choreography vs Orchestration), operational best-practices, observability ও testing কিভাবে করবেন—সবকিছু বাংলা ভাষায় পরিষ্কারভাবে ব্যাখ্যা করব। ফলাফল: আপনি সিদ্ধান্ত-ভিত্তিকভাবে EDA গ্রহণ বা প্রত্যাখ্যান করতে পারবেন এবং একটি নিরাপদ প্রটোটাইপ ডিজাইন করতে পারবেন।
+
+চেকলিস্ট
+
+- EDA সংজ্ঞা ও ব্যবসায়িক সুবিধা
+- Event Sourcing ও CQRS’র সারমর্ম
+- Choreography বনাম Orchestration
+- Transactional outbox ও CDC বাস্তবায়ন
+- Ordering, idempotency ও deduplication কৌশল
+- Observability: tracing, metrics, logs
+- Testing, replay, এবং data migration বিবেচনা
+
+---
+
+## ১) Event-driven Architecture: সংজ্ঞা ও মূল ধারণা
+
+Event-driven Architecture (EDA) হল এমন একটি ডিজাইন যেখানে সিস্টেমের state‑changes ইভেন্ট হিসাবে প্রকাশ করা হয় এবং অন্যান্য সার্ভিসগুলো ঐ ইভেন্টগুলোর উপর ভিত্তি করে কাজ করে। EDA loose‑coupling, অনুকূলে স্কেলিং, এবং reactive systems তৈরিতে সহায়তা করে।
+
+রূপক: একটি ব্যবসা হলো একটি নাটক; একটি অভিনেতা (service) যখন একটি কাজ করে (order created), সে একটি ঘটা (event) ঘোষণা করে—অন্যান্য অভিনেতারা শুনে তাদের অংশ (notify, bill, ship) শুরু করে। অভিনেতারা একে অপরকে সরাসরি কল করে না, শুধু ঘটনা শুনে কাজ করে।
+
+ব্যবসায়িক সুবিধা:
+- Decoupling: producer কে consumers‑এর বাস্তবতা জানা লাগে না
+- Resilience: consumers ডাউন থাকলে ইভেন্ট ধরে রাখা যায় এবং পরে প্রক্রিয়াকরণ করা যায়
+- Scalability: producers ও consumers স্বতন্ত্রভাবে স্কেল করা যায়
+- Extensibility: নতুন সাবস্ক্রাইবার যোগ করে নতুন বিকল্প কার্যক্রম সহজে চালু করা যায়
+
+## ২) Event Sourcing এবং CQRS — সংক্ষেপে
+
+Event Sourcing:
+- শেষ অবস্থা (current state) আলাদাভাবে স্টোর না করে, system state তৈরি করা হয় ইভেন্টের ক্রমানুসারে (append-only log)।
+- সুবিধা: audit trail, time-travel, সহজ replay ও rebuild materialized views
+- অসুবিধা: increased complexity, schema evolution, and query complexity for current state
+
+CQRS (Command Query Responsibility Segregation):
+- লিখার (commands) পথ ও পড়ার (queries) পথ আলাদা করা; often CQRS combined with Event Sourcing where commands create events and read side keeps materialized views optimized for queries
+- সুবিধা: read-side optimized storage, independent scaling
+
+কখন ব্যবহার করবেন:
+- যদি audit, history, পুনর্গঠন বা complex domain logic থাকে → Event Sourcing/CQRS মূল্যবান
+- সোজাসুজি CRUD‑অ্যাপ্লিকেশনের জন্য অতিরিক্ত জটিলতা হতে পারে; প্রয়োজন অনুযায়ী বিবেচনা করুন
+
+## ৩) Choreography vs Orchestration
+
+Choreography:
+- কোন কেন্দ্রীয় পরিচালক নেই; সেবা‑সেবা ইভেন্ট শোনে ও যথাযথ কাজ করে
+- সুবিধা: low coupling, easy horizontal scaling
+- অসুবিধা: রক্ষণাবেক্ষণের সময় এটি জটিল হতে পারে যদি প্রবাহ অনেক বড় হয়
+
+Orchestration:
+- কেন্দ্রীয় orchestrator (workflow engine) প্রতিটি ধাপ ট্রিগার করে
+- সুবিধা: কাস্টমাইজযোগ্য সিরিয়াল ফ্লোর সহজ ও দেখতে সুবিধা
+- অসুবিধা: single point of coordination, possible tight coupling
+
+নির্বাচন নির্দেশিকা: সহজ workflows এবং central visibility চাইলে Orchestration; loosely coupled scalable flows চান হলে Choreography। অনেক বড় সিস্টেমে হাইব্রিডও দেখা যায়—মূলত Choreography কিন্তু কিছু গুরুত্বপূর্ণ প্রক্রিয়ায় orchestrator রাখা হয়।
+
+## ৪) Transactional Outbox ও Change Data Capture (CDC)
+
+Problem: কিছু ক্ষেত্রে DB write এবং event publish দুটি পৃথক অপারেশন হলে dual‑write সমস্যা হয়।
+
+Transactional Outbox:
+- একই DB transaction‑এ domain change + outbox row লিখুন
+- আলাদা পলিং/connector প্রক্রিয়া outbox থেকে ইভেন্ট পড়ে broker‑এ publish করে এবং মারক করে
+- সুবিধা: atomicity রক্ষা হয় (no lost events)
+
+CDC:
+- DB WAL (write-ahead-log) ব্যবহার করে changes stream করা হয় (Debezium, Maxwell)
+- সুবিধা: no application code change required for outbox, low coupling; কিন্তু অপারেশনাল ও লগিক্যাল ঝামেলা থাকতে পারে
+
+## ৫) Ordering, idempotency & deduplication
+
+- Ordering প্রয়োজন হলে partitioning key ব্যবহার করুন (e.g., per‑user, per‑order)
+- Duplicate delivery সম্ভাব্য—always design consumers idempotent বা maintain dedupe store (unique event id)
+- Exactly‑once processing খুব কঠিন; pragmatic approach: at-least-once + idempotency
+
+Deduplication strategies:
+- event_id stored in dedupe table with TTL
+- idempotent upserts (UPSERT) keyed by natural unique key
+- CRDTs for commutative updates
+
+## ৬) Observability: tracing, metrics, logs
+
+- Inject trace_id into event headers so publish→consume causal chain traceable
+- Metrics: events_published_total, events_consumed_total, consumer_lag, processing_duration_histogram, dead_letter_count
+- Structured logs should include trace_id/span_id and event metadata
+- Provide replay dashboards to see reprocessing and incident impact
+
+## ৭) Schema evolution ও Schema Registry
+
+- Use schema registry (Avro/Protobuf/JSON Schema) to enforce compatibility
+- Backward/Forward compatibility rules: producer/consumer contracts must be maintained
+- Versioning: use minor changes non-breaking, and major versions with migration paths
+
+## ৮) Testing, replay ও migration
+
+Testing approaches:
+- Local end-to-end tests with embedded broker (Kafka, localstack)
+- Contract tests between producer & consumer
+- Replay tests: verify reprocessing of historical events produces expected state
+
+Data migration:
+- Rebuild read models from event log for schema changes or bug fixes
+- Keep migration scripts idempotent and tested on staging
+
+## ৯) Operational concerns
+
+- Retention: determine retention window balancing cost & replay needs
+- Backpressure: monitor consumer lag and apply throttling at producers or scale consumers
+- Dead-letter handling: move bad messages to DLQ with reason and payload for offline inspection
+- Security: sign events or use mTLS for integrity if needed for regulatory requirements
+
+## ১০) Real-world উদাহরণ
+
+1) E‑commerce order processing: order.created → payment service, inventory service, notification service subscribe and react; transactional outbox ensures events published when DB write succeeds
+
+2) Analytics pipeline: all user actions published to event bus → stream processors build aggregates and feed analytics warehouse
+
+3) Integration/Sync: legacy DB changes captured via CDC → events drive synchronization to microservices and search indexes
+
+## ১১) Decision flow (সংক্ষিপ্ত)
+
+1) Do you need audit/replay or complex cross-service process? Yes → consider EDA with Event Sourcing
+2) Is your team comfortable with operational complexity (brokers, schema registry, retention)? If not, start small with simpler pub/sub
+3) Need per-entity ordering? Design partition key early
+4) Ensure idempotency & monitoring are non-negotiable
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি Mermaid workflow ডায়াগ্রাম, একটি transactional outbox example (Postgres + Node.js) অথবা একটি CDC + Debezium কনফিগ স্নিপেট যোগ করে দেব—কোনটি আগে যোগ করব?
