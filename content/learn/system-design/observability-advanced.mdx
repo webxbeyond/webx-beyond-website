@@ -1,0 +1,151 @@
+---
+title: Observability - Logging, Tracing, Metrics
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## টাস্ক রিসিপ্ট ও পরিকল্পনা
+
+আমি এই ফাইলে একটি পূর্ণাঙ্গ, বাংলায় লং‑ফর্ম টিউটোরিয়াল তৈরি করব যা লোগিং, মেট্রিক্স এবং ট্রেসিং‑এর ধারণা, প্র্যাকটিস, অপারেশনাল টিপস ও বাস্তব উদাহরণ দেয়। পরবর্তী ধাপে আমি চাইলে runnable উদাহরণ (OpenTelemetry + Prometheus + Grafana + Tempo অথবা Node/Go instrumentation) जोड़বো।
+
+চেকলিস্ট (নির্দেশিকা):
+- লম্বা‑ফর্ম বাংলা পাঠ, beginner→intermediate
+- বাস্তব উদাহরণ ও রূপক
+- অপারেশনাল টিপস, decision flow ও runbook‑style নির্দেশনা
+- প্রতিটি কনসেপ্ট একবার ব্যাখ্যা (অন্য পাঠের পুনরাবৃত্তি এড়ানো)
+
+---
+
+## দ্রুত সারাংশ
+
+Observability বলতে বোঝায় system‑এর ভিতরের অবস্থা বুঝবার সক্ষমতা — সেটা logging, metrics বা distributed tracing‑এর মিশ্রণ ব্যবহার করে। ভালো observability থাকলে incident diagnosis দ্রুত হয়, RCA সহজ হয় এবং ভেতরের ইনসাইট থেকে সিস্টেম উন্নত করা যায়।
+
+## ১) Observability কি ও কেন জরুরি? (রূপক)
+
+রূপক: আপনার সার্ভার একটি কারখানা; logging হলো কাজের নোটবুক, metrics হলো মিটার/ঘড়ি‑র রিডিং, tracing হলো assembly line‑এ প্রত্যেক আইটেমের পথে চিহ্ন। তিনটি মিলে বোঝায় কোথায় ধীরতা, কোথায় ত্রুটি এবং কেন এমন ঘটছে।
+
+Observability‑এর তিনটি pillar: Logs, Metrics, Traces — প্রতিটি আলাদা প্রশ্নের উত্তর দেয়:
+- Logs: কি ঘটল? (detail, high cardinality)
+- Metrics: কতটা দ্রুত/কতটা প্রায়োগিক? (aggregated, time‑series)
+- Traces: রিকোয়েস্ট কোন path নিলো? (causal sequence)
+
+## ২) Logging – সেরা অনুশীলন (Best practices)
+
+- Structured logs (JSON) ব্যবহার করুন — key/value ফরম্যাট সার্চ ও বিশ্লেষণে সহজ করে
+- Correlation ID: প্রতিটি external request‑এ unique trace_id/request_id পাস করুন; সব logs এ include করুন
+- Log levels: ERROR, WARN, INFO, DEBUG — production এ DEBUG কম রাখুন
+- Avoid PII in logs; redact sensitive fields or use tokenized references
+- Logging backends: Elasticsearch, ClickHouse, Loki — storage ও query‑performance বিবেচনা করুন
+- Indexing ও retention policy: high‑cardinality fields index করলে খরচ বাড়ে; frequency অনুযায়ী hot/warm/cold tiers রাখুন
+
+Operational tips:
+- Rate limit noisy logs at source (agent/sidecar)
+- Use sampling for high‑volume subsystems but ensure you always sample errors
+- Use structured error codes to map log messages to runbook steps
+
+## ৩) Metrics – টাইপস ও ট্যাগিং কৌশল
+
+- তিনটি প্রধান metrics টাইপ: Counter (ইভেন্ট কাউন্ট), Gauge (current value), Histogram/Summary (latency distributions)
+- Prometheus‑style metrics: exposition via /metrics endpoints
+- Labels vs high‑cardinality: labels (tags) helpful, কিন্তু cardinality explode করলে storage 비용 ও query latency বাড়ে
+
+Best practices:
+- Keep label set small and bounded (use service, endpoint, region; avoid user_id as label)
+- Use histograms for latency and compute SLOs from percentiles (p95/p99)
+- Instrument critical business events (orders_processed, payments_failed)
+- Export to a TSDB (Prometheus, VictoriaMetrics, ClickHouse) depending on write/retention needs
+
+Sampling & aggregation:
+- Aggregate metrics at the service level; for very high cardinality streams use pre‑aggregation
+- Use exemplars (OpenTelemetry) to link metrics to traces for deeper diagnosis
+
+## ৪) Tracing – distributed traces এবং context propagation
+
+- Traces composed of spans; each span = operation with start/end timestamps and metadata
+- Context propagation: trace id must flow across HTTP headers (W3C traceparent) or gRPC metadata
+- Tracing backends: Jaeger, Zipkin, Tempo (Grafana), Lightstep
+
+Practical advice:
+- Instrument entry/exit points and important downstream calls (DB, external APIs)
+- Capture useful attributes: http.method, http.url (but avoid full payload), db.statement (sanitized)
+- Sampling strategy: use dynamic sampling (sample all errors, sample small percent of normal requests)
+
+## ৫) OpenTelemetry ও পূর্ণ স্ট্যাক ইন্টিগ্রেশন
+
+- OpenTelemetry provides SDKs, collectors, and exporters for logs/metrics/traces
+- Collector acts as pipeline: receive → process (batch, transform, sampling) → export
+- Use OpenTelemetry collector to centralize batching, sampling, and vendor‑neutral export
+
+Collector tips:
+- Offload heavy transforms to collector (avoid client CPU overhead)
+- Use tail‑based sampling in collector for better error capture when possible (but needs buffering)
+
+## ৬) Storage ও খরচ‑বিবেচনা
+
+- Logs: volume heavy → index/partition strategy জরুরি; cold storage (S3)‑এ long retention
+- Metrics: Prometheus local storage for short retention + remote write to long term TSDB (VictoriaMetrics, ClickHouse)
+- Traces: retain spans based on sampling; use trace storage optimized for high write/low cost (Tempo + object storage)
+
+Cardinality problem:
+- High cardinality labels cause explosion. Plan labels, use aggregation, and employ cardinality guards and alerts.
+
+## ৭) Alerting, SLOs, এবং Runbooks
+
+- Define SLIs (success rate, latency p95) and SLOs (target % over time)
+- Alerts should be action‑oriented: "What changed?" and "What to do?" not just "something failed"
+- Pager thresholds: use severity (page for P1, message/channel for P2)
+- Runbooks: for each alert, have exact diagnosis steps, common causes, and remediation commands
+
+Example SLI/SLO:
+- SLI: request_success_rate over 5m window
+- SLO: 99.9% success rate monthly
+- Alert: burn rate alert when error budget consumption > x% in y minutes
+
+## ৮) Dashboards ও 탐색 (Exploration)
+
+- Dashboards per‑persona: SRE (service health), Dev (endpoint performance), Product (business metrics)
+- Use wide‑range overview panels (availability, latency histograms) and drilldowns (per‑endpoint traces)
+- Use exemplars to link Prometheus histograms to trace IDs in Tempo/Jaeger
+
+## ৯) Security ও Privacy
+
+- Mask PII in logs and tracing attributes; use token references instead
+- Protect telemetry pipelines (mTLS between agents and collectors)
+- Enforce RBAC on dashboards and query APIs
+
+## ১০) Common anti‑patterns ও কিভাবে এড়াবেন
+
+- Logging everything at DEBUG in prod → cost & noise. Mitigate: log level lifecycle and sampling
+- Using user_id as metric label → cardinality explosion. Mitigate: aggregate by user cohorts or use dimension store
+- No tracing in async queues → instrument producers & consumers and propagate context via message headers
+
+## ১১) Real‑world example (E‑commerce checkout flow)
+
+Scenario: একজন গ্রাহক checkout করে। Observability pipeline:
+1. Client request enters API gateway — request gets a correlation id
+2. Gateway logs request received (structured) and emits metric `request_count{route="/checkout"}`
+3. Backend services (cart, pricing, payments) create spans; database calls instrumented as child spans
+4. Prometheus scrapes metrics; traces exported to Tempo; logs sent to Loki/ClickHouse
+5. If payment latency > p95 threshold an alert fires; SRE uses dashboard to open a trace (linked via exemplar) and the runbook suggests checking external payment provider latency
+
+Diagnosis flow example:
+- Alert → open dashboard → check p95 latency → jump to traces → find span with external API call → check logs for errors → apply retry/backoff or rollback deploy if needed
+
+## ১২) Implementation checklist (quick starter)
+
+- Ensure all services propagate trace ids (W3C traceparent)
+- Expose Prometheus /metrics and instrument counters/histograms
+- Adopt structured logging and include correlation id
+- Deploy OpenTelemetry Collector with batching and tail‑based sampling if possible
+- Create SLOs and corresponding alerts with actionable runbooks
+
+## ১৩) Next steps ও runnable artifacts (আমি যা যোগ করতে পারি)
+
+- (A) Minimal Node.js app instrumented with OpenTelemetry (logs/metrics/traces) + docker‑compose for Prometheus + Grafana + Tempo (runnable)
+- (B) Go microservice example with OTLP exporter and Prometheus scrape + sample dashboards
+- (C) OpenTelemetry Collector config + Prometheus remote_write → VictoriaMetrics + Grafana dashboards + sample alert rules
+
+আপনি কোনটি চান? (A / B / C / None)
+
+---
+
+এই পাঠে আমি logging, metrics ও tracing‑এর মূল এবং অপারেশনাল দিকগুলি সংক্ষিপ্তভাবে কভার করেছি; আপনি যে runnable উদাহরণটি চান বলে দিন, আমি তা তৈরি করে পরীক্ষা করে দেব।

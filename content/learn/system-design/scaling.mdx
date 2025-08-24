@@ -1,0 +1,133 @@
+---
+title: Horizontal vs Vertical Scaling
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা Horizontal (scale-out) এবং Vertical (scale-up) স্কেলিং এর মধ্যে পার্থক্য, কখন কোনটি ব্যবহার করবেন, বাস্তব উদাহরণ, ডাটাবেস ও স্টেটফুল সার্ভিসে স্কেলিং কৌশল, autoscaling নীতিমালা এবং সিদ্ধান্ত নেয়ার জন্য একটি সহজ ফর্মুলা আলোচনা করব। লক্ষ্য: আপনি স্কেলিং সিদ্ধান্তগুলোকে সংখ্যায় পরিমাপ করে যুক্তিপূর্ণভাবে তুলনা করতে পারবেন।
+
+## চেকলিস্ট
+
+- Vertical vs Horizontal সংজ্ঞা ও ট্রেড-অফ
+- Stateless vs Stateful সার্ভিসে কৌশল
+- Database scaling: replication, sharding, partitioning
+- Autoscaling best practices (metrics, cool-down, policies)
+- Capacity planning ও stress-testing
+- সাধারণ পিটফলস ও mitigation
+
+---
+
+## ১) সংজ্ঞা & মূল ধারণা
+
+- Vertical Scaling (Scale-Up): একটি একক নোডের সম্পদ (CPU, RAM, Disk I/O) বাড়ানো। সহজ কিন্তু সীমিত—একটি হার্ডওয়্যার-সীমা আছে এবং single point of failure রয়ে যায়।
+- Horizontal Scaling (Scale-Out): আরও নোড/ইনস্ট্যান্স যোগ করে সিস্টেমকে বিস্তৃত করা। বেশি কনফিগারেশন, কিন্তু ভালো অপব্যর্থতা সহ্যশীলতা ও অনুকূল স্কেল পেতে দেয়।
+
+রূপক: Vertical scaling হলো এক জন লোককে বেশি কাজ শেখানো—উনি দ্রুত কাজ করতে পারবে কিন্তু এক জনই সব কাজ করবে; Horizontal scaling হলো আরও লোক নিয়োগ করা যাতে কাজ ভাগ হয়ে যায়।
+
+## ২) ট্রেড-অফস (উদাহরণসহ)
+
+- Vertical: সুবিধা — সহজ স্থাপন, কম কমপ্লেক্সিটি; অসুবিধা — সীমাবদ্ধতা, single point of failure, সীমিত লাভ (eventual hardware cap)।
+- Horizontal: সুবিধা — উচ্চে স্কেল, fault-tolerant; অসুবিধা — ডিস্ট্রিবিউশন জটিলতা (consistency, coordination), বেশি অপারেশনাল কাজ।
+
+উদাহরণ: যদি আপনার ওয়েব সার্ভার latency বাড়ছে, প্রথমেই vertical (ইনস্ট্যান্স টাইপ পরিবর্তন) দ্রুত রিলিফ দেয়; কিন্তু যেকোনো বড় উন্নতি এফেক্ট পেতে হলে scale-out প্রয়োজন।
+
+## ৩) Stateless বনাম Stateful সার্ভিস
+
+- Stateless সার্ভিস: প্রতিটি অনুরোধ স্বাধীন—scale-out সহজ। (e.g., API servers)
+- Stateful সার্ভিস: session/connection/local state থাকে—scale-out করতে হলে state externalize করতে হয় বা বিশেষ শার্ডিং প্রয়োজন। (e.g., game servers, websocket hubs)
+
+প্যাটার্নস:
+- Externalize session state (Redis) → stateless app servers সহজে horizontal scale হয়
+- Sticky sessions বা consistent hashing ব্যবহার করে stateful connection shards করা যায়; কিন্তু ডিস্ট্রিবিউশন ও রিকভারি জটিল হবে
+
+## ৪) Database scaling কৌশল
+
+1) Vertical scale DB: বড় instance, বেশি IOPS — সহজ কিন্তু সীমিত
+2) Read Replicas: primary → replicas (read scaling), ব্যবহার: reporting ও readonly traffic
+3) Partitioning / Sharding: horizontally partition data by key—complexity: cross-shard joins, rebalancing
+4) Multi-region strategies: geo-partitioning, active-passive vs active-active
+
+প্র্যাকটিক্যাল সিদ্ধান্ত: প্রথমে replication + caching দিয়ে read pressure হ্যালাল করুন; write pressure বাড়লে consider sharding.
+
+## ৫) Caching ও queueing—স্কেলিংয়ে বড় বাজেট-বচাট
+
+- Cache (Redis, Memcached, CDN) read-heavy workload-কে অনেকটা দ্রুত কমায়।
+- Queue (Kafka, RabbitMQ) asynchronous কাজ করে write/processing pressure কমায় এবং স্পাইক হ্যান্ডলিং সহজ করে।
+
+ইউজ কেস: high read, low write for product pages → CDN + Redis cache; background jobs via queue for non-critical work।
+
+## ৬) Autoscaling — নীতিমালা ও মেট্রিকস
+
+Key metrics:
+- CPU/Memory (useful but noisy)
+- Request latency (P95/P99)
+- Request queue length or concurrency
+- Custom application metrics (e.g., job backlog size)
+
+Policies:
+- Scale-up policy: when metric > threshold for X seconds → add N instances
+- Scale-down policy: when metric < threshold for Y seconds → remove M instances
+
+Best practices:
+- Use multiple metrics (combine CPU + latency) to avoid flapping
+- Add cooldown periods between scaling actions
+- Prefer gradual scaling (step-sizes) and proactive scaling for predictable traffic (scheduled)
+- Test scaling behaviour with load-tests
+
+## ৭) Capacity planning ও stress testing
+
+Steps:
+1) Estimate baseline: current QPS, average payload, concurrent connections
+2) Define SLO/SLA targets (P99 latency, error budget)
+3) Run stress tests ramping to target + buffer (e.g., 2x expected peak)
+4) Identify bottlenecks (CPU, disk I/O, DB locks, network)
+5) Iterate: tune config, add cache/replicas, re-run
+
+Tools: k6, locust, vegeta, wrk; I/O profiling via iostat, vmstat, pprof for app CPU profiling
+
+## ৮) State synchronization, rebalancing ও rolling upgrades
+
+- When adding/removing nodes, ensure consistent hashing or rebalancing strategy minimizes data movement
+- Rolling upgrades: drain connections, deploy new version, then re-introduce instance
+- For stateful shards, plan migration & cutover steps carefully and test in staging
+
+## ৯) Real-world patterns ও উদাহরণ
+
+1) Wordpress-style site
+- Start: vertical (bigger VM)
+- Next: move static assets to CDN, add Redis cache, then horizontal scale app servers behind LB
+
+2) High-write analytics collector
+- Use partitioned ingestion (Kafka), stateless consumers scaled horizontally, long-term storage in columnar DB (ClickHouse)
+
+3) Chat / game servers
+- Use sharded stateful servers (by room or region), use presence service + message broker for fanout
+
+## ১০) Economics ও অপারেশনাল সিদ্ধান্ত
+
+- Vertical scaling may be cheaper short-term (single larger instance) but can reach diminishing returns
+- Horizontal scaling increases instance-count management cost but offers better resilience and incremental scaling
+- Consider managed services (RDS, Elasticache, managed Kubernetes) to offload operational burden; trade with vendor lock-in and cost
+
+## ১১) Pitfalls ও কিভাবে এড়িয়ে চলবেন
+
+- Premature optimization: avoid sharding before needs; start with caching & read replicas
+- Relying only on CPU/Memory for autoscaling—prefer latency or queue-length metrics too
+- Ignoring state migration complexity—test rebalancing thoroughly
+
+## ১২) Decision flow (Quick algorithm)
+
+1) Is the service stateless? If yes, prefer horizontal scaling.
+2) Is there a short-term spike? If yes, consider vertical + autoscaling + caching for immediate relief.
+3) Is write throughput bounded by single-node DB? If yes, plan sharding or write fanout patterns.
+4) Are operations & cost acceptable? Choose the simplest solution that meets SLOs.
+
+## ১৩) পরবর্তী ধাপ ও রিসোর্স
+
+- পরবর্তী পাঠ: [Caching Basics: CDN, Redis, Memcached](/system-design/caching)
+- পড়ুন: Kubernetes autoscaling docs, AWS Autoscaling, Cassandra/CockroachDB sharding guides
+
+---
+
+আমি Mermaid ডায়াগ্রাম যোগ করতে পারি (scale-up vs scale-out visual), এবং একটি ছোট load-test k6 স্ক্রিপ্ট বা autoscaling policy উদাহরণ তৈরি করে দিতে পারি—আপনি কোনটা চান আগে? 

@@ -1,0 +1,156 @@
+---
+title: Eventual Consistency বনাম Strong Consistency
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা consistency-এর বিভিন্ন মডেল (strong/linearizability, sequential, causal, eventual) এবং practical trade‑offs কভার করব। রূপক, বাস্তব উদাহরণ (ব্যান্কিং, সোশ্যাল ফিড, কনফিগ সার্ভিস), conflict resolution কৌশল (LWW, vector clocks, CRDTs), এবং অপারেশনাল টিপস (monitoring, testing, SLAs) দেওয়া আছে। পাঠের শেষে একটি সিদ্ধান্ত ফ্লো থাকবে যা বলবে কবে strong consistency দরকার এবং কখন eventual consistency গ্রহণ করা ভালো।
+
+## চেকলিস্ট (এই পাঠে যা থাকবে)
+
+- Strong consistency ও eventual consistency কী এবং ভিন্নতা
+- Linearizability vs Sequential consistency
+- Session guarantees: read‑your‑writes, monotonic reads ইত্যাদি
+- CAP theorem সম্পর্কিত ব্যাখ্যা (practical view)
+- Techniques to implement strong consistency (leader, quorum) এবং eventual consistency (anti‑entropy, read repair)
+- Conflict resolution: LWW, vector clocks, CRDTs
+- Testing এবং monitoring advice
+- Decision flow: build vs reuse
+
+---
+
+## ১) সংজ্ঞা ও রূপক
+
+- Strong consistency (প্রায়ই linearizability): একক গ্লোবাল ordering ধারণ করা হয়; একটি operation সার্ভ করা হলে, সবাই পরবর্তীতে সেই ফলাফলই দেখবে।
+- Eventual consistency: যদি পর্যাপ্ত সময় ও যোগাযোগ থাকে, সব replica শেষমেষ একই ভ্যালুতে পৌছাবে; কিন্তু অস্থায়ীভাবে inconsistent state থাকতে পারে।
+
+রূপক: একটি লাইব্রেরির এক কপির বই ধরুন — strong consistency হলে library catalog-এ বইটি প্রদর্শিত হলে সবাই একই মুহূর্তে বইয়ের অবস্থান দেখবে; eventual consistency হলে কিছু লোক ধরে রাখার পরে catalog কয়েক সেকেন্ড/মিনিটে আপডেট হবে এবং পরে সকল কপি সমন্বিত হবে।
+
+## ২) Linearizability vs Sequential consistency (সংক্ষেপ)
+
+- Linearizability: প্রতিটি অপারেশনকে এমন একটি সিঙ্গল টাইম‑স্ট্যাম্পে ভাবা যায় যা wall‑clock order-এর সাথে সামঞ্জস্যপূর্ণ; এটা strongest and intuitive guarantee।
+- Sequential consistency: সব processes‑এর operations একটি global sequence-এ রয়েছে কিন্তু timestamps বা real‑time ordering থাকার প্রয়োজন নেই।
+
+Linearizability→stronger, latency সাধারণত higher; sequential→less strict কিন্তু reasoning সহজ।
+
+## ৩) Session guarantees (user-facing সিম্পল গ্যারান্টি)
+
+- Read‑Your‑Writes (RYW): একজন user নিজের লেখার পর তা পরে পড়বে
+- Monotonic Reads: একই user এর পরে করা reads কখনো পুরোনো ভ্যালু দেখাবে না
+- Monotonic Writes: একই user এর writes ordering বজায় থাকবে
+- Writes‑Follow‑Reads: a write after a read is ordered after the read's seen value
+
+Session guarantees practical: client‑side session tokens or sticky sessions প্রয়োগ করে সহজে নিশ্চিত করা যায়—eventual systems এ UX‑level consistency বাড়াতে সহায়ক।
+
+## ৪) CAP theorem — বাস্তব দৃষ্টিভঙ্গি
+
+CAP বলে: in presence of network partition (P), system must choose between Consistency (C) এবং Availability (A)। বাস্তবে:
+- Partition rare নয়; design-এর সময় network failures ধরে নিন
+- Strict C under partitions → some requests will be rejected (less available)
+- Strong A under partitions → accept writes but risk divergence
+
+পার্থক্য নির্ধারণ: business requirement নির্ধারণ করে — ব্যাংকিং‑অ্যাকাউন্ট update এ C অগ্রাধিকার; social feed এ A‑centric approach acceptable।
+
+## ৫) কিভাবে strong consistency বাস্তবায়ন করবেন
+
+Leader‑based replication:
+- Single leader serializes writes; followers replicate and apply
+- Guarantees linearizability if reads go through leader (or use read‑quorum + write‑quorum carefully)
+
+Quorum protocols (read/write quorums):
+- With N replicas, require write quorum W and read quorum R such that R+W>N ensures latest write seen by reads
+- Example: N=3, W=2, R=2 → tolerant to 1 failure, provides read‑after‑write if quorums overlap
+
+Tradeoffs:
+- Strong consistency → higher latency (synchronous replication or quorum waits) and lower availability during partitions
+
+## ৬) কিভাবে eventual consistency কাজ করে (এবং কীভাবে জানবেন)
+
+Techniques:
+- Asynchronous replication: leader writes locally then async pushes to followers
+- Anti‑entropy (gossip): replicas exchange digests and repair divergence
+- Read repair: on read detect mismatch and repair background
+
+Consistency window: Time between write and when all replicas converge. Design to keep window small for better UX.
+
+## ৭) Conflict detection ও resolution
+
+Conflict arises when concurrent writes to same key happen at different replicas. Approaches:
+
+- Last‑Writer‑Wins (LWW): timestamp-based; simplest, but may lose updates due to clock skew
+- Vector clocks: causal history tracked per replica to detect concurrency and need for merge
+- Application merge: app-level domain knowledge used to merge (e.g., sum counters)
+- CRDTs (Conflict‑Free Replicated Data Types): data structures designed to merge deterministically (counters, sets, registers)
+
+প্র্যাকটিকাল টিপস:
+- Use LWW only when occasional lost update acceptable or timestamps are strictly synchronized
+- Use vector clocks or CRDTs for critical merges or commutative operations (counters, sets)
+- Keep merge logic domain‑specific — e.g., for inventory you likely need correct subtraction semantics, not naive LWW
+
+## ৮) CRDTs সংক্ষেপে
+
+- CRDTs are data types that guarantee convergence without coordination.
+- Two families: operation‑based (op‑based) এবং state‑based (join on states)
+- Example: GCounter (grow‑only counter), PN‑Counter (positive/negative), OR‑Set (observed‑removed set)
+
+Use cases: offline editors, counters, presence/likes aggregation where merges are simple and commutative.
+
+## ৯) Practical patterns to improve user‑facing consistency
+
+- Client‑side sticky session to leader for reads after writes
+- Session tokens (logical clocks) for read‑your‑writes
+- Read repair + background anti‑entropy to reduce divergence window
+- Use hybrid approach: strong consistency for critical keys, eventual for less critical
+
+Example: user profile updates (strong consistency for email change), social reactions (eventual acceptable)
+
+## ১০) Testing & validation strategies
+
+- Unit tests for merge functions and CRDT operations
+- Integration tests for replication lag, partition handling
+- Chaos testing: simulate partitions and measure divergence windows
+- Property testing: eventual convergence after sequence of operations
+
+Key tests:
+- Read‑Your‑Writes verification under leader failover
+- Concurrent writes detection and merge correctness (vector clock cases)
+
+## ১১) Monitoring & SLOs
+
+Metrics to expose:
+- replication_lag_seconds (per replica)
+- divergence_rate (conflict events per minute)
+- convergence_time_seconds (time until all replicas agree)
+- stale_reads_ratio (reads returning older than latest write)
+
+Suggested SLOs:
+- For strong keyspace: 99.99% linearizable reads within 100ms
+- For eventual keyspace: median convergence time < X seconds, stale_reads_ratio < Y%
+
+## ১২) Operational pitfalls ও mitigations
+
+- Clock skew: affects LWW — mitigate with NTP and logical timestamps where possible
+- Hot keys: under replication can create heavy conflicts — partition hotspot, use sharding or single‑writer patterns
+- Long convergence windows: tune anti‑entropy frequency and read repair
+- Hidden dependencies: services assuming strong guarantees from an eventual system lead to subtle bugs — audit assumptions
+
+## ১৩) Real‑world examples
+
+- Banking balances: strong consistency (or ledger with reconciliation). Many banks use single‑partition transactions or strong consensus for money movement
+- Social timelines: eventual consistency—likes/comments replicate eventually; systems show "may not include latest" notice sometimes
+- Feature flags/config service: often strong consistency desired for control plane; use etcd/consul (Raft)
+
+## ১৪) Decision flow (সংক্ষেপে)
+
+1. Is correctness critical (financial, legal, safety)? → Prefer strong consistency.
+2. Is low latency & availability more important and conflicts manageable? → Eventual + reconciliation (sagas/CRDTs)
+3. Can you scope strong consistency to small subset (hot keys, config) and keep other things eventual? → Hybrid approach.
+
+## ১৫) Follow‑ups আমি যোগ করে দিতে পারি
+
+- A mermaid diagram showing quorum read/write overlaps and leader flow
+- A small Node.js example demonstrating vector clocks + merge for concurrent updates
+- A CRDT example (PN‑counter) in Python with tests and README
+
+আপনি কোনটা আগে চান? আমি নির্বাচিত অপশনের জন্য কোড, README এবং দ্রুত টেস্ট যোগ করে দেব।

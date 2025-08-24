@@ -1,0 +1,185 @@
+---
+title: Authentication বনাম Authorization
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই পাঠে আমরা Authentication (নির্ধারণ—who are you?) ও Authorization (অনুমতি—what can you do?) এর পার্থক্য এবং প্রতিটি স্তরে বাস্তবপন্থা, আর্কিটেকচার, ও নিরাপত্তার টিপস দেবো। কভার করা হবে: লগইন প্যাটার্ন, পাসওয়ার্ড হ্যাশিং, MFA, OAuth2/OpenID Connect, JWT এবং সেশন ম্যানেজমেন্ট, RBAC/ABAC, API authentication (HMAC, API key), সিকিউরিটি আক্রমণ প্রতিকার (CSRF, session fixation), secrets management ও অপারেশনাল কার্যক্রম (rotation, auditing, monitoring)। লক্ষ্য: আপনি একটি প্রডাকশন‑গ্রেড auth সিস্টেম ডিজাইন ও অপারেট করতে পারবেন বা একটি identity provider reuse করার সিদ্ধান্ত নিতে পারবেন।
+
+## চেকলিস্ট (আপনার অনুরোধ অনুযায়ী)
+
+- Authentication vs Authorization স্পষ্টভাবে ব্যাখ্যা করা
+- Password storage ও hashing best practices
+- MFA/2FA প্যাটার্ন ও UX টিপস
+- OAuth2 ও OpenID Connect বাস্তব ব্যবহার ও ফ্লো গাইড
+- JWT ব্যবহার, ঝুঁকি ও mitigation (revocation, rotation)
+- Session management, cookie flags, CSRF, session fixation
+- API authentication: API keys, HMAC, signed requests
+- RBAC vs ABAC vs PBAC ও delegation patterns
+- Secrets management, rotation ও auditing
+- Scaling/availability considerations এবং decision flow
+
+---
+
+## ১) Authentication বনাম Authorization — সোজা পার্থক্য
+
+- Authentication: ব্যবহারকারী বা সার্ভিসের পরিচয় নিশ্চিত করা (Who are you?)
+- Authorization: সেই পরিচিত ব্যক্তি/সার্ভিস কী কি কার্য করতে পারবে বলে নির্ধারণ করা (What are you allowed to do?)
+
+রূপক: Authentication হলো প্রবেশদ্বারে পরিচয় দেখানো (ID চেক); Authorization হলো টিকিট দেখিয়ে কোন রুমে ঢুকতে পারবেন কি না নির্ধারণ করা।
+
+ওপেনিং নীতি: সব authentication আজীবন নয়—সেশন, কিংবদন্তি ও credential lifecycle‑এর কথা মাথায় রাখুন।
+
+## ২) পাসওয়ার্ড স্টোরেজ ও ক্রেডেনশিয়াল নিরাপত্তা
+
+- কখনোই plain text‑এ পাসওয়ার্ড রাখবেন না। শক্তিশালী hashing algorithm ব্যবহার করুন: Argon2id, bcrypt, বা scrypt
+- Hashing‑এর parameter (work factor, memory) টিউন করুন: CPU ও memory‑র trade‑off আছে; Argon2 আধুনিক ও নিরাপদ
+- Salt: প্রতিটি পাসওয়ার্ড‑এ আলাদা random salt যোগ করুন
+- Pepper: (ঐচ্ছিক) — সার্ভার‑side secret, hash‑এর সাথে আলাদা করে রাখুন
+- Rate limiting ও account lockout: brute force‑এর বিরুদ্ধে সুরক্ষা
+- Password policy: দৈর্ঘ্য ও passphrase‑এ গুরুত্ব দিন, শুধু জটিলতা নয়; অদ্ভুত সিম্বল চেয়ে বড় পাসওয়ার্ড ভালো
+
+পাসওয়ার্ড ফ্লো চেকলিস্ট:
+- সাইনআপ‑এ: salt তৈরি, Argon2id‑এ hash করুন, (salt, hash, Argon2 param) সংরক্ষণ
+- লগইন‑এ: সংরক্ষিত salt ও param‑এ hash করুন, constant time‑এ তুলনা করুন
+
+## ৩) মাল্টি‑ফ্যাক্টর অথেন্টিকেশন (MFA)
+
+- MFA ধরন: SMS OTP (সহজ, কিন্তু দুর্বল), TOTP (Authenticator app), Push MFA, U2F/WebAuthn (hardware key)
+- সুপারিশ: WebAuthn/FIDO2 সাপোর্ট করুন; fallback‑এ TOTP; উচ্চ নিরাপত্তায় SMS এড়িয়ে চলুন
+- UX: গুরুত্বপূর্ণ কাজ (payment, recovery, admin)‑এ MFA বাধ্যতামূলক করুন
+- Recovery: নিরাপদ recovery flow দিন (backup code, hardware key); অনিরাপদ reset এড়িয়ে চলুন
+
+## ৪) সেশন ম্যানেজমেন্ট ও কুকি নিরাপত্তা
+
+- দুই পদ্ধতি: stateful server session (session store) বনাম stateless token (JWT)
+- Cookie: Secure, HttpOnly, SameSite=strict/lax ঠিকভাবে সেট করুন; ব্রাউজারে localStorage‑এ token রাখবেন না
+- Session fixation প্রতিরোধ: privilege change‑এ (যেমন login) session id নতুন করে দিন
+- Idle ও absolute session timeout; sliding expiration‑এর tradeoff
+- Logout‑এ: server‑side session invalidation/token revoke নিশ্চিত করুন
+
+Cookie flags:
+- HttpOnly: JS‑এ অ্যাক্সেস বন্ধ
+- Secure: শুধু HTTPS‑এ
+- SameSite: CSRF প্রতিরোধ (Lax ডিফল্ট, Strict হলে ভালো)
+
+## ৫) CSRF, XSS, session fixation ও প্রতিকার
+
+- CSRF: SameSite cookie, anti‑CSRF token (double submit cookie/server‑side token), Origin/Referer যাচাই
+- XSS: user input sanitize, Content Security Policy (CSP), HttpOnly cookie
+- Session fixation: authentication‑এর পর নতুন session id দিন
+
+## ৬) টোকেন প্যাটার্ন: JWT, opaque token, refresh token
+
+- JWT (JSON Web Token): claim‑সহ self‑contained token, signature‑এ stateless verify
+  - সুবিধা: স্কেল সহজ (server session লাগে না), metadata বহন করে
+  - ঝুঁকি: stateless হলে revoke কঠিন, বড় token, signature algorithm ভুল হলে সমস্যা
+- Opaque token: random string, server‑side store‑এ reference — revoke সহজ
+- Best practice: short‑lived access token + long‑lived refresh token (refresh token নিরাপদে রাখুন, ব্যবহার হলে rotate করুন)
+- Token rotation: প্রতিবার refresh‑এ নতুন refresh token দিন, পুরনো revoke করুন
+- Introspection endpoint (OAuth2)‑এ resource server opaque token validate করতে পারে
+
+JWT নিরাপত্তা টিপস:
+- signature ও claim (iss, aud, exp, nbf) validate করুন
+- asymmetric signing (RS256/ES256) ব্যবহার করুন; private key নিরাপদে রাখুন
+- token‑এ সংবেদনশীল ডেটা রাখবেন না
+
+## ৭) OAuth2 ও OpenID Connect (OIDC) — ব্যবহারিক গাইড
+
+- OAuth2: authorization framework, delegated access‑এর জন্য; OIDC‑তে authentication (identity layer) যোগ হয়
+- Common flow:
+  - Authorization Code Flow (PKCE‑সহ): web/mobile‑এ সুপারিশ
+  - Client Credentials Flow: machine‑to‑machine
+  - Implicit Flow: deprecated
+  - Resource Owner Password Credentials: discouraged
+
+- PKCE: native/mobile‑এ বাধ্যতামূলক — auth code interception রোধ
+- Scope/consent: কম scope ব্যবহার করুন, consent‑এর ব্যাখ্যা দিন
+- Claims mapping: IdP‑এর claim‑কে internal user model‑এ map করুন
+
+IdP ব্যবহার/নিজে বানানোর সিদ্ধান্ত:
+- Auth0, Okta, Keycloak, AWS Cognito‑এর মতো managed IdP ব্যবহার করুন, যদি না বিশেষ কারণ থাকে; security/compliance কঠিন
+
+## ৮) Authorization models: RBAC, ABAC, PBAC
+
+- RBAC (Role‑Based Access Control): assign roles to users, permissions to roles — simple and easy to reason
+- ABAC (Attribute‑Based Access Control): policies based on attributes (user, resource, environment) — expressive
+- PBAC (Policy‑Based Access Control) / XACML: centralized policy service (PDP/PEP) for complex decisions
+
+Delegation patterns:
+- OAuth2 scopes vs full RBAC: use scopes for delegated access to APIs; internal authorization may use RBAC/ABAC
+- Principle of least privilege: grant minimal rights by default
+
+## ৯) API authentication: API keys, HMAC, signed requests
+
+- API keys: simple but bearer tokens—protect and rotate regularly
+- HMAC / signed requests (AWS‑style): request signing including timestamp and canonicalized payload — resists replay and tampering
+- Mutual TLS (mTLS): strong machine authentication using client certificates
+
+Choose pattern by threat model:
+- Public third‑party clients → OAuth2 with scopes
+- Internal services → mTLS or mutual authentication + short‑lived certificates
+- Third‑party server‑to‑server → client credentials flow + signed requests
+
+## ১০) Secrets management ও key rotation
+
+- Never store secrets in version control. Use dedicated secrets manager (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault)
+- Automate rotation of keys/credentials and keep audit logs
+- Use short‑lived credentials / dynamic secrets where possible (Vault leasing)
+- Protect private keys of signing certificates (HSM or cloud KMS)
+
+## ১১) Auditing, logging ও compliance
+
+- Log authentication events: login success/failure, MFA events, token issuance/revocation, privileged actions
+- Protect logs (PII) and ensure retention policies meet compliance
+- Monitor abnormal patterns: login spikes, geo‑anomalies, impossible travel
+
+## ১২) Scaling: central auth service vs distributed tokens
+
+- Centralized identity service (IdP) with short lived tokens scales well; resource servers validate tokens locally (JWT) or via introspection
+- Stateful sessions require session stores (Redis) — scale with cluster and sticky sessions if needed
+- Caching verification keys (JWKS) to avoid repeated network calls
+
+Design tradeoffs:
+- Stateless JWTs reduce central load but complicate revocation
+- Stateful tokens simplify revocation but add operational complexity
+
+## ১৩) Testing & threat modelling
+
+- Threat model: enumerate assets, actors, attack vectors (credential stuffing, token theft, CSRF)
+- Automated tests: unit tests for auth logic, integration tests against IdP, pen testing
+- Security testing: fuzzing endpoints, brute force simulation, check for open redirect, improper token validation
+
+## ১৪) Monitoring & SLOs
+
+Key metrics:
+- auth_success_rate, auth_latency_seconds
+- mfa_enrollment_rate, mfa_challenge_failures
+- token_issue_rate, token_revocation_rate
+- failed_login_rate (per IP, per user)
+
+SLO examples:
+- 99.9% auth request latency < 500ms
+- failed_login_rate under threshold; alert on spikes
+
+## ১৫) Operational runbooks
+
+- Compromised credential response: force password reset, revoke tokens, invalidate sessions, notify users
+- Key compromise: rotate signing keys, publish new JWKS, support key rollover for verification
+- IdP outage: have fallback authentication (cached tokens, read‑only maintenance mode) and documented failover steps
+
+## ১৬) Privacy & legal considerations
+
+- Minimize stored PII; password reset flows must avoid leaking sensitive info
+- Comply with regulations (GDPR, CCPA) on data subject rights and breach notification
+
+## ১৭) Decision flow — build vs reuse
+
+- Use managed IdP unless you need full control/compliance reasons
+- Build only when:
+  - You need custom credential semantics or offline auth
+  - You have the team and processes for secure key management and audits
+- Prefer open standards (OAuth2, OIDC, SAML) to reduce integration friction
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি রানেবল Node.js + Express উদাহরণ যোগ করে দিবো: (A) OAuth2 Authorization Code flow with PKCE + OIDC login and session handling, (B) JWT access + rotating refresh tokens example with tests, অথবা (C) RBAC policy example (OPA/Rego) integrated with an API gateway — কোনটা আগে যোগ করব?

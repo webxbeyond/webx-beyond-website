@@ -1,0 +1,165 @@
+---
+title: Consensus Algorithms - Paxos, Raft
+icon: carbon:hierarchical-view
+---
+
+## দ্রুত প্রারম্ভ
+
+এই পাঠে আমরা distributed systems-এ একাধিক নোড মিলিয়ে কিভাবে একটিমত (consensus) আনা হয় তা দেখে নিব — কেন এটা প্রয়োজন, সমস্যা ক্ষেত্র, এবং Paxos ও Raft এ্যালগরিদম কিভাবে কাজ করে। প্রতিটি কনসেপ্ট বাস্তব উদাহরণ, রূপক এবং অপারেশনাল দিক দিয়ে ব্যাখ্যা করা আছে। পাঠ শেষে আপনি সিদ্ধান্ত নিতে পারবেন কখন নিজে consensus ব্যবহার করবেন, কখন managed সার্ভিস ব্যবহার করবেন, এবং কীভাবে production এ পরীক্ষা ও মনিটর করবেন।
+
+## চেকলিস্ট
+
+- Consensus কী এবং তা কেন দরকার
+- Safety ও Liveness ধারণা
+- Paxos: ভূমিকা (proposer, acceptor, learner), two-phase handshake, Multi-Paxos
+- Raft: leader election, log replication, terms, safety
+- Paxos বনাম Raft — তুলনা ও বাস্তব আন্তর্জাতিক উদাহরণ
+- Membership changes, log compaction ও snapshots
+- Testing, fault-injection, এবং monitoring নির্দেশিকা
+- সিদ্ধান্ত ফ্লো: build vs reuse
+
+---
+
+## ১) Consensus — সমস্যাটির সারমর্ম
+
+সমস্যা: একটি ডিস্ট্রিবিউটেড সিস্টেমে অনেক নোড একই সিদ্ধান্তে পৌঁছাতে হবে — উদাহরণ: একটি লক সার্ভিসে কেবল একজনে রিসোর্স খোলা পাবে, বা একটি কনফিগারেশন সার্ভারে নতুন কনফিগ প্রযোজ্য হবে সবাইকে একসাথে।
+
+রূপক: আপনি ও আপনার বন্ধুরা একটা গল্প লিখছেন — প্রত্যেকের কাগজে একই সংস্করণ থাকতে হবে; কেউ কাগজ হারালে বা ভুল পাতায় সই করলে সবাই মিলে ঠিক মিলিয়ে নিতে হবে।
+
+প্রত্যাশা:
+- Safety: কোনও ভুল সিদ্ধান্ত কখনো হয় না (for example, দুইটি নোডই একক লিডার মনে না করে)
+- Liveness: নির্দিষ্ট সময়ের মধ্যে সিস্টেম সিদ্ধান্তে পৌঁছাবে (নোড কাঁটছেঁড়া থাকলেও)
+
+এই দুইয়ের মধ্যে trade-offs ও বাস্তব সমস্যার কারণে consensus ডিজাইন জটিল হয়।
+
+## ২) Paxos — সংক্ষেপে কী করে
+
+মূল ধারণা:
+- Paxos হলো quorum‑based এ্যালগরিদম যেখানে proposers প্রস্তাব করে, acceptors ভোট দেয়, এবং learners সিদ্ধান্ত শোনে।
+- দুটো ধাপ আছে: Prepare (প্রস্তাব নম্বর পাঠান এবং মামলা‑দাখিল দেখতে বলা) এবং Accept (acceptors Accept করে)।
+
+ভূমিকা:
+- Proposer: সিদ্ধান্ত প্রস্তাব করে (e.g., new leader, value)
+- Acceptor: ভোট দেয়/সংরক্ষণ করে — acceptance হচ্ছে commit-এর অংশ
+- Learner: সিদ্ধান্ত জানে (final value) — application layer দেখতে পায়
+
+ফ্লো (সরলীকৃত):
+1. Proposer একটি unique নম্বর N দিয়ে Prepare(N) পাঠায়।
+2. Acceptors যদি এই নম্বরটি পুরোনো না বলে মনে করে, তারা Prepare‑reply পাঠায় এবং পূর্বে কোন value তারা Accept করেছে তা জানায়
+3. Proposer পূর্বের accepted value পড়ে, যদি থাকে তবে সেইটি Accept করার চেষ্টা করে, না হলে নিজের value পাঠায় Accept(N, value)
+4. Acceptors Accept করলে তারা Accept reply দেয়; যখন quorum (majority) Accept করছে তখন value নির্বাচন হয়ে যায়
+
+মাল্টি-Paxos:
+- যদি বারবার একই লিডার থাকে, তাহলে Prepare ফেজ বারবার চালাতে হয় না; লিডার একবার election জিতে পরে দীর্ঘকাল ধরে Accept ফেজে শুধুমাত্র Append করে — production‑ready Paxos deploymentsে এই রূপই বেশি ব্যবহৃত হয়।
+
+পয়েন্টারস:
+- Paxos ব্যাখ্যা করা ভাসমান; বাস্তবে Multi-Paxos বা Paxos‑based systems (Zookeeper এর ZAB, Chubby তে Paxos প্রভাব) বেশি ব্যবহৃত
+
+## ৩) Raft — সরল এবং ইন্টারপ্রেটেবল
+
+Raft তৈরি করা হয়েছে Paxos‑এর জটিলতা কমাতে — সবাই কাজটি কিভাবে করা হচ্ছে সহজে বোঝার জন্য। প্রধান উপাদান:
+- Leader election
+- Log replication
+- Safety via terms ও committed index
+
+মূল ধারণা:
+- System মধ্যে এক লিডার থাকে; ক্লায়েন্ট সব লেখা লিডারকে দেয়। লিডার log entry তৈরি করে, followers-দের কাছে পাঠায় (AppendEntries RPC)।
+- Entry majority কাছে লিখলেই commit ধরা হয় এবং লিডার commit notification পাঠায়।
+- Leader failure হলে নতুন নির্বাচন হয়: কাকে ভোট দেবেন তা `term` ও `log` freshness দেখে সিদ্ধান্ত হয়।
+
+Raft-এর প্রাথমিক APIs:
+- RequestVote(term, candidateId, lastLogIndex, lastLogTerm)
+- AppendEntries(term, leaderId, prevLogIndex, prevLogTerm, entries[], leaderCommit)
+
+লিডার নির্বাচনের রূপক: লোকাল গ্রামে একটি মেলার নেতা নির্বাচন — যে প্রার্থী তার কাজের নথি (log) সবচেয়ে আপ‑টু‑ডেট রাখে এবং সর্বোচ্চ টার্ম আছে, সে জিততে পারে।
+
+## ৪) Raft-এর নিরাপত্তা (Safety) কীভাবে আসে
+
+- Term এবং log matching property নিশ্চিত করে যে একটা নতুন লিডার পুরোনো committed entries মুছতে পারবে না।
+- Vote granting এ condition থাকে: ভোট দিতে হবে কেবল যদি candidate-এর log follower-র log-ও কমপক্ষে যতটা আপডেট থাকে।
+
+এই সিম্পল কিন্তু শক্তিশালী invariants গুলো Raft‑কে ব্যবহারযোগ্য ও ব্যাখ্যা করার সহজ করে তোলে।
+
+## ৫) Paxos বনাম Raft — তুলনা ও বাস্তব সিদ্ধান্ত
+
+- Paxos শক্তিশালী ছিল কিন্তু বোঝা কঠিন; Raft readable এবং implementable হওয়ায় জনপ্রিয়তা পেয়েছে।
+- বাস্তবে অনেক সিস্টেম Paxos-এর আইডিয়া ব্যবহার করে কিন্তু Raft‑style APIs বেশি পরিচিত (etcd, Consul, and many newer systems use Raft).
+
+সিদ্ধান্ত নির্দেশিকা:
+- আপনি library/embedded consensus চান যেখানে ব্যাকএন্ড অনেক কাস্টম হবে → Paxos‑family (Multi‑Paxos) বিবেচনা
+- আপনি একটি সোজা, audit‑friendly implementation চান এবং community support জরুরি → Raft (etcd, HashiCorp Raft)
+
+## ৬) বাস্তব অপারেশনাল বিষয়
+
+1. Quorum sizing:
+   - 3‑node cluster: majority=2 — সাধারণত small production deployments এর জন্য প্রাথমিক পছন্দ
+   - odd number nodes avoid split‑votes inefficiencies
+2. Heartbeats ও election timeouts:
+   - টিউনিং জরুরি — খুব ছোট timeout → unnecessary elections; খুব বড় → slow failover
+3. Log compaction ও snapshots:
+   - দীর্ঘদিনের logs state size বাড়ায়; periodic snapshots নেওয়া ও ব্যবহার করা উচিত (compact+truncate old logs)
+4. Membership changes (joint consensus):
+   - পরিবর্তন করার সময় joint consensus pattern ব্যবহার করে safety বজায় রাখা প্রয়োজন (old+new config quorum)
+
+## ৭) Edge cases ও mitigations
+
+- Network partitions: minority partition can't progress (safety) — majority partition continues (liveness) when partition heals
+- Split brain: odd node counts and quorum rules prevent dual leaders
+- Slow followers causing high leader IO → use follower throttling, async replication with care about consistency
+- Disk corruption / compaction bug → maintain backups and verify snapshots
+
+## ৮) Testing ও ভেরিফিকেশন
+
+- Unit & integration: test vote granting logic, log append & commit path, snapshot & restore
+- Failure injection: leader kill, partition, delayed RPCs — verify safety invariants
+- Model checking: TLA+/PlusCal বা Jepsen-style tests for network partitions and timing anomalies
+- Recommended tools: Jepsen (for partition tests), TLA+ (spec verification), testcontainers for integration tests
+
+## ৯) Metrics ও মনিটরিং
+
+মেট্রিক্স (প্রাথমিক):
+- leader churn rate (leader-ში change frequency)
+- commit latency (write latency to majority)
+- follower lag (bytes/index behind leader)
+- election timeout occurrences
+- snapshot frequency and size
+
+অ্যালার্ট পাতার নির্দেশিকা:
+- frequent elections → timer misconfiguration / instability
+- growing follower lag → IO bottleneck or GC pressure
+- snapshot failure rate → long recovery time
+
+## ১০) বাস্তব উদাহরণ ও ব্যবহার-কেস
+
+- Zookeeper/Chubby: metadata store, leader election for distributed coordination
+- etcd/Consul: service discovery, config storage (Raft under the hood)
+- Distributed lock service: use consensus to ensure mutual exclusion and sequential leases
+- Primary‑backup coordination: choose leader and replicate commands via log replication
+
+## ১১) সরল pseudocode (Raft — AppendEntries simplified)
+
+1. Leader receives client command → append entry to local log with currentTerm
+2. For each follower:
+   - send AppendEntries(prevLogIndex, prevLogTerm, entries, leaderCommit)
+   - if follower responds success -> mark matchIndex for follower
+3. If majority matchIndex ≥ N then leader advances commitIndex and apply entries
+
+(এখানে network retries, backoff, snapshotting ও snapshot install RPC ও timers যোগ করার কথা আছে — production এ বিস্তারিত কাজ দরকার)
+
+## ১২) Build vs Reuse — সিদ্ধান্ত ফ্লো
+
+- আপনি যদি critical, well‑tested consensus দরকার → reuse battle‑tested projects (etcd, Consul, Zookeeper)
+- যদি lightweight/embeded প্রয়োজন হলে → use existing Raft libraries (HashiCorp Raft, Apache Curator for ZK)
+- নিজের consensus লিখবেন কেবল যখন:
+  - আপনি প্রটোটাইপ বা গবেষণা করছেন, অথবা
+  - আপনার ডোমেইন‑নির্দিষ্ট guarantees প্রয়োজন যা কোনো existing library পূরণ করে না
+
+## ১৩) নিরাপত্তা ও কনফিগারেশন টিপস
+
+- RPC authentication এবং TLS প্রয়োগ করুন (node identities verified)
+- Disk encryption for snapshots if sensitive data আছে
+- Role‑based access: reading committed config vs admin operations আলাদা করে দিন
+
+---
+
+আপনি চাইলে আমি এখানে একটি small Raft appendEntries/RequestVote reference implementation (Go) যোগ করে দিতে পারি, বা একটি TLA+ স্পেসিফিকেশন টেমপ্লেট যোগ করব, অথবা একটি Jepsen test plan লিখব — কোনটা প্রথমে যোগ করা উচিত?

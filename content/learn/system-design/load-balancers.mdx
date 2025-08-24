@@ -1,0 +1,152 @@
+---
+title: Load Balancers ও Reverse Proxies
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সংক্ষিপ্ত মন্তব্য
+
+এই পাঠে আমরা Load Balancer এবং Reverse Proxy-এর ভূমিকা, ধরন, রাউটিং অ্যালগরিদম, বাস্তবে ব্যবহার ও ডিপ্লয়মেন্ট কৌশল নিয়ে বিশদ আলোচনা করব। লক্ষ্য: আপনি এগুলোকে সঠিক জায়গায় প্রয়োগ করতে পারবেন এবং ডিজাইন-সমাধানে যুক্তি দেখাতে পারবেন।
+
+চেকলিস্ট (এই পাঠে যা পাবেন)
+- Load Balancer vs Reverse Proxy: মূল পার্থক্য ও ওভারল্যাপ
+- Layer 4 ও Layer 7 LB-এর তুলনা
+- সাধারণ অ্যালগরিথম: Round-Robin, Least Connections, IP Hash, Consistent Hashing
+- Sticky sessions, health checks, TLS termination, connection draining
+- Cloud-managed LB vs self-hosted (NGINX/HAProxy) বিবেচনা
+- বাস্তব কেস (web app, websocket, API, large file uploads)
+- মনিটরিং, টেস্টিং ও ডিপ্লয়মেন্ট টিপস
+
+---
+
+## ১) Load Balancer ও Reverse Proxy — ভূমিকা ও মৌলিক ধারণা
+
+Load Balancer (LB) হলো একটি নেটওয়ার্ক কম্পোনেন্ট যা ইনকামিং ট্র্যাফিক সার্ভার পুলে সমানভাবে বিতরণ করে যাতে কোনো একক সার্ভার অতিরিক্ত লোডে না পড়ে। Reverse Proxy হলো LB-এর একটি বাস্তবায়ন যা ক্লায়েন্টদের সামনে বসে সার্ভারের ভিউ রাইটিং, ক্সি, TLS টার্মিনেশন ইত্যাদি করে। প্রযুক্তিগতভাবে দুটির মধ্যে ওভারল্যাপ আছে — অনেক reverse proxy লোড ব্যালান্সিং করে।
+
+রূপক: LB হলো ট্রাফিক কুশন বা ট্রাফিক-রেগুলেটর—একটি busy বাজারে টিকেট কাউন্টারের সামনে লাইনগুলোকে সঠিকভাবে বিভিন্ন কাউন্টারে বিতরণ করে যাতে ঘণ্টার পর ঘণ্টা লাইন বড় না হয়।
+
+## ২) Layer 4 vs Layer 7 — কোথায় কাজ করে এবং কেন পার্থক্য গুরুত্বপূর্ণ
+
+- Layer 4 (Transport layer): TCP/UDP লেভেলে কাজ করে। ফিচার: দ্রুত, কম CPU কস্ট; সিদ্ধান্ত নেয় IP/port ও connection-level info দেখে। উপযুক্ত যখন শুধুই connection-level routing দরকার (নিম্ন-লেভেল প্রোটকল)।
+- Layer 7 (Application layer): HTTP/HTTPS, gRPC ইত্যাদি বুঝতে পারে, URI/path, headers, cookies দেখে রাউট করে। সুবিধা: কনটেন্ট-ভিত্তিক রাউটিং, auth, rate-limiting; কিন্তু CPU-ইনটেনসিভ।
+
+নির্বাচন: latency-sensitive TCP proxies বা অনেক বড় কানেকশন হলে L4 বেছে নিতে পারেন; HTTP API, microservices বা ওয়েব ট্র্যাফিক হলে L7 দরকারী ফিচার দেয়।
+
+## ৩) সাধারণ লোড ব্যালান্সিং অ্যালগরিদম
+
+- Round-Robin: সার্ভারগুলোর একটা রাউন্ড-রোবিন হয়ে অনুরোধ দেওয়া হয় — সহজ, কিন্তু ভ্যারিয়েশন হলে সমান লোড নয়।
+- Least Connections: বর্তমানে সবচেয়ে কম ওপেন কানেকশন আছে এমন সার্ভারে পাঠায় — connection-heavy workload-এ ভাল।
+- Weighted Round-Robin / Weighted Least Connections: সার্ভারের ক্ষমতা (CPU/RAM) অনুযায়ী ওজন দিয়ে পাঠায়।
+- IP Hash: ক্লায়েন্ট IP-এর হ্যাশ দেখে সার্ভারে পাঠায় — session-affinity দরকার হলে ব্যবহার্য।
+- Consistent Hashing: cache এবং partitioned storage-এর জন্য উপযুক্ত — রি-শার্ডিং কম হয় যখন নোড যোগ/বিয়োগ হয়।
+
+প্রায় সব LB সফটওয়ার-সমাধান weight ও health-aware routing সমর্থন করে।
+
+## ৪) Sticky sessions (Session affinity) এবং কেন সতর্ক থাকা উচিত
+
+Sticky session মানে একটি ক্লায়েন্টকে একই ব্যাকেন্ডে পাঠিয়ে দেয়া যাতে সার্ভার-লেভেলে সেশন-স্টেট রয়ে যায়। সুবিধা: সহজ সেশন হ্যান্ডলিং legacy apps-এ। সমস্যা: লোড-ইম্ব্যালান্স, স্কেলিং ও রিকভারি জটিল করে।
+
+বিকল্প: session-state externalize করুন (Redis, DB) — এতে সেশন ডিসট্রিবিউশন এবং failover সহজ হয়।
+
+## ৫) Health checks, connection draining, ও failover
+
+- Health checks: LB নিয়মিত ব্যাকেন্ডের হেলথ চেক করে (TCP connect, HTTP health endpoint)।
+- Connection draining: একটি ব্যাকেন্ড নোড বাদ দেয়ার সময় LB নতুন কানেকশন না দিয়ে পুরোনো কানেকশনগুলিকে সময় দিয়ে শেষ করতে দেয়—এটি গ্রেসফুল রোলআউট ও রোলব্যাক সহজ করে।
+- Failover: ব্যাকেন্ড ফেইল হলে LB ট্রাফিক অন্য নোডে সরায়।
+
+Design tip: health endpointটি লুদ-সার্ভিসেস বা ডিপেন্ডেন্সি চেক করে একটি aggregated healthy state রিটার্ন করুন; LB-এর পক্ষে সহজ boolean নয়।
+
+## ৬) TLS termination এবং End-to-end TLS
+
+- TLS termination (offloading): LB/TLS proxy-এ TLS টার্মিনেট করলে ব্যাকেন্ডে plaintext ট্রাফিক যেতে পারে—এটি CPU-নিয়ে উপকারী কিন্তু ইনফ্রা নিরাপত্তা বিবেচ্য।
+- TLS passthrough / end-to-end TLS: LB কেবল TCP স্তরে রাউট করে এবং ব্যাকেন্ড সার্ভার পর্যন্ত TLS এনক্রিপশন বজায় থাকে—পছন্দযোগ্য যখন compliance/zero-trust প্রয়োজন।
+
+হাইব্রিড প্যাটার্ন: LB-তে TLS টার্মিনেট করে, LB↔backend মধ্যে mTLS ব্যবহার করুন—এটি উভয়ের সুবিধা দেয়।
+
+## ৭) Reverse Proxy-এর অতিরিক্ত ফিচার
+
+- Caching (response caching)
+- Request/response modification (header injection, URL rewrite)
+- Rate limiting ও WAF (web application firewall)
+- Compression, connection multiplexing (HTTP/2)
+
+NGINX, HAProxy, Envoy প্রভৃতি reverse proxies এই ফিচারগুলো সরবরাহ করে।
+
+## ৮) Cloud-managed LB vs self-hosted
+
+Cloud-managed LB (AWS ALB/NLB, GCP LB, Azure LB):
+- সুবিধা: managed, autoscaling, regional/global options, DDoS প্রটেকশন ও SLAs।
+- সীমাবদ্ধতা: configuration-driven, দাম, কিছু কাস্টম ফিচার সীমিত হতে পারে।
+
+Self-hosted (NGINX, HAProxy, Envoy):
+- সুবিধা: কনফিগারেশন ও কাস্টম লজিকে পূর্ণ নিয়ন্ত্রণ, edge cases সমাধান করা যায়।
+- সীমাবদ্ধতা: অপারেশনাল ও মেইনটেনান্স কস্ট, scaling automation নিজে তৈরি করতে হবে।
+
+প্রয়োগ নীতি: দ্রুত স্টার্টে cloud-managed LB বেছে নিন; যখন ফিচার/কাস্টম লজিক বাড়ে তখন reverse proxy বা service mesh (Envoy) যুক্ত করুন।
+
+## ৯) WebSocket / long-lived connections vs HTTP requests
+
+WebSocket বা TCP-ভিত্তিক পরিষেবায় connection-count হলো মূল সীমা। LB-তে নিচের পয়েন্টগুলো বিবেচনা করুন:
+- Idle timeouts: LB এর idle timeout WebSocket এর প্রয়োজন অনুযায়ী বাড়ান।
+- Sticky-session অথবা consistent hashing যখন per-connection context দরকার।
+- Connection multiplexing: HTTP/2/gRPC ব্যবহার করলে একক TCP সংযোগে বহু streams চলে—এতে connection overhead কমে।
+
+নোট: অনেক managed LB গুলো দীর্ঘসময় ধরে WebSocket সংযোগ ধরে রাখতে আলাদা কনফিগ অপশন দেয় (ALB/GCLB)।
+
+## ১০) Rate limiting, throttling ও QoS
+
+LB/Reverse proxy স্তরে rate limiting প্রয়োগ করলে backend রক্ষা হয়। প্যাটার্নসমূহ:
+- Global rate limit per IP
+- Token bucket per user/API key
+- Distributed rate limiting via Redis or external store
+
+সতর্কতা: Rate-limit policy aggressive হলে legitimate burst ট্রাফিক ব্লক হতে পারে—use graceful throttling ও backoff responses (429)।
+
+## ১১) Metrics, 모니터িং এবং টেস্টিং
+
+মনিটরিং মেট্রিকস:
+- Active connections, new connections/sec
+- Request latency (P50/P95/P99)
+- Backend health & error-rates
+- HTTP status distribution (5xx/4xx)
+
+টেস্টিং:
+- Load test with gradual increase; test connection churn
+- Simulate backend failure and observe failover
+- Test TLS termination scenarios and certificate rotations
+
+## ১২) বাস্তব কেস স্টাডি
+
+1) E-commerce during flash sale
+- সমস্যা: ব্যবহারের হঠাৎ spike, many concurrent short requests
+- কৌশল: ALB/NGINX at edge + CDN for static, rate limiting at LB, autoscaling app servers, DB read-replicas, queueing for non-critical tasks (emails)
+
+2) Large file uploads
+- সমস্যা: long-lived POST/PUT requests, bandwidth-heavy
+- কৌশল: use signed direct uploads to object storage (S3), LB only routes to pre-signed upload endpoint or use multipart uploads handled by storage service—এইভাবে app servers ও LB-এর লোড কমে
+
+3) Real-time chat with WebSockets
+- সমস্যা: thousands of concurrent connections
+- কৌশল: use L4 LB or specialized proxy that supports TCP long-lived connections, shard connections by user-id, use presence service and message brokers for fanout
+
+## ১৩) Deployment patterns ও best practices
+
+- Use health checks that include dependency checks, not just process up/down
+- Implement connection draining on deploys
+- Automate certificate rotation and test it in staging
+- Prefer gradual rollouts (canary) when changing LB rules
+- Log at proxy level but avoid PII — use sampling for tracing high-volume traffic
+
+## ১৪) সাধারণ ভুলসমূহ
+
+- LB কে কেবল simple traffic-router ধরে নেওয়া—এটা অপারেশনাল ও সিকিউরিটি লেয়ারও
+- Ignoring connection limits on app servers (max file descriptors, threads)
+- Relying on sticky sessions without external session store
+
+## ১৫) পরবর্তী বিষয় ও রিসোর্স
+
+- পরবর্তী পাঠ: [Caching Basics: CDN, Redis, Memcached](/system-design/caching)
+- পড়ুন: HAProxy/NGINX/Envoy ডকস, Cloud LB docs (AWS ALB/NLB), service mesh (Istio/Linkerd) সংক্রান্ত টিউটোরিয়াল
+
+---
+
+আপনি চাইলে আমি এই পাতায় Mermaid ডায়াগ্রাম যোগ করব এবং একটি ছোট HAProxy/NGINX কনফিগ টেমপ্লেট ও load-test কনফিগ (k6) তৈরি করে দেব—কোনটি আগে দেখতে চান? 

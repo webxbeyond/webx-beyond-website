@@ -1,0 +1,173 @@
+---
+title: Rate Limiting ও Throttling
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## কাজের গ্রহণ ও পরিকল্পনা
+
+এই পাঠে আমি Rate Limiting ও Throttling-এর ধারণা, জনপ্রিয় অ্যালগরিদম (Token Bucket, Leaky Bucket, Fixed/Sliding Window), বাস্তবায়ন প্যাটার্ন, অপারেশনাল কনসিডারেশন এবং টেস্টিং/মনিটরিং গাইড দেব। শুরু থেকে ইন্টারমিডিয়েট পর্যায়ের উপযোগী উদাহরণ ও রূপক থাকবে।
+
+চেকলিস্ট
+- Rate limiting এবং throttling-এর সংজ্ঞা ও পার্থক্য
+- Token Bucket, Leaky Bucket, Fixed Window, Sliding Window (log/counter) ব্যাখ্যা
+- Client identification (API key, IP, user), scope (per-user, per-endpoint, global)
+- Implementation patterns (Redis, Envoy, Nginx, API Gateway) এবং distributed challenges
+- Headers, Retry-After, best practices এবং testing/monitoring
+
+---
+
+## ১) Rate limiting বনাম Throttling — সংক্ষেপে
+
+- Rate limiting: একটি নির্দিষ্ট টোকেন বা কোটার মধ্যে কাস্টমার/ক্লায়েন্টকে অনুরোধ সীমাবদ্ধ করা—উদাহরণ: 100 রিকোয়েস্ট প্রতি মিনিট
+- Throttling: সার্ভিস-স্তরে ব্যাকপ্রেশার প্রয়োগ করে সমগ্র সার্ভিসকে সাময়িকভাবে ধীর করা বা অগ্রাধিকার ভিত্তিক ট্রাফিক গ্রহণ করা—উদাহরণ: overload অবস্থায় non-critical ব্যাকগ্রাউন্ড কাজ পেছানো
+
+রূপক: Rate limiting = রাস্তার টলটাক্স যেখানে প্রতিটি গাড়ির কুপন গুনে পারাপার; Throttling = ট্রাফিক জ্যামের সময় ট্রাফিক পুলিশ গাড়ির গতি ধীর করে প্রাধান্য দেয় জরুরি গাড়িকে।
+
+## ২) জনপ্রিয় অ্যালগরিদমের ধারণা
+
+1) Fixed Window Counter
+- প্রতিটি time-window (e.g., 60s) এ ইনক্রিমেন্ট করে; যদি count > limit → reject
+- সহজ কিন্তু boundary spike সমস্যা (window boundary-তে দুই উইন্ডোতে রাস্তা পারাপারে অতিরিক্ত)
+
+2) Sliding Window Log
+- প্রতিটি রিকোয়েস্টের timestamp লগ রাখে এবং কেবল গত T সময়ের রিকোয়েস্ট গণনা করে
+- একান্ত নির্ভুল কিন্তু স্টোরেজ খরচ বেশি (log growth)
+
+3) Sliding Window Counter (approximate)
+- time window কে ছোট subwindow-এ ভাগ করে প্রতিটি subwindow-এর কাউন্টার রাখে; সাম্প্রতিক rate আনুমানিক
+- কম মেমরি, boundary problem কম
+
+4) Token Bucket
+- টোকেন পর্যায়ক্রমে refill হয় (rate r); ক্লায়েন্ট অনুরোধ করার পর একটি টোকেন খরচ করে; বার্থ (burst) সহনশীল
+- জনপ্রিয় ও কার্যকর—burst control এবং sustained rate উভয় নিয়ন্ত্রণ করে
+
+5) Leaky Bucket
+- ইনকামিং রিকোয়েস্টগুলো queue-তে ঢোকে এবং নির্দিষ্ট রেট-এ প্রসেস হয়; বেশি পার হলে drop বা reject
+- নিরীক্ষণ সহজ; token bucket-এর মত burst-friendly নয়
+
+ট্রেড-অফ সারাংশ:
+- Accuracy vs memory vs burst behavior—আপনার use-case অনুযায়ী নির্বাচন করুন।
+
+## ৩) স্কোপ ও গ্রানুল্যারিটি
+
+- Per-IP: anonymous public endpoints
+- Per-API-key / per-user: authenticated APIs
+- Per-endpoint: expensive endpoints (search, export)
+- Global / service-wide: total RPS cap
+
+নির্দেশিকা: authentication থাকা অবস্থায় per-user বা per-api-key খুব ব্যবহারিক; public APIs-এ per-IP + global safeguards রাখা দরকার।
+
+## ৪) Implementation patterns
+
+1) In-process limiter
+- library-level (Go/Java/Node) token bucket বা leaky-bucket per-instance
+- সুবিধা: latency কম, dependency কম
+- অসুবিধা: distributed case-এ global enforcement লাগে
+
+2) Centralized store (Redis) based
+- Redis INCR/EXPIRE, sorted sets বা Lua scripts দিয়ে atomic operations
+- উদাহরণ: fixed window via INCR with EXPIRE; token bucket via Lua refill logic
+- সুবিধা: centralized consistency, সহজ per-key aggregation
+- অসুবিধা: Redis single-point-of-failure (use clustering), latency overhead
+
+3) Edge / Gateway enforcement (Envoy, Nginx, API Gateway)
+- Envoy rate-limiter filter, Nginx limit_req, cloud API Gateway (AWS API Gateway) provides baked-in limits
+- সুবিধা: early rejection, protects backend
+- অসুবিধা: less flexible per-user logic unless integrated with auth
+
+4) Hybrid: local fast path + central sync
+- 每 instance local bucket for very short bursts and central Redis for guaranteed long-term quotas
+- reduces latency and pressure on central store
+
+Distributed challenges and mitigations:
+- Clock skew: use relative counters or TTL based logic; avoid relying on strict clocks
+- Hot keys: a few keys (popular API keys) receiving disproportionate traffic → use per-key quotas + mitigate via sharding or dedicated throttles
+- Consistency: choose eventual enforcement for low-stakes, strong enforcement for critical actions
+
+## ৫) Atomicity and Redis patterns
+
+- Use Lua scripts for multi-step atomic operations (read token, decrement, set expiry)
+- Sorted set pattern for sliding log: ZADD with timestamp, ZREMRANGEBYSCORE to remove old entries, ZCARD to count
+
+Simple fixed-window Redis (pseudo):
+
+```
+local count = redis.call('INCR', key)
+if count == 1 then
+  redis.call('EXPIRE', key, window)
+end
+if count > limit then
+  return 0
+end
+return 1
+```
+
+Token bucket via Lua (high-level): maintain token count and last refill timestamp atomically.
+
+## ৬) Headers, client UX ও retry guidance
+
+- Standard headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` (or `Retry-After`)
+- On 429 responses provide `Retry-After` (seconds) and a human-friendly message
+- Clients should implement exponential backoff with jitter to prevent synchronized retries
+
+UX tips:
+- For non-critical operations, return cached response or stale data with warning instead of 429
+- For interactive UIs, show user-friendly limits (e.g., "Too many requests, try again in 30s")
+
+## ৭) Quotas, fairness ও priority
+
+- Soft quotas vs hard quotas: soft = warn/slow down; hard = immediate reject
+- Priority queues: premium users may get higher rate; implement separate token buckets or weight-based allocation
+
+Fairness strategies:
+- Weighted token buckets
+- Leaky bucket per-class with shared global cap
+
+## ৮) Monitoring, metrics ও SLOs
+
+Key metrics:
+- `requests_total`, `requests_allowed`, `requests_throttled` (429s)
+- `rate_limit_remaining` distribution
+- latency impact due to checks (P95)
+- Redis/central store ops per second
+
+Alerts:
+- sudden rise in 429s
+- central store errors or latency spikes
+- hot-key detection (one key responsible for large fraction of throttles)
+
+SLO examples:
+- 99% of allowed requests processed within 200ms
+- fewer than 0.1% requests receive unexpected 429s under normal traffic
+
+## ৯) Testing & drills
+
+- Load tests: simulate steady-state + burst traffic; measure 429 rate and backend protection
+- Fairness tests: multiple concurrent clients with different weights
+- Fault-injection: simulate Redis failure — ensure fallback (fail-open vs fail-closed) behaviour defined and tested
+
+## ১০) Edge cases, pitfalls ও mitigation
+
+- Fail-open vs Fail-closed: default to fail-closed (reject) for abuse protection, but some systems prefer fail-open to maintain availability—document trade-offs
+- High cardinality of keys: monitoring memory: use approximate counters (HyperLogLog) or TTL-based expiry to bound memory
+- Retry storm: ensure backoff + jitter policies and server-side rate smoothing
+
+## ১১) Real-world examples
+
+1) Public API: per-IP 60/min + per-key 1000/min. Use API Gateway for early rejection and Redis for per-key counters.
+
+2) Login endpoint: strict throttling per-IP and per-account (e.g., 5 attempts per minute) with progressive backoff and account lockout policies.
+
+3) Search endpoint: costlier; per-user lower sustained RPS, allow short bursts via token bucket; enforce global circuit if backend overloaded
+
+## ১২) Quick decision flow
+
+1) Identify the resource to protect (CPU, DB queries, external API)
+2) Choose scope (per-user/per-key/per-endpoint/global)
+3) Decide burst tolerance (token bucket for bursts)
+4) Implement enforcement at the edge (gateway) + central store for global quotas
+5) Add headers, backoff guidance, monitoring and drills
+
+---
+
+আমি এই পাতায় একটি Redis Lua token-bucket implementation, Envoy/Nginx config snippets অথবা একটি k6 test script যোগ করে দিতে পারি—কোনটি আগে যোগ করব? 

@@ -1,0 +1,176 @@
+---
+title: Machine Learning Systems Design (Recommendation Engines, Ranking Systems)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা recommendation ও ranking systems‑এর ইঞ্জিনিয়ারিং দিকটি বাংলায় বিস্তারিতভাবে দেখব — কেন এগুলো আলাদা ধরণের সিস্টেম, কিভাবে candidate generation ও ranking pipeline গঠন করা হয়, feature store, offline ও online pipelines, latency ও freshness‑এর trade‑offs, পর্যবেক্ষণ ও মেট্রিক্স, এবং production‑grade পরীক্ষণ ও রোলআউট কৌশল। বাস্তব উদাহরণ, রূপক এবং সিদ্ধান্ত‑ফ্লো দিয়ে শেষ করা হবে।
+
+## চেকলিস্ট (এই পাতায় যা পাবেন)
+
+- Recommendation vs ranking মানে কী এবং কবে কোনটি দরকার
+- সার্ভিসের কন্ট্রাক্ট: ইনপুট/আউটপুট, সাফল্য পরিমাপ, ব্যর্থতা মোড
+- Candidate generation (retrieval) ও ranking স্টেপস স্পষ্ট করা
+- Feature pipeline: offline feature computation, online features, feature store
+- Model training, validation, CI/CD ও deployment patterns
+- Latency, freshness ও consistency tradeoffs
+- Observability: business metrics (engagement), system metrics (latency, drift)
+- Edge cases (cold start, popularity bias, data drift, adversarial behavior)
+- দ্রুত সিদ্ধান্ত‑ফ্লো ও runnable example অপশন
+
+---
+
+## ১) Recommendation/Ranking সিস্টেম কেন আলাদা?
+
+রূপক: ধরুন, আপনি একটি বিশাল লাইব্রেরিতে ঢুকেছেন। সেখানে হাজার হাজার বই আছে, কিন্তু আপনার জন্য সবচেয়ে উপযোগী বইগুলোই সামনে আসা উচিত। এখানে candidate set মানে সম্ভাব্য বইয়ের তালিকা, আর ranking মানে কোন বইটি আগে দেখানো হবে। Recommendation system ঠিক এভাবেই—প্রতিটি ব্যবহারকারীর জন্য বিশাল কনটেন্ট পুল থেকে ছোট, প্রাসঙ্গিক অংশ বের করে, তারপর সেগুলোকে সাজিয়ে দেখায়।
+
+মূল চ্যালেঞ্জ:
+- লক্ষাধিক/কোটি আইটেমের মধ্যে থেকে দ্রুত নির্বাচন
+- ব্যবহারকারীর রিকোয়েস্টের জন্য ১০০–৩০০ মিলিসেকেন্ডের মধ্যে ফলাফল দেখাতে হবে
+- নতুন কনটেন্ট যেন দ্রুত দেখা যায় (freshness)
+- সিস্টেমের কার্যকারিতা যাচাই করতে অনলাইন A/B টেস্ট
+
+## ২) সার্ভিসের চুক্তি (ইনপুট/আউটপুট, সফলতা, ব্যর্থতা)
+
+- ইনপুট: user_id (বা session context), ডিভাইস/লোকেশন, কখনো কখনো seed আইটেম
+- আউটপুট: সাজানো আইটেমের তালিকা, প্রতিটির স্কোর ও তথ্য (কখনো explanation)
+- সফলতা: ব্যবহারকারীর engagement (CTR, সময়) বেড়েছে কিনা; latency নির্দিষ্ট সীমার নিচে
+- ব্যর্থতা: মডেল কাজ না করলে জনপ্রিয় আইটেম দেখানো; ফিচার স্টোর ডাউন হলে ডিফল্ট/ক্যাশড ফিচার
+
+## ৩) উচ্চস্তরের আর্কিটেকচার
+
+১) ইভেন্ট সংগ্রহ: ব্যবহারকারীর ক্লিক, ভিউ, কনভার্সন—এসব Kafka বা অন্য স্ট্রিমিং প্ল্যাটফর্মে যায়
+২) অফলাইন পাইপলাইন: ব্যাচ ETL দিয়ে ফিচার তৈরি, মডেল ট্রেনিং (Spark/Flink, Airflow)
+৩) ফিচার স্টোর: ট্রেনিংয়ের জন্য অফলাইন ফিচার, সার্ভিংয়ের জন্য অনলাইন ফিচার (যেমন Redis)
+৪) Candidate generation: inverted index, ANN (প্রায় কাছাকাছি আইটেম), মেটাডাটা ফিল্টার, কনটেন্ট‑বেসড রিট্রিভাল
+৫) Ranking service: প্রতিটি রিকোয়েস্টে হালকা মডেল/ensemble দিয়ে candidate‑এর স্কোরিং, তারপর top‑K ফেরত
+৬) সার্ভিং ইন্ফ্রা: দ্রুত অনলাইন মডেল সার্ভার (TF Serving, Triton, বা মাইক্রোসার্ভিস), হট ইউজারদের জন্য ক্যাশ
+৭) পর্যবেক্ষণ ও পরীক্ষা: মেট্রিক্স পাইপলাইন (ClickHouse/BigQuery), অনলাইন এক্সপেরিমেন্ট প্ল্যাটফর্ম
+
+ডায়াগ্রাম (ধারণা): ইভেন্ট → ফিচার পাইপলাইন → মডেল ট্রেনিং → মডেল রেজিস্ট্রি → অনলাইন সার্ভিং + ফিচার স্টোর → ক্লায়েন্ট
+
+## ৪) Candidate generation (retrieval) প্যাটার্ন
+
+- সহজ নিয়ম/বিজনেস রুল: ভাষা, অঞ্চল, অ্যাভেইলেবিলিটি দিয়ে দ্রুত ফিল্টার
+- জনপ্রিয়তা/সময়: গ্লোবাল বা লোকাল জনপ্রিয় আইটেম
+- Collaborative filtering/embedding: ANN index (Faiss, Annoy, Milvus)
+- কনটেন্ট‑বেসড: টেক্সট/ইমেজ similarity
+
+নোট: retrieval খুব দ্রুত হতে হবে, এবং ছোট candidate set (১০০–১০০০) ফেরত দিতে হবে যাতে ranking সহজ হয়
+
+## ৫) Ranking stage — স্কোরিং মডেল ও latency
+
+- হালকা মডেল (GBDT, logistic regression) সাধারণত ব্যবহার হয়, কারণ latency কম
+- ভারী মডেল (deep/contextual) হাইব্রিডভাবে—স্কোর অফলাইনে/নিয়ারলাইনে প্রি‑কম্পিউট
+- ফিচার normalization, missing value handle, explainability signal গুরুত্বপূর্ণ
+
+Latency কমানোর কৌশল:
+- ফিচার lookup যেন সস্তা হয়: Redis‑এ অনলাইন স্টোর + ব্যাচে আপডেট
+- মডেল inference‑এ batching/multiplexing
+- প্রতি ইউজার/সেগমেন্টের জন্য ছোট সময়ের জন্য ক্যাশ
+
+## ৬) Feature store ও feature pipeline
+
+দুই ধরনের ফিচার:
+- অফলাইন ফিচার (ট্রেনিং): পুরনো ডেটা, ইউজার/আইটেম embedding, গ্লোবাল স্ট্যাট
+- অনলাইন ফিচার (সার্ভিং): সর্বশেষ কাউন্টার, সেশন ফিচার, লোকাল ক্যাশ
+
+Feature store‑এর কাজ:
+- ফিচার সংজ্ঞা ও ট্রান্সফরমেশন‑এর একক উৎস
+- ট্রেনিং ডেটা ও অনলাইন API‑তে ফিচার সরবরাহ
+- freshness guarantee ও ব্যাকফিল ম্যানেজ
+
+Implementation: Feast, Hopsworks, বা কাস্টম (Kafka + DB + API)
+
+## ৭) Training, validation ও CI/CD
+
+- ট্রেনিং pipeline reproducible রাখতে MLflow/DVC‑এর মতো টুলে artifact track করুন
+- মডেল validation: অফলাইন মেট্রিক্স (AUC, precision@K), sanity check (feature importance, drift)
+- Canary/Shadow deployment: নতুন মডেল প্রথমে কিছু ইউজার বা ছায়া‑মোডে চালান, তুলনা করুন
+- ধাপে ধাপে rollout: A/B test‑এ statistical significance পেলে ধাপে ধাপে সবার জন্য চালু
+
+Contract test:
+- মডেল schema পরিবর্তন হলে compatibility টেস্ট
+- ইনপুট validation (রেঞ্জ, missing value)
+
+## ৮) Freshness বনাম accuracy tradeoff
+
+- Freshness: রিয়েল‑টাইম ইভেন্ট (সাম্প্রতিক ক্লিক) ranking‑এ প্রভাব ফেলে; ব্যাচ ফিচার একটু পিছিয়ে
+- কৌশল:
+  - হাইব্রিড ফিচার: ব্যাচ aggregate + ছোট রিয়েল‑টাইম কাউন্টার (Kafka → অনলাইন স্টোর)
+  - গুরুত্বপূর্ণ ফিচারের জন্য ছোট সময়ের ক্যাশ ও ইভেন্ট‑ড্রিভেন আপডেট
+  - একদম নতুন সিগনালের জন্য ফাস্ট KV‑তে স্ট্রিমিং ফিচার (যেমন, শেষ ৫ মিনিটের ক্লিক)
+
+## ৯) Evaluation: অফলাইন বনাম অনলাইন
+
+অফলাইন মূল্যায়ন:
+- আলাদা ডেটাসেট (holdout), সময়ভিত্তিক ভাগ, ranking‑এর counterfactual policy eval
+
+অনলাইন মূল্যায়ন:
+- A/B test, interleaving, multi‑armed bandit—নতুন আইডিয়া/মডেল পরীক্ষা
+- ব্যবসায়িক মেট্রিক্স (CTR, conversion), downstream impact (revenue)
+
+Safety net: latency, error rate, revenue drop—guardrail মেট্রিক্স; অটো‑aborts
+
+## ১০) Observability ও ML‑specific metrics
+
+সিস্টেম মেট্রিক্স:
+- রিকোয়েস্ট latency (p95), মডেল inference‑এর সময়, ফিচার স্টোর latency, ক্যাশ hit rate
+
+ব্যবসায়িক মেট্রিক্স:
+- CTR@K, conversion rate, ব্যবহারকারীর সময়, প্রতি ইউজারে revenue
+
+ML‑health:
+- ফিচার distribution drift, training/serving‑এর পার্থক্য, মডেল স্কোর distribution
+
+Alert:
+- হঠাৎ CTR কমে গেলে বা ফিচার drift হলে অ্যালার্ট, তদন্ত ও rollback
+
+## ১১) Edge case ও failure mode (সম্ভাব্য সমস্যা)
+
+১. নতুন ইউজার/আইটেম (cold start): জনপ্রিয়তা, কনটেন্ট ফিচার, বা bandit‑এর মাধ্যমে এক্সপ্লোর
+২. ডেটা drift বা ফিচার schema পরিবর্তন: distribution তুলনা করে detect, বেশি হলে training বন্ধ
+৩. ফিচার স্টোর ডাউন: ক্যাশড/ডিফল্ট ফিচার দিয়ে fallback
+৪. স্প্যাম/অ্যাডভার্সারিয়াল আচরণ: anomaly detect করে throttle
+৫. মডেল deploy‑এর পর regression: অটো rollback, canary threshold
+
+সমাধান: শক্ত logging, event stream replay, ধাপে ধাপে rollout
+
+## ১২) নৈতিকতা: fairness ও privacy
+
+- জনপ্রিয়তা bias যেন না বাড়ে, তাই exploration/diversity যুক্ত করুন
+- privacy: ব্যক্তিগত তথ্য (PII) সুরক্ষা, সংবেদনশীল ডেটা aggregate বা differential privacy
+- explanation দিন, ইউজারকে personalization opt‑out করার সুযোগ দিন
+
+## ১৩) খরচ ও অপারেশনাল tradeoff
+
+- ANN index/embedding‑এর জন্য বেশি RAM/CPU লাগে—shard করে আলাদা নোডে রাখুন
+- ফিচার স্টোর/অনলাইন ক্যাশের খরচ ট্রাফিকের সাথে বাড়ে; প্রি‑কম্পিউট বনাম অনলাইন কম্পিউটের tradeoff
+- latency কমাতে খরচ কত বাড়ছে, revenue‑এর সাথে তুলনা করুন
+
+## ১৪) ছোট বাস্তব উদাহরণ
+
+ফ্লো:
+- ইভেন্ট → Kafka → স্ট্রিমিং জব সাম্প্রতিক কাউন্ট বের করে → Redis‑এ লিখে
+- ব্যাচ জব রাতে ইউজার/আইটেম embedding বের করে → Faiss‑এ ANN index‑এ রাখে
+- রিকোয়েস্ট: ANN‑এ retrieval → candidate set → অনলাইন ফিচার বের করে → GBDT মডেল দিয়ে ranking → top‑K ফেরত
+
+## ১৫) সিদ্ধান্ত ফ্লো (সংক্ষেপে)
+
+১. রিয়েল‑টাইম personalization দরকার? → স্ট্রিমিং ফিচার pipeline + অনলাইন ফিচার স্টোর
+২. অনেক আইটেম ও similarity দরকার? → embedding + ANN retrieval
+৩. latency‑এর কঠিন সীমা? → ভারী অংশ প্রি‑কম্পিউট, অনলাইন অংশ হালকা রাখুন
+৪. নিরাপত্তা/fairness দরকার? → exploratory logic, monitoring, সংবেদনশীল ক্ষেত্রে human review
+
+## ১৬) Runnable উদাহরণ (আমি যা তৈরি করতে পারি)
+
+- (A) Python‑এ candidate+rank demo: ছোট dataset, Faiss ANN retrieval, scikit‑learn ranking, Flask‑এ সার্ভিং, Dockerfile ও smoke test
+- (B) Feast‑এ feature store demo: ব্যাচ ফিচার pipeline, Redis‑এ অনলাইন সার্ভ, Helm/compose snippet
+- (C) End‑to‑end scaffold: Kafka ইভেন্ট → Spark‑এ স্ট্রিমিং ফিচার → মডেল ট্রেনিং (notebook) → TF Serving microservice (CI script)
+
+আপনি কোনটি চান? (A / B / C / None)
+
+---
+
+এই পাতায় আমি recommendation ও ranking systems‑এর ইঞ্জিনিয়ারিং ধারণা, trade‑off, এবং production‑grade পরীক্ষা ও রোলআউট কৌশল বাংলায় ব্যাখ্যা করেছি; runnable উদাহরণ চাইলে বলুন, আমি তৈরি করে smoke‑test চালিয়ে দেব।

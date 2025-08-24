@@ -1,0 +1,189 @@
+---
+title: Distributed Transactions ও 2PC/3PC
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা distributed transactions কী, কেন প্রয়োজন, তাদের সীমাবদ্ধতা এবং জনপ্রিয় commit protocols — Two‑Phase Commit (2PC) ও Three‑Phase Commit (3PC) — কিভাবে কাজ করে তা বিশদে দেখব। আমরা বাস্তব উদাহরণ (ব্যাংক ট্রান্সফার, অর্ডার ও ইনভেন্টরি), ব্যর্থতা মোড, blocking সমস্যা, এবং আধুনিক বিকল্প (sagas, idempotency, compensating actions) কভার করব। লক্ষ্য: আপনি সিদ্ধান্ত নিতে পারবেন কখন distributed transaction ব্যবহার করবেন, কখন সেগুলো থেকে বিরত থাকবেন, এবং প্রডাকশনে কীভাবে পরীক্ষা ও মনিটর করবেন।
+
+## চেকলিস্ট (এই পাঠে যা প্রয়োজন)
+
+- distributed transactions সংজ্ঞা ও প্রয়োজনীয়তা
+- ACID vs BASE প্রাসঙ্গিকতা
+- 2PC: ভূমিকা (coordinator, participant), ধাপ, failure modes
+- 3PC: কী পরিবর্তন করে, non‑blocking claim এবং সীমাবদ্ধতা
+- XA ও two‑phase commit বাস্তব ইমপ্লিমেন্টেশন
+- Alternates: Sagas (orchestration vs choreography), idempotency, compensating transactions
+- Consistency trade‑offs, isolation খেয়াল রাখা
+- Testing ও monitoring কৌশল
+
+---
+
+## ১) কেন distributed transactions দরকার?
+
+একক মেশিন বা একক ডাটাবেসে transaction মানে multiple operations‑কে একটি atomic, consistent ইউনিটে bundling করা। কিন্তু মডার্ন আর্কিটেকচারে এক logical operation অনেক সার্ভিস/ডাটাবেস স্পর্শ করে — উদাহরণ: একটি e‑commerce order placed হলে অর্ডার সার্ভিস, ইনভেন্টরি সার্ভিস, পেমেন্ট সার্ভিস সবাই আপডেট হয়। এই সিনক্রোনাইজেশন না হলে inconsistent state হতে পারে (উদাহরণ: পেমেন্ট হবে কিন্তু স্টক না update)।
+
+রূপক: আপনি ও আপনার বন্ধু মিলে একটি বিল ভাগ করছেন — প্রতিটি মানুষের হাতে একটি কপি আছে; সবাই একসাথে স্বাক্ষর না দিলে চুক্তি সম্পূর্ণ হয়নি।
+
+Distributed transaction লজিক্যালভাবে নিশ্চিত করে যে বা‑ই সব অংশই commit করে অথবা কেউ commit না করলে rollback করে — atomic across nodes.
+
+## ২) ACID vs BASE — কি দেখতে হবে
+
+- ACID (Atomicity, Consistency, Isolation, Durability): ক্লাসিক transactional guarantees
+- BASE (Basically Available, Soft state, Eventual consistency): distributed, high-availability প্যারাডাইম
+
+নির্বাচন: যদি strict atomicity জরুরি (financial transfers), তখন distributed transactions বিবেচনা করুন; কিন্তু availability ও latency‑requirements উচ্চ হলে BASE‑মডেল বা compensating approaches বেশি প্র্যাকটিক্যাল।
+
+## ৩) Two‑Phase Commit (2PC) — কীভাবে কাজ করে
+
+Actors:
+- Coordinator (committee chair)
+- Participants (the services/databases that must commit)
+
+ফেজ‑১ (Prepare / Voting phase):
+1. Coordinator -> Participants: "Prepare (prepare to commit)"
+2. Each Participant: locally prepare (flush changes to durable prepare state), reply VoteCommit বা VoteAbort
+
+ফেজ‑২ (Commit/Abort phase):
+3. If coordinator gets VoteCommit from all -> Coordinator -> Participants: "Global Commit"
+   Else -> Coordinator -> Participants: "Global Abort"
+4. Participants on Global Commit perform local commit; on Abort undo/cleanup
+
+লক্ষণীয়: prepare phase ensures participants have durably recorded enough state to later commit even if they crash and recover.
+
+### 2PC failure মোড এবং সমস্যা
+
+- Coordinator failure בין Prepare ও Commit: participants যেগুলো VoteCommit করে রেখে যায়—শুধু wait করে (blocked) যতক্ষণ coordinator ফিরে না আসে → blocking problem
+- Participant failure: coordinator may wait until timeouts; if participant recovers, it consults durable prepare state
+- Network partitions: blocking increases; manual intervention may be needed
+
+Consequences:
+- Blocking reduces availability; operations on participants may be held and resource locks retained → throughput hurt
+- Complexity of distributed locking & long‑running transactions (locks held longer) → contention
+
+## ৪) Three‑Phase Commit (3PC) — লক্ষ্য ও সীমাবদ্ধতা
+
+3PC যোগ করে একটি extra phase যাতে coordinator failure এও participants blocking থেকে রক্ষা পায় (theory says non‑blocking under certain network assumptions):
+- canCommit? (prepare) → preCommit (write intent) → doCommit
+
+তবে 3PC‑র non‑blocking claim কোন realistic asynchronous network এবং crash model‑এ সবসময় সত্যি নয়। যদি network partitions ও crashes একসাথে ঘটে, safety বা liveness বজায় রাখতে নিশ্চিত করা কঠিন। তাই 3PC productionে বিরল।
+
+## ৫) XA ও বাস্তব ইমপ্লিমেন্টেশন
+
+- XA হলো একটি standard for distributed transaction processing (X/Open XA) — JTA/ResourceManager ইত্যাদি এটি ব্যবহার করে two‑phase commit across heterogeneous resource managers (RDBMS, JMS)
+- বাস্তবে XA drivers/databases maintain prepare/commit protocol and durable logs
+
+প্রতিবিধান:
+- XA simplifies integration across systems supporting XA but তা নাইলে custom 2PC layers লাগে
+- XA transactions expensive: latency (multiple round‑trips), locks, complex recovery
+
+## ৬) যখন 2PC ব্যবহার করবেন না — বিকল্প প্যাটার্নস
+
+1) Sagas: long‑running distributed transactions broken into a sequence of local transactions with compensating transactions on failure
+   - Orchestration: a centralized saga orchestrator calls services step‑by‑step and triggers compensating actions on failure
+   - Choreography: services publish events and react; no central coordinator
+
+Example (Order flow):
+- Step1: Reserve inventory (if fail → abort)
+- Step2: Charge payment (if fail → compensate: release inventory)
+- Step3: Confirm order
+
+2) Idempotency + Retries: design APIs and sinks to accept duplicate requests safely so at‑least‑once semantics acceptable
+3) Eventual Consistency + Reconciliation: accept temporary inconsistency and run background reconciliation jobs
+4) Optimistic Concurrency & Versioning: use version checks (compare‑and‑swap) at boundaries
+
+Tradeoffs:
+- Sagas avoid global locks and blocking but require compensating logic and careful reasoning about side effects
+- Idempotency reduces need for strict atomicity but adds implementational burden (dedupe keys, idempotency tokens)
+
+## ৭) Isolation across services — what it means
+
+Database isolation levels (read uncommitted→serializable) not directly portable across microservices. Two key patterns:
+- Per‑service strong consistency: within a service DB transactions maintain isolation
+- Cross‑service consistency via orchestrated sequences or saga compensations
+
+Beware: trying to implement global serializable semantics across independent DBs is expensive and fragile.
+
+## ৮) Failure modes, heuristics এবং recovery
+
+Common failures:
+- Coordinator crash after participants VoteCommit (blocking)
+- Network partition leading to split decisions
+- Participant crash before durable prepare
+
+Heuristics for recovery:
+- Persistent prepare logs: participants can query a recovery coordinator or consult an external registry
+- Timeouts + manual operator intervention for stuck transactions
+- Automated heuristics: if coordinator missing for X time, escalate to operator or use external consensus to decide (but careful with safety)
+
+## ৯) Observability ও monitoring
+
+Metric suggestions:
+- transactions_started_total, transactions_committed_total, transactions_aborted_total
+- prepare_duration_seconds, commit_duration_seconds
+- stuck_transactions (time > threshold)
+- resources_locked_duration
+
+Alerts:
+- growing stuck_transactions → indicates coordinator failures or long‑running locks
+- rising prepare_duration → IO bottleneck or slow participants
+
+Logging:
+- record transaction id (global xid), participant ids, timestamps of prepare/commit, coordinator decisions
+- include human‑readable context for operators
+
+## ১০) Testing distributed transactions
+
+- Unit tests for local transaction & compensating actions
+- Integration tests with multiple resource managers using embedded databases or testcontainers
+- Failure injection tests: kill coordinator mid‑protocol, drop network packets, restart participants
+- Chaos tests: simulate partitions, disk corruption and verify recovery paths
+
+Tools: testcontainers, Jepsen (for deeper partitioning semantics), custom simulators
+
+## ১১) Practical examples
+
+1) Bank transfer (strict atomicity required):
+   - Debit Account A and Credit Account B must be atomic. Options:
+     - Use single transactional DB partitioning both accounts if possible (best)
+     - If accounts live in different DBs: 2PC (XA) or use a saga with compensate (hard — money corrections are sensitive)
+   - In financial domain exactly‑once and strong auditing are essential — often systems use a combination of idempotency, append‑only ledgers and reconciliation jobs.
+
+2) E‑commerce order placement:
+   - Typical approach: Saga orchestration (reserve inventory → charge payment → confirm); compensating actions release inventory or refund payment
+
+3) Hotel booking across providers:
+   - Choreography style: each provider returns availability; final reservation may require compensations if one provider fails later
+
+## ১২) Pseudocode — Simple 2PC coordinator
+
+1. coordinator.startTransaction(xid, participants)
+2. for p in participants: send Prepare(xid) and await VoteCommit/VoteAbort
+3. if all VoteCommit: for p in participants: send Commit(xid)
+   else: for p in participants: send Abort(xid)
+
+Participants persist prepare state on VoteCommit (so they can complete after crash).
+
+## ১৩) Decision flow — choose a path
+
+- If your operation touches a single database or can be co‑located → prefer local ACID transaction
+- If crossing multiple resources but strong atomicity is mandatory and you accept availability cost → consider 2PC/XA
+- If availability & latency critical and you can design compensations → use Sagas + idempotency
+- If operations are short and side effects reversible with compensating actions → Saga is usually better
+
+## ১৪) Operational checklists
+
+Before enabling distributed transactions:
+- Have durable logs and recovery process for coordinator and participants
+- Add observability (metrics, traces) including global transaction id
+- Define timeouts and escalation process for stuck transactions
+- Prepare operator runbooks for manual recovery and reconciliation
+
+## ১৫) Follow‑ups — আপনি কি চান আমি যোগ করি?
+
+- একটি runnable Saga orchestration example (Node.js/Express + simple in‑memory participants) — থাকবে README ও tests
+- একটি small 2PC simulator (Go) that demonstrates blocking and recovery paths with scripts to kill coordinator/participant
+- A Jepsen-style test plan / chaos scenario checklist for distributed transaction failures
+
+আপনি কোনটা আগে চান? আমি চয়েস অনুযায়ী কোড, README এবং দ্রুত ইনস্ট্রাকশন যোগ করে দেব।

@@ -1,0 +1,154 @@
+---
+title: Horizontal Scaling - Stateless Services, Auto-scaling
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা Horizontal Scaling-এর ধারণা, Stateless সার্ভিস ডিজাইন করার নীতিমালা, Auto-scaling কনসেপ্ট ও নীতিমালা, সেশন ম্যানেজমেন্ট, রোলআউট স্ট্র্যাটেজি ও পর্যবেক্ষণ নিয়ে বিস্তারিত আলোচনা করব। বাস্তব উদাহরণ, অনুশীলনযোগ্য টেস্টিং আইডিয়া এবং decision‑making গাইড থাকবে—বিগিনার থেকে ইন্টারমিডিয়েট স্তরের জন্য উপযুক্ত।
+
+## চেকলিস্ট
+
+- Horizontal vs Vertical scaling সংজ্ঞা ও কখন কোনটা বেছে নিবেন
+- Stateless সার্ভিস ডিজাইন প্যাটার্নস এবং state externalization
+- Session handling (sticky session vs token/session store)
+- Autoscaling কৌশল (metrics, policies, cooldown, scale-up/down strategies)
+- Resource limits, connection pooling ও backpressure
+- Health checks, graceful shutdown ও rolling upgrades
+- Monitoring metrics ও SLO পরামর্শ
+
+---
+
+## ১) Horizontal vs Vertical scaling — সংজ্ঞা ও সিদ্ধান্ত
+
+- Vertical scaling: একই মেশিন/VM-এ CPU/Memory/IO বাড়ানো। সোজা, কিন্তু সীমিত—hardware limit পড়বে এবং single point-of-failure রয়ে যায়।
+- Horizontal scaling: সার্ভিসের ইন্সট্যান্স বাড়িয়ে লোড ভাগ করা—scale-out। এটি fault-tolerant এবং capacity অনন্যভাবে বাড়ানো যায়।
+
+নির্বাচন নির্দেশিকা:
+- ছোট প্রোডাক্ট/প্রোটোটাইপে vertical দ্রুত সুবিধা দেয়।
+- প্রডাকশনে সাধারণত horizontal preferred because reliability and cost-efficiency at scale.
+
+রূপক: Vertical = একটি বড় ট্রাক কিনে আরও পণ্য নিয়ে যাওয়া; Horizontal = ছোট ছোট ভ্যান চালিয়ে একসাথে অনেক প্যাকেট পাঠানো—যদি এক ভ্যান বন্ধ হয়, অন্যগুলো চালু থাকে।
+
+## ২) Stateless সার্ভিস ডিজাইন — কেন এবং কীভাবে
+
+Stateless সার্ভিস মানে: কোনো ক্লায়েন্ট‑স্পেসিফিক বা সেশন‑স্টেট সার্ভার‑ইনস্ট্যান্সের RAM/ফাইল সিস্টেমে রাখে না। ফলে ইনস্ট্যান্স যেকোনো সময় যোগ বা বাদ দেওয়া যায়।
+
+State externalization প্যাটার্নস:
+- Client-side state: JWT/opaque tokens, local storage (browser) — সার্ভারের উপর লোড কমে কিন্তু security ও token invalidation যুক্ত চ্যালেঞ্জ আনে
+- Centralized state store: Redis/Memcached/DB for session data — সহজ session invalidation; latency trade-off
+- Sticky sessions + distributed cache: লো-ট্র্যাফিক ক্ষেত্রে ব্যবহারযোগ্য কিন্তু ইন্সট্যান্স failures এ ঝুঁকি বাড়ে
+
+Design rules:
+1) Keep request handling idempotent where সম্ভব
+2) Externalize sessions and user data to shared stores
+3) Avoid in-memory caches for critical state unless replicated and durable
+
+উদাহরণ: একটি REST API server হলো stateless—هر request contains auth token and full context needed; background workers may be stateful (processing job queues) but their state is local to the job and persisted in queue/db.
+
+## ৩) সেশন স্ট্র্যাটেজি: sticky sessions বনাম centralized session store
+
+Sticky sessions (load balancer level): সহজ; কিন্তু ইন্সট্যান্স failure হলে session loss হতে পারে এবং রোলআউট/scale-down কঠিন।
+
+Central session store (Redis): session durability, shared across instances, সহজ scale, কিন্তু Redis latency/availability আপনার অ্যাপের UX-এ প্রভাব ফেলবে—use timeouts, circuit-breakers
+
+টিপ: authentication tokens (JWT) + short TTL + refresh token pattern অনেক ক্ষেত্রে best practical approach দেয়—server-side session store তখন শুধুমাত্র revocation বা large session data-এর জন্য ব্যবহার হবে।
+
+## ৪) Auto-scaling: metrics ও নীতিমালা
+
+Auto-scaling উপাদান:
+- Scaling triggers (metrics): CPU, memory, request latency, request per second (RPS), queue length, custom application metrics (e.g., request backlog)
+- Scale policies: target-based scaling (e.g., target CPU 60%), step-scaling (scale by N instances), scheduled scaling (predictable peaks)
+- Cooldown: rapid oscillation (thrashing) রোধে cooldown period দরকার
+
+Policy design examples:
+- Web frontends: target latency or RPS per instance + min/max instances
+- Background workers: scale based on queue length (e.g., >1000 jobs → add 5 workers)
+
+Scale-up considerations:
+- Warm-up time: JIT compilation, cache warming—consider pre-warming or warm pools
+- Startup cost: avoid scaling on short spikes; use duration thresholds
+
+Scale-down considerations:
+- Safe draining: stop accepting new connections, finish in-flight requests, persist ephemeral state
+- Connection draining timeout must be tuned to typical request duration
+
+## ৫) Connection pooling, database limits ও backpressure
+
+প্রতিটি application instance DB বা upstream services‑এ connections রাখবে—যদি too many instances খোলা হয় তাহলে DB connection limit ছাড়িয়ে যেতে পারে।
+
+Mitigations:
+- Connection pooler/proxy (PgBouncer for Postgres) ব্যবহার করুন
+- Maximum instances bound by DB connection capacity: compute max_instances = DB_max_connections / connections_per_instance
+- Use queueing or rate-limiting at ingress to apply backpressure (503 with Retry-After or client-side retries with exponential backoff)
+
+উদাহরণ: আপনার Postgres max_connections=500, প্রতি instance ~20 connections লাগলে max_instances ≈ 25। Autoscaler সেট করার সময় এই সীমা বিবেচনা করতে হবে।
+
+## ৬) Health checks, readiness, liveness ও graceful shutdown
+
+- Liveness probe: process responsive? সার্ভার crash হলে restart
+- Readiness probe: service traffic নেবে কি না? চালু হওয়ার আগে readiness=false until warm
+- Graceful shutdown: SIGTERM এ new requests না নিয়ে existing requests শেষ করে তারপর exit
+
+Load balancer + readiness ensures zero-downtime deploys ও safe autoscaling: scale-down করলে instance first mark not-ready, drain, then terminate
+
+## ৭) Rolling upgrades, canary ও blue/green deploys
+
+Deploy strategies:
+- Rolling: একে একে ইনস্ট্যান্স আপডেট—simple কিন্তু slow
+- Canary: ছোট সাবসেট-এ নতুন ভার্সন, metrics চার্ট করে ব্যাপক রোলআউট
+- Blue/Green: full env switch—fast rollback, cost of double infra
+
+Best practice: combination—canary for confident rollouts + automated rollback on SLI breach
+
+## ৮) Observability: metrics, logs ও tracing
+
+Must-have metrics:
+- Instance-level: CPU, memory, GC pauses
+- Application-level: requests/sec, error-rate, request latency P50/P95/P99
+- Autoscaler metrics: desired vs actual replicas
+- Upstream metrics: DB connections, queue length, job backlog
+
+Tracing: distributed traces show where latency accumulates; span tags should include instance id/zone to detect skew
+
+Alerts / SLOs:
+- P99 latency, error rates, queue backlog thresholds, replica saturation
+
+## ৯) Testing & drills
+
+Tests to run:
+- Load testing across user journeys (steady load + spikes)
+- Chaos testing: kill instances during scale-up/down, simulate slow upstream
+- Scale-to-zero and scale-from-zero test (if using serverless)
+
+Tools: k6, locust, vegeta for load; chaos tools like kubernetes' kube-monkey, litmus
+
+## ১০) Real-world examples
+
+Example 1 — REST API frontend:
+- Stateless: each request contains bearer token; sessions not stored on web nodes
+- Autoscaling: target CPU 50% + RPS per instance cap
+- DB: use connection pooler and read replicas; use cache for read-heavy endpoints
+
+Example 2 — Background workers (video transcode):
+- Workers scale based on job queue length
+- Workers are stateful for job lifetime but job metadata in persistent store
+- Use spot/preemptible instances for cost but ensure checkpointing and requeue logic
+
+## ১১) Common pitfalls ও mitigation
+
+- Ignoring DB connection limits → autoscaler creates instances that fail at startup. Mitigate by deriving max instances from DB capacity.
+- Using only CPU to scale → misses IO-bound or queue-bound workloads. Mitigate by custom metrics (RPS, queue length).
+- Not handling sticky sessions during deploy → user sessions can break. Mitigate by external session store and session migration plan.
+
+## ১২) Quick decision flow
+
+1) Is the bottleneck vertical or horizontal? Profile (CPU, IO, mem, network)
+2) If horizontal scaling needed: make service stateless or externalize state
+3) Choose autoscaling metric aligned with bottleneck (RPS, latency, queue length)
+4) Cap instances by upstream limits (DB connections, license limits)
+5) Implement graceful shutdown + health checks + observability
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি small k6 load-test script (example for scaling thresholds) এবং একটি Prometheus metrics list + Grafana panel suggestion যোগ করে দেব—কোনটি আগে যোগ করব? 

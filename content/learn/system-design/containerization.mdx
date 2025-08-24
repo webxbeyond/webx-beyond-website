@@ -1,0 +1,171 @@
+---
+title: Containerization - Docker, Kubernetes
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা containerization‑এর মৌলিক ধারণা থেকে শুরু করে কিভাবে Docker images তৈরি করা হয়, কীভাবে runtime‑এ container কাজ করে, কেন orchestration লাগে এবং Kubernetes‑এর মূল building blocks (Pods, Services, Deployments, ConfigMaps, Secrets, Ingress) কিভাবে ব্যবহার করবেন — সবগুলো বাংলা ভাষায় বাস্তব উদাহরণ ও অপারেশনাল টিপস সহ আলোচনা করব।
+
+## চেকলিস্ট
+
+- Containerisation কী এবং কেন দরকার
+- Docker image vs container vs registry
+- Dockerfile সেরা অনুশীলন ও multi‑stage builds
+- Local dev with Docker Compose
+- Orchestration প্রয়োজনীয়তা ও Kubernetes‑এর মূল অংশ
+- Networking, storage, health checks, scaling ও rolling updates
+- Security, image scanning ও secrets management
+- CI/CD এবং deployment best practices
+
+---
+
+## ১) Containerization — সহজ রূপক
+
+ধরুন আপনার অ্যাপ্লিকেশনটি একটি রান্নাঘর যেখানে প্রতিটি রান্নার পদ্ধতি ভিন্ন; container হলো একটি prepacked cooker‑box যেখানে সব উপকরণ ও recipe রইলো — আপনি যেকোন সার্ভারে ঐ cooker‑box চালাতে পারবেন, পরিবেশ (OS, লাইব্রেরি) একই থাকবে। এর মানে: "It works on my machine" সমস্যা কমে যায়।
+
+মূল সুযোগ: পরিবাহিততা (portability), isolation, repeatable builds এবং দ্রুত startup time (VM তুলনায়)।
+
+## ২) Docker: images, containers ও registries
+
+- Image: আপনার অ্যাপ্লিকেশনের read‑only blue‑print (built from a Dockerfile)
+- Container: running instance of an image (writeable layer on top)
+- Registry: image store (Docker Hub, GitHub Container Registry, private registries)
+
+Dockerfile‑এর মৌলিক উদাহরণ:
+
+- Use an official base image
+- Install only runtime deps
+- Add non‑root user
+- Use multi‑stage build to keep image small
+
+মাল্টি‑স্টেজ উদাহরণ (সারাংশ):
+- builder stage: compile / build artifacts
+- final stage: copy only artifacts into minimal runtime image
+
+কারণ: ছোট images security ও deploy time কমায়।
+
+## ৩) Local development: Docker Compose
+
+- Compose দিয়ে আপনি multiple services (app, db, redis) local‑এ orchestration করতে পারেন
+- ঘোষণা: version, services, volumes, networks
+- tip: use bind mounts for code in dev, but switch to COPY for production images
+
+উদাহরণ: app + postgres + redis সোজা local setup; সঙ্গে healthcheck‑based wait strategies ব্যবহারে service startup ordering সমাধান হয়।
+
+## ৪) কেন orchestration লাগে?
+
+একটু load বা availability চাইলে শুধু অনেক কনটেইনার চালালেই হবে না — orchestration দরকার: scheduling, health monitoring, scaling, networking, secret distribution, rolling updates। Kubernetes এইসব solve করে।
+
+## ৫) Kubernetes — মূল ধারণা (সংক্ষেপে)
+
+- Cluster = control plane (API server, scheduler, controller manager) + nodes (kubelet)
+- Pod = smallest deployable unit (এক বা একাধিক tightly coupled containers)
+- Deployment = declarative controller to manage PodReplicaSets (rolling updates, rollbacks)
+- Service = stable network endpoint / load balancing abstraction (ClusterIP, NodePort, LoadBalancer)
+- ConfigMap ও Secret = configuration এবং সিক্রেট ম্যানেজমেন্ট
+- Ingress = HTTP routing ও TLS termination (north‑south)
+
+অপারেশনাল টিপস:
+- সব সম্পদ declarative YAML/Helm charts‑এ রাখুন
+- use readinessProbe আলাদাভাবে set করুন — traffic না যাওয়া পর্যন্ত pod serve করবে না
+- livenessProbe ব্যবহার করুন restart loop detect করার জন্য
+
+## ৬) Networking ও DNS
+
+- Pod‑to‑Pod communication: cluster network provides flat network (each pod gets IP)
+- Service DNS: kube‑dns/CoreDNS resolves service names inside cluster
+- Network Policies (Calico, Cilium): east‑west traffic control — default deny principle প্রয়োগ করুন যেখানে প্রয়োজন
+
+## ৭) Storage
+
+- Ephemeral storage in Pod lifecycle ধরুন (emptyDir) — persistent data জন্য PersistentVolume (PV) ও PersistentVolumeClaim (PVC) ব্যবহার করুন
+- Stateful workloads: StatefulSet (stable network id, ordered scaling)
+- Use ReadWriteMany capable storage for shared volumes (NFS, cloud file services)
+
+## ৮) Scaling ও Updates
+
+- Horizontal Pod Autoscaler (HPA) — CPU/ custom metrics‑এর উপর নির্ভর করে scale out
+- Vertical scaling (resource requests/limits) কম ব্যবহার করুন; prefer horizontal for stateless services
+- Rolling updates via Deployment updates — set maxSurge/maxUnavailable policy
+- Canary releases: weight traffic with service mesh or ingress controller features
+
+## ৯) Health checks ও graceful shutdown
+
+- Liveness probe: detect crashed or stuck processes
+- Readiness probe: indicate ready to receive traffic
+- Graceful shutdown: trap SIGTERM, stop accepting requests, drain active connections, finish work, exit; Kubernetes terminationGracePeriodSeconds ব্যবহার করুন
+
+## ১০) Observability: logging, metrics, tracing
+
+- Centralized logging: stdout/stderr from containers → collection by Fluentd/Logstash/Vector → store in Elastic/ClickHouse
+- Metrics: expose Prometheus metrics endpoint; use ServiceMonitors (Prometheus Operator)
+- Tracing: propagate trace context (W3C traceparent) and collect spans (Jaeger/Zipkin)
+- Tip: attach sidecar for log shipping only when necessary; prefer node‑level agents for scale
+
+## ১১) Security ও image hygiene
+
+- Run containers as non‑root user
+- Scan images for vulnerabilities (Trivy, Clair)
+- Sign images (notary/cosign) and enforce admission controllers to only allow signed images
+- Limit container capabilities; use seccomp & AppArmor profiles
+- Use NetworkPolicies and RBAC — least privilege
+
+## ১২) Secrets management
+
+- Kubernetes Secrets for small use; integrate with Vault/KMS for production secrets management
+- Avoid baking secrets into images
+- For cloud: use KMS + CSI Secrets Store to mount secrets as volumes dynamically
+
+## ১৩) CI/CD ও deployment patterns
+
+- Build pipeline: lint → unit tests → build image → scan image → push to registry → deploy
+- Tagging strategy: immutable tags (sha), use latest for dev only
+- Blue/Green vs Canary: choose based on risk tolerance and rollback speed
+- Automate migrations: use jobs/helm hooks or external migration tooling; avoid migrations on critical path of rollout unless zero‑downtime safe
+
+## ১৪) Resource management & quotas
+
+- Set requests and limits for CPU & memory for each container
+- Use ResourceQuotas and LimitRanges per namespace to avoid noisy neighbors
+- Monitor OOMKills and throttling and tune requests/limits accordingly
+
+## ১৫) Common pitfalls ও mitigation
+
+- Large images → slow deploys; mitigate with multi‑stage builds and smaller base images
+- No probes → invisible failures; add liveness/readiness
+- Secrets in env vars or images → migrate to secret stores
+- Namespace sprawl → use naming conventions and RBAC
+
+## ১৬) Advanced tools ও ecosystem
+
+- Helm: package manager for templated deployments
+- Operators: custom controllers for complex stateful apps (Postgres Operator, Prometheus Operator)
+- Service meshes: Istio/Linkerd for traffic control, mTLS and telemetry
+- GitOps: ArgoCD/Flux for declarative continuous delivery
+
+## ১৭) রিয়েল‑ওয়ার্ল্ড উদাহরণ (concise)
+
+- Example 1: E‑commerce storefront
+  - Dev: Docker Compose for local (app, product service, db)
+  - Prod: Kubernetes with Deployments for frontend & backend, HPA for frontend, StatefulSet for DB, Ingress with TLS, Prometheus metrics
+
+- Example 2: Data‑processing pipeline
+  - Use sidecar containers for log shipping, ephemeral workers as Jobs, CronJobs for scheduled ETL
+
+## ১৮) Decision flow (সংক্ষেপে)
+
+1. Do you need many services + high availability? → use Kubernetes
+2. Is local developer experience important? → provide Docker Compose and dev images
+3. Need complex operator behavior (DB clusters)? → use Operators
+4. Want safe deployments with audit trail? → GitOps (ArgoCD/Flux)
+
+---
+
+আপনি চাইলে আমি এই পাতায় যে কোনো একটি runnable example যোগ করে দেবো:
+
+- (A) Minimal Node.js app + Dockerfile + Docker Compose dev setup (runnable locally)
+- (B) Kubernetes manifest (Deployment, Service, Ingress) + simple Helm chart and README
+- (C) GitHub Actions CI pipeline to build, scan (Trivy) and push an image to GitHub Container Registry and deploy via kubectl/ArgoCD
+
+আপনি কোনটি চান? (A / B / C / None)

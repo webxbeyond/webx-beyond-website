@@ -1,0 +1,160 @@
+---
+title: Fault Tolerance ও Disaster Recovery
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা ফল্ট টলার্যান্স (fault tolerance) ও ডিজাস্টার রিকভারি (DR) — ধারণা, ডিজাইন প্যাটার্ন, অপারেশনাল প্র‍্যাকটিস এবং টেস্টিং — সবকিছু বাংলায় সহজ ভাষায় বিস্তারিতভাবে আলোচনা করব। বাস্তব উদাহরণ, রূপক, সিদ্ধান্ত ফ্লো এবং runbook‑স্তরের নির্দেশনা থাকবে যাতে আপনি production‑গ্রেড resilience পরিকল্পনা করতে পারেন।
+
+## চেকলিস্ট (এই পাঠে যা থাকবে)
+
+- Fault tolerance ও high availability ইন্টারপ্রেট করা
+- Redundancy, replication, failover প্যাটার্ন
+- Graceful degradation ও circuit breakers
+- RPO (Recovery Point Objective) ও RTO (Recovery Time Objective)
+- Backup strategies, consistency ও retention
+- Region/zone failures ও multi‑region অসংগতির পরিকল্পনা
+- Disaster recovery drills, runbooks ও incident process
+- Chaos engineering, fault injection ও validation
+- Metrics, alerts ও post‑mortem অনুশীলন
+
+---
+
+## ১) মূল ধারণা: Fault tolerance কি এবং কেন দরকার
+
+Fault tolerance মানে সিস্টেম এমনভাবে ডিজাইন করা যে কোনো উপাদান ব্যর্থ হলে পুরো সার্ভিস থামে না। লক্ষ্য: সার্ভিসের degradation সীমিত রাখা এবং critical functionality বজায় রাখা।
+
+রূপক: একটি বিমান না — প্রতিটি সিস্টেমকে life‑support নয়, বরং জীবনের অবলম্বন হিসেবে redundant systems রাখা হয়, যেন এক ইঞ্জিন বন্ধ হলে অন্যটি কাজ চালিয়ে নেবে।
+
+Availability, durability এবং correctness—এই তিনটিকে সমভাবে বিবেচনা করে ডিজাইন করতে হয়।
+
+## ২) Redundancy ও replication
+
+- Active‑Passive: primary (leader) active; standby passive এবং takeover হলে promote হয়। সুবিধা: সরলতা। অসুবিধা: failover latency।
+- Active‑Active: একাধিক নোড/রিজিয়ন একই সাথে traffic গ্রহণ করে। সুবিধা: উচ্চ availability ও load sharing; অসুবিধা: conflict resolution ও consistency ব্যবস্থাপনা।
+- Replication modes: synchronous (write waits for replica) vs asynchronous (write returns immediately then replicate)
+  - Synchronous → lower data loss (small RPO) কিন্তু higher latency ও availability cost during partitions
+  - Asynchronous → better latency ও availability, কিন্তু higher RPO (possible data loss)
+
+ডিজাইন টিপ: critical writes → consider synchronous replication for small replica count; for high throughput use async with compensating measures.
+
+## ৩) Failover প্যাটার্ন ও election strategies
+
+- Heartbeating ও health checks: detect failure fast but avoid flapping by tuning timeouts
+- Leader election: use consensus (Raft/etcd) বা lease based (Kubernetes Lease) mechanics for safe leadership handoff
+- Graceful shutdown: when taking leader down, demote and ensure in‑flight work drained
+
+Operational tip: automate failover but ensure observability & runbook for manual override.
+
+## ৪) Graceful degradation ও user‑facing behavior
+
+- Feature toggles: non‑critical features disabled under load to preserve core functionality
+- Circuit Breaker pattern: detect downstream failures and stop cascading calls, retry with backoff
+- Bulkheads: isolate resources (thread pools, connection pools) per subsystem to prevent cascading failure
+
+Example: payment service may disable non‑critical analytics ingestion under heavy load while still allowing payments to proceed.
+
+## ৫) RPO ও RTO — কিভাবে নির্ধারণ করবেন
+
+- RPO (Recovery Point Objective): সর্বোচ্চ ডেটা‑লস আপনি অনুমোদন করবেন (e.g., 1 hour)
+- RTO (Recovery Time Objective): সিস্টেম পুনরায় কার্যকর হতে সর্বোচ্চ সময় (e.g., 30 mins)
+
+এই মানদণ্ড অনুসারে architecture নির্ধারণ করুন: synchronous replication, cross‑region backups, readiness drills সব RPO/RTO‑এর উপর নির্ভর করে।
+
+## ৬) Backup strategies ও consistency
+
+- Full, incremental ও differential backups
+- Application‑consistent vs crash‑consistent backups:
+  - Application‑consistent: transactional systems require quiescing/flushing before backup (better restore correctness)
+  - Crash‑consistent: file‑system snapshot at a point in time (faster but may need WAL replay)
+
+- Backup storage: offsite / cross‑region + encryption at rest
+- Retention & lifecycle: legal/compliance retention vs storage cost
+
+Recoverability tip: automate restore drills and verify backups periodically (not just existence). Use checksum and test restores to validate integrity.
+
+## ৭) Multi‑region ও zone failures
+
+- Single‑region failure resilience: replicate across AZs with automatic failover
+- Multi‑region DR: active‑active or active‑passive cross‑region strategies
+  - Active‑active: regional multi‑write with conflict resolution or partitioning (complex)
+  - Active‑passive: standby region warmed up with replicated state or incremental snapshots
+
+Consider data gravity: some data is expensive to replicate; decide which data must be cross‑region replicated vs reconstructed on failover.
+
+## ৮) Disaster Recovery drills ও runbooks
+
+Runbook must include:
+- Detection: how failure is detected (monitoring/alert)
+- Decision tree: automatic failover criteria vs manual escalation
+- Roles & communication: who is incident commander, who runs DR steps
+- Steps: failover steps, checks to validate functional recovery, post‑failback steps
+- Post‑mortem: timelines, impact, root cause and remediation
+
+DR drill cadence: quarterly full DR test, weekly partial simulations. Keep runbooks versioned and accessible offline (in case primary systems down).
+
+## ৯) Chaos engineering ও fault injection
+
+- Purpose: validate assumptions and uncover hidden dependencies
+- Start small: test single failure mode (e.g., kill instance), progress to latency injection, network partition, resource exhaustion
+- Tools: Chaos Mesh, Gremlin, Litmus, Chaos Toolkit
+
+Principles:
+- Hypothesis driven experiments
+- Gradual blast radius increase
+- Steady observability and rollback plan
+
+Example experiments:
+- Kill database primary and observe failover
+- Inject 500ms latency between services and monitor SLOs
+
+## ১০) Testing, validation ও CI/CD integration
+
+- Include resilience tests in CI: unit tests for retry logic, integration tests for circuit breakers
+- Stage environment should mimic production network topology for realistic tests
+- Automated canary deployments and rollout strategies reduce blast radius during deploys
+
+## ১১) Metrics, logs ও alerts (observability)
+
+Key metrics:
+- availability_percentage, error_rate, request_latency P50/P95/P99
+- instance_health_count, leader_changes_count
+- failover_duration, backup_success_rate, restore_time
+
+Alert guidance:
+- Alert on sustained error rate or latency spikes, not single transient errors
+- Alert on backup failures, missed snapshots, or high restore times
+
+Logging:
+- Structured logs with correlation IDs and event types for incident tracing
+- Store critical logs in immutable store or with access controls for post‑mortem
+
+## ১২) Post‑mortem ও blameless culture
+
+- Conduct blameless post‑mortems focused on system fixes and process improvements
+- Document timelines, decisions, and follow‑up action items with owners
+- Track fixes and verify in subsequent drills
+
+## ১৩) Cost‑vs‑resilience tradeoffs
+
+- Higher availability typically costs more (multi‑AZ, multi‑region, more replicas)
+- Evaluate business impact of downtime vs cost and choose SLOs accordingly
+- Use tiered resilience: critical services get multi‑region HA; low‑priority services get simpler backups
+
+## ১৪) Practical recipes
+
+- Simple web app: 3 AZ instances behind LB, DB primary + async replicas, daily backups, automated health checks and auto‑restart
+- Strong DR (financial app): active‑passive multi‑region with near‑sync replication, warm standby, documented RTO/RPO and quarterly failover drills
+- Stateless microservices: design for rapid redeploy, use sticky session avoidance and externalize state to durable stores
+
+## ১৫) Quick decision flow
+
+1. Define critical user journeys and acceptable downtime/data loss
+2. Map architecture to achieve target RTO/RPO per journey
+3. Implement redundancy, automate failover, add observability
+4. Run drills, iterate on runbooks and monitor cost vs value
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি (A) Chaos Mesh experiment manifest ও guide, (B) একটি DR runbook টেমপ্লেট (Markdown) এবং কন্ডাক্ট‑ড্রিল চেকলিস্ট, বা (C) একটি small restore‑validation script + CI job (Bash + GitHub Actions sample) যোগ করে দেব—কোনটা আগে যোগ করি?

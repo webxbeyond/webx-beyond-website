@@ -1,0 +1,180 @@
+---
+title: Leader Election ও Failover Strategies
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা কভার করব: কেন লিডার প্রয়োজন হয়, জনপ্রিয় leader election অ্যালগরিদম (Bully, Raft‑style election), leader leases ও fencing, failover প্যাটার্ন (active‑passive, active‑active), Kubernetes‑style lease election, split‑brain প্রতিরোধ, অপারেশনাল টিউনিং, এবং প্র্যাকটিক্যাল টেস্টিং। সবকিছু বাস্তব উদাহরণ ও রূপকের সঙ্গে। লক্ষ্য: আপনি সঠিক লিডারিং ও failover প্যাটার্ন বেছে নিতে পারবেন এবং production‑ready অপারেশন পরিকল্পনা করতে পারবেন।
+
+## চেকলিস্ট (এই পাঠে যা করা হবে)
+
+- Leader election কেন দরকার এবং কখন না লাগবে
+- সাধারণ অ্যালগরিদম: Bully, Ring, Raft election, ZooKeeper/ZAB
+- Leader leases, heartbeats, election timeouts ও fencing
+- Failover প্যাটার্ন: active‑passive, active‑active, leaderless alternatives
+- Kubernetes Lease API ও practical leader election
+- Split‑brain সমস্যা ও mitigations
+- Monitoring, metrics ও testing (failure injection)
+- সিদ্ধান্ত ফ্লো: build vs reuse
+
+---
+
+## ১) সমস্যা ও রূপক
+
+কখন লিডার লাগে:
+- যখন সিস্টেমে একক‑point‑of‑coordination প্রয়োজন (উদাহরণ: schedule assignment, global sequence number, primary for writes)
+- resource locking বা singleton task execution দরকার হলে
+
+রূপক: কল্পনা করুন একটি অর্কেস্ট্রার, যেখানে কনডাক্টরই সঙ্গীতের গতি ধরে রাখে — কনডাক্টর না থাকলে সবাই অনির্দিষ্টভাবে বাজায়। কনডাক্টরই লিডার; লিডার fail করলে নতুন কনডাক্টর দ্রুত নির্বাচনের প্রয়োজন।
+
+কখন লিডার দরকার নয়:
+- যখন system design inherently leaderless and conflict‑resolving (CRDTs, quorum writes with client‑side coordination)
+- আপনি যদি write conflicts সহজে reconcile করতে পারেন বা decentralized algorithms ব্যবহার করতে চান
+
+## ২) লোকাল/সাধারণ অ্যালগরিদমের সারাংশ
+
+Bully algorithm (সরল):
+- উচ্চ প্রাধিকার (ID) 가진 নোড সকলকে বলে "আমি লিডার হতে চেয়েছি"; যদি কেউ higher ID প্রতিক্রিয়া না দেয়, সে লিডার
+- সহজ কিন্তু বাহ্যিক নেটওয়ার্ক ব্যর্থতা ও partition‑এর ক্ষেত্রে জটিল
+
+Ring algorithm (পাসিং টোকেন):
+- নোডগুলো ring‑এ arrange করা হয়; লিডার নির্বাচনের জন্য token পাস করা হয়
+- ছোট ক্লাস্টারে কার্যকর, তবে failure handling জটিল
+
+Raft‑style election (practical, durable):
+- সবাই election timeout রাখে; যদি leader heartbeat অনুপস্থিত, candidate হয় এবং RequestVote RPC পাঠায়
+- majority ভোট পেলে leader বনতে পারে
+- Raft election log‑based freshness rule বজায় রাখে (freshest log wins) → safety
+
+ZooKeeper/ZAB: Paxos/Zab family approach with leader election via fast path; ZK provides ephemeral znodes often used for leader indicators
+
+## ৩) Leader leases, heartbeats ও election timeouts
+
+- Heartbeat: লিডার সময় সময় followers-কে heartbeat/AppendEntries পাঠায়; followers heartbeat না পেলে election শুরু হয়
+- Election timeout: follower‑side randomized timeout (e.g., 150–300ms) helps avoid split elections; range should be > typical heartbeat interval × factor
+- Lease: লিডারকে নির্দিষ্ট সময়ের জন্য exclusive right দেওয়া; lease-based leaders avoid expensive distributed locks but require clock or lease guarantees
+
+টিউনিং guideline:
+- Heartbeat কম (small) → দ্রুত failover কিন্তু বেশি network overhead
+- Election timeout খুব ছোট → frequent elections; খুব বড় → slow failover
+- Randomize timeout per node to avoid simultaneous candidacy
+
+## ৪) Fencing ও safety during failover
+
+Problem: old leader may still have pending actions after failover (split‑brain) → need fencing
+
+Fencing techniques:
+- Leases with lease owner validation (leader holds lease token which expires)
+- Monotonic leader epoch / term numbers: all actions tagged with current leader term; followers reject older‑term writes
+- External fencing: switch off old leader’s access to shared resources (e.g., network ACLs, revoke DB credentials)
+
+Practical pattern: when a node steps down, it must either gracefully relinquish resources or ensure resources are fenced by another mechanism before new leader uses them.
+
+## ৫) Failover patterns
+
+Active‑Passive (Primary‑Backup):
+- Single active leader handles writes; passive replicas standby and take over on failure
+- Simpler to reason about but failover time depends on detection & promotion
+- Usecases: systems that need strict single writer semantics (databases, leader‑driven schedulers)
+
+Active‑Active (Multi‑primary / Leaderless):
+- Multiple nodes accept writes; conflict resolution done by CRDTs or last‑write‑wins, or via application level reconciliation
+- Faster availability, but extra complexity in conflict handling and causality
+
+Leaderless / Quorum-based:
+- No single coordinator; clients write to a number of replicas and read with quorum guarantees
+- Examples: Cassandra, Dynamo‑style; avoids single leader bottleneck
+
+Hybrid approaches:
+- Per‑partition leader (shard leaders) to limit scope of coordination
+- Lease‑based primary for windowed tasks while allowing read replicas to serve reads
+
+## ৬) Kubernetes মোডেলে leader election practical
+
+Kubernetes-style leader election using Lease API:
+- Pods coordinate by updating a Lease object in the API server. The holder is the leader for the lease duration.
+- Advantages: uses k8s API (auth, RBAC, TLS), no external dependency, lease renewal via small heartbeats
+- Client libraries: client-go leaderelection package (supports callbacks on start/stop leadership)
+
+Practical tips for k8s:
+- Use Lease (coordination.k8s.io/v1) instead of ConfigMap locks for correctness
+- Set appropriate leaseDuration, renewDeadline, retryPeriod values. Example defaults: leaseDuration=15s, renewDeadline=10s, retryPeriod=2s — tune by observed pod scheduling delays and API latency
+- Ensure RBAC permissions for writing Lease objects
+
+## ৭) Split‑brain—কারণ ও প্রতিকার
+
+কারণ:
+- Network partition → two partitions each think they have majority (rare if majorities correct) or minority partition forms a new leader when split decides incorrectly
+- Clock skew combined with lease-based approaches
+
+প্রতিরোধ:
+- Ensure majority-based quorum for safety (odd number nodes helps)
+- Use fencing and epoch/term stamping
+- Use reliable discovery service (etcd, ZK) with strong guarantees
+- Avoid relying purely on processing‑time or local clocks for leader validity
+
+## ৮) Operational considerations ও monitoring
+
+Key metrics:
+- leader_changes_total (rate of leader switches)
+- election_duration_seconds (how long elections take)
+- leader_heartbeat_latency
+- follower_lag (for log‑based systems)
+- lease_renewal_failures
+
+Alerts:
+- frequent leader changes → unstable cluster or tight timeouts
+- long election duration → network or node slowness
+- follower lag growth → IO bottleneck or GC pauses
+
+Runbooks:
+- If leader flapping: increase election timeouts, inspect GC/CPU spikes, check network partition logs
+- If follower lagging: snapshot/compact logs, increase IO, or add more followers carefully (rehashing/resharding may be needed)
+
+## ৯) Testing & failure‑injection
+
+Tests to run:
+- Leader kill test: kill leader process and observe election & recovery
+- Partition tests: isolate a node and observe quorum behavior
+- Slow network / delayed RPCs: verify safety invariants hold
+- Membership changes: add/remove nodes and verify joint consensus behaviour
+
+Tools:
+- Chaos engineering frameworks (Chaos Mesh, Litmus, Gremlin)
+- Jepsen for deep partition & persistence semantics testing
+- Local testcontainers & integration test harnesses for fast CI checks
+
+## ১০) Practical code & pseudocode
+
+Leader election minimalist pseudocode (Raft‑like candidate flow):
+
+1. On startup set state=Follower, election_timeout=random(min,max)
+2. While running:
+   - if receive heartbeat from leader -> reset election_timeout
+   - if election_timeout expires -> become Candidate, currentTerm++, vote for self, send RequestVote to others
+   - if receive majority votes -> become Leader and start heartbeats
+   - if receive higher term message -> revert to Follower and update term
+
+(Production systems add persistent term storage, RPC retries, backoff, and log checks for safety.)
+
+## ১১) Decision flow — কখন লিডার/ফailover দরকার
+
+- যদি আপনার কাজ "single source of truth" বা sequential command ordering চায় → centralized leader behövs
+- যদি low latency & horizontal writes জরুরি এবং conflicts manageable → leaderless/quorum approach ভাল
+- For global coordination (locks, scheduling), prefer small consensus cluster (3 or 5 nodes) with Raft or managed etcd
+
+## ১২) Build vs Reuse
+
+- Reuse when you can: etcd, Consul, Zookeeper provide tested leader election & membership semantics
+- Build only when:
+  - you need a very small embedded leader election (use well‑tested libraries), or
+  - your constraints (resource, latency, environment) force a custom approach
+
+## ১৩) Follow‑ups আমি যোগ করে দিতে পারি
+
+- A small Go example using Kubernetes Lease API (client-go) for leader election (runnable) ✅
+- A lightweight leader election script using Redis SET NX + TTL with fencing notes
+- A runbook + Chaos Mesh job template to test leader failover
+
+আপনি কোনটি আগে যোগ করতে চান? আমি নির্বাচিত অপশনের জন্য কোড + README + দ্রুত টেস্ট যোগ করে দেব।

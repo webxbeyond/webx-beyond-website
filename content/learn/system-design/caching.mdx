@@ -1,0 +1,163 @@
+---
+title: Caching Basics - CDN, Redis, Memcached
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+এই পাঠে আমরা ক্যাশিং-এর মৌলিক ধারণা, ধরনের ক্যাশ (CDN, in-memory cache), ক্যাশিং স্ট্র্যাটেজি (write-through, write-back, write-around), কীভাবে ক্যাশ ডিজাইন করবেন, সাধারণ পিটফলস এবং বাস্তব উদাহরণসহ কৌশল আলোচনা করব। লক্ষ্য: ইন্টারভিউ-এ পরিষ্কারভাবে কনসেপ্ট ব্যাখ্যা করা এবং প্রকল্পে ব্যবহারযোগ্য, পরীক্ষিত ক্যাশিং রীতিনীতি তৈরি করা।
+
+চেকলিস্ট
+- ক্যাশিং কেন করা হয় ও কী অর্জন করা যায় — latency ও throughput-এর প্রভাব
+- CDN vs Redis vs Memcached: কখন কোনটি ব্যবহার করবেন
+- Cache population: lazy vs proactive (cache-aside, write-through, write-back, write-around)
+- Cache invalidation এবং consistency সমস্যা ও সমাধান
+- Cache stampede, stale data, cache warming, and mitigation patterns
+- Metrics, testing, ও monitoring checklist
+- বাস্তব উদাহরণ: API response caching, session store, large media via CDN
+
+---
+
+## ১) কেন ক্যাশিং দরকার? (বড় ছবিটি)
+
+ক্যাশিং মূলত দুইটি জিনিসের জন্য দরকার: latency কমানো এবং backend load কমানো। ক্যাশিং হলে সাধারণত read latency পড়ে যায় এবং আর্কিটেকচারের ব্যাক-এন্ড কম কনসুম হয়, ফলে টেকনিক্যাল খরচ ও রিসোর্স সাশ্রয় হয়।
+
+রূপক: যদি প্রতি সকালেই ১০০ জন একই কক্ষের দরজা খুলে একই তথ্য দেখতে চায়, প্রত্যেকবার প্রধান কক্ষ থেকে তথ্য এনে দেখানোর বদলে দরজার কাছে একটি কপি রাখলে দ্রুত সেবা দেওয়া যায়।
+
+মেট্রিকস দ্বারা মূল্যায়ন: cache hit rate, cache miss rate, P95 read latency, backend QPS reduction, memory hit ratio।
+
+## ২) CDN vs In-memory cache (Redis / Memcached)
+
+CDN (Content Delivery Network):
+- উদ্দেশ্য: স্ট্যাটিক কন্টেন্ট (images, JS/CSS, ভিডিও) বা edge-cacheable responses (public HTML) ব্যবহারকারীর নিকটস্থ POP-এ রাখে।
+- সুবিধা: global edge, latency কমে, origin সার্ভারে লোড কমে।
+- সীমাবদ্ধতা: dynamic/personalized content caching সীমিত, invalidation ও cache-control জরুরি।
+
+Redis / Memcached (in-memory):
+- উদ্দেশ্য: low-latency key-value store, session store, cache-aside pattern, counters, leaderboards।
+- Redis সুবিধা: persistence, rich data structures (lists, sets, sorted sets), Lua scripting, TTLs।
+- Memcached সুবিধা: সরলতা, দ্রুত serialization-less ops, memory-efficient for simple key-value।
+
+নির্বাচন: যদি আপনাকে global content ও static assets serve করতে হয় CDN; যদি per-request object caching/ session/store দরকার হয় Redis/Memcached।
+
+## ৩) ক্যাশিং স্ট্র্যাটেজি (প্যাটার্নস)
+
+1) Cache-Aside (Lazy Loading)
+   - Flow: Read -> cache lookup -> miss -> load from DB -> populate cache -> return
+   - সুবিধা: সহজ, control হাতে থাকে
+   - সমস্যা: উচ্চ প্রথম-পাবলিশ লেটেন্সি, race condition
+
+2) Write-Through
+   - Flow: Write -> write to cache -> write to DB (sync)
+   - সুবিধা: cache গুলো সর্বদা হিট হওয়া ডাটা রাখে (consistent)
+   - সমস্যা: write latency বাড়ে (DB write alongside cache)
+
+3) Write-Back (Write-Behind)
+   - Flow: Write -> write to cache -> async flush to DB
+   - সুবিধা: write latency কমে; DB অপ্টিমাইজ করা যায়
+   - সমস্যা: data-loss risk on cache failure, complexity বেশি
+
+4) Write-Around
+   - Flow: Write -> write to DB (bypass cache); cache populated on read
+   - সুবিধা: টিপিক্যাল write-heavy workload-এ cache pollution কমায়
+   - সমস্যা: increased read latency for freshly written data
+
+স্ট্র্যাটেজি নির্বাচন: workload (read-heavy vs write-heavy), data criticality, consistency requirements এবং operational constraints বিবেচনা করে করুন।
+
+## ৪) ক্যাশ ইনভ্যালিডেশন এবং কনসিস্টেন্সি
+
+ক্যাশ ইস্যু সবচেয়ে কঠিন: "How do you keep cache coherent with the source of truth?"
+
+প্যাটার্নস:
+- Time-based TTL: সহজ কিন্তু stale data থাকতে পারে
+- Explicit invalidation: application-level delete/update cache key on DB write
+- Versioned keys: key-prefix/version changed করে ইনভ্যালিডেশন
+- Event-driven invalidation: DB change events → invalidate cache (via message bus)
+
+ট্রেড-অফ: aggressive TTL → more origin load; long TTL → stale data. Best practice: combine TTL + explicit invalidation + monitoring.
+
+## ৫) Cache Stampede, Thundering Herd, Penalties ও Mitigation
+
+সমস্যা: অনেক concurrent requests একই সময়ে miss করলে origin-এ হিট বৃদ্ধি পায় (cache stampede)।
+
+Mitigations:
+- Mutex/lock per-key: first request rebuilds cache, অন্যরা wait বা get stale data
+- Request coalescing / singleflight: deduplicate concurrent loads
+- Early recompute / proactive refresh: refresh popular keys before TTL expires
+- Use stale-while-revalidate: serve stale while background refreshes cache
+
+উদাহরণ: Redis-এর অধীনে আপনি ponerse 'SETNX' lock বা Redlock ব্যবহার করে singleflight ইমপ্লিমেন্ট করতে পারেন।
+
+## ৬) Cache warming এবং prefetching
+
+Cache warming: ডেপ্লয় বা স্টার্টআপে জনপ্রিয় keys আগেভাগে Pre-populate করা।
+
+Prefetching: background worker জনপ্রিয় বা সন্দেহভাজন keys রিফ্রেশ করে রাখে।
+
+প্রশ্ন: কখন warming করবেন? যখন cold-start latency ভাঙে ইউজার এক্সপিরিয়েন্স বা উর্ডার-of-magnitude cache misses প্রত্যাশা থাকে (e.g., ক্যাম্পেইন-লঞ্চ)।
+
+## ৭) Cache key design ও serialization
+
+নিয়ম:
+- Keys should be deterministic and compact
+- Use namespaces/prefixes for versioning (e.g., users:123:profile:v2)
+- Avoid huge keys; use hashed keys for large identifiers
+- Explicit TTL per key type, don't rely on global defaults
+
+Serialization:
+- Choose compact formats (msgpack, protobuf) if performance critical
+- For Redis, avoid storing huge JSON strings if frequent field updates needed—use hashes or separate keys
+
+## ৮) 캐시িং টিপস per use-case
+
+- API response caching (public responses): CDN at edge + cache-control headers; use stale-while-revalidate for UX
+- Partial page caching: cache fragments (e.g., sidebar, product card)
+- Session store: Redis with TTL + persistence if session critical
+- Leaderboards / counters: Redis sorted sets / atomic increments
+
+## ৯) Security & operational considerations
+
+- Avoid caching PII on public caches / CDN
+- Use signed URLs for private content on CDN or short TTLs
+- Monitor memory usage & eviction policies (LRU vs TTL)
+- Plan for cache failure: have a graceful fallback to origin and alerting
+
+## ১০) Metrics, testing ও quality gates
+
+মেট্রিকস মনিটর করতে হবে:
+- Cache hit rate (goal > 80% for effective caches)
+- Cache latency (P50/P95)
+- Origin QPS reduction
+- Eviction rate, memory usage, connection count
+
+Testing:
+- Simulate cache miss/hit scenarios with load tests
+- Test cache stampede by forcing simultaneous misses
+- Validate invalidation by updating origin and asserting eventual consistency
+
+## ১১) বাস্তব উদাহরণসমূহ
+
+1) E-commerce product pages
+- CDN serves static assets; dynamic price/stock via short-TTL cache-aside Redis; on price update publish invalidation event
+
+2) Social feed
+- Personalized feed kept in Redis (per-user cache) with background fanout/update; use write-through or event-driven updates to keep feeds consistent
+
+3) Video streaming
+- CDN for large objects; signed URLs + edge caching; origin only used for infrequent cache misses
+
+## ১২) অনুশীলনী (short checklist to design a cache)
+
+1) Determine read/write ratio and acceptable staleness
+2) Choose cache type (CDN vs in-memory)
+3) Design key schema and TTL strategy
+4) Implement cache pattern (cache-aside, write-through etc.)
+5) Add stampede mitigation & warming if needed
+6) Monitor hit-rate, latencies, evictions and iterate
+
+## ১৩) পরবর্তী বিষয় ও রিসোর্স
+
+- Next: [Database Basics: SQL বনাম NoSQL](/system-design/databases)
+- Read: Redis official docs, HTTP cache-control RFCs, CDN provider docs (Cloudflare, Fastly, AWS CloudFront)
+
+---
+
+আমি এই পাতায় প্রয়োজনে উদাহরণকোড (Node.js + Redis), একটি k6 load-test এবং Mermaid ডায়াগ্রাম যোগ করে দিতে পারি—বলুন কোনটি আগে যোগ করব।

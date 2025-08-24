@@ -1,0 +1,185 @@
+---
+title: URL Shortener (Bitly, TinyURL)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা URL shortener সার্ভিস (যেমন Bitly, TinyURL) ডিজাইন করব—end‑to‑end: API, ডেটা মডেল, ক্ষুদ্র কোড জেনারেশন পদ্ধতি, redirect latency অপটিমাইজেশন, স্কেলিং, ক্যাশিং, বিশ্লেষণ, এবং অপারেশনাল ও সিকিউরিটি কনসিডারেশন। বাস্তব উদাহরণ, রূপক ও সিদ্ধান্ত ফ্লো দিয়ে শেষ করা হবে যাতে আপনি production‑grade সার্ভিস তৈরি করতে পারেন।
+
+## চেকলিস্ট
+
+- কী সমস্যা আমরা সমাধান করছি (requirements)
+- API ও data model (shorten, redirect, analytics)
+- short code generation: hash vs sequence vs vanity
+- storage options: RDBMS vs NoSQL vs in‑memory + persistence
+- low‑latency redirect (CDN, edge caching) ও cache invalidation
+- scaling: sharding, consistent hashing, replication
+- analytics pipeline (event collection, stream processing)
+- security: abuse control, rate limiting, phishing detection
+- operational: monitoring, SLOs, backup, migration
+
+---
+
+## ১) প্রাথমিক প্রয়োজনীয়তা (Requirements & constraints)
+
+প্রাথমিক functional requirements:
+- Create short URL from long URL
+- Redirect short → long with minimal latency
+- Track click analytics (time, geo, referrer, UA)
+- Support custom/vanity aliases
+- Expiration and deletion
+
+Non‑functional constraints:
+- রিডাইরেক্ট‑এর জন্য প্রচুর রিড (লেখার চেয়ে অনেক বেশি)
+- খুব কম latency (edge‑এ ৫০ms‑এর নিচে লক্ষ্য)
+- উচ্চ availability ও সুন্দর degrade
+- অ্যানালিটিক্স স্কেলেবল, কিন্তু redirect‑এ স্লো না
+
+এগুলো পরে ডিজাইনে প্রভাব ফেলবে—redirect fast রাখতে reads‑optimized design জরুরি।
+
+## ২) API ও Data model
+
+Basic APIs:
+```
+POST /shorten { url, ttl?, custom_alias?, tags? } — { short_url } ফেরত
+GET /:alias — ৩০২ redirect করে বড় URL‑এ
+GET /analytics/:alias — summary stats ফেরত
+```
+
+Data model (সরল):
+```
+urls(id PK, alias VARCHAR UNIQUE, long_url TEXT, created_at, expires_at, owner_id)
+clicks(id PK, alias FK, ts, ip, ua, referrer, geo)
+```
+
+Alias র‍্যাপিং: alias হলো ছোট key (6–10 chars) — আলফানুমেরিক + URL‑safe।
+
+## ৩) Alias generation strategies
+
+a) Sequential counter (base62):
+- Advantages: simple, no collisions, small aliases
+- Disadvantages: predictable (enumeration), hot counter requires coordination
+
+b) Hashing (e.g., MD5/SHA + base62 truncate):
+- Advantages: deterministic mapping, can be idempotent (same long URL → same alias)
+- Disadvantages: collision risk, need collision resolution (append salt or rehash)
+
+c) Random generator (secure RNG):
+- Advantages: distributed generation possible, less predictable
+- Disadvantages: need collision checks; probability manageable with sufficient length
+
+d) Vanity/custom aliases:
+- Validate uniqueness and disallow offensive words; may be rate‑limited or paid feature
+
+Design note: many systems combine approaches — use sequential for internal generation, allow custom aliases, and support deterministic hashing as an option.
+
+## ৪) Storage & lookup patterns
+
+Redirects are read‑heavy; use fast key‑value store as primary lookup (Redis, DynamoDB, Cassandra). Typical pattern:
+- Primary writable store (e.g., RDBMS or DynamoDB) for strong consistency on writes
+- Denormalized K/V for reads: alias → long_url in Redis or DynamoDB with low latency
+
+Startup flow:
+- On shorten: write canonical DB for durability, write to K/V cache
+- On redirect: lookup cache (very fast). On cache miss, read DB and populate cache.
+
+Persistence: if using Redis as cache, persist to durable DB; or use Redis‑Cluster with AOF/RDB depending on SLAs.
+
+## ৫) Edge performance & CDN
+
+Redirects should often be served at the edge (CDN). Options:
+- Store alias→long_url mapping in CDN edge via key‑value store (Fastly edge dictionaries, Cloudflare Workers KV)
+- Use CDN to return 302 directly, avoiding origin hop for most requests
+
+Tradeoffs:
+- Edge replication increases propagation delay for new aliases (eventual consistency)
+- For vanity/custom/paid URLs, consider immediate origin write + edge invalidation
+
+## ৬) Scaling: sharding, replication, and consistent hashing
+
+- Hash‑based partitioning: partition alias space by hash prefix, store partitions on different shards
+- Consistent hashing useful for adding/removing nodes with minimal rebalancing
+- Replication for high availability: multi‑AZ replicas, leader‑follower pattern for writes
+
+For read‑heavy workload:
+- Use global secondary indexes or read replicas
+- Cache aggressively; use TTLs but ensure rapid invalidation when alias updated/deleted
+
+## ৭) Analytics pipeline (decouple from redirect path)
+
+Do NOT log every click synchronously during redirect. Use async eventing:
+- On redirect: emit lightweight event (e.g., message to Kafka/Cloud PubSub or append to log blob), return 302 immediately
+- Downstream: stream processing (Flafka/Flink/Kafka Streams) to aggregate clicks, enrich geo from IP, store aggregates in OLAP store (ClickHouse, BigQuery)
+
+Design patterns:
+- Use idempotent events or include request id to avoid double counting
+- Use compacted topics for per‑alias state
+
+## ৮) Consistency, TTL, deletions
+
+- TTLs: store expires_at and remove alias from cache on expiration; edge caches may still serve until TTL expires—consider short edge TTL for expiring links
+- Soft delete vs hard delete: soft delete flag helps for auditing and avoids immediate edge inconsistency
+
+## ৯) Abuse prevention ও security
+
+- Rate limit shorten API per user/IP; for redirects, rate limit suspicious IPs
+- Malware/phishing scan: scan long_url against blocklists and use Google Safe Browsing or similar
+- CAPTCHA or verification for mass creation; paid accounts for bulk/vanity
+- Detect and block enumeration patterns (sequential scanning)
+- Protect analytics pipeline against forged click events using signed tokens or server side enrichment
+
+## ১০) Monitoring, SLOs ও runbooks
+
+Key metrics:
+- redirect_latency_p95, redirect_error_rate
+- cache_hit_ratio, db_reads_per_second
+- shorten_rate, vanity_request_rate
+- analytics_event_lag, event_processing_errors
+
+SLO উদাহরণ:
+```
+redirect success rate মাসে ৯৯.৯৯%
+৯৫th percentile redirect latency edge‑এ ৩০ms‑এর নিচে, origin‑এ ১০০ms‑এর নিচে
+```
+
+Runbook:
+- error rate বেশি হলে cache tier/DB connectivity চেক করুন
+- event processing lag হলে consumer lag/reprocess topic চেক করুন
+- abuse spike হলে offending IP‑তে rate limit/block দিন
+
+## ১১) Testing & migrations
+
+- Load test redirect path separately (reads) and shorten path (writes)
+- Chaos test edge cache invalidation and DB failover
+- Migration strategy: zero‑downtime migration by dual‑writes and backfill for alias table
+
+## ১২) Cost considerations
+
+- Edge caching lowers egress and origin load but increases storage/replication
+- Analytics at high QPS can be costly—use sampling for raw events with full aggregation for anomalies
+- Vanity paid features can subsidize costs
+
+## ১৩) Example architecture (concise)
+
+1) Ingress (CDN) → Edge KV (lookup) or Edge → Origin
+2) Origin API (shorten endpoint): writes to SQL/DynamoDB; publishes event to Kafka; writes to K/V cache
+3) Redirect path: CDN edge lookup → if miss, origin reads from cache/db and responds with 302
+4) Event stream → stream processor → OLAP datastore for analytics
+
+## ১৪) Decision flow (সংক্ষেপে)
+
+- High read QPS & global presence? → push mappings to CDN edge or use global K/V (Cloudflare Workers KV)
+- Need immediate consistency for new aliases? → serve from origin with short edge TTL and synchronous write to durable DB
+- Need deterministic alias for same long URL? → use hashing with collision handling
+- Want low op overhead? → managed services (Cloudflare Workers, AWS Lambda + DynamoDB + CloudFront)
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি runnable example যোগ করে দেবো:
+
+- (A) Minimal Node.js + Redis implementation (Docker Compose) showing shorten, redirect, and simple event queue
+- (B) CDN‑edge demo using Cloudflare Workers script (example code) that performs alias lookup from Workers KV
+- (C) Scalable design with DynamoDB + Lambda + CloudFront example scaffold and infra snippets (IaC)
+
+কোনটি চান? (A / B / C / None)

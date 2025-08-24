@@ -1,0 +1,140 @@
+---
+title: Synchronous বনাম Asynchronous কমিউনিকেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## কাজে নেয়া পরিকল্পনা
+
+এই পাঠে আমরা synchronous ও asynchronous কমিউনিকেশনের মৌলিক পার্থক্য, ব্যবহারিক প্যাটার্ন, delivery guarantees (at-most-once, at-least-once, exactly-once), retry ও idempotency কৌশল, transactional outbox ও saga patterns, এবং অপারেশনাল টিপস কভার করব। উদাহরণ, রূপক ও বাস্তব সিদ্ধান্ত গাইড থাকবে যাতে একজন ইঞ্জিনিয়ার সিদ্ধান্ত-ভিত্তিকভাবে sync বা async বেছে নিতে পারে।
+
+চেকলিস্ট
+- Synchronous vs Asynchronous সংজ্ঞা ও প্রয়োগ ক্ষেত্র
+- Delivery guarantees এবং trade-offs
+- Message Queue, Pub/Sub, Event-driven প্যাটার্নস
+- Retries, backoff, idempotency ও deduplication
+- Transactional Outbox, CDC এবং SAGA pattern সারাংশ
+- Monitoring, testing ও failure drills
+
+---
+
+## ১) সংজ্ঞা ও মূল ধারণা
+
+- Synchronous communication: ক্লায়েন্ট একটি রিকোয়েস্ট পাঠায় এবং সার্ভার থেকে তাৎক্ষণিক জবাবের অপেক্ষা করে (ব্লকিং বা await)। উদাহরণ: HTTP request/response, RPC।
+- Asynchronous communication: ক্লায়েন্ট রিকোয়েস্ট পোস্ট করে এবং যতক্ষণ না রিসপন্স আসে তা অপেক্ষা করে না; কাজ background বা অন্য সার্ভিসে প্রক্রিয়াকরণ হয়। উদাহরণ: message queues, event streams।
+
+রূপক: synchronous = ফোন কল — আপনি বলছেন, উত্তর পাচ্ছেন অবিলম্বে; asynchronous = ইমেইল — আপনি পাঠালেন, উত্তর পরে আসবে এবং আপনি কাজে চলে যাবেন।
+
+কখন sync? when immediate result required (login validation, payment authorization). কখন async? when work can be deferred (send email, thumbnail generation, analytics ingestion).
+
+## ২) Delivery guarantees: at-most-once, at-least-once, exactly-once
+
+- At-most-once: message সর্বোচ্চ একবার পৌঁছাবে (সাধারণত drop rather than duplicate). সহজ কিন্তু data-loss সম্ভাব্য।
+- At-least-once: message কমপক্ষে একবার পৌঁছাবে; duplicate arrivals সম্ভব → consumer-side dedup required।
+- Exactly-once: প্রতিটি message ঠিক একবার প্রক্রিয়িত হবে। খুব কঠিন ও costly; কিছু systems (Kafka Streams, managed services) limited support দেয় via idempotent producers, transactions।
+
+Trade-offs:
+- durability, latency, complexity—যত বেশি guarantee চাওয়া হয় তত বেশি latency/overhead বাড়ে।
+
+## ৩) প্যাটার্নস: request-response, queue-based, pub/sub, event-sourcing
+
+1) Request-Response (sync)
+- সহজ, direct call; পরাধীনতা বেশি—latency ও failures cascade করতে পারে
+
+2) Message Queue (async point-to-point)
+- producer pushes message to queue; one consumer processes it; good for work queues, retries, backpressure
+
+3) Publish/Subscribe (event-driven)
+- producer emits events to topic; multiple subscribers consume independently; good for fan-out, loose coupling
+
+4) Event Sourcing
+- state represented as event stream; subscriptions and materialized views used for queries
+
+## ৪) Retries, backoff ও idempotency
+
+Retries: unavoidable in distributed systems. Combine with backoff and jitter to avoid retry storms.
+
+- Exponential backoff + jitter (randomized) is preferred
+- Circuit breaker pattern prevents overload on downstream failures
+
+Idempotency: design producers/consumers so repeated processing doesn't corrupt state.
+
+Idempotency strategies:
+- Idempotency keys: client supplies unique key per logical operation (e.g., payment_id) and server stores processed keys
+- De-duplication window: consumer records recent message ids to ignore duplicates
+- Use of immutable events and CRDTs for commutative updates
+
+Example: Payment API — client provides unique idempotency_key; server checks DB for processed key before applying charge.
+
+## ৫) Transactional Outbox ও Change Data Capture (CDC)
+
+Problem: how to reliably produce events during a transaction so DB write and event publish are not lost.
+
+Transactional Outbox:
+- write application data and outbox row in the same DB transaction
+- separate process reads outbox and publishes to message broker, then marks outbox row as sent
+- ensures atomicity between DB state and outbound event (no dual-write problem)
+
+CDC (Change Data Capture): use DB transaction log (WAL) to stream changes to brokers (Debezium, Maxwell). Useful for low-coupling replication between DB and event bus.
+
+## ৬) SAGA pattern ও distributed transactions
+
+Two approaches:
+- Orchestration-based saga: a central orchestrator calls services in sequence and triggers compensating actions on failure
+- Choreography-based saga: services emit events and other services react; no central orchestrator
+
+Compensating transactions: rollback by applying compensating actions (e.g., refund if payment succeeded but downstream booking failed).
+
+When to use: long-running business processes spanning multiple services where 2PC is impractical.
+
+## ৭) Ordering, partitioning ও affinity
+
+- Some workflows need per-entity ordering (e.g., user updates). Use partition key (user_id) so messages for same key go to same partition and processed in order (Kafka partitions, SQS FIFO).
+- Global ordering across all keys is expensive; prefer per-key ordering when feasible.
+
+## ৮) Observability, monitoring ও retry visibility
+
+Instrument both sync and async flows:
+- instrument request latencies, queue lengths, consumer lag, processing durations
+- trace context propagation across messages (inject trace_id into message headers)
+- monitor DLQs (dead-letter queues), retry counts, poison message trends
+
+Alerts to consider:
+- consumer lag > threshold, queue length growth rate high
+- repeated poison messages or retries for same message id
+
+## ৯) Testing এবং chaos drills
+
+Test cases:
+- End-to-end tests with slow downstream to validate backpressure
+- Duplicate delivery tests to verify idempotency
+- Outbox and CDC integration tests (atomicity verification)
+- Failure injection: broker down, network partition, consumer crash
+
+Tools: localstack, testcontainers, kafkajs + test harness, Jepsen-style tests for ordering/delivery guarantees
+
+## ১০) Real-world উদাহরণ
+
+1) Email sending: async via queue — user request returns quickly; worker sends email and retries on failure; poison messages land in DLQ
+
+2) Payment processing: sync for authorization (immediate), async for downstream bookkeeping and notifications; use idempotency keys and outbox
+
+3) Image processing: upload triggers async worker pipeline (thumbnail, CDN push); use event with correlation id for tracing
+
+4) Analytics: fire-and-forget event stream (high throughput, eventual delivery acceptable), use partitioning by user or topic
+
+## ১১) Decision flow (সংক্ষিপ্ত)
+
+1) Is immediate user-visible result required? Yes → synchronous
+2) Can work be deferred without harming UX or correctness? Yes → asynchronous
+3) Does operation span multiple services/long duration? Use saga/outbox patterns
+4) Do you need strict ordering? Partition by key or use FIFO queues
+
+## ১২) Common pitfalls ও mitigation
+
+- Relying too much on synchronous calls → cascading failures; mitigate with timeouts, retries, circuit breakers
+- Forgetting idempotency → duplicates corrupt state; design idempotent handlers
+- Not monitoring queues → lag leads to user-visible delays; instrument queue metrics and alerts
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি small transactional outbox example (Postgres + Node.js), Kafka partitioning diagram (Mermaid) বা একটি sample consumer retry Lua/Redis dedupe snippet যোগ করে দিতে পারি—কোনটি আগে যোগ করব? 

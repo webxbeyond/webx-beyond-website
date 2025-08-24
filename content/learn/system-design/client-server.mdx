@@ -1,0 +1,123 @@
+---
+title: Client-Server Architecture
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা Client-Server আর্কিটেকচারের মূল ধারণা, বিভিন্ন ক্লায়েন্ট-টাইপ, সার্ভিস টাইপ, যোগাযোগের প্যাটার্ন এবং বাস্তব জীবনের উদাহরণ ও ডিজাইন বিবেচনা আলোচনা করব। লক্ষ্য: আপনি একটি সাধারণ ওয়েব/মোবাইল/রিয়েল-টাইম সিস্টেমের ক্লায়েন্ট-সার্ভার ফ্লো স্পষ্টভাবে বুঝতে এবং ছোট সিস্টেম থেকে বড় সিস্টেমের দিকে কিভাবে বিবর্তন করবেন তা জানবেন।
+
+## ১) সহজ সংজ্ঞা ও রূপক
+
+সংজ্ঞা: Client-Server আর্কিটেকচার হচ্ছে একটি প্যাটার্ন যেখানে ক্লায়েন্ট (ব্যবহারকারী বা ডিভাইস) সার্ভারের কাছে অনুরোধ পাঠায় এবং সার্ভার সেই অনুরোধ প্রক্রিয়াকরণ করে উত্তর পাঠায়। সার্ভার সাধারনত ডেটা, লজিক বা রিসোর্স সরবরাহ করে; ক্লায়েন্ট সেই ডেটা দেখায় বা ব্যবহার করে।
+
+রূপক: একটি রেস্তোরাঁ — গ্রাহক (client) ওয়েটারকে (request) বলে খাবার চাই, কিচেন (server) অর্ডার তৈরি করে এবং ওয়েটার খাবার (response) পরিবেশন করে। কিচেন একাধিক ওয়েটারের অনুরোধ সামলাতে পারে, মার্কেট বা ক্যাশারের মতো অংশগুলোও আছে—ঠিক তেমনি লোড-ব্যাল্যান্সার, ক্যাশ বা ডাটাবেসও আছে।
+
+## ২) ক্লায়েন্টের ধরণ
+
+- Thick/Fat client: ক্লায়েন্টে বেশি লজিক থাকে (desktop apps), সার্ভারের উপর কম নির্ভরশীল।
+- Thin client: ব্রাউজার বা হালকা মোবাইল ক্লায়েন্ট—বেশি লজিক সার্ভারে থাকে।
+- Stateless clients: প্রতিটি অনুরোধ স্বাধীন (REST)।
+- Stateful clients: দীর্ঘমেয়াদি সংযোগ প্রয়োজন (WebSocket, TCP)।
+
+## ৩) সার্ভারের ধরন ও রোল
+
+- Stateless server: প্রতিটি অনুরোধ স্বাধীন, স্কেল করা সহজ (auto-scaling)।
+- Stateful server: session/connection ধরে রাখে (game server, websocket hub)।
+- API server: ব্যাকএন্ড লজিক ও ডাটাবেস এক্সেস করে।
+- Proxy/Edge server: CDN, reverse proxy — ক্যাশিং, TLS টার্মিনেশন।
+
+## ৪) যোগাযোগ প্যাটার্ন ও প্রোটোকল
+
+- Request-Response (HTTP/HTTPS): ওয়েব ও REST API-এর প্রধান প্যাটার্ন।
+- Long-lived connections (WebSocket, gRPC streams): রিয়েল-টাইম ইভেন্টস/চ্যাটের জন্য।
+- Pub/Sub & Message Queues (Kafka, RabbitMQ): অ্যাসিঙ্ক্রোনাস কমিউনিকেশন, ডিকাপলিং।
+- RPC (gRPC, Thrift): সার্ভিস-টু-সার্ভিস কমিউনিকেশনে কার্যকরি, low-latency ও typed contracts।
+
+প্রোটোকল বিবেচনা: নিরাপত্তা (TLS), পেইলোড সাইজ, latency, compatibility (browser vs native) ইত্যাদি।
+
+## ৫) Stateless vs Stateful — কখন কোনটা?
+
+- Stateless মডেল সহজে স্কেল করে, rolling updates সহজ, কিন্তু session data আলাদা স্টোরেজে রাখতে হয় (e.g., Redis)।
+- Stateful দরকার যখন persistent connection দরকার (gaming, live-collaboration) বা যেখানে per-connection context আছে।
+
+ডিজাইন টিপ: যদি সম্ভাব্য হয় Stateless রাখুন; Stateful হলে connection orchestration, sticky sessions, অথবা external session store বিবেচনা করুন।
+
+## ৬) সাধারণ আর্কিটেকচারাল উপাদান
+
+- Load Balancer: ট্রাফিক রুট করে, হেলথ-চেক করে
+- Reverse Proxy: TLS টার্মিনেশন, রুটিং, rate limiting
+- API Gateway: auth, request aggregation, throttling
+- Application Servers: business logic, stateless preferably
+- Databases: SQL/NoSQL depending on access patterns
+- Cache (CDN/Redis): latency কমায় ও read-scale বাড়ায়
+- Message Queue: ব্যাকগ্রাউন্ড কাজ/ডিকাপলিং
+
+## ৭) বাস্তব জীবনের উদাহরণগুলো
+
+1) সাধারণ ওয়েব অ্যাপ (ব্লগ বা ই-কমার্স)
+   - Client: Browser
+   - Flow: Browser → CDN (static) / LB → Web Servers → DB
+   - Optimizations: CDN for assets, page-level caching, DB connection pooling
+
+2) মোবাইল অ্যাপ (REST backend)
+   - Client: Mobile app (occasionally offline)
+   - Flow: App → API Gateway → Microservices → DB
+   - Considerations: offline sync, battery/network constraints, exponential backoff
+
+3) রিয়েল-টাইম চ্যাট
+   - Client: Browser/Mobile
+   - Flow: Client ↔ WebSocket Gateway ↔ Chat Servers ↔ Persistence
+   - Considerations: partitioning users by shard, presence service, delivery guarantees
+
+4) IoT ডিভাইস
+   - Client: constrained device
+   - Flow: Device → Edge Gateway (MQTT) → Ingest → Stream Processing
+   - Considerations: unreliable networks, small payloads, batching
+
+## ৮) স্কেলিং কনসিডারেশন
+
+- Horizontal scaling of stateless app servers behind LB
+- DB scaling: read replicas, partitioning/sharding
+- Cache strategically: CDN for static, Redis for hot reads
+- Connection management: keep-alives, max connections, circuit breakers
+
+উদাহরণ: একটি নিউজ সাইটে ট্রাফিক spike হলে CDN দিয়ে static content সরিয়ে অ্যাপ সার্ভারে লোড কমান; dynamic API-কে rate limit করে সংরক্ষণ করুন।
+
+## ৯) নিরাপত্তা ও অপারেশনাল দিক
+
+- TLS everywhere, API authentication (OAuth/JWT), input validation
+- Rate limiting & WAF to prevent abuse
+- Secrets management (Vault), rotated credentials
+- Observability: structured logs, metrics, distributed tracing
+- Runbooks for common incidents (DB failover, certificate expiry)
+
+## ১০) latency ও bandwidth অপ্টিমাইজেশন
+
+- Keep payloads small (sparse fields, compression)
+- Use HTTP/2 or gRPC for multiplexing
+- Aggressive caching & cache-control headers for client-side caching
+- Use content negotiation and pagination for large datasets
+
+## ১১) interview-focused checklist & talking points
+
+- State your assumptions (QPS, avg payload, concurrency)
+- Show HL diagram quickly (client, LB, app, db, cache)
+- Decide stateless/stateful and justify
+- Pick one hotspot and deep-dive: e.g., session handling, websocket scaling, or DB partitioning
+- Mention monitoring & rollout plan
+
+## ১২) common pitfalls
+
+- Keeping state in local memory without plan for failover
+- Ignoring network unreliability (no retries/backoff)
+- Not planning for API versioning and backward compatibility
+
+## ১৩) পরবর্তী ধাপ ও প্র্যাকটিস আইডিয়া
+
+- ছোট প্রজেক্ট: একটি simple REST API with stateless servers + Redis cache। পরে add WebSocket support and measure differences.
+- Try: simulate load with k6 or locust and observe P95/P99 latency while scaling app servers.
+
+---
+
+আপনি চাইলে আমি এই পাঠে Mermaid ডায়াগ্রাম যোগ করব এবং তিনটি ছোট উদাহরণ (REST server, WebSocket server, Pub/Sub ingestion) এর জন্য টেমপ্লেট কোড (Node.js/Go) ও load-test স্ক্রিপ্ট তৈরি করে দেব। কী চান আমি পরে যোগ করি? 

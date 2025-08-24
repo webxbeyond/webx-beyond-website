@@ -1,0 +1,163 @@
+---
+title: Clock Synchronization ও Vector Clocks
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা সময় তারিখ ও ইভেন্ট অর্ডারিং সংক্রান্ত সমস্যাগুলো আলোচনা করব — শারীরিক ঘড়ির (physical clocks) সিঙ্ক্রোনাইজেশন, logical clocks (Lamport clocks), এবং vector clocks—কীভাবে এগুলো causality শনাক্ত করে, কোথায় ব্যবহার করা হয়, এবং practical ইমপ্লিমেন্টেশন ও অপারেশনাল টিপস। লক্ষ্যমাত্রা: আপনি বুঝতে পারবেন কখন physical clocks প্রয়োজন, কখন logical clocks যথেষ্ট, এবং কিভাবে vector clocks ব্যবহার করে concurrent events detect ও merge করা যায়।
+
+## চেকলিস্ট
+
+- Physical clocks (NTP/PTP) ও সমস্যা (clock skew, drift, leap seconds)
+- Logical clocks: Lamport লেখা এবং সীমাবদ্ধতা
+- Vector clocks: data structure, update rules, happened‑before relation
+- Hybrid Logical Clocks (HLC) — বাস্তব ও যৌক্তিক মিলিয়ে সমস্যা হ্রাস
+- Use cases: causal broadcast, conflict detection, replication, debugging
+- Implementation tips, storage overhead, pruning strategies
+- Testing, monitoring ও decision flow
+
+---
+
+## ১) সমস্যা: সময়, অর্ডারিং এবং কারণিকতা (causality)
+
+ডিস্ট্রিবিউটেড সিস্টেমে events নানা নোডে ঘটে; কখনো আমাদের জানতে হয় কোন event আগে ঘটেছে বা একটার ফলেই আরেকটি ঘটেছে কি না। কিন্তু wall‑clock time ভরসাযোগ্য নয়—নেটওয়ার্ক‑ডিলে, ক্লক‑স্কিউ ও রিকভারির কারণে time stamps alone তুলনামূলক অপ্রতুল।
+
+রূপক: দুইজন লেখক একই গল্পকে আলাদা কপি হিসেবে লিখছে; আপনি প্রতিটি পরিবর্তনের ক্রম নির্ধারণ করতে চান—কিন্তু তারা একে অন্যকে সঙ্গে সঙ্গে দেখতে পাচ্ছে না।
+
+Happened‑before relation (→): যদি event A একটি διαδικিয়ার মাধ্যমে B‑কে অনুধাবন করায় (same process A before B) বা A এর message B‑তে পৌঁছায়, তাহলে A → B। যদি neither A → B nor B → A then A এবং B concurrent।
+
+## ২) Physical clocks: NTP, PTP ও সীমাবদ্ধতা
+
+Physical clocks (UTC‑based) ব্যবহার করে timestamps দিতে চাইলে সেগুলোকে সিঙ্ক করতে হয়:
+- NTP (Network Time Protocol): সাধারণত মিলিসেকেন্ড লেভেল সিঙ্ক প্রদান করে (ইন্টারনাল ল্যানে আরো ভাল)
+- PTP (Precision Time Protocol): উচ্চ সুনির্দিষ্টতা প্রয়োজন হলে ব্যবহৃত (ইনফ্রাস্ট্রাকচারে) — microsecond
+
+সমস্যা:
+- clock drift: ঘড়ি আলাদা গতিতে চলে
+- clock skew: নোডগুলোর মধ্যেকার সময় পার্থক্য
+- leap seconds ও অপ্রত্যাশিত clock adjustments
+
+অপারেশনাল নোটস:
+- NTP সার্ভার/cluster ব্যবহার করুন; পর্যাপ্ত pools এবং monitoring রাখুন
+- Avoid large backwards jumps in clock (can break monotonic assumptions)
+
+## ৩) Lamport logical clocks — ধারণা
+
+Lamport clocks (1978) একটি সহজ logical clock যা ordering প্রদান করে:
+- প্রতিটি process একটি counter ধরে রাখে
+- local event → counter++ এবং attach counter to event
+- send message → include counter
+- on receive message: counter = max(counter, received) + 1
+
+টাকা: Lamport clock নিশ্চিত করে: যদি A → B তাহলে L(A) < L(B)। কিন্তু বিপরীতটা সত্য নয়: L(A) < L(B) মানে A → B নয়ই। অর্থাৎ Lamport ordering partial ordering কে total ordering এ রূপান্তর করে না; concurrent events আলাদা করে দিতে পারে না।
+
+## ৪) Vector clocks — কিভাবে কাজ করে
+
+Vector clock একটি vector (size = number of processes/nodes, বা dynamic mapping keyed by node id) যেখানে প্রতিটি index সেই node‑এর logical counter ধরে রাখে।
+
+নিয়ম:
+- প্রতিটি node i‑র local vector V
+- local event: V[i]++
+- send message: attach V
+- receive message with vector W: for all k: V[k] = max(V[k], W[k]); then V[i]++
+
+Comparisons:
+- V ≤ W যদি ∀k: V[k] ≤ W[k]
+- V < W (strict) যদি V ≤ W এবং ∃k: V[k] < W[k]
+- যদি neither V ≤ W nor W ≤ V then vectors concurrent
+
+অর্থাৎ vector clocks বলবে কোন event causally precedes যেটা আর concurrent। এটি concurrency detection‑এ শক্তিশালী।
+
+উদাহরণ: তিনটি নোড A,B,C সবসময় নিজদের counter রাখে। যদি A থেকে B‑তে msg যায়, B‑র vector A‑এর counter ধারণ করবে এবং তাই causal relation রেকর্ড হবে।
+
+## ৫) সাইজ ও স্কেলিং সমস্যা; pruning
+
+Vector size proportional to number of participants — large clusters‑এ storage ও bandwidth বাড়ে। mitigations:
+- sparse representations: only keep entries for nodes seen recently
+- incarnation ids: nodes that die and replaced reuse ids cautiously
+- pruning policies: evict old node entries after long inactivity or checkpoint snapshot and garbage collection
+
+Production টিপ: keep logical clock space bounded by mapping node ids to compact integers and periodically snapshot state with compaction metadata.
+
+## ৬) Hybrid Logical Clocks (HLC)
+
+HLCs attempt to combine physical timestamps (for real-time ordering) with logical counters to preserve causality even when clocks are loosely synchronized. Basic idea:
+- Maintain (physical_time, logical_counter)
+- On receive, set physical_time = max(local_physical, recv_physical)
+- If physical_time increased → logical_counter = 0 else increment logical_counter
+
+HLC allows mostly real-time timestamps but still orders causally concurrent events correctly. Useful when you want monotonic, roughly physical timestamps without sacrificing causality.
+
+## ৭) ব্যবহার‑কেস ও প্রাকটিক্যাল উদাহরণ
+
+1) Conflict detection in replication: key‑value stores use vector clocks to detect concurrent updates and then require application merge (Amazon Dynamo originally used vector clocks for versioning)
+2) Causal broadcast: deliver messages preserving causal order; messaging systems that need causal delivery (e.g., collaborative editors) use vector clocks
+3) Debugging / trace reconstruction: vector clocks help determine which events could have influenced others when reconstructing distributed traces
+
+Example (Dynamo‑style): two clients concurrently update same object on different replicas → replicas store both versions with their vector clocks → application merges or return conflict to client
+
+## ৮) Implementation notes (pseudocode)
+
+```
+Representation: map<NodeId,uint64>
+
+OnLocalEvent(node):
+	V[node] += 1
+	attach copy(V) to event
+
+OnSend(node, msg):
+	attach V
+```
+
+OnReceive(node, msg, W):
+- for k in union(keys(V), keys(W)): V[k] = max(V.get(k,0), W.get(k,0))
+- V[node] += 1
+- process event with attached vector W
+
+Storage: when storing versions per key, keep (value, vectorClock, timestamp)
+
+Merge policy example:
+```
+if V1 < V2 — V2 is descendant — V2 is latest
+if V2 < V1 — V1 latest
+else concurrent — application merges both (বা দুই ভার্সন রেখে conflict দেখান)
+```
+
+## ৯) Practical engineering tradeoffs
+
+- If participants small (e.g., per‑partition replicas ≤5) vector clocks are cheap and informative
+- For global per‑client counters across millions of clients: use CRDTs or session‑scoped vector clocks
+- Use HLC when you need physical timestamps for TTLs or audit logs but still want causality safety
+- Always design merge functions for domain semantics — naive LWW may lose business‑critical updates
+
+## ১০) Testing এবং validation
+
+```
+Unit tests for vector comparison algebra (≤, <, concurrency)
+Integration tests with simulated delays and partitions to observe stored versions and conflict handling
+Property tests: after sequence of operations and propagation, check convergence properties when using CRDTs or merging policies
+Chaos tests: kill nodes, reorder messages, and verify no safety invariant violated
+```
+
+## ১১) Monitoring ও metrics
+
+- vector_clock_size (per key/replica)
+- concurrent_versions_count (how often concurrent updates occur)
+- average_merge_time (for application merges)
+- HLC_clock_skew (max difference between local physical time and observed physical time in messages)
+
+Alerts:
+- rising concurrent_versions_count → application design may need stronger coordination or client‑side locks
+- large vector_clock_size → consider pruning or rethinking identifier scheme
+
+## ১২) Decision flow — কখন কোনটায় যান?
+
+- যদি আপনার goal causal ordering or conflict detection across small replica sets → vector clocks
+- যদি physical timestamp & audit trail দরকার কিন্তু clocks loosely syncable → HLC
+- যদি full global ordering এবং low latency tolerated না → use consensus (Raft/leader) for serialization
+- যদি application-level merges সহজ → consider eventual models with vector clocks or CRDTs
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি small Node.js উদাহরণ যোগ করব যা vector clocks দিয়ে concurrent updates detect করে এবং merge করে, বা একটি HLC implementation (Go) যোগ করব—কোনটি আগে যোগ করবো?

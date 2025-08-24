@@ -1,0 +1,153 @@
+---
+title: সিস্টেম ডিজাইন প্রসেস ও অ্যাপ্রোচ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ
+
+এই পাঠে আমরা সিস্টেম ডিজাইন করার জন্য একটি পরিচ্ছন্ন, প্রাকটিক্যাল প্রসেস শিখব — যে প্রসেসটি ইন্টারভিউ-এ দ্রুত ধারণা বোঝাতে সাহায্য করে এবং বাস্তবে স্থিতিস্থাপক, টেস্টযোগ্য ও ডেলিভারযোগ্য সিস্টেম তৈরি করতে নির্দেশ দেয়। প্রতিটি ধাপের ইনপুট, আউটপুট ও সিদ্ধান্ত গ্রহণের মানদণ্ড দেয়া আছে। উদাহরণ ও টেমপ্লেট সহ।
+
+## চেকলিস্ট (আপনি এই পাঠ থেকে কী পাবেন)
+
+- একটি 8-ধাপ সিস্টেম ডিজাইন প্রসেস টেমপ্লেট
+- ইন্টারভিউ-ফ্রেন্ডলি টাইমবক্স কৌশল
+- প্রকল্পে বাস্তবে কাজ করার সময় কী বিভাগে মনোযোগ দিন
+- ছোট কেস স্টাডি: Notification System
+- যাচাই, টেস্টিং ও রোলআউট পরিকল্পনা
+
+---
+
+## ১) কন্ট্রাক্ট — ইনপুট, আউটপুট, সাকস ক্রাইটেরিয়া
+
+- ইনপুট: প্রোডাক্ট অবজেকটিভ (use-cases), এস্টিমেটেড লোড, latency & consistency targets, সীমাবদ্ধতা (budget, infra, compliance)।
+- আউটপুট: HL আর্কিটেকচার, LL ডিজাইন (কম্পোনেন্ট/এন্ডপয়েন্ট ডিটেইল), SLOs, টেস্ট প্ল্যান, রোলআউট স্ট্র্যাটেজি।
+- সাফল্য: প্র্যুট-টেস্টে SLO মেট; কোডরিভিউ/রিফ্যাক্টর সহজ; নিরাপত্তা ও অপারেশনাল প্লেবুক আছে।
+
+## ২) 8-ধাপ সিস্টেম ডিজাইন প্রসেস (স্টেপ-বাই-স্টেপ)
+
+1) Clarify & Scope
+   - প্রশ্ন করুন: Who are the users? What exact problem are we solving? Any hard constraints? Peak vs average load?
+   - আউটপুট: স্পষ্ট assumptions তালিকা।
+
+2) Quantify Requirements
+   - রিকোয়েস্ট/সেকেন্ড (QPS), latency targets (P95/P99), data size, retention, SLAs।
+   - কেন: সিদ্ধান্তগুলো কেকার (e.g., cache vs DB) নির্ভর করে সংখ্যার উপর।
+
+3) Sketch High-Level Architecture
+   - Client, API gateway, services, DB, cache, queues, external dependencies।
+   - আউটপুট: 1-page block diagram + key decisions (stateless/stateful, regions)।
+
+4) Identify Bottlenecks & Risks
+   - বোতলনেক কী হতে পারে? কোন সেবা বা কম্পোনেন্ট single-point-of-failure?
+   - আউটপুট: prioritized risk list (impact vs likelihood)।
+
+5) Dive into Critical Components (Low-level)
+   - For each hotspot, design APIs, data models, concurrency strategy, and failure modes।
+   - আউটপুট: API specs, schema, sequence diagrams, pseudo-code।
+
+6) Define Non-Functional Plan
+   - Scaling strategy, caching rules, replication/sharding plan, backup & DR, security model, observability।
+
+7) Validation Strategy
+   - Load tests, integration tests, chaos tests, security scans।
+   - আউটপুট: test-cases, acceptance criteria।
+
+8) Rollout & Monitoring Plan
+   - Deployment strategy (canary, blue-green), feature flags, alerting thresholds, runbooks।
+
+এই 8-ধাপ প্রসেস ইন্টারভিউ-তে ৬–১৫ মিনিটের HL+LL প্রদর্শনেও কার্যকর এবং প্রকল্পে বাস্তবে প্রমাণীকরণ ও রোলআউট চালাতে সক্ষম।
+
+## ৩) ইন্টারভিউ-ফোকাসড টাইমবক্স টেমপ্লেট (৩০ মিনিট স্কুল)
+
+- 1–2 মিনিট: Requirement clarification ও assumptions বলা
+- 4–6 মিনিট: High-level architecture sketch করা
+- 10–12 মিনিট: এক বা দুইটি হটস্পটে low-level dive (data model, APIs, concurrency)
+- 4–6 মিনিট: scaling, reliability, monitoring summary
+- 2–3 মিনিট: wrap-up এবং possible extensions
+
+রুমার্কার: assumptions খোলাসা করে বললে interviewer দ্রুত challenge করতে পারে—এটাই চাই।
+
+## ৪) Practical decisions & example considerations
+
+- When to use sync vs async: যদি ইউজার ইনিশিয়াল রেসপন্স প্রয়োজনীয়তা কম থাকে (e.g., email notification), async দিয়ে latency কমান; পেমেন্ট ধরনের critical path হলে sync + strict consistency দরকার।
+- When to cache: read-heavy, mostly-stable data; use TTL, cache-aside প্যাটার্ন, invalidate on write।
+- When to shard: single-node can't handle write/read scale or hot keys—use user-id hashing or range-based sharding।
+
+সিদ্ধান্ত নেবার ফর্মুলা: impact × frequency × cost। সবচেয়ে বেশি impact × high frequency হলে অগ্রাধিকার দিন।
+
+## ৫) কেস স্টাডি: Notification System (পুশ/ইমেইল)
+
+চ্যালেঞ্জ: লক্ষ্যের লক্ষ্য — প্রতি মিনিটে 50k নোটিফিকেশন পাঠানো,_delivery latency < 10s (push), retries & backoff, user preferences (email/push/in-app)।
+
+স্টেপস প্রয়োগ:
+1) Clarify: notification types, ordering guarantees, personalization, retention
+2) Quantify: 50k/min ≈ 833 req/s average; peak factor 3 → 2.5k rps
+3) HL sketch:
+   - Event Producer (app servers)
+   - Ingestion API behind LB
+   - Message Queue (Kafka/RabbitMQ)
+   - Worker Pool (stateless) for personalization + delivery
+   - Push Service (APNs/FCM), Email Provider (SES)
+   - DB for preferences & logs
+
+4) Bottlenecks:
+   - Queue throughput, external provider rate limits, personalization latency
+
+5) LL dives (examples):
+   - Idempotency: message-id + dedupe store for retries
+   - Backoff: exponential backoff with jitter for provider errors
+   - Ordering: per-user ordering via keyed partition in Kafka
+
+6) Non-functional:
+   - Retry budget, dead-letter queue, monitoring (delivery latency, failure-rate), circuit-breakers around external providers
+
+7) Validation:
+   - Load test with synthetic events, chaos test on worker pool
+
+8) Rollout:
+   - Canary for a small user segment, monitor delivery metrics, then ramp up
+
+এই কেস স্টাডি দেখায় কিভাবে 8-ধাপ প্রসেস ব্যবহার করে একটি বাস্তব ফিচার ডিজাইন করতে হয়।
+
+## ৬) মানদণ্ড ও মেট্রিকস (ডিসিশন জন্য)
+
+- Performance: P50/P95/P99 latency, throughput (req/s)
+- Reliability: success-rate, MTTR, incidents/month
+- Cost: infra cost per 1M requests
+- Maintainability: deploy frequency, lead time for changes, mean time to restore
+
+প্রতিটি আর্কিটেকচারাল সিদ্ধান্তকে উপরোক্ত মেট্রিক দিয়ে justify করুন — কিভাবে পরিবর্তন করলে মেট্রিক বদলাবে সেটাই দেখান।
+
+## ৭) টেস্টিং ও ভ্যালিডেশন ডিটেইলস
+
+- Load testing: step-up load until target+buffer, capture latency & errors
+- Integration tests: external provider mocks, schema contract tests
+- Chaos experiments: kill workers, simulate DB failover, network latency
+- Security tests: vulnerability scans, dependency audits
+
+## ৮) রোলআউট প্যাটার্নস ও অপারেশনাল প্ল্যান
+
+- Canary releases: small percent traffic → monitor → increase
+- Blue-Green: zero-downtime switch, quick rollback
+- Feature flags: instant disable without redeploy
+- Runbooks: incident playbooks with exact remediation steps
+
+## ৯) সাধারণ ভুল ও পরিহারযোগ্য পুরনো ধারণা
+
+- Directly optimizing without measuring — always profile first
+- Designing for infinite scale from day one — YAGNI applies; prefer iterative scaling
+- Not planning for operability: no dashboards/alerts/runbooks is a risk
+
+## ১০) Communication টেমপ্লেট — কিভাবে সিদ্ধান্ত ব্যাখ্যা করবেন
+
+1) Statement: "I assume X, Y, Z about users and load."
+2) HL summary: "My design has these components..." (diagram mention)
+3) Focus: "I'll deep-dive into component A because of these risks..."
+4) Trade-offs: "Option 1 costs less but increases latency; Option 2 increases cost but reduces complexity..."
+5) Metrics & rollout: "We'll validate with these tests and roll out as a canary with these alerts..."
+
+ইন্টারভিউ-ওয়ার্ল্ডে এই টেমপ্লেট ব্যবহার করলে আপনি সংগঠিত, প্রোফাইল-চালিত এবং সিদ্ধান্ত-ভিত্তিক মনে হবেন।
+
+---
+
+পরবর্তী ধাপ: আমি এটাকে Mermaid ডায়াগ্রামসহ আপডেট করে দেব এবং Notification কেস-স্টাডির জন্য একটি ছোট load-test-স্ক্রিপ্ট (k6/locust) ও unit-test scaffold তৈরি করতে পারি—আপনি কোনটা চাইবেন? 

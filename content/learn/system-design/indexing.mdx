@@ -1,0 +1,136 @@
+---
+title: Indexing ও Query Optimization
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## সারাংশ ও পরিকল্পনা
+
+এই পাঠে আমরা ডাটাবেস ইনডেক্সিং (Indexing) ও কুয়েরি অপ্টিমাইজেশন সম্পর্কে গভীরভাবে জানব — কী ধরনের ইনডেক্স আছে, কখন কোন ইনডেক্স ব্যবহার করবেন, কিভাবে কুয়েরি টিউন করবেন, এবং কিভাবে EXPLAIN/EXPLAIN ANALYZE দিয়ে প্ল্যান পড়বেন। উদাহরণ হিসেবে PostgreSQL ও MySQL-ভিত্তিক টিপস দেবো।
+
+চেকলিস্ট
+- ইনডেক্সের মৌলিক ধারণা ও টাইপস (B-tree, Hash, GIN/GiST, BRIN)
+- Cardinality, Selectivity, এবং কীভাবে তারা কুয়েরি প্ল্যান প্রভাবিত করে
+- Composite, Partial, Expression, Covering ইনডেক্স কবে ব্যবহার করবেন
+- EXPLAIN ANALYZE পড়ে সমস্যা খুঁজে বের করা ও সংশোধন
+- Pagination, keyset-pagination vs OFFSET, index-only scans
+- ইনডেক্স মেইনটেন্যান্স, write penalty, VACUUM ও fillfactor
+
+---
+
+## ১) ইনডেক্স কি — সহজভাবে
+
+ইনডেক্স হল ডাটাবেস টেবিলের উপর একটি সহায়িকা ডাটা স্ট্রাকচার যা রো খুঁজে বের করার কাজকে দ্রুত করে। রূপক: বইয়ের শেষে থাকা সূচি—আপনি পুরো বই না পড়ে সরাসরি পৃষ্ঠা খুঁজে পান।
+
+ইনডেক্স না থাকলে ডাটাবেস পুরো টেবিল (sequential scan) দেখতে পারে—বড় টেবিল হলে এটা ধীর।
+
+তবে ইনডেক্সেরও খরচ আছে: মেমরি ও ডিস্ক, ইনসার্ট/আপডেট/ডিলেটে অতিরিক্ত লেখা (write amplification)।
+
+## ২) ইনডেক্সের ধরণ ও ব্যবহার
+
+- B-tree (default): রেঞ্জ ও সঠিক ম্যাচের জন্য ভাল (WHERE col = ? OR col BETWEEN ? AND ?), ORDER BY এবং ORDER BY ... LIMIT কেসে কাজে লাগে।
+- Hash index: exact-match দ্রুত (WHERE col = ?), কিছু DB-তে সীমাবদ্ধতা আছে; Postgres-এ আগে সীমিত ছিল, এখন বেশ কিছু সংস্করণে উন্নতি আছে।
+- GIN / GiST: array, JSONB, full-text search-এর জন্য; GIN inverted index টেক্সট এবং jsonb containment (? | @> ) কুয়েরির জন্য কার্যকর।
+- BRIN: বড়, sequentially appended টেবিলের জন্য; ছোট footprint, coarse-grained pointer—time-series বা append-only tables-এ উপযুক্ত।
+
+নির্বাচন: access pattern (range vs exact vs full-text) দেখে ইনডেক্স টাইপ নির্বাচন করুন।
+
+## ৩) Cardinality ও Selectivity — কেন গুরুত্বপূর্ণ
+
+- Cardinality: distinct values এর সংখ্যা (উদাহরণ: country column low cardinality; uuid high cardinality)
+- Selectivity: কুয়েরি কতটা রো ফিরিয়ে দেয় (low selectivity মানে বেশি রো)
+
+ইনডেক্স সবচেয়ে বেশি উপকার দেয় high-cardinality, high-selectivity কেসে (যেখানে কুয়েরি কেবল ছোট অংশ ফেরত দেবে)।
+
+DB অটোম্যাটিকভাবে statistics (ANALYZE) সংগ্রহ করে; সঠিক স্ট্যাটস না হলে planner ভুল সিদ্ধান্ত নিতে পারে—তাই আপডেট বা bulk-load-এর পরে ANALYZE চালান।
+
+## ৪) Composite, Partial ও Expression ইনডেক্স
+
+- Composite index (multi-column): যেখানে কুয়েরি একাধিক কলাম ফিল্টার করে; খেয়াল রাখুন left-most rule—index ব্যবহার হবে যখন কুয়েরি leading column-এ filter করবে।
+- Partial index: index only on rows matching predicate (e.g., WHERE deleted = false) — saves space ও বেস রোড।
+- Expression index: index on an expression (lower(email) বা (created_at::date)) — case-insensitive search বা function-based lookup দ্রুত করে।
+
+উদাহরণ: case-insensitive email lookup → CREATE INDEX ON users (lower(email));
+
+## ৫) Covering / Index-only scans
+
+Covering index: index যেই সব কলামের ডেটা কুয়েরি-তে লাগে সেটা অন্তর্ভুক্ত করে—এখানে DB table access বাদ দিয়ে শুধু index থেকে উত্তর পাওয়া যায় (index-only scan)। এটা দ্রুত কিন্তু নির্ভর করে visibility map (Postgres) আপ-টু-ডেট থাকলে কার্যকর।
+
+তাই SELECT only indexed columns হলে index-only scan হওয়ার সম্ভাবনা বাড়ে।
+
+## ৬) EXPLAIN ও EXPLAIN ANALYZE — প্ল্যান পড়া
+
+- EXPLAIN: planner কী পরিকল্পনা করবে তা দেখায় (estimated rows, cost)
+- EXPLAIN ANALYZE: বাস্তবে কুয়েরি চালায় এবং actual time/rows দেখায়
+
+কি দেখবেন:
+- Sequential scan vs Index scan
+- Estimated rows vs Actual rows (বড় ভিন্নতা হলে stats outdated বা wrong predicate)
+- Cost estimates ও CPU/io breakdown
+- Nested loop vs Hash Join vs Merge Join — কোনটি কোন কেসে ভালো
+
+টিপ: প্ল্যান থেকে বুঝে নিন কোথায় বেশি সময় যাচ্ছে—তারপর index যোগ করা বা কুয়েরি rewrite করুন।
+
+## ৭) কুয়েরি অপ্টিমাইজেশন কৌশল
+
+1) Avoid SELECT * — প্রয়োজনীয় কলামই সিলেক্ট করুন (helps covering index)
+2) Push predicates early (WHERE clauses) — allow index to filter
+3) Rewrite OR clauses (OR can prevent index use) → use UNION ALL or separate queries
+4) Use LIMIT with ORDER BY on indexed columns for fast top-N
+5) For pagination prefer keyset-pagination (seek method) over OFFSET for large pages
+
+Keyset pagination example:
+SELECT * FROM posts WHERE (created_at, id) < (last_seen_at, last_seen_id) ORDER BY created_at DESC, id DESC LIMIT 20;
+
+## ৮) Full-text, JSONB ও special indexes
+
+- Postgres full-text: use tsvector column + GIN index for fast text search
+- JSONB: GIN indexes for containment queries (->> comparisons may need expression index)
+
+Example: CREATE INDEX ON documents USING GIN (to_tsvector('english', body));
+
+## ৯) Maintenance: write penalty, VACUUM, fillfactor, concurrent indexes
+
+- প্রতিটি ইনডেক্স write cost বাড়ায়; heavy write workloads-এ index count ট্যুন করুন
+- Postgres: autovacuum/ VACUUM ANALYZE প্রয়োজন; fillfactor adjust করলে page-level bloat কমে
+- Concurrent index creation (CREATE INDEX CONCURRENTLY) ব্যবহার করলে production locks এড়ানো যায় (তবে slow)
+
+Operational tips:
+- After bulk loads, run VACUUM ANALYZE and maybe REINDEX if bloat high
+- Monitor index size, bloat, and index usage (pg_stat_user_indexes)
+
+## ১০) Materialized views, denormalization ও partitioning
+
+- Materialized view: expensive aggregation precomputed; REFRESH MATERIALIZED VIEW periodically or concurrently
+- Denormalization: for read-heavy paths replicate data into read-optimized tables (with asynchronous updates)
+- Partitioning: range/list/hash partitioning reduces scan cost on large tables and improves VACUUM behavior
+
+## ১১) Common anti-patterns ও কিভাবে ফিক্স করবেন
+
+- Indexing everything → high write penalty; fix: remove unused indexes, monitor pg_stat_user_indexes
+- Relying on outdated statistics → run ANALYZE or increase autovacuum frequency
+- Using OFFSET pagination for deep pages → switch to keyset-pagination
+
+## ১২) Debugging workflow (quick)
+
+1) Reproduce slow query with realistic data
+2) Run EXPLAIN ANALYZE
+3) Check estimated vs actual rows
+4) Consider index addition (single-column or composite) or query rewrite
+5) Test again and measure P95/P99 improvements
+
+## ১৩) ছোট কেস স্টাডি
+
+User search by email domain and active status: initial query slow due to seq scan. Solution:
+1) Add expression index on lower(email)
+2) Add partial index WHERE active = true AND lower(email) LIKE '%%@example.com'
+
+এখানে partial+expression index disk footprint ও lookup time দুটোই কমায়।
+
+## ১৪) পরবর্তী ধাপ ও রিসোর্স
+
+- পরবর্তী পাঠ: [NoSQL মডেল: Document, Key-Value, Columnar, Graph](/system-design/nosql)
+- পড়ুন: PostgreSQL EXPLAIN docs, High Performance MySQL chapter on indexing, Use the query planner to guide index design
+
+---
+
+আপনি চাইলে আমি একটি ছোট Postgres উদাহরণ (CREATE INDEX statements, EXPLAIN ANALYZE run) এবং k6/pgbench টেস্ট কনফিগ যোগ করব—কোনটি আগে যোগ করি? 

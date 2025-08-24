@@ -1,0 +1,158 @@
+---
+title: Service Discovery ও API Gateway
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা দুটি নেটওয়ার্কিং ক্লাসিক্যাল ধারণা কভার করব: service discovery (কিভাবে সার্ভিসগুলো একে‑অন্যকে খুঁজে পায়) এবং API gateway (ক্লায়েন্ট‑ফেসিং শেখানো, নিরাপত্তা ও রাউটিং)। বাস্তব উদাহরণ, রূপক, ডিজাইন প্যাটার্ন, অপারেশনাল টিপস এবং সিদ্ধান্ত ফ্লো দিয়ে শেষ করা হবে যাতে আপনি production‑ready আর্কিটেকচার বেছে নিতে পারেন।
+
+## চেকলিস্ট
+
+- Service discovery কেন দরকার এবং এর প্রকারভেদ
+- Client‑side vs Server‑side discovery
+- Service registries: Consul, etcd, Eureka, Kubernetes DNS
+- DNS‑based discovery & SRV records
+- Sidecar proxies ও service mesh (Envoy, Istio) ভূমিকা
+- API Gateway — routing, auth, rate limiting, aggregation
+- Caching, TTL, circuit breakers ও resilience considerations
+- Monitoring, health checks ও canonical runbooks
+
+---
+
+## ১) কেন service discovery দরকার?
+
+ডায়নামিক পরিবেশে (auto‑scale, deployments) সার্ভিসের IP/পোর্ট স্থায়ী নয়। যখন সার্ভিস instances বারবার ওঠে/নেমে তখন নোডগুলো কিভাবে একে‑অন্যকে খুঁজবে? Service discovery সেই সমস্যা সমাধান করে — একটি registry বা ধারা যার মাধ্যমে সার্ভিস নিজেদের register করে এবং অন্যরা lookup করে।
+
+রূপক: একটি বাজারে দোকানগুলো ট্যাগ (shop id) বদলে দিচ্ছে; ক্রেতারা কীভাবে ঠিক ঠিক দোকান খুঁজে পাবে? একটি তালিকা (registry) এবং নির্দেশিকা বোর্ড (gateway) সাহায্য করে।
+
+## ২) Client‑side discovery বনাম Server‑side discovery
+
+Client‑side discovery:
+- সার্ভিস A registry থেকে B‑এর healthy instances list নেয় এবং সরাসরি load‑balance করে
+- প্রক্রিয়া: registry (e.g., Consul, Eureka) + client library
+- সুবিধা: latency কম, client‑control; অসুবিধা: client logic বাড়ে, সব ক্লায়েন্টকে library/behavior বজায় রাখতে হবে
+
+Server‑side discovery (Gateway/Load Balancer):
+- ক্লায়েন্ট সবসময় gateway বা load balancer‑কে কল করে; gateway নিজেরাই registry থেকে backend নির্বাচন করে
+- উদাহরণ: API Gateway, Kubernetes Service (kube‑proxy/iptables) বা Envoy
+- সুবিধা: client সোজা; অসুবিধা: gateway becomes a control point এবং সুযোগ আছে single‑point overhead বাড়তে পারে
+
+নির্বাচন নির্দেশিকা: ছোট সার্ভিসes এবং light client control চাইলে client‑side; সাধারণত cloud/native deployments‑এ server‑side (Ingress/Service mesh) বেশি ব্যবহার করা হয়।
+
+## ৩) Service registry ও discovery প্রযুক্তি
+
+- Consul: service registration, health checks, KV store, DNS interface
+- etcd: lightweight KV store used by Kubernetes for cluster state; service info often surfaced through kube‑dns
+- Eureka (Netflix OSS): JVM ecosystem‑এ জনপ্রিয় registry historically
+- Kubernetes: built‑in service discovery via DNS (ClusterIP, Headless services) ও endpoints
+
+DNS‑based discovery:
+- SRV বা A records ব্যবহার করে service endpoints প্রকাশ করা যায়
+- সহজ ও interoperable; তবে TTL এবং propagation latency মাথায় রাখতে হবে
+
+Health checks:
+- registry‑based discovery অবশ্যই health checks সমর্থন করে — readiness (ready to serve) ও liveness (alive) বিভক্ত করা উচিত
+- প্রস্তুতিতে heavy DB checks না রাখুন; readiness নির্ভর করবে external dependencies‑এর উপর
+
+## ৪) Sidecars, Proxies, এবং Service Mesh
+
+Sidecar proxy pattern:
+- প্রতিটি সার্ভিস instance‑এর সাথে একটি lightweight proxy (sidecar) চলে; proxy সার্ভিস‑টু‑সার্ভিস ট্রাফিক হ্যান্ডেল করে
+- উদাহরণ: Envoy sidecar used with Istio
+
+Service mesh (Istio, Linkerd):
+- control plane (policy, config) + data plane (sidecars) ধারায় সার্ভিস‑টু‑সার্ভিস কনফিগারেশন করে
+- সুবিধা: centralized mTLS, retries, timeouts, telemetry, traffic shifting (canary)
+- অসুবিধা: অপারেশনাল জটিলতা ও resource overhead
+
+Use cases for mesh:
+- Zero‑trust environments (mTLS everywhere)
+- Centralized observability & policy enforcement
+- Advanced traffic control (mirroring, weighted routing)
+
+## ৫) API Gateway — ভূমিকা ও দায়িত্ব
+
+API Gateway হলো ক্লায়েন্ট‑ফেসিং endpoint যা একাধিক সার্ভিসকে উত্থাপিত করে। প্রধান দায়িত্ব:
+- Authentication & Authorization (JWT validation, OAuth introspection)
+- Rate limiting, quota enforcement ও abuse protection
+- Request routing, path rewriting ও versioning
+- Aggregation / Backend‑for‑Frontend (BFF): combine responses from multiple services
+- Caching ও response transformation
+
+Gateway choices:
+- Managed: AWS API Gateway, Cloud Endpoints
+- OSS: Kong, Tyk, Traefik, Ambassador
+- Envoy + custom control plane: flexible but more setup
+
+Design notes:
+- Keep gateway stateless; use external session store when needed
+- Avoid business logic in gateway; keep it focused on cross‑cutting concerns
+
+## ৬) Caching, TTL ও consistency implications
+
+- DNS + registry caches improve performance but add staleness risk. Set TTL balancing latency vs freshness.
+- Client‑side caching for discovery results must respect service health notifications (push) where possible
+- For headless services or ephemeral endpoints use short TTL or no caching; rely on local sidecar cache with push updates
+
+## ৭) Resilience patterns & failure modes
+
+- Circuit breakers at client or sidecar to prevent cascading failures
+- Retries with idempotency keys — ensure operations are safe to retry
+- Backoff strategies and jitter to avoid thundering herd
+- Graceful shutdown: service should de‑register and drain connections before exit
+
+Failure scenarios:
+- Registry partition: clients may have stale lists → use health checks + short TTL
+- Rapid churn (scale bursts): registry and clients must handle flapping; use backoff and stabilizing windows
+
+## ৮) Observability ও metrics
+
+Service discovery & gateway metrics to track:
+- service_registry_up/down, registrations_total, deregistrations_total
+- discovery_latency, lookup_errors
+- gateway_request_rate, gateway_error_rate, gateway_latency P50/P95/P99
+- TLS handshake failures, auth failures, rate_limit_throttled
+
+Tracing:
+- propagate trace id across gateway and sidecars
+- capture upstream/downstream latencies and total request path
+
+Logging:
+- structured logs with service ids, upstream host, and health events
+
+## ৯) Security ও access control
+
+- Secure registry APIs with mutual TLS + RBAC (who can register or query)
+- Authenticate services (certs or mTLS) before registration in sensitive environments
+- Gateways should validate tokens and implement OWASP‑style protections
+
+## ১০) Deployment & operational tips
+
+- Automate service registration via startup hooks or sidecars; prefer ephemeral registrations for auto‑scale
+- Use health check endpoints with separate readiness/live semantics
+- Automate certificate issuance (cert‑manager) for mTLS and gateway TLS
+- Monitor registry size and churn; set alerts for abnormal registration patterns
+
+## ১১) Choosing a stack — quick guidance
+
+- Kubernetes environment: use built‑in DNS + Ingress for north‑south traffic; consider Envoy/IngressController + service mesh for east‑west needs
+- Non‑Kubernetes: Consul for registration + Envoy sidecars gives portable mesh features
+- Simple setups: DNS + LBs + Traefik/NGINX as gateway (low ops)
+
+## ১২) Practical examples
+
+1) Kubernetes: Service discovery via kube‑dns, Ingress Controller (nginx/Traefik) as API gateway; consider Istio for mTLS & advanced routing
+2) Consul + Envoy: Consul for service registry, Envoy sidecars for proxying and Envoy as gateway; Consul Connect provides service identity and intentions
+3) Serverless front door: API Gateway (AWS) + Lambda integrations; discovery delegated to managed services
+
+## ১৩) Decision flow (সংক্ষেপে)
+
+1. Are you on Kubernetes? → prefer kube DNS + Ingress; add sidecars/mesh if you need centralized policy & mTLS
+2. Do you need strong east‑west observability, mTLS or traffic control? → use service mesh (Envoy/Istio/Linkerd)
+3. Do you want minimal ops and managed features? → use cloud API Gateway + managed registry
+4. Keep gateway simple: auth, rate‑limit, routing; keep business logic in services
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি (A) small Consul + Envoy example with registration and simple routing (Docker Compose), (B) Kubernetes Ingress + Envoy ingresscontroller example with annotations, বা (C) an API Gateway config (Kong or Traefik) showing JWT auth + rate limiting—কোনটি আগে যোগ করব?

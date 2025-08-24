@@ -1,0 +1,155 @@
+---
+title: Design for High Availability (HA)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## দ্রুত সারাংশ
+
+এই পাঠে আমরা High Availability (HA) কী, কেন প্রয়োজন, কিরূপ নকশা প্যাটার্ন এবং অপারেশনাল প্র্যাকটিস দরকার—সবকিছু বাংলায় সহজ ভাষায় বোঝাব। আমরা redundancy, failover, load balancing, degradation strategies, SLO‑ভিত্তিক ডিজাইন, multi‑AZ/region স্থাপত্য, এবং পরীক্ষণ ও মনিটরিং টিপস দেখাবো। পাঠ শেষে আপনি একটি পরিষেবা‑নির্দিষ্ট HA পরিকল্পনা তৈরি করতে পারবেন এবং ট্রেড‑অফ সমঝতে শোধন করতে পারবেন।
+
+## চেকলিস্ট (এই পাঠে যা থাকবে)
+
+- HA কি এবং business impact analysis
+- Redundancy প্যাটার্ন: active‑active, active‑passive, leaderless
+- Load balancers, health checks ও session handling
+- Data availability: replication, quorum, read replicas, eventual vs strong
+- Graceful degradation, circuit breakers, bulkheads
+- Multi‑AZ ও Multi‑Region কৌশল, failover choreography
+- SLO/RTO/RPO নির্ধারণ ও প্রভাবিত ডিজাইন
+- Testing: chaos engineering, failover drills, backup restores
+- Observability ও runbooks
+
+---
+
+## ১) HA — সমস্যা খুঁজে বের করা: business impact
+
+High Availability ডিজাইন শুরু করবেন business impact বুঝে: কোন user journeys critical, আর downtime‑এর কী ক্ষতি হবে।
+
+- SLAs ও SLOs নির্ধারণ করুন: uptime %, latency targets
+- নির্ধারণ করুন critical paths (login, checkout, payment) এবং non‑critical features (analytics, recommendations)
+
+রূপক: একটি হাসপাতালের ICU‑এর নির্ধারিত মুহূর্তে সিস্টেম ডাউন হলে জীবন‑ঝুঁকি বাড়ে — তাই ICU ফিচারগুলো জন্য আরও শক্ত HA প্রয়োজন, কিন্তু ওয়েবসাইটের ব্লগ লোড না হলে ব্যবসার ক্ষতি তুলনামূলক কম।
+
+## ২) Redundancy প্যাটার্ন ও কখন কোনটা ব্যবহার করবেন
+
+- Active‑Active:
+  - সব রিগ্রা একই সময়ে traffic সামলায়; ব্যবহার করা হয় low‑latency, high‑throughput প্রয়োজন হলে।
+  - সুবিধা: no single point of failure, capacity pooling
+  - ঝুঁকি: consistency management (concurrent writes), complex failover coordination
+
+- Active‑Passive:
+  - primary active, secondary standby ready to take over
+  - সুবিধা: সরল, consistency সহজ
+  - অসুবিধা: standby may be cold/warm (failover latency), resource underutilization
+
+- Leaderless/Quorum systems:
+  - No single leader; writes proceed to replica sets with quorum rules (e.g., Cassandra)
+  - সুবিধা: high availability under partitions; write locality
+  - অসুবিধা: eventual consistency tradeoffs, conflict resolution complexity
+
+নির্বাচন টিপ: transactional workloads (banks) → prefer leader/consensus; high write throughput with partition tolerance → consider leaderless designs.
+
+## ৩) Load balancing, health checks ও session handling
+
+Load balancers sit between clients and service pool। মৌলিক উপাদান:
+- L4 vs L7 balancing: TCP/UDP level vs HTTP path/host based routing
+- Health checks: readonly endpoint (e.g., /healthz/ready and /healthz/live) রিটার্ন করে তবে heavy DB calls না করা ভাল
+- Session handling: avoid sticky sessions when possible—externalize session state (Redis) or use stateless JWT
+
+Health check best practices:
+- লাইটওয়েট হওয়া উচিত; externals (DB)‑এর জন্য আলাদা readiness probe ব্যবহার করুন
+- Circuit breaker & retry logic: LB‑level retries vs application retries—avoid thundering herd
+
+## ৪) Data availability: replication ও consistency considerations
+
+- Synchronous replication: write waits for replicas → stronger durability, higher latency
+- Asynchronous replication: fast writes, potential data loss on primary failure
+- Read replicas: scale reads but consider replication lag
+- Quorum-based reads/writes (R+W>N) ensure read‑after‑write guarantees
+
+Storage patterns:
+- Primary‑replica (RDBMS with replicas): simple to reason; scale reads
+- Partitioned/sharded: horizontal scaling and failure domain reduction
+- Distributed log + event sourcing: durable write‑ahead log like Kafka for replays and recovery
+
+## ৫) Graceful degradation ও resilience patterns
+
+- Circuit Breakers: stop calling a failing downstream and fallback to degraded flow
+- Bulkheads: isolate resources per subsystem to prevent cascading failures
+- Backpressure: apply limits when system overloaded instead of crashing
+- Feature toggles: disable non‑critical features under stress
+
+Example: if recommendation service is slow, show cached recommendations or simple default, while keeping checkout live.
+
+## ৬) Multi‑AZ ও Multi‑Region কৌশল
+
+- Multi‑AZ (same region, different availability zones): protects against datacenter rack or AZ failures; usually low latency between AZs
+- Multi‑Region: protects against region outages and provides geo‑locality benefits
+
+Design options:
+- Active‑active multi‑region: serve traffic from multiple regions, requires cross‑region replication & conflict handling
+- Active‑passive multi‑region: failover to secondary region with replicated or replayed state
+
+Considerations:
+- Data gravity and replication cost
+- Latency vs consistency tradeoffs
+- DR runbooks and automated failover vs manual promotion
+
+## ৭) SLO, RTO, RPO এবং আর্কিটেকচারের সম্পর্ক
+
+- SLO dictates acceptable behaviour; RTO/RPO derive from that
+- Low RTO → invest in automation, warm standbys, orchestrated failover
+- Low RPO → synchronous replication or reliable async replication with minimal lag
+
+Architectural choices should be driven by required RTO/RPO per feature, not by general rules.
+
+## ৮) Testing: failover drills ও chaos engineering
+
+- Failover drills: scheduled tests where failures are induced and recovery is validated
+- Chaos engineering: hypothesis‑based tests to uncover hidden coupling (start small and expand)
+- Restore drills: test backup restore end‑to‑end regularly
+
+Key practices:
+- Automate drills and assert recovery metrics
+- Maintain checklists and post‑mortems for each drill
+
+## ৯) Observability ও alerting
+
+Essential signals:
+- Availability, error rates, latency P50/P95/P99
+- Leader election events, failover duration, replication lag
+- Health check failures, crash loops, pod restarts
+
+Alerting guidance:
+- Alert on sustained anomalies (e.g., >5m elevated error rate) not on short transients
+- Use escalation policies and runbooks linked in alerts
+
+## ১০) Operations: runbooks, automation ও run‑time playbooks
+
+- Automated failover vs manual: prefer automated for common, well‑tested flows; manual for complex cross‑region promotions
+- Runbooks should include: detection, decision tree, steps to failover, validation tests, rollback
+- Access control: restrict who can initiate failover and require audit trail
+
+## ১১) Cost vs availability tradeoffs
+
+Higher availability costs money: double resources, cross‑region replication, license overhead
+- Use tiering: critical services get highest HA levels, non‑critical services cheaper architectures
+- Use autoscaling to optimize cost during normal loads
+
+## ১২) Quick practical architectures
+
+- Small web app: 3 AZ app instances behind LB, managed DB with replicas, daily backups, readiness/liveness probes
+- Large transactional system: consensus‑based metadata (etcd), multi‑AZ DB clusters, warm standby region, automated failover scripts
+- Global read‑heavy application: multi‑region read replicas + write partitioning or geo‑sharding
+
+## ১৩) Decision flow — দ্রুত সিদ্ধান্ত নেওয়ার গাইড
+
+1. সাইন‑অফ করা critical user journeys এবং SLO নির্ধারণ করুন
+2. প্রতিটি journey‑এর জন্য RPO/RTO নির্ধারণ করুন
+3. নির্বাচিত RTO/RPO অনুযায়ী replication ও failover প্যাটার্ন ঠিক করুন
+4. Implement health checks, monitoring, runbooks এবং automated drills
+5. Iterate এবং cost‑benefit বিষয়ক পর্যালোচনা চালান
+
+---
+
+আপনি চাইলে আমি এই পাতায় একটি (A) HA runbook টেমপ্লেট (Markdown) + checklist, (B) Kubernetes high‑availability manifests ও best‑practice snippets (readiness/liveness, PodDisruptionBudget, anti‑affinity), বা (C) একটি Chaos experiment manifest (Litmus/Chaos Mesh) যোগ করে দেব—কোনটা আগে যোগ করি?
