@@ -1,0 +1,86 @@
+---
+title: Attention মেকানিজম ব্যাখ্যা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি ক্লাসে শিক্ষককে শুনছেন, কিন্তু হঠাৎ গুরুত্বপূর্ণ কথায় বেশি মনোযোগ দেন। ঠিক তেমনই, Attention মেকানিজম মডেলকে শেখায়—কোন অংশে বেশি "মনোযোগ" দিতে হবে।
+
+## বাস্তব উদাহরণ: পরীক্ষার সময় নোট
+
+যেমন, পরীক্ষার সময় আপনি পুরো বই পড়েন না—শুধু গুরুত্বপূর্ণ অংশে ফোকাস করেন। Attention-ও ঠিক তেমন—ইনপুটের গুরুত্বপূর্ণ অংশে ফোকাস করে।
+
+## Attention কী?
+
+Attention হলো এমন এক টেকনিক, যেখানে মডেল ইনপুটের প্রতিটি অংশের জন্য "ওজন" (weight) নির্ধারণ করে—কোন অংশ বেশি গুরুত্বপূর্ণ, কোনটা কম।
+
+### Analogy: টিমওয়ার্ক
+
+একটি টিমে সবাই কাজ করে, কিন্তু কেউ কেউ বেশি গুরুত্বপূর্ণ। Attention-ও ইনপুটের "টিম" থেকে গুরুত্বপূর্ণ অংশ বেছে নেয়।
+
+## কোথায় ব্যবহার হয়?
+- ভাষা অনুবাদ (Machine Translation)
+- টেক্সট সামারাইজেশন
+- চ্যাটবট
+- ট্রান্সফরমার
+
+## Attention-এর ধরণ
+- **Global Attention:** পুরো ইনপুটে ফোকাস
+- **Local Attention:** নির্দিষ্ট অংশে ফোকাস
+- **Self-Attention:** নিজের ইনপুটের বিভিন্ন অংশে ফোকাস (Transformer-এ ব্যবহৃত)
+
+## PyTorch-এ Attention ইমপ্লিমেন্টেশন
+
+### Simple Attention
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class SimpleAttention(nn.Module):
+    def __init__(self, hidden_dim):
+        super().__init__()
+        self.attn = nn.Linear(hidden_dim, 1)
+    def forward(self, encoder_outputs):
+        # encoder_outputs: (batch, seq_len, hidden_dim)
+        attn_weights = F.softmax(self.attn(encoder_outputs), dim=1)  # (batch, seq_len, 1)
+        context = torch.sum(attn_weights * encoder_outputs, dim=1)  # (batch, hidden_dim)
+        return context, attn_weights
+```
+
+### Self-Attention (Transformer-এর বেসিক)
+```python
+def scaled_dot_product_attention(Q, K, V):
+    # Q, K, V: (batch, seq_len, d_k)
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / (Q.size(-1) ** 0.5)
+    attn_weights = F.softmax(scores, dim=-1)
+    output = torch.matmul(attn_weights, V)
+    return output, attn_weights
+```
+
+## Attention-এর সুবিধা
+- Long sequence-এ distant dependency ধরা যায়
+- Context-aware output
+- Parallelization সহজ (Transformer)
+
+## চ্যালেঞ্জ
+- Computational cost বেশি
+- Training সময় বেশি
+
+## সংক্ষেপে
+Attention মেকানিজম NLP-র রেভল্যুশন। এটি মডেলকে শেখায়—কোন অংশে বেশি মনোযোগ দিতে হবে। PyTorch-এ সহজেই ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## অনুশীলন
+- একটি ছোট গল্পে কোন শব্দে বেশি attention পড়ে, দেখুন
+- Self-attention দিয়ে ইনপুটের context বের করুন
+- Transformer-এর attention visualization করুন
+
+---
+
+## আরও পড়ুন
+- [Illustrated Attention](https://jalammar.github.io/illustrated-transformer/)
+- [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473)
+- [PyTorch Attention Tutorial](https://pytorch.org/tutorials/beginner/transformer_tutorial.html)

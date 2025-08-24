@@ -1,0 +1,135 @@
+---
+title: Deep Q-Networks (DQN)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Q-Learning-এর সীমাবদ্ধতা হলো—State space বড় হলে Q-table রাখা অসম্ভব। Deep Q-Networks (DQN) এই সমস্যার সমাধান দেয়, যেখানে Q-value শেখার জন্য Neural Network ব্যবহার করা হয়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি শহরের প্রতিটি রাস্তা, দোকান, রেস্টুরেন্টের জন্য আলাদা নোট লিখে রাখেন (Q-table)। শহর বড় হলে, নোটের সংখ্যা এত বেশি হয় যে, মনে রাখা যায় না। DQN-এ Neural Network ব্যবহার করে "নোট" না রেখে, অভিজ্ঞতা থেকে "বুদ্ধি" শেখা হয়—যেমন একজন অভিজ্ঞ ট্যাক্সি ড্রাইভার শহরের ম্যাপ না দেখে, অভিজ্ঞতা থেকে সেরা রাস্তা বেছে নেয়।
+
+## DQN-এর মূল ধারণা
+- **Q-Network:** Neural Network, যা State থেকে Q-value প্রেডিক্ট করে
+- **Experience Replay:** পুরনো অভিজ্ঞতা থেকে শেখা (Random sampling)
+- **Target Network:** Training stability বাড়াতে আলাদা Network
+- **Batch Training:** একসাথে অনেক অভিজ্ঞতা থেকে Gradient update
+
+## DQN Algorithm
+1. Q-Network initialize করুন
+2. Experience Replay Buffer তৈরি করুন
+3. Environment থেকে State নিন
+4. Action নিন (explore/exploit)
+5. Reward, Next State, Done পান
+6. Buffer-এ অভিজ্ঞতা সংরক্ষণ করুন
+7. Batch sample নিয়ে Q-Network train করুন
+8. Target Network update করুন
+
+## PyTorch দিয়ে DQN ইমপ্লিমেন্টেশন
+
+### Simple CartPole উদাহরণ (সংক্ষেপে)
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import random
+import numpy as np
+import gym
+
+class QNetwork(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim)
+        )
+    def forward(self, x):
+        return self.fc(x)
+
+# Experience Replay Buffer
+class ReplayBuffer:
+    def __init__(self, capacity):
+        self.buffer = []
+        self.capacity = capacity
+    def push(self, exp):
+        if len(self.buffer) >= self.capacity:
+            self.buffer.pop(0)
+        self.buffer.append(exp)
+    def sample(self, batch_size):
+        return random.sample(self.buffer, batch_size)
+
+env = gym.make('CartPole-v1')
+state_dim = env.observation_space.shape[0]
+action_dim = env.action_space.n
+q_net = QNetwork(state_dim, action_dim)
+target_net = QNetwork(state_dim, action_dim)
+target_net.load_state_dict(q_net.state_dict())
+optimizer = optim.Adam(q_net.parameters(), lr=1e-3)
+buffer = ReplayBuffer(10000)
+gamma = 0.99
+epsilon = 0.1
+batch_size = 64
+
+for episode in range(300):
+    state = env.reset()
+    done = False
+    while not done:
+        state_tensor = torch.FloatTensor(state)
+        if random.random() < epsilon:
+            action = env.action_space.sample()
+        else:
+            with torch.no_grad():
+                action = torch.argmax(q_net(state_tensor)).item()
+        next_state, reward, done, _ = env.step(action)
+        buffer.push((state, action, reward, next_state, done))
+        state = next_state
+        if len(buffer.buffer) >= batch_size:
+            batch = buffer.sample(batch_size)
+            states, actions, rewards, next_states, dones = zip(*batch)
+            states = torch.FloatTensor(states)
+            actions = torch.LongTensor(actions)
+            rewards = torch.FloatTensor(rewards)
+            next_states = torch.FloatTensor(next_states)
+            dones = torch.FloatTensor(dones)
+            q_values = q_net(states).gather(1, actions.unsqueeze(1)).squeeze()
+            next_q = target_net(next_states).max(1)[0]
+            target = rewards + gamma * next_q * (1 - dones)
+            loss = nn.functional.mse_loss(q_values, target)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    if episode % 10 == 0:
+        target_net.load_state_dict(q_net.state_dict())
+```
+
+### কোড ব্যাখ্যা
+- QNetwork: State থেকে Action-এর Q-value প্রেডিক্ট করে
+- ReplayBuffer: অভিজ্ঞতা সংরক্ষণ ও র‍্যান্ডম স্যাম্পল
+- Target Network: Training stability
+- Batch Training: Gradient update
+
+## বাস্তব জীবনের ব্যবহার
+- **গেম:** Atari, Doom, Chess
+- **রোবটিক্স:** জটিল পরিবেশে রোবটের সিদ্ধান্ত
+- **অটোমেশন:** Dynamic control systems
+
+## চ্যালেঞ্জ ও টিপস
+- Overestimation: Target Network ব্যবহার করুন
+- Sample efficiency: Experience Replay
+- Stability: Batch training, Target update
+
+## Analogies: "অভিজ্ঞ ট্যাক্সি ড্রাইভার"
+
+DQN-কে ভাবুন "অভিজ্ঞ ট্যাক্সি ড্রাইভার"—শহরের ম্যাপ না দেখে, অভিজ্ঞতা থেকে সেরা Policy শেখে।
+
+## সংক্ষেপে
+- DQN-এ Neural Network দিয়ে Q-value শেখা হয়
+- Experience Replay ও Target Network stability বাড়ায়
+- PyTorch দিয়ে সহজেই ইমপ্লিমেন্ট করা যায়
+
+## আরও জানুন
+- [DQN Explained (DeepMind)](https://deepmind.com/research/publications/2015/human-level-control-through-deep-reinforcement-learning)
+- [PyTorch DQN Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html)
+- [OpenAI Gym DQN](https://spinningup.openai.com/en/latest/)

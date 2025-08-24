@@ -1,0 +1,94 @@
+---
+title: পাই-টর্চ ইন্সটলেশন (CPU ও GPU)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## পরিচিতি
+
+পাই-টর্চ শেখার প্রথম ধাপ হলো সঠিকভাবে ইন্সটল করা। পাই-টর্চ CPU ও GPU—দুইভাবেই রান করতে পারে। GPU সাপোর্ট থাকলে বড় ডেটাসেট ও মডেল দ্রুত ট্রেইন হয়। এই পাঠে আমরা দেখব কিভাবে Windows, macOS, ও Linux-এ পাই-টর্চ ইন্সটল করতে হয় এবং GPU (CUDA) সাপোর্ট কনফিগার করতে হয়।
+
+## কেন GPU?
+
+GPU মানে গ্রাফিক্স প্রসেসিং ইউনিট—যা হাজার হাজার অপারেশন একসাথে করতে পারে। ডিপ লার্নিংয়ে বড় মডেল ও ডেটা প্রসেসিং GPU ছাড়া প্রায় অসম্ভব।
+
+_অ্যানালজি:_ CPU হচ্ছে একজন সাধারণ কর্মী, আর GPU হচ্ছে শত শত কর্মীর টিম—যারা একসাথে কাজ করে দ্রুত ফলাফল দেয়।
+
+## পাই-টর্চ ইন্সটলেশন স্টেপ-বাই-স্টেপ
+
+### ১. Python ইন্সটল আছে কিনা চেক করুন
+
+Python 3.8 বা তার বেশি ভার্সন দরকার।
+
+```bash
+python --version
+```
+
+### ২. ভার্চুয়াল এনভায়রনমেন্ট তৈরি করুন (সুপারিশকৃত)
+
+```bash
+python -m venv pytorch-env
+source pytorch-env/bin/activate  # macOS/Linux
+pytorch-env\Scripts\activate    # Windows
+```
+
+### ৩. পাই-টর্চ ইন্সটল করুন
+
+#### (A) CPU-Only ইন্সটলেশন
+
+```bash
+pip install torch torchvision torchaudio
+```
+
+#### (B) GPU (CUDA) ইন্সটলেশন
+
+- আপনার GPU ও CUDA ভার্সন চেক করুন:
+  - NVIDIA GPU থাকলে: [CUDA Toolkit Download](https://developer.nvidia.com/cuda-toolkit)
+- পাই-টর্চ অফিসিয়াল সাইটে গিয়ে (https://pytorch.org/get-started/locally/) আপনার OS, Python, ও CUDA ভার্সন সিলেক্ট করুন।
+- উদাহরণ (CUDA 11.8):
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+### ৪. ইন্সটলেশন সফল কিনা যাচাই করুন
+
+```python
+import torch
+print(torch.__version__)
+print(torch.cuda.is_available())  # True হলে GPU সাপোর্ট
+print(torch.cuda.device_count())  # কয়টি GPU আছে
+```
+
+## রিয়েল-লাইফ উদাহরণ
+
+ধরা যাক, আপনি একটি ইমেজ ক্লাসিফিকেশন মডেল ট্রেইন করতে চান। GPU থাকলে ট্রেইনিং টাইম ১০ গুণ কমে যেতে পারে।
+
+## কমন সমস্যা ও সমাধান
+
+- **CUDA না পাওয়া গেলে:**
+  - GPU ড্রাইভার ও CUDA Toolkit সঠিকভাবে ইন্সটল হয়েছে কিনা চেক করুন।
+  - pip কমান্ডে সঠিক CUDA ভার্সন ব্যবহার করুন।
+- **Python ভার্সন mismatch:**
+  - Python 3.8+ ব্যবহার করুন।
+- **Virtualenv না থাকলে:**
+  - pip install virtualenv
+
+## ইনস্টলেশন চেকলিস্ট
+
+- Python 3.8+
+- pip আপডেট
+- Virtualenv
+- GPU থাকলে NVIDIA ড্রাইভার ও CUDA Toolkit
+- pip install torch torchvision torchaudio
+
+## সংক্ষিপ্ত টিপস
+
+- Jupyter Notebook-এ কোড রান করুন, GPU সাপোর্ট চেক করুন।
+- অফিসিয়াল PyTorch ডকুমেন্টেশন অনুসরণ করুন: https://pytorch.org/get-started/locally/
+- GPU না থাকলে CPU-তে ইন্সটল করুন—শেখার জন্য যথেষ্ট।
+
+## উপসংহার
+
+পাই-টর্চ ইন্সটলেশন সহজ, তবে GPU সাপোর্ট চাইলে কিছু বাড়তি ধাপ আছে। একবার সঠিকভাবে ইন্সটল হলে, আপনি ডিপ লার্নিংয়ের শক্তিশালী টুল হাতে পাবেন।
+
+_পরবর্তী পাঠে: টেনসর বেসিকস—PyTorch-এর মূল ডেটা স্ট্রাকচার!_

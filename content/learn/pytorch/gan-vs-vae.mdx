@@ -1,0 +1,64 @@
+---
+title: GAN vs VAE তুলনা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, দুইজন শিল্পী—একজন কল্পনা থেকে ছবি আঁকেন (GAN), আরেকজন গল্পের সারাংশ থেকে ছবি reconstruct করেন (VAE)। Generative AI-তে GAN ও VAE—দুইটি জনপ্রিয় টেকনিক, কিন্তু কোনটা কখন ব্যবহার করবেন?
+
+## বাস্তব উদাহরণ: শিল্পী ও গল্পকার
+
+- **GAN:** শিল্পী, যিনি নতুন ছবি আঁকেন, বিচারককে ফাঁকি দিতে চান
+- **VAE:** গল্পকার, যিনি গল্পের সারাংশ থেকে নতুন গল্প reconstruct করেন
+
+## GAN ও VAE-এর মূল পার্থক্য
+| বৈশিষ্ট্য         | GAN                        | VAE                        |
+|-------------------|----------------------------|----------------------------|
+| Output Quality    | খুব বাস্তবসম্মত, sharp     | কিছুটা blurry, smooth      |
+| Training          | Instability, mode collapse | Stable, easy convergence   |
+| Latent Space      | Unstructured               | Structured, interpretable  |
+| Use Case          | Image generation, art      | Representation learning, denoising |
+| Loss Function     | Adversarial (BCE)          | Reconstruction + KL        |
+| Creativity        | বেশি                       | কম                         |
+
+## GAN-এর সুবিধা ও চ্যালেঞ্জ
+- **সুবিধা:** বাস্তবসম্মত ছবি, creativity
+- **চ্যালেঞ্জ:** training instability, mode collapse
+
+## VAE-এর সুবিধা ও চ্যালেঞ্জ
+- **সুবিধা:** stable training, latent space visualization
+- **চ্যালেঞ্জ:** blurry output, less creative
+
+## কখন কোনটা ব্যবহার করবেন?
+- **GAN:** যখন খুব বাস্তবসম্মত ছবি/ডেটা দরকার, যেমন ফেক ফেস, আর্টিফিশিয়াল ডেটা
+- **VAE:** যখন ডেটার representation দরকার, denoising, latent space analysis
+
+## Analogy: কল্পনা বনাম reconstruction
+- GAN: শিল্পী কল্পনা থেকে নতুন ছবি আঁকেন
+- VAE: গল্পকার গল্পের সারাংশ reconstruct করেন
+
+## PyTorch-এ GAN ও VAE
+- GAN: Generator ও Discriminator, adversarial loss
+- VAE: Encoder-Decoder, reconstruction loss + KL divergence
+
+## বাস্তব প্রজেক্ট
+- GAN: ফেক ইমেজ, ভিডিও, আর্ট, ডেটা অগমেন্টেশন
+- VAE: ডেনয়েজিং, representation learning, anomaly detection
+
+## সংক্ষেপে
+GAN ও VAE—দুইটি শক্তিশালী generative টেকনিক, কিন্তু তাদের লক্ষ্য, output, ও training dynamics আলাদা। প্রজেক্টের চাহিদা অনুযায়ী সঠিক টেকনিক বেছে নিন।
+
+---
+
+## অনুশীলন
+- GAN ও VAE দিয়ে একই ডেটাসেটে ছবি জেনারেট করুন
+- Latent space visualize করুন
+- Output quality ও training stability তুলনা করুন
+
+---
+
+## আরও পড়ুন
+- [GANs Explained](https://arxiv.org/abs/1406.2661)
+- [VAE Tutorial](https://arxiv.org/abs/1312.6114)
+- [GAN vs VAE: Practical Comparison](https://towardsdatascience.com/gan-vs-vae-which-one-should-you-use-6c5f7a3b5a49)

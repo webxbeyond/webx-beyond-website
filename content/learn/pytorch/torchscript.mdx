@@ -1,0 +1,91 @@
+---
+title: TorchScript ও মডেল ট্রেসিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একটি বই লিখেছেন—এবার সেটি PDF-এ রূপান্তর করে সবাইকে পাঠাতে চান। PyTorch-এও মডেল ট্রেনিং শেষে "TorchScript"-এ রূপান্তর করে production-এ deploy করা যায়।
+
+## বাস্তব উদাহরণ: বই থেকে PDF
+
+- **TorchScript:** PyTorch মডেলকে portable, optimized format-এ রূপান্তর
+- **Tracing:** মডেলের computation graph "রেকর্ড" করা
+
+## TorchScript কী?
+
+TorchScript হলো PyTorch-এর একটি ফরম্যাট, যা Python ছাড়াও C++, Java, বা অন্য environment-এ রান করা যায়। এতে:
+- মডেল portable হয়
+- production deployment সহজ
+- optimization ও speed বাড়ে
+
+## TorchScript তৈরির দুইটি উপায়
+- **Tracing:** উদাহরণ ইনপুট দিয়ে মডেলের computation graph "রেকর্ড" করা
+- **Scripting:** Python code থেকে TorchScript code তৈরি
+
+## Tracing vs Scripting
+| বৈশিষ্ট্য      | Tracing                        | Scripting                      |
+|----------------|-------------------------------|-------------------------------|
+| কিভাবে কাজ করে | উদাহরণ ইনপুট দিয়ে graph capture | Python code থেকে TorchScript   |
+| Dynamic control| handle করতে পারে না            | handle করতে পারে              |
+| Use case       | Simple, feed-forward model      | Complex, control flow model    |
+
+## TorchScript-এ মডেল রূপান্তর
+
+### ১. Tracing
+```python
+import torch
+from my_model import MyModel
+
+model = MyModel()
+example_input = torch.randn(1, 3, 224, 224)
+traced = torch.jit.trace(model, example_input)
+traced.save('traced_model.pt')
+```
+
+### ২. Scripting
+```python
+import torch
+from my_model import MyModel
+
+model = MyModel()
+scripted = torch.jit.script(model)
+scripted.save('scripted_model.pt')
+```
+
+## TorchScript মডেল লোড ও রান
+```python
+import torch
+
+model = torch.jit.load('traced_model.pt')
+model.eval()
+output = model(torch.randn(1, 3, 224, 224))
+```
+
+## টিপস ও চ্যালেঞ্জ
+- Tracing-এ dynamic control flow handle হয় না
+- Scripting-এ সব Python code compatible নয়
+- Deployment-এর আগে eval() ব্যবহার করুন
+- TorchScript model C++ API-তে ব্যবহার করা যায়
+
+## বাস্তব প্রজেক্ট
+- Mobile/Edge deployment
+- FastAPI/Flask API-তে serve
+- C++/Java production environment
+
+## সংক্ষেপে
+TorchScript ও মডেল ট্রেসিং—PyTorch মডেলকে production-ready, portable, ও optimized করতে অপরিহার্য। Tracing ও scripting—দুইটি টেকনিক, প্রজেক্ট অনুযায়ী সঠিকটা বেছে নিন।
+
+---
+
+## অনুশীলন
+- নিজের মডেল TorchScript-এ রূপান্তর করুন
+- Tracing ও scripting-এর পার্থক্য দেখুন
+- TorchScript model C++ API-তে ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [TorchScript Documentation](https://pytorch.org/docs/stable/jit.html)
+- [PyTorch Model Tracing Tutorial](https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html)
+- [Deploying TorchScript Models](https://pytorch.org/tutorials/recipes/recipes/torchscript_recipe.html)

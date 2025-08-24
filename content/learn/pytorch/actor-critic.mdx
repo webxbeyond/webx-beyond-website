@@ -1,0 +1,157 @@
+---
+title: Policy Gradients ও Actor-Critic মডেল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Q-Learning বা DQN-এর সীমাবদ্ধতা হলো—Action space বড় হলে বা Continuous হলে Q-value শেখা কঠিন। Policy Gradients ও Actor-Critic মডেল এই সমস্যার সমাধান দেয়, যেখানে Agent সরাসরি Policy শেখে—"কীভাবে Action নিতে হয়"—Neural Network দিয়ে।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, একজন ফুটবল খেলোয়াড় মাঠে খেলার সময় প্রতিটি মুহূর্তে কীভাবে পাস, শট, ড্রিবল করবে—এটা "Policy"। সে বারবার চেষ্টা করে, ভুল করে, কোচের নির্দেশনা (Reward) পায়, এবং ধীরে ধীরে নিজের Policy উন্নত করে। Policy Gradients মানে—Agent নিজের Policy-র Parameter আপডেট করে, যাতে ভবিষ্যতে আরও ভালো Action নিতে পারে।
+
+## Policy Gradients-এর মূল ধারণা
+- **Policy:** Action নেওয়ার নিয়ম, Neural Network দিয়ে শেখা
+- **Objective:** Expected Reward সর্বোচ্চ করা
+- **Gradient Ascent:** Policy Parameter আপডেট করা
+- **Stochastic Policy:** Action probabilistically নেওয়া
+
+## Policy Gradients Algorithm
+1. Policy Network initialize করুন
+2. Environment থেকে State নিন
+3. Policy থেকে Action নিন
+4. Reward ও Next State পান
+5. Trajectory (Episode) সংগ্রহ করুন
+6. Policy Gradient দিয়ে Parameter আপডেট করুন
+
+## PyTorch দিয়ে Policy Gradients (REINFORCE) উদাহরণ
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+import gym
+
+class PolicyNet(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim),
+            nn.Softmax(dim=-1)
+        )
+    def forward(self, x):
+        return self.fc(x)
+
+env = gym.make('CartPole-v1')
+state_dim = env.observation_space.shape[0]
+action_dim = env.action_space.n
+policy = PolicyNet(state_dim, action_dim)
+optimizer = optim.Adam(policy.parameters(), lr=1e-2)
+
+def compute_returns(rewards, gamma=0.99):
+    R = 0
+    returns = []
+    for r in reversed(rewards):
+        R = r + gamma * R
+        returns.insert(0, R)
+    return returns
+
+for episode in range(300):
+    state = env.reset()
+    log_probs = []
+    rewards = []
+    done = False
+    while not done:
+        state_tensor = torch.FloatTensor(state)
+        probs = policy(state_tensor)
+        dist = torch.distributions.Categorical(probs)
+        action = dist.sample()
+        log_prob = dist.log_prob(action)
+        next_state, reward, done, _ = env.step(action.item())
+        log_probs.append(log_prob)
+        rewards.append(reward)
+        state = next_state
+    returns = compute_returns(rewards)
+    returns = torch.FloatTensor(returns)
+    loss = -torch.sum(torch.stack(log_probs) * returns)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+```
+
+### কোড ব্যাখ্যা
+- PolicyNet: State থেকে Action-এর probability দেয়
+- REINFORCE: Trajectory থেকে Gradient update
+- compute_returns: Future reward discount করে
+
+## Actor-Critic মডেল
+
+Policy Gradients-এর সমস্যা—Variance বেশি, Training ধীর। Actor-Critic মডেলে দুটি Network থাকে:
+- **Actor:** Policy শেখে (Action নেওয়ার নিয়ম)
+- **Critic:** Value function শেখে (State কত ভালো)
+
+Critic থেকে Advantage/Value signal নিয়ে Actor-কে আরও ভালো Policy শেখানো হয়।
+
+### Actor-Critic Algorithm
+1. Actor ও Critic Network initialize করুন
+2. Environment থেকে State নিন
+3. Actor থেকে Action নিন
+4. Critic থেকে Value নিন
+5. Reward ও Next State পান
+6. Advantage/TD Error দিয়ে Update করুন
+
+### PyTorch Actor-Critic (সংক্ষেপে)
+
+```python
+class Actor(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim),
+            nn.Softmax(dim=-1)
+        )
+    def forward(self, x):
+        return self.fc(x)
+
+class Critic(nn.Module):
+    def __init__(self, state_dim):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, 1)
+        )
+    def forward(self, x):
+        return self.fc(x)
+
+# Training loop: Actor ও Critic update
+# ... (Actor-Critic training details)
+```
+
+## বাস্তব জীবনের ব্যবহার
+- **রোবটিক্স:** Continuous control (walking, grasping)
+- **গেম:** Atari, Go, Chess
+- **অটোমেশন:** Smart decision making
+
+## চ্যালেঞ্জ ও টিপস
+- Variance কমাতে Critic ব্যবহার করুন
+- Advantage normalization
+- Continuous Action space-এ Actor-Critic সেরা
+
+## Analogies: "কোচ ও খেলোয়াড়"
+
+Actor-Critic-কে ভাবুন "কোচ ও খেলোয়াড়"—Actor খেলোয়াড়, Critic কোচ; কোচের ফিডব্যাক নিয়ে খেলোয়াড় নিজের Policy উন্নত করে।
+
+## সংক্ষেপে
+- Policy Gradients-এ Agent সরাসরি Policy শেখে
+- Actor-Critic-এ Actor Policy শেখে, Critic Value signal দেয়
+- PyTorch দিয়ে সহজেই ইমপ্লিমেন্ট করা যায়
+
+## আরও জানুন
+- [Policy Gradients Explained (Lil'Log)](https://lilianweng.github.io/posts/2018-04-08-policy-gradient/)
+- [PyTorch Actor-Critic Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_actor_critic.html)
+- [OpenAI Spinning Up: Actor-Critic](https://spinningup.openai.com/en/latest/)

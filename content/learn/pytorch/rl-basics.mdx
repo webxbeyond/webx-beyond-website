@@ -1,0 +1,94 @@
+---
+title: রিইনফোর্সমেন্ট লার্নিং (RL) বেসিক ধারণা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+রিইনফোর্সমেন্ট লার্নিং (RL) হচ্ছে এমন এক ধরনের মেশিন লার্নিং, যেখানে একটি "এজেন্ট" (Agent) পরিবেশের (Environment) সাথে ইন্টারঅ্যাক্ট করে এবং নিজের কাজের জন্য পুরস্কার (Reward) পায়। RL-এ এজেন্ট শেখে কীভাবে সিদ্ধান্ত নিতে হয়, যাতে সর্বোচ্চ পুরস্কার পাওয়া যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি একটি ছোট বাচ্চাকে বাইসাইকেল চালাতে শেখাচ্ছেন। সে বারবার চেষ্টা করে, পড়ে যায়, আবার উঠে—ধীরে ধীরে শেখে কীভাবে ব্যালেন্স রাখতে হয়। এখানে "বাচ্চা" হচ্ছে RL Agent, "বাইসাইকেল চালানো" হচ্ছে Environment, আর "না পড়ে যাওয়া" হচ্ছে Reward!
+
+আরেকটি উদাহরণ—গেম খেলা। গেমের খেলোয়াড় (Agent) বিভিন্ন পদক্ষেপ নেয়, স্কোর বাড়ায় (Reward), এবং গেমের পরিবেশে (Environment) পরিবর্তন আসে।
+
+## RL-এর মূল ধারণা
+- **Agent:** সিদ্ধান্ত নেয় (Action)
+- **Environment:** Agent-এর Action-এর প্রতিক্রিয়া দেয় (State, Reward)
+- **State:** পরিবেশের বর্তমান অবস্থা
+- **Action:** Agent যা করে
+- **Reward:** Agent-এর Action-এর জন্য পাওয়া পয়েন্ট
+- **Policy:** Agent কীভাবে Action নেয়, তার নিয়ম
+- **Episode:** RL-এর একটি সম্পূর্ণ "গেম" বা ট্রায়াল
+
+## RL-এর কাজের ধাপ
+1. Agent পরিবেশে একটি Action নেয়
+2. Environment নতুন State ও Reward দেয়
+3. Agent Policy আপডেট করে
+4. Agent আবার Action নেয়
+
+## RL-এর প্রধান লক্ষ্য
+Agent যেন এমন Policy শেখে, যাতে দীর্ঘমেয়াদে সর্বোচ্চ Reward পায়।
+
+## RL-এর ধরণ
+- **Model-Free RL:** Agent Environment-এর মডেল না জেনে Action নেয় (Q-Learning, Policy Gradients)
+- **Model-Based RL:** Agent Environment-এর মডেল শেখে ও ব্যবহার করে
+
+## RL-এর ব্যবহার
+- **গেম:** Atari, Chess, Go
+- **রোবোটিক্স:** রোবটকে হাঁটা, জিনিস ধরতে শেখানো
+- **ফাইন্যান্স:** স্টক ট্রেডিং
+- **স্বয়ংক্রিয় গাড়ি:** Self-driving car
+- **ইন্ডাস্ট্রি:** অটোমেশন, কন্ট্রোল
+
+## RL কোডের সাধারণ কাঠামো (PyTorch)
+
+```python
+import torch
+import random
+
+class SimpleAgent:
+    def __init__(self, n_actions):
+        self.n_actions = n_actions
+    def select_action(self, state):
+        return random.randint(0, self.n_actions-1)
+
+# Environment (উদাহরণ)
+class DummyEnv:
+    def reset(self):
+        return 0
+    def step(self, action):
+        next_state = action
+        reward = 1 if action == 1 else 0
+        done = True
+        return next_state, reward, done, {}
+
+agent = SimpleAgent(n_actions=2)
+env = DummyEnv()
+state = env.reset()
+for _ in range(10):
+    action = agent.select_action(state)
+    next_state, reward, done, _ = env.step(action)
+    print(f"Action: {action}, Reward: {reward}")
+    state = next_state
+    if done:
+        state = env.reset()
+```
+
+## RL শেখার চ্যালেঞ্জ
+- Reward Delay: অনেক সময় Action-এর ফলাফল পরে পাওয়া যায়
+- Exploration vs Exploitation: নতুন কিছু চেষ্টা করা vs পুরাতন ভালো Policy ব্যবহার
+- Stability: Training সময় Policy পরিবর্তন হলে সমস্যা
+
+## Analogies: "শেখার খেলা"
+
+RL-কে ভাবুন "শেখার খেলা"—Agent বারবার চেষ্টা করে, ভুল করে, পুরস্কার পায়, এবং ধীরে ধীরে সেরা সিদ্ধান্ত নিতে শেখে।
+
+## সংক্ষেপে
+- RL-এ Agent পরিবেশে Action নিয়ে Reward পায়
+- Policy শেখার মাধ্যমে Agent সর্বোচ্চ Reward পেতে চেষ্টা করে
+- গেম, রোবোটিক্স, ফাইন্যান্স—সব জায়গায় RL ব্যবহৃত হয়
+
+## আরও জানুন
+- [RL Introduction (DeepMind)](https://www.deepmind.com/learning-resources/reinforcement-learning-introduction)
+- [PyTorch RL Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html)
+- [OpenAI Spinning Up](https://spinningup.openai.com/en/latest/)

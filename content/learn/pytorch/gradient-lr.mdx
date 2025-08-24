@@ -1,0 +1,87 @@
+---
+title: গ্রেডিয়েন্ট ক্লিপিং ও লার্নিং রেট স্কেজিউল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি পাহাড়ে হাঁটছেন—কখনো ধীরে, কখনো দ্রুত। মডেল ট্রেনিং-এও "learning rate" কখনো বাড়ানো, কখনো কমানো দরকার। আবার, কখনো পাহাড় এত খাড়া যে পড়ে যাওয়ার ঝুঁকি—এটা "gradient explosion"। এই সমস্যা সমাধানে gradient clipping ও learning rate scheduling!
+
+## বাস্তব উদাহরণ: পাহাড়ে হাঁটা
+
+- **Gradient Clipping:** পাহাড়ে হাঁটার সময় হঠাৎ পা পিছলে গেলে নিজেকে ধরে রাখা—gradient বেশি হলে কেটে দেয়া
+- **Learning Rate Scheduling:** কখনো দ্রুত, কখনো ধীরে হাঁটা—training-এর সময় learning rate adjust করা
+
+## Gradient Clipping কী?
+
+Gradient clipping হলো এমন এক টেকনিক, যেখানে gradient-এর মান নির্দিষ্ট সীমার বেশি হলে কেটে দেয়া হয়। এতে "gradient explosion" এড়ানো যায়, মডেল স্থিতিশীল থাকে।
+
+### PyTorch-এ Gradient Clipping
+```python
+import torch.nn.utils as utils
+
+# ট্রেনিং লুপে
+for batch_x, batch_y in loader:
+    optimizer.zero_grad()
+    outputs = model(batch_x)
+    loss = criterion(outputs, batch_y)
+    loss.backward()
+    utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+    optimizer.step()
+```
+
+## Learning Rate Scheduling কী?
+
+Learning rate scheduling মানে—training-এর সময় learning rate পরিবর্তন করা, যাতে মডেল দ্রুত ও স্থিতিশীলভাবে শেখে।
+
+### Learning Rate Scheduler-এর ধরণ
+- **StepLR:** নির্দিষ্ট epoch পর পর learning rate কমানো
+- **ExponentialLR:** প্রতি epoch-এ exponential decay
+- **ReduceLROnPlateau:** validation loss না কমলে learning rate কমানো
+- **CosineAnnealingLR:** cosine function অনুযায়ী learning rate পরিবর্তন
+
+### PyTorch-এ Learning Rate Scheduler
+```python
+import torch.optim as optim
+
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+for epoch in range(30):
+    for batch_x, batch_y in loader:
+        optimizer.zero_grad()
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss.backward()
+        utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()
+    scheduler.step()
+```
+
+## বাস্তব প্রজেক্ট
+- NLP, CV, GAN—সব ধরনের মডেল ট্রেনিং
+- Long sequence, deep network—gradient explosion এড়াতে
+- Hyperparameter tuning
+
+## চ্যালেঞ্জ ও টিপস
+- max_norm ও learning rate tune করুন
+- ReduceLROnPlateau validation loss-এর জন্য ভালো
+- CosineAnnealingLR large scale training-এ জনপ্রিয়
+- Scheduler-এর সাথে optimizer.step() ও scheduler.step() ঠিকভাবে ব্যবহার করুন
+
+## সংক্ষেপে
+Gradient clipping ও learning rate scheduling—PyTorch-এ স্মার্ট ও স্থিতিশীল ট্রেনিংয়ের জন্য অপরিহার্য।
+
+---
+
+## অনুশীলন
+- gradient clipping ব্যবহার করে মডেল ট্রেনিং করুন
+- বিভিন্ন scheduler দিয়ে learning rate পরিবর্তন দেখুন
+- validation loss অনুযায়ী ReduceLROnPlateau ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch Gradient Clipping](https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html)
+- [PyTorch Learning Rate Scheduler Docs](https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate)
+- [Best Practices for Training Neural Networks](https://pytorch.org/tutorials/beginner/nn_tutorial.html)

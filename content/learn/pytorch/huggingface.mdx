@@ -1,0 +1,100 @@
+---
+title: HuggingFace Transformers লাইব্রেরি
+description: HuggingFace Transformers লাইব্রেরি, PyTorch-এ ব্যবহার, বাস্তব উদাহরণ ও প্রজেক্ট
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একটি লাইব্রেরিতে গেছেন—হাজার হাজার বই, প্রতিটি বিষয়ে। HuggingFace Transformers লাইব্রেরি ঠিক তেমন—NLP-র জন্য হাজার হাজার প্রি-ট্রেইনড মডেল, সহজ API, ও কমিউনিটি সাপোর্ট।
+
+## বাস্তব উদাহরণ: বইয়ের দোকান
+
+যেমন, বইয়ের দোকানে আপনি গল্প, বিজ্ঞান, ইতিহাস—সব ধরনের বই পেয়ে যান। HuggingFace-এও BERT, GPT, RoBERTa, DistilBERT, T5—সব ধরনের NLP মডেল পেয়ে যান।
+
+## HuggingFace Transformers কী?
+- ওপেন সোর্স লাইব্রেরি
+- হাজার হাজার প্রি-ট্রেইনড NLP মডেল
+- PyTorch, TensorFlow, JAX—সব প্ল্যাটফর্মে সাপোর্ট
+- সহজ API: টোকেনাইজার, মডেল, ট্রেনিং, ইভ্যালুয়েশন
+
+## কোথায় ব্যবহার হয়?
+- টেক্সট ক্লাসিফিকেশন
+- টেক্সট জেনারেশন
+- ভাষা অনুবাদ
+- প্রশ্নোত্তর
+- সামারাইজেশন
+
+## PyTorch-এ HuggingFace Transformers ব্যবহার
+
+### ১. ইনস্টলেশন
+```bash
+pip install transformers
+```
+
+### ২. টোকেনাইজার ও মডেল লোড
+```python
+from transformers import AutoTokenizer, AutoModel
+
+# BERT টোকেনাইজার ও মডেল
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+model = AutoModel.from_pretrained('bert-base-uncased')
+
+text = "HuggingFace makes NLP easy!"
+inputs = tokenizer(text, return_tensors='pt')
+outputs = model(**inputs)
+```
+
+### ৩. টেক্সট ক্লাসিফিকেশন
+```python
+from transformers import pipeline
+
+classifier = pipeline('sentiment-analysis')
+result = classifier("I love PyTorch!")
+print(result)
+```
+
+### ৪. টেক্সট জেনারেশন (GPT-2)
+```python
+generator = pipeline('text-generation', model='gpt2')
+output = generator("Once upon a time", max_length=50)
+print(output[0]['generated_text'])
+```
+
+### ৫. ভাষা অনুবাদ
+```python
+translator = pipeline('translation_en_to_fr')
+result = translator("PyTorch is awesome!")
+print(result)
+```
+
+## HuggingFace Hub
+- হাজার হাজার মডেল, ডেটাসেট, ও টোকেনাইজার
+- [https://huggingface.co/models](https://huggingface.co/models)
+
+## বাস্তব প্রজেক্ট
+- চ্যাটবট
+- অটোমেটিক ইমেইল ক্লাসিফিকেশন
+- কাস্টমার সার্ভিস অটোমেশন
+- সোশ্যাল মিডিয়া মনিটরিং
+
+## চ্যালেঞ্জ ও টিপস
+- GPU ব্যবহার করলে দ্রুত ইনফারেন্স
+- কাস্টম ডেটাসেটে ফাইন-টিউনিং
+- মডেল সাইজ ও latency
+
+## সংক্ষেপে
+HuggingFace Transformers লাইব্রেরি NLP-র জন্য game changer। PyTorch-এ সহজেই ব্যবহার, হাজার হাজার মডেল, ও কমিউনিটি সাপোর্ট—সব একসাথে।
+
+---
+
+## অনুশীলন
+- sentiment-analysis pipeline ব্যবহার করুন
+- GPT-2 দিয়ে গল্প জেনারেট করুন
+- HuggingFace Hub থেকে নতুন মডেল খুঁজে ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [HuggingFace Transformers Documentation](https://huggingface.co/docs/transformers/index)
+- [HuggingFace Model Hub](https://huggingface.co/models)
+- [Tutorial: Fine-tuning Transformers with PyTorch](https://huggingface.co/docs/transformers/training)

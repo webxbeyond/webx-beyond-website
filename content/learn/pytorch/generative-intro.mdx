@@ -1,0 +1,114 @@
+---
+title: Generative Models পরিচিতি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একজন শিল্পী—কাগজে নতুন ছবি আঁকছেন, যা আগে কেউ দেখেনি। Generative Models ঠিক এমন—কম্পিউটারকে শেখানো হয়, যেন সে নতুন ছবি, টেক্সট, মিউজিক, এমনকি কোডও তৈরি করতে পারে!
+
+## বাস্তব উদাহরণ: শিল্পী ও গল্পকার
+
+- **শিল্পী:** GAN দিয়ে নতুন ছবি আঁকা
+- **গল্পকার:** VAE দিয়ে নতুন গল্প বা টেক্সট তৈরি
+
+## Generative Model কী?
+
+Generative Model এমন এক নিউরাল নেটওয়ার্ক, যা ডেটার "distribution" শেখে এবং নতুন, বাস্তবসম্মত ডেটা তৈরি করতে পারে।
+
+### Discriminative vs Generative
+- **Discriminative:** "কোনটা বিড়াল, কোনটা কুকুর"—ক্লাসিফিকেশন
+- **Generative:** "নতুন বিড়াল বা কুকুরের ছবি তৈরি"—generation
+
+## কোথায় ব্যবহার হয়?
+- ইমেজ জেনারেশন (GAN)
+- টেক্সট জেনারেশন (VAE, GPT)
+- মিউজিক, ভিডিও
+- ডেটা অগমেন্টেশন
+- ডেনয়েজিং, ইনপেইন্টিং
+
+## Generative Model-এর ধরণ
+- **GAN (Generative Adversarial Network):** দুইটি নেটওয়ার্ক—Generator ও Discriminator
+- **VAE (Variational Autoencoder):** Encoder-Decoder, latent space থেকে নতুন ডেটা
+- **Autoregressive Models:** GPT, PixelRNN
+
+## GAN-এর ধারণা
+
+GAN-এ দুইটি অংশ:
+- **Generator:** নতুন ডেটা তৈরি করে
+- **Discriminator:** আসল নাকি নকল, সেটা বলে
+
+### Analogy: জাল নোট ও পুলিশ
+
+Generator জাল নোট বানায়, Discriminator পুলিশ—আসল নোট চিনে ফেলে। Generator যত ভালো হয়, Discriminatorকে ফাঁকি দিতে পারে!
+
+## VAE-এর ধারণা
+
+VAE-তে Encoder ইনপুটকে latent space-এ পাঠায়, Decoder সেই latent থেকে নতুন ডেটা তৈরি করে।
+
+### Analogy: গল্পের সারাংশ
+
+Encoder গল্পের সারাংশ লেখে, Decoder সেই সারাংশ থেকে নতুন গল্প বানায়।
+
+## PyTorch-এ Generative Model
+
+### GAN-এর বেসিক
+```python
+import torch
+import torch.nn as nn
+
+class Generator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(100, 784)
+    def forward(self, z):
+        return torch.tanh(self.fc(z))
+
+class Discriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(784, 1)
+    def forward(self, x):
+        return torch.sigmoid(self.fc(x))
+```
+
+### VAE-এর বেসিক
+```python
+class VAE(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder = nn.Linear(784, 20)
+        self.decoder = nn.Linear(20, 784)
+    def forward(self, x):
+        z = self.encoder(x)
+        out = self.decoder(z)
+        return out
+```
+
+## চ্যালেঞ্জ ও টিপস
+- GAN ট্রেনিং কঠিন, balance রাখতে হয়
+- VAE-তে reconstruction loss ও KL divergence
+- Mode collapse, overfitting
+
+## বাস্তব প্রজেক্ট
+- ফেক ইমেজ/ভিডিও তৈরি
+- ডেটা অগমেন্টেশন
+- ডেনয়েজিং
+- কাস্টম আর্ট/মিউজিক জেনারেশন
+
+## সংক্ষেপে
+Generative Models—PyTorch-এ কল্পনা থেকে বাস্তব তৈরি করার টুল। GAN, VAE—দুইটি জনপ্রিয় টেকনিক, যা নতুন ডেটা তৈরি করতে পারে।
+
+---
+
+## অনুশীলন
+- GAN দিয়ে নতুন ছবি জেনারেট করুন
+- VAE দিয়ে ডেনয়েজিং বা reconstruction করুন
+- Generator ও Discriminator-এর পারফরম্যান্স তুলনা করুন
+
+---
+
+## আরও পড়ুন
+- [GANs Explained](https://arxiv.org/abs/1406.2661)
+- [VAE Tutorial](https://arxiv.org/abs/1312.6114)
+- [PyTorch Generative Models](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)

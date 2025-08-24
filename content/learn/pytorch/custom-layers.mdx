@@ -1,0 +1,112 @@
+---
+title: কাস্টম লেয়ার ও লস ফাংশন লেখা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## PyTorch-এ গবেষণা ও এক্সপেরিমেন্ট
+
+PyTorch-এর সবচেয়ে শক্তিশালী দিক—আপনি নিজের মতো করে নিউরাল নেটওয়ার্কের লেয়ার ও লস ফাংশন লিখতে পারেন। গবেষণা, নতুন আইডিয়া, বা বিশেষ প্রজেক্টে কাস্টম লেয়ার/লস অপরিহার্য।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি কেক বানাচ্ছেন—রেডিমেড মিক্স ব্যবহার করতে পারেন, আবার নিজের রেসিপি দিয়ে নতুন স্বাদও আনতে পারেন। PyTorch-এ কাস্টম লেয়ার/লস মানে—"নিজের রেসিপি"।
+
+## কাস্টম লেয়ার লেখার ধাপ
+
+PyTorch-এ সব লেয়ার `nn.Module` থেকে ইনহেরিট করে।
+
+### উদাহরণ: কাস্টম Dense Layer
+```python
+import torch
+import torch.nn as nn
+
+class CustomDense(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.weight = nn.Parameter(torch.randn(in_features, out_features))
+        self.bias = nn.Parameter(torch.zeros(out_features))
+    def forward(self, x):
+        return x @ self.weight + self.bias
+
+# ব্যবহার:
+layer = CustomDense(10, 5)
+input = torch.randn(2, 10)
+output = layer(input)
+print(output)
+```
+
+### উদাহরণ: কাস্টম Activation Layer
+```python
+class CustomReLU(nn.Module):
+    def forward(self, x):
+        return torch.maximum(x, torch.tensor(0.0))
+```
+
+## কাস্টম লস ফাংশন লেখার ধাপ
+
+লস ফাংশন সাধারণত `forward` মেথডে ডিফাইন করা হয়।
+
+### উদাহরণ: কাস্টম MSE Loss
+```python
+class CustomMSELoss(nn.Module):
+    def forward(self, input, target):
+        return torch.mean((input - target) ** 2)
+
+# ব্যবহার:
+loss_fn = CustomMSELoss()
+pred = torch.tensor([2.0, 3.0])
+target = torch.tensor([1.0, 2.0])
+loss = loss_fn(pred, target)
+print(loss)
+```
+
+### উদাহরণ: কাস্টম Regularization Loss
+```python
+class L1Regularization(nn.Module):
+    def forward(self, weights):
+        return torch.sum(torch.abs(weights))
+```
+
+## বাস্তব জীবনের ব্যবহার
+- **গবেষণা:** নতুন লেয়ার/লস ডিজাইন
+- **বিশেষ প্রজেক্ট:** Custom attention, normalization, regularization
+- **AI Product:** Unique feature extraction
+
+## টিপস ও চ্যালেঞ্জ
+- Autograd: PyTorch স্বয়ংক্রিয়ভাবে gradient হিসাব করে
+- Custom backward চাইলে `torch.autograd.Function` ব্যবহার করুন
+- Parameter register করতে `nn.Parameter` ব্যবহার করুন
+- Input/output shape ঠিকভাবে handle করুন
+
+### Advanced: Custom backward (gradient) লিখতে চাইলে
+```python
+class MyFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input):
+        ctx.save_for_backward(input)
+        return input ** 2
+    @staticmethod
+    def backward(ctx, grad_output):
+        input, = ctx.saved_tensors
+        return 2 * input * grad_output
+
+# ব্যবহার:
+x = torch.tensor(3.0, requires_grad=True)
+y = MyFunction.apply(x)
+y.backward()
+print(x.grad)
+```
+
+## Analogies: "নিজের রেসিপি, নিজের স্বাদ"
+
+কাস্টম লেয়ার/লস মানে—"নিজের রেসিপি, নিজের স্বাদ"—গবেষণায় নতুনত্ব আনতে, বা বিশেষ সমস্যার সমাধানে।
+
+## সংক্ষেপে
+- PyTorch-এ সহজেই কাস্টম লেয়ার ও লস ফাংশন লেখা যায়
+- গবেষণা, এক্সপেরিমেন্ট, ও প্রোডাকশন—সব জায়গায় দরকার
+- Autograd ও nn.Module ব্যবহার করুন
+
+## আরও জানুন
+- [PyTorch Custom Layers Guide](https://pytorch.org/tutorials/beginner/examples_nn/two_layer_net_custom_function.html)
+- [PyTorch Autograd Documentation](https://pytorch.org/docs/stable/autograd.html)
+- [Advanced Custom Loss Functions](https://pytorch.org/tutorials/beginner/examples_nn/two_layer_net_custom_function.html)

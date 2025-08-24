@@ -1,0 +1,91 @@
+---
+title: GPU এক্সিলারেশন (CUDA টেনসর)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## GPU এক্সিলারেশন কী?
+
+GPU (Graphics Processing Unit) হচ্ছে এমন একটি হার্ডওয়্যার, যা হাজার হাজার অপারেশন একসাথে করতে পারে। PyTorch-এ GPU ব্যবহার মানে—CUDA টেনসর ব্যবহার করে ডিপ লার্নিং মডেল দ্রুত ট্রেইন করা।
+
+_অ্যানালজি:_ CPU হচ্ছে একজন সাধারণ কর্মী, আর GPU হচ্ছে শত শত কর্মীর টিম—যারা একসাথে কাজ করে দ্রুত ফলাফল দেয়।
+
+## CUDA কী?
+
+CUDA (Compute Unified Device Architecture) হচ্ছে NVIDIA-এর তৈরি একটি প্ল্যাটফর্ম, যা GPU-তে ডেটা প্রসেসিংয়ের জন্য ব্যবহৃত হয়। PyTorch-এ CUDA টেনসর মানে—GPU-তে রাখা টেনসর।
+
+## PyTorch-এ GPU ব্যবহার
+
+### ১. GPU আছে কিনা চেক করুন
+```python
+import torch
+print(torch.cuda.is_available())  # True হলে GPU সাপোর্ট
+print(torch.cuda.device_count())  # কয়টি GPU আছে
+print(torch.cuda.get_device_name(0))  # GPU-এর নাম
+```
+
+### ২. টেনসর GPU-তে পাঠানো
+```python
+x = torch.tensor([1, 2, 3])
+x_gpu = x.to('cuda')
+print(x_gpu.device)  # cuda:0
+```
+
+### ৩. মডেল GPU-তে পাঠানো
+```python
+model = MyModel()
+model.to('cuda')
+```
+
+### ৪. ডেটা ও মডেল GPU-তে থাকলে অপারেশন দ্রুত হয়
+
+_রিয়েল-ওয়ার্ল্ড উদাহরণ:_
+ধরা যাক, আপনি একটি ইমেজ ক্লাসিফিকেশন মডেল ট্রেইন করছেন—CPU-তে ১ ঘণ্টা লাগতে পারে, GPU-তে ৫ মিনিটেই হয়ে যাবে!
+
+## CPU ↔ GPU ডেটা ট্রান্সফার
+
+- `.to('cuda')`: GPU-তে পাঠানো
+- `.to('cpu')`: CPU-তে ফেরত আনা
+
+```python
+x = x.to('cuda')  # GPU
+x = x.to('cpu')   # CPU
+```
+
+## সতর্কতা
+- ডেটা ও মডেল দুইটাই GPU-তে পাঠাতে হবে, না হলে error আসতে পারে।
+- GPU মেমরি সীমিত—বড় ডেটাসেট হলে out-of-memory error আসতে পারে।
+- GPU-তে কাজ করার সময় সব টেনসর ও মডেল `.to('cuda')` দিয়ে পাঠান।
+
+## কমন GPU ফাংশন
+- `torch.cuda.is_available()`: GPU আছে কিনা
+- `torch.cuda.device_count()`: কয়টি GPU
+- `torch.cuda.get_device_name(idx)`: GPU-এর নাম
+- `.to('cuda')`, `.to('cpu')`: ডিভাইস পরিবর্তন
+
+## GPU-তে মডেল ট্রেইনিং উদাহরণ
+```python
+import torch
+model = MyModel().to('cuda')
+for data, target in dataloader:
+    data, target = data.to('cuda'), target.to('cuda')
+    output = model(data)
+    loss = loss_fn(output, target)
+    loss.backward()
+    optimizer.step()
+```
+
+## GPU না থাকলে কী করবেন?
+- CPU-তে কোড রান করুন—শেখার জন্য যথেষ্ট।
+- Google Colab বা Kaggle-তে GPU ফ্রি পাওয়া যায়।
+
+## সংক্ষিপ্ত চেকলিস্ট
+- GPU আছে কিনা চেক করুন
+- টেনসর ও মডেল `.to('cuda')` দিয়ে GPU-তে পাঠান
+- ডেটা ও মডেল দুইটাই GPU-তে থাকলে অপারেশন দ্রুত হবে
+- GPU না থাকলে Colab/Kaggle ব্যবহার করুন
+
+## উপসংহার
+
+GPU এক্সিলারেশন PyTorch-এর সবচেয়ে বড় শক্তি—বড় মডেল, ডেটা, ও ডিপ লার্নিং ট্রেইনিং দ্রুত ও সহজ হয়। CUDA টেনসর ব্যবহার করে আপনি ডিপ লার্নিংয়ের জগতে আরও এগিয়ে যেতে পারবেন।
+
+_পরবর্তী মডিউলে: নিউরাল নেটওয়ার্ক বেসিকস—PyTorch দিয়ে মডেল বানানো ও ট্রেইনিং!_

@@ -1,0 +1,87 @@
+---
+title: ইমেজ ট্রান্সফরমেশন ও ডেটা অগমেন্টেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ইমেজ ট্রান্সফরমেশন কী?
+
+ইমেজ ট্রান্সফরমেশন মানে—ইমেজ ডেটাকে প্রসেস, পরিবর্তন, বা প্রস্তুত করা; যাতে মডেল সহজে ও ভালোভাবে শিখতে পারে। Torchvision-এ অনেক বিল্ট-ইন ট্রান্সফরমেশন আছে—যেমন, রিসাইজ, ক্রপ, রোটেট, ফ্লিপ, নরমালাইজ ইত্যাদি।
+
+_অ্যানালজি:_ ইমেজ ট্রান্সফরমেশনকে ভাবুন—একটি ফটো এডিটর, যেখানে ছবি কাটাছেঁড়া, ঘুরানো, রঙ পরিবর্তন, ইত্যাদি করা যায়।
+
+## ডেটা অগমেন্টেশন কী?
+
+ডেটা অগমেন্টেশন মানে—একই ডেটা থেকে নতুন উদাহরণ তৈরি করা, যাতে মডেল আরও জেনারালাইজড হয়। যেমন, একটি ছবিকে ঘুরিয়ে, উল্টে, বা রঙ পরিবর্তন করে নতুন ছবি বানানো।
+
+_রিয়েল-ওয়ার্ল্ড উদাহরণ:_ ধরুন, আপনার কাছে ১০০টি ফুলের ছবি আছে। ডেটা অগমেন্টেশন দিয়ে আপনি ৫০০টি নতুন ছবি বানাতে পারেন—মডেল আরও শক্তিশালী হবে।
+
+## Torchvision-এ ট্রান্সফরমেশন
+
+### ১. ট্রান্সফরমেশন কম্পোজ
+```python
+from torchvision import transforms
+transform = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+```
+
+### ২. ডেটাসেটে ট্রান্সফরমেশন অ্যাপ্লাই
+```python
+from torchvision import datasets
+train_data = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+```
+
+### ৩. কমন ট্রান্সফরমেশন
+- `Resize`: ছবির সাইজ পরিবর্তন
+- `CenterCrop`, `RandomCrop`: ছবির অংশ কাটা
+- `RandomHorizontalFlip`: ডান-বাম উল্টানো
+- `RandomRotation`: ঘুরানো
+- `ColorJitter`: উজ্জ্বলতা, কনট্রাস্ট, রঙ পরিবর্তন
+- `Normalize`: পিক্সেল ভ্যালু স্কেল করা
+
+## ডেটা অগমেন্টেশন—কেন দরকার?
+- ডেটা কম থাকলে মডেল overfit করে
+- অগমেন্টেশন দিয়ে ডেটা বাড়ানো যায়
+- মডেল নতুন ভ্যারিয়েশন শিখে
+
+## উদাহরণ: ফুল ক্লাসিফিকেশন
+
+```python
+transform = transforms.Compose([
+    transforms.RandomResizedCrop(32),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+    transforms.ToTensor()
+])
+train_data = datasets.ImageFolder(root='./flowers', transform=transform)
+```
+
+## Custom Transform
+
+নিজের ট্রান্সফরমেশন বানাতে পারেন:
+```python
+class MyTransform:
+    def __call__(self, img):
+        # কাস্টম প্রসেসিং
+        return img
+```
+
+## টিপস ও সতর্কতা
+- ট্রেনিং ডেটায় অগমেন্টেশন ব্যবহার করুন, টেস্ট ডেটায় নয়
+- নরমালাইজেশন সবসময় করুন
+- অগমেন্টেশন বেশি হলে noise বাড়তে পারে
+
+## সংক্ষিপ্ত চেকলিস্ট
+- transforms.Compose দিয়ে ট্রান্সফরমেশন সাজান
+- ডেটাসেটে transform=transform ব্যবহার করুন
+- Custom Transform বানাতে __call__ ব্যবহার করুন
+
+## উপসংহার
+
+ইমেজ ট্রান্সফরমেশন ও ডেটা অগমেন্টেশন—কম্পিউটার ভিশনে মডেলকে শক্তিশালী ও জেনারালাইজড করার মূল টুল। Torchvision দিয়ে সহজেই এসব করতে পারবেন।
+
+_পরবর্তী পাঠে: Convolutional Neural Networks (CNN) বেসিকস—ইমেজ থেকে ফিচার শেখা!_

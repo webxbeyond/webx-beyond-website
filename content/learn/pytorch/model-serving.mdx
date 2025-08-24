@@ -1,0 +1,134 @@
+---
+title: FastAPI/Flask দিয়ে PyTorch মডেল সার্ভিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+PyTorch দিয়ে ট্রেইন করা মডেল শুধু জুপিটার নোটবুক বা স্ক্রিপ্টে ব্যবহার করলে বাস্তব জীবনের সমস্যার সমাধান হয় না। মডেলকে প্রোডাকশন বা রিয়েল-টাইম অ্যাপ্লিকেশনে ব্যবহার করতে হলে API আকারে সার্ভ করতে হয়, যাতে অন্য অ্যাপ, ওয়েব, বা মোবাইল ক্লায়েন্ট সহজে ব্যবহার করতে পারে।
+
+এই পাঠে আমরা শিখব কীভাবে FastAPI ও Flask দিয়ে PyTorch মডেলকে REST API আকারে সার্ভ করা যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনার কাছে একটি দক্ষ বাবুর্চি (PyTorch মডেল) আছে, কিন্তু সে শুধু রান্নাঘরে রান্না করে। আপনি চান, সবাই তার রান্না খেতে পারুক—তখন দরকার একটি "রেস্টুরেন্ট" (API), যেখানে অর্ডার দিলে খাবার (prediction) পাওয়া যায়। FastAPI/Flask হচ্ছে সেই রেস্টুরেন্টের সার্ভার।
+
+## কেন API সার্ভিং দরকার?
+- **স্কেলেবল:** একাধিক ইউজার একসাথে মডেল ব্যবহার করতে পারে
+- **ইন্টিগ্রেশন:** ওয়েব/মোবাইল/IoT অ্যাপে সহজে যুক্ত করা যায়
+- **রিয়েল-টাইম:** দ্রুত prediction দেয়
+- **ডিপ্লয়মেন্ট:** ক্লাউড, সার্ভার, বা লোকালহোস্টে সহজে চালানো যায়
+
+## Flask দিয়ে PyTorch মডেল সার্ভিং
+
+### ধাপে ধাপে:
+
+1. **মডেল লোড করুন:**
+   ```python
+   import torch
+   from my_model import MyModel
+
+   model = MyModel()
+   model.load_state_dict(torch.load('model.pth'))
+   model.eval()
+   ```
+
+2. **Flask API তৈরি করুন:**
+   ```python
+   from flask import Flask, request, jsonify
+   import torch
+
+   app = Flask(__name__)
+
+   @app.route('/predict', methods=['POST'])
+   def predict():
+       data = request.get_json()
+       input_tensor = torch.tensor(data['input'])
+       with torch.no_grad():
+           output = model(input_tensor)
+       return jsonify({'output': output.tolist()})
+
+   if __name__ == '__main__':
+       app.run(debug=True)
+   ```
+
+3. **API কল করুন:**
+   ```python
+   import requests
+   response = requests.post('http://localhost:5000/predict', json={'input': [1.0, 2.0, 3.0]})
+   print(response.json())
+   ```
+
+## FastAPI দিয়ে PyTorch মডেল সার্ভিং
+
+FastAPI আরও দ্রুত, আধুনিক ও টাইপ-সেফ।
+
+### ধাপে ধাপে:
+
+1. **FastAPI ইনস্টল করুন:**
+   ```bash
+   pip install fastapi uvicorn
+   ```
+
+2. **FastAPI API তৈরি করুন:**
+   ```python
+   from fastapi import FastAPI
+   from pydantic import BaseModel
+   import torch
+
+   class InputData(BaseModel):
+       input: list
+
+   app = FastAPI()
+
+   model = torch.load('model.pth')
+   model.eval()
+
+   @app.post('/predict')
+   def predict(data: InputData):
+       input_tensor = torch.tensor(data.input)
+       with torch.no_grad():
+           output = model(input_tensor)
+       return {'output': output.tolist()}
+   ```
+
+3. **API চালান:**
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+4. **API কল করুন:**
+   ```python
+   import requests
+   response = requests.post('http://localhost:8000/predict', json={'input': [1.0, 2.0, 3.0]})
+   print(response.json())
+   ```
+
+## বাস্তব জীবনের ব্যবহার
+
+- **হাসপাতাল:** রোগীর ডেটা পাঠিয়ে রোগ নির্ণয় API থেকে পাওয়া যায়
+- **ব্যাংক:** লোন অ্যাপ্লিকেশন স্কোরিং API
+- **ই-কমার্স:** রিয়েল-টাইম রিকমেন্ডেশন API
+
+## ডিপ্লয়মেন্ট টিপস
+- Docker ব্যবহার করুন—API ও মডেল একসাথে প্যাকেজ করা যায়
+- Gunicorn/Uvicorn দিয়ে প্রোডাকশন সার্ভ করুন
+- ক্লাউডে (AWS, GCP, Azure) ডিপ্লয় করুন
+- API security (authentication, rate limiting) যুক্ত করুন
+
+## চ্যালেঞ্জ ও সমাধান
+- **Concurrency:** FastAPI/Flask async সাপোর্ট দেয়
+- **Large Model:** মডেল লোডিং টাইম কমাতে lazy loading বা batching ব্যবহার করুন
+- **GPU:** মডেলকে CUDA-তে পাঠিয়ে দ্রুত prediction
+
+## Analogies: API as "Waiter"
+
+API-কে ভাবুন "ওয়েটার"—আপনি অর্ডার দেন, ওয়েটার রান্নাঘর থেকে খাবার এনে দেয়। ইউজার API-তে ডেটা পাঠায়, API মডেল থেকে prediction এনে দেয়।
+
+## সংক্ষেপে
+- FastAPI/Flask দিয়ে PyTorch মডেল সহজে সার্ভ করা যায়
+- রিয়েল-টাইম prediction, স্কেলিং, ও ইন্টিগ্রেশন সহজ
+- প্রোডাকশন ডিপ্লয়মেন্টে API অপরিহার্য
+
+## আরও জানুন
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [Deploying PyTorch Models as API](https://pytorch.org/tutorials/intermediate/flask_api_tutorial.html)

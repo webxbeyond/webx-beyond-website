@@ -1,0 +1,91 @@
+---
+title: Transformer আর্কিটেকচার বেসিকস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি simultaneously অনেক বই পড়ছেন, আর প্রতিটি বইয়ের গুরুত্বপূর্ণ অংশে ফোকাস করছেন। Transformer ঠিক এমনই—একসাথে পুরো ইনপুট প্রসেস করে, গুরুত্বপূর্ণ অংশে "attention" দেয়।
+
+## বাস্তব উদাহরণ: একাধিক শিক্ষকের ক্লাস
+
+যেমন, এক ক্লাসে অনেক শিক্ষক আছেন—প্রতিটি শিক্ষক আলাদা বিষয় পড়ান, আর ছাত্ররা সবার কাছ থেকে গুরুত্বপূর্ণ তথ্য নেয়। Transformer-এ "attention heads" একসাথে বিভিন্ন অংশে ফোকাস করে।
+
+## Transformer কী?
+
+Transformer হলো এমন এক নিউরাল নেটওয়ার্ক, যা RNN/LSTM-এর সীমাবদ্ধতা কাটিয়ে, parallel ভাবে ইনপুট প্রসেস করে। এর মূল অংশ:
+- Self-Attention
+- Multi-Head Attention
+- Positional Encoding
+- Feed Forward Network
+- Encoder-Decoder Structure
+
+## আর্কিটেকচারের গঠন
+
+### ১. Encoder
+- ইনপুট সিকোয়েন্স নেয়
+- Self-attention দিয়ে context বোঝে
+- Feed-forward দিয়ে ফিচার প্রসেস করে
+
+### ২. Decoder
+- আউটপুট সিকোয়েন্স তৈরি করে
+- Encoder-এর context ব্যবহার করে
+- Self-attention ও encoder-decoder attention
+
+### ৩. Multi-Head Attention
+
+একই ইনপুটে একাধিক "attention head"—যেমন, ছাত্ররা একসাথে অনেক শিক্ষকের কথা শুনছে।
+
+### ৪. Positional Encoding
+
+Transformer-এ কোনো "sequence order" নেই, তাই প্রতিটি শব্দের অবস্থান বোঝাতে positional encoding যোগ করা হয়।
+
+## PyTorch-এ Transformer
+
+PyTorch-এ `nn.Transformer` ও `nn.TransformerEncoder`/`Decoder` ক্লাস আছে।
+
+```python
+import torch
+import torch.nn as nn
+
+# ইনপুট: (sequence_length, batch_size, embed_dim)
+src = torch.rand((10, 32, 512))  # ১০ শব্দ, ৩২ স্যাম্পল, ৫১২ dimension
+trg = torch.rand((20, 32, 512))
+
+transformer = nn.Transformer(d_model=512, nhead=8)
+output = transformer(src, trg)
+print(output.shape)  # (20, 32, 512)
+```
+
+## Transformer-এর সুবিধা
+- Long sequence-এ distant dependency সহজে ধরা যায়
+- Parallelization সহজ
+- Context-aware output
+- Training দ্রুত
+
+## কোথায় ব্যবহার হয়?
+- Machine Translation
+- Text Summarization
+- Question Answering
+- Text Generation (GPT, BERT)
+
+## চ্যালেঞ্জ
+- Computational cost বেশি
+- Memory usage বেশি
+
+## সংক্ষেপে
+Transformer NLP-র সবচেয়ে শক্তিশালী আর্কিটেকচার। Attention, parallelization, ও context-aware প্রসেসিং—সব একসাথে। PyTorch-এ সহজেই ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## অনুশীলন
+- ছোট একটি অনুবাদ টাস্কে Transformer ব্যবহার করুন
+- Multi-head attention visualization করুন
+- Positional encoding কীভাবে কাজ করে, দেখুন
+
+---
+
+## আরও পড়ুন
+- [Attention Is All You Need (Original Paper)](https://arxiv.org/abs/1706.03762)
+- [Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
+- [PyTorch Transformer Docs](https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html)

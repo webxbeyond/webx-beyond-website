@@ -1,0 +1,120 @@
+---
+title: GAN আর্কিটেকচার ও ট্রেইনিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, একজন শিল্পী নতুন ছবি আঁকছেন, আর একজন বিচারক বলছেন—ছবিটা আসল নাকি নকল। GAN-এও ঠিক এমন—Generator নতুন ডেটা তৈরি করে, Discriminator বলে আসল নাকি নকল।
+
+## GAN কী?
+
+GAN (Generative Adversarial Network) হলো দুইটি নিউরাল নেটওয়ার্কের টিম—Generator ও Discriminator।
+- **Generator:** নতুন ডেটা তৈরি করে
+- **Discriminator:** ডেটা আসল নাকি নকল, সেটা বলে
+
+### Analogy: জাল নোট ও পুলিশ
+
+Generator জাল নোট বানায়, Discriminator পুলিশ—আসল নোট চিনে ফেলে। Generator যত ভালো হয়, Discriminatorকে ফাঁকি দিতে পারে!
+
+## GAN-এর আর্কিটেকচার
+
+- **Noise Vector (z):** Generator-এ ইনপুট
+- **Generator:** Noise থেকে ডেটা তৈরি
+- **Discriminator:** ডেটা আসল নাকি নকল, সেটা বলে
+- **Loss Function:** Binary Cross Entropy
+
+## GAN ট্রেইনিং
+
+GAN ট্রেইনিং-এ দুইটি নেটওয়ার্ক একে অপরের বিরুদ্ধে শেখে:
+1. Generator নকল ডেটা বানায়
+2. Discriminator আসল/নকল বলে
+3. Generator Discriminatorকে ফাঁকি দিতে শেখে
+4. Discriminator আরও ভালোভাবে আসল/নকল চিনে
+
+### PyTorch-এ GAN ট্রেইনিং
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+class Generator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(100, 256),
+            nn.ReLU(),
+            nn.Linear(256, 784),
+            nn.Tanh()
+        )
+    def forward(self, z):
+        return self.fc(z)
+
+class Discriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Sequential(
+            nn.Linear(784, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 1),
+            nn.Sigmoid()
+        )
+    def forward(self, x):
+        return self.fc(x)
+
+G = Generator()
+D = Discriminator()
+
+criterion = nn.BCELoss()
+g_optimizer = optim.Adam(G.parameters(), lr=0.0002)
+d_optimizer = optim.Adam(D.parameters(), lr=0.0002)
+
+for epoch in range(epochs):
+    for real_data in dataloader:
+        batch_size = real_data.size(0)
+        # ট্রেইন Discriminator
+        z = torch.randn(batch_size, 100)
+        fake_data = G(z)
+        real_labels = torch.ones(batch_size, 1)
+        fake_labels = torch.zeros(batch_size, 1)
+        d_loss_real = criterion(D(real_data), real_labels)
+        d_loss_fake = criterion(D(fake_data.detach()), fake_labels)
+        d_loss = d_loss_real + d_loss_fake
+        d_optimizer.zero_grad()
+        d_loss.backward()
+        d_optimizer.step()
+        # ট্রেইন Generator
+        g_loss = criterion(D(fake_data), real_labels)
+        g_optimizer.zero_grad()
+        g_loss.backward()
+        g_optimizer.step()
+```
+
+## চ্যালেঞ্জ ও টিপস
+- **Mode Collapse:** Generator একই ডেটা বারবার বানায়
+- **Training Instability:** Loss oscillate করে
+- **Hyperparameter tuning:** lr, batch size, architecture
+- **Label Smoothing, Feature Matching**
+
+## বাস্তব প্রজেক্ট
+- ফেক ইমেজ/ভিডিও তৈরি
+- ডেটা অগমেন্টেশন
+- ডেনয়েজিং
+- কাস্টম আর্ট/মিউজিক জেনারেশন
+
+## সংক্ষেপে
+GAN—PyTorch-এ নতুন ডেটা তৈরি করার জন্য সবচেয়ে জনপ্রিয় টেকনিক। Generator ও Discriminator—দুইটি নেটওয়ার্কের টিমওয়ার্কে কল্পনা থেকে বাস্তব তৈরি হয়।
+
+---
+
+## অনুশীলন
+- নিজের GAN মডেল তৈরি করুন
+- Generator ও Discriminator-এর পারফরম্যান্স তুলনা করুন
+- Mode collapse ও instability handle করার টেকনিক ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [GANs Explained](https://arxiv.org/abs/1406.2661)
+- [PyTorch DCGAN Tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
+- [Best Practices for GAN Training](https://machinelearningmastery.com/how-to-train-stable-generative-adversarial-networks/)

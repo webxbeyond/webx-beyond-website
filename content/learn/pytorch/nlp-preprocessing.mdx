@@ -1,0 +1,82 @@
+---
+title: টেক্সট প্রি-প্রসেসিং ও টোকেনাইজেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## NLP-তে টেক্সট প্রি-প্রসেসিং কী?
+
+NLP (Natural Language Processing)-তে টেক্সট ডেটা সরাসরি মডেলে ব্যবহার করা যায় না। আগে ডেটা পরিষ্কার, ফরম্যাট, ও টোকেনাইজ করতে হয়—এটাই প্রি-প্রসেসিং।
+
+_অ্যানালজি:_ টেক্সট প্রি-প্রসেসিংকে ভাবুন—একটি বইয়ের পাতা ছেঁটে, অপ্রয়োজনীয় শব্দ বাদ দিয়ে, বাক্যগুলো ছোট ছোট অংশে ভাগ করা।
+
+## কেন দরকার?
+- টেক্সট ডেটা noisy, spelling mistake, punctuation, stopwords থাকে
+- মডেলকে সহজ ও পরিষ্কার ইনপুট দিতে হয়
+- ভালো accuracy ও performance পাওয়া যায়
+
+## সাধারণ প্রি-প্রসেসিং স্টেপ
+- Lowercase: সব অক্ষর ছোট করা
+- Remove punctuation: কমা, ডট, ইত্যাদি বাদ
+- Remove stopwords: 'the', 'is', 'and' ইত্যাদি বাদ
+- Stemming/Lemmatization: শব্দের মূল রূপে আনা
+
+### উদাহরণ:
+```python
+import re
+text = "PyTorch is awesome! NLP rocks."
+text = text.lower()
+text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
+print(text)  # pytorch is awesome nlp rocks
+```
+
+## টোকেনাইজেশন কী?
+
+টোকেনাইজেশন মানে—টেক্সটকে ছোট ছোট অংশে (token) ভাগ করা। Token হতে পারে শব্দ, অক্ষর, বা সাবওয়ার্ড।
+
+_অ্যানালজি:_ টোকেনাইজেশনকে ভাবুন—একটি বাক্যকে শব্দে, শব্দকে অক্ষরে ভাগ করা।
+
+### শব্দভিত্তিক টোকেনাইজেশন
+```python
+sentence = "PyTorch rocks for NLP!"
+tokens = sentence.split()
+print(tokens)  # ['PyTorch', 'rocks', 'for', 'NLP!']
+```
+
+### Python লাইব্রেরি দিয়ে টোকেনাইজেশন
+- NLTK, spaCy, HuggingFace Tokenizers
+
+```python
+import nltk
+nltk.download('punkt')
+from nltk.tokenize import word_tokenize
+sentence = "PyTorch rocks for NLP!"
+tokens = word_tokenize(sentence)
+print(tokens)
+```
+
+## Advanced: Subword Tokenization
+- BERT, GPT-এর মতো মডেলে সাবওয়ার্ড টোকেনাইজার (WordPiece, Byte-Pair Encoding) ব্যবহার হয়
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি বাংলা টেক্সট ক্লাসিফিকেশন করতে চান।
+- প্রথমে টেক্সট lowercase করুন
+- punctuation ও stopwords বাদ দিন
+- শব্দভিত্তিক টোকেনাইজ করুন
+- টোকেনকে ইনডেক্স/embedding-এ রূপান্তর করুন
+
+## টিপস ও সতর্কতা
+- ভাষাভেদে stopwords ও stemming আলাদা হয়
+- টোকেনাইজার ঠিকভাবে কনফিগার করুন
+- Unicode ও special character হ্যান্ডল করুন
+
+## সংক্ষিপ্ত চেকলিস্ট
+- Lowercase, punctuation remove, stopwords remove
+- Tokenization: split, word_tokenize, subword
+- Embedding/Index-এ রূপান্তর
+
+## উপসংহার
+
+টেক্সট প্রি-প্রসেসিং ও টোকেনাইজেশন—NLP-তে সফল মডেল তৈরির প্রথম ধাপ। পরিষ্কার, সঠিক টোকেন দিলে মডেল ভালোভাবে শিখতে পারে।
+
+_পরবর্তী পাঠে: ওয়ার্ড এমবেডিংস—টোকেনকে ভেক্টরে রূপান্তর!_

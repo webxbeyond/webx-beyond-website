@@ -1,0 +1,121 @@
+---
+title: টেক্সট ক্লাসিফিকেশন প্রজেক্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি হাজার হাজার ইমেইল পাচ্ছেন—কিছু স্প্যাম, কিছু গুরুত্বপূর্ণ। কীভাবে কম্পিউটার বুঝবে কোনটা স্প্যাম, কোনটা নয়? এটাই টেক্সট ক্লাসিফিকেশনের কাজ।
+
+টেক্সট ক্লাসিফিকেশন NLP-র সবচেয়ে জনপ্রিয় টাস্ক। যেমন:
+- ইমেইল স্প্যাম ডিটেকশন
+- সেন্টিমেন্ট অ্যানালাইসিস (পজিটিভ/নেগেটিভ রিভিউ)
+- নিউজ ক্যাটাগরাইজেশন
+- টুইটারের hate speech ফিল্টার
+
+## বাস্তব জীবনের analogy: লাইব্রেরির বই সাজানো
+
+যেমন, লাইব্রেরিতে বইগুলো বিষয় অনুযায়ী সাজানো হয়—বিজ্ঞান, সাহিত্য, ইতিহাস। টেক্সট ক্লাসিফিকেশনও ঠিক তেমন—প্রতিটি টেক্সটকে সঠিক "লেবেল" দেয়।
+
+## ধাপে ধাপে টেক্সট ক্লাসিফিকেশন
+
+### ১. ডেটা সংগ্রহ ও প্রি-প্রসেসিং
+
+- ডেটাসেট: IMDB movie reviews, SMS spam dataset
+- টোকেনাইজেশন: শব্দগুলোকে আলাদা করা
+- স্টপওয়ার্ড রিমুভ, লোয়ারকেস, প্যাডিং
+
+```python
+import torch
+from torchtext.data.utils import get_tokenizer
+
+text = "This movie was fantastic!"
+tokenizer = get_tokenizer("basic_english")
+tokens = tokenizer(text)
+print(tokens)  # ['this', 'movie', 'was', 'fantastic', '!']
+```
+
+### ২. ওয়ার্ড এমবেডিংস
+
+- প্রতিটি শব্দকে ভেক্টর হিসেবে রূপান্তর
+- `nn.Embedding` বা প্রি-ট্রেইনড GloVe/Word2Vec
+
+### ৩. মডেল তৈরি (RNN/LSTM/GRU)
+
+- ইনপুট: এমবেডিং ভেক্টর
+- আউটপুট: ক্লাস লেবেল (স্প্যাম/নন-স্প্যাম, পজিটিভ/নেগেটিভ)
+
+```python
+import torch.nn as nn
+
+class TextClassifier(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, num_classes)
+    def forward(self, x):
+        x = self.embedding(x)
+        _, (h_n, _) = self.lstm(x)
+        out = self.fc(h_n[-1])
+        return out
+```
+
+### ৪. লস ফাংশন ও অপ্টিমাইজার
+
+- `nn.CrossEntropyLoss`
+- `torch.optim.Adam`
+
+### ৫. ট্রেনিং লুপ
+
+- ইনপুট: টোকেনাইজড ও এমবেডেড টেক্সট
+- আউটপুট: প্রেডিক্টেড লেবেল
+- লস কমানো, একুরেসি বাড়ানো
+
+```python
+model = TextClassifier(vocab_size=5000, embed_dim=100, hidden_dim=128, num_classes=2)
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(10):
+    for batch_x, batch_y in train_loader:
+        optimizer.zero_grad()
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss.backward()
+        optimizer.step()
+```
+
+### ৬. ইভ্যালুয়েশন
+
+- টেস্ট ডেটাসেটে একুরেসি, precision, recall
+- Confusion matrix
+
+### ৭. বাস্তব প্রয়োগ
+
+- ইমেইল ফিল্টার
+- রিভিউ অ্যানালাইসিস
+- কাস্টমার সার্ভিস চ্যাটবট
+
+## চ্যালেঞ্জ ও টিপস
+- Imbalanced dataset: oversampling/undersampling
+- OOV শব্দ: UNK টোকেন
+- Sequence length: প্যাডিং
+- Hyperparameter tuning
+
+## সংক্ষেপে
+টেক্সট ক্লাসিফিকেশন NLP-র gateway। PyTorch দিয়ে সহজেই ডেটা থেকে টোকেনাইজেশন, এমবেডিং, মডেলিং, ট্রেনিং, ও ইভ্যালুয়েশন করা যায়।
+
+---
+
+## অনুশীলন
+- IMDB movie review dataset দিয়ে স্প্যাম/নন-স্প্যাম ক্লাসিফায়ার বানান
+- নিজের SMS ডেটা নিয়ে ক্লাসিফিকেশন করুন
+- মডেলের একুরেসি বাড়াতে hyperparameter টিউন করুন
+
+---
+
+## আরও পড়ুন
+- [Text Classification with PyTorch](https://pytorch.org/tutorials/beginner/text_sentiment_ngrams_tutorial.html)
+- [TorchText Documentation](https://pytorch.org/text/stable/index.html)
+- [NLP Best Practices](https://developers.google.com/machine-learning/guides/text-classification)

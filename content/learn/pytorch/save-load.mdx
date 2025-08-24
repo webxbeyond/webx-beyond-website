@@ -1,0 +1,95 @@
+---
+title: PyTorch মডেল সেভ ও লোড
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একটি বড় বই লিখেছেন—এখন সেটি সংরক্ষণ করতে চান, যেন ভবিষ্যতে আবার পড়তে পারেন। PyTorch-এও মডেল ট্রেনিং শেষে সেটি "সেভ" করে রাখা যায়, এবং পরে "লোড" করে ব্যবহার করা যায়।
+
+## বাস্তব উদাহরণ: বই সংরক্ষণ ও পড়া
+
+- **Save:** বই লিখে লাইব্রেরিতে রেখে দিলেন
+- **Load:** লাইব্রেরি থেকে বই নিয়ে আবার পড়লেন
+
+## কেন মডেল সেভ ও লোড?
+- ট্রেনিং শেষ হলে মডেল সংরক্ষণ
+- প্রোডাকশনে ব্যবহার
+- পুনরায় ট্রেনিং/ফাইন-টিউন
+- শেয়ার/ডিপ্লয়মেন্ট
+
+## PyTorch-এ মডেল সেভ
+
+### ১. state_dict দিয়ে সেভ
+```python
+import torch
+
+# ধরুন, model হলো আপনার neural network
+torch.save(model.state_dict(), 'model.pth')
+```
+
+### ২. পুরো মডেল সেভ
+```python
+torch.save(model, 'full_model.pth')
+```
+
+## PyTorch-এ মডেল লোড
+
+### ১. state_dict দিয়ে লোড
+```python
+import torch
+from my_model import MyModel
+
+model = MyModel()
+model.load_state_dict(torch.load('model.pth'))
+model.eval()  # inference mode
+```
+
+### ২. পুরো মডেল লোড
+```python
+model = torch.load('full_model.pth')
+model.eval()
+```
+
+## state_dict vs full model
+- **state_dict:** শুধু ওজন, কোড থাকতে হবে
+- **full model:** সবকিছু, কিন্তু version mismatch হলে সমস্যা
+
+## টিপস ও চ্যালেঞ্জ
+- GPU/CPU-তে লোড করার সময় map_location ব্যবহার করুন
+```python
+model.load_state_dict(torch.load('model.pth', map_location='cpu'))
+```
+- eval() ব্যবহার করুন inference-এর আগে
+- version mismatch এড়াতে state_dict ব্যবহার বেশি নিরাপদ
+- checkpoint সেভ করুন (optimizer, epoch)
+```python
+torch.save({
+    'epoch': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'loss': loss,
+}, 'checkpoint.pth')
+```
+
+## বাস্তব প্রজেক্ট
+- ইমেজ ক্লাসিফিকেশন মডেল সেভ করে API-তে ব্যবহার
+- NLP মডেল ফাইন-টিউন করে সংরক্ষণ
+- GAN/Autoencoder মডেল শেয়ার
+
+## সংক্ষেপে
+PyTorch-এ মডেল সেভ ও লোড—AI প্রোডাকশনে নেওয়ার জন্য অপরিহার্য। state_dict, checkpoint, eval—সব ঠিকভাবে ব্যবহার করুন।
+
+---
+
+## অনুশীলন
+- নিজের মডেল সেভ ও লোড করুন
+- checkpoint সেভ ও restore করুন
+- GPU/CPU-তে লোড করার পার্থক্য দেখুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch Model Saving & Loading](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+- [Best Practices for Model Checkpointing](https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html)
+- [Deploying PyTorch Models](https://pytorch.org/tutorials/beginner/deploying_pytorch_models.html)

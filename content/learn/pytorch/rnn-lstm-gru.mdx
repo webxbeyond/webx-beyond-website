@@ -1,0 +1,108 @@
+---
+title: RNN, LSTM, GRU মডেলস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি গল্প পড়ছেন—প্রতিটি বাক্য আগের বাক্যের সাথে সম্পর্কিত। ঠিক তেমনই, অনেক ডেটা আছে যেখানে বর্তমান তথ্য আগের তথ্যের উপর নির্ভরশীল। যেমন:
+- ভাষা (একটি বাক্যের শব্দ)
+- সময়-ভিত্তিক ডেটা (স্টক মার্কেট, আবহাওয়া)
+- অডিও, ভিডিও
+
+এই ধরনের "সিকোয়েন্সিয়াল" ডেটার জন্য সাধারণ নিউরাল নেটওয়ার্ক যথেষ্ট নয়। এখানে আসে RNN, LSTM, GRU!
+
+## RNN (Recurrent Neural Network) কী?
+
+RNN এমন এক নিউরাল নেটওয়ার্ক, যা আগের ইনপুটের তথ্য মনে রাখে এবং বর্তমান ইনপুটের সাথে মিলিয়ে সিদ্ধান্ত নেয়।
+
+### বাস্তব উদাহরণ: গল্পের ধারাবাহিকতা
+
+যেমন, গল্প পড়ার সময় আপনি আগের বাক্য মনে রাখেন। RNN-ও ঠিক তেমন—আগের "হিডেন স্টেট" মনে রেখে নতুন ইনপুট প্রসেস করে।
+
+### RNN-এর সমস্যা: ভ্যানিশিং গ্রেডিয়েন্ট
+
+RNN দীর্ঘ সিকোয়েন্সে "ভুলে যায়"—দূরবর্তী তথ্য মনে রাখতে পারে না। একে বলে "vanishing gradient problem"।
+
+## LSTM (Long Short-Term Memory)
+
+LSTM হলো RNN-এর উন্নত সংস্করণ। এটি "সেল স্টেট" ও "গেট" ব্যবহার করে কোন তথ্য মনে রাখতে হবে, আর কোনটা ভুলে যেতে হবে, তা ঠিক করে।
+
+### বাস্তব উদাহরণ: স্মার্ট নোটবুক
+
+ধরা যাক, আপনি পড়ার সময় গুরুত্বপূর্ণ তথ্য নোট করেন, আর অপ্রয়োজনীয় তথ্য বাদ দেন। LSTM-ও ঠিক তেমন—"forget gate" দিয়ে অপ্রয়োজনীয় তথ্য বাদ দেয়, "input gate" দিয়ে নতুন তথ্য যোগ করে, "output gate" দিয়ে সিদ্ধান্ত দেয়।
+
+## GRU (Gated Recurrent Unit)
+
+GRU হলো LSTM-এর সহজ সংস্করণ। এতে দুটি গেট—"reset gate" ও "update gate"। কম কম্পিউটেশন, কিন্তু অনেক ক্ষেত্রে LSTM-এর মতোই কার্যকর।
+
+### বাস্তব উদাহরণ: স্মার্ট ফিল্টার
+
+যেমন, ইমেইল ফিল্টার—কিছু মেইল রেখে দেয়, কিছু মুছে ফেলে। GRU-ও ঠিক তেমন—reset gate পুরনো তথ্য মুছে দেয়, update gate নতুন তথ্য যোগ করে।
+
+## PyTorch-এ RNN, LSTM, GRU
+
+PyTorch-এ তিনটি লেয়ার আছে:
+- `nn.RNN`
+- `nn.LSTM`
+- `nn.GRU`
+
+### উদাহরণ: টেক্সট সিকোয়েন্স প্রসেসিং
+
+```python
+import torch
+import torch.nn as nn
+
+# ইনপুট: (sequence_length, batch_size, input_size)
+input = torch.randn(5, 3, 10)  # ৫ শব্দ, ৩ স্যাম্পল, ১০ ফিচার
+
+# RNN
+rnn = nn.RNN(input_size=10, hidden_size=20, num_layers=1)
+h0 = torch.zeros(1, 3, 20)  # initial hidden state
+output, hn = rnn(input, h0)
+
+# LSTM
+lstm = nn.LSTM(input_size=10, hidden_size=20, num_layers=1)
+h0 = torch.zeros(1, 3, 20)
+c0 = torch.zeros(1, 3, 20)
+lstm_output, (hn, cn) = lstm(input, (h0, c0))
+
+# GRU
+gru = nn.GRU(input_size=10, hidden_size=20, num_layers=1)
+h0 = torch.zeros(1, 3, 20)
+gru_output, hn = gru(input, h0)
+```
+
+## কখন কোনটা ব্যবহার করবেন?
+- **RNN:** ছোট সিকোয়েন্স, কমplexity কম
+- **LSTM:** দীর্ঘ সিকোয়েন্স, context গুরুত্বপূর্ণ
+- **GRU:** দ্রুত ট্রেনিং, কম রিসোর্স
+
+## বাস্তব জীবনের প্রজেক্ট
+- টেক্সট জেনারেশন (গল্প লেখা)
+- ভাষা অনুবাদ
+- স্পিচ টু টেক্সট
+- আবহাওয়া পূর্বাভাস
+
+## চ্যালেঞ্জ ও সীমাবদ্ধতা
+- দীর্ঘ সিকোয়েন্সে তথ্য "ভুলে যাওয়া"
+- ট্রেনিং সময় বেশি
+- Parallelization কঠিন
+
+## সংক্ষেপে
+RNN, LSTM, GRU—তিনটি শক্তিশালী টুল ধারাবাহিক ডেটা প্রসেসিংয়ের জন্য। PyTorch-এ সহজেই ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## অনুশীলন
+- একটি ছোট গল্পের প্রতিটি শব্দকে RNN দিয়ে প্রসেস করুন
+- LSTM দিয়ে টেক্সট জেনারেশন শুরু করুন
+- GRU দিয়ে আবহাওয়া ডেটা প্রেডিক্ট করুন
+
+---
+
+## আরও পড়ুন
+- [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+- [PyTorch RNN Docs](https://pytorch.org/docs/stable/generated/torch.nn.RNN.html)
+- [PyTorch LSTM Docs](https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html)
+- [PyTorch GRU Docs](https://pytorch.org/docs/stable/generated/torch.nn.GRU.html)

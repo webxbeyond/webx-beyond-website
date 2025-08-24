@@ -1,0 +1,109 @@
+---
+title: ONNX এক্সপোর্ট ও ইন্টারঅপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ONNX এক্সপোর্ট ও ইন্টারঅপ
+
+PyTorch দিয়ে তৈরি মডেলকে প্রোডাকশনে নেওয়ার সময় অনেক সময় আমাদের দরকার হয় মডেলকে অন্য ফ্রেমওয়ার্ক বা প্ল্যাটফর্মে ব্যবহার করার। যেমন, আপনি PyTorch-এ ট্রেইন করেছেন, কিন্তু ডিপ্লয় করতে চান TensorFlow, Caffe2, বা কোনো ক্লাউড সার্ভিসে। এই সমস্যার সমাধান দেয় ONNX (Open Neural Network Exchange)।
+
+## ONNX কী?
+ONNX হচ্ছে একটি ওপেন ফরম্যাট, যা ডিপ লার্নিং মডেলকে এক ফ্রেমওয়ার্ক থেকে অন্য ফ্রেমওয়ার্কে ট্রান্সফার করার জন্য তৈরি হয়েছে। একে ভাবুন "ইউনিভার্সাল ভাষা"—যেমন PDF ফাইল যেকোনো ডিভাইসে খোলা যায়, ONNX ফরম্যাটে সেভ করা মডেল যেকোনো ONNX-কম্প্যাটিবল প্ল্যাটফর্মে রান করানো যায়।
+
+## কেন ONNX দরকার?
+- **ইন্টারঅপের সুবিধা:** PyTorch, TensorFlow, Caffe2, MXNet, CoreML—সব ফ্রেমওয়ার্কে ONNX সাপোর্ট আছে।
+- **ডিপ্লয়মেন্ট সহজ:** ক্লাউড, মোবাইল, এজ ডিভাইসে সহজে ডিপ্লয় করা যায়।
+- **হার্ডওয়্যার অপ্টিমাইজেশন:** ONNX-র জন্য অনেক অপ্টিমাইজড রানটাইম (ONNX Runtime, TensorRT) আছে, যা GPU/CPU-তে দ্রুত inference দেয়।
+
+## PyTorch থেকে ONNX এক্সপোর্ট
+
+ধরা যাক, আপনি একটি PyTorch মডেল ট্রেইন করেছেন। এখন সেটিকে ONNX ফরম্যাটে এক্সপোর্ট করতে চান।
+
+### ধাপে ধাপে:
+
+1. **মডেল প্রস্তুত করুন:**
+   ```python
+   import torch
+   import torch.nn as nn
+
+   class SimpleModel(nn.Module):
+       def __init__(self):
+           super().__init__()
+           self.fc = nn.Linear(10, 2)
+       def forward(self, x):
+           return self.fc(x)
+
+   model = SimpleModel()
+   model.eval()  # Inference mode
+   ```
+
+2. **ডামি ইনপুট তৈরি করুন:**
+   ONNX এক্সপোর্টের সময় ইনপুট শেইপ জানা দরকার।
+   ```python
+   dummy_input = torch.randn(1, 10)
+   ```
+
+3. **ONNX-এ এক্সপোর্ট করুন:**
+   ```python
+   torch.onnx.export(
+       model,                # PyTorch model
+       dummy_input,          # Example input
+       "simple_model.onnx", # Output filename
+       input_names=['input'],
+       output_names=['output'],
+       opset_version=11      # ONNX opset version
+   )
+   ```
+
+এভাবে আপনার PyTorch মডেলটি `simple_model.onnx` নামে সেভ হবে।
+
+### কোড ব্যাখ্যা:
+- `model.eval()` — মডেলকে inference মোডে আনছে।
+- `dummy_input` — ইনপুটের শেইপ ও টাইপ দেখাতে ব্যবহার হয়।
+- `torch.onnx.export()` — আসল এক্সপোর্ট ফাংশন।
+
+## ONNX মডেল কোথায় ব্যবহার করবেন?
+
+- **ONNX Runtime:** Microsoft-এর তৈরি, খুব দ্রুত inference দেয়।
+- **TensorRT:** NVIDIA-এর GPU-তে অপ্টিমাইজড inference।
+- **OpenVINO:** Intel-এর CPU/FPGA-তে দ্রুত inference।
+- **ক্লাউড সার্ভিস:** Azure, AWS, Google Cloud—সব জায়গায় ONNX সাপোর্ট আছে।
+
+### উদাহরণ: ONNX Runtime দিয়ে inference
+
+```python
+import onnxruntime as ort
+
+session = ort.InferenceSession("simple_model.onnx")
+input_data = {"input": dummy_input.numpy()}
+output = session.run(["output"], input_data)
+print(output)
+```
+
+## বাস্তব জীবনের উদাহরণ
+
+ধরা যাক, আপনি একটি PyTorch মডেল ট্রেইন করেছেন, কিন্তু আপনার কোম্পানির প্রোডাকশন সার্ভার TensorFlow Lite বা C++-এ চলে। ONNX-এ এক্সপোর্ট করে সহজেই সেই মডেল অন্য প্ল্যাটফর্মে ব্যবহার করতে পারবেন।
+
+আরেকটি উদাহরণ—মোবাইল অ্যাপে AI ফিচার যোগ করতে চান, কিন্তু PyTorch সরাসরি সাপোর্ট করে না। ONNX-এ এক্সপোর্ট করে CoreML বা TensorFlow Lite-এ কনভার্ট করে মোবাইল অ্যাপে ব্যবহার করতে পারবেন।
+
+## কিছু সাধারণ সমস্যা ও সমাধান
+
+- **Unsupported Ops:** সব PyTorch অপারেশন ONNX-এ সাপোর্ট করে না।
+  - সমাধান: `opset_version` বাড়িয়ে দেখুন, অথবা কাস্টম অপারেশন লিখুন।
+- **Dynamic Input Shape:** ONNX-এ ডাইনামিক শেইপ সাপোর্ট আছে, কিন্তু এক্সপোর্টের সময় স্পেশাল ফ্ল্যাগ দিতে হয়।
+- **Version mismatch:** PyTorch ও ONNX-এর ভার্সন mismatch হলে error আসতে পারে।
+
+## Analogies: ONNX as "Universal Adapter"
+
+ONNX-কে ভাবুন "ইউনিভার্সাল অ্যাডাপ্টার"—যেমন এক দেশ থেকে অন্য দেশে গেলে প্লাগ-এডাপ্টার লাগে, তেমনি মডেলকে এক ফ্রেমওয়ার্ক থেকে অন্য ফ্রেমওয়ার্কে নিতে ONNX লাগে।
+
+## সংক্ষেপে
+- ONNX হচ্ছে ডিপ লার্নিং মডেলের "ইউনিভার্সাল ফরম্যাট"
+- PyTorch থেকে সহজেই ONNX-এ এক্সপোর্ট করা যায়
+- ONNX মডেল বিভিন্ন প্ল্যাটফর্মে, হার্ডওয়্যারে, ও ফ্রেমওয়ার্কে ব্যবহার করা যায়
+- প্রোডাকশন, মোবাইল, ক্লাউড—সব জায়গায় ONNX ইন্টারঅপের সুবিধা দেয়
+
+## আরও জানুন
+- [ONNX Documentation](https://onnx.ai/)
+- [ONNX Runtime](https://onnxruntime.ai/)
+- [PyTorch ONNX Export Guide](https://pytorch.org/docs/stable/onnx.html)

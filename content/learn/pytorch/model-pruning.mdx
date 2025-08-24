@@ -1,0 +1,115 @@
+---
+title: মডেল কমপ্রেশন ও প্রুনিং
+slug: model-pruning
+---
+
+## PyTorch-এ স্মার্ট, দ্রুত, ছোট মডেল
+
+বড় নিউরাল নেটওয়ার্ক অনেক সময় খুব বেশি মেমোরি, কম্পিউটেশন, ও স্টোরেজ নেয়। মোবাইল, এজ, বা রিয়েল-টাইম অ্যাপে ছোট, দ্রুত মডেল দরকার। Model Compression ও Pruning হচ্ছে সেই "ডায়েট প্ল্যান"—মডেলকে ছোট, lean, ও efficient করা।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি একটি বড় বই পড়ছেন—সব তথ্য দরকার নেই, শুধু গুরুত্বপূর্ণ অংশ রাখেন। মডেল কমপ্রেশন/প্রুনিং মানে—"বইয়ের সারাংশ রাখা"।
+
+## Model Compression কী?
+- **Pruning:** কম গুরুত্বপূর্ণ ওয়েট/নোড বাদ দেওয়া
+- **Quantization:** ওয়েট/অ্যাক্টিভেশন কম বিটে রূপান্তর
+- **Knowledge Distillation:** বড় মডেল থেকে ছোট মডেল শেখানো
+- **Weight Sharing:** একই ওয়েট একাধিক স্থানে ব্যবহার
+
+## Pruning: PyTorch-এ Implementation
+
+PyTorch-এ `torch.nn.utils.prune` মডিউল দিয়ে সহজেই Pruning করা যায়।
+
+### উদাহরণ: Simple Pruning
+```python
+import torch
+import torch.nn as nn
+import torch.nn.utils.prune as prune
+
+model = nn.Sequential(
+    nn.Linear(10, 20),
+    nn.ReLU(),
+    nn.Linear(20, 2)
+)
+
+# প্রথম লেয়ারে ৫০% ওয়েট prune করুন
+prune.l1_unstructured(model[0], name='weight', amount=0.5)
+print(model[0].weight)
+```
+
+### কোড ব্যাখ্যা
+- `prune.l1_unstructured`: L1 norm অনুযায়ী ওয়েট prune
+- `amount`: কত শতাংশ ওয়েট বাদ যাবে
+
+## Quantization: মডেলকে কম বিটে রূপান্তর
+
+PyTorch-এ quantization দিয়ে মডেলকে int8/fp16-এ রূপান্তর করা যায়।
+
+### উদাহরণ: Dynamic Quantization
+```python
+import torch
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(10, 20),
+    nn.ReLU(),
+    nn.Linear(20, 2)
+)
+
+quantized_model = torch.quantization.quantize_dynamic(
+    model, {nn.Linear}, dtype=torch.qint8
+)
+print(quantized_model)
+```
+
+### কোড ব্যাখ্যা
+- `quantize_dynamic`: রানটাইমে quantization
+- `dtype`: কোন টাইপে রূপান্তর (qint8, fp16)
+
+## Knowledge Distillation: বড় Teacher থেকে ছোট Student
+
+বড় মডেল (Teacher) থেকে ছোট মডেল (Student) কে "soft target" দিয়ে শেখানো হয়।
+
+### উদাহরণ: Distillation Loss
+```python
+import torch.nn.functional as F
+
+def distillation_loss(student_logits, teacher_logits, target, T=2.0, alpha=0.7):
+    soft_loss = F.kl_div(
+        F.log_softmax(student_logits/T, dim=1),
+        F.softmax(teacher_logits/T, dim=1),
+        reduction='batchmean'
+    ) * (T * T)
+    hard_loss = F.cross_entropy(student_logits, target)
+    return alpha * soft_loss + (1 - alpha) * hard_loss
+```
+
+### কোড ব্যাখ্যা
+- `soft_loss`: Teacher-এর soft target
+- `hard_loss`: আসল label
+- `alpha`: দুই loss-এর ওজন
+
+## বাস্তব জীবনের ব্যবহার
+- **মোবাইল/এজ:** ছোট, দ্রুত মডেল
+- **ক্লাউড:** কম স্টোরেজ, কম latency
+- **AI Product:** Efficient deployment
+
+## টিপস ও চ্যালেঞ্জ
+- Accuracy drop: Pruning/quantization বেশি হলে পারফরম্যান্স কমে যেতে পারে
+- Fine-tuning: Pruning/quantization-এর পর আবার ট্রেনিং দিন
+- Hardware compatibility: Quantized model সব ডিভাইসে চলে না
+
+## Analogies: "বইয়ের সারাংশ, ডায়েট প্ল্যান"
+
+Model Compression/Pruning মানে—"বইয়ের সারাংশ রাখা, ডায়েট প্ল্যান"—মডেল lean, efficient, ও deployable করা।
+
+## সংক্ষেপে
+- Pruning, Quantization, Distillation—মডেল ছোট ও efficient করার টেকনিক
+- PyTorch-এ সহজেই implement করা যায়
+- Accuracy ও efficiency ব্যালেন্স করুন
+
+## আরও জানুন
+- [PyTorch Model Pruning Guide](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
+- [PyTorch Quantization Documentation](https://pytorch.org/docs/stable/quantization.html)
+- [Knowledge Distillation Paper](https://arxiv.org/abs/1503.02531)
