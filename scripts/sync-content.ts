@@ -1,5 +1,7 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 import { algoliasearch } from 'algoliasearch';
-import { sync, DocumentRecord } from 'fumadocs-core/search/algolia';
+import { sync } from 'fumadocs-core/search/algolia';
 import * as fs from 'node:fs';
 
 // the path of pre-rendered `static.json`, choose one according to your React framework
@@ -11,12 +13,22 @@ const filePath = {
 
 const content = fs.readFileSync(filePath);
 
-const records = JSON.parse(content.toString()) as DocumentRecord[];
+const records = JSON.parse(content.toString());
 
-const client = algoliasearch('id', 'key');
+const appId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
+
+const apiKey = process.env.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY;
+const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME;
+console.log('ALGOLIA ENV:', { appId, apiKey, indexName });
+if (!appId || !apiKey || !indexName) {
+  throw new Error('Algolia environment variables are missing. Check your .env.local file.');
+}
+const client = algoliasearch(appId, apiKey);
 
 // update the index settings and sync search indexes
 void sync(client, {
-  indexName: 'document',
+  indexName,
   documents: records,
 });
+
+// Run this script to sync node scripts/sync-content.ts

@@ -4,7 +4,7 @@ import {
   SearchDialog,
   SearchDialogClose,
   SearchDialogContent,
-  // SearchDialogFooter,
+  SearchDialogFooter,
   SearchDialogHeader,
   SearchDialogIcon,
   SearchDialogInput,
@@ -15,8 +15,9 @@ import {
 import { useDocsSearch } from 'fumadocs-core/search/client';
 import { useI18n } from 'fumadocs-ui/contexts/i18n';
 
-const appId = '0JWC89VYWG';
-const apiKey = '45ce316c2d5a2d2b975376253d9a4d7d';
+const appId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!;
+const apiKey = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!;
+const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME!;
 const client = liteClient(appId, apiKey);
 
 export default function CustomSearchDialog(props: SharedProps) {
@@ -24,7 +25,7 @@ export default function CustomSearchDialog(props: SharedProps) {
   const { search, setSearch, query } = useDocsSearch({
     type: 'algolia',
     client,
-    indexName: 'document',
+    indexName,
     locale,
   });
 
@@ -42,16 +43,18 @@ export default function CustomSearchDialog(props: SharedProps) {
           <SearchDialogInput />
           <SearchDialogClose />
         </SearchDialogHeader>
-        <SearchDialogList items={query.data !== 'empty' ? query.data : null} />
-        {/* <SearchDialogFooter>
+        <SearchDialogList
+          items={query.data !== 'empty' ? query.data : null}
+        />
+        <SearchDialogFooter>
           <a
             href="https://algolia.com"
             rel="noreferrer noopener"
             className="ms-auto text-xs text-fd-muted-foreground"
           >
-            Search powered by Algolia
+            Algolia দ্বারা চালিত অনুসন্ধান
           </a>
-        </SearchDialogFooter> */}
+        </SearchDialogFooter>
       </SearchDialogContent>
     </SearchDialog>
   );

@@ -12,6 +12,7 @@
     "@iconify/react": "^6.0.0",
     "algoliasearch": "^5.35.0",
     "class-variance-authority": "^0.7.1",
+    "dotenv": "^17.2.1",
     "framer-motion": "^12.23.12",
     "fumadocs-core": "15.7.0",
     "fumadocs-docgen": "^2.1.0",
