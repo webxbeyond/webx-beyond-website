@@ -1,0 +1,89 @@
+---
+title: BERT, GPT মডেল পরিচিতি
+description: PyTorch ও NLP-তে BERT ও GPT মডেলের ধারণা, বাস্তব উদাহরণ, ও ব্যবহার
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একটি গল্প পড়ছেন—কখনো পুরো গল্পের অর্থ বোঝার চেষ্টা করছেন (BERT), কখনো গল্পের পরবর্তী লাইন লিখছেন (GPT)। BERT ও GPT—দুইটি transformer-ভিত্তিক মডেল, NLP-তে বিপ্লব এনেছে।
+
+## বাস্তব উদাহরণ: শিক্ষক ও গল্পকার
+
+- **BERT:** শিক্ষক, যিনি পুরো বাক্য পড়ে, প্রতিটি শব্দের অর্থ বোঝেন।
+- **GPT:** গল্পকার, যিনি আগের লাইন দেখে পরবর্তী লাইন লেখেন।
+
+## BERT (Bidirectional Encoder Representations from Transformers)
+
+- **Bidirectional:** ইনপুটের দুই পাশ থেকেই context বোঝে
+- **Pre-training:** "Masked Language Model"—কিছু শব্দ লুকিয়ে রেখে বাকিগুলো দেখে অনুমান করে
+- **Fine-tuning:** বিভিন্ন NLP টাস্কে ব্যবহার (ক্লাসিফিকেশন, প্রশ্নোত্তর, সামারাইজেশন)
+
+### PyTorch-এ BERT
+
+HuggingFace Transformers লাইব্রেরি দিয়ে সহজেই BERT ব্যবহার করা যায়:
+```python
+from transformers import BertTokenizer, BertModel
+
+# টোকেনাইজার ও মডেল লোড
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertModel.from_pretrained('bert-base-uncased')
+
+text = "PyTorch is awesome!"
+inputs = tokenizer(text, return_tensors='pt')
+outputs = model(**inputs)
+```
+
+## GPT (Generative Pre-trained Transformer)
+
+- **Unidirectional:** শুধু আগের context দেখে পরবর্তী শব্দ অনুমান
+- **Text Generation:** গল্প লেখা, চ্যাটবট, কোড লেখা
+- **Pre-training:** অনেক টেক্সট পড়ে শেখে
+- **Fine-tuning:** নির্দিষ্ট টাস্কে ব্যবহার
+
+### PyTorch-এ GPT
+
+```python
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
+
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+text = "Once upon a time"
+inputs = tokenizer(text, return_tensors='pt')
+outputs = model.generate(inputs['input_ids'], max_length=50)
+generated = tokenizer.decode(outputs[0])
+print(generated)
+```
+
+## BERT vs GPT
+| বৈশিষ্ট্য | BERT | GPT |
+|-----------|------|-----|
+| Context   | Bidirectional | Unidirectional |
+| Task      | Understanding | Generation |
+| Usage     | Classification, QA | Text Generation |
+
+## কোথায় ব্যবহার হয়?
+- **BERT:** সার্চ ইঞ্জিন, প্রশ্নোত্তর, টেক্সট ক্লাসিফিকেশন
+- **GPT:** গল্প লেখা, চ্যাটবট, কোড জেনারেশন
+
+## চ্যালেঞ্জ
+- Computational cost বেশি
+- Memory usage বেশি
+- Bias ও নিরাপত্তা
+
+## সংক্ষেপে
+BERT ও GPT—NLP-র আধুনিক যুগের দুইটি pillar। PyTorch ও HuggingFace দিয়ে সহজেই ব্যবহার করা যায়।
+
+---
+
+## অনুশীলন
+- BERT দিয়ে টেক্সট ক্লাসিফিকেশন করুন
+- GPT দিয়ে গল্প জেনারেট করুন
+- BERT ও GPT-এর আউটপুট তুলনা করুন
+
+---
+
+## আরও পড়ুন
+- [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
+- [GPT-2: Language Models are Unsupervised Multitask Learners](https://openai.com/research/gpt-2)
+- [HuggingFace Transformers Docs](https://huggingface.co/docs/transformers/index)

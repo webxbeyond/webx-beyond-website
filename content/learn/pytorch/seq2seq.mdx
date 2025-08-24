@@ -1,0 +1,100 @@
+---
+title: সিকোয়েন্স টু সিকোয়েন্স (Seq2Seq) মডেল
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# সিকোয়েন্স টু সিকোয়েন্স (Seq2Seq) মডেল: ভাষা অনুবাদ থেকে চ্যাটবট
+
+## ভূমিকা
+
+ধরা যাক, আপনি বাংলা থেকে ইংরেজি অনুবাদ করছেন—"আমি স্কুলে যাই" → "I go to school"। এখানে ইনপুট ও আউটপুট দুইটাই "সিকোয়েন্স"। এই ধরনের টাস্কের জন্যই Seq2Seq মডেল!
+
+## বাস্তব উদাহরণ: ডাকপিয়নের চিঠি
+
+যেমন, একজন ডাকপিয়ন চিঠি নিয়ে যায়, আর অন্যজন সেই চিঠি পড়ে উত্তর দেয়। Seq2Seq-এ "encoder" ইনপুট পড়ে, "decoder" আউটপুট তৈরি করে।
+
+## Seq2Seq মডেলের গঠন
+
+- **Encoder:** ইনপুট সিকোয়েন্সকে ভেক্টরে রূপান্তর করে
+- **Decoder:** সেই ভেক্টর থেকে আউটপুট সিকোয়েন্স তৈরি করে
+
+### Encoder-Decoder analogy
+
+Encoder হলো শিক্ষক, যিনি ছাত্রের প্রশ্ন বুঝে নোট করেন। Decoder হলো ছাত্র, যিনি সেই নোট দেখে উত্তর লেখেন।
+
+## কোথায় ব্যবহার হয়?
+- ভাষা অনুবাদ (Machine Translation)
+- চ্যাটবট
+- টেক্সট সামারাইজেশন
+- স্পিচ টু টেক্সট
+
+## PyTorch-এ Seq2Seq ইমপ্লিমেন্টেশন
+
+### Encoder
+```python
+import torch
+import torch.nn as nn
+
+class Encoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True)
+    def forward(self, x):
+        x = self.embedding(x)
+        outputs, (h, c) = self.lstm(x)
+        return h, c
+```
+
+### Decoder
+```python
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, vocab_size)
+    def forward(self, x, h, c):
+        x = self.embedding(x)
+        outputs, (h, c) = self.lstm(x, (h, c))
+        out = self.fc(outputs)
+        return out, h, c
+```
+
+### Seq2Seq
+```python
+class Seq2Seq(nn.Module):
+    def __init__(self, encoder, decoder):
+        super().__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+    def forward(self, src, tgt):
+        h, c = self.encoder(src)
+        output, _, _ = self.decoder(tgt, h, c)
+        return output
+```
+
+## ট্রেনিং ও ইনফারেন্স
+- Teacher Forcing: ট্রেনিংয়ে decoder-এ আসল আউটপুট দেয়া হয়
+- Inference: decoder নিজের আউটপুট ব্যবহার করে
+
+## চ্যালেঞ্জ ও সীমাবদ্ধতা
+- Long sequence: তথ্য হারিয়ে যেতে পারে
+- Attention না থাকলে distant dependency ধরা কঠিন
+
+## সংক্ষেপে
+Seq2Seq মডেল ভাষা অনুবাদ, চ্যাটবট, সামারাইজেশনসহ অনেক NLP টাস্কে ব্যবহৃত হয়। Encoder-Decoder আর্কিটেকচার PyTorch-এ সহজেই ইমপ্লিমেন্ট করা যায়।
+
+---
+
+## অনুশীলন
+- বাংলা থেকে ইংরেজি অনুবাদ মডেল তৈরি করুন
+- চ্যাটবটের জন্য Seq2Seq ব্যবহার করুন
+- Teacher Forcing ও Inference-এর পার্থক্য দেখুন
+
+---
+
+## আরও পড়ুন
+- [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215)
+- [PyTorch Seq2Seq Tutorial](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html)
+- [Understanding Encoder-Decoder Models](https://machinelearningmastery.com/encoder-decoder-sequence-to-sequence-predictive-models/)

@@ -1,0 +1,118 @@
+---
+title: DCGAN দিয়ে ইমেজ জেনারেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, একজন শিল্পী কাগজে নতুন ছবি আঁকছেন—কিন্তু এবার শিল্পী একজন কম্পিউটার! DCGAN (Deep Convolutional GAN) দিয়ে কম্পিউটারকে শেখানো হয়, যেন সে নতুন, বাস্তবসম্মত ছবি তৈরি করতে পারে।
+
+## বাস্তব উদাহরণ: শিল্পী ও বিচারক
+
+- **Generator:** শিল্পী, যিনি noise থেকে ছবি আঁকেন
+- **Discriminator:** বিচারক, যিনি বলেন ছবিটা আসল নাকি নকল
+
+## DCGAN কী?
+
+DCGAN হলো GAN-এর একটি বিশেষ সংস্করণ, যেখানে Generator ও Discriminator-এ Convolutional Neural Network (CNN) ব্যবহার করা হয়।
+
+### DCGAN-এর আর্কিটেকচার
+- **Generator:** Noise vector থেকে convolutional layers দিয়ে ছবি তৈরি
+- **Discriminator:** ছবিকে convolutional layers দিয়ে যাচাই—আসল নাকি নকল
+
+## DCGAN Generator
+```python
+import torch
+import torch.nn as nn
+
+class DCGANGenerator(nn.Module):
+    def __init__(self, nz=100, ngf=64, nc=1):
+        super().__init__()
+        self.main = nn.Sequential(
+            nn.ConvTranspose2d(nz, ngf*8, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(ngf*8),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf*8, ngf*4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf*4),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf*4, ngf*2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf*2),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf*2, ngf, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
+            nn.Tanh()
+        )
+    def forward(self, input):
+        return self.main(input)
+```
+
+## DCGAN Discriminator
+```python
+class DCGANDiscriminator(nn.Module):
+    def __init__(self, nc=1, ndf=64):
+        super().__init__()
+        self.main = nn.Sequential(
+            nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf, ndf*2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf*2),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf*2, ndf*4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf*4),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf*4, ndf*8, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf*8),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(ndf*8, 1, 4, 1, 0, bias=False),
+            nn.Sigmoid()
+        )
+    def forward(self, input):
+        return self.main(input)
+```
+
+## DCGAN ট্রেইনিং
+- Generator: noise থেকে ছবি আঁকে
+- Discriminator: আসল/নকল ছবি যাচাই
+- Loss: Binary Cross Entropy
+
+### PyTorch-এ DCGAN ট্রেইনিং
+```python
+# Noise vector
+z = torch.randn(batch_size, 100, 1, 1)
+# Fake image
+fake_img = G(z)
+# Discriminator output
+output = D(fake_img)
+# Loss
+loss = criterion(output, real_labels)
+```
+
+## বাস্তব প্রজেক্ট
+- ফেক ফেস/আনুষঙ্গিক ছবি তৈরি
+- আর্টিফিশিয়াল ডেটা অগমেন্টেশন
+- ফ্যাশন ডিজাইন, গেম গ্রাফিক্স
+
+## চ্যালেঞ্জ ও টিপস
+- Mode collapse: Generator একই ছবি বারবার আঁকে
+- Training instability: Loss oscillate করে
+- BatchNorm ও LeakyReLU ব্যবহার করুন
+- Hyperparameter tuning: lr, batch size, architecture
+
+## সংক্ষেপে
+DCGAN—PyTorch-এ ইমেজ জেনারেশনের জন্য শক্তিশালী টুল। Generator ও Discriminator-এর টিমওয়ার্কে noise থেকে বাস্তবসম্মত ছবি তৈরি হয়।
+
+---
+
+## অনুশীলন
+- DCGAN দিয়ে নিজের dataset-এ ছবি জেনারেট করুন
+- Generator ও Discriminator-এর পারফরম্যান্স তুলনা করুন
+- Mode collapse ও instability handle করার টেকনিক ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [DCGAN Paper](https://arxiv.org/abs/1511.06434)
+- [PyTorch DCGAN Tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
+- [Best Practices for GAN Training](https://machinelearningmastery.com/how-to-train-stable-generative-adversarial-networks/)

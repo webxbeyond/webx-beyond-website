@@ -1,0 +1,88 @@
+---
+title: বেসিক নিউরাল নেটওয়ার্ক বানানো (MLP)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## MLP (Multilayer Perceptron) কী?
+
+MLP হচ্ছে নিউরাল নেটওয়ার্কের সবচেয়ে সহজ ও বেসিক ফর্ম—যেখানে একাধিক লেয়ার থাকে, প্রতিটি লেয়ার ইনপুট থেকে আউটপুটে তথ্য পাঠায়।
+
+_অ্যানালজি:_ MLP-কে ভাবুন—একটি ফ্যাক্টরি, যেখানে কাঁচামাল (ইনপুট) একাধিক মেশিন (লেয়ার) দিয়ে প্রসেস হয়ে চূড়ান্ত পণ্য (আউটপুট) হয়।
+
+## MLP-এর গঠন
+- ইনপুট লেয়ার: ডেটা প্রবেশ করে
+- হিডেন লেয়ার: তথ্য প্রসেস হয়
+- আউটপুট লেয়ার: চূড়ান্ত ফলাফল
+
+## PyTorch-এ MLP বানানো
+
+### ১. nn.Module থেকে ক্লাস তৈরি
+### ২. `__init__`-এ লেয়ার ডিফাইন
+### ৩. `forward`-এ ডেটা প্রসেস
+
+```python
+import torch
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(4, 8)   # ইনপুট ৪, হিডেন ৮
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(8, 3)   # হিডেন ৮, আউটপুট ৩
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+model = MLP()
+print(model)
+```
+
+## ডেটা তৈরি ও ট্রেনিং
+
+ধরা যাক, আমাদের কাছে ফুলের ডেটাসেট আছে—প্রতিটি ফুলের বৈশিষ্ট্য (৪টি ফিচার) ও ক্যাটাগরি (৩টি ক্লাস)।
+
+```python
+import torch
+X = torch.rand(10, 4)      # ১০টি ফুল, ৪টি ফিচার
+y = torch.randint(0, 3, (10,))  # ৩টি ক্যাটাগরি
+```
+
+## ট্রেনিং লুপ
+
+```python
+import torch.optim as optim
+loss_fn = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+for epoch in range(100):
+    optimizer.zero_grad()
+    output = model(X)
+    loss = loss_fn(output, y)
+    loss.backward()
+    optimizer.step()
+    if epoch % 10 == 0:
+        print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+```
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি একটি ফুল ক্লাসিফিকেশন অ্যাপ বানাচ্ছেন—ইউজার ফুলের বৈশিষ্ট্য ইনপুট দিলে, MLP মডেল ক্যাটাগরি প্রেডিক্ট করবে।
+
+## MLP-এর সীমাবদ্ধতা
+- শুধুমাত্র ট্যাবুলার/ফিচার ডেটার জন্য ভালো
+- ইমেজ, টেক্সট, সিকোয়েন্স ডেটার জন্য CNN/RNN দরকার
+
+## সংক্ষিপ্ত চেকলিস্ট
+- nn.Module থেকে MLP ক্লাস তৈরি
+- ইনপুট, হিডেন, আউটপুট লেয়ার ডিফাইন
+- ট্রেনিং লুপে loss.backward(), optimizer.step()
+- CrossEntropyLoss ব্যবহার করুন (Classification)
+
+## উপসংহার
+
+MLP PyTorch-এ নিউরাল নেটওয়ার্ক শেখার প্রথম ধাপ—এটি ভালোভাবে বুঝলে, আরও জটিল মডেল সহজে বানাতে পারবেন।
+
+_পরবর্তী পাঠে: ক্লাসিফিকেশন টাস্কে ট্রেইনিং ও ইভ্যালুয়েশন—মডেল কিভাবে পারফর্ম করে!_

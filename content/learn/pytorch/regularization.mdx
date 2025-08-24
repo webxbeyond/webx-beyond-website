@@ -1,0 +1,82 @@
+---
+title: রেগুলারাইজেশন - Dropout, BatchNorm
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি পরীক্ষার সময় শুধু মুখস্থ করে যাচ্ছেন—কিন্তু বাস্তব জীবনে প্রশ্ন একটু ঘুরিয়ে এলে ভুল করেন। মডেলও ঠিক এমন—"overfitting" হলে ট্রেনিং ডেটা ভালোভাবে শেখে, কিন্তু নতুন ডেটায় ভুল করে। এই সমস্যা সমাধানে রেগুলারাইজেশন!
+
+## বাস্তব উদাহরণ: পরীক্ষার প্রস্তুতি
+
+- **Dropout:** পরীক্ষার সময় কিছু প্রশ্ন বাদ দিয়ে পড়া—সবকিছু মুখস্থ না করে, randomly কিছু অংশ বাদ দেয়া
+- **BatchNorm:** পড়ার সময় প্রতিটি বিষয়ের গুরুত্ব সমান রাখা—কোনো বিষয় বেশি, কোনোটা কম না
+
+## Overfitting কী?
+
+মডেল ট্রেনিং ডেটা খুব ভালোভাবে শেখে, কিন্তু নতুন ডেটায় পারফর্ম করে না।
+
+## Dropout কী?
+
+Dropout হলো এমন এক টেকনিক, যেখানে ট্রেনিং-এর সময় randomly কিছু neuron "off" করে দেয়া হয়। এতে মডেল robust হয়, overfitting কমে।
+
+### PyTorch-এ Dropout
+```python
+import torch.nn as nn
+
+layer = nn.Linear(128, 64)
+dropout = nn.Dropout(p=0.5)  # ৫০% neuron off
+
+x = torch.randn(32, 128)
+x = layer(x)
+x = dropout(x)
+```
+
+## Batch Normalization (BatchNorm) কী?
+
+BatchNorm ইনপুট ফিচারগুলোকে normalize করে—mean 0, variance 1। এতে ট্রেনিং দ্রুত হয়, মডেল স্থিতিশীল থাকে।
+
+### PyTorch-এ BatchNorm
+```python
+import torch.nn as nn
+
+layer = nn.Linear(128, 64)
+batchnorm = nn.BatchNorm1d(64)
+
+x = torch.randn(32, 128)
+x = layer(x)
+x = batchnorm(x)
+```
+
+## কখন কোনটা ব্যবহার করবেন?
+- **Dropout:** overfitting বেশি হলে
+- **BatchNorm:** deep network, fast training
+- একসাথে ব্যবহার করা যায়
+
+## বাস্তব প্রজেক্ট
+- ইমেজ ক্লাসিফিকেশন (CNN)
+- NLP টেক্সট ক্লাসিফিকেশন
+- GAN, Autoencoder
+
+## চ্যালেঞ্জ ও টিপস
+- Dropout শুধু ট্রেনিং-এ, eval-এ নয়
+- BatchNorm ইনপুট shape ঠিক রাখতে হবে
+- Dropout rate tune করুন (0.2-0.5)
+- BatchNorm-এর momentum ও eps parameter
+
+## সংক্ষেপে
+Dropout ও BatchNorm—PyTorch-এ overfitting কমাতে ও ট্রেনিং দ্রুত করতে অপরিহার্য।
+
+---
+
+## অনুশীলন
+- Dropout rate পরিবর্তন করে accuracy দেখুন
+- BatchNorm দিয়ে ট্রেনিং স্পিড তুলনা করুন
+- একসাথে Dropout ও BatchNorm ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch Dropout Documentation](https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html)
+- [PyTorch BatchNorm Documentation](https://pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html)
+- [Regularization Techniques in Deep Learning](https://machinelearningmastery.com/dropout-regularization-deep-learning-models/)

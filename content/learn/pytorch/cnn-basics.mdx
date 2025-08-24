@@ -1,0 +1,84 @@
+---
+title: Convolutional Neural Networks (CNN) বেসিকস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## CNN কী?
+
+Convolutional Neural Network (CNN) হচ্ছে এমন একটি নিউরাল নেটওয়ার্ক, যা ইমেজ, ভিডিও, ও স্পেশাল ডেটা প্রসেস করতে বিশেষভাবে ডিজাইন করা। CNN-এর মূল শক্তি—ইমেজ থেকে ফিচার (বৈশিষ্ট্য) বের করা ও ক্লাসিফিকেশন করা।
+
+_অ্যানালজি:_ CNN-কে ভাবুন—একটি স্ক্যানার, যা ছবির প্রতিটি অংশ স্ক্যান করে গুরুত্বপূর্ণ তথ্য বের করে।
+
+## CNN-এর গঠন
+- **Convolutional Layer:** ইমেজ থেকে ফিচার বের করে
+- **Activation Layer (ReLU):** নন-লিনিয়ারিটি যোগ করে
+- **Pooling Layer:** ফিচার কম্প্রেস করে, noise কমায়
+- **Fully Connected Layer:** চূড়ান্ত ক্লাসিফিকেশন
+
+## Convolutional Layer কী?
+
+Convolutional Layer ইমেজের ছোট অংশ (filter/kernel) নিয়ে ফিচার বের করে।
+
+```python
+import torch.nn as nn
+conv = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=1)
+```
+
+## Pooling Layer কী?
+
+Pooling Layer ইমেজের ফিচার কম্প্রেস করে—যেমন, MaxPooling সবচেয়ে বড় ভ্যালু রাখে।
+
+```python
+pool = nn.MaxPool2d(kernel_size=2, stride=2)
+```
+
+## CNN-এ Forward Pass
+
+```python
+class SimpleCNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc = nn.Linear(16*16*16, 10)  # Assuming input 32x32
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+```
+
+## CNN-এর শক্তি
+- ইমেজ থেকে অটোমেটিক ফিচার বের করে
+- Translation Invariance: ছবির অংশ ঘুরলেও সঠিক ক্লাসিফিকেশন
+- Noise কমায়, ডেটা জেনারালাইজ করে
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি একটি কুকুর-বিড়াল চেনার অ্যাপ বানাচ্ছেন। CNN দিয়ে ছবির ফিচার বের করে, মডেল ক্লাসিফাই করে—কুকুর না বিড়াল।
+
+## CNN-এ Training
+- ডেটাসেট: ইমেজ (CIFAR, MNIST)
+- Loss Function: CrossEntropyLoss
+- Optimizer: Adam/SGD
+- Evaluation: Accuracy
+
+## টিপস ও সতর্কতা
+- ইনপুট ইমেজ সাইজ ঠিক রাখুন (যেমন, 32x32)
+- Overfitting কমাতে Dropout, Data Augmentation ব্যবহার করুন
+- GPU-তে ট্রেনিং দ্রুত হয়
+
+## সংক্ষিপ্ত চেকলিস্ট
+- Conv2d দিয়ে ফিচার বের করুন
+- MaxPool2d দিয়ে ফিচার কম্প্রেস করুন
+- ReLU দিয়ে নন-লিনিয়ারিটি যোগ করুন
+- Fully Connected দিয়ে ক্লাসিফিকেশন
+
+## উপসংহার
+
+CNN—কম্পিউটার ভিশনের জন্য সবচেয়ে শক্তিশালী নিউরাল নেটওয়ার্ক। ইমেজ ক্লাসিফিকেশন, অবজেক্ট ডিটেকশন, ফেস রিকগনিশন—সবকিছুতে CNN ব্যবহার হয়।
+
+_পরবর্তী পাঠে: MNIST ইমেজ ক্লাসিফায়ার—হাতেকলমে CNN কোড!_

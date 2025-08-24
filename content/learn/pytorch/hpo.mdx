@@ -1,0 +1,148 @@
+---
+title: হাইপারপ্যারামিটার অপ্টিমাইজেশন (Optuna, Ray)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## PyTorch-এ গবেষণা ও পারফরম্যান্স
+
+নিউরাল নেটওয়ার্ক ট্রেনিংয়ে হাইপারপ্যারামিটার (learning rate, batch size, optimizer, ইত্যাদি) ঠিকভাবে সেট করা খুব গুরুত্বপূর্ণ। ভুল হাইপারপ্যারামিটার দিলে মডেল ভালো শেখে না, পারফরম্যান্স কমে যায়। Optuna ও Ray হচ্ছে আধুনিক টুল, যা অটোমেটেডভাবে সেরা হাইপারপ্যারামিটার খুঁজে দেয়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি কেক বানাচ্ছেন—চিনি, ডিম, ময়দা, বেকিং টাইম—সব ঠিকভাবে না দিলে কেক ভালো হবে না। হাইপারপ্যারামিটার অপ্টিমাইজেশন মানে—"রেসিপির সেরা অনুপাত খোঁজা"। Optuna/Ray হচ্ছে সেই "শেফ"—যে অটোমেটেডভাবে সেরা রেসিপি খুঁজে দেয়।
+
+## হাইপারপ্যারামিটার কী?
+- **Learning Rate:** কত দ্রুত মডেল শেখে
+- **Batch Size:** একবারে কত ডেটা প্রসেস হয়
+- **Optimizer:** SGD, Adam, RMSprop
+- **Dropout Rate, Layer Size, Activation** ইত্যাদি
+
+## অপ্টিমাইজেশন পদ্ধতি
+- **Grid Search:** সব কম্বিনেশন ট্রাই করা
+- **Random Search:** র‍্যান্ডমভাবে ট্রাই করা
+- **Bayesian Optimization:** আগের ফলাফল দেখে নতুন ট্রাই
+- **Optuna/Ray:** অটোমেটেড, স্মার্ট, স্কেলেবল
+
+## Optuna দিয়ে Hyperparameter Optimization
+
+### ইনস্টলেশন
+```bash
+pip install optuna
+```
+
+### PyTorch উদাহরণ
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import optuna
+
+# Simple MLP
+class Net(nn.Module):
+    def __init__(self, hidden_size):
+        super().__init__()
+        self.fc1 = nn.Linear(10, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, 2)
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        return self.fc2(x)
+
+def objective(trial):
+    hidden_size = trial.suggest_int('hidden_size', 16, 128)
+    lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
+    batch_size = trial.suggest_int('batch_size', 16, 64)
+    model = Net(hidden_size)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    # Dummy data
+    x = torch.randn(batch_size, 10)
+    y = torch.randint(0, 2, (batch_size,))
+    criterion = nn.CrossEntropyLoss()
+    for epoch in range(10):
+        optimizer.zero_grad()
+        output = model(x)
+        loss = criterion(output, y)
+        loss.backward()
+        optimizer.step()
+    return loss.item()
+
+study = optuna.create_study(direction='minimize')
+study.optimize(objective, n_trials=30)
+print('Best params:', study.best_params)
+```
+
+### কোড ব্যাখ্যা
+- `trial.suggest_*`: Optuna trial-এ parameter ট্রাই করা
+- `study.optimize`: Optuna study চালানো
+- Best params: সেরা হাইপারপ্যারামিটার
+
+## Ray Tune দিয়ে Hyperparameter Optimization
+
+### ইনস্টলেশন
+```bash
+pip install ray[tune]
+```
+
+### PyTorch উদাহরণ
+```python
+from ray import tune
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+def train(config):
+    model = nn.Sequential(
+        nn.Linear(10, config['hidden_size']),
+        nn.ReLU(),
+        nn.Linear(config['hidden_size'], 2)
+    )
+    optimizer = optim.Adam(model.parameters(), lr=config['lr'])
+    x = torch.randn(config['batch_size'], 10)
+    y = torch.randint(0, 2, (config['batch_size'],))
+    criterion = nn.CrossEntropyLoss()
+    for epoch in range(10):
+        optimizer.zero_grad()
+        output = model(x)
+        loss = criterion(output, y)
+        loss.backward()
+        optimizer.step()
+    tune.report(loss=loss.item())
+
+tune.run(
+    train,
+    config={
+        'hidden_size': tune.choice([16, 32, 64, 128]),
+        'lr': tune.loguniform(1e-4, 1e-2),
+        'batch_size': tune.choice([16, 32, 64])
+    },
+    num_samples=20
+)
+```
+
+### কোড ব্যাখ্যা
+- `tune.choice`, `tune.loguniform`: Ray-এ parameter ট্রাই করা
+- `tune.report`: Ray-এ ফলাফল রিপোর্ট
+
+## বাস্তব জীবনের ব্যবহার
+- **গবেষণা:** নতুন মডেল/ডেটাসেটে সেরা পারফরম্যান্স
+- **প্রোডাকশন:** অটোমেটেড tuning, স্কেলিং
+- **AI Product:** Fast iteration, AutoML
+
+## টিপস ও চ্যালেঞ্জ
+- Search space ঠিকভাবে সেট করুন
+- Early stopping ব্যবহার করুন
+- Parallelization: Ray দিয়ে distributed tuning
+- Visualization: Optuna/Ray-এ ফলাফল visualize করুন
+
+## Analogies: "শেফের সেরা রেসিপি খোঁজা"
+
+হাইপারপ্যারামিটার অপ্টিমাইজেশন মানে—"শেফের সেরা রেসিপি খোঁজা"—Optuna/Ray অটোমেটেডভাবে সেরা কম্বিনেশন খুঁজে দেয়।
+
+## সংক্ষেপে
+- Optuna/Ray দিয়ে PyTorch মডেলের হাইপারপ্যারামিটার অটোমেটেডভাবে অপ্টিমাইজ করা যায়
+- গবেষণা, প্রোডাকশন, AutoML—সব জায়গায় দরকার
+- কোড সহজ, স্কেলেবল, ও দ্রুত
+
+## আরও জানুন
+- [Optuna Documentation](https://optuna.org/)
+- [Ray Tune Documentation](https://docs.ray.io/en/latest/tune/index.html)
+- [Hyperparameter Tuning in PyTorch](https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html)

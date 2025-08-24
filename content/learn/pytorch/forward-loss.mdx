@@ -1,0 +1,87 @@
+---
+title: ফরওয়ার্ড পাস ও লস ফাংশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ফরওয়ার্ড পাস কী?
+
+ফরওয়ার্ড পাস হচ্ছে নিউরাল নেটওয়ার্কে ইনপুট ডেটা একের পর এক লেয়ার দিয়ে প্রসেস করে আউটপুট পাওয়ার প্রক্রিয়া। প্রতিটি লেয়ার ইনপুটকে পরিবর্তন করে, নতুন ফিচার তৈরি করে, এবং শেষ পর্যন্ত চূড়ান্ত প্রেডিকশন দেয়।
+
+_অ্যানালজি:_ ফ্যাক্টরিতে কাঁচামাল ঢুকিয়ে একের পর এক মেশিনে পাঠিয়ে চূড়ান্ত পণ্য তৈরি—এটাই ফরওয়ার্ড পাস।
+
+## PyTorch-এ ফরওয়ার্ড পাস
+
+PyTorch-এ `forward` মেথডে ইনপুট ডেটা প্রসেস হয়।
+
+```python
+import torch
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(4, 8)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(8, 2)
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+net = SimpleNet()
+x = torch.rand(1, 4)
+out = net(x)
+print(out)
+```
+
+## লস ফাংশন কী?
+
+লস ফাংশন (Loss Function) হচ্ছে এমন একটি ফাংশন, যা মডেলের প্রেডিকশন ও আসল ভ্যালুর মধ্যে পার্থক্য হিসাব করে। লক্ষ্য—লস কমানো, মানে মডেলকে আরও ভালো করা।
+
+### সাধারণ লস ফাংশন
+- `nn.MSELoss`: Mean Squared Error (Regression)
+- `nn.CrossEntropyLoss`: Classification
+- `nn.BCELoss`: Binary Classification
+
+## লস ফাংশন ব্যবহার উদাহরণ
+
+```python
+import torch.nn as nn
+output = torch.tensor([[2.0, 1.0]])
+target = torch.tensor([0])
+loss_fn = nn.CrossEntropyLoss()
+loss = loss_fn(output, target)
+print(loss)
+```
+
+## ফরওয়ার্ড পাস ও লস ফাংশন—রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি একটি ফুল ক্লাসিফিকেশন মডেল বানাচ্ছেন। ইনপুট: ফুলের বৈশিষ্ট্য, ফরওয়ার্ড পাসে প্রেডিকশন, লস ফাংশনে আসল ক্যাটাগরি ও প্রেডিকশন তুলনা—লস কমাতে মডেল শেখে।
+
+## ট্রেনিং লুপে ফরওয়ার্ড ও লস
+
+```python
+for data, target in dataloader:
+    output = net(data)
+    loss = loss_fn(output, target)
+    loss.backward()  # গ্রেডিয়েন্ট হিসাব
+    optimizer.step() # ওজন আপডেট
+    optimizer.zero_grad() # গ্রেডিয়েন্ট রিসেট
+```
+
+## সংক্ষিপ্ত চেকলিস্ট
+- ফরওয়ার্ড পাসে ইনপুট → লেয়ার → আউটপুট
+- লস ফাংশনে প্রেডিকশন ও আসল ভ্যালু তুলনা
+- ট্রেনিং লুপে loss.backward(), optimizer.step(), optimizer.zero_grad()
+
+## সতর্কতা
+- Classification-এ `nn.CrossEntropyLoss` ব্যবহার করুন
+- Regression-এ `nn.MSELoss` ব্যবহার করুন
+- ইনপুট ও টার্গেটের শেইপ ঠিক আছে কিনা চেক করুন
+
+## উপসংহার
+
+ফরওয়ার্ড পাস ও লস ফাংশন—নিউরাল নেটওয়ার্ক শেখার মূল ভিত্তি। এগুলো ভালোভাবে বুঝলে, PyTorch-এ যেকোনো মডেল ট্রেইন করা সহজ হবে।
+
+_পরবর্তী পাঠে: অপ্টিমাইজার ও ব্যাকপ্রপাগেশন—মডেল কীভাবে শেখে!_

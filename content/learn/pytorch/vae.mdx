@@ -1,0 +1,99 @@
+---
+title: Variational Autoencoders (VAE)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি গল্পের সারাংশ লিখছেন—সেই সারাংশ থেকে নতুন গল্প বানানো যায়। VAE-ও ঠিক এমন—ইনপুট ডেটা থেকে "latent space"-এ সারাংশ তৈরি করে, তারপর সেই সারাংশ থেকে নতুন ডেটা reconstruct বা generate করে।
+
+## বাস্তব উদাহরণ: গল্পের সারাংশ
+
+- **Encoder:** গল্পের সারাংশ লেখে
+- **Decoder:** সেই সারাংশ দেখে নতুন গল্প বানায়
+
+## VAE কী?
+
+VAE (Variational Autoencoder) হলো Encoder-Decoder আর্কিটেকচার, যেখানে ইনপুট ডেটা থেকে latent space-এ compressed representation তৈরি হয়, এবং সেই representation থেকে নতুন ডেটা reconstruct করা যায়।
+
+### VAE-এর মূল অংশ
+- **Encoder:** ইনপুট থেকে mean ও variance বের করে
+- **Latent Space:** compressed representation
+- **Decoder:** latent থেকে ডেটা reconstruct
+- **Loss:** reconstruction loss + KL divergence
+
+## VAE আর্কিটেকচার
+```python
+import torch
+import torch.nn as nn
+
+class VAE(nn.Module):
+    def __init__(self, input_dim=784, latent_dim=20):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 400),
+            nn.ReLU(),
+        )
+        self.fc_mu = nn.Linear(400, latent_dim)
+        self.fc_logvar = nn.Linear(400, latent_dim)
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, 400),
+            nn.ReLU(),
+            nn.Linear(400, input_dim),
+            nn.Sigmoid()
+        )
+    def encode(self, x):
+        h = self.encoder(x)
+        return self.fc_mu(h), self.fc_logvar(h)
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+    def decode(self, z):
+        return self.decoder(z)
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        return self.decode(z), mu, logvar
+```
+
+## VAE Loss Function
+```python
+def vae_loss(recon_x, x, mu, logvar):
+    recon_loss = nn.functional.binary_cross_entropy(recon_x, x, reduction='sum')
+    kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return recon_loss + kl_loss
+```
+
+## VAE-এর সুবিধা
+- নতুন ডেটা জেনারেশন
+- ডেনয়েজিং, ইনপেইন্টিং
+- Latent space visualization
+
+## চ্যালেঞ্জ ও টিপস
+- KL divergence balance করতে হয়
+- Reconstruction loss tune করুন
+- Latent dimension বেশি হলে blurry output
+- Training stability
+
+## বাস্তব প্রজেক্ট
+- ফেক ইমেজ/ফেস জেনারেশন
+- ডেনয়েজিং অটোএনকোডার
+- Latent space থেকে ডেটা ম্যানিপুলেশন
+
+## সংক্ষেপে
+VAE—PyTorch-এ নতুন ডেটা জেনারেশন, ডেনয়েজিং, ও representation learning-এর জন্য শক্তিশালী টুল। Encoder-Decoder ও probabilistic latent space—VAE-র মূল শক্তি।
+
+---
+
+## অনুশীলন
+- VAE দিয়ে MNIST ইমেজ reconstruct করুন
+- Latent space visualize করুন
+- Reconstruction loss ও KL divergence পরিবর্তন করে output দেখুন
+
+---
+
+## আরও পড়ুন
+- [VAE Paper](https://arxiv.org/abs/1312.6114)
+- [PyTorch VAE Tutorial](https://github.com/pytorch/examples/tree/main/vae)
+- [Understanding VAEs](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73)

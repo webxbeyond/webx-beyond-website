@@ -1,0 +1,112 @@
+---
+title: Q-Learning ইমপ্লিমেন্টেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+Q-Learning হচ্ছে রিইনফোর্সমেন্ট লার্নিং-এর সবচেয়ে জনপ্রিয় ও সহজ টেকনিক। এটি Model-Free RL, যেখানে Agent পরিবেশের সাথে ইন্টারঅ্যাক্ট করে Action-Value (Q-value) শেখে—কোন Action কোন State-এ কতটা ভালো, তা জানার জন্য।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি নতুন শহরে ঘুরতে গেছেন। কোথায় খাওয়া ভালো, কোথায় ঘুরতে মজা—প্রথমে আন্দাজে যান, পরে অভিজ্ঞতা থেকে শিখে নেন কোন রাস্তা/রেস্টুরেন্ট সেরা। Q-Learning-এ Agent ঠিক এভাবেই "ট্রাই-এন্ড-এলার্ন" করে।
+
+## Q-Learning-এর মূল ধারণা
+- **Q-value:** State-Action pair-এর জন্য "ভালো লাগার স্কোর"
+- **Q-table:** সব State-Action-এর Q-value টেবিল
+- **Update Rule:** নতুন অভিজ্ঞতা থেকে Q-value আপডেট
+- **Exploration vs Exploitation:** নতুন কিছু চেষ্টা করা vs পুরাতন ভালো Action নেওয়া
+
+## Q-Learning Algorithm
+
+1. Q-table initialize করুন (সব Q-value শূন্য)
+2. Environment থেকে State নিন
+3. Action নিন (explore/exploit)
+4. Reward ও Next State পান
+5. Q-value আপডেট করুন:
+   ```
+   Q(s, a) = Q(s, a) + lr * [reward + gamma * max(Q(s', a')) - Q(s, a)]
+   ```
+   - lr: Learning rate
+   - gamma: Discount factor
+6. Next State-এ যান, Repeat করুন
+
+## PyTorch দিয়ে Q-Learning ইমপ্লিমেন্টেশন
+
+### Simple Grid World উদাহরণ
+
+```python
+import numpy as np
+import torch
+
+# Environment: 4x4 Grid, Goal at (3,3)
+class GridWorld:
+    def __init__(self):
+        self.size = 4
+        self.state = (0, 0)
+    def reset(self):
+        self.state = (0, 0)
+        return self.state
+    def step(self, action):
+        x, y = self.state
+        if action == 0: x = min(x+1, self.size-1)  # Down
+        if action == 1: x = max(x-1, 0)           # Up
+        if action == 2: y = min(y+1, self.size-1) # Right
+        if action == 3: y = max(y-1, 0)           # Left
+        self.state = (x, y)
+        reward = 1 if self.state == (3,3) else -0.01
+        done = self.state == (3,3)
+        return self.state, reward, done
+
+# Q-table
+q_table = torch.zeros((4, 4, 4))  # (x, y, action)
+lr = 0.1
+gamma = 0.99
+epsilon = 0.2
+
+env = GridWorld()
+for episode in range(1000):
+    state = env.reset()
+    done = False
+    while not done:
+        x, y = state
+        if np.random.rand() < epsilon:
+            action = np.random.randint(4)  # Explore
+        else:
+            action = torch.argmax(q_table[x, y]).item()  # Exploit
+        next_state, reward, done = env.step(action)
+        nx, ny = next_state
+        old_q = q_table[x, y, action]
+        next_max = torch.max(q_table[nx, ny])
+        new_q = old_q + lr * (reward + gamma * next_max - old_q)
+        q_table[x, y, action] = new_q
+        state = next_state
+```
+
+### কোড ব্যাখ্যা
+- Q-table: 4x4x4 টেনসর, প্রতিটি অবস্থার জন্য ৪টি Action
+- epsilon: Random Action নেওয়ার প্রবণতা (exploration)
+- gamma: ভবিষ্যৎ পুরস্কারের গুরুত্ব
+- lr: শেখার গতি
+
+## বাস্তব জীবনের ব্যবহার
+- **গেম:** Maze solving, path finding
+- **রোবট:** রোবটকে পথ খুঁজে নিতে শেখানো
+- **অটোমেশন:** Decision making in unknown environments
+
+## চ্যালেঞ্জ ও টিপস
+- State space বড় হলে Q-table বড় হয়—Deep Q-Learning ব্যবহার করুন
+- Exploration vs Exploitation ব্যালেন্স করুন
+- Reward shaping: সঠিক পুরস্কার দিলে Agent দ্রুত শেখে
+
+## Analogies: "শহর ঘুরে সেরা রাস্তা খোঁজা"
+
+Q-Learning-কে ভাবুন "শহর ঘুরে সেরা রাস্তা খোঁজা"—Agent বারবার চেষ্টা করে, অভিজ্ঞতা থেকে শেখে, এবং শেষ পর্যন্ত সেরা Policy খুঁজে পায়।
+
+## সংক্ষেপে
+- Q-Learning-এ Agent Q-table থেকে Action-Value শেখে
+- PyTorch দিয়ে সহজেই ইমপ্লিমেন্ট করা যায়
+- গেম, রোবটিক্স, অটোমেশন—সব জায়গায় ব্যবহার
+
+## আরও জানুন
+- [Q-Learning Explained (Medium)](https://towardsdatascience.com/simple-reinforcement-learning-q-learning-fcddc4b6fe56)
+- [PyTorch RL Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html)
+- [OpenAI Gym Q-Learning](https://spinningup.openai.com/en/latest/)

@@ -1,0 +1,100 @@
+---
+title: ডেটা লোডার ও ব্যাচিং অপ্টিমাইজেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একটি বড় লাইব্রেরি থেকে বই পড়ছেন—একবারে সব বই পড়া সম্ভব নয়, তাই কিছু বই একসাথে নিয়ে পড়েন। PyTorch-এও বড় ডেটাসেট একবারে মডেলে পাঠানো যায় না, তাই "batch" করে পাঠানো হয়।
+
+## বাস্তব উদাহরণ: বাসে যাত্রী ওঠা
+
+যেমন, বাসে একসাথে অনেক যাত্রী ওঠে—একজন একজন করে নয়। ডেটা লোডারও ঠিক তেমন—একসাথে অনেক ডেটা "batch" করে মডেলে পাঠায়।
+
+## DataLoader কী?
+
+PyTorch-এর `DataLoader` ক্লাস ডেটাসেট থেকে ডেটা "batch" করে, shuffle করে, ও parallel ভাবে লোড করে।
+
+### সুবিধা
+- বড় ডেটাসেট সহজে হ্যান্ডল
+- ট্রেনিং দ্রুত
+- GPU-তে ডেটা efficiently পাঠানো
+
+## DataLoader ব্যবহার
+
+```python
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+# ডেটাসেট তৈরি
+X = torch.randn(1000, 20)  # ১০০০ স্যাম্পল, ২০ ফিচার
+y = torch.randint(0, 2, (1000,))
+dataset = TensorDataset(X, y)
+
+# DataLoader
+loader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+for batch_X, batch_y in loader:
+    # ট্রেনিং লুপ
+    pass
+```
+
+## Batch Size কী?
+
+- ছোট batch: কম মেমরি, noisy gradient
+- বড় batch: বেশি মেমরি, smooth gradient
+- সাধারণত 16, 32, 64, 128—GPU/CPU অনুযায়ী
+
+## ব্যাচিং অপ্টিমাইজেশন টিপস
+- **num_workers:** parallel data loading (CPU cores)
+- **pin_memory:** GPU-তে দ্রুত ডেটা পাঠাতে
+- **prefetch_factor:** আগেই ডেটা লোড
+
+```python
+loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=4, pin_memory=True)
+```
+
+## Custom Dataset
+
+নিজের ডেটাসেটের জন্য `Dataset` ক্লাস inherit করে কাস্টম ডেটা লোডার বানানো যায়।
+
+```python
+from torch.utils.data import Dataset
+
+class MyDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+    def __len__(self):
+        return len(self.data)
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
+```
+
+## বাস্তব প্রজেক্ট
+- ইমেজ ক্লাসিফিকেশন
+- NLP টেক্সট প্রসেসিং
+- টাইম সিরিজ ডেটা
+
+## চ্যালেঞ্জ ও টিপস
+- ডেটা imbalance হলে stratified batching
+- বড় ডেটাসেট হলে HDF5/LMDB ব্যবহার
+- GPU-তে ডেটা পাঠানোর সময় pin_memory=True
+- Data augmentation pipeline DataLoader-এর সাথে
+
+## সংক্ষেপে
+DataLoader ও ব্যাচিং PyTorch-এ efficient ট্রেনিংয়ের জন্য অপরিহার্য। batch size, num_workers, pin_memory—সব optimize করলে ট্রেনিং দ্রুত ও স্মার্ট হয়।
+
+---
+
+## অনুশীলন
+- নিজের ডেটাসেট দিয়ে DataLoader তৈরি করুন
+- batch size পরিবর্তন করে ট্রেনিং স্পিড দেখুন
+- num_workers ও pin_memory ব্যবহার করুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch DataLoader Documentation](https://pytorch.org/docs/stable/data.html)
+- [Efficient Data Loading in PyTorch](https://pytorch.org/tutorials/beginner/data_loading_tutorial.html)
+- [Best Practices for Data Loading](https://discuss.pytorch.org/t/best-practices-for-data-loading/40510)

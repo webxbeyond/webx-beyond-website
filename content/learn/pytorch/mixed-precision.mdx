@@ -1,0 +1,74 @@
+---
+title: মিক্সড প্রিসিশন ট্রেইনিং
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি বড় বই পড়ছেন—সব সময় ভারী বই নিয়ে পড়া কষ্টকর, তাই কখনো ছোট বই, কখনো বড় বই পড়েন। মডেল ট্রেনিং-এও "float32" (বড় বই) ও "float16" (ছোট বই) একসাথে ব্যবহার করলে ট্রেনিং দ্রুত হয়, মেমরি কম লাগে—এটাই "মিক্সড প্রিসিশন"।
+
+## বাস্তব উদাহরণ: হালকা ও ভারী বই
+
+যেমন, পরীক্ষার সময় গুরুত্বপূর্ণ অংশ ছোট বই থেকে পড়েন, আর বিশদ অংশ বড় বই থেকে। মিক্সড প্রিসিশন-এও কিছু অপারেশন float16-এ, কিছু float32-এ হয়।
+
+## মিক্সড প্রিসিশন কী?
+
+মিক্সড প্রিসিশন ট্রেইনিং-এ মডেলের কিছু অংশ (weight, activation) float16-এ, কিছু float32-এ প্রসেস হয়। এতে:
+- মেমরি কম লাগে
+- ট্রেনিং দ্রুত হয়
+- GPU-র computational power ভালোভাবে ব্যবহার হয়
+
+## PyTorch-এ মিক্সড প্রিসিশন
+
+PyTorch-এ `torch.cuda.amp` API দিয়ে সহজেই মিক্সড প্রিসিশন ট্রেইনিং করা যায়।
+
+### উদাহরণ: Simple Training Loop
+```python
+import torch
+from torch.cuda.amp import autocast, GradScaler
+
+model = ...
+optimizer = ...
+scaler = GradScaler()
+
+for batch_x, batch_y in loader:
+    optimizer.zero_grad()
+    with autocast():
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()
+```
+
+## সুবিধা
+- বড় মডেল/ডেটাসেটে দ্রুত ট্রেনিং
+- GPU-র মেমরি কম লাগে
+- Accuracy সাধারণত একই থাকে
+
+## চ্যালেঞ্জ ও টিপস
+- সব অপারেশন float16-এ চলে না (e.g. softmax, batchnorm)
+- GradScaler ব্যবহার না করলে gradient underflow হতে পারে
+- কিছু পুরনো GPU-তে সাপোর্ট কম
+
+## বাস্তব প্রজেক্ট
+- ইমেজ ক্লাসিফিকেশন (ResNet, EfficientNet)
+- NLP (Transformer, BERT)
+- GAN, Autoencoder
+
+## সংক্ষেপে
+মিক্সড প্রিসিশন ট্রেইনিং—PyTorch-এ দ্রুত, কম মেমরি, ও স্মার্ট ট্রেনিংয়ের জন্য অপরিহার্য।
+
+---
+
+## অনুশীলন
+- নিজের মডেলে মিক্সড প্রিসিশন ট্রেইনিং চালান
+- GradScaler ব্যবহার করে gradient stability দেখুন
+- float16 ও float32 অপারেশনের পার্থক্য দেখুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch Mixed Precision Training](https://pytorch.org/docs/stable/amp.html)
+- [NVIDIA Apex Library](https://github.com/NVIDIA/apex)
+- [Best Practices for Mixed Precision](https://pytorch.org/tutorials/recipes/recipes/amp_recipe.html)

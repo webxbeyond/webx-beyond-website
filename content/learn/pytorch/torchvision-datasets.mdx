@@ -1,0 +1,86 @@
+---
+title: Torchvision ডেটাসেট লোডার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Torchvision কী?
+
+Torchvision হচ্ছে PyTorch-এর একটি লাইব্রেরি, যা ইমেজ প্রসেসিং, ডেটাসেট, ও ট্রান্সফরমেশন সহজ করে। এতে অনেক জনপ্রিয় ইমেজ ডেটাসেট (MNIST, CIFAR, ImageNet) ও ইউটিলিটি ফাংশন আছে।
+
+_অ্যানালজি:_ Torchvision-কে ভাবুন—একটি সুসংগঠিত লাইব্রেরি, যেখানে ইমেজ ডেটা, প্রসেসিং টুল, ও রেডি-মেড ডেটাসেট সব একসাথে পাওয়া যায়।
+
+## ডেটাসেট লোডার কী?
+
+ডেটাসেট লোডার হচ্ছে এমন একটি টুল, যা ডেটা ডাউনলোড, প্রসেস, ও লোড করে—মডেল ট্রেইনিংয়ের জন্য প্রস্তুত করে।
+
+## Torchvision-এ ডেটাসেট লোড করা
+
+### ১. ডেটাসেট ইম্পোর্ট
+```python
+from torchvision import datasets
+```
+
+### ২. ডেটাসেট ডাউনলোড ও লোড
+```python
+mnist_train = datasets.MNIST(root='./data', train=True, download=True)
+mnist_test = datasets.MNIST(root='./data', train=False, download=True)
+```
+
+### ৩. ট্রান্সফরমেশন অ্যাপ্লাই
+```python
+from torchvision import transforms
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+mnist_train = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+```
+
+### ৪. DataLoader দিয়ে ব্যাচে ডেটা লোড
+```python
+from torch.utils.data import DataLoader
+train_loader = DataLoader(mnist_train, batch_size=32, shuffle=True)
+```
+
+## জনপ্রিয় Torchvision ডেটাসেট
+- MNIST: হাতে-লেখা সংখ্যা
+- CIFAR10/CIFAR100: ছোট রঙিন ছবি
+- FashionMNIST: পোশাকের ছবি
+- ImageNet: বড় স্কেল ইমেজ ডেটাসেট
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি একটি ডিজিট ক্লাসিফিকেশন অ্যাপ বানাতে চান। Torchvision দিয়ে MNIST ডেটাসেট সহজে ডাউনলোড, প্রসেস, ও ট্রেনিংয়ের জন্য প্রস্তুত করতে পারবেন।
+
+## Custom Dataset
+
+নিজের ডেটাসেট থাকলে `torch.utils.data.Dataset` ক্লাস ইনহেরিট করে কাস্টম ডেটাসেট বানানো যায়।
+
+```python
+from torch.utils.data import Dataset
+class MyDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+    def __len__(self):
+        return len(self.data)
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
+```
+
+## টিপস ও সতর্কতা
+- ডেটাসেট ডাউনলোডে ইন্টারনেট লাগবে
+- ট্রান্সফরমেশন দিয়ে ডেটা নরমালাইজ করুন
+- DataLoader-এ shuffle=True দিলে ট্রেনিং ভালো হয়
+
+## সংক্ষিপ্ত চেকলিস্ট
+- Torchvision দিয়ে ডেটাসেট ইম্পোর্ট
+- ট্রান্সফরমেশন অ্যাপ্লাই
+- DataLoader দিয়ে ব্যাচে ডেটা লোড
+- Custom Dataset বানাতে Dataset ক্লাস ব্যবহার
+
+## উপসংহার
+
+Torchvision ডেটাসেট লোডার—PyTorch-এ ইমেজ ডেটা নিয়ে কাজ করার সবচেয়ে সহজ ও শক্তিশালী টুল। ডেটা লোড, প্রসেস, ও ট্রেনিং—সবকিছু সহজে করতে পারবেন।
+
+_পরবর্তী পাঠে: ইমেজ ট্রান্সফরমেশন ও ডেটা অগমেন্টেশন—ডেটা আরও শক্তিশালী করুন!_

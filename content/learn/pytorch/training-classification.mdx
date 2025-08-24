@@ -1,0 +1,100 @@
+---
+title: ক্লাসিফিকেশন টাস্কে ট্রেইনিং ও ইভ্যালুয়েশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ক্লাসিফিকেশন টাস্ক কী?
+
+ক্লাসিফিকেশন টাস্কে মডেল ইনপুট ডেটা থেকে নির্দিষ্ট ক্যাটাগরি/ক্লাস প্রেডিক্ট করে। যেমন—ইমেইল স্প্যাম/নন-স্প্যাম, ফুলের প্রজাতি, ছবি থেকে কুকুর/বিড়াল চেনা।
+
+_অ্যানালজি:_ ক্লাসিফিকেশনকে ভাবুন—একজন শিক্ষক ছাত্রদের নম্বর দেখে গ্রেড (A/B/C) দেন।
+
+## PyTorch-এ ক্লাসিফিকেশন মডেল ট্রেইনিং
+
+### ১. ডেটাসেট তৈরি
+```python
+import torch
+X = torch.rand(100, 4)      # ১০০টি উদাহরণ, ৪টি ফিচার
+y = torch.randint(0, 3, (100,))  # ৩টি ক্লাস
+```
+
+### ২. মডেল তৈরি
+```python
+import torch.nn as nn
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(4, 8)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(8, 3)
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+model = MLP()
+```
+
+### ৩. লস ফাংশন ও অপ্টিমাইজার
+```python
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+```
+
+### ৪. ট্রেনিং লুপ
+```python
+for epoch in range(50):
+    optimizer.zero_grad()
+    output = model(X)
+    loss = loss_fn(output, y)
+    loss.backward()
+    optimizer.step()
+    if epoch % 10 == 0:
+        print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+```
+
+## ইভ্যালুয়েশন কী?
+
+ইভ্যালুয়েশন মানে—মডেল কতটা ভালো কাজ করছে তা পরিমাপ করা। সাধারণত accuracy, precision, recall, F1-score ব্যবহার করা হয়।
+
+### Accuracy হিসাব
+```python
+with torch.no_grad():
+    output = model(X)
+    preds = torch.argmax(output, dim=1)
+    accuracy = (preds == y).float().mean()
+    print(f"Accuracy: {accuracy:.2f}")
+```
+
+### Precision, Recall, F1-score
+- এগুলো sklearn লাইব্রেরি দিয়ে সহজে হিসাব করা যায়।
+
+```python
+from sklearn.metrics import precision_score, recall_score, f1_score
+# preds ও y numpy array হলে
+precision = precision_score(y.numpy(), preds.numpy(), average='macro')
+recall = recall_score(y.numpy(), preds.numpy(), average='macro')
+f1 = f1_score(y.numpy(), preds.numpy(), average='macro')
+print(f"Precision: {precision:.2f}, Recall: {recall:.2f}, F1: {f1:.2f}")
+```
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনি একটি ফুল ক্লাসিফিকেশন অ্যাপ বানাচ্ছেন—ইউজার ফুলের বৈশিষ্ট্য ইনপুট দিলে, মডেল ক্যাটাগরি প্রেডিক্ট করবে। ইভ্যালুয়েশন মেট্রিক দিয়ে বুঝবেন, মডেল কতটা নির্ভুল।
+
+## টিপস ও সতর্কতা
+- ট্রেনিং ও ইভ্যালুয়েশন ডেটা আলাদা রাখুন (train/test split)
+- Accuracy ছাড়াও precision, recall, F1-score দেখুন
+- Overfitting হলে—ডেটা অগমেন্টেশন, রেগুলারাইজেশন ব্যবহার করুন
+
+## সংক্ষিপ্ত চেকলিস্ট
+- ডেটাসেট তৈরি
+- মডেল, লস, অপ্টিমাইজার সেটআপ
+- ট্রেনিং লুপ
+- ইভ্যালুয়েশন: accuracy, precision, recall, F1-score
+
+## উপসংহার
+
+ক্লাসিফিকেশন টাস্কে ট্রেইনিং ও ইভ্যালুয়েশন—PyTorch-এ মডেল শেখার ও পারফরম্যান্স যাচাইয়ের মূল ধাপ। এগুলো ভালোভাবে বুঝলে, যেকোনো ক্লাসিফিকেশন সমস্যা সমাধান করতে পারবেন।
+
+_পরবর্তী মডিউলে: কম্পিউটার ভিশন—ইমেজ প্রসেসিং ও CNN!_

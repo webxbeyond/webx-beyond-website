@@ -1,0 +1,90 @@
+---
+title: ডিস্ট্রিবিউটেড ট্রেইনিং (Multi-GPU, DDP)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি একা বিশাল বই পড়ছেন—সময় লাগবে। কিন্তু যদি ৫ জন বন্ধু মিলে বই ভাগ করে পড়েন, কাজ দ্রুত শেষ হবে। মডেল ট্রেনিং-এও একই—একাধিক GPU বা কম্পিউটার একসাথে কাজ করলে বড় ডেটা ও মডেল দ্রুত ট্রেনিং হয়।
+
+## বাস্তব উদাহরণ: টিমওয়ার্ক
+
+যেমন, বড় প্রজেক্টে সবাই ভাগাভাগি করে কাজ করেন। ডিস্ট্রিবিউটেড ট্রেইনিং-এও ডেটা ও মডেল ভাগ করে GPU-তে পাঠানো হয়।
+
+## ডিস্ট্রিবিউটেড ট্রেইনিং কী?
+
+ডিস্ট্রিবিউটেড ট্রেইনিং মানে—একাধিক GPU বা কম্পিউটার একসাথে মডেল ট্রেনিং। এতে:
+- বড় ডেটাসেট ও মডেল সহজে ট্রেনিং
+- সময় কম লাগে
+- GPU-র সম্পূর্ণ ক্ষমতা ব্যবহার
+
+## Multi-GPU Training
+
+- **Data Parallelism:** ডেটা ভাগ করে GPU-তে পাঠানো
+- **Model Parallelism:** মডেলের বিভিন্ন অংশ আলাদা GPU-তে
+
+## PyTorch-এ DistributedDataParallel (DDP)
+
+DDP হলো PyTorch-এর অফিসিয়াল distributed training API।
+
+### DDP-এর সুবিধা
+- Efficient gradient synchronization
+- Scalability
+- Simple API
+
+### DDP ব্যবহার
+```python
+import torch
+import torch.nn as nn
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+
+# Initialization
+# torchrun --nproc_per_node=2 train.py
+
+def setup(rank, world_size):
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+
+def cleanup():
+    dist.destroy_process_group()
+
+# Model, optimizer
+model = nn.Linear(100, 10).cuda()
+model = DDP(model)
+optimizer = torch.optim.Adam(model.parameters())
+
+# Training loop
+for batch_x, batch_y in loader:
+    optimizer.zero_grad()
+    outputs = model(batch_x.cuda())
+    loss = criterion(outputs, batch_y.cuda())
+    loss.backward()
+    optimizer.step()
+```
+
+## বাস্তব প্রজেক্ট
+- ImageNet, BERT, GPT-3—বড় ডেটাসেট ও মডেল
+- Research, production training
+
+## চ্যালেঞ্জ ও টিপস
+- DataLoader-এ DistributedSampler ব্যবহার করুন
+- GPU-র সংখ্যা অনুযায়ী batch size adjust করুন
+- torchrun বা python -m torch.distributed.launch দিয়ে রান করুন
+- Network bandwidth ও synchronization
+
+## সংক্ষেপে
+ডিস্ট্রিবিউটেড ট্রেইনিং—PyTorch-এ বড় মডেল ও ডেটাসেট দ্রুত ট্রেনিংয়ের জন্য অপরিহার্য। Multi-GPU ও DDP দিয়ে সহজেই স্কেল করা যায়।
+
+---
+
+## অনুশীলন
+- নিজের মডেল DDP দিয়ে ট্রেনিং করুন
+- DataLoader-এ DistributedSampler ব্যবহার করুন
+- Multi-GPU-তে batch size পরিবর্তন করে দেখুন
+
+---
+
+## আরও পড়ুন
+- [PyTorch Distributed Training Documentation](https://pytorch.org/docs/stable/notes/ddp.html)
+- [Getting Started with Distributed Data Parallel](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html)
+- [Best Practices for Distributed Training](https://pytorch.org/tutorials/beginner/dist_overview.html)

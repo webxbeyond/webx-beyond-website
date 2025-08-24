@@ -1,0 +1,102 @@
+---
+title: টেক্সট জেনারেশন প্রজেক্ট (GPT ফাইন-টিউন)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## ভূমিকা
+
+ধরা যাক, আপনি গল্প লিখছেন—"একদিন এক বনে..." এরপর GPT মডেল বাকিটা লিখে দেয়। টেক্সট জেনারেশন NLP-র সবচেয়ে আকর্ষণীয় টাস্ক, যেখানে মডেল নতুন গল্প, কবিতা, ইমেইল, কোড—সবকিছু লিখতে পারে।
+
+## বাস্তব উদাহরণ: গল্পের লেখক
+
+যেমন, একজন লেখক গল্পের শুরু করেন, আর GPT মডেল গল্পের পরবর্তী অংশ লিখে দেয়।
+
+## GPT ফাইন-টিউন কী?
+
+GPT (Generative Pre-trained Transformer) মডেল অনেক টেক্সট পড়ে শেখে। ফাইন-টিউন মানে—আপনার কাস্টম ডেটাসেটে মডেলকে আরও ভালোভাবে "ট্রেইন" করা, যাতে নির্দিষ্ট টাস্কে পারফর্ম করে।
+
+## ধাপে ধাপে টেক্সট জেনারেশন প্রজেক্ট
+
+### ১. ডেটা সংগ্রহ ও প্রস্তুতি
+- গল্প, কবিতা, ইমেইল, কোড—যে কোনো টেক্সট
+- ডেটা ক্লিনিং, টোকেনাইজেশন
+
+### ২. HuggingFace Transformers ইনস্টল
+```bash
+pip install transformers datasets
+```
+
+### ৩. প্রি-ট্রেইনড GPT-2 লোড
+```python
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
+
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+```
+
+### ৪. ডেটাসেট তৈরি
+```python
+from datasets import load_dataset
+
+dataset = load_dataset('text', data_files={'train': 'my_text.txt'})
+```
+
+### ৫. ফাইন-টিউনিং
+```python
+from transformers import Trainer, TrainingArguments
+
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=2,
+    per_device_train_batch_size=2,
+    save_steps=500,
+    logging_steps=100,
+    fp16=True,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset['train'],
+)
+
+trainer.train()
+```
+
+### ৬. টেক্সট জেনারেশন
+```python
+prompt = "একদিন এক বনে"
+inputs = tokenizer(prompt, return_tensors='pt')
+outputs = model.generate(inputs['input_ids'], max_length=50)
+generated = tokenizer.decode(outputs[0])
+print(generated)
+```
+
+## বাস্তব প্রজেক্ট
+- গল্প/কবিতা জেনারেশন
+- অটোমেটিক ইমেইল লেখা
+- কাস্টমার সার্ভিস চ্যাটবট
+- কোড জেনারেশন
+
+## চ্যালেঞ্জ ও টিপস
+- GPU ব্যবহার করলে ট্রেনিং দ্রুত
+- ডেটা কোয়ালিটি ভালো হলে আউটপুটও ভালো
+- Overfitting এড়াতে validation dataset ব্যবহার করুন
+- Temperature ও top-k sampling দিয়ে creativity বাড়ান
+
+## সংক্ষেপে
+GPT ফাইন-টিউন দিয়ে টেক্সট জেনারেশন NLP-র সবচেয়ে শক্তিশালী ও মজার টাস্ক। PyTorch ও HuggingFace দিয়ে সহজেই কাস্টম প্রজেক্ট বানানো যায়।
+
+---
+
+## অনুশীলন
+- নিজের গল্প/কবিতা দিয়ে GPT-2 ফাইন-টিউন করুন
+- বিভিন্ন prompt দিয়ে টেক্সট জেনারেট করুন
+- Temperature ও top-k sampling পরিবর্তন করে আউটপুট দেখুন
+
+---
+
+## আরও পড়ুন
+- [HuggingFace Text Generation Tutorial](https://huggingface.co/docs/transformers/tasks/text_generation)
+- [GPT-2 Paper](https://openai.com/research/gpt-2)
+- [Fine-tuning Transformers](https://huggingface.co/docs/transformers/training)

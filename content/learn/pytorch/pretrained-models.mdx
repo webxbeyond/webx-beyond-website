@@ -1,0 +1,89 @@
+---
+title: প্রি-ট্রেইনড মডেল ব্যবহার (ResNet, VGG)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## প্রি-ট্রেইনড মডেল কী?
+
+প্রি-ট্রেইনড মডেল মানে—যে মডেল আগে থেকেই বড় ডেটাসেটে (যেমন ImageNet) ট্রেইন করা আছে। আপনি চাইলে এই মডেল নিজের ডেটাসেটে ব্যবহার বা ফাইন-টিউন করতে পারেন।
+
+_অ্যানালজি:_ ভাবুন, আপনি নতুন কিছু শিখতে যাচ্ছেন—যদি আগে থেকেই দক্ষ কেউ আপনাকে গাইড করে, তাহলে শেখা সহজ হয়। ঠিক তেমনই, প্রি-ট্রেইনড মডেল আপনার কাজ দ্রুত ও সহজ করে দেয়।
+
+## কেন প্রি-ট্রেইনড মডেল?
+- কম ডেটা থাকলেও ভালো ফলাফল
+- কম সময় ও কম কম্পিউটেশনে ট্রেইনিং
+- Complex ফিচার অটোমেটিক পাওয়া যায়
+
+## Torchvision-এ ResNet, VGG
+
+Torchvision-এ অনেক প্রি-ট্রেইনড মডেল আছে—ResNet, VGG, AlexNet, MobileNet ইত্যাদি।
+
+### ResNet
+- Residual Network, deep architecture
+- Skip connection দিয়ে gradient vanish সমস্যা কমায়
+
+### VGG
+- Simple, sequential architecture
+- Uniform convolutional layers
+
+## PyTorch-এ প্রি-ট্রেইনড মডেল লোড
+
+```python
+from torchvision import models
+# ResNet
+resnet = models.resnet18(pretrained=True)
+# VGG
+vgg = models.vgg16(pretrained=True)
+```
+
+## ইমেজ প্রিপ্রসেসিং
+
+প্রি-ট্রেইনড মডেল সাধারণত 224x224 RGB ইমেজ চায়, এবং normalization দরকার।
+
+```python
+from torchvision import transforms
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
+```
+
+## প্রেডিকশন করা
+```python
+from PIL import Image
+img = Image.open('cat.jpg')
+img = transform(img).unsqueeze(0)
+output = resnet(img)
+pred = output.argmax(dim=1)
+print(pred)
+```
+
+## ফাইন-টিউনিং
+
+নিজের ডেটাসেটে ফাইন-টিউন করতে চাইলে, শেষের লেয়ার (classifier/head) পরিবর্তন করুন:
+
+```python
+resnet.fc = nn.Linear(resnet.fc.in_features, num_classes)
+```
+
+## রিয়েল-ওয়ার্ল্ড উদাহরণ
+
+ধরা যাক, আপনার কাছে ৫০০টি ফুলের ছবি আছে—নিজের ডেটা দিয়ে ResNet ফাইন-টিউন করলে, অল্প ডেটাতেও ভালো accuracy পাবেন।
+
+## টিপস ও সতর্কতা
+- প্রি-ট্রেইনড মডেল ব্যবহার করলে GPU থাকলে ভালো
+- ইমেজ সাইজ ও normalization ঠিক রাখুন
+- ফাইন-টিউনিংয়ে learning rate কম রাখুন
+
+## সংক্ষিপ্ত চেকলিস্ট
+- Torchvision থেকে প্রি-ট্রেইনড মডেল লোড
+- ইমেজ প্রিপ্রসেসিং করুন
+- নিজের ডেটাসেটে ফাইন-টিউন করুন
+- Accuracy ও performance দেখুন
+
+## উপসংহার
+
+প্রি-ট্রেইনড মডেল—PyTorch-এ কম্পিউটার ভিশন প্রজেক্টে দ্রুত ও শক্তিশালী ফলাফল পাওয়ার সহজ উপায়। ResNet, VGG—দুইটাই ইন্ডাস্ট্রি স্ট্যান্ডার্ড।
+
+_পরবর্তী পাঠে: ট্রান্সফার লার্নিং ও ফাইন-টিউনিং—নিজের ডেটা দিয়ে মডেল কাস্টমাইজ করুন!_

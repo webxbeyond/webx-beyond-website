@@ -1,0 +1,96 @@
+---
+title: গ্রাফ নিউরাল নেটওয়ার্ক (GNN)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+
+গ্রাফ নিউরাল নেটওয়ার্ক (GNN) হচ্ছে এমন এক ধরনের নিউরাল নেটওয়ার্ক, যা গ্রাফ-ভিত্তিক ডেটা (নোড, এজ, কানেকশন) বিশ্লেষণ করতে পারে। সোশ্যাল নেটওয়ার্ক, রাস্তার ম্যাপ, মলিকিউলার স্ট্রাকচার—সবই গ্রাফ। GNN দিয়ে এই ধরনের জটিল সম্পর্ক ও স্ট্রাকচার শেখা যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনি একটি শহরের ম্যাপ দেখছেন—প্রতিটি মোড় (নোড), রাস্তা (এজ) দিয়ে কানেক্টেড। শহরের প্রতিটি মোড়ের তথ্য, এবং কোন রাস্তা দিয়ে কোথায় যাওয়া যায়—এই সম্পর্ক বিশ্লেষণ করতে GNN ব্যবহার হয়।
+
+আরেকটি উদাহরণ—সোশ্যাল নেটওয়ার্ক। প্রতিটি মানুষ (নোড), তাদের বন্ধুত্ব (এজ) দিয়ে কানেক্টেড। কারা সবচেয়ে প্রভাবশালী, কারা গ্রুপে আছে—GNN দিয়ে বিশ্লেষণ করা যায়।
+
+## GNN-এর মূল ধারণা
+- **Node:** গ্রাফের প্রতিটি পয়েন্ট (ব্যক্তি, শহর, মলিকিউল)
+- **Edge:** কানেকশন (বন্ধুত্ব, রাস্তা, রাসায়নিক বন্ধন)
+- **Message Passing:** প্রতিবেশী নোড থেকে তথ্য সংগ্রহ
+- **Aggregation:** প্রতিবেশী নোডের তথ্য একত্রিত করা
+- **Update:** নিজের তথ্য আপডেট করা
+
+## GNN-এর কাজের ধাপ
+1. প্রতিটি নোডের ইনিশিয়াল ফিচার
+2. প্রতিবেশী নোড থেকে "মেসেজ" সংগ্রহ
+3. মেসেজ অ্যাগ্রিগেট করে নিজের ফিচার আপডেট
+4. একাধিক লেয়ার/রাউন্ডে রিপিট
+
+## PyTorch দিয়ে GNN ইমপ্লিমেন্টেশন (Graph Convolutional Network)
+
+GNN-এর জন্য PyTorch Geometric লাইব্রেরি জনপ্রিয়।
+
+### ইনস্টলেশন
+```bash
+pip install torch-geometric
+```
+
+### উদাহরণ: Simple GCN
+```python
+import torch
+import torch.nn as nn
+from torch_geometric.nn import GCNConv
+from torch_geometric.data import Data
+
+# গ্রাফ ডেটা: 4 নোড, 4 এজ
+edge_index = torch.tensor([[0, 1, 2, 3], [1, 0, 3, 2]], dtype=torch.long)
+x = torch.tensor([[1], [2], [3], [4]], dtype=torch.float)
+data = Data(x=x, edge_index=edge_index)
+
+class GCN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(1, 4)
+        self.conv2 = GCNConv(4, 2)
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = self.conv1(x, edge_index)
+        x = torch.relu(x)
+        x = self.conv2(x, edge_index)
+        return x
+
+model = GCN()
+output = model(data)
+print(output)
+```
+
+### কোড ব্যাখ্যা
+- `GCNConv`: গ্রাফ কনভলিউশন লেয়ার
+- `edge_index`: কোন নোড কোন নোডের সাথে কানেক্টেড
+- `x`: নোড ফিচার
+- Forward: প্রতিবেশী নোড থেকে তথ্য নিয়ে ফিচার আপডেট
+
+## GNN-এর ব্যবহার
+- **সোশ্যাল নেটওয়ার্ক:** Influencer detection, কমিউনিটি ফাইন্ডিং
+- **কেমিস্ট্রি:** মলিকিউল প্রপার্টি প্রেডিকশন
+- **রোড নেটওয়ার্ক:** ট্রাফিক ফ্লো, পথ খোঁজা
+- **Recommendation:** ইউজার-আইটেম গ্রাফ
+
+## চ্যালেঞ্জ ও টিপস
+- গ্রাফ ডেটা প্রিপারেশন: edge_index, node features
+- Scalability: বড় গ্রাফে batching, sampling
+- Over-smoothing: বেশি লেয়ার হলে নোড ফিচার একরকম হয়ে যায়
+- PyTorch Geometric, DGL—দুইটি জনপ্রিয় লাইব্রেরি
+
+## Analogies: "শহরের ম্যাপ বিশ্লেষণ"
+
+GNN-কে ভাবুন "শহরের ম্যাপ বিশ্লেষণ"—প্রতিটি মোড়, রাস্তা, এবং তাদের সম্পর্ক থেকে তথ্য শেখা।
+
+## সংক্ষেপে
+- GNN দিয়ে গ্রাফ ডেটা বিশ্লেষণ ও লার্নিং করা যায়
+- PyTorch Geometric দিয়ে সহজেই ইমপ্লিমেন্ট করা যায়
+- সোশ্যাল, কেমিস্ট্রি, রোড—সব জায়গায় ব্যবহার
+
+## আরও জানুন
+- [PyTorch Geometric Documentation](https://pytorch-geometric.readthedocs.io/en/latest/)
+- [GNN Explained (Stanford)](https://web.stanford.edu/class/cs224w/)
+- [Graph Neural Networks Paper](https://arxiv.org/abs/1812.08434)

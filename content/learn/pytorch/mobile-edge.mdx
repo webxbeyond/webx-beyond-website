@@ -1,0 +1,111 @@
+---
+title: মোবাইল ও এজ ডেপ্লয়মেন্ট
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## PyTorch মডেলকে স্মার্ট ডিভাইসে নিয়ে যাওয়া
+
+PyTorch দিয়ে ট্রেইন করা মডেল শুধু সার্ভারে বা ক্লাউডে চালানোই যথেষ্ট নয়—আজকের যুগে AI চলে মোবাইল, IoT, ও এজ ডিভাইসে! এই পাঠে শিখবেন কীভাবে PyTorch মডেলকে মোবাইল (Android/iOS) ও এজ (Raspberry Pi, Jetson, Microcontroller) ডিভাইসে ডেপ্লয় করা যায়।
+
+## বাস্তব উদাহরণ ও অ্যানালজি
+
+ভাবুন, আপনার কাছে একটি দক্ষ শিক্ষক (AI মডেল) আছে, সে শুধু বিশ্ববিদ্যালয়ে পড়ায়। আপনি চান, গ্রামের স্কুলেও সে পড়াক—তখন দরকার তাকে "ছোট করে" গ্রামে পাঠানো। মোবাইল/এজ ডেপ্লয়মেন্ট মানে মডেলকে ছোট, দ্রুত, ও কম রিসোর্সে চালানোর উপযোগী করা।
+
+## কেন মোবাইল ও এজ ডেপ্লয়মেন্ট?
+- **রিয়েল-টাইম:** ইন্টারনেট ছাড়াই দ্রুত prediction
+- **প্রাইভেসি:** ডেটা ডিভাইসেই থাকে, ক্লাউডে যায় না
+- **কস্ট-এফিশিয়েন্ট:** ক্লাউড ব্যয় কমে
+- **ইউজার এক্সপেরিয়েন্স:** স্মার্ট অ্যাপ, IoT, অটোমেশন
+
+## PyTorch Mobile: Android/iOS-এ মডেল চালানো
+
+### ধাপে ধাপে:
+
+1. **TorchScript-এ মডেল কনভার্ট করুন:**
+   ```python
+   import torch
+   from my_model import MyModel
+
+   model = MyModel()
+   model.load_state_dict(torch.load('model.pth'))
+   model.eval()
+   scripted_model = torch.jit.script(model)
+   scripted_model.save('model_mobile.pt')
+   ```
+
+2. **Android/iOS অ্যাপে ইন্টিগ্রেট করুন:**
+   - Android Studio বা Xcode-এ PyTorch Mobile লাইব্রেরি যুক্ত করুন
+   - `model_mobile.pt` ফাইল অ্যাপে কপি করুন
+   - PyTorch Mobile API দিয়ে ইনফারেন্স চালান
+
+#### Android উদাহরণ:
+```java
+Module module = Module.load(assetFilePath(this, "model_mobile.pt"));
+Tensor input = Tensor.fromBlob(...);
+Tensor output = module.forward(IValue.from(input)).toTensor();
+```
+
+#### iOS উদাহরণ:
+```swift
+let module = TorchModule(fileAtPath: "model_mobile.pt")
+let output = module.predict(inputTensor)
+```
+
+## Edge Deployment: Raspberry Pi, Jetson, Microcontroller
+
+### ধাপে ধাপে:
+
+1. **মডেল অপ্টিমাইজ করুন:**
+   - TorchScript/ONNX-এ কনভার্ট করুন
+   - কু-প্রিসিশন (int8, fp16) ব্যবহার করুন
+   - মডেল প্রুনিং/কমপ্রেশন
+
+2. **ডিভাইসে রান করুন:**
+   - PyTorch Lite/ONNX Runtime ইনস্টল করুন
+   - মডেল লোড ও ইনফারেন্স চালান
+
+#### Raspberry Pi উদাহরণ:
+```python
+import torch
+model = torch.jit.load('model_mobile.pt')
+input = torch.tensor([...])
+output = model(input)
+```
+
+#### Jetson Nano উদাহরণ:
+```python
+import onnxruntime as ort
+session = ort.InferenceSession('model.onnx')
+output = session.run(None, {'input': input_array})
+```
+
+## বাস্তব জীবনের ব্যবহার
+- **স্মার্ট ক্যামেরা:** লোকাল ডিভাইসে ফেস/অবজেক্ট ডিটেকশন
+- **হেলথ ডিভাইস:** হার্টবিট/ECG বিশ্লেষণ মোবাইলেই
+- **IoT সেন্সর:** এজ ডিভাইসে অ্যানোমালি ডিটেকশন
+
+## ডেপ্লয়মেন্ট টিপস
+- মডেল ছোট করুন (quantization, pruning)
+- TorchScript/ONNX ব্যবহার করুন
+- ডিভাইসের হার্ডওয়্যার অনুযায়ী অপ্টিমাইজ করুন
+- ব্যাটারি ও মেমোরি ব্যবহারে নজর দিন
+
+## চ্যালেঞ্জ ও সমাধান
+- **মেমোরি সীমাবদ্ধতা:** ছোট মডেল, lightweight ops
+- **CPU/GPU সীমাবদ্ধতা:** quantization, hardware acceleration
+- **ইনফারেন্স latency:** batching, async processing
+
+## Analogies: "Teacher in Every Village"
+
+মডেলকে মোবাইল/এজে পাঠানো মানে—"শিক্ষককে গ্রামে পাঠানো"—কম রিসোর্সে, দ্রুত, ও সহজে জ্ঞান পৌঁছে দেওয়া।
+
+## সংক্ষেপে
+- PyTorch মডেল TorchScript/ONNX-এ কনভার্ট করে মোবাইল/এজে চালানো যায়
+- Android/iOS-এ PyTorch Mobile API ব্যবহার করুন
+- Raspberry Pi/Jetson-এ TorchScript/ONNX Runtime ব্যবহার করুন
+- মডেল ছোট ও দ্রুত করুন—quantization, pruning
+
+## আরও জানুন
+- [PyTorch Mobile Documentation](https://pytorch.org/mobile/home/)
+- [ONNX Runtime for Edge](https://onnxruntime.ai/)
+- [Deploying AI on Raspberry Pi](https://pytorch.org/tutorials/recipes/recipes/deployment_on_raspberry_pi.html)
