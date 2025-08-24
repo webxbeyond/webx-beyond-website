@@ -122,7 +122,7 @@ Example SLI/SLO:
 
 Scenario: একজন গ্রাহক checkout করে। Observability pipeline:
 1. Client request enters API gateway — request gets a correlation id
-2. Gateway logs request received (structured) and emits metric request_count{route="/checkout"}
+2. Gateway logs request received (structured) and emits metric `request_count{route="/checkout"}`
 3. Backend services (cart, pricing, payments) create spans; database calls instrumented as child spans
 4. Prometheus scrapes metrics; traces exported to Tempo; logs sent to Loki/ClickHouse
 5. If payment latency > p95 threshold an alert fires; SRE uses dashboard to open a trace (linked via exemplar) and the runbook suggests checking external payment provider latency

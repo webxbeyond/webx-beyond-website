@@ -122,34 +122,39 @@ Targets: aim for hit ratio > 90% on read-heavy endpoints but measure business im
 ## ১১) Implementation examples (pseudo-code)
 
 Cache-aside (pseudo):
-
+```
 1) read(key):
-- v = cache.get(key)
-- if v != null: return v
-- v = db.get(key)
-- cache.set(key, v, ttl)
-- return v
+	v = cache.get(key)
+	if v != null: return v
+	v = db.get(key)
+	cache.set(key, v, ttl)
+	return v
 
 2) write(key, value):
-- db.write(key, value)
-- cache.delete(key)  // explicit invalidation
+	db.write(key, value)
+	cache.delete(key)  // explicit invalidation
+```
 
 Write-through (pseudo):
-
+```
 1) write(key, value):
-- cache.set(key, value, ttl)
-- db.write(key, value)
+	cache.set(key, value, ttl)
+	db.write(key, value)
+```
 
 Write-back (pseudo with durable queue):
-
+```
 1) write(key, value):
-- cache.set(key, value, ttl)
-- enqueue(persistent_queue, {key, value})
-- background_worker consumes queue and writes DB
+	cache.set(key, value, ttl)
+	enqueue(persistent_queue, {key, value})
+	background_worker consumes queue and writes DB
+```
 
 Redis tips:
-- Use Redis as cache (volatile-lru) for small objects; enable AOF or RDB if using write-back and durability needed
-- Use Redlock or Redis SET with NX+PX for simple distributed locking
+```
+Use Redis as cache (volatile-lru) for small objects; enable AOF or RDB if using write-back and durability needed
+Use Redlock or Redis SET with NX+PX for simple distributed locking
+```
 
 ## ১২) বাস্তব উদাহরণ ও কেস স্টাডি
 
