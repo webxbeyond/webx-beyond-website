@@ -62,11 +62,11 @@ HL ডিজাইন (কী প্রয়োজন):
 
 LL ডিজাইন: Data model & API
 
-- API: POST /shorten {"url":"https://..."} → {"short":"/abc123"}
+- API: POST /shorten `{"url":"https://..."} → {"short":"/abc123"}`
 - Redirect: GET /abc123 → 302 Location: https://...
 
 ডাটা মডেল (simple key-value):
-
+```
 {
   "shortKey": "abc123",
   "originalUrl": "https://example.com/very/long/path",
@@ -74,6 +74,7 @@ LL ডিজাইন: Data model & API
   "owner": "user-id",
   "expiry": null
 }
+```
 
 Key generation (LL concern): base62 encode of an incremental ID vs hash(random) — trade-offs:
 - incremental ID: সহজ, কোলিশন নেই, predictability সমস্যা (guessable URLs)
@@ -110,6 +111,7 @@ Analytics: Async logging via message queue to avoid slowing redirect path.
 ## ৯) ছোট LL স্নিপেট — প্যাটার্ন দেখানোর জন্য (pseudo-code)
 
 // Shorten endpoint pseudo
+```
 function shorten(url, userId) {
   // validate URL
   // generate candidate key
@@ -119,6 +121,7 @@ function shorten(url, userId) {
   // async log analytics
   return key
 }
+```
 
 এই কোডটি LL ধারণা দেখায়: validation, key generation, atomic insert, retry logic, async logging।
 

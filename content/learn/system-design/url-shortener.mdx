@@ -31,23 +31,27 @@ icon: solar:alt-arrow-right-bold-duotone
 - Expiration and deletion
 
 Non‑functional constraints:
-- High read QPS for redirects (reads >> writes)
-- Low latency (aim <50ms at edge)
-- High availability and graceful degradation
-- Scalable analytics without slowing redirects
+- রিডাইরেক্ট‑এর জন্য প্রচুর রিড (লেখার চেয়ে অনেক বেশি)
+- খুব কম latency (edge‑এ ৫০ms‑এর নিচে লক্ষ্য)
+- উচ্চ availability ও সুন্দর degrade
+- অ্যানালিটিক্স স্কেলেবল, কিন্তু redirect‑এ স্লো না
 
 এগুলো পরে ডিজাইনে প্রভাব ফেলবে—redirect fast রাখতে reads‑optimized design জরুরি।
 
 ## ২) API ও Data model
 
 Basic APIs:
-- POST /shorten { url, ttl?, custom_alias?, tags? } → { short_url }
-- GET /:alias → 302 redirect to long URL
-- GET /analytics/:alias → aggregated stats
+```
+POST /shorten { url, ttl?, custom_alias?, tags? } — { short_url } ফেরত
+GET /:alias — ৩০২ redirect করে বড় URL‑এ
+GET /analytics/:alias — summary stats ফেরত
+```
 
-Data model (simplified):
-- urls(id PK, alias VARCHAR UNIQUE, long_url TEXT, created_at, expires_at, owner_id)
-- clicks(id PK, alias FK, ts, ip, ua, referrer, geo)
+Data model (সরল):
+```
+urls(id PK, alias VARCHAR UNIQUE, long_url TEXT, created_at, expires_at, owner_id)
+clicks(id PK, alias FK, ts, ip, ua, referrer, geo)
+```
 
 Alias র‍্যাপিং: alias হলো ছোট key (6–10 chars) — আলফানুমেরিক + URL‑safe।
 
@@ -133,14 +137,16 @@ Key metrics:
 - shorten_rate, vanity_request_rate
 - analytics_event_lag, event_processing_errors
 
-SLO examples:
-- Redirect success rate 99.99% monthly
-- 95th percentile redirect latency < 30ms (edge), <100ms origin
+SLO উদাহরণ:
+```
+redirect success rate মাসে ৯৯.৯৯%
+৯৫th percentile redirect latency edge‑এ ৩০ms‑এর নিচে, origin‑এ ১০০ms‑এর নিচে
+```
 
-Runbook items:
-- High error rate → check cache tier & DB connectivity
-- Event processing lag → check consumer lag, reprocess topic
-- Abuse spike → rate limit or block offending IP ranges
+Runbook:
+- error rate বেশি হলে cache tier/DB connectivity চেক করুন
+- event processing lag হলে consumer lag/reprocess topic চেক করুন
+- abuse spike হলে offending IP‑তে rate limit/block দিন
 
 ## ১১) Testing & migrations
 

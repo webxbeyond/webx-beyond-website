@@ -99,14 +99,16 @@ Example (Dynamo‑style): two clients concurrently update same object on differe
 
 ## ৮) Implementation notes (pseudocode)
 
+```
 Representation: map<NodeId,uint64>
 
 OnLocalEvent(node):
-- V[node] += 1
-- attach copy(V) to event
+	V[node] += 1
+	attach copy(V) to event
 
 OnSend(node, msg):
-- attach V
+	attach V
+```
 
 OnReceive(node, msg, W):
 - for k in union(keys(V), keys(W)): V[k] = max(V.get(k,0), W.get(k,0))
@@ -116,9 +118,11 @@ OnReceive(node, msg, W):
 Storage: when storing versions per key, keep (value, vectorClock, timestamp)
 
 Merge policy example:
-- if V1 < V2 → V2 is descendant → V2 is latest
-- if V2 < V1 → V1 latest
-- else concurrent → application merges both (or keep both versions and return conflict)
+```
+if V1 < V2 — V2 is descendant — V2 is latest
+if V2 < V1 — V1 latest
+else concurrent — application merges both (বা দুই ভার্সন রেখে conflict দেখান)
+```
 
 ## ৯) Practical engineering tradeoffs
 
@@ -129,10 +133,12 @@ Merge policy example:
 
 ## ১০) Testing এবং validation
 
-- Unit tests for vector comparison algebra (≤, <, concurrency)
-- Integration tests with simulated delays and partitions to observe stored versions and conflict handling
-- Property tests: after sequence of operations and propagation, check convergence properties when using CRDTs or merging policies
-- Chaos tests: kill nodes, reorder messages, and verify no safety invariant violated
+```
+Unit tests for vector comparison algebra (≤, <, concurrency)
+Integration tests with simulated delays and partitions to observe stored versions and conflict handling
+Property tests: after sequence of operations and propagation, check convergence properties when using CRDTs or merging policies
+Chaos tests: kill nodes, reorder messages, and verify no safety invariant violated
+```
 
 ## ১১) Monitoring ও metrics
 

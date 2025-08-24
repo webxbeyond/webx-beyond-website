@@ -29,75 +29,75 @@ icon: solar:alt-arrow-right-bold-duotone
 
 ওপেনিং নীতি: সব authentication আজীবন নয়—সেশন, কিংবদন্তি ও credential lifecycle‑এর কথা মাথায় রাখুন।
 
-## ২) Password storage ও credentials নিরাপত্তা
+## ২) পাসওয়ার্ড স্টোরেজ ও ক্রেডেনশিয়াল নিরাপত্তা
 
-- কখনো plain text নয়। পাসওয়ার্ড স্টোর করলে strong hashing algorithm ব্যবহার করুন: Argon2id, bcrypt, বা scrypt
-- Hashing parameters (work factor, memory) টিউন করুন: CPU এবং memory trade‑offs আছে; Argon2 মডার্ন পছন্দ
-- Salt: প্রতিটি password‑এ unique random salt যোগ করুন
-- Pepper: optional — সার্ভার‑side secret added to hashes stored separately (নোড‑level secret)
-- Rate limiting ও account lockouts: brute force protection
-- Password policies: length & passphrase emphasis, not just complexity; prefer length over weird symbols requirement
+- কখনোই plain text‑এ পাসওয়ার্ড রাখবেন না। শক্তিশালী hashing algorithm ব্যবহার করুন: Argon2id, bcrypt, বা scrypt
+- Hashing‑এর parameter (work factor, memory) টিউন করুন: CPU ও memory‑র trade‑off আছে; Argon2 আধুনিক ও নিরাপদ
+- Salt: প্রতিটি পাসওয়ার্ড‑এ আলাদা random salt যোগ করুন
+- Pepper: (ঐচ্ছিক) — সার্ভার‑side secret, hash‑এর সাথে আলাদা করে রাখুন
+- Rate limiting ও account lockout: brute force‑এর বিরুদ্ধে সুরক্ষা
+- Password policy: দৈর্ঘ্য ও passphrase‑এ গুরুত্ব দিন, শুধু জটিলতা নয়; অদ্ভুত সিম্বল চেয়ে বড় পাসওয়ার্ড ভালো
 
-Example checklist for password flow:
-- On signup: generate salt, compute Argon2id(hash), store (salt, hash, Argon2 params)
-- On login: compute hash with stored salt & params, compare constant time
+পাসওয়ার্ড ফ্লো চেকলিস্ট:
+- সাইনআপ‑এ: salt তৈরি, Argon2id‑এ hash করুন, (salt, hash, Argon2 param) সংরক্ষণ
+- লগইন‑এ: সংরক্ষিত salt ও param‑এ hash করুন, constant time‑এ তুলনা করুন
 
-## ৩) Multi‑Factor Authentication (MFA)
+## ৩) মাল্টি‑ফ্যাক্টর অথেন্টিকেশন (MFA)
 
-- MFA types: SMS OTP (convenient but weaker), TOTP (Authenticator apps), Push MFA, U2F/WebAuthn (hardware keys)
-- Recommendation: support WebAuthn/FIDO2 for highest security; TOTP as fallback; avoid SMS for high‑security flows
-- UX: progressive disclosure — require MFA for sensitive operations (payments, recovery, admin)
-- Recovery: provide secure recovery flows (backup codes, hardware key registration), avoid insecure resets
+- MFA ধরন: SMS OTP (সহজ, কিন্তু দুর্বল), TOTP (Authenticator app), Push MFA, U2F/WebAuthn (hardware key)
+- সুপারিশ: WebAuthn/FIDO2 সাপোর্ট করুন; fallback‑এ TOTP; উচ্চ নিরাপত্তায় SMS এড়িয়ে চলুন
+- UX: গুরুত্বপূর্ণ কাজ (payment, recovery, admin)‑এ MFA বাধ্যতামূলক করুন
+- Recovery: নিরাপদ recovery flow দিন (backup code, hardware key); অনিরাপদ reset এড়িয়ে চলুন
 
-## ৪) Session management ও cookie security
+## ৪) সেশন ম্যানেজমেন্ট ও কুকি নিরাপত্তা
 
-- Two approaches: stateful server sessions (session store) vs stateless tokens (JWT)
-- Cookies: set Secure, HttpOnly, SameSite=strict/lax appropriately; avoid storing tokens in localStorage for browsers
-- Session fixation mitigation: regenerate session id on privilege change (e.g., login)
-- Idle & absolute session timeouts; sliding expiration tradeoffs
-- Logout: ensure server‑side session invalidation or token revocation
+- দুই পদ্ধতি: stateful server session (session store) বনাম stateless token (JWT)
+- Cookie: Secure, HttpOnly, SameSite=strict/lax ঠিকভাবে সেট করুন; ব্রাউজারে localStorage‑এ token রাখবেন না
+- Session fixation প্রতিরোধ: privilege change‑এ (যেমন login) session id নতুন করে দিন
+- Idle ও absolute session timeout; sliding expiration‑এর tradeoff
+- Logout‑এ: server‑side session invalidation/token revoke নিশ্চিত করুন
 
-Cookie flags summary:
-- HttpOnly: prevent JS access
-- Secure: only over HTTPS
-- SameSite: mitigate CSRF (Lax good default, Strict if app supports)
+Cookie flags:
+- HttpOnly: JS‑এ অ্যাক্সেস বন্ধ
+- Secure: শুধু HTTPS‑এ
+- SameSite: CSRF প্রতিরোধ (Lax ডিফল্ট, Strict হলে ভালো)
 
-## ৫) CSRF, XSS, session fixation ও mitigations
+## ৫) CSRF, XSS, session fixation ও প্রতিকার
 
-- CSRF: use SameSite cookies, anti‑CSRF tokens (double submit cookie or server‑side stored token), and verify Origin/Referer for sensitive endpoints
-- XSS: sanitize user input, Content Security Policy (CSP), HttpOnly cookies
-- Session fixation: always issue new session id after authentication
+- CSRF: SameSite cookie, anti‑CSRF token (double submit cookie/server‑side token), Origin/Referer যাচাই
+- XSS: user input sanitize, Content Security Policy (CSP), HttpOnly cookie
+- Session fixation: authentication‑এর পর নতুন session id দিন
 
-## ৬) Token patterns: JWT, opaque tokens, refresh tokens
+## ৬) টোকেন প্যাটার্ন: JWT, opaque token, refresh token
 
-- JWT (JSON Web Token): self‑contained token with claims, can be statelessly verified with signature
-  - Advantages: easy to scale (no server session), carries metadata
-  - Risks: revocation hard if purely stateless, large tokens, signature algorithm misuse
-- Opaque tokens: random string referencing server‑side store — easy to revoke
-- Best practice: use short‑lived access tokens + long‑lived refresh tokens (refresh tokens stored securely; rotate on use)
-- Token rotation: issue new refresh token on each refresh and revoke old one to mitigate replay
-- Introspection endpoint (OAuth2) for resource servers to validate opaque tokens
+- JWT (JSON Web Token): claim‑সহ self‑contained token, signature‑এ stateless verify
+  - সুবিধা: স্কেল সহজ (server session লাগে না), metadata বহন করে
+  - ঝুঁকি: stateless হলে revoke কঠিন, বড় token, signature algorithm ভুল হলে সমস্যা
+- Opaque token: random string, server‑side store‑এ reference — revoke সহজ
+- Best practice: short‑lived access token + long‑lived refresh token (refresh token নিরাপদে রাখুন, ব্যবহার হলে rotate করুন)
+- Token rotation: প্রতিবার refresh‑এ নতুন refresh token দিন, পুরনো revoke করুন
+- Introspection endpoint (OAuth2)‑এ resource server opaque token validate করতে পারে
 
-Security tips for JWT:
-- Validate signature and claims (iss, aud, exp, nbf)
-- Use asymmetric signing (RS256/ES256) for distributed verification; protect private keys
-- Avoid including sensitive data in token payloads
+JWT নিরাপত্তা টিপস:
+- signature ও claim (iss, aud, exp, nbf) validate করুন
+- asymmetric signing (RS256/ES256) ব্যবহার করুন; private key নিরাপদে রাখুন
+- token‑এ সংবেদনশীল ডেটা রাখবেন না
 
-## ৭) OAuth2 ও OpenID Connect (OIDC) — practical guide
+## ৭) OAuth2 ও OpenID Connect (OIDC) — ব্যবহারিক গাইড
 
-- OAuth2: authorization framework for delegated access. OIDC extends OAuth2 to provide authentication (identity layer)
-- Common flows:
-  - Authorization Code Flow (with PKCE for public clients): recommended for web & mobile
+- OAuth2: authorization framework, delegated access‑এর জন্য; OIDC‑তে authentication (identity layer) যোগ হয়
+- Common flow:
+  - Authorization Code Flow (PKCE‑সহ): web/mobile‑এ সুপারিশ
   - Client Credentials Flow: machine‑to‑machine
   - Implicit Flow: deprecated
   - Resource Owner Password Credentials: discouraged
 
-- PKCE: required for native/mobile apps — prevents interception of auth code
-- Scopes & consent: use minimal scopes, explain consent to users
-- Claims mapping: map identity provider claims to your internal user model
+- PKCE: native/mobile‑এ বাধ্যতামূলক — auth code interception রোধ
+- Scope/consent: কম scope ব্যবহার করুন, consent‑এর ব্যাখ্যা দিন
+- Claims mapping: IdP‑এর claim‑কে internal user model‑এ map করুন
 
-When to use an IdP vs build your own:
-- Use managed IdPs (Auth0, Okta, Keycloak, AWS Cognito) unless you have strong reason to build—security and compliance are non‑trivial
+IdP ব্যবহার/নিজে বানানোর সিদ্ধান্ত:
+- Auth0, Okta, Keycloak, AWS Cognito‑এর মতো managed IdP ব্যবহার করুন, যদি না বিশেষ কারণ থাকে; security/compliance কঠিন
 
 ## ৮) Authorization models: RBAC, ABAC, PBAC
 

@@ -140,10 +140,12 @@ Runbook snippets:
 
 ## ১৩) Decision flow (সংক্ষেপে)
 
-1. Is ultra‑low latency (<1s) required? → consider WebRTC or LL‑HLS/DASH; higher complexity
-2. Is cost a primary concern for VOD? → pre‑transcode popular content, use cold storage for infrequent content
-3. Need DRM & wide device support? → choose DRM ecosystem and ensure CMAF compatibility
-4. Expect global scale? → use multi‑region origin + CDN, and global object storage or replication
+```
+১. ultra‑low latency (১ সেকেন্ডের নিচে) দরকার? — WebRTC বা LL‑HLS/DASH ব্যবহার করুন; বেশি জটিলতা
+২. VOD‑এ খরচ গুরুত্বপূর্ণ? — জনপ্রিয় কনটেন্ট pre‑transcode করুন, কম ব্যবহৃত কনটেন্ট cold storage‑এ রাখুন
+৩. DRM ও device support দরকার? — DRM ecosystem বেছে নিন, CMAF compatibility নিশ্চিত করুন
+৪. global scale দরকার? — multi‑region origin + CDN, global object storage/replication ব্যবহার করুন
+```
 
 ## ১৪) বাস্তব‑বিশেষ উদাহরণ (concise)
 
