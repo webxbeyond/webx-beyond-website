@@ -1,0 +1,181 @@
+---
+title: টাইপস্ক্রিপট সিলেবাস
+icon: logos:typescript-icon
+---
+
+## মডিউল ১: পরিচিতি ও সেটআপ
+**লক্ষ্য:** TypeScript কী, কেন ব্যবহার করবেন এবং লোকাল/প্রজেক্ট স্তরে কিভাবে সেটআপ করবেন তা বোঝা।
+
+### পাঠসমূহ:
+1. [TypeScript কী এবং কেন ব্যবহার করবেন?](/typescript/intro)
+2. [TypeScript ইনস্টল ও `tsconfig.json` কনফিগারেশন](/typescript/setup)
+3. [TypeScript কম্পাইলার (tsc) ও বিল্ড প্রক্রিয়া](/typescript/compiler)
+4. [Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript ব্যবহার](/typescript/node-integration)
+
+**হ্যান্ডস-অন:** `tsc --init` চালিয়ে একটি প্রজেক্ট তৈরি করুন এবং বেসিক টাইপ চেকিং ও কম্পাইল করে দেখুন।
+
+---
+
+## মডিউল ২: টাইপ সিস্টেম ফান্ডামেন্টালস
+**লক্ষ্য:** TypeScript-এর স্ট্যাটিক টাইপ সিস্টেমের মৌলিক ধারণা আয়ত্ত করা।
+
+### পাঠসমূহ:
+1. [প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)](/typescript/primitives)
+2. [টাইপ অ্যানোটেশন বনাম টাইপ ইনফারেন্স](/typescript/type-inference)
+3. [অ্যারে, টাপল ও readonly টাইপ](/typescript/arrays-tuples)
+4. [অবজেক্ট টাইপ ও টাইপ অ্যালিয়াস](/typescript/type-alias)
+
+**হ্যান্ডস-অন:** স্ট্রংলি-টাইপড ডাটা মডেল তৈরি করুন।
+
+---
+
+## মডিউল ৩: ফাংশন ও অ্যাডভান্সড টাইপ ফিচার
+**লক্ষ্য:** ফাংশনের টাইপিং এবং জটিল টাইপ কনসেপ্টগুলো শেখা।
+
+### পাঠসমূহ:
+1. [ফাংশন টাইপ অ্যানোটেশন ও ডিফল্ট প্যারামিটার](/typescript/functions)
+2. [অপশনাল ও রেস্ট প্যারামিটার](/typescript/optional-rest)
+3. [রিটার্ন টাইপ ও `void` বনাম `never`](/typescript/return-types)
+4. [ফাংশন ওভারলোডিং](/typescript/function-overloading)
+5. [জেনেরিকস পরিচিতি: কেন ও কিভাবে](/typescript/generics)
+
+**হ্যান্ডস-অন:** জেনেরিকস ব্যবহার করে পুনঃব্যবহারযোগ্য (reusable) ফাংশন লিখুন।
+
+---
+
+## মডিউল ৪: অ্যাডভান্সড টাইপ ও প্যাটার্ন
+**লক্ষ্য:** জটিল টাইপ নিয়ে কাজ করা এবং টাইপ-লেভেলে প্রোগ্রামিং অনুশীলন।
+
+### পাঠসমূহ:
+1. [Union ও Intersection টাইপ বিস্তারিত](/typescript/union-intersection)
+2. [Literal টাইপ ও Discriminated Unions](/typescript/discriminated-unions)
+3. [Mapped টাইপ ও Utility টাইপ (`Partial`, `Pick`, `Record`)](/typescript/utility-types)
+4. [টাইপ গার্ডস ও `typeof` / `instanceof`](/typescript/type-guards)
+5. [Conditional টাইপ ও `infer`](/typescript/conditional-types)
+6. [Template Literal টাইপ](/typescript/template-literal-types)
+
+**হ্যান্ডস-অন:** একটি type-safe API রেসপন্স হ্যান্ডলার তৈরি করুন।
+
+---
+
+## মডিউল ৫: TypeScript-এ অবজেক্ট-ওরিয়েন্টেড প্রোগ্রামিং
+**লক্ষ্য:** ক্লাস-ভিত্তিক প্রোগ্রামিং কনসেপ্টগুলো আয়ত্ত করা।
+
+### পাঠসমূহ:
+1. [ক্লাস ও অ্যাক্সেস মডিফায়ার (`public`, `private`, `protected`)](/typescript/classes)
+2. [Readonly ও Static প্রপার্টি](/typescript/readonly-static)
+3. [ইনহেরিট্যান্স ও মেথড ওভাররাইডিং](/typescript/inheritance)
+4. [অ্যাবস্ট্রাক্ট ক্লাস ও ইন্টারফেস](/typescript/interfaces)
+5. [পলিমরফিজম ও ডিজাইন প্যাটার্ন](/typescript/polymorphism)
+
+**হ্যান্ডস-অন:** OOP ভিত্তিক একটি ছোট প্রজেক্ট তৈরি করুন।
+
+---
+
+## মডিউল ৬: TypeScript ও JavaScript ইন্টারঅপেরেবিলিটি
+**লক্ষ্য:** বিদ্যমান JS লাইব্রেরি ও DefinitelyTyped সহ কিভাবে কাজ করবেন তা শেখা।
+
+### পাঠসমূহ:
+1. [`.d.ts` ফাইল ব্যবহার এবং Declaration Merging](/typescript/declaration-files)
+2. [থার্ড-পার্টি JS লাইব্রেরি কাজে লাগানো](/typescript/js-integration)
+3. [কাস্টম টাইপ ডেফিনিশন তৈরি করা](/typescript/custom-types)
+
+**হ্যান্ডস-অন:** একটি external লাইব্রেরির জন্য custom টাইপ ডেফিনিশন তৈরি করুন।
+
+---
+
+## মডিউল ৭: অ্যাডভান্সড জেনেরিকস ও টাইপ ইনফারেন্স
+**লক্ষ্য:** জেনেরিকস নিয়ে গভীরভাবে অনুশীলন করা।
+
+### পাঠসমূহ:
+1. [Generic Constraints ও `extends`](/typescript/generic-constraints)
+2. [ডিফল্ট জেনেরিক টাইপ](/typescript/default-generics)
+3. [Keyof, Lookup ও Indexed Access টাইপ](/typescript/keyof-lookup)
+4. [Variadic Tuple টাইপ](/typescript/variadic-tuple)
+5. [Type-safe Builders ও Fluent API ডিজাইন](/typescript/fluent-api)
+
+**হ্যান্ডস-অন:** একটি type-safe query builder তৈরি করুন।
+
+---
+
+## মডিউল ৮: ডেকোরেটর ও মেটা-প্রোগ্রামিং
+**লক্ষ্য:** পরীক্ষামূলক (experimental) ফিচার ও অ্যাডভান্সড টেকনিকগুলো শেখা।
+
+### পাঠসমূহ:
+1. [ডেকোরেটর কী ও কিভাবে কাজ করে](/typescript/decorators)
+2. [ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর](/typescript/class-method-decorators)
+3. [মেটাডাটা রিফ্লেকশন API (`reflect-metadata`)](/typescript/reflect-metadata)
+
+**হ্যান্ডস-অন:** কাস্টম ক্লাস ডেকোরেটর তৈরি করুন।
+
+---
+
+## মডিউল ৯: রিয়েল-ওয়ার্ল্ড অ্যাপ্লিকেশনে TypeScript
+**লক্ষ্য:** ফ্রেমওয়ার্ক ইন্টিগ্রেশন ও বড় প্রজেক্টে TypeScript ব্যবহার শেখা।
+
+### পাঠসমূহ:
+1. [React-এ TypeScript (Hooks, Props, Context API)](/typescript/react)
+2. [Node.js-এ TypeScript (Express, Fastify)](/typescript/node)
+3. [Next.js ও API রাউটসের সাথে TypeScript](/typescript/next)
+4. [Monorepo-এ TypeScript (Nx, Turborepo)](/typescript/monorepo)
+
+**হ্যান্ডস-অন:** React + Node.js দিয়ে TypeScript ভিত্তিক একটি ফুল-স্ট্যাক অ্যাপ তৈরি করুন।
+
+---
+
+## মডিউল ১০: এরর হ্যান্ডলিং ও স্ট্রিক্ট মোড
+**লক্ষ্য:** টাইপ সেফটি কড়া করা ও সম্ভাব্য ব্যতিক্রম গুলো ধরতে শেখা।
+
+### পাঠসমূহ:
+1. [`strict` মোড ও `noImplicitAny`](/typescript/strict-mode)
+2. [নাল সেফটি ও `strictNullChecks`](/typescript/null-safety)
+3. [Exhaustiveness চেকিং `never` দিয়ে](/typescript/exhaustiveness)
+
+**হ্যান্ডস-অন:** একটি type-safe এরর হ্যান্ডলিং স্ট্র্যাটেজি ইমপ্লিমেন্ট করুন।
+
+---
+
+## মডিউল ১১: টেস্টিং ও টুলিং
+**লক্ষ্য:** TypeScript কোড টেস্ট করবার ও রক্ষণাবেক্ষণযোগ্য করা।
+
+### পাঠসমূহ:
+1. [Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং](/typescript/testing-jest)
+2. [ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস](/typescript/testing-integration)
+3. [CI/CD-তে টাইপ চেকিং](/typescript/type-checking-ci)
+4. [লিন্টার ও ফরম্যাটার (ESLint, Prettier)](/typescript/eslint-prettier)
+
+**হ্যান্ডস-অন:** CI পাইপলাইনে টাইপ চেকিং অন করে দিন।
+
+---
+
+## মডিউল ১২: পারফরম্যান্স, অপ্টিমাইজেশন ও বেস্ট প্র্যাকটিস
+**লক্ষ্য:** বড় কোডবেসে পারফরম্যান্স ও বিল্ড টাইম অপ্টিমাইজ করা।
+
+### পাঠসমূহ:
+1. [বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন](/typescript/build-optimization)
+2. [কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript](/typescript/tree-shaking)
+3. [অ্যাডভান্সড টাইপ বনাম সরল থাকার ট্রেড-অফ](/typescript/performance)
+4. [বড় রিপোজিটরির জন্য প্রজেক্ট রেফারন্স](/typescript/project-references)
+
+**হ্যান্ডস-অন:** বড় প্রজেক্টে incremental build ইমপ্লিমেন্ট করুন।
+
+---
+
+## মডিউল ১৩: এন্টারপ্রাইজ ও API ডিজাইন জন্য TypeScript
+**লক্ষ্য:** এন্টারপ্রাইজ-লেভেলের প্যাটার্ন ও কন্ট্র্যাক্ট-ফার্স্ট ডিজাইন শেখা।
+
+### পাঠসমূহ:
+1. [Domain-driven Design (DDD) সাথে TypeScript](/typescript/ddd)
+2. [Contract-first API ডিজাইন (OpenAPI + TS)](/typescript/api-contracts)
+3. [মাইক্রোসার্ভিসে টাইপ-সেফ gRPC ও ইভেন্ট-ড্রিভেন সিস্টেম](/typescript/microservices)
+
+**হ্যান্ডস-অন:** একটি type-safe OpenAPI ক্লায়েন্ট জেনারেট করুন।
+
+---
+
+### ✅ বোনাস টপিকস:
+- **TypeScript কম্পাইলার ইন্টারনালস**  
+- **AST (Abstract Syntax Tree) ম্যানিপুলেশন**  
+- **TypeScript-সহ কাস্টম ESLint রুলস**  
+- **TS Transformers দিয়ে কোড জেনারেশন**
+- **Code Generation with TS Transformers**  

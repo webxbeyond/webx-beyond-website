@@ -262,6 +262,7 @@ function SelectTopics() {
   { title: 'অ্যানসিবল (Ansible)', description: 'ইনফ্রা অটোমেশন, কনফিগ ম্যানেজমেন্ট, ক্লাউড, ডেভঅপস, টেস্টিং ও স্কেলিং—বাংলায় মাস্টার ইন আনসিবল সিরিজ।', icon: 'cib:ansible', href: '/ansible', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, category: 'ডেভঅপস' },
   { title: 'সেলফ হোস্টিং ও হোম ল্যাব', description: 'নিজস্ব সার্ভার সেটআপ, ওপেন-সোর্স সফটওয়ার চালানো, ফাইল শেয়ারিং, স্ট্রিমিং, ব্যাকআপ, রিভার্স প্রক্সি, মনিটরিং ও সিকিউরিটি—ব্যক্তিগত ক্লাউড ও হোস্টিংয়ের জন্য।', icon: 'ph:cloud-arrow-down-duotone', href: '/self-hosting', badge: { text: 'চলমান', variant: 'progress' }, category: 'ডেভঅপস' },
   { title: 'ট্র্যাফিক (Traefik)', description: 'রিভার্স প্রক্সি ও ইনগ্রেস কনফিগারেশন—HTTPS, Let\'s Encrypt, ডাইনামিক রাউটিং ও কনফিগারেশন প্যাটার্ন। কুবেরনেটিস ও সেলফ-হোস্টিং পরিবেশে ডিপ্লয় ও কনফিগার করার গাইড।', icon: 'simple-icons:traefikproxy', href: '/traefik', badge: { text: 'চলমান', variant: 'progress' }, category: 'ডেভঅপস' },
+  { title: 'ডকার', description: 'কনটেইনারাইজেশন, Dockerfile, ইমেজ বিল্ড, Docker Compose ও প্রোডাকশন প্রস্তুতি—ডকার দিয়ে অ্যাপ কন্টেইনারাইজ করার সম্পূর্ণ গাইড।', icon: 'logos:docker-icon', href: '/docker', badge: { text: 'চলমান', variant: 'progress' }, category: 'ডেভঅপস' },
     // Networking & Security
   { title: 'নেটওয়ার্কিং', description: 'কম্পিউটার নেটওয়ার্ক, প্রোটোকল, ট্রাবলশুটিং, নিরাপত্তা ও বাস্তবিক উদাহরণ—নেটওয়ার্কিংয়ের বেসিক থেকে অ্যাডভান্সড।', icon: 'material-symbols:cable-sharp', href: '/networking', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, category: 'নেটওয়ার্কিং' },
   { title: 'মাইক্রোটিক', description: 'রাউটার, নেটওয়ার্কিং, ISP, VPN, ফায়ারওয়াল, অটোমেশন—বাংলায় সম্পূর্ণ মাইক্রোটিক মাস্টারি সিরিজ।', icon: 'solar:wi-fi-router-bold', href: '/mikrotik', badge: { text: 'সম্পূর্ণ', variant: 'progress' }, category: 'নেটওয়ার্কিং' },
@@ -279,11 +280,11 @@ function SelectTopics() {
   { title: 'টেরাফর্ম / IaC', description: 'ইনফ্রাস্ট্রাকচার অ্যাজ কোড, ক্লাউড রিসোর্স ম্যানেজমেন্ট ও অটোমেশন—Terraform ও IaC-এর হাতে-কলমে গাইড।', icon: 'logos:terraform-icon', href: '/terraform', badge: { text: 'চলমান', variant: 'progress' }, category: 'উন্নত' },
   { title: 'সংক্ষিপ্ত নোট (Cheatsheets)', description: 'প্রোগ্রামিং, টুলিং ও ডেভঅপসের জন্য দ্রুত রেফারেন্স—কমান্ড, সিনট্যাক্স, কনফিগ ও শর্টকাট।', icon: 'fluent:notebook-16-regular', href: '/cheatsheet', badge: { text: 'চলমান', variant: 'progress' }, category: 'উন্নত' },
     // Upcoming and advanced topics
-  { title: 'টাইপস্ক্রিপ্ট', description: 'টাইপ-সিস্টেম যুক্ত জাভাস্ক্রিপ্ট — টাইপস, জেনেরিকস, টুলিং ও প্রকল্পে টাইপস যুক্ত করার শ্রেষ্ঠ অনুশীলন।', icon: 'logos:typescript-icon', href: '/typescript', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'মৌলিক' },
+  { title: 'টাইপস্ক্রিপ্ট', description: 'টাইপ-সিস্টেম যুক্ত জাভাস্ক্রিপ্ট — টাইপস, জেনেরিকস, টুলিং ও প্রকল্পে টাইপস যুক্ত করার শ্রেষ্ঠ অনুশীলন।', icon: 'logos:typescript-icon', href: '/typescript', badge: { text: 'চলমান', variant: 'progress' }, category: 'মৌলিক' },
   { title: 'রিয়্যাক্ট (React)', description: 'কম্পোনেন্ট মডেল, হুকস, স্টেট ম্যানেজমেন্ট ও কাজের উদাহরণ সহ আধুনিক React ডেভেলপমেন্ট।', icon: 'logos:react', href: '/react', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ওয়েব' },
   { title: 'Next.js', description: 'SSR/SSG, রুটিং, ডেটা ফেচিং ও পারফরম্যান্স অপ্টিমাইজেশন সহ Next.js ভিত্তিক অ্যাপ নির্মাণ।', icon: 'logos:nextjs', href: '/nextjs', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ওয়েব' },
   { title: 'কুবেরনেটিস', description: 'কন্টেইনার অর্কেস্ট্রেশন, ডিপ্লয়মেন্ট, সার্ভিস, কনফিগারেশন ও অপারেশনাল বেস্ট প্র্যাকটিস।', icon: 'logos:kubernetes', href: '/kubernetes', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ডেভঅপস' },
-  { title: 'AWS', description: 'AWS পরিষেবাগুলো — EC2, S3, IAM, VPC, ও ডিপ্লয়মেন্ট প্যাটার্ন সহ ক্লাউড অপারেশন ও আর্কিটেকচার।', icon: 'logos:aws', href: '/aws', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ডেভঅপস' },
+  { title: 'AWS', description: 'AWS পরিষেবাগুলো — EC2, S3, IAM, VPC, ও ডিপ্লয়মেন্ট প্যাটার্ন সহ ক্লাউড অপারেশন ও আর্কিটেকচার।', icon: 'logos:aws', href: '/aws', badge: { text: 'চলমান', variant: 'progress' }, category: 'ডেভঅপস' },
   { title: 'GCP', description: 'Google Cloud Platform — Compute, Storage, Networking ও কনটেইনার সার্ভিস সহ ক্লাউড বেসিক ও অ্যাডভান্সড কনসেপ্ট।', icon: 'logos:google-cloud', href: '/gcp', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ডেভঅপস' },
   { title: 'হাসিকর্প ভল্ট', description: 'HashiCorp Vault সিক্রেট ম্যানেজমেন্ট ও কী ম্যানেজমেন্ট — Vault সেটআপ, পলিসি, টোকেন, রোলিং, রি-অনক্রিপশন, এবং অ্যাপলিকেশন ইন্টিগ্রেশন।', icon: 'lucide:vault', href: '/vault', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'ডেভঅপস' },
   { title: 'ইথিক্যাল হ্যাকিং', description: 'হ্যাকিং কৌশল, নিরাপত্তা টেস্টিং, সাইবার থ্রেট ও ডিফেন্স—নিজেকে ও অন্যকে নিরাপদ রাখার জন্য।', icon: 'ph:terminal-duotone', href: '/#select-topics', badge: { text: 'শীঘ্রই আসছে', variant: 'soon' }, category: 'উন্নত' },
@@ -327,6 +328,29 @@ function SelectTopics() {
       <p className="text-center text-fd-muted-foreground mb-6 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন বা সার্চ করুন।</p>
 
       <div className="mx-auto px-4 mb-6">
+        {/* Search box (wired to query state) */}
+        <div className="flex justify-center mb-4">
+          <div className="relative w-full max-w-md">
+            <Iconify icon="ph:magnifying-glass" width={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fd-muted-foreground" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="সার্চ টপিক (শিরোনাম বা বর্ণনা)..."
+              aria-label="Search topics"
+              className="w-full rounded-full pl-10 pr-10 py-2 text-sm border border-fd-foreground/10 bg-fd-background/60 placeholder:text-fd-muted-foreground"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full p-1 text-fd-muted-foreground hover:text-fd-foreground"
+              >
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="flex flex-wrap gap-3 items-center justify-center mb-4">
             <button
               className={cn('px-3 py-1 rounded-full text-sm font-medium', selectedCategory === 'all' ? 'bg-fd-primary text-white' : 'bg-fd-background border border-fd-foreground/10')}

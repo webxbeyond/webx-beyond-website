@@ -1,0 +1,255 @@
+---
+title: ডকার সম্পূর্ণ সিলেবাস
+icon: logos:docker-icon
+---
+
+## মডিউল ১: ডকার পরিচিতি
+
+**লক্ষ্য:** ডকার কী, কেন ব্যবহার করবেন এবং কন্টেইনারাইজেশন ধারণা বোঝা।
+
+### পাঠসমূহ:
+1. [Containerization বনাম Virtualization](/docker/container-vs-vm)
+2. [ডকার কী এবং কিভাবে কাজ করে](/docker/what-is-docker)
+3. [Docker Engine, CLI ও Daemon পরিচিতি](/docker/docker-engine-cli)
+4. [ডকার ইনস্টলেশন (Linux, Mac, Windows)](/docker/install)
+5. [Hello World: প্রথম কন্টেইনার চালানো](/docker/hello-world)
+
+**প্রজেক্ট:** ডকার ইনস্টল করুন এবং একটি বেসিক Nginx কন্টেইনার চালান।
+
+---
+
+## মডিউল ২: ডকার বেসিকস
+
+**লক্ষ্য:** ডকারের মূল কমান্ড, ইমেজ ম্যানেজমেন্ট ও কন্টেইনার হ্যান্ডলিং শেখা।
+
+### পাঠসমূহ:
+1. [Docker Images: Pull, Build, Tag](/docker/images)
+2. [কন্টেইনার লাইফসাইকেল: Run, Stop, Remove](/docker/container-lifecycle)
+3. [Docker Hub ও প্রাইভেট রেজিস্ট্রি](/docker/docker-hub)
+4. [Volumes ও Bind Mounts](/docker/volumes-mounts)
+5. [Port Mapping ও নেটওয়ার্ক বেসিকস](/docker/network-basics)
+
+**প্রজেক্ট:** একটি স্ট্যাটিক ওয়েবসাইট কন্টেইনারে হোস্ট করুন।
+
+---
+
+## মডিউল ৩: Dockerfile ও ইমেজ বিল্ডিং
+
+**লক্ষ্য:** কাস্টম ডকার ইমেজ তৈরি ও অপ্টিমাইজ করা।
+
+### পাঠসমূহ:
+1. [Dockerfile বেসিক ও নির্দেশনা (FROM, RUN, COPY, CMD)](/docker/dockerfile-basics)
+2. [Multi-stage Builds ও ইমেজ সাইজ অপ্টিমাইজেশন](/docker/multi-stage-build)
+3. [Build Context ও Cache Layers](/docker/build-cache)
+4. [ডকার ইমেজের সেরা অনুশীলন](/docker/dockerfile-best-practices)
+
+**প্রজেক্ট:** Node.js বা Python অ্যাপের জন্য একটি কাস্টম ডকার ইমেজ তৈরি করুন।
+
+---
+
+## মডিউল ৪: ডকার নেটওয়ার্কিং
+
+**লক্ষ্য:** কন্টেইনারগুলোর মধ্যে যোগাযোগ এবং নেটওয়ার্কিং মডেল বুঝে ওঠা।
+
+### পাঠসমূহ:
+1. [Bridge Network ও Container Linking](/docker/bridge-network)
+2. [Host ও None Network Drivers](/docker/host-none-network)
+3. [Custom User-defined Networks](/docker/custom-network)
+4. [DNS রেজলিউশন ও সার্ভিস ডিসকভারি](/docker/service-discovery)
+
+**প্রজেক্ট:** App + Database কনফিগ করে দুইটি কন্টেইনারের মধ্যে নেটওয়ার্কিং তৈরি করুন।
+
+---
+
+## মডিউল ৫: ডেটা ম্যানেজমেন্ট
+
+**লক্ষ্য:** ডেটা পার্সিস্টেন্স এবং ভলিউম ম্যানেজমেন্ট শেখা।
+
+### পাঠসমূহ:
+1. [Bind Mount বনাম Volumes](/docker/mount-vs-volume)
+2. [Named Volumes ও Volume Drivers](/docker/volume-drivers)
+3. [Docker ব্যাকআপ ও রিস্টোর কৌশল](/docker/data-backup)
+
+**প্রজেক্ট:** MySQL ডাটাবেসের ডেটা Docker Volumes দিয়ে পার্সিস্ট করুন।
+
+---
+
+## মডিউল ৬: Docker Compose
+
+**লক্ষ্য:** বহু-কন্টেইনার অ্যাপ্লিকেশন সহজে ডিপ্লয় করা।
+
+### পাঠসমূহ:
+1. [Docker Compose পরিচিতি ও YAML স্ট্রাকচার](/docker/compose-intro)
+2. [Environment Variables ও Overrides](/docker/compose-env)
+3. [Compose-এ Networks ও Volumes ব্যবহার](/docker/compose-networks-volumes)
+4. [Service Scaling ও Auto-restart কনফিগারেশন](/docker/compose-scaling)
+
+**প্রজেক্ট:** Docker Compose দিয়ে একটি Full-stack App (React + Node.js + MongoDB) ডিপ্লয় করুন।
+
+---
+
+## মডিউল ৭: ডকার সিকিউরিটি
+
+**লক্ষ্য:** নিরাপত্তা সেরা অনুশীলন ও ইমেজ স্ক্যানিং শেখা।
+
+### পাঠসমূহ:
+1. [Docker Daemon সিকিউরিটি](/docker/daemon-security)
+2. [Least Privilege ও Non-root Containers](/docker/non-root-containers)
+3. [Docker-এ সিক্রেট ম্যানেজমেন্ট](/docker/secrets-management)
+4. [ইমেজ দুর্বলতা স্ক্যানিং](/docker/vulnerability-scanning)
+
+**প্রজেক্ট:** Trivy ব্যবহার করে ইমেজ স্ক্যান করুন এবং সিকিউরিটি অডিট বাস্তবায়ন করুন।
+
+---
+
+## মডিউল ৮: Docker Swarm ও অর্কেস্ট্রেশন বেসিকস
+
+**লক্ষ্য:** কন্টেইনার অর্কেস্ট্রেশন ধারণা বোঝা।
+
+### পাঠসমূহ:
+1. [অর্কেস্ট্রেশন কেন প্রয়োজন? Docker Swarm ওভারভিউ](/docker/swarm-overview)
+2. [Swarm Init, Nodes ও Managers](/docker/swarm-init)
+3. [Services, Stacks ও স্কেলিং](/docker/swarm-services)
+4. [লোড ব্যালান্সিং ও রোলিং আপডেট](/docker/swarm-load-balancing)
+
+**প্রজেক্ট:** Swarm ক্লাস্টার তৈরি করে লোড-ব্যালান্সড সার্ভিস চালান।
+
+---
+
+## মডিউল ৯: মনিটরিং ও লগিং
+
+**লক্ষ্য:** কন্টেইনার পারফরম্যান্স মনিটরিং ও লগিং কৌশল শেখা।
+
+### পাঠসমূহ:
+1. [Docker Logs ও Log Drivers](/docker/logging)
+2. [Container Metrics (docker stats)](/docker/metrics)
+3. [Prometheus + Grafana দিয়ে মনিটরিং](/docker/monitoring-stack)
+
+**প্রজেক্ট:** Prometheus + Grafana দিয়ে Docker হোস্ট মনিটরিং সেটআপ করুন।
+
+---
+
+## মডিউল ১০: উন্নত ও প্রোডাকশন-রেডি ডকার
+
+**লক্ষ্য:** প্রোডাকশন-গ্রেড ডিপ্লয়মেন্ট ও অপ্টিমাইজেশন শেখা।
+
+### পাঠসমূহ:
+1. [রিসোর্স সীমা (CPU, Memory)](/docker/resource-limits)
+2. [Health Checks ও Auto-restart নীতিমালা](/docker/health-checks)
+3. [রেজিস্ট্রি ম্যানেজমেন্ট: প্রাইভেট রেজিস্ট্রি, Harbor](/docker/private-registry)
+4. [CI/CD পাইপলাইনে Docker ব্যবহার](/docker/docker-ci-cd)
+
+**প্রজেক্ট:** GitHub Actions দিয়ে Docker ইমেজ বিল্ড ও Push করার একটি পাইপলাইন তৈরি করুন।
+
+---
+
+## মডিউল ১১: বাস্তব-জীবন প্রজেক্টসমূহ
+
+**লক্ষ্য:** Docker ব্যবহার করে পূর্ণাঙ্গ সমাধান তৈরি করা।
+
+### প্রজেক্টসমূহ:
+1. [WordPress + MySQL in Docker](/docker/project-wordpress)
+2. [Full-stack MERN App with Docker Compose](/docker/project-mern)
+3. [Secure Private Docker Registry with SSL](/docker/project-registry)
+4. [Cloud-এ Dockerized App ডিপ্লয় (AWS, GCP, Azure)](/docker/project-cloud-deploy)
+
+---
+
+## মডিউল ১২: ডকার আর্কিটেকচার ইন্টারনালস
+
+**লক্ষ্য:** ডকারের ভেতরের কাজগুলো কিভাবে চলে তা গভীরভাবে বোঝা।
+
+### পাঠসমূহ:
+1. [Docker Architecture: Components & Flow](/docker/architecture-internals)
+2. [Container Lifecycle in Detail](/docker/container-lifecycle-internal)
+3. [Namespaces, Cgroups & UnionFS ব্যাখ্যা](/docker/linux-kernel-features)
+4. [ইমেজ লেয়ারিং ও কেচ মেকানিজম](/docker/image-layering)
+5. [স্টোরেজ ড্রাইভার: Overlay2, AUFS, Device Mapper, Btrfs](/docker/storage-drivers)
+
+**হ্যান্ডস-অন:** `docker info` আউটপুট বিশ্লেষণ করুন এবং আপনার সিস্টেমে ব্যবহৃত ড্রাইভার শনাক্ত করুন।
+
+---
+
+## মডিউল ১৩: উন্নত ইমেজ ম্যানেজমেন্ট
+
+**লক্ষ্য:** ইমেজ অপ্টিমাইজেশন, নিরাপত্তা ও কৌশল শেখা।
+
+### পাঠসমূহ:
+1. [Slim Images & Multi-stage Builds গভীর আলোচনা](/docker/slim-images)
+2. [Immutable Images ও Tagging কৌশল](/docker/tagging-strategy)
+3. [Image Signing & Verification (Docker Content Trust)](/docker/docker-content-trust)
+4. [OCI Image Specification নিয়ে কাজ](/docker/oci-spec)
+
+**হ্যান্ডস-অন:** প্রোডাকশন-রেডি lightweight ইমেজ তৈরি করুন (উদাহরণ: Alpine-based Node.js)।
+
+---
+
+## মডিউল ১৪: উন্নত নেটওয়ার্কিং কনসেপ্ট
+
+**লক্ষ্য:** জটিল কন্টেইনার নেটওয়ার্কিং ও পারফর্ম্যান্স টিউনিং ধারণা করা।
+
+### পাঠসমূহ:
+1. [Overlay Networking & Swarm Service Discovery](/docker/overlay-network)
+2. [Macvlan, IPVLAN, Custom DNS ও IPAM](/docker/custom-dns)
+3. [Network Troubleshooting Tools: netshoot, curl, ping](/docker/network-debugging)
+
+**প্রজেক্ট:** একটি জটিল নেটওয়ার্ক টপোলজি ডিজাইন ও বাস্তবায়ন করুন।
+
+---
+
+## মডিউল ১৫: CI/CD, DevOps ও ডকার
+
+**লক্ষ্য:** ডকারের সাথে CI/CD ও DevOps প্রক্রিয়া সংহত করা।
+
+### পাঠসমূহ:
+1. [Docker in Jenkins, GitHub Actions & GitLab CI](/docker/ci-cd-integration)
+2. [Image Build & Push Automation](/docker/image-build-automation)
+3. [Security Gates in CI/CD](/docker/security-gates)
+4. [Monitoring & Logging in CI/CD Pipelines](/docker/monitoring-logging-cicd)
+
+**প্রজেক্ট:** Jenkins ব্যবহার করে একটি সম্পূর্ণ CI/CD পাইপলাইন তৈরি করুন যা ডকার ইমেজ বিল্ড, টেস্ট ও ডিপ্লয় করে।
+
+---
+
+## মডিউল ১৬: ডকার টুলিং ও এক্সটেনশনস
+
+**লক্ষ্য:** ডকারের জন্য বিভিন্ন টুল ও এক্সটেনশনস ব্যবহার করা।
+
+### পাঠসমূহ:
+1. [Docker Compose, Swarm, Kubernetes CLI Tools](/docker/cli-tools)
+2. [Docker Desktop ও Docker Hub টুলস](/docker/desktop-hub-tools)
+3. [Third-party Tools: Portainer, Rancher, etc.](/docker/third-party-tools)
+
+**হ্যান্ডস-অন:** Portainer ব্যবহার করে একটি ডকার ক্লাস্টার ম্যানেজ করুন।
+
+---
+
+## মডিউল ১৭: ডকারের ভবিষ্যৎ ও নতুন ট্রেন্ডস
+
+**লক্ষ্য:** ডকারের ভবিষ্যৎ, নতুন ফিচার ও ট্রেন্ডস সম্পর্কে আপডেট থাকা।
+
+### পাঠসমূহ:
+1. [Docker Roadmap ও Upcoming Features](/docker/roadmap)
+2. [Container Orchestration Trends: Kubernetes, OpenShift](/docker/orchestration-trends)
+3. [Serverless Containers ও Docker](/docker/serverless-containers)
+4. [Docker Community ও Contribution](/docker/community-contribution)
+
+**প্রজেক্ট:** একটি নতুন ডকার ফিচার বা উন্নয়ন সম্পর্কে একটি প্রেজেন্টেশন তৈরি করুন।
+
+---
+
+## মডিউল ১৮: সমাপনী প্রকল্প ও সার্টিফিকেশন প্রস্তুতি
+
+**লক্ষ্য:** শেখা সবকিছু একত্রিত করে একটি পূর্ণাঙ্গ প্রকল্প তৈরি করা এবং সার্টিফিকেশন পরীক্ষার জন্য প্রস্তুতি নেওয়া।
+
+### প্রকল্প:
+1. [একটি সম্পূর্ণ ডকারাইজড ওয়েব অ্যাপ্লিকেশন তৈরি করুন](/docker/final-project-web-app)
+2. [মাইক্রোসার্ভিসেস আর্কিটেকচার সহ একটি অ্যাপ্লিকেশন তৈরি করুন](/docker/final-project-microservices)
+3. [ডকার সিকিউরিটি অডিট ও অপ্টিমাইজেশন প্রকল্প](/docker/final-project-security)
+
+### সার্টিফিকেশন প্রস্তুতি:
+1. [Docker সার্টিফিকেশন পরীক্ষার গাইডলাইন](/docker/certification-guide)
+2. [প্রশ্নোত্তর সেশন ও ফিডব্যাক](/docker/qna-session)
+3. [অতিরিক্ত রিসোর্স ও স্টাডি ম্যাটেরিয়াল](/docker/additional-resources)
+
+---
