@@ -26,7 +26,7 @@ function badgeClasses(variant: HighlightCardBadgeVariant) {
   }
 }
 
-export function HighlightCard({ icon, title, description, href, badge, className, progress, category }: HighlightCardProps) {
+export function HighlightCard({ icon, title, description, href, badge, className, progress }: HighlightCardProps) {
   return (
     <Link
       href={href}
