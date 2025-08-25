@@ -1,0 +1,78 @@
+---
+title: "Hardhat দিয়ে ইউনিট টেস্টিং"
+icon: vscode-icons:file-type-solidity
+---
+
+# Hardhat দিয়ে ইউনিট টেস্টিং — Solidity-তে Contract Reliability
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Software Release-এর আগে Automated Testing অপরিহার্য। Solidity Smart Contract-এও Unit Testing—Contract-এর Reliability, Security ও Maintainability নিশ্চিত করতে—Hardhat ব্যবহার করা হয়।
+
+## Core Concepts
+
+### ১. Hardhat কী?
+- **Definition:** Ethereum Smart Contract Development-এর জন্য Modern Framework
+- **ব্যবহার:** Compile, Deploy, Test, Debug
+- **Features:**
+    - Local Blockchain
+    - Plugin Support
+    - Fast Testing
+
+### ২. Unit Testing
+- **Definition:** Contract-এর প্রতিটি Function/Logic আলাদাভাবে Test করা
+- **ব্যবহার:** Bug Detection, Security Assurance
+- **উদাহরণ:**
+```javascript
+const { expect } = require("chai");
+describe("MyContract", function () {
+  it("should return correct value", async function () {
+    const MyContract = await ethers.getContractFactory("MyContract");
+    const contract = await MyContract.deploy();
+    expect(await contract.value()).to.equal(42);
+  });
+});
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Contract Reliability
+- Bug Prevention
+- Security Assurance
+- Developer Confidence
+
+### ৪. কখন ব্যবহার করবেন?
+- Contract Deployment-এর আগে
+- Major Update-এর পরে
+- Security Critical Logic
+
+### ৫. Common Pitfalls
+- Test Coverage কম রাখা
+- Edge Case Test না করা
+- Manual Test-এ নির্ভর করা
+
+### ৬. Best Practices
+- 100% Test Coverage
+- Automated Test Run
+- Edge Case Test করুন
+- Proper Documentation
+
+### ৭. Industry Trends
+- CI/CD Integration
+- Automated Security Patch
+- Community Test Suite
+
+## উদাহরণ ও এনালজি
+- Unit Test—"গাড়ি চালানোর আগে প্রতিটি পার্ট চেক করা"
+- Hardhat—"নিজস্ব পরীক্ষাগার, সবকিছু দ্রুত ও সহজ"
+
+## Quick Reference
+- Hardhat Test: `npx hardhat test`
+- Chai Assertion: `expect(value).to.equal(expected)`
+
+## উপসংহার
+
+Hardhat Unit Testing—Solidity Contract Reliability, Security ও Maintainability-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, Maintainable ও Developer Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Unit Testing-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Ganache ও লোকাল ব্লকচেইন সেটআপ

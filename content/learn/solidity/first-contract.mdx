@@ -1,0 +1,85 @@
+---
+title: "প্রথম স্মার্ট কন্ট্রাক্ট লেখা ও ডিপ্লয় করা"
+icon: vscode-icons:file-type-solidity
+---
+
+# প্রথম স্মার্ট কন্ট্রাক্ট লেখা ও ডিপ্লয় করা — হাতে-কলমে শুরু
+
+## প্রস্তাবনা
+
+যেমন Google বা Uber-এ প্রথম API বা Backend Service ডিপ্লয় করা হয়, তেমনই ব্লকচেইনে স্মার্ট কন্ট্রাক্ট ডিপ্লয় করা হলো Web3 ডেভেলপমেন্টের প্রথম ধাপ। এই পাঠে আমরা হাতে-কলমে Solidity দিয়ে প্রথম স্মার্ট কন্ট্রাক্ট লিখব, Remix IDE-তে কম্পাইল ও ডিপ্লয় করব, এবং বাস্তব উদাহরণ ও Best Practices দেখব।
+
+## Core Concepts
+
+### ১. স্মার্ট কন্ট্রাক্ট কী?
+- **ডিজিটাল চুক্তিপত্র:** Blockchain-এ স্বয়ংক্রিয়ভাবে চলা কোড
+- **ব্যবহার:** Token, NFT, DeFi, DAO, Supply Chain
+
+### ২. HelloWorld কন্ট্রাক্ট লেখা
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    string public greet = "Hello, Solidity!";
+}
+```
+- `contract` কীওয়ার্ড দিয়ে শুরু
+- ভেতরে ভেরিয়েবল ও ফাংশন
+
+### ৩. Remix IDE-তে কম্পাইল ও ডিপ্লয়
+1. https://remix.ethereum.org খুলুন
+2. "New File" > `HelloWorld.sol` লিখুন
+3. কোড লিখুন, Compile করুন
+4. Deploy বাটনে ক্লিক করুন
+5. Contract Address ও Function দেখুন
+
+### ৪. বাস্তব উদাহরণ
+- Token Contract (ERC20)
+- NFT Contract (ERC721)
+- Supply Chain Contract
+
+### ৫. Common Pitfalls
+- Compiler Version mismatch
+- Constructor ভুল
+- Test ছাড়া Deploy
+
+### ৬. Best Practices
+- Remix-এ Practice, Testnet-এ Deploy
+- Proper Comment ও Naming Convention
+- Automated Test
+- Contract Audit
+
+### ৭. Industry Trends
+- Contract Factory Pattern
+- Upgradeable Contract
+- Layer 2 Deployment
+
+## উদাহরণ ও এনালজি
+- Contract—"ডিজিটাল চুক্তিপত্র"
+- Deploy—"অ্যাপ প্রকাশ করা"
+
+## Quick Reference: Remix IDE-তে Deploy
+
+1. Remix IDE খুলুন
+2. নতুন ফাইল তৈরি করুন: `HelloWorld.sol`
+3. নিচের কোড লিখুন:
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    string public greet = "Hello, Solidity!";
+}
+```
+4. Compile করুন
+5. Deploy করুন
+6. Contract Address ও Function দেখুন
+
+## উপসংহার
+
+প্রথম স্মার্ট কন্ট্রাক্ট লেখা ও ডিপ্লয় করা—Solidity শেখার সবচেয়ে গুরুত্বপূর্ণ ধাপ। হাতে-কলমে চেষ্টা করুন, ভুলত্রুটি থেকে শিখুন, Best Practices অনুসরণ করুন—তাহলেই Web3 ডেভেলপমেন্টে আত্মবিশ্বাসী হয়ে উঠবেন।
+
+---
+
+**পরবর্তী পাঠ:** টেস্টনেট ও মেইননেট পরিচিতি

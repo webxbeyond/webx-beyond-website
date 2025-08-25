@@ -1,0 +1,98 @@
+---
+title: "কন্ট্রাক্ট ইনহেরিটেন্স"
+icon: vscode-icons:file-type-solidity
+---
+
+# কন্ট্রাক্ট ইনহেরিটেন্স — Solidity-তে কোড রিইউজ ও সংগঠন
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ Parent Class/Module থেকে Child Class/Service ফিচার নেয়, তেমনই Solidity-তে Contract Inheritance ব্যবহার করে এক Contract-এর ফিচার, ফাংশন, ও ভেরিয়েবল অন্য Contract-এ রিইউজ করা যায়। এই পাঠে আমরা Inheritance-এর ব্যবহার, গঠন, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract-এ কোড রিইউজ, সংগঠন ও Maintainability বাড়ে।
+
+## Core Concepts
+
+### ১. Inheritance কী?
+- **Parent-Child Relationship:** Base Contract থেকে Derived Contract
+- **ব্যবহার:** Common Logic, Access Control, Upgradeability
+- **উদাহরণ:**
+```solidity
+contract Parent {
+    function greet() public pure returns (string memory) {
+        return "Hello";
+    }
+}
+contract Child is Parent {
+    function getGreet() public pure returns (string memory) {
+        return greet();
+    }
+}
+```
+
+### ২. Multiple Inheritance
+- **একাধিক Parent Contract:**
+```solidity
+contract A { ... }
+contract B { ... }
+contract C is A, B { ... }
+```
+
+### ৩. Override
+- **Parent Function-কে Child-এ নতুনভাবে ডিফাইন:**
+```solidity
+contract Parent {
+    function greet() public virtual returns (string memory) {
+        return "Hello";
+    }
+}
+contract Child is Parent {
+    function greet() public override returns (string memory) {
+        return "Hi";
+    }
+}
+```
+
+### ৪. পার্থক্য ও গুরুত্ব
+| বিষয়         | Parent Contract    | Child Contract      |
+|--------------|-------------------|--------------------|
+| Use Case     | Common Logic      | Custom Logic       |
+| Example      | Access Control    | Business Logic     |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Code Reusability
+- Contract Organization
+- Upgradeability
+
+### ৬. Common Pitfalls
+- Function Override ভুল
+- Multiple Inheritance Conflict
+- Access Control Misuse
+
+### ৭. Best Practices
+- Proper Use of `virtual` ও `override`
+- Clear Contract Structure
+- Minimal Multiple Inheritance
+- Access Control Separation
+
+### ৮. Industry Trends
+- OpenZeppelin Base Contract
+- Upgradeable Contract Pattern
+- Modular Contract Design
+
+## উদাহরণ ও এনালজি
+- Parent Contract—"স্কুলের প্রধান শিক্ষক"
+- Child Contract—"সহকারী শিক্ষক"
+- Inheritance—"প্রধান শিক্ষকের নিয়ম অনুসরণ"
+
+## Quick Reference
+
+- Inheritance: `contract Child is Parent {}`
+- Override: `function name() public override {}`
+- Multiple: `contract C is A, B {}`
+
+## উপসংহার
+
+Contract Inheritance—Solidity-তে কোড রিইউজ, সংগঠন ও Maintainability-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সহজ, দ্রুত ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Inheritance ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী মডিউল:** ইথার ও গ্যাস

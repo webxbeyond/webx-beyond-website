@@ -1,0 +1,103 @@
+---
+title: "ফাংশন সিনট্যাক্স, প্যারামিটার ও রিটার্ন টাইপ"
+icon: vscode-icons:file-type-solidity
+---
+
+# ফাংশন সিনট্যাক্স, প্যারামিটার ও রিটার্ন টাইপ — Solidity-তে কার্যকরী কোড
+
+## প্রস্তাবনা
+
+যেমন Google বা Uber-এ Backend Service-এ Function/Method ব্যবহার হয়, তেমনই Solidity-তে ফাংশন Contract-এর মূল চালিকাশক্তি। এই পাঠে আমরা Solidity-র ফাংশন সিনট্যাক্স, প্যারামিটার, রিটার্ন টাইপ, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract-এ কার্যকরী ও নিরাপদ কোড লেখা যায়।
+
+## Core Concepts
+
+### ১. ফাংশন সিনট্যাক্স
+- **Function Keyword:** `function`
+- **Structure:** Name, Parameter, Visibility, Return Type
+- **উদাহরণ:**
+```solidity
+function setName(string memory _name) public {
+    name = _name;
+}
+```
+
+### ২. প্যারামিটার
+- **Input Data:** Function-এর Argument
+- **Type ও Data Location:** `memory`, `calldata`, `storage`
+- **উদাহরণ:**
+```solidity
+function setAge(uint _age) public {
+    age = _age;
+}
+function setNames(string[] calldata _names) external {
+    names = _names;
+}
+```
+
+### ৩. রিটার্ন টাইপ
+- **Output Data:** Function থেকে ফেরত দেওয়া মান
+- **Syntax:** `returns(type)`
+- **উদাহরণ:**
+```solidity
+function getName() public view returns (string memory) {
+    return name;
+}
+function getSum(uint a, uint b) public pure returns (uint) {
+    return a + b;
+}
+```
+
+### ৪. Visibility
+- **Access Control:** `public`, `private`, `internal`, `external`
+- **উদাহরণ:**
+```solidity
+function onlyOwner() private {
+    // Only contract can call
+}
+```
+
+### ৫. পার্থক্য ও গুরুত্ব
+| বিষয়         | Function Syntax    | Parameter         | Return Type       |
+|--------------|-------------------|-------------------|------------------|
+| Use Case     | Action/Logic      | Input Data        | Output Data      |
+| Example      | setName()         | _name             | string memory    |
+
+### ৬. কেন গুরুত্বপূর্ণ?
+- Contract Logic
+- Data Flow
+- Security
+
+### ৭. Common Pitfalls
+- Data Location ভুল
+- Visibility ভুল
+- Return Type mismatch
+
+### ৮. Best Practices
+- Proper Naming
+- Explicit Data Location
+- Access Control
+- Input Validation
+
+### ৯. Industry Trends
+- Custom Error Handling
+- Advanced Parameter Type
+- Multiple Return Values
+
+## উদাহরণ ও এনালজি
+- Function—"রেসিপি, কীভাবে কাজ করবে"
+- Parameter—"রেসিপির উপকরণ"
+- Return—"রেসিপির ফলাফল"
+
+## Quick Reference
+
+- Function: `function name(params) visibility returns(type) {}`
+- Parameter: `type location name`
+- Return: `returns(type)`
+
+## উপসংহার
+
+Function Syntax, Parameter, Return Type—Solidity-তে কার্যকরী ও নিরাপদ Contract লেখার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সহজ, দ্রুত ও নিরাপদ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Function ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** ভিজিবিলিটি (public, private, internal, external)

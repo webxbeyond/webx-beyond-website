@@ -1,0 +1,100 @@
+---
+title: "ভিজিবিলিটি (public, private, internal, external)"
+icon: vscode-icons:file-type-solidity
+---
+
+# ভিজিবিলিটি (public, private, internal, external) — Solidity-তে অ্যাক্সেস কন্ট্রোল
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ কিছু ফাংশন বা ডাটা শুধু নির্দিষ্ট টিম বা সার্ভিস ব্যবহার করতে পারে, তেমনই Solidity-তে ভিজিবিলিটি নির্ধারণ করে কে, কখন, কীভাবে Contract-এর ফাংশন ও ভেরিয়েবল ব্যবহার করতে পারবে। এই পাঠে আমরা Solidity-র ভিজিবিলিটি টাইপ, ব্যবহার, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract নিরাপদ ও নিয়ন্ত্রিত হয়।
+
+## Core Concepts
+
+### ১. Public
+- **সবাই অ্যাক্সেস করতে পারে:** External/Internal Call
+- **ব্যবহার:** Getter, Open Function
+- **উদাহরণ:**
+```solidity
+function getName() public view returns (string memory) {
+    return name;
+}
+```
+
+### ২. Private
+- **শুধু Contract-এর ভেতর:** External Call Allowed নয়
+- **ব্যবহার:** Internal Logic, Sensitive Data
+- **উদাহরণ:**
+```solidity
+function calculate() private pure returns (uint) {
+    return 2 + 2;
+}
+```
+
+### ৩. Internal
+- **Contract ও Inherited Contract:** External Call Allowed নয়
+- **ব্যবহার:** Base Logic, Reusable Function
+- **উদাহরণ:**
+```solidity
+function baseLogic() internal {
+    // Only this contract or child contract
+}
+```
+
+### ৪. External
+- **শুধু বাইরের Call:** Contract-এর ভেতর থেকে সরাসরি Call করা যায় না
+- **ব্যবহার:** API, External Interaction
+- **উদাহরণ:**
+```solidity
+function setData(uint _data) external {
+    data = _data;
+}
+```
+
+### ৫. পার্থক্য ও গুরুত্ব
+| বিষয়         | Public            | Private           | Internal          | External          |
+|--------------|-------------------|-------------------|-------------------|-------------------|
+| Access       | All               | Only Contract     | Contract/Child    | Only External     |
+| Use Case     | Getter/Setter     | Internal Logic    | Inheritance       | API/Interaction   |
+
+### ৬. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Logic Separation
+- Controlled Access
+
+### ৭. Common Pitfalls
+- Sensitive Logic Public রাখা
+- External Function-এ Internal Call
+- Visibility ভুল ডিফাইন
+
+### ৮. Best Practices
+- Sensitive Logic—Private/Internal
+- User Interaction—Public/External
+- Explicit Visibility
+- Access Control Modifier
+
+### ৯. Industry Trends
+- Custom Access Control
+- Role-based Visibility
+- Advanced Modifier Usage
+
+## উদাহরণ ও এনালজি
+- Public—"স্কুলের নোটিশ বোর্ড"
+- Private—"শিক্ষকের ব্যক্তিগত নোট"
+- Internal—"শিক্ষক ও সহকারী শিক্ষক"
+- External—"বাইরের অতিথি"
+
+## Quick Reference
+
+- Public: `function name() public {}`
+- Private: `function name() private {}`
+- Internal: `function name() internal {}`
+- External: `function name() external {}`
+
+## উপসংহার
+
+Visibility—Solidity-তে Contract-এর নিরাপত্তা ও নিয়ন্ত্রণের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, দ্রুত ও নিয়ন্ত্রিত হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Visibility ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** ফাংশন মডিফায়ারস

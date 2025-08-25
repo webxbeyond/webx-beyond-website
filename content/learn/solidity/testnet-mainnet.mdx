@@ -1,0 +1,74 @@
+---
+title: "টেস্টনেট ও মেইননেট পরিচিতি"
+icon: vscode-icons:file-type-solidity
+---
+
+# টেস্টনেট ও মেইননেট পরিচিতি — নিরাপদ ও বাস্তব ডিপ্লয়মেন্টের পথ
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ নতুন ফিচার সরাসরি লাইভে দেওয়া হয় না, আগে টেস্টিং হয়, তেমনই ব্লকচেইনে স্মার্ট কন্ট্রাক্ট ডিপ্লয় করার আগে টেস্টনেটে পরীক্ষা করা হয়। এই পাঠে আমরা টেস্টনেট ও মেইননেটের গুরুত্ব, পার্থক্য, ব্যবহার, এবং Best Practices নিয়ে আলোচনা করব।
+
+## Core Concepts
+
+### ১. টেস্টনেট (Testnet) কী?
+- **টেস্টিং ব্লকচেইন:** বাস্তব ইথার নয়, ফেক টোকেন
+- **ব্যবহার:** Contract Deploy, Bug Fix, Experiment
+- **উদাহরণ:** Goerli, Sepolia, Rinkeby
+
+### ২. মেইননেট (Mainnet) কী?
+- **প্রধান ব্লকচেইন:** Real Ether, Actual Transaction
+- **ব্যবহার:** Production Deploy, User Interaction
+- **উদাহরণ:** Ethereum Mainnet
+
+### ৩. পার্থক্য
+| বিষয়         | টেস্টনেট         | মেইননেট         |
+|--------------|------------------|-----------------|
+| Ether        | ফেক/ফ্রি         | Real/মূল্যবান    |
+| Risk         | কম               | বেশি            |
+| Use Case     | টেস্ট, ডেভেলপ   | Production      |
+| Transaction  | দ্রুত, সস্তা     | ধীর, ব্যয়বহুল   |
+
+### ৪. কেন টেস্টনেট ব্যবহার করবেন?
+- নিরাপদে Contract Test
+- Gas Fee ছাড়াই Deploy
+- Bug Fix ও Experiment
+
+### ৫. কিভাবে টেস্টনেটে Deploy করবেন?
+1. Remix IDE-তে Contract লিখুন
+2. Injected Provider (MetaMask) সিলেক্ট করুন
+3. Testnet (Goerli/Sepolia) সিলেক্ট করুন
+4. Faucet থেকে Test Ether নিন
+5. Deploy করুন
+
+### ৬. Common Pitfalls
+- Testnet ও Mainnet কনফিউশন
+- Test Ether শেষ
+- Contract Address ভুল
+
+### ৭. Best Practices
+- Production Deploy-এর আগে Testnet-এ Deploy করুন
+- Proper Logging ও Monitoring
+- Contract Audit
+
+### ৮. Industry Trends
+- New Testnets (Sepolia)
+- Layer 2 Testnet
+- Automated Deployment Tools
+
+## উদাহরণ ও এনালজি
+- Testnet—"স্যান্ডবক্স"
+- Mainnet—"লাইভ সার্ভার"
+
+## Quick Reference
+
+- Testnet Faucet: https://goerlifaucet.com
+- Mainnet Explorer: https://etherscan.io
+
+## উপসংহার
+
+টেস্টনেট ও মেইননেট—Solidity ডেভেলপমেন্টে নিরাপদ ও সফল ডিপ্লয়মেন্টের জন্য অপরিহার্য। আগে Testnet-এ Deploy, পরে Mainnet—এই পথেই ভুল কমে, Production নিরাপদ হয়।
+
+---
+
+**পরবর্তী মডিউল:** ডাটা টাইপ ও ভেরিয়েবলস

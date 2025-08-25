@@ -1,0 +1,92 @@
+---
+title: "payable ফাংশন ও fallback"
+icon: vscode-icons:file-type-solidity
+---
+
+# payable ফাংশন ও fallback — Solidity-তে Ether Receive ও Contract Flexibility
+
+## প্রস্তাবনা
+
+যেমন Uber-এ পেমেন্ট নেওয়ার জন্য নির্দিষ্ট ফিচার থাকে, তেমনই Solidity-তে Contract-এ Ether Receive ও Unexpected Call Handle করার জন্য payable Function ও fallback Function ব্যবহার হয়। এই পাঠে আমরা এই দুইটি ফিচারের ব্যবহার, গঠন, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract নিরাপদ, কার্যকর ও Flexible হয়।
+
+## Core Concepts
+
+### ১. payable Function
+- **Ether Receive/Transfer-এর জন্য:** Function-এ payable Modifier
+- **ব্যবহার:** Deposit, Crowdfunding, Token Sale
+- **উদাহরণ:**
+```solidity
+function deposit() public payable {
+    // Ether Deposited
+}
+```
+
+### ২. fallback Function
+- **Unknown Call Handle:** Contract-এ Function না থাকলে Call Handle
+- **ব্যবহার:** Logging, Error Handling, Ether Receive (pre-0.6.0)
+- **উদাহরণ:**
+```solidity
+fallback() external payable {
+    // Handle Unknown Call
+}
+```
+
+### ৩. receive Function
+- **Direct Ether Receive:** Only Ether Receive, No Data
+- **উদাহরণ:**
+```solidity
+receive() external payable {
+    // Ether Received
+}
+```
+
+### ৪. পার্থক্য ও গুরুত্ব
+| বিষয়         | payable Function   | fallback Function   | receive Function  |
+|--------------|-------------------|--------------------|-------------------|
+| Use Case     | Ether Handling    | Unknown Call       | Direct Ether      |
+| Data         | Yes/No            | Yes/No             | No                |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Contract Flexibility
+- Ether Receive
+- Error Handling
+
+### ৬. বাস্তব উদাহরণ
+- Crowdfunding Contract: deposit() payable
+- dApp Payment: receive() external payable
+- Logging Contract: fallback() external
+
+### ৭. Common Pitfalls
+- Non-payable Function-এ Ether Send
+- fallback-এ Logic ভুল
+- receive ও fallback Confusion
+
+### ৮. Best Practices
+- Proper Modifier ব্যবহার করুন
+- Minimal Logic in fallback/receive
+- Error Handling
+- Security Audit
+
+### ৯. Industry Trends
+- Custom Fallback Pattern
+- Advanced Ether Handling
+- Layer 2 Payment Integration
+
+## উদাহরণ ও এনালজি
+- payable—"বিক্রেতা টাকা নিতে পারবে"
+- fallback—"অজানা কলের জন্য প্রস্তুত"
+- receive—"শুধু টাকা নেওয়ার জন্য"
+
+## Quick Reference
+
+- payable: `function name() public payable {}`
+- fallback: `fallback() external payable {}`
+- receive: `receive() external payable {}`
+
+## উপসংহার
+
+payable Function, fallback ও receive—Solidity-তে Contract-এর Ether Receive, Flexibility ও Error Handling-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, কার্যকর ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Ether Handling ও Contract Flexibility-তে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** গ্যাস অপটিমাইজেশন টেকনিকস

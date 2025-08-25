@@ -1,9 +1,70 @@
 {
-  "title": "ট্র্যাফিক (Traefik)",
-  "description": "শূন্য থেকে মাস্টারি পর্যন্ত Traefik শেখার পূর্ণাঙ্গ বাংলা সিলেবাস",
-  "icon": "simple-icons:traefikproxy",
+  "title": "সলিডিটি (Solidity)",
+  "description": "সলিডিটি সিলেবাস — শূন্য থেকে অ্যাডভান্সড পর্যন্ত স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্ট",
+  "icon": "logos:solidity",
   "root": true,
   "pages": [
-    "index"
+    "index",
+
+    "---মডিউল ১: সলিডিটি পরিচিতি---",
+    "what-is-solidity",
+    "dev-setup",
+    "solidity-syntax",
+    "first-contract",
+    "testnet-mainnet",
+
+    "---মডিউল ২: ডাটা টাইপ ও ভেরিয়েবলস---",
+    "data-types",
+    "storage-memory",
+    "arrays-structs-mappings",
+    "constants-immutables",
+
+    "---মডিউল ৩: ফাংশন ও কন্ট্রাক্ট স্ট্রাকচার---",
+    "functions-basics",
+    "visibility",
+    "function-modifiers",
+    "events-logs",
+    "inheritance",
+
+    "---মডিউল ৪: ইথার ও গ্যাস---",
+    "gas-basics",
+    "ether-transfer",
+    "payable-fallback",
+    "gas-optimization",
+
+    "---মডিউল ৫: অ্যাডভান্সড কনসেপ্টস---",
+    "libraries-interfaces",
+    "abstract-contracts",
+    "delegatecall-proxy",
+    "assembly-lowlevel",
+
+    "---মডিউল ৬: এরর হ্যান্ডলিং ও সিকিউরিটি---",
+    "error-handling",
+    "common-vulnerabilities",
+    "openzeppelin-security",
+    "auditing-tools",
+
+    "---মডিউল ৭: টেস্টিং ও ডিপ্লয়মেন্ট---",
+    "hardhat-testing",
+    "local-blockchain",
+    "testnet-deployment",
+    "mainnet-deployment",
+
+    "---মডিউল ৮: সলিডিটি অ্যাডভান্সড প্যাটার্নস---",
+    "factory-registry",
+    "upgradeable-patterns",
+    "gas-efficient",
+    "oracles-chainlink",
+
+    "---মডিউল ৯: সলিডিটি + ডি-ফাই---",
+    "amm",
+    "lending-borrowing",
+    "yield-farming",
+    "dao-contracts",
+
+    "---মডিউল ১০: সলিডিটির ভবিষ্যৎ---",
+    "latest-updates",
+    "alternatives",
+    "evm-layer2"
   ]
 }

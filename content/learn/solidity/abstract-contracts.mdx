@@ -1,0 +1,88 @@
+---
+title: "Abstract কন্ট্রাক্ট ও Virtual ফাংশন"
+icon: vscode-icons:file-type-solidity
+---
+
+# Abstract কন্ট্রাক্ট ও Virtual ফাংশন — Solidity-তে ফ্লেক্সিবল ডিজাইন ও এক্সটেন্ডেবিলিটি
+
+## প্রস্তাবনা
+
+Google-এর মতো বড় কোম্পানিতে API বা Service Design-এ অনেক সময় কিছু ফাংশন "শুধু ঘোষণা" করা হয়, বাস্তবায়ন পরে অন্য টিম বা সাব-ক্লাসে। Netflix বা Uber-এর মতো প্ল্যাটফর্মে Core Logic আলাদা রেখে Customization সহজ করতে এই প্যাটার্ন ব্যবহৃত হয়। Solidity-তে Abstract Contract ও Virtual Function ঠিক এই কাজেই ব্যবহৃত হয়—Contract Structure Flexible ও Extensible রাখতে।
+
+## Core Concepts
+
+### ১. Abstract Contract
+- **Definition:** এমন Contract যেখানে কিছু Function শুধু ঘোষণা (Declaration) করা হয়, বাস্তবায়ন (Implementation) হয় না।
+- **ব্যবহার:** Base Contract Design, Template, API
+- **উদাহরণ:**
+```solidity
+abstract contract Animal {
+    function makeSound() public virtual;
+}
+contract Dog is Animal {
+    function makeSound() public override {
+        // বাস্তবায়ন
+    }
+}
+```
+
+### ২. Virtual Function
+- **Definition:** এমন Function যেটি Child Contract-এ Override করা যাবে।
+- **ব্যবহার:** Custom Logic, Extensibility
+- **উদাহরণ:**
+```solidity
+contract Parent {
+    function greet() public virtual returns (string memory) {
+        return "Hello";
+    }
+}
+contract Child is Parent {
+    function greet() public override returns (string memory) {
+        return "Hi!";
+    }
+}
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Flexible Contract Design
+- Code Reusability
+- Customization
+- Industry Standard (OpenZeppelin, ERC Standards)
+
+### ৪. কখন ব্যবহার করবেন?
+- Base Contract Design
+- API/Template Contract
+- Multiple Implementation Support
+
+### ৫. Common Pitfalls
+- Abstract Contract-এ সব Function বাস্তবায়ন না করা
+- Virtual Function-এ override ভুলভাবে ব্যবহার
+- Constructor-এ Implementation
+
+### ৬. Best Practices
+- Base Logic—Abstract Contract
+- Custom Logic—Override
+- Proper Naming
+- Documentation
+
+### ৭. Industry Trends
+- Modular Contract Architecture
+- OpenZeppelin ERC Standards
+- Plug-and-Play dApp Design
+
+## উদাহরণ ও এনালজি
+- Abstract Contract—"স্কুলের সিলেবাস, শিক্ষক পরে ক্লাসে পড়ান"
+- Virtual Function—"রেসিপি, সবাই নিজের মতো রান্না করতে পারে"
+
+## Quick Reference
+- Abstract Contract: `abstract contract Name { function ...; }`
+- Virtual Function: `function name() public virtual {}`
+- Override: `function name() public override {}`
+
+## উপসংহার
+
+Abstract Contract ও Virtual Function—Solidity-তে Contract Design Flexible, Reusable ও Extensible করার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সহজ, Maintainable ও Industry Standard হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Abstract Contract ও Virtual Function ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Delegatecall ও Proxy প্যাটার্ন

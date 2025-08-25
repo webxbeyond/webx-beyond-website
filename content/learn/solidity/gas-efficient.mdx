@@ -1,0 +1,109 @@
+---
+title: "Gas-Efficient Data Structures"
+icon: vscode-icons:file-type-solidity
+---
+
+# Gas-Efficient Data Structures — Solidity-তে পারফরম্যান্স ও কস্ট অপটিমাইজেশন
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে ডেটা স্টোর, প্রসেস ও ট্রান্সফার করতে Efficient Data Structure ব্যবহার হয়—Performance ও Cost কমাতে। Solidity Smart Contract-এও Gas-Efficient Data Structure—Storage, Transaction ও Execution-এ Gas Consumption কমাতে—Industry Standard।
+
+## Core Concepts
+
+### ১. Storage vs Memory
+- **Storage:** Persistent, Expensive (High Gas)
+- **Memory:** Temporary, Cheap (Low Gas)
+- **Best Practice:** Storage Write কম, Memory Use বেশি
+
+### ২. Data Structure Selection
+- **Array:** Simple, Sequential Data
+- **Mapping:** Key-Value, Fast Lookup
+- **Struct:** Composite Data, Efficient Grouping
+- **উদাহরণ:**
+```solidity
+struct User {
+    uint id;
+    string name;
+}
+mapping(address => User) public users;
+```
+
+### ৩. Packed Storage
+- **Definition:** Multiple Small Variable একসাথে Store করা
+- **Technique:** uint8, bool, address এক struct-এ
+- **উদাহরণ:**
+```solidity
+struct Packed {
+    uint8 a;
+    bool b;
+    address c;
+}
+Packed public packedData;
+```
+
+### ৪. Minimize Storage Write
+- **Technique:** Batch Update, Conditional Write
+- **উদাহরণ:**
+```solidity
+function batchUpdate(address[] memory addrs, uint8 value) public {
+    for (uint i = 0; i < addrs.length; i++) {
+        users[addrs[i]].id = value;
+    }
+}
+```
+
+### ৫. Efficient Loop
+- **Technique:** Loop Unrolling, Minimal Iteration
+- **উদাহরণ:**
+```solidity
+function sum(uint[] memory arr) public pure returns (uint total) {
+    for (uint i = 0; i < arr.length; i++) {
+        total += arr[i];
+    }
+}
+```
+
+### ৬. কেন গুরুত্বপূর্ণ?
+- Gas Cost কমানো
+- Contract Scalability
+- User Experience
+- Developer Reputation
+
+### ৭. কখন ব্যবহার করবেন?
+- High Volume Data
+- Frequent Transaction
+- Cost Sensitive dApp
+
+### ৮. Common Pitfalls
+- Unpacked Storage
+- Unoptimized Loop
+- Excessive Storage Write
+
+### ৯. Best Practices
+- Packed Storage Use করুন
+- Mapping/Struct Efficiently Use করুন
+- Storage Write Minimize করুন
+- Loop Optimize করুন
+
+### ১০. Industry Trends
+- Layer 2 Solution
+- Off-chain Data Processing
+- Automated Gas Report
+
+## উদাহরণ ও এনালজি
+- Packed Storage—"এক বাক্সে ছোট ছোট জিনিস গুছিয়ে রাখা"
+- Mapping—"ফোনবুক, নাম ধরে নম্বর খোঁজা"
+
+## Quick Reference
+- Packed Storage: `struct { uint8; bool; address; }`
+- Mapping: `mapping(address => User)`
+- Loop: Efficient Iteration
+
+## উপসংহার
+
+Gas-Efficient Data Structure—Solidity Contract Performance, Cost Optimization ও Scalability-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract দ্রুত, কম খরচে ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Gas-Efficient Data Structure-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Oracle ইন্টিগ্রেশন ও Chainlink

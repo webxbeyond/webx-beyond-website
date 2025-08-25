@@ -1,0 +1,71 @@
+---
+title: "টেস্টনেটে ডিপ্লয়মেন্ট (Ropsten, Goerli)"
+icon: vscode-icons:file-type-solidity
+---
+
+# টেস্টনেটে ডিপ্লয়মেন্ট (Ropsten, Goerli) — Solidity-তে Production Simulation
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Production Release-এর আগে Staging/Test Environment-এ Extensive Testing করা হয়। Solidity Smart Contract-এও Testnet Deployment—Ropsten, Goerli—ব্যবহার করে Production Simulation, Security Assurance ও User Experience নিশ্চিত করা হয়।
+
+## Core Concepts
+
+### ১. Testnet কী?
+- **Definition:** Ethereum-এর Public Blockchain, Production-এর মতো কিন্তু Real Fund নেই
+- **ব্যবহার:** Contract Deploy, Transaction Test, User Simulation
+- **Popular Testnets:**
+    - Ropsten
+    - Goerli
+    - Sepolia
+
+### ২. Deployment Workflow
+- **Step 1:** Contract Compile (Hardhat/Remix)
+- **Step 2:** Testnet Account Setup (MetaMask)
+- **Step 3:** Faucet থেকে Test Ether সংগ্রহ
+- **Step 4:** Contract Deploy (Hardhat/Remix)
+- **Step 5:** Transaction Monitor (Etherscan)
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Production Simulation
+- Security Assurance
+- User Experience
+- Developer Confidence
+
+### ৪. কখন ব্যবহার করবেন?
+- Contract Deployment-এর আগে
+- Major Update-এর পরে
+- User Acceptance Test
+
+### ৫. Common Pitfalls
+- Real Ether ব্যবহার
+- Testnet Faucet Issue
+- Deployment Script ভুল
+
+### ৬. Best Practices
+- Always use Testnet before Mainnet
+- Monitor Transaction (Etherscan)
+- Use Faucet for Test Ether
+- Document Deployment Steps
+
+### ৭. Industry Trends
+- Automated Deployment Script
+- CI/CD Integration
+- Multi-Testnet Support
+
+## উদাহরণ ও এনালজি
+- Testnet—"নতুন গাড়ি চালানোর আগে ট্র্যাক-এ পরীক্ষা"
+- Faucet—"ডেমো টাকা, আসল ঝুঁকি নেই"
+
+## Quick Reference
+- Deploy: `npx hardhat run scripts/deploy.js --network goerli`
+- Faucet: Goerli/Ropsten Faucet Website
+- Monitor: Etherscan Testnet
+
+## উপসংহার
+
+Testnet Deployment—Solidity Contract Production Simulation, Security Assurance ও User Experience-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, Maintainable ও Developer Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Testnet Deployment-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** মেইননেটে ডিপ্লয়মেন্ট ও গ্যাস অপটিমাইজেশন

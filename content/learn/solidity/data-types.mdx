@@ -1,0 +1,85 @@
+---
+title: "ভ্যালু ও রেফারেন্স টাইপস"
+icon: vscode-icons:file-type-solidity
+---
+
+# ভ্যালু ও রেফারেন্স টাইপস — Solidity-তে ডাটা ব্যবস্থাপনা
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ ডাটা স্টোর করার জন্য বিভিন্ন টাইপের ভেরিয়েবল ব্যবহার হয়, তেমনই Solidity-তে ডাটা ব্যবস্থাপনার জন্য Value ও Reference টাইপস গুরুত্বপূর্ণ। এই পাঠে আমরা Value ও Reference টাইপের পার্থক্য, ব্যবহার, এবং Best Practices নিয়ে আলোচনা করব—যাতে স্মার্ট কন্ট্রাক্টে ডাটা নিরাপদ ও দক্ষভাবে ব্যবহৃত হয়।
+
+## Core Concepts
+
+### ১. Value Types কী?
+- **সরাসরি ডাটা স্টোর:** ভেরিয়েবল নিজেই ডাটা ধারণ করে
+- **উদাহরণ:** `uint`, `int`, `bool`, `address`, `bytes`
+- **ব্যবহার:** Simple Calculation, State Variable
+
+#### Value Type Example
+```solidity
+uint age = 25;
+bool isActive = true;
+address owner = 0x123...;
+```
+
+### ২. Reference Types কী?
+- **ডাটা অন্য কোথাও স্টোর:** ভেরিয়েবল শুধু রেফারেন্স রাখে
+- **উদাহরণ:** `array`, `struct`, `mapping`
+- **ব্যবহার:** Complex Data Structure, Storage Management
+
+#### Reference Type Example
+```solidity
+string name = "Anis";
+uint[] scores = [10, 20, 30];
+struct User {
+    string name;
+    uint age;
+}
+User user = User("Anis", 25);
+mapping(address => uint) balances;
+```
+
+### ৩. Value vs Reference — পার্থক্য
+| বিষয়         | Value Type         | Reference Type         |
+|--------------|-------------------|-----------------------|
+| Storage      | সরাসরি            | রেফারেন্স             |
+| Copy         | ডাটা কপি হয়       | রেফারেন্স কপি হয়      |
+| Example      | uint, bool        | array, struct, mapping|
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- ডাটা নিরাপত্তা ও অপ্টিমাইজেশন
+- Storage vs Memory ব্যবস্থাপনা
+- Contract Performance
+
+### ৫. Common Pitfalls
+- Reference Type ভুলভাবে কপি করা
+- Storage vs Memory ভুল ব্যবহার
+- Mapping-এ ডাটা Access Error
+
+### ৬. Best Practices
+- Value Type—Simple Variable, Reference Type—Complex Structure
+- Storage ও Memory স্পষ্টভাবে ডিফাইন করুন
+- Proper Initialization
+
+### ৭. Industry Trends
+- Custom Struct ও Mapping
+- Nested Data Structure
+- Storage Optimization
+
+## উদাহরণ ও এনালজি
+- Value Type—"টিফিন বক্সে খাবার"
+- Reference Type—"খাবারের ঠিকানা লিখে দেওয়া"
+
+## Quick Reference
+
+- Value Type: `uint`, `int`, `bool`, `address`, `bytes`
+- Reference Type: `string`, `array`, `struct`, `mapping`
+
+## উপসংহার
+
+Value ও Reference টাইপ—Solidity-তে ডাটা ব্যবস্থাপনার মূল ভিত্তি। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, দ্রুত ও দক্ষ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে ডাটা ব্যবস্থাপনায় দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** স্টোরেজ বনাম মেমোরি বনাম ক্যালডাটা

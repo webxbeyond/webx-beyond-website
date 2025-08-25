@@ -1,0 +1,113 @@
+---
+title: "Lending ও Borrowing কন্ট্রাক্ট"
+icon: vscode-icons:file-type-solidity
+---
+
+# Lending ও Borrowing কন্ট্রাক্ট — Solidity-তে DeFi Protocol Design
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Resource Sharing, Automated Service ও Risk Management ব্যবহৃত হয়—Efficiency ও Scalability বাড়াতে। DeFi-তে Lending ও Borrowing Contract—User-রা Token Deposit, Loan, Interest Earn ও Repayment—সবকিছু Automated ও Decentralized ভাবে করতে পারে। Solidity-তে Lending/Borrowing Contract—Aave, Compound-এর মতো Industry Standard।
+
+## Core Concepts
+
+### ১. Lending Contract
+- **Definition:** User-রা Token Deposit করে Interest Earn করে
+- **Features:**
+    - Deposit
+    - Interest Calculation
+    - Withdraw
+- **উদাহরণ:**
+```solidity
+contract Lending {
+    mapping(address => uint) public deposits;
+    mapping(address => uint) public interest;
+    function deposit(uint amount) public {
+        deposits[msg.sender] += amount;
+        // Interest Logic
+    }
+    function withdraw(uint amount) public {
+        require(deposits[msg.sender] >= amount, "Insufficient balance");
+        deposits[msg.sender] -= amount;
+        // Transfer Logic
+    }
+}
+```
+
+### ২. Borrowing Contract
+- **Definition:** User-রা Collateral দিয়ে Loan নিতে পারে
+- **Features:**
+    - Collateral Deposit
+    - Loan Issue
+    - Repayment
+- **উদাহরণ:**
+```solidity
+contract Borrowing {
+    mapping(address => uint) public collateral;
+    mapping(address => uint) public loans;
+    function depositCollateral(uint amount) public {
+        collateral[msg.sender] += amount;
+    }
+    function borrow(uint amount) public {
+        require(collateral[msg.sender] >= amount, "Insufficient collateral");
+        loans[msg.sender] += amount;
+        // Loan Issue Logic
+    }
+    function repay(uint amount) public {
+        require(loans[msg.sender] >= amount, "No loan");
+        loans[msg.sender] -= amount;
+        // Repayment Logic
+    }
+}
+```
+
+### ৩. Interest Calculation
+- **Technique:** Simple/Compound Interest
+- **Features:**
+    - Automated Calculation
+    - Time-based Logic
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Decentralized Finance
+- User Empowerment
+- Automated Service
+- Risk Management
+
+### ৫. কখন ব্যবহার করবেন?
+- Token Deposit
+- Loan Issue
+- Interest Earn
+- Repayment
+
+### ৬. Common Pitfalls
+- Insufficient Collateral
+- Interest Calculation Error
+- Security Vulnerability
+
+### ৭. Best Practices
+- Audit Interest Logic
+- Secure Collateral Management
+- User Education
+- Regular Update
+
+### ৮. Industry Trends
+- Flash Loan
+- Multi-Asset Lending
+- Automated Liquidation
+
+## উদাহরণ ও এনালজি
+- Lending—"ব্যাংকে টাকা রেখে সুদ পাওয়া"
+- Borrowing—"বন্ধুর কাছ থেকে টাকা ধার নেওয়া, পরে ফেরত দেয়া"
+
+## Quick Reference
+- Deposit: `deposit(amount)`
+- Borrow: `borrow(amount)`
+- Repay: `repay(amount)`
+
+## উপসংহার
+
+Lending ও Borrowing Contract—Solidity-তে DeFi Protocol, Automated Service ও User Empowerment-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract Efficient, Secure ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Lending/Borrowing Contract-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Yield Farming লজিক

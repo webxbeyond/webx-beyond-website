@@ -1,0 +1,104 @@
+---
+title: "DAO স্মার্ট কন্ট্রাক্ট"
+icon: vscode-icons:file-type-solidity
+---
+
+# DAO স্মার্ট কন্ট্রাক্ট — Solidity-তে Decentralized Organization Design
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Decision Making, Resource Management ও User Participation—সবকিছু Hierarchical ও Centralized ভাবে হয়। DeFi-তে DAO (Decentralized Autonomous Organization)—User-রা Collective Decision, Resource Control ও Automated Governance করতে পারে—Central Authority ছাড়াই। Solidity-তে DAO Contract—MakerDAO, MolochDAO-এর মতো Industry Standard।
+
+## Core Concepts
+
+### ১. DAO কী?
+- **Definition:** Decentralized Organization, Smart Contract-এ Automated Governance
+- **ব্যবহার:** Collective Decision, Fund Management, Voting
+- **Popular Protocols:** MakerDAO, MolochDAO, Aragon
+
+### ২. Membership & Governance
+- **Technique:** Token-based Membership, Voting Power
+- **Features:**
+    - Proposal Creation
+    - Voting
+    - Execution
+- **উদাহরণ:**
+```solidity
+contract DAO {
+    mapping(address => bool) public members;
+    struct Proposal {
+        string description;
+        uint voteCount;
+        bool executed;
+    }
+    Proposal[] public proposals;
+    function addMember(address user) public {
+        members[user] = true;
+    }
+    function createProposal(string memory desc) public {
+        require(members[msg.sender], "Not a member");
+        proposals.push(Proposal(desc, 0, false));
+    }
+    function vote(uint proposalId) public {
+        require(members[msg.sender], "Not a member");
+        proposals[proposalId].voteCount++;
+    }
+    function execute(uint proposalId) public {
+        require(proposals[proposalId].voteCount > 1, "Not enough votes");
+        proposals[proposalId].executed = true;
+        // Execution Logic
+    }
+}
+```
+
+### ৩. Fund Management
+- **Technique:** Collective Control, Automated Distribution
+- **Features:**
+    - Treasury
+    - Spending Proposal
+    - Automated Payment
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Decentralized Governance
+- User Empowerment
+- Automated Decision
+- Transparency
+
+### ৫. কখন ব্যবহার করবেন?
+- Collective Decision
+- Fund Management
+- Automated Governance
+
+### ৬. Common Pitfalls
+- Low Participation
+- Voting Manipulation
+- Security Vulnerability
+
+### ৭. Best Practices
+- Audit Voting Logic
+- Secure Fund Management
+- User Education
+- Regular Update
+
+### ৮. Industry Trends
+- Token-weighted Voting
+- Multi-signature Treasury
+- Automated Governance
+
+## উদাহরণ ও এনালজি
+- DAO—"একটি ক্লাব, সবাই মিলে সিদ্ধান্ত নেয়"
+- Voting—"সবার ভোটে সিদ্ধান্ত, কেউ একা নিয়ন্ত্রণ করতে পারে না"
+
+## Quick Reference
+- Member: `addMember(user)`
+- Proposal: `createProposal(desc)`
+- Vote: `vote(proposalId)`
+- Execute: `execute(proposalId)`
+
+## উপসংহার
+
+DAO Contract—Solidity-তে Decentralized Governance, User Empowerment ও Automated Decision-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract Efficient, Secure ও Transparent হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে DAO Contract-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Solidity-র ভবিষ্যৎ

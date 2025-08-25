@@ -1,0 +1,97 @@
+---
+title: "Yield Farming লজিক"
+icon: vscode-icons:file-type-solidity
+---
+
+# Yield Farming লজিক — Solidity-তে Automated Passive Income
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Automated Service, Resource Optimization ও User Incentive ব্যবহৃত হয়—Efficiency ও Engagement বাড়াতে। DeFi-তে Yield Farming—User-রা Token Deposit করে Automated Reward পায়—Passive Income ও Liquidity Provision নিশ্চিত হয়। Solidity-তে Yield Farming Logic—Uniswap, Yearn Finance-এর মতো Industry Standard।
+
+## Core Concepts
+
+### ১. Yield Farming কী?
+- **Definition:** User-রা Token Deposit করে Automated Reward Earn করে
+- **ব্যবহার:** Liquidity Provision, Passive Income, Incentive Program
+- **Popular Protocols:** Uniswap, Yearn Finance, SushiSwap
+
+### ২. Reward Calculation
+- **Technique:** Proportional, Time-based, Multi-token
+- **Features:**
+    - Automated Distribution
+    - Pool Share
+    - Bonus/Incentive
+- **উদাহরণ:**
+```solidity
+contract YieldFarm {
+    mapping(address => uint) public deposits;
+    mapping(address => uint) public rewards;
+    uint public totalDeposits;
+    function deposit(uint amount) public {
+        deposits[msg.sender] += amount;
+        totalDeposits += amount;
+        // Reward Logic
+    }
+    function claimReward() public {
+        uint reward = calculateReward(msg.sender);
+        rewards[msg.sender] = 0;
+        // Transfer Logic
+    }
+    function calculateReward(address user) public view returns (uint) {
+        // Proportional Reward
+        return (deposits[user] * 100) / totalDeposits;
+    }
+}
+```
+
+### ৩. Incentive Program
+- **Technique:** Bonus, Multi-token Reward, Time-based Incentive
+- **Features:**
+    - User Engagement
+    - Liquidity Boost
+    - Automated Bonus
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Passive Income
+- Liquidity Provision
+- User Engagement
+- Automated Service
+
+### ৫. কখন ব্যবহার করবেন?
+- Token Deposit
+- Reward Claim
+- Incentive Program
+
+### ৬. Common Pitfalls
+- Reward Calculation Error
+- Low Liquidity
+- Security Vulnerability
+
+### ৭. Best Practices
+- Audit Reward Logic
+- Secure Deposit Management
+- User Education
+- Regular Update
+
+### ৮. Industry Trends
+- Multi-token Yield
+- Automated Bonus
+- Layer 2 Yield Farming
+
+## উদাহরণ ও এনালজি
+- Yield Farming—"ব্যাংকে টাকা রেখে সুদ পাওয়া, ব্যাংক নিজে নিজে হিসাব করে দেয়"
+- Incentive Program—"বিশেষ অফার, বেশি জমা রাখলে বেশি পুরস্কার"
+
+## Quick Reference
+- Deposit: `deposit(amount)`
+- Claim: `claimReward()`
+- Reward: `calculateReward(user)`
+
+## উপসংহার
+
+Yield Farming Logic—Solidity-তে Automated Passive Income, Liquidity Provision ও User Engagement-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract Efficient, Secure ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Yield Farming Logic-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** DAO স্মার্ট কন্ট্রাক্ট
