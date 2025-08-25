@@ -1,0 +1,113 @@
+---
+title: "Custom Headers দিয়ে Security & Performance"
+icon: simple-icons:traefikproxy
+---
+
+# Custom Headers দিয়ে Security & Performance
+
+## পরিচিতি
+
+Modern app-এ security ও performance—দুইটাই HTTP headers দিয়ে অনেকাংশে control করা যায়। Traefik-এর custom headers middleware দিয়ে security header enforce, performance optimize, এবং compliance maintain করা যায়। এই পাঠে জানব, custom headers কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Custom Headers Middleware কী?
+
+- **Custom Headers Middleware**—request/response-এ custom header add/modify করা
+- Security, caching, এবং browser behavior control করতে must-have
+
+### Real-life Use Case
+Google—security header enforce করে, Netflix—caching header optimize করে
+
+---
+
+## Security Headers
+
+- **Security Headers**—browser-level vulnerability minimize করে
+- উদাহরণ: HSTS, X-Frame-Options, Content-Security-Policy
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        stsSeconds: 31536000
+        contentSecurityPolicy: "default-src 'self'"
+```
+
+- **frameDeny:** Clickjacking protection
+- **sslRedirect:** HTTP → HTTPS redirect
+- **stsSeconds:** HSTS (HTTP Strict Transport Security)
+- **contentSecurityPolicy:** Trusted source থেকে content load
+
+---
+
+## Performance Headers
+
+- **Performance Headers**—caching, compression, ও resource optimization
+- উদাহরণ: Cache-Control, ETag, Accept-Encoding
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    perf-headers:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "public, max-age=3600"
+          ETag: "W/\"123456\""
+          Accept-Encoding: "gzip, deflate"
+```
+
+---
+
+## Compliance Headers
+
+- GDPR, PCI-DSS-এর মতো standard-এ কিছু header mandatory
+- Example: Strict-Transport-Security, X-Content-Type-Options
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Header miss:** Security vulnerability exposed
+- **Wrong value:** Performance impact বা browser bug
+- **Overuse:** Too many header—response size বাড়ে
+
+---
+
+## Best Practices
+
+- Security header industry standard অনুযায়ী enforce করুন
+- Performance header logically define করুন—caching optimize করুন
+- Compliance header mandatory value maintain করুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—security ও performance header default
+- API gateway—custom header automate
+- SaaS platform—compliance header must-have
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Custom header**—"office instruction board"—কীভাবে behave করতে হবে, তা বলে দেয়
+
+---
+
+## Conclusion
+
+Traefik-এর custom headers middleware দিয়ে app/API-তে security, performance, ও compliance automate করা যায়। Proper config, standard value, এবং staging-এ test—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Traefik Dashboard Overview](/traefik/dashboard)

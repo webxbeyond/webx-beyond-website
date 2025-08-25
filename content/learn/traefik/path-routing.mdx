@@ -1,0 +1,105 @@
+---
+title: "Path-based Routing"
+icon: simple-icons:traefikproxy
+---
+
+# Path-based Routing
+
+## পরিচিতি
+
+Modern web apps-এ একাধিক service, API, বা app একসাথে চালাতে হয়। Path-based routing মানে—user কোন path-এ request পাঠাচ্ছে, তার উপর ভিত্তি করে Traefik সেই request-কে নির্দিষ্ট backend-এ পাঠায়। এই পাঠে জানব, path-based routing কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Path-based Routing কী?
+
+- **Path-based Routing** হলো—URL-এর path দেখে request-কে নির্দিষ্ট service-এ পাঠানো
+- উদাহরণ: `/api` path-এ গেলে API server, `/blog`-এ গেলে blog app
+- Microservices, multi-app platform, বা SaaS-এ এটি must-have
+
+### Real-life Use Case
+Netflix, Uber—একই domain-এ `/user`, `/ride`, `/payment`-এর মতো path-এ আলাদা service চালায়
+
+---
+
+## Traefik-এ Path-based Routing কিভাবে কাজ করে?
+
+Traefik-এর router config-এ "rule" define করতে হয়—যেখানে path match করলে কোন service-এ request যাবে
+
+### YAML Config Example
+
+```yaml
+http:
+  routers:
+    api-router:
+      rule: "PathPrefix(`/api`)"
+      service: api-service
+      entryPoints:
+        - web
+    blog-router:
+      rule: "PathPrefix(`/blog`)"
+      service: blog-service
+      entryPoints:
+        - web
+```
+
+- **PathPrefix:** `/api` বা `/blog` দিয়ে শুরু হলে match করবে
+- **service:** কোন backend-এ request যাবে
+
+### Docker Labels Example
+
+```yaml
+labels:
+  - "traefik.http.routers.api-router.rule=PathPrefix(`/api`)"
+  - "traefik.http.routers.api-router.service=api-service"
+  - "traefik.http.routers.blog-router.rule=PathPrefix(`/blog`)"
+  - "traefik.http.routers.blog-router.service=blog-service"
+```
+
+---
+
+## Nested Routing
+
+- Complex app-এ nested path—যেমন `/api/v1`, `/api/v2`—routing করা যায়
+- Rule: `PathPrefix(`/api/v1`)`
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Rule overlap:** `/api` ও `/api/v1`-এর rule overlap করলে ভুল service-এ request যেতে পারে
+- **Priority ভুল:** Multiple rule থাকলে priority ঠিক না হলে expected routing হবে না
+- **Trailing slash:** `/api` vs `/api/`—match না হলে bug হতে পারে
+
+---
+
+## Best Practices
+
+- Specific path আগে define করুন—priority ঠিক রাখুন
+- PathPrefix vs Path—কখন কোনটা ব্যবহার করবেন বুঝে নিন
+- Config change/staging-এ test করুন
+- Logs দেখে routing validate করুন
+
+---
+
+## Industry Trends
+
+- Microservices architecture—path-based routing default
+- API gateway—path-based rule দিয়ে multiple API serve
+- SaaS platform—single domain-এ multiple app path-based serve
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Path-based routing** হলো—"বড় বিল্ডিং-এর gatekeeper"—কোন gate দিয়ে ঢুকলে কোন floor-এ যাবেন, তা ঠিক করে দেয়
+
+---
+
+## Conclusion
+
+Path-based routing দিয়ে Traefik-এ একাধিক app, API, বা service সহজে চালানো যায়। Proper rule, priority, এবং config test—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Host-based Routing (Subdomains, Wildcards)](/traefik/host-routing)

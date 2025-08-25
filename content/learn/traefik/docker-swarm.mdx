@@ -1,0 +1,102 @@
+---
+title: "Docker Swarm Integration: Traefik-এ ক্লাস্টার স্কেলিং ও সার্ভিস ডিসকভারি"
+icon: mdi:docker-swarm
+---
+
+# Docker Swarm Integration: Traefik-এ ক্লাস্টার স্কেলিং ও সার্ভিস ডিসকভারি
+
+## পরিচিতি
+
+Docker Swarm—একটি container orchestration tool—production-grade ক্লাস্টার স্কেলিং ও সার্ভিস ডিসকভারি সহজ করে। Traefik-এর সাথে Docker Swarm ইন্টিগ্রেট করলে, অটোমেটিক সার্ভিস ডিসকভারি, লোড ব্যালেন্সিং, ও হাই এভেইলেবিলিটি নিশ্চিত করা যায়।
+
+## Docker Swarm কী ও কেন?
+
+- **Docker Swarm:** Docker container-কে cluster হিসেবে deploy, manage, ও scale করার টুল।
+- **Use Case:** Netflix, Uber-এর মতো কোম্পানিতে হাজার হাজার container orchestration, zero downtime deployment, auto-scaling—সবকিছুতে Swarm ব্যবহৃত হয়।
+- **Importance:** Cluster management, service discovery, rolling update, failover—সবকিছু সহজ হয়।
+
+## Traefik-এ Docker Swarm Integration
+
+Traefik Docker provider-এর মাধ্যমে Swarm cluster-এর সার্ভিস অটোমেটিক detect ও route করতে পারে।
+
+### ১. Traefik as Swarm Ingress Controller
+- Traefik কে Swarm cluster-এর ingress controller হিসেবে deploy করুন।
+- Example command:
+```bash
+docker service create \
+  --name traefik \
+  --publish 80:80 \
+  --publish 443:443 \
+  --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+  traefik:v2.10 \
+  --providers.docker.swarmMode=true \
+  --providers.docker.endpoint=unix:///var/run/docker.sock
+```
+
+### ২. Service Discovery
+- Traefik Docker label পড়ে অটোমেটিক route তৈরি করে।
+- Example label:
+```yaml
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.myapp.rule=Host(`myapp.local`)"
+```
+
+### ৩. Load Balancing & Failover
+- Swarm cluster-এ multiple replica—Traefik অটোমেটিকভাবে healthy instance-এ traffic পাঠায়।
+
+### ৪. Rolling Update
+- Swarm service update করলে, Traefik অটোমেটিকভাবে নতুন instance detect করে, downtime ছাড়াই traffic route করে।
+
+## Core Concepts
+
+### Overlay Network
+- Swarm cluster-এ container-রা overlay network-এ communicate করে।
+- Traefik সেই network-এ traffic route করে।
+
+### Service Scaling
+- Swarm service scale করলে, Traefik অটোমেটিকভাবে নতুন instance-এ traffic পাঠায়।
+- Example command:
+```bash
+docker service scale myapp=5
+```
+
+### Health Check Integration
+- Swarm service health check enable করলে, Traefik unhealthy instance exclude করে।
+
+## Real-life Example & Analogy
+
+- **Uber:** হাজার হাজার container—Swarm cluster-এ orchestration, Traefik-এ routing, downtime zero।
+- **Analogy:** Imagine a busy airport—air traffic controller (Traefik) planes (containers) কে runway (network) route করে।
+
+## Common Pitfalls
+
+- **Docker socket permission ভুল হলে:** Traefik service discovery fail করে।
+- **Label ভুল হলে:** Routing problem, traffic ভুল service-এ যায়।
+- **Network misconfiguration:** Container-রা communicate করতে পারে না।
+
+## Best Practices
+
+- **Docker socket secure করুন:** Production-এ socket access restrict করুন।
+- **Label convention maintain করুন:** Routing সহজ হবে।
+- **Health check enable করুন:** Unhealthy instance exclude করুন।
+- **Monitoring করুন:** Cluster status, traffic, error rate track করুন।
+
+## Industry Trends
+
+- **Multi-cluster orchestration:** Swarm + Kubernetes—hybrid orchestration হচ্ছে।
+- **Service mesh integration:** Traefik Mesh—advanced traffic management।
+- **Auto-scaling:** Traffic pattern অনুযায়ী container সংখ্যা অটোমেটিক বাড়ে/কমে।
+
+## কখন ব্যবহার করবেন?
+
+- Production-grade container orchestration, zero downtime deployment, auto-scaling নিশ্চিত করতে।
+- Microservices, API gateway, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Docker Swarm Integration দিয়ে ক্লাস্টার স্কেলিং, সার্ভিস ডিসকভারি, ও হাই এভেইলেবিলিটি অনেক সহজ হয়। সঠিকভাবে কনফিগার করলে, সার্ভিসের reliability ও performance নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Kubernetes Scaling](/traefik/k8s-scaling)

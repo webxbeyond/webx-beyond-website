@@ -1,0 +1,134 @@
+---
+title: Docker Provider দিয়ে ডাইনামিক কনফিগ
+icon: simple-icons:traefikproxy
+---
+
+# Docker Provider দিয়ে ডাইনামিক কনফিগ — Traefik-এ অটোমেটিক সার্ভিস ডিসকভারি
+
+## পরিচিতি
+
+Traefik-এর Docker Provider হচ্ছে সেই পদ্ধতি, যেখানে Docker container চালু হলে Traefik অটোমেটিকভাবে রাউট, সার্ভিস, middleware—সবকিছু তৈরি ও আপডেট করে। এটি cloud-native, automation-friendly, এবং DevOps pipeline-এর জন্য আদর্শ।
+
+---
+
+## ১. কেন Docker Provider?
+
+- **Automation:** নতুন container চালু হলে অটোমেটিক রাউটিং
+- **Scalability:** একাধিক অ্যাপ/সার্ভিস একসাথে চালানো
+- **Zero-downtime deployment:** config পরিবর্তন করলে restart দরকার নেই
+- **Security:** Docker label দিয়ে authentication, rate limit, TLS—সবকিছু কনফিগার
+
+### বাস্তব উদাহরণ
+- SaaS: একাধিক অ্যাপ, একাধিক ডোমেইন
+- API gateway: automated routing
+- DevOps pipeline: CI/CD integration
+
+---
+
+## ২. Docker Provider কনফিগারেশন
+
+### Step 1: Static config-এ Docker Provider যুক্ত করুন
+
+`traefik.yml`:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+providers:
+  docker:
+    exposedByDefault: false
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: web
+```
+
+### Step 2: Docker Compose ফাইল তৈরি করুন
+
+`docker-compose.yml`:
+```yaml
+version: "3.8"
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  app1:
+    image: nginx:alpine
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app1.rule=Host(`app1.localhost`)"
+      - "traefik.http.routers.app1.entrypoints=websecure"
+      - "traefik.http.routers.app1.tls.certresolver=myresolver"
+      - "traefik.http.routers.app1.middlewares=auth"
+
+  app2:
+    image: httpd:alpine
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app2.rule=Host(`app2.localhost`)"
+      - "traefik.http.routers.app2.entrypoints=websecure"
+      - "traefik.http.routers.app2.tls.certresolver=myresolver"
+```
+
+### Step 3: Middleware ও অন্যান্য label
+
+```yaml
+traefik.http.middlewares.auth.basicauth.users=user:password
+traefik.http.routers.app1.middlewares=auth
+```
+
+---
+
+## ৩. Docker Provider-এর সুবিধা
+
+- Container চালু/বন্ধ হলে Traefik config অটোমেটিক আপডেট
+- Docker label দিয়ে routing, middleware, TLS—সবকিছু কনফিগার
+- Manual override ছাড়াই automation
+
+### সহজ উদাহরণ: বাস স্ট্যান্ডের অটো-রুট
+
+যেমন বাস স্ট্যান্ডে নতুন বাস এলে অটোমেটিক রুট আপডেট হয়—Traefik Docker Provider ঠিক সেইভাবে container চালু হলে অটোমেটিক রাউটিং আপডেট করে।
+
+---
+
+## ৪. Common Pitfalls
+
+- Docker label ভুল হলে routing/middleware কাজ করবে না
+- exposedByDefault: false না দিলে সব container exposed
+- acme.json permission ভুল হলে SSL হবে না
+
+## ৫. Best Practices
+
+- Docker label/comment/documentation ভালোভাবে লিখুন
+- exposedByDefault: false ব্যবহার করুন
+- acme.json permission ঠিক রাখুন
+- Config version control-এ রাখুন
+
+## ৬. Industry Trends
+
+- Automation—Docker/Kubernetes provider
+- Multi-app—SaaS, API gateway
+- Security—HTTPS everywhere
+
+## উপসংহার
+
+Traefik-এর Docker Provider—production-ready, scalable, ও automation-friendly ডিপ্লয়মেন্টের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা ডকার লেবেল দিয়ে রাউটিং নিয়ে বিস্তারিতভাবে দেখব।

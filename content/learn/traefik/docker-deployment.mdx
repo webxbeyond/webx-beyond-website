@@ -1,0 +1,129 @@
+---
+title: Docker কন্টেইনারে ট্র্যাফিক চালানো
+icon: simple-icons:traefikproxy
+---
+
+# Docker কন্টেইনারে ট্র্যাফিক চালানো — সহজ, স্কেলেবল ও অটোমেটেড ডিপ্লয়মেন্ট
+
+## পরিচিতি
+
+Docker কন্টেইনারে Traefik চালানো মানে—আপনি cloud-native, automation-friendly, এবং production-ready রিভার্স প্রক্সি প্ল্যাটফর্ম পাচ্ছেন। এই পদ্ধতি DevOps, Microservices, SaaS, API gateway—সবকিছুতেই জনপ্রিয়।
+
+---
+
+## ১. কেন Docker-এ Traefik?
+
+- **Portability:** যেকোনো environment-এ সহজে deploy
+- **Automation:** Docker provider দিয়ে অটোমেটিক সার্ভিস ডিসকভারি
+- **Scalability:** একাধিক অ্যাপ/সার্ভিস একসাথে চালানো
+- **Security:** HTTPS, authentication, rate limit—সবকিছু সহজে
+
+### বাস্তব উদাহরণ
+- SaaS: একাধিক অ্যাপ, একাধিক ডোমেইন
+- API gateway: automated routing
+- DevOps pipeline: CI/CD integration
+
+---
+
+## ২. Docker-এ Traefik চালানোর ধাপ
+
+### Step 1: Traefik কনফিগারেশন ফাইল তৈরি করুন
+
+`traefik.yml`:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+providers:
+  docker:
+    exposedByDefault: false
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: web
+```
+
+### Step 2: Docker Compose ফাইল তৈরি করুন
+
+`docker-compose.yml`:
+```yaml
+version: "3.8"
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+```
+
+### Step 3: acme.json ফাইল তৈরি করুন
+
+```bash
+touch acme.json
+chmod 600 acme.json
+```
+
+### Step 4: Docker Compose দিয়ে চালান
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## ৩. Docker Provider দিয়ে সার্ভিস ডিসকভারি
+
+- Traefik Docker provider দিয়ে নতুন container অটোমেটিক রাউটিং-এ যুক্ত হয়
+- Docker label দিয়ে routing, middleware, entrypoint, TLS—সবকিছু কনফিগার করা যায়
+
+### উদাহরণ:
+```yaml
+app1:
+  image: nginx:alpine
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.app1.rule=Host(`app1.localhost`)"
+    - "traefik.http.routers.app1.entrypoints=websecure"
+    - "traefik.http.routers.app1.tls.certresolver=myresolver"
+```
+
+---
+
+## ৪. Common Pitfalls
+
+- Docker label ভুল হলে routing কাজ করবে না
+- acme.json permission ভুল হলে SSL হবে না
+- exposedByDefault: false না দিলে সব container exposed
+
+## ৫. Best Practices
+
+- Docker label/comment/documentation ভালোভাবে লিখুন
+- acme.json permission ঠিক রাখুন
+- exposedByDefault: false ব্যবহার করুন
+- Config version control-এ রাখুন
+
+## ৬. Industry Trends
+
+- Automation—Docker/Kubernetes provider
+- Multi-app—SaaS, API gateway
+- Security—HTTPS everywhere
+
+## উপসংহার
+
+Docker কন্টেইনারে Traefik চালানো—production-ready, scalable, ও secure ডিপ্লয়মেন্টের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা File Provider কনফিগারেশন নিয়ে বিস্তারিতভাবে দেখব।

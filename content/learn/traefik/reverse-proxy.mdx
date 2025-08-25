@@ -1,0 +1,140 @@
+---
+title: হ্যান্ডস-অন: মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ
+icon: simple-icons:traefikproxy
+---
+
+# হ্যান্ডস-অন: মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ — Traefik দিয়ে বাস্তব উদাহরণ
+
+## পরিচিতি
+
+আধুনিক ওয়েব ও API প্ল্যাটফর্মে একাধিক অ্যাপ/সার্ভিস একসাথে চালানো খুবই সাধারণ। Traefik দিয়ে মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ করলে আপনি স্কেলিং, সিকিউরিটি, এবং অটোমেশন সহজেই পাবেন। এই পাঠে আমরা Docker-ভিত্তিক একটি হ্যান্ডস-অন মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ দেখব।
+
+---
+
+## ১. কেন মাল্টি-অ্যাপ রিভার্স প্রক্সি?
+
+- একাধিক অ্যাপ/সার্ভিস একসাথে চালানো
+- একাধিক ডোমেইন/পাথ/সাবডোমেইন
+- HTTPS, authentication, rate limit—সবকিছু এক জায়গায়
+- Automation ও zero-downtime deployment
+
+### বাস্তব উদাহরণ
+- SaaS: `app1.example.com`, `app2.example.com`
+- API gateway: `/api/v1`, `/api/v2`
+- WordPress + Node.js + API
+
+---
+
+## ২. Docker-ভিত্তিক মাল্টি-অ্যাপ সেটআপ
+
+### স্টেপ ১: Traefik কনফিগারেশন ফাইল তৈরি করুন
+
+`traefik.yml`:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+providers:
+  docker:
+    exposedByDefault: false
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: web
+```
+
+### স্টেপ ২: Docker Compose ফাইল তৈরি করুন
+
+`docker-compose.yml`:
+```yaml
+version: "3.8"
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  app1:
+    image: nginx:alpine
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app1.rule=Host(`app1.localhost`)"
+      - "traefik.http.routers.app1.entrypoints=websecure"
+      - "traefik.http.routers.app1.tls.certresolver=myresolver"
+
+  app2:
+    image: httpd:alpine
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app2.rule=Host(`app2.localhost`)"
+      - "traefik.http.routers.app2.entrypoints=websecure"
+      - "traefik.http.routers.app2.tls.certresolver=myresolver"
+```
+
+### স্টেপ ৩: acme.json ফাইল তৈরি করুন
+
+```bash
+touch acme.json
+chmod 600 acme.json
+```
+
+### স্টেপ ৪: Docker Compose দিয়ে চালান
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## ৩. কীভাবে কাজ করে?
+
+- Traefik container—reverse proxy, SSL, automation
+- app1 (nginx)—`app1.localhost` ডোমেইনে
+- app2 (httpd)—`app2.localhost` ডোমেইনে
+- HTTPS অটোমেটিক, Docker label দিয়ে routing
+
+### সহজ উদাহরণ: বাস স্ট্যান্ড
+
+যেমন বাস স্ট্যান্ডে যাত্রীদের গন্তব্য অনুযায়ী আলাদা বাসে পাঠানো হয়—Traefik ঠিক সেইভাবে রিকোয়েস্টকে সঠিক অ্যাপে পাঠায়।
+
+---
+
+## ৪. Common Pitfalls
+
+- Docker label ভুল হলে routing কাজ করবে না
+- acme.json permission ভুল হলে SSL হবে না
+- exposedByDefault: false না দিলে সব container exposed
+
+## ৫. Best Practices
+
+- Docker label/comment/documentation ভালোভাবে লিখুন
+- acme.json permission ঠিক রাখুন
+- exposedByDefault: false ব্যবহার করুন
+- Config version control-এ রাখুন
+
+## ৬. Industry Trends
+
+- Automation—Docker/Kubernetes provider
+- Multi-app—SaaS, API gateway
+- Security—HTTPS everywhere
+
+## উপসংহার
+
+Traefik দিয়ে মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ—production-ready, scalable, ও secure প্ল্যাটফর্মের জন্য অপরিহার্য।
+
+পরবর্তী মডিউলে আমরা ডকার ও ফাইল প্রোভাইডার ব্যবহার করে ট্র্যাফিক ডিপ্লয় করা নিয়ে বিস্তারিত দেখব।

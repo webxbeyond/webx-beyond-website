@@ -1,0 +1,106 @@
+---
+title: Services: লোড ব্যালেন্সিং স্ট্র্যাটেজি
+icon: simple-icons:traefikproxy
+---
+
+# Services: লোড ব্যালেন্সিং স্ট্র্যাটেজি — Traefik-এ স্কেলিং ও পারফরম্যান্স
+
+## পরিচিতি
+
+Traefik-এর Services হচ্ছে backend—যেখানে রিকোয়েস্ট শেষ পর্যন্ত যায়। Services-এর লোড ব্যালেন্সিং স্ট্র্যাটেজি ঠিকভাবে বুঝলে আপনি স্কেলেবল, ফাস্ট, ও রিলায়েবল অ্যাপ্লিকেশন তৈরি করতে পারবেন।
+
+---
+
+## ১. Service কী?
+
+- Service মানে—Traefik-এর backend, যেমন Docker container, Kubernetes pod, static server ইত্যাদি।
+- একাধিক Service থাকলে Traefik লোড ব্যালেন্সিং করে—রিকোয়েস্ট ভাগ করে দেয়।
+- Health check, failover, weighted balancing—সব Traefik Service-এ সাপোর্ট করে।
+
+### সহজ উদাহরণ: স্কুলের ক্লাসরুম
+
+যেমন ছাত্ররা ক্লাসে গিয়ে পড়াশোনা করে—Traefik-এর Service মানে, রিকোয়েস্ট backend-এ গিয়ে কাজ শেষ করে।
+
+---
+
+## ২. লোড ব্যালেন্সিং স্ট্র্যাটেজি
+
+### কী?
+
+- লোড ব্যালেন্সিং মানে—একাধিক সার্ভিসে রিকোয়েস্ট ভাগ করে দেওয়া, যাতে কোনো সার্ভিসে অতিরিক্ত চাপ না পড়ে।
+- Traefik-এ বিভিন্ন স্ট্র্যাটেজি—Round Robin, Weighted, Sticky Sessions, Circuit Breaker ইত্যাদি।
+
+### সাধারণ স্ট্র্যাটেজি
+1. **Round Robin:** রিকোয়েস্ট একটার পর একটা সার্ভিসে যায়
+2. **Weighted:** কিছু সার্ভিসে বেশি রিকোয়েস্ট, কিছুতে কম
+3. **Sticky Sessions:** একই ইউজার বারবার একই সার্ভিসে যায়
+4. **Circuit Breaker:** কোনো সার্ভিস ডাউন হলে রিকোয়েস্ট অন্য সার্ভিসে যায়
+
+### বাস্তব উদাহরণ
+- Netflix: হাজার হাজার সার্ভিস—লোড ব্যালেন্সিং ছাড়া স্কেলিং সম্ভব নয়
+- Uber: API gateway—weighted balancing
+
+---
+
+## ৩. Service কনফিগারেশন
+
+### YAML/TOML (File Provider):
+```yaml
+http:
+  services:
+    my-app:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.0.1"
+          - url: "http://10.0.0.2"
+        passHostHeader: true
+        sticky:
+          cookie: {}
+        healthCheck:
+          path: "/health"
+          interval: "10s"
+```
+
+### Docker label:
+```
+traefik.http.services.myapp.loadbalancer.server.port=8080
+traefik.http.services.myapp.loadbalancer.sticky.cookie=true
+```
+
+### Kubernetes annotation:
+```
+traefik.ingress.kubernetes.io/service.sticky: "true"
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- Multiple backend—scaling, reliability
+- API gateway—weighted, sticky sessions
+- Health check—failover, zero-downtime
+
+## কমন পিটফল
+
+- Health check miss করলে ডাউন সার্ভিসে রিকোয়েস্ট
+- Weighted balancing ভুল হলে কিছু সার্ভিস overloaded
+- Sticky session miss করলে user experience খারাপ
+
+## বেস্ট প্র্যাকটিস
+
+- Health check ও failover এনাবল করুন
+- Weighted balancing ঠিকভাবে কনফিগার করুন
+- Sticky session ব্যবহার করুন (login, payment)
+- Config version control-এ রাখুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Advanced balancing—canary, blue/green deployment
+- Automation—dynamic service discovery
+- Circuit breaker everywhere
+
+## উপসংহার
+
+Traefik-এর Services—লোড ব্যালেন্সিং স্ট্র্যাটেজি—production-ready, scalable, ও reliable অ্যাপ্লিকেশনের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা Middleware: রিকোয়েস্ট ও রেসপন্স পরিবর্তন নিয়ে বিস্তারিতভাবে দেখব।

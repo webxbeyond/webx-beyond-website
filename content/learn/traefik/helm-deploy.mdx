@@ -1,0 +1,110 @@
+---
+title: "Helm Chart দিয়ে ডিপ্লয়: Kubernetes-এ Traefik সহজে সেটআপ"
+icon: simple-icons:helm
+---
+
+# Helm Chart দিয়ে ডিপ্লয়: Kubernetes-এ Traefik সহজে সেটআপ
+
+## পরিচিতি
+
+Kubernetes cluster-এ production-grade API gateway deploy করতে Helm Chart সবচেয়ে সহজ ও জনপ্রিয় পদ্ধতি। Helm—Kubernetes-এর package manager—Traefik-এর জন্য ready-made Chart দেয়, যাতে configuration, upgrade, rollback, ও scaling সহজ হয়।
+
+## Helm Chart কী ও কেন?
+
+- **Helm Chart:** Kubernetes application deploy, manage, ও upgrade করার জন্য YAML template bundle।
+- **Use Case:** Google, Netflix, Uber—cluster-এ হাজার হাজার app—Helm Chart ছাড়া manual deployment অসম্ভব।
+- **Importance:** Version control, repeatable deployment, rollback, ও automation—সব Helm দিয়ে সহজ।
+
+## Traefik Helm Chart Integration
+
+Traefik Helm Chart দিয়ে Kubernetes-এ deploy করলে, configuration, scaling, ও update সহজ হয়।
+
+### ১. Helm Install
+- Helm install করুন (যদি না থাকে):
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+### ২. Traefik Helm Repo Add
+- Traefik Helm repo add করুন:
+```bash
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+```
+
+### ৩. Traefik Deploy
+- Helm Chart দিয়ে Traefik deploy করুন:
+```bash
+helm install traefik traefik/traefik --namespace traefik --create-namespace
+```
+
+### ৪. Custom Values Configuration
+- Custom config values.yaml-এ define করুন—entryPoints, providers, middleware, TLS, dashboard, ইত্যাদি।
+- Example values.yaml:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+providers:
+  kubernetesCRD: {}
+  kubernetesIngress: {}
+api:
+  dashboard: true
+```
+
+### ৫. Upgrade ও Rollback
+- Helm দিয়ে সহজে upgrade ও rollback করা যায়:
+```bash
+helm upgrade traefik traefik/traefik --namespace traefik
+helm rollback traefik 1 --namespace traefik
+```
+
+## Core Concepts
+
+### Version Control
+- Helm Chart version—specific app version deploy, rollback, ও audit সহজ।
+
+### Parameterization
+- values.yaml-এ parameter define—environment অনুযায়ী config change করা যায়।
+
+### Automation
+- CI/CD pipeline-এ Helm Chart ব্যবহার—automated deployment, scaling, ও monitoring।
+
+## Real-life Example & Analogy
+
+- **Netflix:** Cluster-এ হাজার হাজার app—Helm Chart দিয়ে automated deployment, upgrade, rollback manage হয়।
+- **Analogy:** Helm Chart হচ্ছে packaged meal kit—সব ingredient ready, শুধু রান্না করুন। Kubernetes-এ Helm Chart-ও ঠিক তেমন—ready-made config, deploy করুন।
+
+## Common Pitfalls
+
+- **values.yaml ভুল হলে:** Deployment fail, config mismatch, security issue হতে পারে।
+- **Namespace ভুল দিলে:** Resource deploy হবে না বা ভুল namespace-এ যাবে।
+- **Chart version mismatch:** Compatibility issue, error হতে পারে।
+
+## Best Practices
+
+- **values.yaml properly maintain করুন:** Environment অনুযায়ী config update করুন।
+- **Version control করুন:** Helm Chart version track ও rollback সহজ করুন।
+- **Monitoring করুন:** Deployment status, error, resource usage track করুন।
+- **Documentation follow করুন:** Traefik Helm Chart docs-এ latest example দেখুন।
+
+## Industry Trends
+
+- **GitOps deployment:** Helm Chart + GitOps—automated, versioned deployment pipeline।
+- **Multi-cluster Helm management:** একাধিক cluster—centralized Helm deployment।
+- **Helm plugin integration:** Monitoring, security, backup—Helm plugin দিয়ে manage হচ্ছে।
+
+## কখন ব্যবহার করবেন?
+
+- Production-grade Kubernetes cluster—repeatable, automated, versioned deployment নিশ্চিত করতে।
+- Multi-tenant, multi-environment, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Helm Chart দিয়ে Kubernetes-এ deployment, configuration, ও scaling অনেক সহজ ও শক্তিশালী হয়। সঠিকভাবে কনফিগার করলে, reliability, automation, ও developer productivity নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Hands-on: মাইক্রোসার্ভিস অ্যাপ ডিপ্লয়মেন্ট](/traefik/k8s-microservices)

@@ -1,0 +1,122 @@
+---
+title: ইন্সটলেশন (Binary, Docker, Kubernetes)
+icon: simple-icons:traefikproxy
+---
+
+# Traefik ইন্সটলেশন: Binary, Docker, Kubernetes
+
+## পরিচিতি
+
+Traefik ইন্সটল করা খুবই সহজ, কারণ এটি cloud-native ও automation-friendly। আপনি চাইলে সরাসরি binary ডাউনলোড করে চালাতে পারেন, Docker কন্টেইনারে রান করতে পারেন, অথবা Kubernetes-এ production-grade deployment করতে পারেন। এই পাঠে আমরা তিনটি পদ্ধতি—Binary, Docker, Kubernetes—ধাপে ধাপে দেখব।
+
+---
+
+## ১. Binary ইন্সটলেশন
+
+### কী?
+
+Traefik-এর অফিসিয়াল binary ফাইল ডাউনলোড করে সরাসরি আপনার সার্ভারে চালানো যায়।
+
+### ধাপসমূহ
+1. অফিসিয়াল ওয়েবসাইট থেকে binary ডাউনলোড করুন: https://traefik.io/download/
+2. ফাইল extract করুন
+3. কমান্ড লাইনে চালান:
+   ```bash
+   ./traefik --version
+   ./traefik --configFile=traefik.yml
+   ```
+4. কনফিগারেশন ফাইল (traefik.yml) তৈরি করুন
+
+### সহজ উদাহরণ: মোবাইল অ্যাপ ডাউনলোড
+
+যেমন আপনি Google Play থেকে অ্যাপ ডাউনলোড করেন, ঠিক তেমনই Traefik binary ডাউনলোড করে চালাতে পারেন।
+
+### বাস্তব উদাহরণ
+- ছোট API gateway, dev/test environment
+
+---
+
+## ২. Docker-এ Traefik
+
+### কী?
+
+Docker কন্টেইনারে Traefik চালানো—cloud-native deployment-এর জন্য সবচেয়ে জনপ্রিয়।
+
+### ধাপসমূহ
+1. Docker ইনস্টল করুন
+2. Traefik-এর অফিসিয়াল ইমেজ ব্যবহার করুন:
+   ```bash
+   docker run -d \
+     -p 80:80 -p 443:443 \
+     -v $PWD/traefik.yml:/etc/traefik/traefik.yml \
+     traefik:v3.0
+   ```
+3. কনফিগারেশন ও লেবেল দিয়ে সার্ভিস রাউটিং করুন
+
+### সহজ উদাহরণ: টিফিন বক্স
+
+যেমন আপনি টিফিন বক্সে খাবার নিয়ে যান—সব ready-made, portable। Docker-এ Traefik চালানো মানে—সব ready, portable, automation-friendly।
+
+### বাস্তব উদাহরণ
+- Microservices, SaaS, API gateway
+- DevOps pipeline
+
+---
+
+## ৩. Kubernetes-এ Traefik
+
+### কী?
+
+Kubernetes-এ Traefik চালানো—production-grade, scalable, automated deployment-এর জন্য আদর্শ।
+
+### ধাপসমূহ
+1. Kubernetes cluster তৈরি করুন (Minikube, EKS, GKE, AKS)
+2. Helm Chart দিয়ে ইন্সটল করুন:
+   ```bash
+   helm repo add traefik https://traefik.github.io/charts
+   helm repo update
+   helm install traefik traefik/traefik
+   ```
+3. IngressRoute, Middleware, Service—সবকিছু কনফিগার করুন
+
+### সহজ উদাহরণ: স্কুলে ভর্তি
+
+যেমন স্কুলে ভর্তি হলে সবকিছু অটোমেটিক হয়ে যায়—রোল কল, ক্লাস, বই। Kubernetes-এ Traefik চালানো মানে—সবকিছু অটোমেটিক, স্কেলেবল, managed।
+
+### বাস্তব উদাহরণ
+- Production API gateway
+- Multi-tenant SaaS
+- Cloud-native apps
+
+---
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Binary:** Simple, single-server, dev/test
+- **Docker:** Microservices, automation, portability
+- **Kubernetes:** Production, scalability, cloud-native
+
+## কমন পিটফল
+
+- কনফিগারেশন ভুল হলে সার্ভিস inaccessible
+- Docker volume/label ভুল হলে রাউটিং সমস্যা
+- Kubernetes RBAC/Ingress ভুল হলে security issue
+
+## বেস্ট প্র্যাকটিস
+
+- কনফিগারেশন version control-এ রাখুন
+- Health check ও monitoring এনাবল করুন
+- Helm Chart দিয়ে Kubernetes-এ install করুন
+- Docker-এ volume ও label ঠিকভাবে ব্যবহার করুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Cloud-native deployment বাড়ছে—Docker/Kubernetes জনপ্রিয়
+- Automation ও GitOps—Helm, CI/CD pipeline
+- Production-ready API gateway—Kubernetes-এ Traefik
+
+## উপসংহার
+
+Traefik ইন্সটল করা মানে—স্কেলিং, automation, এবং security সহজ করা। Binary, Docker, Kubernetes—আপনার প্রয়োজন অনুযায়ী পদ্ধতি বেছে নিন।
+
+পরবর্তী পাঠে আমরা Traefik-এর আর্কিটেকচার—EntryPoints, Routers, Services, Providers—বিস্তারিতভাবে দেখব।

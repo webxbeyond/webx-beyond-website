@@ -1,0 +1,90 @@
+---
+title: ডকার লেবেল দিয়ে রাউটিং
+icon: simple-icons:traefikproxy
+---
+
+# ডকার লেবেল দিয়ে রাউটিং — Traefik-এ অটোমেটিক ও কাস্টমাইজড কনফিগারেশন
+
+## পরিচিতি
+
+Traefik-এর Docker Provider-এ Docker label ব্যবহার করে আপনি container-ভিত্তিক রাউটিং, middleware, TLS, entrypoint—সবকিছু অটোমেটিক ও কাস্টমাইজডভাবে কনফিগার করতে পারেন। এটি cloud-native, automation-friendly, এবং DevOps pipeline-এর জন্য আদর্শ।
+
+---
+
+## ১. Docker Label কী?
+
+- Docker label মানে—container-এর metadata, যা Traefik পড়ে রাউট, সার্ভিস, middleware, TLS, entrypoint—সবকিছু তৈরি করে
+- label key-value pair, যেমন: `traefik.http.routers.app1.rule=Host(`app1.localhost`)`
+
+### সহজ উদাহরণ: বাসের গায়ে গন্তব্যের নাম
+
+যেমন বাসের গায়ে "ঢাকা" বা "চট্টগ্রাম" লেখা থাকে—Traefik Docker label ঠিক সেইভাবে container-এর গায়ে রাউটিং, middleware, TLS-এর তথ্য লিখে দেয়
+
+---
+
+## ২. Docker Label দিয়ে রাউটিং
+
+### Step 1: Container-এ label যোগ করুন
+
+```yaml
+app1:
+  image: nginx:alpine
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.app1.rule=Host(`app1.localhost`)"
+    - "traefik.http.routers.app1.entrypoints=websecure"
+    - "traefik.http.routers.app1.tls.certresolver=myresolver"
+    - "traefik.http.routers.app1.middlewares=auth"
+```
+
+### Step 2: Middleware, TLS, EntryPoint, Priority
+
+- Middleware: `traefik.http.routers.app1.middlewares=auth`
+- TLS: `traefik.http.routers.app1.tls.certresolver=myresolver`
+- EntryPoint: `traefik.http.routers.app1.entrypoints=websecure`
+- Priority: `traefik.http.routers.app1.priority=10`
+
+### Step 3: Service config
+
+- Port: `traefik.http.services.app1.loadbalancer.server.port=8080`
+- Weighted: `traefik.http.services.app1.loadbalancer.server.weight=2`
+
+---
+
+## ৩. Docker Label-এর সুবিধা
+
+- container চালু/বন্ধ হলে Traefik config অটোমেটিক আপডেট
+- label দিয়ে routing, middleware, TLS—সবকিছু কনফিগার
+- manual override ছাড়াই automation
+
+### বাস্তব উদাহরণ
+- SaaS: একাধিক অ্যাপ, একাধিক ডোমেইন
+- API gateway: automated routing
+- DevOps pipeline: CI/CD integration
+
+---
+
+## ৪. Common Pitfalls
+
+- label ভুল হলে routing/middleware কাজ করবে না
+- priority miss করলে overlapping rule
+- exposedByDefault: false না দিলে সব container exposed
+
+## ৫. Best Practices
+
+- label/comment/documentation ভালোভাবে লিখুন
+- priority ও entrypoint ঠিকভাবে ব্যবহার করুন
+- exposedByDefault: false ব্যবহার করুন
+- config version control-এ রাখুন
+
+## ৬. Industry Trends
+
+- Automation—Docker/Kubernetes provider
+- Multi-app—SaaS, API gateway
+- Security—HTTPS everywhere
+
+## উপসংহার
+
+Traefik-এর Docker label—production-ready, scalable, ও automation-friendly container-based ডিপ্লয়মেন্টের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা প্র্যাকটিক্যাল সেটআপ: মাল্টি-অ্যাপ সার্ভিসিং নিয়ে বিস্তারিতভাবে দেখব।

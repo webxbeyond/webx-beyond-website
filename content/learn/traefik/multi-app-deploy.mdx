@@ -1,0 +1,90 @@
+---
+title: "একাধিক অ্যাপ (Web, API, DB) ডিপ্লয়"
+icon: simple-icons:traefikproxy
+---
+
+# একাধিক অ্যাপ (Web, API, DB) ডিপ্লয় — প্রোডাকশন-রেডি মাল্টি-সার্ভিস প্ল্যাটফর্ম
+
+## পরিচিতি
+
+আধুনিক সিস্টেম ডিজাইনে একাধিক অ্যাপ (Web, API, Database) একসাথে ডিপ্লয় করা খুবই গুরুত্বপূর্ণ। Google, Netflix, Uber-এর মতো বড় কোম্পানি—সবাই মাল্টি-সার্ভিস আর্কিটেকচার ব্যবহার করে। এই পাঠে শিখব, কীভাবে Traefik দিয়ে একাধিক অ্যাপ সহজে, নিরাপদে, ও স্কেলেবলভাবে ডিপ্লয় করবেন।
+
+## Core Concepts
+
+### ১. মাল্টি-সার্ভিস আর্কিটেকচার
+- Web, API, DB—প্রতিটি আলাদা সার্ভিস
+- Microservices, Containerization (Docker)
+- Scalability, Fault Isolation
+
+### ২. Traefik Reverse Proxy Setup
+- EntryPoints: HTTP, HTTPS
+- Routers: Path/Host-based Routing
+- Services: Backend Mapping
+- Middleware: Security, Rate Limit, Auth
+
+### ৩. Docker Compose ব্যবহার
+- একাধিক সার্ভিস একসাথে চালানো
+- Example:
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx
+    labels:
+      - "traefik.http.routers.web.rule=Host(`web.local`)"
+  api:
+    image: node:18
+    labels:
+      - "traefik.http.routers.api.rule=Host(`api.local`)"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: example
+```
+
+### ৪. Routing ও Security
+- Web → `/`, API → `/api`, DB → Internal
+- HTTPS, Authentication, Rate Limit
+- Example: Middleware দিয়ে IP Whitelist
+
+### ৫. Monitoring ও Observability
+- Traefik Dashboard, Logs, Metrics
+- Prometheus, Grafana Integration
+
+### ৬. Common Pitfalls
+- Routing Rule ভুল, SSL Misconfiguration
+- DB Publicly Exposed, Monitoring না থাকা
+- Resource Bottleneck, Scalability Issue
+
+## বাস্তব উদাহরণ
+
+- **SaaS Platform:** Web, API, DB—সব আলাদা সার্ভিস, Traefik দিয়ে Routing
+- **E-commerce:** Web (Shop), API (Order), DB (Inventory)
+- **DevOps:** Automated Deployment, Health Check, Canary Release
+
+## Analogies
+
+- মাল্টি-সার্ভিস মানে—একই বাড়িতে আলাদা রুম, প্রতিটি রুমের দরজা আলাদা
+- Traefik হলো—একটি স্মার্ট গেটকিপার, কে কোন রুমে যাবে ঠিক করে দেয়
+
+## Best Practices
+
+- Docker Compose/Stack ব্যবহার করুন
+- Routing Rule ও Middleware ভালোভাবে কনফিগার করুন
+- DB সার্ভিস Publicly Expose করবেন না
+- Automated Testing, Monitoring, Logging
+- Documentation ও Team Collaboration
+
+## Industry Trends
+
+- Microservices, Container Orchestration (Kubernetes)
+- Automated SSL, API Gateway
+- Zero-downtime Deployment, Canary Release
+
+## উপসংহার
+
+একাধিক অ্যাপ ডিপ্লয় করলে—আপনার প্ল্যাটফর্ম হবে আরও স্কেলেবল, ফ্লেক্সিবল, ও প্রোডাকশন-রেডি। Traefik দিয়ে Routing, Security, Monitoring—সবকিছু সহজে করা যায়। বাস্তব উদাহরণ, Best Practices, ও Industry Trends অনুসরণ করুন—তাহলেই সফল মাল্টি-সার্ভিস Deployment সম্ভব।
+
+---
+
+**পরবর্তী কাজ:** HTTPS, Authentication ও Rate Limit সক্রিয় করা

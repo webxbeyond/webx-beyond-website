@@ -1,0 +1,119 @@
+---
+title: "বিল্ট-ইন মিডলওয়্যার (Auth, Compression, Retry)"
+icon: simple-icons:traefikproxy
+---
+
+# বিল্ট-ইন মিডলওয়্যার (Auth, Compression, Retry)
+
+## পরিচিতি
+
+Traefik-এর built-in middleware মানে—ready-made security, performance, ও reliability solution। Middleware দিয়ে authentication, response compression, এবং request retry—সবকিছু automate করা যায়। এই পাঠে জানব, built-in middleware কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Authentication Middleware
+
+- **Authentication Middleware** দিয়ে basic/digest authentication enforce করা যায়
+- Sensitive API, admin panel, বা private app-এ must-have
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    basic-auth:
+      basicAuth:
+        users:
+          - "user:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
+```
+
+- **users:** username:password (hashed)
+
+### Real-life Use Case
+Uber—internal dashboard-এ basic auth enforce করে
+
+---
+
+## Compression Middleware
+
+- **Compression Middleware** দিয়ে response size কমানো যায়—Gzip, Deflate
+- Faster load, bandwidth save, এবং better user experience
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    compress:
+      compress: {}
+```
+
+- **compress:** Gzip/Deflate—auto apply
+
+### Real-life Use Case
+Netflix—API response-এ compression enable করে, mobile user-দের জন্য faster load
+
+---
+
+## Retry Middleware
+
+- **Retry Middleware** দিয়ে request fail হলে auto retry করা যায়
+- Network glitch, temporary error—user experience ভালো থাকে
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    retry:
+      retry:
+        attempts: 3
+```
+
+- **attempts:** কতবার retry হবে
+
+### Real-life Use Case
+Google—API call fail হলে auto retry, downtime কমে
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Auth config ভুল:** Legitimate user block হতে পারে
+- **Compression miss:** Mobile user-দের জন্য slow response
+- **Retry overuse:** Too many retry—backend overload
+
+---
+
+## Best Practices
+
+- Sensitive route-এ authentication enforce করুন
+- Compression সব response-এ enable করুন
+- Retry value realistic রাখুন—backend overload না হয়
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—built-in middleware default
+- API gateway—auth, compression, retry automate
+- SaaS platform—performance ও security middleware must-have
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Auth middleware** হলো—"office gatekeeper"—শুধু অনুমোদিত লোক ঢুকতে পারে
+- **Compression middleware** হলো—"vacuum pack"—data ছোট করে পাঠানো
+- **Retry middleware** হলো—"courier service"—delivery fail হলে আবার চেষ্টা
+
+---
+
+## Conclusion
+
+Traefik-এর built-in middleware দিয়ে security, performance, ও reliability automate করা যায়। Proper config, realistic value, এবং staging-এ test—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [চেইনড মিডলওয়্যার](/traefik/chained-middleware)

@@ -1,0 +1,130 @@
+---
+title: আর্কিটেকচার: EntryPoints, Routers, Services, Providers
+icon: simple-icons:traefikproxy
+---
+
+# Traefik-এর আর্কিটেকচার: EntryPoints, Routers, Services, Providers
+
+## পরিচিতি
+
+Traefik-এর শক্তিশালী ও ফ্লেক্সিবল আর্কিটেকচার—EntryPoints, Routers, Services, Providers—এই চারটি কম্পোনেন্টের উপর ভিত্তি করে তৈরি। এগুলো ঠিকভাবে বুঝলে আপনি সহজেই স্কেলেবল, সিকিউর, ও অটোমেটেড রিভার্স প্রক্সি প্ল্যাটফর্ম তৈরি করতে পারবেন।
+
+---
+
+## ১. EntryPoints
+
+### কী?
+
+EntryPoints মানে—Traefik-এর দরজা, যেখানে বাইরের রিকোয়েস্ট (HTTP, HTTPS, TCP, UDP) প্রথমে আসে।
+
+### কেন গুরুত্বপূর্ণ?
+- **Security:** HTTPS, TLS, SSL—সব EntryPoint-এ কনফিগার করা যায়
+- **Multiple Protocols:** HTTP, HTTPS, TCP, UDP—সবকিছু সাপোর্ট
+- **Custom Ports:** আলাদা সার্ভিসের জন্য আলাদা EntryPoint
+
+### বাস্তব উদাহরণ
+- **API Gateway:** 443 (HTTPS) EntryPoint দিয়ে সিকিউর API
+- **Web App:** 80 (HTTP) EntryPoint দিয়ে ওয়েব অ্যাপ
+
+### সহজ উদাহরণ: স্কুলের গেট
+
+যেমন স্কুলে ঢোকার জন্য গেট লাগে, Traefik-এ EntryPoint মানে—রিকোয়েস্ট ঢোকার গেট।
+
+---
+
+## ২. Routers
+
+### কী?
+
+Router মানে—EntryPoint-এ আসা রিকোয়েস্ট কোন সার্ভিসে যাবে, সেটা ঠিক করে দেয়। রুলস, পাথ, হোস্ট, হেডার—সবকিছু দিয়ে রিকোয়েস্ট ফিল্টার ও রাউট করা যায়।
+
+### কেন গুরুত্বপূর্ণ?
+- **Custom Routing:** Host, Path, Header—সবকিছু দিয়ে রিকোয়েস্ট রাউট
+- **Priority:** একাধিক রুল থাকলে কোনটা আগে চলবে, সেটাও ঠিক করা যায়
+- **Middleware Integration:** Router-এ middleware অ্যাপ্লাই করা যায়
+
+### বাস্তব উদাহরণ
+- **SaaS Platform:** subdomain অনুযায়ী আলাদা সার্ভিসে রিকোয়েস্ট
+- **API Gateway:** path-based routing
+
+### সহজ উদাহরণ: স্কুলের রিসেপশন
+
+যেমন রিসেপশনিস্ট ঠিক করে দেয়, কোন ছাত্র কোন ক্লাসে যাবে—Traefik-এর Router ঠিক সেই কাজটাই করে।
+
+---
+
+## ৩. Services
+
+### কী?
+
+Service মানে—Traefik-এর backend, যেখানে রিকোয়েস্ট শেষ পর্যন্ত যায়। Service হতে পারে—Docker container, Kubernetes pod, static server, ইত্যাদি।
+
+### কেন গুরুত্বপূর্ণ?
+- **Load Balancing:** একাধিক সার্ভিসে রিকোয়েস্ট ভাগ করে দেওয়া
+- **Health Check:** ডাউন সার্ভিসে রিকোয়েস্ট না পাঠানো
+- **Scalability:** নতুন সার্ভিস যোগ/বাতিল করা
+
+### বাস্তব উদাহরণ
+- **Microservices:** একাধিক backend—Traefik load balance করে
+- **API Gateway:** health check ও failover
+
+### সহজ উদাহরণ: স্কুলের ক্লাসরুম
+
+যেমন ছাত্ররা ক্লাসে গিয়ে পড়াশোনা করে—Traefik-এর Service মানে, রিকোয়েস্ট backend-এ গিয়ে কাজ শেষ করে।
+
+---
+
+## ৪. Providers
+
+### কী?
+
+Provider মানে—Traefik কোথা থেকে কনফিগারেশন পাবে। হতে পারে—File, Docker, Kubernetes, Consul, Etcd ইত্যাদি।
+
+### কেন গুরুত্বপূর্ণ?
+- **Automation:** Docker/Kubernetes-এ নতুন সার্ভিস এলে অটোমেটিক কনফিগ
+- **Flexibility:** একাধিক provider—multi-platform support
+- **Dynamic Discovery:** সার্ভিস যোগ/বাতিল হলে অটোমেটিক আপডেট
+
+### বাস্তব উদাহরণ
+- **Docker Provider:** নতুন container এলে Traefik নিজে থেকে রাউটিং আপডেট করে
+- **Kubernetes Provider:** নতুন pod এলে Traefik অটোমেটিক কনফিগ
+
+### সহজ উদাহরণ: স্কুলের অ্যাডমিন অফিস
+
+যেমন অ্যাডমিন অফিস থেকে ছাত্রদের তথ্য আসে—Traefik-এর Provider মানে, কনফিগারেশন কোথা থেকে আসবে।
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **EntryPoints:** Multiple protocol, custom port, security
+- **Routers:** Custom routing, middleware integration
+- **Services:** Load balancing, health check, scalability
+- **Providers:** Automation, dynamic discovery, multi-platform
+
+## কমন পিটফল
+
+- EntryPoint ভুল হলে রিকোয়েস্ট আসবে না
+- Router রুল overlap হলে রিকোয়েস্ট ভুল যায়
+- Service health check না থাকলে ডাউন সার্ভিসে রিকোয়েস্ট
+- Provider কনফিগ ভুল হলে automation কাজ করবে না
+
+## বেস্ট প্র্যাকটিস
+
+- EntryPoint-এ HTTPS/TLS এনাবল করুন
+- Router-এ clear ও non-overlapping রুলস ব্যবহার করুন
+- Service-এ health check ও load balancing এনাবল করুন
+- Provider-এ automation ও version control ব্যবহার করুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Multi-protocol support—EntryPoint-এ TCP/UDP
+- Dynamic routing—Router-এ advanced rules
+- Service mesh—Service-এ deep integration
+- Cloud-native automation—Provider-এ Kubernetes/Docker
+
+## উপসংহার
+
+Traefik-এর EntryPoints, Routers, Services, Providers—এই চারটি কম্পোনেন্ট ঠিকভাবে বুঝলে আপনি production-ready, scalable, ও secure রিভার্স প্রক্সি প্ল্যাটফর্ম তৈরি করতে পারবেন।
+
+পরবর্তী মডিউলে আমরা Traefik-এর কোর কনসেপ্ট—স্ট্যাটিক বনাম ডাইনামিক কনফিগারেশন, EntryPoints, Routers, Services, Middleware—বিস্তারিতভাবে দেখব।

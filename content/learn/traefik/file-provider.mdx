@@ -1,0 +1,144 @@
+---
+title: File Provider কনফিগারেশন
+icon: simple-icons:traefikproxy
+---
+
+# File Provider কনফিগারেশন — Traefik-এ ফ্লেক্সিবল ও কন্ট্রোলড ডিপ্লয়মেন্ট
+
+## পরিচিতি
+
+Traefik-এর File Provider হচ্ছে সেই পদ্ধতি, যেখানে YAML/TOML ফাইলে কনফিগারেশন লিখে রাউটিং, সার্ভিস, middleware, TLS—সবকিছু কাস্টমাইজ করা যায়। এটি production-ready, version control-friendly, এবং automation-compatible।
+
+---
+
+## ১. কেন File Provider?
+
+- **Flexibility:** কনফিগারেশন ফাইলে লিখে সহজে পরিবর্তন
+- **Version Control:** Git-এ কনফিগারেশন ট্র্যাক করা যায়
+- **Automation:** CI/CD pipeline-এ কনফিগারেশন deploy
+- **Production Control:** Sensitive config, manual override
+
+### বাস্তব উদাহরণ
+- API gateway: custom routing, middleware
+- SaaS: multiple domain, path, TLS
+- Enterprise: security, audit trail
+
+---
+
+## ২. File Provider কনফিগারেশন
+
+### Step 1: Static config-এ File Provider যুক্ত করুন
+
+`traefik.yml`:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+providers:
+  file:
+    filename: "/etc/traefik/dynamic.yml"
+    watch: true
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: web
+```
+
+### Step 2: Dynamic config ফাইল তৈরি করুন
+
+`dynamic.yml`:
+```yaml
+http:
+  routers:
+    app1:
+      rule: "Host(`app1.localhost`)"
+      service: app1-service
+      entryPoints:
+        - websecure
+      middlewares:
+        - auth
+    app2:
+      rule: "Host(`app2.localhost`)"
+      service: app2-service
+      entryPoints:
+        - websecure
+  services:
+    app1-service:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.0.1"
+    app2-service:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.0.2"
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "user:password"
+```
+
+### Step 3: Traefik container-এ config mount করুন
+
+`docker-compose.yml`:
+```yaml
+traefik:
+  image: traefik:v3.0
+  command:
+    - --configFile=/etc/traefik/traefik.yml
+  ports:
+    - "80:80"
+    - "443:443"
+  volumes:
+    - ./traefik.yml:/etc/traefik/traefik.yml
+    - ./dynamic.yml:/etc/traefik/dynamic.yml
+    - ./acme.json:/acme.json
+    - /var/run/docker.sock:/var/run/docker.sock
+  restart: always
+```
+
+---
+
+## ৩. File Provider-এর সুবিধা
+
+- কনফিগারেশন পরিবর্তন করলে Traefik অটোমেটিক আপডেট (watch: true)
+- Sensitive config (middleware, TLS) ফাইলে রাখা যায়
+- Manual override—Docker/Kubernetes provider ছাড়াও
+
+### সহজ উদাহরণ: স্কুলের রুটিন বই
+
+যেমন স্কুলে রুটিন বইয়ে ক্লাসের সময়, বিষয়, শিক্ষক—সব লেখা থাকে; Traefik-এর File Provider config ফাইলে সবকিছু লেখা থাকে।
+
+---
+
+## ৪. Common Pitfalls
+
+- YAML/TOML syntax ভুল হলে Traefik config error
+- File path ভুল হলে provider কাজ করবে না
+- watch: true না দিলে config আপডেট হবে না
+
+## ৫. Best Practices
+
+- Config file version control-এ রাখুন
+- Syntax checker ব্যবহার করুন
+- Sensitive config আলাদা ফাইলে রাখুন
+- Documentation/comment ভালোভাবে লিখুন
+
+## ৬. Industry Trends
+
+- GitOps—config file দিয়ে automated deployment
+- Multi-provider—Docker + File provider
+- Security—manual override, audit trail
+
+## উপসংহার
+
+Traefik-এর File Provider—production-ready, flexible, ও controlled ডিপ্লয়মেন্টের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা Docker Provider দিয়ে ডাইনামিক কনফিগ নিয়ে বিস্তারিতভাবে দেখব।

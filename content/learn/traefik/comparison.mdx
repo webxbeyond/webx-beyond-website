@@ -1,0 +1,93 @@
+---
+title: ট্র্যাফিক বনাম Nginx / HAProxy / Envoy
+icon: simple-icons:traefikproxy
+---
+
+# ট্র্যাফিক বনাম Nginx / HAProxy / Envoy: তুলনা ও ব্যবহারিক দিক
+
+## পরিচিতি
+
+আধুনিক ওয়েব ও মাইক্রোসার্ভিস আর্কিটেকচারে রিভার্স প্রক্সি ও লোড ব্যালেন্সার অপরিহার্য। Traefik, Nginx, HAProxy, Envoy—সবগুলোই জনপ্রিয় টুল, কিন্তু কোনটা কখন ব্যবহার করবেন? এই পাঠে আমরা তুলনামূলকভাবে প্রতিটি টুলের বৈশিষ্ট্য, ব্যবহারিক দিক, এবং বাস্তব উদাহরণ আলোচনা করব।
+
+## মূল টুলগুলোর সংক্ষিপ্ত পরিচয়
+
+- **Traefik:** Cloud-native, ডাইনামিক রাউটিং, Docker/Kubernetes ইন্টিগ্রেশন, অটো-HTTPS, সহজ কনফিগারেশন।
+- **Nginx:** Static কনফিগ, ওয়েব সার্ভার ও রিভার্স প্রক্সি, উচ্চ পারফরম্যান্স, বহুল ব্যবহৃত।
+- **HAProxy:** Enterprise-grade লোড ব্যালেন্সার, TCP/HTTP, গভীর কাস্টমাইজেশন, স্কেলিং ও সিকিউরিটি ফিচার।
+- **Envoy:** Service mesh-ready, ডাইনামিক কনফিগ, API gateway, distributed tracing, cloud-native ফিচার।
+
+## তুলনামূলক টেবিল
+
+| ফিচার                | Traefik         | Nginx           | HAProxy         | Envoy           |
+|----------------------|-----------------|-----------------|-----------------|-----------------|
+| কনফিগারেশন          | Dynamic         | Static          | Static/Dynamic  | Dynamic         |
+| Docker/K8s Support   | Built-in        | Limited         | Limited         | Built-in        |
+| HTTPS Automation     | Yes (Let's Encrypt) | Manual      | Manual          | Yes             |
+| Dashboard            | Yes             | No              | No              | Yes             |
+| Middleware           | Built-in        | Limited         | Limited         | Advanced        |
+| Service Discovery    | Auto            | Manual          | Manual          | Auto            |
+| Performance          | High            | Very High       | Very High       | High            |
+| Service Mesh         | Yes (Mesh Mode) | No              | No              | Yes             |
+
+## বাস্তব উদাহরণ
+
+- **Google:** Envoy ব্যবহার করে distributed tracing ও service mesh পরিচালনা করে।
+- **Netflix:** HAProxy ও Nginx—দুইটাই ব্যবহার করে, depending on use-case।
+- **Uber:** Traefik ও Envoy—cloud-native deployment ও API gateway হিসেবে।
+
+## সহজ উদাহরণ: ডাক্তার, নার্স, ও রিসেপশনিস্ট
+
+ধরুন, একটি হাসপাতাল।
+- **Nginx:** রিসেপশনিস্ট—সব রিকোয়েস্ট হাতে লিখে, কোথায় যাবে ঠিক করে দেয়।
+- **HAProxy:** নার্স—রোগীকে সঠিক ডাক্তারের কাছে পাঠায়, লোড ব্যালেন্স করে।
+- **Traefik:** স্মার্ট রিসেপশনিস্ট—নতুন ডাক্তার এলে অটোমেটিক লিস্টে যোগ করে, রোগীকে দ্রুত পাঠায়।
+- **Envoy:** সুপারভাইজার—সবকিছু মনিটর করে, ট্রেসিং, সিকিউরিটি, এবং অটোমেশন দেখে।
+
+## কখন কোনটা ব্যবহার করবেন?
+
+- **Traefik:**
+    - Docker/Kubernetes environment
+    - Dynamic service discovery দরকার
+    - Auto-HTTPS ও middleware ফিচার চাই
+    - Cloud-native, GitOps, automation
+- **Nginx:**
+    - Static ওয়েব সার্ভার
+    - Simple reverse proxy
+    - High performance, low resource
+    - Legacy systems
+- **HAProxy:**
+    - Heavy load balancing
+    - TCP/HTTP deep customization
+    - Enterprise-grade security
+    - Mission-critical systems
+- **Envoy:**
+    - Service mesh
+    - Distributed tracing
+    - Advanced API gateway
+    - Cloud-native, microservices
+
+## কমন পিটফল
+
+- Traefik-এর ডাইনামিক কনফিগারেশন ভুল হলে সার্ভিস inaccessible হতে পারে
+- Nginx-এ manual SSL renew করতে হয়
+- HAProxy-তে কনফিগারেশন জটিল, ভুল হলে downtime
+- Envoy-তে learning curve বেশি, কনফিগারেশন complex
+
+## বেস্ট প্র্যাকটিস
+
+- নিজের use-case বুঝে টুল নির্বাচন করুন
+- কনফিগারেশন version control-এ রাখুন
+- Health check ও monitoring এনাবল করুন
+- Security best practices অনুসরণ করুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Cloud-native deployment বাড়ছে—Traefik ও Envoy জনপ্রিয় হচ্ছে
+- Service mesh adoption—Envoy ও Traefik Mesh
+- Automation ও GitOps—Traefik ও Envoy সহজে ইন্টিগ্রেট হয়
+
+## উপসংহার
+
+একটি টুল সবার জন্য পারফেক্ট নয়। আপনার অ্যাপ, স্কেল, এবং ডিপ্লয়মেন্ট স্টাইল বুঝে Traefik, Nginx, HAProxy, বা Envoy নির্বাচন করুন।
+
+পরবর্তী পাঠে আমরা Traefik-এর মূল ফিচার—ডাইনামিক রাউটিং, সার্ভিস ডিসকভারি, মিডলওয়্যার—বিস্তারিতভাবে দেখব।

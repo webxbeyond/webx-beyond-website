@@ -1,0 +1,77 @@
+---
+title: "SaaS Multi-App with Subdomain Routing"
+icon: simple-icons:traefikproxy
+---
+
+# SaaS Multi-App with Subdomain Routing: Traefik দিয়ে বাস্তবিক অ্যাপ ডিপ্লয়মেন্ট
+
+## পরিচিতি
+
+SaaS (Software as a Service) প্ল্যাটফর্মে একাধিক অ্যাপ, ক্লায়েন্ট, ও টিমের জন্য আলাদা সাবডোমেইন ব্যবহৃত হয়। Traefik দিয়ে Multi-App ও Subdomain Routing সহজ, স্কেলেবল, ও নিরাপদভাবে করা যায়। এই পাঠে জানব, কীভাবে Traefik দিয়ে SaaS Multi-App ও Subdomain Routing বাস্তবায়ন করবেন।
+
+## কেন Subdomain Routing গুরুত্বপূর্ণ?
+
+- একাধিক ক্লায়েন্ট/টিমের জন্য আলাদা অ্যাপ
+- Custom Branding, Security, Resource Isolation
+- উদাহরণ: app1.example.com, app2.example.com, client1.example.com
+
+## Core Concepts
+
+### ১. Multi-App Deployment
+- Docker/Kubernetes-এ একাধিক অ্যাপ চালানো
+- Traefik-এ প্রতিটি অ্যাপের জন্য আলাদা Router, Service, Middleware
+
+### ২. Subdomain Routing
+- Host-based Routing: সাবডোমেইন অনুযায়ী ট্রাফিক রাউট
+- Traefik Rule: `Host(`app1.example.com`)`
+- Wildcard Subdomain: `*.example.com`
+
+### ৩. Custom Middleware per App
+- Authentication, Rate Limiting, Headers—প্রতিটি অ্যাপে আলাদা কনফিগ
+- Security ও Performance বাড়ানো
+
+### ৪. SSL/TLS per Subdomain
+- Let's Encrypt বা Custom Certificate
+- প্রতিটি সাবডোমেইনে HTTPS
+
+### ৫. Monitoring & Logging
+- Access Logs, Error Logs, Metrics—প্রতিটি অ্যাপের জন্য আলাদা
+- Real-time Dashboard
+
+## বাস্তব উদাহরণ
+
+- **Shopify:** প্রতিটি দোকানের জন্য আলাদা সাবডোমেইন
+- **Slack:** টিম-ভিত্তিক সাবডোমেইন (team1.slack.com)
+- **SaaS Startup:** client1.example.com, client2.example.com
+
+## Analogies
+
+- Subdomain Routing হলো—একটি বিল্ডিংয়ে একাধিক ফ্ল্যাট, প্রতিটি ফ্ল্যাটের জন্য আলাদা দরজা
+- Multi-App Deployment মানে—একই প্ল্যাটফর্মে একাধিক দোকান, প্রতিটির জন্য আলাদা প্রবেশপথ
+
+## Common Pitfalls
+
+- Wildcard SSL না থাকলে HTTPS Error
+- Routing Rule ভুল হলে ট্রাফিক ভুল অ্যাপে চলে যায়
+- Logging না থাকলে সমস্যা ডিবাগ কঠিন
+
+## Best Practices
+
+- Host-based Routing Rule স্পষ্টভাবে লিখুন
+- SSL/TLS প্রতিটি সাবডোমেইনে চালু রাখুন
+- Custom Middleware ও Logging চালু রাখুন
+- Documentation ও Automation বজায় রাখুন
+
+## Industry Trends
+
+- Multi-Tenant SaaS, Custom Branding, Resource Isolation
+- Automated SSL/TLS, Real-time Monitoring
+- API Gateway ও Service Mesh Integration
+
+## উপসংহার
+
+Traefik দিয়ে SaaS Multi-App ও Subdomain Routing করলে, আপনার প্ল্যাটফর্ম হবে আরও স্কেলেবল, নিরাপদ, ও কাস্টমাইজেবল। বড় SaaS কোম্পানি যেমন Shopify, Slack—সবাই Subdomain Routing ব্যবহার করে। আপনার অ্যাপের স্কেল, ক্লায়েন্ট চাহিদা, ও নিরাপত্তা অনুযায়ী Routing Design করুন।
+
+---
+
+**পরবর্তী পাঠ:** [WordPress + Node.js + API Gateway Setup](/traefik/wordpress-node)

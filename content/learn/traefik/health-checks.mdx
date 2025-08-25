@@ -1,0 +1,94 @@
+---
+title: "Service Health Checks: Traefik-এ সার্ভিসের স্বাস্থ্য নিরীক্ষণ"
+icon: mdi:heart-pulse
+---
+
+# Service Health Checks: Traefik-এ সার্ভিসের স্বাস্থ্য নিরীক্ষণ
+
+## পরিচিতি
+
+কোনো সার্ভিস "বেঁচে" আছে কিনা, ঠিকভাবে কাজ করছে কিনা—এটা জানা অত্যন্ত গুরুত্বপূর্ণ। Production environment-এ downtime, error, বা slow response হলে ইউজার experience খারাপ হয়। তাই Service Health Checks—Traefik-এর মাধ্যমে—সিস্টেম ডিজাইনের অপরিহার্য অংশ।
+
+## Health Check কী ও কেন?
+
+- **Health Check:** সার্ভিসের "স্বাস্থ্য" (health) নিরীক্ষণ করার স্বয়ংক্রিয় পদ্ধতি।
+- **Use Case:** Google, Netflix, Uber-এর মতো কোম্পানিতে হাজার হাজার সার্ভিসের health monitor করা হয়।
+- **Importance:** সার্ভিস ডাউন হলে দ্রুত detect করে, ট্রাফিক reroute বা alert পাঠানো যায়।
+
+## Traefik-এ Health Check Integration
+
+Traefik Dynamic Configuration-এ health check সহজেই কনফিগার করা যায়।
+
+### YAML Configuration Example
+
+```yaml
+http:
+  services:
+    my-service:
+      loadBalancer:
+        healthCheck:
+          path: "/health"
+          interval: "10s"
+          timeout: "2s"
+```
+
+- **path:** কোন endpoint-এ health check হবে (e.g., `/health`).
+- **interval:** কত সময় পরপর check হবে (e.g., 10s)।
+- **timeout:** response না এলে কতক্ষণ অপেক্ষা করবে।
+
+### Docker Label Example
+
+```yaml
+labels:
+  - "traefik.http.services.my-service.loadbalancer.healthcheck.path=/health"
+  - "traefik.http.services.my-service.loadbalancer.healthcheck.interval=10s"
+  - "traefik.http.services.my-service.loadbalancer.healthcheck.timeout=2s"
+```
+
+## Core Concepts
+
+### Active vs Passive Health Check
+- **Active:** Traefik নিজে থেকে নির্দিষ্ট endpoint-এ request পাঠায়।
+- **Passive:** Traefik response error detect করে health determine করে।
+
+### Rerouting & Failover
+- Health check fail হলে Traefik সেই সার্ভিসে আর request পাঠায় না, healthy সার্ভিসে পাঠায়।
+- High Availability ও Zero Downtime-এর জন্য অপরিহার্য।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার microservice—health check fail হলে দ্রুত reroute হয়, ইউজার কোনো downtime টের পায় না।
+- **Analogy:** Imagine a doctor doing regular checkups. If a patient is sick, treatment starts immediately. Health check is like that doctor for your services.
+
+## Common Pitfalls
+
+- **Health endpoint ভুল হলে:** সার্ভিস healthy হলেও false negative দেখাতে পারে।
+- **Interval বেশি বড় হলে:** downtime detect করতে দেরি হয়।
+- **Timeout কম হলে:** slow network-এ false positive দেখাতে পারে।
+
+## Best Practices
+
+- **Health endpoint simple রাখুন:** শুধু "OK" return করুক, complex logic নয়।
+- **Interval ও timeout balance করুন:** Production-এ 5–15s interval, 2–5s timeout ভালো।
+- **Alerting setup করুন:** Health check fail হলে alert পাঠান।
+- **Failover strategy ঠিক করুন:** Healthy সার্ভিসে দ্রুত reroute করুন।
+
+## Industry Trends
+
+- **Automated Remediation:** Health check fail হলে auto-restart বা auto-scale হচ্ছে।
+- **AI-based Prediction:** Machine learning দিয়ে downtime predict করা হচ্ছে।
+- **Cloud-native Health Checks:** Kubernetes, Docker—সবখানে built-in health check support।
+
+## কখন ব্যবহার করবেন?
+
+- Production environment-এ downtime, error, slow response detect করতে।
+- High Availability ও Zero Downtime নিশ্চিত করতে।
+- SLA monitoring ও auto-scaling-এর জন্য।
+
+## উপসংহার
+
+Service Health Checks দিয়ে Traefik-centric architecture-এ reliability, availability, ও user experience অনেক উন্নত হয়। সঠিকভাবে কনফিগার করলে, downtime ও error দ্রুত detect ও mitigate করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Load Balancing Strategies](/traefik/load-balancing)

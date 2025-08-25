@@ -1,0 +1,99 @@
+---
+title: "Blue/Green Deployment with Traefik"
+icon: simple-icons:traefikproxy
+---
+
+# Blue/Green Deployment with Traefik
+
+## পরিচিতি
+
+Zero-downtime deployment, safe rollback, এবং instant switch—modern app-এ Blue/Green deployment technique খুব জনপ্রিয়। Traefik দিয়ে Blue/Green deployment সহজে automate করা যায়। এই পাঠে জানব, Blue/Green deployment কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Blue/Green Deployment কী?
+
+- **Blue/Green Deployment** মানে—production environment-এ দুইটি version (Blue ও Green) parallel-এ চালানো
+- User traffic এক version থেকে অন্য version-এ instant switch করা যায়
+- Safe rollout, quick rollback, এবং downtime-free deployment-এ এটি must-have
+
+### Real-life Use Case
+Netflix—new feature deploy করার সময় Blue/Green setup রাখে, issue হলে instant rollback করে
+
+---
+
+## Traefik-এ Blue/Green Deployment কিভাবে কাজ করে?
+
+Traefik-এর router ও service config-এ দুইটি backend (Blue ও Green) define করতে হয়, তারপর traffic switch করা যায়
+
+### YAML Config Example
+
+```yaml
+http:
+  services:
+    blue-service:
+      loadBalancer:
+        servers:
+          - address: "blue-app:80"
+    green-service:
+      loadBalancer:
+        servers:
+          - address: "green-app:80"
+  routers:
+    app-router:
+      rule: "Host(`app.example.com`)"
+      service: blue-service # অথবা green-service
+      entryPoints:
+        - web
+```
+
+- **service:** Blue ও Green—দুইটি backend
+- **router:** কোন service-এ traffic যাবে, তা config-এ switch করুন
+
+---
+
+## Traffic Switch Automation
+
+- CI/CD pipeline-এ config change করে instant switch
+- Monitoring/logging দেখে switch decision
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Config ভুল:** Traffic ভুল version-এ চলে গেলে bug/issue
+- **Rollback plan না থাকলে:** Issue হলে downtime বাড়তে পারে
+- **Monitoring miss:** Switch করার আগে health check না করলে production impact
+
+---
+
+## Best Practices
+
+- Blue/Green দুই version-এ same config/test রাখুন
+- Switch করার আগে health check করুন
+- Rollback plan ready রাখুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—Blue/Green deployment default
+- CI/CD pipeline—automated traffic switch ও rollback
+- API gateway—instant version switch
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Blue/Green deployment** হলো—"দুইটা বাস standby"—একটা চললে অন্যটা ready থাকে, issue হলে সাথে সাথে switch
+
+---
+
+## Conclusion
+
+Blue/Green deployment দিয়ে Traefik-এ zero-downtime, safe rollout, এবং instant rollback করা যায়। Proper config, monitoring, এবং rollback—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [বিল্ট-ইন মিডলওয়্যার (Auth, Compression, Retry)](/traefik/builtin-middleware)

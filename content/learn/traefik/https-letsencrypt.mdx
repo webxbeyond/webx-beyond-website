@@ -1,0 +1,122 @@
+---
+title: Let's Encrypt (ACME) দিয়ে HTTPS
+icon: simple-icons:traefikproxy
+---
+
+# Let's Encrypt (ACME) দিয়ে HTTPS — Traefik-এ অটোমেটিক SSL
+
+## পরিচিতি
+
+আধুনিক ওয়েব ও API প্ল্যাটফর্মে HTTPS (SSL/TLS) অপরিহার্য। Traefik-এর Let's Encrypt (ACME) ইন্টিগ্রেশন দিয়ে আপনি অটোমেটিক, ফ্রি, এবং production-ready SSL সার্টিফিকেট পেতে পারেন। এই পাঠে আমরা HTTPS কেন গুরুত্বপূর্ণ, Let's Encrypt কীভাবে কাজ করে, এবং Traefik-এ সেটআপের ধাপ দেখব।
+
+---
+
+## ১. HTTPS কেন গুরুত্বপূর্ণ?
+
+- **Security:** ডেটা এনক্রিপশন, authentication
+- **Trust:** ইউজার ও ব্রাউজার বিশ্বাস পায়
+- **Compliance:** GDPR, PCI, HIPAA
+- **SEO:** Google HTTPS সাইটকে বেশি গুরুত্ব দেয়
+
+### বাস্তব উদাহরণ
+- Banking app, e-commerce site, API gateway
+
+---
+
+## ২. Let's Encrypt (ACME) কী?
+
+- Let's Encrypt: ফ্রি, অটোমেটিক SSL সার্টিফিকেট ইস্যু করার সার্ভিস
+- ACME (Automated Certificate Management Environment): SSL সার্টিফিকেট অটোমেটিক রিকোয়েস্ট, রিনিউ, রিভোক করার প্রোটোকল
+- Traefik ACME protocol দিয়ে Let's Encrypt থেকে SSL সার্টিফিকেট অটোমেটিকভাবে পায়
+
+### সহজ উদাহরণ: ATM থেকে অটোমেটিক টাকা তোলা
+
+যেমন ATM থেকে অটোমেটিক টাকা পাওয়া যায়—Traefik Let's Encrypt দিয়ে অটোমেটিক SSL সার্টিফিকেট পায়
+
+---
+
+## ৩. Traefik-এ Let's Encrypt সেটআপ
+
+### Step 1: Static config-এ ACME যুক্ত করুন
+
+`traefik.yml`:
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: web
+```
+
+### Step 2: Docker Compose ফাইল
+
+`docker-compose.yml`:
+```yaml
+traefik:
+  image: traefik:v3.0
+  command:
+    - --configFile=/etc/traefik/traefik.yml
+  ports:
+    - "80:80"
+    - "443:443"
+  volumes:
+    - ./traefik.yml:/etc/traefik/traefik.yml
+    - ./acme.json:/acme.json
+    - /var/run/docker.sock:/var/run/docker.sock
+  restart: always
+```
+
+### Step 3: acme.json ফাইল তৈরি করুন
+
+```bash
+touch acme.json
+chmod 600 acme.json
+```
+
+### Step 4: Docker label দিয়ে HTTPS এনাবল করুন
+
+```yaml
+app1:
+  image: nginx:alpine
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.app1.rule=Host(`app1.localhost`)"
+    - "traefik.http.routers.app1.entrypoints=websecure"
+    - "traefik.http.routers.app1.tls.certresolver=myresolver"
+```
+
+---
+
+## ৪. Common Pitfalls
+
+- acme.json permission ভুল হলে SSL হবে না
+- certResolver miss করলে HTTPS কাজ করবে না
+- email ভুল হলে renewal notification পাবেন না
+
+## ৫. Best Practices
+
+- acme.json permission 600 রাখুন
+- certResolver ও entrypoint ঠিকভাবে ব্যবহার করুন
+- email ঠিকভাবে দিন
+- config version control-এ রাখুন
+
+## ৬. Industry Trends
+
+- Automation—Let's Encrypt everywhere
+- Zero-downtime SSL renewal
+- Security—HTTPS mandatory
+
+## উপসংহার
+
+Traefik-এর Let's Encrypt (ACME) ইন্টিগ্রেশন—production-ready, scalable, ও secure ওয়েব ও API প্ল্যাটফর্মের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা Staging বনাম Production সার্টিফিকেট নিয়ে বিস্তারিতভাবে দেখব।

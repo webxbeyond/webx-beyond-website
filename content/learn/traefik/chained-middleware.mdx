@@ -1,0 +1,101 @@
+---
+title: "চেইনড মিডলওয়্যার"
+icon: simple-icons:traefikproxy
+---
+
+# চেইনড মিডলওয়্যার
+
+## পরিচিতি
+
+Traefik-এর চেইনড (Chained) middleware মানে—একাধিক middleware একসাথে ব্যবহার করে request/response flow customize করা। Modern app-এ security, performance, ও reliability একসাথে automate করতে চেইনড middleware must-have। এই পাঠে জানব, চেইনড middleware কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## চেইনড Middleware কী?
+
+- **চেইনড Middleware** মানে—multiple middleware sequentially apply করা
+- উদাহরণ: authentication → compression → retry
+- Complex app-এ layered security, performance, ও error handling automate করা যায়
+
+### Real-life Use Case
+Netflix—API endpoint-এ authentication, compression, ও retry একসাথে enforce করে
+
+---
+
+## Traefik-এ চেইনড Middleware কিভাবে কাজ করে?
+
+Traefik-এর router config-এ multiple middleware define করে, array আকারে attach করতে হয়
+
+### YAML Config Example
+
+```yaml
+http:
+  middlewares:
+    basic-auth:
+      basicAuth:
+        users:
+          - "user:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
+    compress:
+      compress: {}
+    retry:
+      retry:
+        attempts: 3
+  routers:
+    app-router:
+      rule: "Host(`app.example.com`)"
+      service: app-service
+      middlewares:
+        - basic-auth
+        - compress
+        - retry
+```
+
+- **middlewares:** array—order অনুযায়ী apply হবে
+
+---
+
+## Middleware Order
+
+- Order গুরুত্বপূর্ণ—authentication আগে, compression পরে, retry শেষে
+- Wrong order হলে expected behavior নাও হতে পারে
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Order ভুল:** Security/performance impact
+- **Config miss:** Middleware attach না করলে effect হবে না
+- **Debugging:** Multiple middleware থাকলে bug খুঁজে পাওয়া কঠিন
+
+---
+
+## Best Practices
+
+- Middleware order logically ঠিক রাখুন
+- Sensitive route-এ layered security enforce করুন
+- Config change/staging-এ test করুন
+- Logs দেখে flow validate করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—chained middleware default
+- API gateway—multiple middleware automate
+- SaaS platform—layered security ও performance
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **চেইনড middleware** হলো—"airport security checkpoint"—passenger sequentially multiple check পার হয়
+
+---
+
+## Conclusion
+
+Traefik-এর চেইনড middleware দিয়ে layered security, performance, ও reliability automate করা যায়। Proper order, config, এবং staging-এ test—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [অথেন্টিকেশন (Basic, Digest, ForwardAuth, OIDC)](/traefik/authentication)

@@ -1,0 +1,127 @@
+---
+title: "Hands-on: মাইক্রোসার্ভিস অ্যাপ ডিপ্লয়মেন্ট Kubernetes-এ Traefik দিয়ে"
+icon: simple-icons:kubernetes
+---
+
+# Hands-on: মাইক্রোসার্ভিস অ্যাপ ডিপ্লয়মেন্ট Kubernetes-এ Traefik দিয়ে
+
+## পরিচিতি
+
+Microservices architecture—cloud-native world-এ—scalability, reliability, ও agility নিশ্চিত করতে ব্যবহৃত হয়। Kubernetes cluster-এ Traefik API Gateway ব্যবহার করে, একাধিক microservice সহজে deploy, route, ও secure করা যায়। এই hands-on গাইডে একটি বাস্তব উদাহরণ দেখানো হবে।
+
+## কেন Microservices ও Traefik?
+
+- **Microservices:** ছোট ছোট, স্বাধীন সার্ভিস—scalable, maintainable, ও resilient।
+- **Traefik:** API Gateway—dynamic routing, SSL, middleware, ও monitoring সহজ করে।
+- **Use Case:** Google, Netflix, Uber—হাজার হাজার microservice—Traefik দিয়ে efficient traffic management।
+
+## Hands-on Deployment Steps
+
+### ১. Kubernetes Cluster Setup
+- Minikube, Kind, বা cloud provider-এ cluster তৈরি করুন।
+
+### ২. Traefik Deploy (Helm Chart)
+```bash
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+helm install traefik traefik/traefik --namespace traefik --create-namespace
+```
+
+### ৩. Microservice App Deploy
+- Example: দুইটি simple app—`app1` ও `app2`
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+        - name: app1
+          image: hashicorp/http-echo
+          args:
+            - "-text=Hello from app1"
+          ports:
+            - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+spec:
+  selector:
+    app: app1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678
+```
+
+### ৪. Traefik IngressRoute CRD Setup
+- Routing rule define করুন—host ও path অনুযায়ী traffic যাবে app1/app2-তে।
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: app1-ingressroute
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`app1.local`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: app1
+          port: 80
+```
+
+### ৫. Middleware ও TLS Integration
+- Authentication, rate limiting, SSL—middleware ও cert-manager দিয়ে enable করুন।
+
+### ৬. Monitoring ও Dashboard
+- Traefik dashboard enable করুন—routing, traffic, error, SSL status real-time monitor করুন।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার microservice—Traefik gateway দিয়ে traffic route, security, ও monitoring manage হয়।
+- **Analogy:** Microservices হচ্ছে আলাদা দোকান, Traefik হচ্ছে শপিং মলের গেট—visitor-দের সঠিক দোকানে পাঠায়।
+
+## Common Pitfalls
+
+- **Service name/port mismatch:** Routing কাজ করবে না।
+- **IngressRoute YAML ভুল হলে:** Traffic যাবে না বা error হবে।
+- **Middleware না থাকলে:** Security ও performance issue হতে পারে।
+
+## Best Practices
+
+- **Service ও route naming convention maintain করুন।**
+- **Middleware properly configure করুন:** Authentication, rate limiting, SSL enable করুন।
+- **Monitoring করুন:** Dashboard-এ traffic, error, SSL status track করুন।
+- **Documentation follow করুন:** Traefik ও Kubernetes docs-এ latest example দেখুন।
+
+## Industry Trends
+
+- **GitOps deployment:** Automated, versioned deployment pipeline—microservices ও gateway।
+- **Service mesh integration:** Advanced traffic management—Traefik Mesh, Istio, Linkerd।
+- **AI-based monitoring:** Traffic anomaly detection, auto-scaling, auto-healing।
+
+## কখন ব্যবহার করবেন?
+
+- Production-grade microservices deployment, API gateway, security, monitoring নিশ্চিত করতে।
+- Multi-tenant, multi-environment, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik gateway দিয়ে Kubernetes-এ microservices deploy, route, ও secure করা অনেক সহজ ও শক্তিশালী। সঠিকভাবে কনফিগার করলে, reliability, scalability, ও developer productivity নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Traefik Enterprise বনাম OSS](/traefik/enterprise-vs-oss)

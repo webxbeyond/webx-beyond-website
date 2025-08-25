@@ -1,0 +1,111 @@
+---
+title: "Kubernetes Middleware ব্যবহার: Traefik-এ Security, Performance ও Custom Logic"
+icon: simple-icons:kubernetes
+---
+
+# Kubernetes Middleware ব্যবহার: Traefik-এ Security, Performance ও Custom Logic
+
+## পরিচিতি
+
+Kubernetes cluster-এ API gateway বা Ingress Controller হিসেবে Traefik ব্যবহার করলে, Middleware configure করা যায়—যা security, performance, ও custom logic implement করতে সাহায্য করে। Middleware—Traefik-এর অন্যতম শক্তিশালী ফিচার—request/response modify, authentication, rate limiting, header management, ইত্যাদি সহজে করা যায়।
+
+## Middleware কী ও কেন?
+
+- **Middleware:** Request/response-এর মাঝখানে কাজ করে—security, performance, ও custom logic implement করে।
+- **Use Case:** Google, Netflix, Uber—authentication, rate limiting, header modification—সব Middleware দিয়ে manage হয়।
+- **Importance:** Security, reliability, ও user experience উন্নত হয়।
+
+## Traefik-এ Kubernetes Middleware Integration
+
+Traefik IngressRoute CRD-এর মাধ্যমে Kubernetes-এ Middleware configure করা যায়।
+
+### ১. Middleware Resource Definition
+- Middleware resource YAML-এ define করুন।
+- Example YAML:
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: auth-middleware
+spec:
+  basicAuth:
+    secret: auth-secret
+```
+
+### ২. Middleware Attach to Route
+- IngressRoute-এ middleware attach করুন।
+- Example YAML:
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-ingressroute
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`myapp.local`)
+      kind: Rule
+      services:
+        - name: my-service
+          port: 80
+      middlewares:
+        - name: auth-middleware
+        - name: rate-limit-middleware
+```
+
+### ৩. Built-in Middleware Types
+- **Authentication:** Basic, Digest, ForwardAuth, OIDC
+- **Rate Limiting:** Request/sec, burst limit
+- **Header Management:** Custom header add/remove/modify
+- **Compression:** Gzip, Brotli
+- **Retry:** Request retry on failure
+- **Redirect:** HTTP→HTTPS, path redirect
+
+## Core Concepts
+
+### Chained Middleware
+- একাধিক middleware একসাথে chain করা যায়—complex logic implement করতে।
+
+### Custom Middleware
+- Custom logic (e.g., custom header, JWT validation) implement করা যায়—ForwardAuth বা plugin দিয়ে।
+
+### Monitoring & Logging
+- Middleware status, error, performance—Traefik dashboard-এ monitor করা যায়।
+
+## Real-life Example & Analogy
+
+- **Netflix:** API gateway-এ authentication, rate limiting, header security—সব Middleware দিয়ে manage হয়।
+- **Analogy:** Middleware হচ্ছে security checkpoint—request-কে verify, modify, বা reject করে।
+
+## Common Pitfalls
+
+- **Middleware ভুল configure করলে:** Security vulnerability, performance issue হতে পারে।
+- **Chain order ভুল হলে:** Logic ভুলভাবে execute হয়।
+- **YAML syntax ভুল হলে:** Middleware attach হবে না।
+
+## Best Practices
+
+- **Middleware properly configure করুন:** Authentication, rate limiting, header security enable করুন।
+- **Chain order maintain করুন:** Logic ঠিকভাবে execute হবে।
+- **Monitoring করুন:** Middleware status, error, performance track করুন।
+- **Documentation follow করুন:** Traefik docs-এ latest example দেখুন।
+
+## Industry Trends
+
+- **Plugin-based middleware:** Custom logic implement—Traefik plugin দিয়ে।
+- **AI-based security:** Middleware-এ anomaly detection, auto-blocking হচ্ছে।
+- **Service mesh integration:** Middleware + service mesh—advanced traffic management।
+
+## কখন ব্যবহার করবেন?
+
+- Security, authentication, rate limiting, custom logic দরকার হলে—Middleware ব্যবহার করুন।
+- Production-grade API gateway, microservices, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Kubernetes Middleware দিয়ে cluster-এ security, performance, ও custom logic সহজে implement করা যায়। সঠিকভাবে কনফিগার করলে, reliability, scalability, ও user experience নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Cert-Manager Integration](/traefik/cert-manager)

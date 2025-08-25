@@ -1,0 +1,114 @@
+---
+title: "IngressRoute CRD বনাম Kubernetes Ingress: Traefik-এ অ্যাডভান্সড রাউটিং"
+icon: simple-icons:kubernetes
+---
+
+# IngressRoute CRD বনাম Kubernetes Ingress: Traefik-এ অ্যাডভান্সড রাউটিং
+
+## পরিচিতি
+
+Kubernetes-এ বাইরের ট্রাফিককে সার্ভিসে route করার জন্য Ingress resource ব্যবহৃত হয়। Traefik—Kubernetes-এ—দুইভাবে routing করতে পারে: standard Kubernetes Ingress ও Traefik-এর নিজস্ব IngressRoute CRD (Custom Resource Definition)। এই দুইটির পার্থক্য, সুবিধা, ও ব্যবহারিক দিক এখানে আলোচনা করা হবে।
+
+## Kubernetes Ingress কী?
+
+- **Kubernetes Ingress:** Standard resource, বাইরের ট্রাফিককে path/host-based rule দিয়ে সার্ভিসে route করে।
+- **Use Case:** Simple routing, SSL termination, basic path/host rules।
+- **Limitations:** Advanced routing, middleware, ও security rules define করা যায় না।
+
+## Traefik IngressRoute CRD কী?
+
+- **IngressRoute CRD:** Traefik-এর custom resource, advanced routing, middleware, ও security rules define করা যায়।
+- **Use Case:** Complex routing, authentication, rate limiting, header modification, canary deployment।
+- **Advantages:** YAML-এ granular control, middleware chaining, traffic splitting, advanced TLS config।
+
+## Core Differences
+
+| Feature                | Kubernetes Ingress | Traefik IngressRoute CRD |
+|------------------------|--------------------|--------------------------|
+| Path/Host Routing      | ✅                 | ✅                       |
+| Middleware Support     | ❌                 | ✅                       |
+| Traffic Splitting      | ❌                 | ✅                       |
+| Canary Deployment      | ❌                 | ✅                       |
+| Advanced TLS Config    | ❌                 | ✅                       |
+| Error Handling         | ❌                 | ✅                       |
+| Custom Headers         | ❌                 | ✅                       |
+| Monitoring Integration | Limited            | Advanced                 |
+
+## Example YAML
+
+### Kubernetes Ingress
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+    - host: myapp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service
+                port:
+                  number: 80
+```
+
+### Traefik IngressRoute CRD
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-ingressroute
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`myapp.local`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: my-service
+          port: 80
+      middlewares:
+        - name: auth-middleware
+        - name: rate-limit-middleware
+```
+
+## Real-life Example & Analogy
+
+- **Netflix:** Complex routing, authentication, canary deployment—IngressRoute CRD ছাড়া সম্ভব নয়।
+- **Analogy:** Kubernetes Ingress হচ্ছে সাধারণ ট্রাফিক সিগনাল, আর IngressRoute CRD হচ্ছে স্মার্ট ট্রাফিক কন্ট্রোল—যেখানে lane, speed, priority সব customize করা যায়।
+
+## Common Pitfalls
+
+- **CRD না install করলে:** IngressRoute resource কাজ করবে না।
+- **Middleware ভুল configure করলে:** Security ও performance issue হতে পারে।
+- **YAML syntax ভুল হলে:** Routing problem, traffic ভুল service-এ যায়।
+
+## Best Practices
+
+- **CRD install করুন:** Traefik Helm Chart বা YAML দিয়ে।
+- **Middleware properly configure করুন:** Authentication, rate limiting, header security enable করুন।
+- **Monitoring করুন:** Routing, error, traffic status track করুন।
+- **Documentation follow করুন:** Traefik docs-এ latest example দেখুন।
+
+## Industry Trends
+
+- **CRD-based routing:** Advanced traffic management, canary deployment, A/B testing—সব CRD দিয়ে সহজ।
+- **Multi-cluster integration:** একাধিক cluster—global routing ও failover হচ্ছে।
+- **Service mesh integration:** IngressRoute + service mesh—advanced traffic control।
+
+## কখন ব্যবহার করবেন?
+
+- Complex routing, authentication, canary deployment, advanced TLS config দরকার হলে—IngressRoute CRD ব্যবহার করুন।
+- Simple path/host-based routing হলে—Kubernetes Ingress যথেষ্ট।
+
+## উপসংহার
+
+Traefik-এর IngressRoute CRD দিয়ে Kubernetes-এ granular, secure, ও advanced routing সহজ হয়। সঠিকভাবে কনফিগার করলে, reliability, scalability, ও user experience নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Kubernetes Middleware ব্যবহার](/traefik/k8s-middleware)

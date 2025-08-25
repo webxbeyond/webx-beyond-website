@@ -1,0 +1,109 @@
+---
+title: "Load Balancing Strategies: Traefik-এ স্কেলিং ও হাই এভেইলেবিলিটি"
+icon: mdi:server-network
+---
+
+# Load Balancing Strategies: Traefik-এ স্কেলিং ও হাই এভেইলেবিলিটি
+
+## পরিচিতি
+
+আধুনিক ওয়েব অ্যাপ্লিকেশন, API, ও মাইক্রোসার্ভিসে স্কেলিং ও হাই এভেইলেবিলিটি (High Availability) নিশ্চিত করতে Load Balancing অপরিহার্য। Traefik-এর মাধ্যমে বিভিন্ন Load Balancing Strategy ব্যবহার করে সার্ভিসের পারফরম্যান্স, রিলায়েবিলিটি, ও ইউজার এক্সপেরিয়েন্স অনেক উন্নত করা যায়।
+
+## Load Balancing কী ও কেন?
+
+- **Load Balancing:** একাধিক সার্ভিস/ইনস্ট্যান্সে রিকোয়েস্ট সমানভাবে ভাগ করে দেয়া।
+- **Use Case:** Google, Netflix, Uber-এর মতো কোম্পানিতে হাজার হাজার রিকোয়েস্ট efficient ভাবে সার্ভিসে ভাগ করা হয়।
+- **Importance:** সার্ভিস ডাউন হলে, অন্য healthy সার্ভিসে রিকোয়েস্ট পাঠানো যায়; স্কেলিং সহজ হয়।
+
+## Traefik-এ Load Balancing Strategies
+
+Traefik বিভিন্ন Load Balancing Algorithm সাপোর্ট করে।
+
+### ১. Weighted Round Robin
+- প্রতিটি সার্ভিসে "weight" দেয়া হয়। বেশি weight মানে বেশি রিকোয়েস্ট যাবে।
+- **Example:**
+```yaml
+http:
+  services:
+    app1:
+      loadBalancer:
+        servers:
+          - url: "http://app1:80"
+        weight: 3
+    app2:
+      loadBalancer:
+        servers:
+          - url: "http://app2:80"
+        weight: 1
+```
+
+### ২. Random
+- রিকোয়েস্ট random ভাবে সার্ভিসে পাঠানো হয়।
+- **Use Case:** Simple scenario, low traffic.
+
+### ৩. Least Request
+- যেই সার্ভিসে কম রিকোয়েস্ট pending, সেখানে নতুন রিকোয়েস্ট পাঠানো হয়।
+- **Use Case:** High concurrency, API gateway.
+
+### ৪. Sticky Sessions
+- ইউজার একবার যেই সার্ভিসে গেছে, পরবর্তী রিকোয়েস্টও সেই সার্ভিসে যাবে।
+- **Use Case:** Login session, shopping cart, personalization।
+- **Example:**
+```yaml
+http:
+  services:
+    my-service:
+      loadBalancer:
+        sticky:
+          cookie:
+            name: "my-cookie"
+```
+
+## Core Concepts
+
+### Health Check Integration
+- Load Balancer healthy সার্ভিসে রিকোয়েস্ট পাঠায়, unhealthy সার্ভিস বাদ দেয়।
+
+### Failover
+- কোনো সার্ভিস ডাউন হলে, অন্য healthy সার্ভিসে রিকোয়েস্ট reroute হয়।
+
+### Scalability
+- সার্ভিসের সংখ্যা বাড়ালে, Load Balancer অটোমেটিকভাবে রিকোয়েস্ট ভাগ করে দেয়।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার সার্ভিস—Load Balancer efficient ভাবে রিকোয়েস্ট ভাগ করে, downtime কমায়।
+- **Analogy:** Imagine a busy call center—calls are distributed among available agents. Load Balancer is like the call dispatcher.
+
+## Common Pitfalls
+
+- **Weight ভুল set করলে:** কিছু সার্ভিসে overload, কিছুতে idle।
+- **Sticky session ভুল কনফিগার করলে:** ইউজার experience খারাপ হতে পারে।
+- **Health check না থাকলে:** Unhealthy সার্ভিসে রিকোয়েস্ট চলে যেতে পারে।
+
+## Best Practices
+
+- **Weight balance করুন:** Traffic pattern অনুযায়ী weight ঠিক করুন।
+- **Health check enable করুন:** Unhealthy সার্ভিস exclude করুন।
+- **Failover strategy রাখুন:** সার্ভিস ডাউন হলে দ্রুত reroute করুন।
+- **Monitoring করুন:** Load distribution, latency, error rate track করুন।
+
+## Industry Trends
+
+- **Auto-scaling:** Traffic বাড়লে/কমলে সার্ভিস সংখ্যা অটোমেটিক বাড়ে/কমে।
+- **Global Load Balancing:** Geo-distributed সার্ভিসে traffic globally ভাগ হয়।
+- **AI-based Load Balancing:** Machine learning দিয়ে intelligent traffic distribution হচ্ছে।
+
+## কখন ব্যবহার করবেন?
+
+- High traffic, high availability, zero downtime নিশ্চিত করতে।
+- Microservices, API gateway, cloud-native architecture-এ।
+- SLA, performance, reliability improve করতে।
+
+## উপসংহার
+
+Traefik-এর Load Balancing Strategies দিয়ে স্কেলিং, হাই এভেইলেবিলিটি, ও ইউজার এক্সপেরিয়েন্স অনেক উন্নত হয়। সঠিকভাবে কনফিগার করলে, সার্ভিসের reliability ও performance নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [High Availability Setup](/traefik/ha-setup)

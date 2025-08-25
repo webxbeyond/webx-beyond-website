@@ -1,0 +1,123 @@
+---
+title: "TCP/UDP Routing (Databases, MQTT)"
+icon: simple-icons:traefikproxy
+---
+
+# TCP/UDP Routing (Databases, MQTT)
+
+## পরিচিতি
+
+Traefik শুধু HTTP/HTTPS নয়—TCP ও UDP protocol-ও route করতে পারে। Modern app-এ database, message broker (MQTT), বা custom protocol serve করতে TCP/UDP routing must-have। এই পাঠে জানব, TCP/UDP routing কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## TCP/UDP Routing কী?
+
+- **TCP Routing:** Database (MySQL, PostgreSQL), SSH, Redis-এর মতো protocol serve করতে
+- **UDP Routing:** MQTT, DNS, VoIP-এর মতো protocol serve করতে
+- HTTP/HTTPS-এর মতো path/host-based rule নয়—entrypoint ও router config লাগে
+
+### Real-life Use Case
+Uber—real-time ride tracking-এর জন্য MQTT (UDP) ব্যবহার করে, Netflix—database cluster-এ TCP routing
+
+---
+
+## Traefik-এ TCP Routing কিভাবে কাজ করে?
+
+Traefik-এর static config-এ TCP entrypoint define করতে হয়, তারপর router ও service config করতে হয়
+
+### YAML Config Example
+
+```yaml
+entryPoints:
+  mysql:
+    address: ":3306"
+
+tcp:
+  routers:
+    mysql-router:
+      entryPoints:
+        - mysql
+      rule: "HostSNI(`*`)"
+      service: mysql-service
+  services:
+    mysql-service:
+      loadBalancer:
+        servers:
+          - address: "db:3306"
+```
+
+- **entryPoints:** TCP port define
+- **HostSNI:** SNI (Server Name Indication)—TLS handshake-এ host match
+- **service:** backend server address
+
+---
+
+## Traefik-এ UDP Routing কিভাবে কাজ করে?
+
+UDP entrypoint define করে, তারপর router ও service config করতে হয়
+
+### YAML Config Example
+
+```yaml
+entryPoints:
+  mqtt:
+    address: ":1883"
+
+udp:
+  routers:
+    mqtt-router:
+      entryPoints:
+        - mqtt
+      service: mqtt-service
+  services:
+    mqtt-service:
+      loadBalancer:
+        servers:
+          - address: "mqtt-broker:1883"
+```
+
+- **entryPoints:** UDP port define
+- **service:** backend server address
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Port conflict:** একই port-এ multiple service run করলে error
+- **TLS config ভুল:** TCP service-এ TLS/SNI ঠিক না হলে handshake fail
+- **UDP debugging:** UDP stateless—debugging কঠিন
+
+---
+
+## Best Practices
+
+- Port allocation clear রাখুন—production-এ conflict এড়ান
+- TCP service-এ TLS/SNI properly configure করুন
+- UDP service-এ monitoring/logging setup করুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—database, message broker serve করতে TCP/UDP routing
+- IoT platform—MQTT (UDP) routing default
+- API gateway—multi-protocol support
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **TCP routing** হলো—"secure tunnel"—specific address-এ data পাঠানো
+- **UDP routing** হলো—"public loudspeaker"—broadcast করে, receive guarantee নেই
+
+---
+
+## Conclusion
+
+TCP/UDP routing দিয়ে Traefik-এ database, message broker, বা custom protocol serve করা যায়। Proper port, TLS/SNI, এবং monitoring—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Weighted Load Balancing ও Canary Deployments](/traefik/canary)
