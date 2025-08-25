@@ -1,23 +1,30 @@
 {
   "pages": [
+    "programming",
     "cheatsheet",
     "js",
-    "git",
-    "system-design",
     "python",
-    "pytorch",
+
     "nodejs",
     "api",
+
+    "system-design",
+
     "dev-ops",
+    "git",
     "linux",
-    "networking",
-    "mikrotik",
-    "self-hosting",
-    "programming",
     "terraform",
     "ansible",
+    "traefik",
+    "self-hosting",
+
+    "networking",
+    "mikrotik",
+
+    "ai",
+    "pytorch",
+
     "blockchain",
-    "crypto-wallet",
-    "ai"
+    "crypto-wallet"
   ]
 }

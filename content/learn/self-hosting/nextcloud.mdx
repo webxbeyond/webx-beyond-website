@@ -1,5 +1,5 @@
 ---
-title: Nextcloud
+title: নেক্সটক্লাউড (Nextcloud)
 icon: ph:cloud
 ---
 
@@ -14,7 +14,7 @@ Nextcloud হলো জনপ্রিয় ওপেন-সোর্স ফা
 
 
 ### Docker Compose ফাইল:
-```yaml
+```yaml title="docker-compose.yml"
 version: '3.7'
 services:
   db:
@@ -47,7 +47,7 @@ volumes:
 - ফাইলটি `docker-compose.yml` নামে সেভ করুন।
 - একই ডিরেক্টরিতে `.env` ফাইল তৈরি করুন এবং সেখানে সব sensitive ডাটা রাখুন:
 
-```
+```bash title=".env"
 MYSQL_ROOT_PASSWORD=yourStrongRootPassword
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud

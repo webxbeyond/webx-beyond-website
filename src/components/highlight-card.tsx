@@ -47,7 +47,16 @@ export function HighlightCard({ icon, title, description, href, badge, className
         </h3>
       </div>
       {description && (
-        <p className="text-sm text-fd-muted-foreground leading-relaxed line-clamp-4 mt-auto">
+        <p
+          className="text-sm text-fd-muted-foreground leading-relaxed mt-auto"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           {description}
         </p>
       )}
