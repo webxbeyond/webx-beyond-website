@@ -327,8 +327,7 @@ function SelectTopics() {
       <p className="text-center text-fd-muted-foreground mb-6 max-w-2xl mx-auto text-sm md:text-base">নতুন শুরুকারীদের জন্য কিউরেটেড কিছু পথ। আপনার লক্ষ্য অনুযায়ী একটি নির্বাচন করুন বা সার্চ করুন।</p>
 
       <div className="mx-auto px-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
-          <div className="flex gap-2 mt-2 sm:mt-0">
+        <div className="flex flex-wrap gap-3 items-center justify-center mb-4">
             <button
               className={cn('px-3 py-1 rounded-full text-sm font-medium', selectedCategory === 'all' ? 'bg-fd-primary text-white' : 'bg-fd-background border border-fd-foreground/10')}
               onClick={() => setSelectedCategory('all')}
@@ -344,7 +343,6 @@ function SelectTopics() {
                 {cat}
               </button>
             ))}
-          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
