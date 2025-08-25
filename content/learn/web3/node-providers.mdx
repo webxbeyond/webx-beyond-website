@@ -1,0 +1,69 @@
+---
+title: "Infura, Alchemy বা QuickNode ব্যবহার"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Infura, Alchemy বা QuickNode ব্যবহার — dApp-এ Blockchain Node Access ও Scalability
+
+## পরিচিতি
+
+Web3 dApp-এ স্মার্ট কন্ট্রাক্টে ইন্টারঅ্যাক্ট করতে হলে Blockchain Node-এর সাথে সংযোগ প্রয়োজন। নিজস্ব Node চালানো ব্যয়বহুল ও জটিল—তাই Infura, Alchemy, QuickNode-এর মতো "Node Provider" ব্যবহার করা হয়। Google বা Netflix যেমন Cloud API ব্যবহার করে, ঠিক তেমনই Web3-এ এই Provider-গুলো দিয়ে দ্রুত, স্কেলেবল, ও নিরাপদ Blockchain Access পাওয়া যায়। এই পাঠে জানব—Node Provider কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. Node Provider কী?
+- Remote Ethereum Node Access
+- API Endpoint (RPC, WebSocket)
+- Scalability, Reliability, Security
+- Free/Paid Plan
+
+### ২. Workflow
+1. Provider-এ Account Create করুন (Infura, Alchemy, QuickNode)
+2. Project/API Key সংগ্রহ করুন
+3. RPC/WebSocket Endpoint ব্যবহার করুন
+4. Ethers.js/Web3.js-এ Provider Setup করুন
+5. Contract Read/Write, Transaction, Event Listen করুন
+
+### ৩. Ethers.js Integration Example
+```javascript
+import { ethers } from "ethers";
+const provider = new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/YOUR_KEY");
+// Contract, Transaction, Event — সবকিছু provider দিয়ে
+```
+
+### ৪. Real-life Use Cases
+- **NFT Marketplace:** Fast Transaction
+- **DeFi App:** Reliable Data Fetch
+- **Analytics Dashboard:** Event Listen
+- **Wallet Integration:** Multi-chain Support
+
+### ৫. Analogies
+- Node Provider—"Cloud Server"
+- API Key—"Server Password"
+- Endpoint—"Server Address"
+
+### ৬. Common Pitfalls
+- API Key leak—Security risk
+- Rate Limit—Request fail
+- Wrong Network—Transaction fail
+- Unhandled error—User confusion
+
+### ৭. Best Practices
+- API Key নিরাপদে রাখুন
+- Rate Limit ও Error Handling করুন
+- Network config ভালোভাবে চেক করুন
+- Security: Sensitive Data না রাখুন
+
+### ৮. Industry Trends
+- Multi-chain Node Provider
+- Real-time Data Streaming
+- Automated Scaling
+- Privacy-preserving Node Access
+
+## উপসংহার
+
+Infura, Alchemy, QuickNode—Web3 dApp-এ Blockchain Node Access, Scalability, ও Reliability-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, dApp Performance, Security, ও Scalability—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** dApp-এ স্টেট ম্যানেজমেন্ট

@@ -1,0 +1,99 @@
+---
+title: "Hardhat বেসিকস: কম্পাইল, টেস্টিং, ডিপ্লয়মেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Hardhat বেসিকস — স্মার্ট কন্ট্রাক্ট কম্পাইল, টেস্টিং ও ডিপ্লয়মেন্ট
+
+## পরিচিতি
+
+Hardhat হলো—ইথেরিয়াম ডেভেলপারদের জন্য সবচেয়ে জনপ্রিয়, শক্তিশালী ও ফ্লেক্সিবল টুল। Google বা Netflix যেমন তাদের সফটওয়্যার ডেভেলপমেন্টে অটোমেশন ও টেস্টিং টুল ব্যবহার করে, ঠিক তেমনই Web3 ডেভেলপমেন্টে Hardhat অপরিহার্য। এই পাঠে জানব—Hardhat কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. Hardhat কী?
+- JavaScript/TypeScript ভিত্তিক Ethereum ডেভেলপমেন্ট এনভায়রনমেন্ট
+- Contract Compile, Test, Deploy, Debug
+- Local Blockchain (Hardhat Network)
+- Plugin System (Ethers.js, Waffle, OpenZeppelin)
+
+### ২. Workflow
+1. Contract লিখুন (Solidity)
+2. Hardhat Project Setup করুন
+3. Compile করুন
+4. Test লিখুন ও চালান
+5. Deploy করুন (Local/Testnet/Mainnet)
+6. Debug ও Script Automation
+
+### ৩. Hardhat Project Setup
+```bash
+mkdir my-hardhat-project
+cd my-hardhat-project
+npm init -y
+npm install --save-dev hardhat
+npx hardhat
+```
+
+### ৪. Compile Contract
+```bash
+npx hardhat compile
+```
+
+### ৫. Test Contract
+```javascript
+const { expect } = require("chai");
+describe("Counter", function () {
+  it("Should increment count", async function () {
+    const Counter = await ethers.getContractFactory("Counter");
+    const counter = await Counter.deploy();
+    await counter.increment();
+    expect(await counter.count()).to.equal(1);
+  });
+});
+```
+
+### ৬. Deploy Contract
+```javascript
+async function main() {
+  const Counter = await ethers.getContractFactory("Counter");
+  const counter = await Counter.deploy();
+  await counter.deployed();
+  console.log("Counter deployed to:", counter.address);
+}
+main();
+```
+
+### ৭. Real-life Use Cases
+- **Production Deployment:** DeFi, NFT, DAO
+- **Automated Testing:** Continuous Integration
+- **Scripted Migration:** Contract Upgrade
+- **Debugging:** Transaction Trace
+
+### ৮. Analogies
+- Hardhat—যেন Web3-এর "Visual Studio Code"
+- Local Blockchain—নিজস্ব "Practice Ground"
+
+### ৯. Common Pitfalls
+- Network config ভুল হলে—Deploy fail
+- Test coverage কম হলে—Bug থেকে যায়
+- Plugin conflict—Error আসে
+
+### ১০. Best Practices
+- Test লিখুন ও চালান
+- Network config ভালোভাবে চেক করুন
+- Plugin version match করুন
+- Documentation ও Team Review
+
+### ১১. Industry Trends
+- Hardhat + Ethers.js Integration
+- Automated Security Testing
+- Forked Mainnet Testing
+- Deployment Script Automation
+
+## উপসংহার
+
+Hardhat—Web3 ডেভেলপমেন্টের জন্য অপরিহার্য টুল। Contract Compile, Test, Deploy—সবকিছু অটোমেটেড ও সহজ। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্ট সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Truffle ফ্রেমওয়ার্ক

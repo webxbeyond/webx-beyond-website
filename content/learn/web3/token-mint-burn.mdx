@@ -1,0 +1,92 @@
+---
+title: "টোকেন মিন্টিং ও বার্নিং"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# টোকেন মিন্টিং ও বার্নিং — টোকেন তৈরি ও ধ্বংস করার কৌশল
+
+## পরিচিতি
+
+টোকেন মিন্টিং (Minting) ও বার্নিং (Burning) হলো—Web3 ও ব্লকচেইনে টোকেনের সংখ্যা নিয়ন্ত্রণের জন্য সবচেয়ে গুরুত্বপূর্ণ কৌশল। Google বা Netflix যেমন ইউজারদের জন্য নতুন পয়েন্ট যোগ বা পুরাতন পয়েন্ট মুছে দেয়, ঠিক তেমনই মিন্টিং ও বার্নিং দিয়ে টোকেন তৈরি ও ধ্বংস করা যায়। এই পাঠে জানব—কেন, কীভাবে, ও কখন মিন্টিং ও বার্নিং ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. মিন্টিং (Minting) কী?
+- নতুন টোকেন তৈরি করা
+- Supply বাড়ানো
+- Contract Owner/Admin মিন্ট করতে পারে
+- Event emit: Mint
+
+### ২. বার্নিং (Burning) কী?
+- টোকেন ধ্বংস করা
+- Supply কমানো
+- User/Admin বার্ন করতে পারে
+- Event emit: Burn
+
+### ৩. Workflow
+1. Contract-এ mint ও burn function লিখুন
+2. Permission (Owner/User) ঠিক করুন
+3. Mint/Burn function call করুন
+4. Event emit করুন
+5. Supply update করুন
+
+### ৪. Solidity Mint/Burn Example
+```solidity
+pragma solidity ^0.8.0;
+
+contract MyToken {
+    uint256 public totalSupply;
+    mapping(address => uint256) public balanceOf;
+
+    event Mint(address indexed to, uint256 amount);
+    event Burn(address indexed from, uint256 amount);
+
+    function mint(address to, uint256 amount) public {
+        totalSupply += amount;
+        balanceOf[to] += amount;
+        emit Mint(to, amount);
+    }
+
+    function burn(address from, uint256 amount) public {
+        require(balanceOf[from] >= amount, "Insufficient balance");
+        totalSupply -= amount;
+        balanceOf[from] -= amount;
+        emit Burn(from, amount);
+    }
+}
+```
+
+### ৫. Real-life Use Cases
+- **Stablecoin:** Supply Control
+- **Gaming:** Asset Mint/Burn
+- **Reward Program:** Point Issue/Expire
+- **DeFi:** Token Burn for Value Increase
+
+### ৬. Analogies
+- Minting—"নতুন কয়েন ছাপানো"
+- Burning—"কয়েন গলিয়ে ফেলা"
+
+### ৭. Common Pitfalls
+- Permission bug—Unauthorized mint/burn
+- Event emit ভুলে গেলে—Wallet integration সমস্যা
+- Supply mismatch—Value calculation error
+
+### ৮. Best Practices
+- Permission ঠিকভাবে চেক করুন
+- Event emit করুন
+- Supply update সঠিকভাবে করুন
+- Security Audit করুন
+
+### ৯. Industry Trends
+- Automated Mint/Burn (Algorithmic Token)
+- Deflationary Token Model
+- NFT Mint/Burn Feature
+- On-chain Governance
+
+## উপসংহার
+
+টোকেন মিন্টিং ও বার্নিং—Web3 ও ব্লকচেইনে টোকেনের সংখ্যা নিয়ন্ত্রণের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Supply Control, Value Management, ও Security—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল টোকেন ইকোসিস্টেম তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** NFT মেটাডাটা ও IPFS স্টোরেজ

@@ -1,0 +1,79 @@
+---
+title: "ফ্রন্টএন্ডের সাথে স্মার্ট কন্ট্রাক্ট কানেক্ট করা"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ফ্রন্টএন্ডের সাথে স্মার্ট কন্ট্রাক্ট কানেক্ট করা — dApp তৈরির মূল ভিত্তি
+
+## পরিচিতি
+
+Web3 অ্যাপের সবচেয়ে গুরুত্বপূর্ণ অংশ—ফ্রন্টএন্ড থেকে স্মার্ট কন্ট্রাক্টে ডেটা পাঠানো, পড়া, ও ট্রানজ্যাকশন করা। Google বা Uber যেমন API দিয়ে ব্যাকএন্ডে ডেটা পাঠায়, ঠিক তেমনই dApp-এ ফ্রন্টএন্ড থেকে স্মার্ট কন্ট্রাক্টে ইন্টারঅ্যাক্ট করতে হয়। এই পাঠে জানব—কেন, কীভাবে, ও কখন ফ্রন্টএন্ড থেকে স্মার্ট কন্ট্রাক্ট কানেক্ট করতে হয়।
+
+## Core Concepts
+
+### ১. dApp (Decentralized App) কী?
+- ফ্রন্টএন্ড: React, Vue, Angular
+- Backend: Blockchain (Ethereum)
+- Contract: Solidity
+- Communication: Ethers.js, Web3.js
+
+### ২. Workflow
+1. Contract ABI ও Address সংগ্রহ করুন
+2. Provider/Wallet (MetaMask) কানেক্ট করুন
+3. Contract Instance তৈরি করুন
+4. Function Call/Transaction Initiate করুন
+5. Event Listen ও UI Update করুন
+
+### ৩. React-এ Integration Example
+```javascript
+import { ethers } from "ethers";
+const provider = new ethers.BrowserProvider(window.ethereum);
+const abi = [/* ABI Array */];
+const contract = new ethers.Contract("0xContractAddress", abi, provider);
+
+// Read
+const value = await contract.count();
+
+// Write
+const signer = await provider.getSigner();
+const contractWithSigner = contract.connect(signer);
+await contractWithSigner.increment();
+```
+
+### ৪. Real-life Use Cases
+- **NFT Marketplace:** Mint, Buy, Sell
+- **DeFi App:** Deposit, Withdraw, Swap
+- **Voting dApp:** Cast Vote, View Results
+- **Gaming dApp:** Asset Transfer, Score Update
+
+### ৫. Analogies
+- Contract—"Server"
+- ABI—"API Documentation"
+- Provider—"Internet Connection"
+- Signer—"User Authentication"
+
+### ৬. Common Pitfalls
+- Wrong ABI/Address—Function call fail
+- Wallet not connected—Transaction fail
+- Unhandled error—UI freeze
+- Network mismatch—User confusion
+
+### ৭. Best Practices
+- Error Handling করুন
+- Network ও Wallet status UI-তে দেখান
+- ABI ও Address ভালোভাবে চেক করুন
+- Security: User Data leak এড়ান
+
+### ৮. Industry Trends
+- Multi-chain Integration
+- WalletConnect, Coinbase Wallet Support
+- Event-driven UI (Real-time Update)
+- Gasless Transaction (Meta-transactions)
+
+## উপসংহার
+
+ফ্রন্টএন্ড থেকে স্মার্ট কন্ট্রাক্ট কানেক্ট করা—dApp ডেভেলপমেন্টের মূল ভিত্তি। সঠিকভাবে করলে, ইউজার ইন্টারঅ্যাকশন, ডেটা ট্রান্সফার, ও রিয়েল-টাইম আপডেট সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ERC-20 টোকেন স্ট্যান্ডার্ড

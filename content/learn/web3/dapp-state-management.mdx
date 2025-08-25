@@ -1,0 +1,80 @@
+---
+title: "dApp-এ স্টেট ম্যানেজমেন্ট"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# dApp-এ স্টেট ম্যানেজমেন্ট — Web3 অ্যাপে ডেটা ও ইউজার ইন্টারঅ্যাকশন নিয়ন্ত্রণ
+
+## পরিচিতি
+
+dApp (Decentralized App) তৈরি করতে গেলে শুধু স্মার্ট কন্ট্রাক্ট নয়—ফ্রন্টএন্ডে "স্টেট" (State) ঠিকভাবে ম্যানেজ করা জরুরি। Google বা Netflix যেমন ইউজার ডেটা, লগইন, ও UI আপডেট করে, ঠিক তেমনই Web3 dApp-এ স্টেট ম্যানেজমেন্ট দিয়ে ইউজার ইন্টারঅ্যাকশন, ডেটা ফেচ, ও UI রিয়েল-টাইমে আপডেট করা হয়। এই পাঠে জানব—dApp-এ স্টেট ম্যানেজমেন্ট কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. State Management কী?
+- UI Component-এর Data Control
+- Contract Read/Write Result Store
+- Wallet Status, Network Info
+- Transaction Pending/Success/Error
+
+### ২. Workflow
+1. Contract থেকে Data Fetch করুন (Ethers.js/Web3.js)
+2. State Variable-এ Store করুন (React useState, Redux)
+3. UI Component-এ State Pass করুন
+4. Transaction/Wallet Status Update করুন
+5. Event Listen ও State Update করুন
+
+### ৩. React-এ State Management Example
+```javascript
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+
+const [count, setCount] = useState(0);
+useEffect(() => {
+  async function fetchCount() {
+    const provider = new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/YOUR_KEY");
+    const abi = ["function count() view returns (uint)"];
+    const contract = new ethers.Contract("0xContractAddress", abi, provider);
+    const value = await contract.count();
+    setCount(value);
+  }
+  fetchCount();
+}, []);
+```
+
+### ৪. Real-life Use Cases
+- **NFT Marketplace:** Listing, Buy/Sell Status
+- **DeFi App:** Balance, Transaction Status
+- **Voting dApp:** Vote Count, User Status
+- **Gaming dApp:** Asset, Score Update
+
+### ৫. Analogies
+- State—"UI-এর বর্তমান অবস্থা"
+- useState—"ডেটা রাখার বাক্স"
+- Event—"ঘটনা ঘটলে UI বদলানো"
+
+### ৬. Common Pitfalls
+- State sync ভুল—UI mismatch
+- Unhandled error—User confusion
+- Multiple wallet/network—State conflict
+- Slow update—User experience খারাপ
+
+### ৭. Best Practices
+- Error Handling করুন
+- State Variable naming পরিষ্কার রাখুন
+- Event-driven UI Update করুন
+- Wallet/Network Status UI-তে দেখান
+
+### ৮. Industry Trends
+- Redux Toolkit, Zustand, Jotai
+- Event-driven State Management
+- Real-time UI Update (Socket, GraphQL)
+- Multi-chain State Handling
+
+## উপসংহার
+
+dApp-এ স্টেট ম্যানেজমেন্ট—Web3 অ্যাপে ইউজার ইন্টারঅ্যাকশন, ডেটা ফেচ, ও UI আপডেটের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, ইউজার Experience, Scalability, ও Security—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ Web3 dApp তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** AMM ও লিকুইডিটি পুল

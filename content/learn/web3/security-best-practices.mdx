@@ -1,0 +1,102 @@
+---
+title: "সিকিউরিটি বেস্ট প্র্যাকটিস"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# সিকিউরিটি বেস্ট প্র্যাকটিস — Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তার মূলনীতি
+
+## পরিচিতি
+
+Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তা নিশ্চিত করা—Google, Netflix, Uber-এর মতো বড় সিস্টেমের মতোই গুরুত্বপূর্ণ। ভুল হলে শুধু ডেটা নয়, ফান্ডও হারাতে পারেন! এই পাঠে জানব—কীভাবে নিরাপদ স্মার্ট কন্ট্রাক্ট লিখবেন, কোন Best Practices অনুসরণ করবেন, এবং Industry Trends কী।
+
+## Core Concepts
+
+### ১. Contract Audit
+- কী: Third-party দ্বারা Source Code পরীক্ষা
+- Workflow: Automated Tool + Manual Review
+- Real-life Use Case: Launch-এর আগে Audit
+- Analogies: "গাড়ি চালানোর আগে সার্ভিসিং"
+- Common Pitfall: Audit ছাড়া Contract Deploy
+- Best Practice: Launch-এর আগে Audit করুন
+
+### ২. Reentrancy Guard
+- কী: Recursive Call Block করা
+- Workflow: State Update আগে, Guard Modifier
+- Real-life Use Case: Withdraw Function
+- Analogies: "দরজায় তালা"
+- Common Pitfall: Guard ছাড়া Withdraw
+- Best Practice: Reentrancy Guard ব্যবহার করুন
+
+### ৩. SafeMath Library
+- কী: Overflow/Underflow Block করা
+- Workflow: Arithmetic Operation Safe
+- Real-life Use Case: Token Transfer
+- Analogies: "বালতি উপচে না পড়া"
+- Common Pitfall: Raw Arithmetic
+- Best Practice: SafeMath বা Solidity >=0.8
+
+### ৪. Access Control
+- কী: Function কে Call করতে পারবে
+- Workflow: OnlyOwner, Role-based Access
+- Real-life Use Case: Admin Function
+- Analogies: "চাবি কাদের কাছে"
+- Common Pitfall: Public Function
+- Best Practice: Access Control Modifier
+
+### ৫. Upgradeability
+- কী: Contract Future-এ Update করা
+- Workflow: Proxy Pattern
+- Real-life Use Case: Bug Fix, Feature Add
+- Analogies: "অ্যাপ আপডেট"
+- Common Pitfall: Upgrade Path ছাড়া Deploy
+- Best Practice: Proxy Contract ব্যবহার করুন
+
+### ৬. Testing & Simulation
+- কী: Contract Behavior Test করা
+- Workflow: Unit Test, Integration Test
+- Real-life Use Case: Hardhat, Truffle
+- Analogies: "গাড়ি চালানোর আগে ট্রায়াল"
+- Common Pitfall: Test ছাড়া Deploy
+- Best Practice: Automated Test লিখুন
+
+### ৭. Bug Bounty Program
+- কী: Community-কে Bug খুঁজে পুরস্কার দেওয়া
+- Workflow: Public Program
+- Real-life Use Case: Immunefi, HackerOne
+- Analogies: "ডাকাত ধরলে পুরস্কার"
+- Common Pitfall: Bug Report Ignore
+- Best Practice: Bug Bounty চালু করুন
+
+## Real-life Use Cases
+- **DeFi Launch:** Audit ছাড়া Deploy করলে Hack
+- **NFT Mint:** Access Control না থাকলে Unauthorized Mint
+- **DEX Trading:** SafeMath ছাড়া Value ভুল
+
+## Common Pitfalls
+- Audit ছাড়া Contract Deploy
+- Access Control ভুল
+- Test ছাড়া Production
+- Upgrade Path ছাড়া Contract
+
+## Best Practices
+- Contract Audit করুন
+- Reentrancy Guard ব্যবহার করুন
+- SafeMath বা Solidity >=0.8
+- Access Control Modifier
+- Proxy Contract
+- Automated Test
+- Bug Bounty Program
+
+## Industry Trends
+- Automated Audit Tools (Slither, MythX)
+- Formal Verification
+- Multi-sig Wallet
+- Layer 2 Security
+
+## উপসংহার
+
+সিকিউরিটি Best Practices—Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তার জন্য অপরিহার্য। সঠিকভাবে অনুসরণ করলে, Hack, Bug, ও Unauthorized Access—সবকিছু এড়ানো সম্ভব। Industry Trends ও Community Engagement বাড়ান—তাহলেই নিরাপদ ও সফল Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** OpenZeppelin লাইব্রেরি ব্যবহার

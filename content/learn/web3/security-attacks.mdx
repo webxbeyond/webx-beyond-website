@@ -1,0 +1,71 @@
+---
+title: "সাধারণ আক্রমণ: Reentrancy, Overflow, Frontrunning"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# সাধারণ আক্রমণ: Reentrancy, Overflow, Frontrunning — Web3-এ নিরাপত্তার চ্যালেঞ্জ
+
+## পরিচিতি
+
+Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তা অত্যন্ত গুরুত্বপূর্ণ। যেমন Google বা Uber-এ ডেটা ও ফান্ডিং সুরক্ষিত রাখতে নানা প্রযুক্তি ব্যবহার হয়, ঠিক তেমনই ব্লকচেইন-ভিত্তিক অ্যাপে কিছু সাধারণ আক্রমণ (Attack) আছে—যেগুলো এড়িয়ে চলা জরুরি। এই পাঠে Reentrancy, Overflow, ও Frontrunning নিয়ে বিস্তারিত জানব।
+
+## Core Concepts
+
+### ১. Reentrancy Attack
+- কী: কন্ট্রাক্টের ফাংশন বারবার (Recursive) কল করা
+- উদাহরণ: DAO Hack (Ethereum)
+- Workflow: External Call → State Change না করে আবার ফাংশন কল
+- Analogies: "একই দরজা দিয়ে বারবার ঢোকা"
+- Real-life Use Case: Fund Withdraw Function
+- Common Pitfall: State Update আগে না করলে Fund Drain
+- Best Practice: State Update আগে করুন, Reentrancy Guard ব্যবহার করুন
+
+### ২. Overflow Attack
+- কী: Variable Value Limit Cross করে ভুল হিসাব
+- উদাহরণ: Integer Overflow/Underflow
+- Workflow: Value > Max Limit → Value Reset
+- Analogies: "বালতি উপচে পড়া"
+- Real-life Use Case: Token Transfer Calculation
+- Common Pitfall: SafeMath না ব্যবহার করলে Value ভুল
+- Best Practice: SafeMath Library ব্যবহার করুন, Solidity >=0.8 ব্যবহার করুন
+
+### ৩. Frontrunning Attack
+- কী: Transaction Pending থাকাকালীন কেউ আগে Submit করে
+- উদাহরণ: DEX-এ Price Manipulation
+- Workflow: Transaction Pool → High Gas Fee দিয়ে আগে Execution
+- Analogies: "লাইন ভেঙে আগে ঢোকা"
+- Real-life Use Case: Token Swap, NFT Mint
+- Common Pitfall: Public Mempool-এ Sensitive Transaction
+- Best Practice: Commit-Reveal Pattern, Private Transaction, Gas Fee Optimization
+
+## Real-life Use Cases
+- **DAO Hack:** Reentrancy দিয়ে $60M Fund Drain
+- **Token Mint/Transfer:** Overflow-এ Supply ভুল
+- **DEX Trading:** Frontrunning-এ Price Manipulation
+
+## Common Pitfalls
+- Contract Audit না করা
+- State Update ভুল
+- SafeMath Library না ব্যবহার
+- Public Transaction Pool-এ Sensitive Data
+
+## Best Practices
+- Reentrancy Guard ব্যবহার করুন
+- SafeMath Library ও Solidity >=0.8
+- Contract Audit করুন
+- Commit-Reveal Pattern
+- Private Transaction ব্যবহার করুন
+
+## Industry Trends
+- Automated Security Tools (Slither, MythX)
+- Formal Verification
+- Layer 2 Security
+- Bug Bounty Program
+
+## উপসংহার
+
+Reentrancy, Overflow, ও Frontrunning—Web3 ও স্মার্ট কন্ট্রাক্টে সবচেয়ে সাধারণ ও বিপজ্জনক আক্রমণ। সঠিক Best Practices ও Industry Trends অনুসরণ করলে, নিরাপদ ও সফল Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** সিকিউরিটি বেস্ট প্র্যাকটিস

@@ -1,0 +1,84 @@
+---
+title: "Rollups ও zk-rollups"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Rollups ও zk-rollups — Web3-এ Scalability ও Security
+
+## পরিচিতি
+
+Rollups ও zk-rollups—Web3 ও Ethereum-এর Scalability, Low Fee, ও Security নিশ্চিত করার জন্য অত্যন্ত গুরুত্বপূর্ণ। যেমন Google বা Netflix-এ Data Batch করে Process হয়, ঠিক তেমনই Ethereum-এ Rollup দিয়ে অনেক Transaction একসাথে Process করে Main Chain-এ Submit করা হয়—Fee কম, Speed বেশি, Security বজায় রেখে।
+
+## Core Concepts
+
+### ১. Rollup কী?
+- অনেক Transaction Batch করে Main Chain-এ Submit
+- Off-chain Computation, On-chain Settlement
+- Two Types: Optimistic Rollup, zk-Rollup
+
+### ২. Optimistic Rollup
+- Transaction Batch করে Assume করে Valid
+- Fraud Proof দিয়ে Invalid Transaction Detect
+- Example: Arbitrum, Optimism
+- Workflow: Batch → Submit → Challenge → Settlement
+- Analogies: "পরীক্ষা না দেখে পাশ"
+
+### ৩. zk-Rollup (Zero-Knowledge Rollup)
+- Transaction Batch করে Cryptographic Proof দিয়ে Validity দেখায়
+- Zero-Knowledge Proof (ZKP)
+- Example: zkSync, StarkNet
+- Workflow: Batch → ZKP Generate → Submit → Verify
+- Analogies: "প্রমাণ ছাড়া বিশ্বাস"
+
+### ৪. Workflow
+1. Transaction Batch করা
+2. Off-chain Computation
+3. Proof Generate (Optimistic/zk)
+4. Main Chain-এ Submit
+5. Settlement
+
+### ৫. Real-life Use Cases
+- **DeFi:** Low Fee, Fast Transaction
+- **NFT Mint:** Cheap Minting
+- **Gaming:** High Scalability
+- **Enterprise:** Bulk Transaction
+
+### ৬. Common Pitfalls
+- Fraud Proof Delay (Optimistic)
+- ZKP Computation Heavy (zk)
+- Compatibility Issue
+- Fee Structure ভুল
+
+### ৭. Best Practices
+- Trusted Rollup Solution ব্যবহার করুন
+- Withdrawal Time বুঝে Asset Transfer
+- Compatibility Test করুন
+- Fee Structure ভালোভাবে চেক করুন
+
+### ৮. Industry Trends
+- zkEVM Integration
+- Multi-chain Rollup
+- Cross-rollup Bridge
+- Layer 3 Development
+
+## Installation & Usage
+
+**zkSync Example:**
+```js
+// zkSync SDK দিয়ে Transaction
+import { sendTransaction } from 'zksync-sdk';
+
+sendTransaction({
+  from: '0x...',
+  to: '0x...',
+  amount: 1
+});
+```
+
+## উপসংহার
+
+Rollups ও zk-rollups—Web3 ও Ethereum-এ Scalability, Low Fee, ও Security-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, DeFi, NFT, Gaming—সবকিছু সহজ ও সাশ্রয়ী হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল Rollup Solution তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** মেইননেটে ডিপ্লয়মেন্ট

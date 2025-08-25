@@ -1,0 +1,72 @@
+---
+title: "স্মার্ট কন্ট্রাক্ট ইভেন্টস"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# স্মার্ট কন্ট্রাক্ট ইভেন্টস — ব্লকচেইনে ডেটা ট্র্যাকিং ও রিয়েল-টাইম রেসপন্স
+
+## পরিচিতি
+
+ইথেরিয়াম স্মার্ট কন্ট্রাক্টে "ইভেন্ট" (Event) হলো—ব্লকচেইনে কোনো গুরুত্বপূর্ণ ঘটনা ঘটলে সেটি লগ বা নোটিফাই করার উপায়। যেমন, Google-এ লগইন হলে নোটিফিকেশন আসে, ঠিক তেমনই কন্ট্রাক্টে কোনো ফাংশন এক্সিকিউট হলে ইভেন্ট ট্রিগার হয়। এই পাঠে জানব—ইভেন্ট কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. ইভেন্ট (Event) কী?
+- স্মার্ট কন্ট্রাক্টে "event" হলো—বাইরের অ্যাপ/ইউজারকে কোনো ঘটনা জানানো
+- ব্লকচেইনে "লগ" হিসেবে সংরক্ষিত হয়
+- ফ্রন্টএন্ড/ড্যাপ সহজে ডেটা রিড করতে পারে
+
+### ২. ইভেন্টের Workflow
+1. Contract-এ event ডিফাইন করুন
+2. Function-এ event emit করুন
+3. Blockchain-এ event log হয়
+4. Frontend/Web3.js/Ethers.js দিয়ে event listen করুন
+
+### ৩. Solidity-তে Event Example
+```solidity
+pragma solidity ^0.8.0;
+
+contract Counter {
+    uint public count;
+    event CountChanged(uint newCount);
+
+    function increment() public {
+        count++;
+        emit CountChanged(count);
+    }
+}
+```
+
+### ৪. Real-life Use Cases
+- **Token Transfer:** ERC20-এ Transfer event
+- **NFT Minting:** Mint event
+- **Auction:** HighestBidIncreased event
+- **DeFi:** Swap, Stake, Unstake event
+
+### ৫. Analogies
+- Event—যেন মোবাইলের নোটিফিকেশন
+- Emit—ঘণ্টা বাজানো, সবাইকে জানানো
+
+### ৬. Common Pitfalls
+- Event-এ sensitive data না রাখা
+- Event emit ভুলে গেলে—ফ্রন্টএন্ডে ডেটা পাওয়া যায় না
+- Event naming inconsistent হলে—ড্যাপে সমস্যা
+
+### ৭. Best Practices
+- Meaningful event name দিন
+- প্রয়োজনীয় data parameter দিন
+- Indexed parameter ব্যবহার করুন (search সহজ)
+- Documentation লিখুন
+
+### ৮. Industry Trends
+- Event-driven dApps: Real-time UI update
+- Analytics: Event log থেকে usage pattern
+- Security: Suspicious event detect
+
+## উপসংহার
+
+স্মার্ট কন্ট্রাক্ট ইভেন্ট—ড্যাপ ও ব্লকচেইন ইন্টিগ্রেশনের জন্য অপরিহার্য। ইভেন্টের মাধ্যমে রিয়েল-টাইম ডেটা, নোটিফিকেশন, ও অ্যানালিটিক্স সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্ট টুলস

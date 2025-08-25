@@ -1,9 +1,77 @@
 {
-  "title": "ট্র্যাফিক (Traefik)",
-  "description": "শূন্য থেকে মাস্টারি পর্যন্ত Traefik শেখার পূর্ণাঙ্গ বাংলা সিলেবাস",
-  "icon": "simple-icons:traefikproxy",
+  "title": "ওয়েব3 (Web3)",
+  "description": "শূন্য থেকে প্রয়োগ পর্যন্ত Web3 শেখার পূর্ণাঙ্গ বাংলা সিলেবাস",
+  "icon": "pixel:web3",
   "root": true,
   "pages": [
-    "index"
+    "index",
+
+    "---মমডিউল ১: ব্লকচেইন ও ওয়েব৩ এর ভিত্তি---",
+    "what-is-web3",
+    "blockchain-basics",
+    "public-vs-private",
+    "smart-contract-overview",
+    "crypto-fundamentals",
+    "ethereum-evm",
+    "tokens-basics",
+
+    "---মডিউল ২: ইথেরিয়াম ও স্মার্ট কন্ট্রাক্ট---",
+    "ethereum-architecture",
+    "intro-to-solidity",
+    "simple-contracts",
+    "remix-deployment",
+    "gas-fees-lifecycle",
+    "contract-events",
+
+    "---মডিউল ৩: স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্ট টুলস---",
+    "hardhat-basics",
+    "truffle-framework",
+    "ganache-local",
+    "ethers-web3js",
+    "frontend-integration",
+
+    "---মডিউল ৪: টোকেন স্ট্যান্ডার্ডস---",
+    "erc20-standard",
+    "erc721-standard",
+    "erc1155-standard",
+    "token-mint-burn",
+    "nft-ipfs",
+
+    "---মডিউল ৫: ডেসেন্ট্রালাইজড অ্যাপস---",
+    "ipfs-arweave",
+    "metamask-integration",
+    "transaction-signing",
+    "node-providers",
+    "dapp-state-management",
+
+    "---মডিউল ৬: ডি-ফাই ও অ্যাডভান্সড ওয়েব৩---",
+    "amm-liquidity",
+    "dex-basics",
+    "lending-borrowing",
+    "yield-staking",
+    "dao-basics",
+
+    "---মডিউল ৭: ওয়েব৩ সিকিউরিটি---",
+    "security-attacks",
+    "security-best-practices",
+    "openzeppelin",
+    "auditing-tools",
+
+    "---মডিউল ৮: লেয়ার ২ ও ক্রস-চেইন---",
+    "layer2-solutions",
+    "cross-chain",
+    "rollups",
+
+    "---মডিউল ৯: প্রোডাকশন ডিপ্লয়মেন্ট---",
+    "mainnet-deployment",
+    "frontend-hosting",
+    "ens-domains",
+    "gasless-transactions",
+
+    "---মডিউল ১০: ওয়েব৩ এর ভবিষ্যৎ প্রবণতা ---",
+    "decentralized-identity",
+    "soulbound-tokens",
+    "web3-social",
+    "ai-integration"
   ]
 }

@@ -1,0 +1,76 @@
+---
+title: "ENS ডোমেইন ব্যবহার"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ENS ডোমেইন ব্যবহার — Web3-এ Human-readable Address ও Identity
+
+## পরিচিতি
+
+ENS (Ethereum Name Service) ডোমেইন—Web3 ও Ethereum-এ Human-readable Address, Identity, ও Decentralized Web-এর জন্য অপরিহার্য। যেমন Google বা Uber-এ সহজ URL বা Username ব্যবহার হয়, ঠিক তেমনই Ethereum-এ ENS দিয়ে 0x... Address-এর বদলে সহজ নাম (example.eth) ব্যবহার করা যায়। এই পাঠে জানব—ENS-এর গুরুত্ব, Workflow, Best Practices, ও Industry Trends।
+
+## Core Concepts
+
+### ১. ENS কী?
+- Ethereum Name Service
+- Human-readable Domain (example.eth)
+- Address Mapping, Identity, Decentralized Website
+
+### ২. Workflow
+1. ENS Domain Search
+2. Register ও Pay Fee
+3. Address Map
+4. Website/IPFS Content Map
+5. Use in Wallet, DApp
+
+### ৩. Real-life Use Cases
+- **Wallet Address:** example.eth দিয়ে Fund Receive
+- **Decentralized Website:** example.eth → IPFS Content
+- **Identity:** Social Profile, DAO Membership
+- **NFT Mint:** ENS-linked NFT
+
+### ৪. Examples & Analogies
+- ENS—"ডিজিটাল নামপ্লেট"
+- Address Mapping—"বাড়ির ঠিকানা"
+- Decentralized Website—"নিজস্ব ওয়েব ঠিকানা"
+
+### ৫. Common Pitfalls
+- Domain Expiry
+- Address Mapping ভুল
+- Subdomain Issue
+- Fee Structure ভুল
+
+### ৬. Best Practices
+- Domain Renew করুন
+- Address ও Content ঠিকভাবে Map করুন
+- Subdomain Properly Configure করুন
+- Fee Structure ভালোভাবে চেক করুন
+
+### ৭. Industry Trends
+- Multi-chain Name Service
+- NFT-linked Domain
+- Social Identity Integration
+- Decentralized Messaging
+
+## Installation & Usage
+
+**ENS Registration Example:**
+- ENS App-এ Domain Search করুন
+- Register ও Pay করুন
+- Address ও Content Map করুন
+
+**ENS Integration (Ethers.js):**
+```js
+// Ethers.js দিয়ে ENS Resolve
+import { ethers } from "ethers";
+const provider = new ethers.providers.JsonRpcProvider();
+const address = await provider.resolveName("example.eth");
+```
+
+## উপসংহার
+
+ENS ডোমেইন—Web3 ও Ethereum-এ Human-readable Address, Identity, ও Decentralized Web-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, User Experience, Security, ও Interoperability—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল ENS Domain ব্যবহার সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ইউজার অনবোর্ডিং ও গ্যাসলেস ট্রানজ্যাকশন
