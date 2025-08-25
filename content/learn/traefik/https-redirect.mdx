@@ -1,0 +1,124 @@
+---
+title: "HTTP → HTTPS রিডাইরেকশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# HTTP → HTTPS রিডাইরেকশন
+
+## পরিচিতি
+
+আজকের ইন্টারনেট নিরাপত্তার জন্য HTTPS অপরিহার্য। কিন্তু অনেক user এখনো পুরনো HTTP লিঙ্ক ব্যবহার করেন, বা ভুল করে HTTP দিয়ে অ্যাক্সেস করেন। Traefik-এ HTTP থেকে HTTPS-এ redirect করা মানে—user যেভাবেই আসুক, তাদের নিরাপদ সংযোগে পাঠানো। এই পাঠে আমরা জানব, কেন HTTP → HTTPS redirect গুরুত্বপূর্ণ, কীভাবে Traefik-এ এটি কনফিগার করবেন, এবং industry best practices কী।
+
+---
+
+## কেন HTTP → HTTPS রিডাইরেকশন গুরুত্বপূর্ণ?
+
+- **Security:** HTTPS ছাড়া data "plain text"-এ যায়—hackers সহজেই intercept করতে পারে।
+- **Trust:** Modern browsers HTTP-তে "Not Secure" দেখায়—user trust কমে যায়।
+- **Compliance:** GDPR, PCI-DSS-এর মতো industry standard-এ HTTPS বাধ্যতামূলক।
+- **SEO:** Google HTTPS-enabled site-কে ranking-এ priority দেয়।
+
+### উদাহরণ:
+Google, Netflix, Uber—সব বড় কোম্পানি HTTP request পেলেই HTTPS-এ redirect করে। এতে user data নিরাপদ থাকে, এবং trust বাড়ে।
+
+---
+
+## Traefik-এ HTTP → HTTPS Redirect কিভাবে কাজ করে?
+
+Traefik-এ "middleware" ব্যবহার করে HTTP request-কে HTTPS-এ পাঠানো যায়। Middleware হলো—request/response modify করার জন্য ছোট config block।
+
+### Core Steps:
+1. **EntryPoint:** HTTP ও HTTPS দুইটা entrypoint define করুন
+2. **Middleware:** RedirectScheme middleware তৈরি করুন
+3. **Router:** HTTP router-এ middleware attach করুন
+
+---
+
+## Hands-on Example: YAML Config
+
+```yaml
+# traefik.yml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+http:
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+  routers:
+    http-router:
+      entryPoints:
+        - web
+      rule: "Host(`example.com`)"
+      middlewares:
+        - redirect-to-https
+      service: dummy
+    https-router:
+      entryPoints:
+        - websecure
+      rule: "Host(`example.com`)"
+      service: dummy
+```
+
+- **redirectScheme:** HTTP request পেলেই HTTPS-এ পাঠাবে
+- **permanent:** 301 redirect—SEO friendly
+
+---
+
+## Docker Labels Example
+
+```yaml
+labels:
+  - "traefik.http.routers.http-router.entrypoints=web"
+  - "traefik.http.routers.http-router.rule=Host(`example.com`)"
+  - "traefik.http.routers.http-router.middlewares=redirect-to-https"
+  - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+  - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+```
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Middleware attach না করা:** HTTP request redirect হবে না
+- **EntryPoint ভুল:** HTTP entrypoint define না করলে redirect কাজ করবে না
+- **Looping redirect:** Config ভুল হলে redirect loop হতে পারে
+
+---
+
+## Best Practices
+
+- সব HTTP router-এ redirect middleware attach করুন
+- Permanent redirect (301) ব্যবহার করুন—SEO ও cache friendly
+- Config change করলে staging-এ test করুন
+- Custom error page ব্যবহার করুন—user experience ভালো হয়
+
+---
+
+## Industry Trends
+
+- Modern cloud-native apps—default-এ HTTP → HTTPS redirect
+- Automated security audit—redirect config check করে
+- Progressive Web Apps (PWA)—HTTPS ছাড়া কাজই করে না
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **HTTP → HTTPS redirect** হলো—"VIP gate"-এ সবাইকে নিরাপদ পথে পাঠানো
+- **Middleware** হলো—"security guard"—যে gate-এ দাঁড়িয়ে সবাইকে সঠিক পথে পাঠায়
+
+---
+
+## Conclusion
+
+HTTP → HTTPS redirect মানে—user যেভাবেই আসুক, তাদের নিরাপদ সংযোগে পাঠানো। Traefik-এ middleware দিয়ে সহজেই এটি automate করা যায়। Security, trust, SEO—সবকিছু বজায় রাখতে এই practice industry standard।
+
+---
+
+**পরবর্তী পাঠ:** [কাস্টম সার্টিফিকেট ব্যবহার](/traefik/custom-cert)

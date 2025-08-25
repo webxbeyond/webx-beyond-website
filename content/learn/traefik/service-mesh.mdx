@@ -1,0 +1,78 @@
+---
+title: "Traefik Mesh (Service Mesh Mode)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Traefik Mesh: সার্ভিস মেশ মোডে আধুনিক অ্যাপ্লিকেশন ডিজাইন
+
+## পরিচিতি
+
+Service Mesh (সার্ভিস মেশ) হলো এমন একটি প্রযুক্তি, যা মাইক্রোসার্ভিস-ভিত্তিক অ্যাপ্লিকেশনে সার্ভিস-টু-সার্ভিস কমিউনিকেশন, নিরাপত্তা, এবং অবজারভেবিলিটি সহজ করে। Traefik Mesh Service Mesh Mode-এ কীভাবে কাজ করে, কেন এটি গুরুত্বপূর্ণ, এবং কোন পরিস্থিতিতে ব্যবহার করবেন—এই পাঠে জানব।
+
+## Service Mesh কী ও কেন?
+
+- **Service Mesh** হলো একাধিক সার্ভিসের মধ্যে ট্রাফিক, নিরাপত্তা, এবং মনিটরিং পরিচালনার জন্য একটি লেয়ার
+- Microservices-এ সার্ভিস-টু-সার্ভিস কমিউনিকেশন জটিল; Service Mesh এই জটিলতা কমায়
+- উদাহরণ: **Google, Netflix, Uber**—সবাই Service Mesh ব্যবহার করে
+
+## Traefik Mesh: মূল ফিচার
+
+- **Lightweight & Simple:** সহজে ডিপ্লয়, কম রিসোর্স
+- **Automatic Service Discovery:** নতুন সার্ভিস এড হলে অটো-ডিসকভার
+- **Traffic Management:** Load Balancing, Circuit Breaking, Retries
+- **Security:** Mutual TLS (mTLS), Encryption
+- **Observability:** Metrics, Tracing, Logging
+- **Platform Support:** Kubernetes, Docker
+
+## Core Concepts
+
+### ১. Service-to-Service Communication
+- Microservices-এ এক সার্ভিস থেকে অন্য সার্ভিসে ডেটা পাঠানো
+- Traefik Mesh Proxy হিসেবে কাজ করে, সব ট্রাফিক নিয়ন্ত্রণ করে
+
+### ২. Security: Mutual TLS (mTLS)
+- সার্ভিস-টু-সার্ভিস কমিউনিকেশন এনক্রিপ্টেড
+- Unauthorized Access ব্লক
+- উদাহরণ: ব্যাংকিং, ফিনটেক, হেলথকেয়ার
+
+### ৩. Traffic Control: Load Balancing, Circuit Breaking
+- সার্ভিস ডাউন হলে অটো-ফেইলওভার
+- Traffic Shaping, Retries
+- উদাহরণ: Real-time Apps, E-commerce
+
+### ৪. Observability: Metrics, Tracing
+- সার্ভিসের Health, Performance, Error ট্র্যাক
+- Distributed Tracing (Jaeger, Zipkin)
+- DevOps/SRE টিমের জন্য অপরিহার্য
+
+## Analogies
+
+- Service Mesh হলো শহরের ট্রাফিক কন্ট্রোল সেন্টার—সব গাড়ি কোথায় যাবে, কোন রাস্তা ফ্রি, কোনটা ব্লক, সবকিছু নিয়ন্ত্রণ
+- Microservices-এ Service Mesh ছাড়া, প্রত্যেক সার্ভিসে আলাদা নিরাপত্তা, মনিটরিং, ও ট্রাফিক কন্ট্রোল করতে হয়—যা জটিল ও সময়সাপেক্ষ
+
+## Common Pitfalls
+
+- Overhead: ছোট প্রজেক্টে Service Mesh অপ্রয়োজনীয় কমপ্লেক্সিটি আনতে পারে
+- Misconfiguration: Security বা Traffic Policy ভুল হলে সার্ভিস ডাউন
+- Monitoring না থাকলে সমস্যা ডিবাগ করা কঠিন
+
+## Best Practices
+
+- Production-এ Mutual TLS (mTLS) চালু রাখুন
+- Traffic Policy ও Circuit Breaking ভালোভাবে কনফিগার করুন
+- Observability (Metrics, Tracing) চালু রাখুন
+- Documentation ও Automation বজায় রাখুন
+
+## Industry Trends
+
+- Service Mesh এখন Cloud Native, Kubernetes-ভিত্তিক অ্যাপ্লিকেশনে অপরিহার্য
+- Zero Trust Security, Automated Policy Management, Multi-Cluster Support
+- Lightweight Mesh (Traefik Mesh) জনপ্রিয় হচ্ছে, কারণ সহজে ডিপ্লয় ও কম রিসোর্স
+
+## উপসংহার
+
+Traefik Mesh Service Mesh Mode-এ ব্যবহার করলে, আপনার Microservices Architecture হবে আরও নিরাপদ, স্কেলেবল, ও ম্যানেজেবল। বড় কোম্পানি যেমন Google, Netflix, Uber—সবাই Service Mesh ব্যবহার করে। আপনার অ্যাপের স্কেল, নিরাপত্তা, ও ম্যানেজমেন্ট চাহিদা অনুযায়ী Service Mesh ডিজাইন করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Hybrid Cloud ও Multi-Cluster Setup](/traefik/hybrid-multi)

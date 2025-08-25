@@ -1,0 +1,112 @@
+---
+title: "Kubernetes Scaling: Traefik-এ ক্লাস্টার ও সার্ভিস স্কেলিং"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Kubernetes Scaling: Traefik-এ ক্লাস্টার ও সার্ভিস স্কেলিং
+
+## পরিচিতি
+
+Kubernetes—cloud-native world-এর সবচেয়ে জনপ্রিয় orchestration প্ল্যাটফর্ম। Production-grade স্কেলিং, হাই এভেইলেবিলিটি, ও zero downtime deployment নিশ্চিত করতে Kubernetes scaling অপরিহার্য। Traefik-এর সাথে Kubernetes ইন্টিগ্রেশন করলে, অটোমেটিক সার্ভিস ডিসকভারি, লোড ব্যালেন্সিং, ও স্কেলিং সহজ হয়।
+
+## Kubernetes Scaling কী ও কেন?
+
+- **Kubernetes Scaling:** Cluster ও সার্ভিসের replica সংখ্যা বাড়ানো/কমানো—traffic, load, ও availability অনুযায়ী।
+- **Use Case:** Google, Netflix, Uber—হাজার হাজার pod, auto-scaling, zero downtime deployment—সব Kubernetes scaling দিয়ে হয়।
+- **Importance:** Traffic spike, failure, বা maintenance—সবকিছুতে uninterrupted service নিশ্চিত করা যায়।
+
+## Traefik-এ Kubernetes Scaling Integration
+
+Traefik Kubernetes provider-এর মাধ্যমে cluster ও সার্ভিস অটোমেটিক detect ও route করতে পারে।
+
+### ১. Horizontal Pod Autoscaler (HPA)
+- Traffic বা CPU usage বাড়লে pod সংখ্যা অটোমেটিক বাড়ে।
+- Example YAML:
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: traefik-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: traefik
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+```
+
+### ২. Traefik Deployment Scaling
+- Traefik deployment-এর replica সংখ্যা বাড়ান—high availability ও load balancing নিশ্চিত করতে।
+- Example YAML:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+spec:
+  replicas: 3
+  ...
+```
+
+### ৩. Service Discovery & Routing
+- Traefik Kubernetes provider pod/service অটোমেটিক detect করে, traffic route করে।
+
+### ৪. Rolling Update & Zero Downtime
+- Kubernetes rolling update—Traefik downtime ছাড়াই নতুন version deploy করে।
+
+## Core Concepts
+
+### Cluster Autoscaler
+- Node pool-এর সংখ্যা বাড়ানো/কমানো—resource usage অনুযায়ী।
+
+### Readiness & Liveness Probe
+- Pod healthy কিনা—Kubernetes probe দিয়ে check করা হয়।
+- Traefik healthy pod-এ traffic পাঠায়।
+
+### Resource Requests & Limits
+- Pod-এর CPU, memory usage limit—scaling ও stability নিশ্চিত করতে।
+
+## Real-life Example & Analogy
+
+- **Google:** হাজার হাজার pod—Kubernetes scaling ছাড়া traffic handle করা অসম্ভব।
+- **Analogy:** Imagine a restaurant—busy time-এ বেশি waiter, slow time-এ কম waiter। Kubernetes scaling-এ pod সংখ্যা traffic অনুযায়ী বাড়ে/কমে।
+
+## Common Pitfalls
+
+- **HPA misconfiguration:** Traffic spike-এ pod scale না হলে downtime হয়।
+- **Resource limit ভুল হলে:** Pod crash বা slow response হতে পারে।
+- **Probe না থাকলে:** Unhealthy pod-এ traffic চলে যেতে পারে।
+
+## Best Practices
+
+- **HPA enable করুন:** Traffic ও resource usage অনুযায়ী pod scale করুন।
+- **Resource request/limit ঠিক রাখুন:** Stability ও performance নিশ্চিত করুন।
+- **Probe configure করুন:** Healthy pod-এই traffic পাঠান।
+- **Monitoring করুন:** Cluster status, pod count, error rate track করুন।
+
+## Industry Trends
+
+- **Multi-cluster scaling:** একাধিক cluster—geo-distributed scaling হচ্ছে।
+- **AI-based autoscaling:** Machine learning দিয়ে intelligent scaling হচ্ছে।
+- **Serverless integration:** Kubernetes + serverless—auto-scale, pay-per-use।
+
+## কখন ব্যবহার করবেন?
+
+- High traffic, high availability, zero downtime নিশ্চিত করতে।
+- Microservices, API gateway, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Kubernetes Scaling দিয়ে ক্লাস্টার ও সার্ভিসের reliability, scalability, ও user experience অনেক উন্নত হয়। সঠিকভাবে কনফিগার করলে, downtime ও error দ্রুত detect ও mitigate করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Auto-discovery in Clusters](/traefik/auto-discovery)

@@ -1,0 +1,115 @@
+---
+title: "Traefik as Ingress Controller: Kubernetes-এ API Gateway ও Routing"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Traefik as Ingress Controller: Kubernetes-এ API Gateway ও Routing
+
+## পরিচিতি
+
+Kubernetes cluster-এ বাইরের ট্রাফিককে সঠিক সার্ভিসে route করার জন্য Ingress Controller অপরিহার্য। Traefik—একটি cloud-native API Gateway—Kubernetes-এ Ingress Controller হিসেবে ব্যবহার করলে, সহজে HTTPS, লোড ব্যালেন্সিং, ও advanced routing rules configure করা যায়।
+
+## Ingress Controller কী ও কেন?
+
+- **Ingress Controller:** বাইরের ট্রাফিককে Kubernetes cluster-এর ভিতরের সার্ভিসে route করার জন্য responsible।
+- **Use Case:** Google, Netflix, Uber—Kubernetes cluster-এ হাজার হাজার সার্ভিস—Ingress Controller ছাড়া efficient routing অসম্ভব।
+- **Importance:** SSL termination, path/host-based routing, security, ও traffic management—সবকিছু সহজ হয়।
+
+## Traefik as Ingress Controller Integration
+
+Traefik Kubernetes provider-এর মাধ্যমে Ingress resource detect করে, traffic route করে।
+
+### ১. Traefik Deployment
+- Traefik-কে Kubernetes cluster-এ deploy করুন।
+- Example YAML:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+spec:
+  replicas: 2
+  ...
+```
+
+### ২. Ingress Resource
+- Kubernetes Ingress resource define করুন—Traefik অটোমেটিক detect ও route করে।
+- Example YAML:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+    - host: myapp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service
+                port:
+                  number: 80
+```
+
+### ৩. Advanced Routing
+- Path-based, host-based, TLS/SSL, middleware—সবকিছু Traefik Ingress Controller-এ configure করা যায়।
+
+### ৪. HTTPS ও Let's Encrypt Integration
+- Traefik-এ Let's Encrypt enable করলে, অটোমেটিক SSL certificate issue হয়।
+- Example annotation:
+```yaml
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+```
+
+## Core Concepts
+
+### Custom Resource Definition (CRD)
+- Traefik IngressRoute CRD—advanced routing, middleware, ও security rules define করা যায়।
+
+### Middleware Integration
+- Authentication, rate limiting, header modification—middleware configure করা যায়।
+
+### Monitoring & Dashboard
+- Traefik dashboard—routing, traffic, error, SSL status real-time monitor করা যায়।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার API—Traefik Ingress Controller দিয়ে efficient routing, SSL, ও security manage হয়।
+- **Analogy:** Imagine a receptionist—visitor-দের সঠিক department-এ পাঠায়। Traefik Ingress Controller-ও বাইরের request-কে সঠিক সার্ভিসে পাঠায়।
+
+## Common Pitfalls
+
+- **Ingress resource ভুল configure করলে:** Routing problem, traffic ভুল service-এ যায়।
+- **SSL/TLS misconfiguration:** Security vulnerability, downtime হতে পারে।
+- **Middleware না থাকলে:** Security ও performance issue হতে পারে।
+
+## Best Practices
+
+- **Ingress resource convention maintain করুন:** Routing সহজ ও error-free হবে।
+- **SSL/TLS enable করুন:** Security ও trust নিশ্চিত করুন।
+- **Middleware configure করুন:** Authentication, rate limiting, header security enable করুন।
+- **Monitoring করুন:** Dashboard-এ routing, error, SSL status track করুন।
+
+## Industry Trends
+
+- **CRD-based routing:** Advanced routing ও middleware—Traefik IngressRoute CRD দিয়ে।
+- **Multi-cluster ingress:** একাধিক cluster—global routing ও failover হচ্ছে।
+- **Service mesh integration:** Ingress Controller + service mesh—advanced traffic management।
+
+## কখন ব্যবহার করবেন?
+
+- Production-grade Kubernetes cluster—API gateway, SSL, advanced routing, security নিশ্চিত করতে।
+- Microservices, cloud-native, multi-tenant architecture-এ।
+
+## উপসংহার
+
+Traefik as Ingress Controller দিয়ে Kubernetes cluster-এ API gateway, routing, ও security অনেক সহজ ও শক্তিশালী হয়। সঠিকভাবে কনফিগার করলে, reliability, scalability, ও user experience নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [IngressRoute CRD বনাম Kubernetes Ingress](/traefik/ingress-crd)

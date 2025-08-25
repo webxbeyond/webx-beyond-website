@@ -1,0 +1,79 @@
+---
+title: "WordPress + Node.js + API Gateway Setup"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# WordPress + Node.js + API Gateway Setup: Traefik দিয়ে হাইব্রিড অ্যাপ ডিপ্লয়মেন্ট
+
+## পরিচিতি
+
+আধুনিক ওয়েব অ্যাপ্লিকেশনে WordPress (কনটেন্ট ম্যানেজমেন্ট) ও Node.js (API, Real-time Service) একসাথে ব্যবহার করা হয়। Traefik API Gateway হিসেবে কাজ করে, দুই প্ল্যাটফর্মকে একত্রে স্কেলেবল, নিরাপদ, ও ম্যানেজেবলভাবে চালাতে সাহায্য করে। এই পাঠে জানব, কীভাবে WordPress + Node.js + API Gateway Setup করবেন।
+
+## কেন এই সেটআপ গুরুত্বপূর্ণ?
+
+- Content + API: একসাথে ব্লগ, ই-কমার্স, Real-time Service
+- Scalability: আলাদা সার্ভিস, আলাদা স্কেল
+- Security: API Gateway দিয়ে অথেন্টিকেশন, Rate Limiting
+- উদাহরণ: Headless CMS, JAMstack, SaaS Platform
+
+## Core Concepts
+
+### ১. Multi-Service Deployment
+- Docker/Kubernetes-এ WordPress ও Node.js আলাদা সার্ভিস
+- Traefik-এ প্রতিটির জন্য আলাদা Router, Service, Middleware
+
+### ২. API Gateway Integration
+- Traefik API Gateway হিসেবে কাজ করে
+- Path-based Routing: `/api/*` Node.js, `/` WordPress
+- Authentication, Rate Limiting, SSL/TLS
+
+### ৩. SSL/TLS & Security
+- Let's Encrypt বা Custom Certificate
+- API ও Web-এ HTTPS
+- Security Middleware: Headers, IP Whitelist
+
+### ৪. Monitoring & Logging
+- Access Logs, Error Logs, Metrics—প্রতিটি সার্ভিসের জন্য
+- Real-time Dashboard
+
+### ৫. Scalability & Performance
+- Load Balancing, Auto-scaling
+- Caching, CDN Integration
+
+## বাস্তব উদাহরণ
+
+- **Headless WordPress:** Frontend Node.js, Backend WordPress
+- **E-commerce:** Product API Node.js, Content WordPress
+- **SaaS Platform:** Blog, Docs WordPress; API Node.js
+
+## Analogies
+
+- WordPress + Node.js মানে—একই বাড়িতে দুই শাখা, একটিতে কনটেন্ট, অন্যটিতে সার্ভিস
+- API Gateway হলো—বাড়ির মূল দরজা, সব প্রবেশপথ নিয়ন্ত্রণ করে
+
+## Common Pitfalls
+
+- Routing Rule ভুল হলে API/Web মিশে যায়
+- SSL/TLS না থাকলে Security Risk
+- Logging না থাকলে সমস্যা ডিবাগ কঠিন
+
+## Best Practices
+
+- Path-based Routing স্পষ্টভাবে লিখুন
+- SSL/TLS ও Security Middleware চালু রাখুন
+- Monitoring ও Logging চালু রাখুন
+- Documentation ও Automation বজায় রাখুন
+
+## Industry Trends
+
+- Headless CMS, JAMstack, API-first Architecture
+- Automated SSL/TLS, Real-time Monitoring
+- API Gateway ও Service Mesh Integration
+
+## উপসংহার
+
+Traefik দিয়ে WordPress + Node.js + API Gateway Setup করলে, আপনার প্ল্যাটফর্ম হবে আরও স্কেলেবল, নিরাপদ, ও কাস্টমাইজেবল। Headless CMS, SaaS, E-commerce—সবই এই প্রযুক্তি ব্যবহার করে। আপনার অ্যাপের স্কেল, কনটেন্ট, ও API চাহিদা অনুযায়ী Routing Design করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Zero-Downtime Canary Release](/traefik/canary-project)

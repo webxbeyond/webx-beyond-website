@@ -1,0 +1,139 @@
+---
+title: "Cert-Manager Integration"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Traefik-এ Kubernetes-এ SSL Automation
+
+## পরিচিতি
+
+Production-grade Kubernetes cluster-এ SSL/TLS certificate management অত্যন্ত গুরুত্বপূর্ণ। Cert-Manager—একটি Kubernetes-native certificate automation tool—Traefik-এর সাথে integrate করলে, SSL certificate issue, renew, ও manage করা যায় অটোমেটিকভাবে। এতে security, reliability, ও developer productivity বাড়ে।
+
+## Cert-Manager কী ও কেন?
+
+- **Cert-Manager:** Kubernetes-এ SSL/TLS certificate issue, renew, revoke, ও manage করার জন্য automation tool।
+- **Use Case:** Google, Netflix, Uber—production cluster-এ হাজার হাজার certificate—manual management অসম্ভব।
+- **Importance:** Security, compliance, ও zero downtime SSL renewal নিশ্চিত হয়।
+
+## Traefik-এ Cert-Manager Integration
+
+Traefik Ingress Controller বা IngressRoute CRD-এর সাথে Cert-Manager ব্যবহার করলে, SSL automation সহজ হয়।
+
+### ১. Cert-Manager Install
+- Helm Chart বা YAML দিয়ে Cert-Manager install করুন।
+- Example command:
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
+```
+
+### ২. ClusterIssuer Resource
+- Cluster-wide certificate issue করার জন্য ClusterIssuer define করুন।
+- Example YAML:
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+```
+
+### ৩. Certificate Resource
+- Specific domain-এর জন্য certificate resource define করুন।
+- Example YAML:
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: myapp-cert
+spec:
+  secretName: myapp-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: myapp.local
+  dnsNames:
+    - myapp.local
+```
+
+### ৪. Traefik Ingress Integration
+- Ingress resource-এ TLS section-এ cert-manager-generated secret ব্যবহার করুন।
+- Example YAML:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  tls:
+    - hosts:
+        - myapp.local
+      secretName: myapp-tls
+  rules:
+    - host: myapp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service
+                port:
+                  number: 80
+```
+
+## Core Concepts
+
+### Automated Renewal
+- Cert-Manager certificate expiry detect করে, অটোমেটিক renew করে—downtime ছাড়াই।
+
+### ACME Challenge
+- Let's Encrypt-এর জন্য HTTP-01 বা DNS-01 challenge solve করে certificate issue হয়।
+
+### Secret Management
+- Certificate Kubernetes secret-এ store হয়—Traefik TLS section-এ reference দেয়া হয়।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার domain—Cert-Manager দিয়ে SSL automation, manual renewal ছাড়াই।
+- **Analogy:** Cert-Manager হচ্ছে bank-এর auto-renewal fixed deposit—expiry হলে অটোমেটিক renew হয়।
+
+## Common Pitfalls
+
+- **ClusterIssuer ভুল configure করলে:** Certificate issue হবে না।
+- **Challenge fail হলে:** SSL certificate issue/renewal fail হবে।
+- **Secret reference ভুল হলে:** Traefik TLS error, site inaccessible।
+
+## Best Practices
+
+- **ClusterIssuer properly configure করুন:** Email, ACME server, solver ঠিক রাখুন।
+- **Monitoring করুন:** Cert-Manager status, certificate expiry, renewal error track করুন।
+- **Secret reference ঠিক রাখুন:** Ingress/IngressRoute-এ TLS section-এ সঠিক secret ব্যবহার করুন।
+- **Documentation follow করুন:** Cert-Manager ও Traefik docs-এ latest example দেখুন।
+
+## Industry Trends
+
+- **Wildcard certificate automation:** Multiple subdomain—single certificate issue হচ্ছে।
+- **Multi-cluster certificate management:** একাধিক cluster—centralized SSL automation।
+- **ACME external challenge solver:** Cloud DNS, custom challenge—advanced automation।
+
+## কখন ব্যবহার করবেন?
+
+- Production-grade Kubernetes cluster—SSL automation, zero downtime renewal, security নিশ্চিত করতে।
+- Multi-tenant, multi-domain, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Cert-Manager Integration দিয়ে Kubernetes cluster-এ SSL/TLS automation, security, ও reliability অনেক সহজ ও শক্তিশালী হয়। সঠিকভাবে কনফিগার করলে, downtime, manual error, ও security risk কমে যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Helm Chart দিয়ে ডিপ্লয়](/traefik/helm-deploy)

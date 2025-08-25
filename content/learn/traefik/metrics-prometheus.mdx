@@ -1,0 +1,105 @@
+---
+title: "Prometheus ও Grafana Integration: ট্র্যাফিক মনিটরিং ও ভিজ্যুয়ালাইজেশন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Prometheus ও Grafana Integration: ট্র্যাফিক মনিটরিং ও ভিজ্যুয়ালাইজেশন
+
+## পরিচিতি
+
+আধুনিক সিস্টেম ডিজাইনে মনিটরিং ও অবজারভেবিলিটি (Observability) অত্যন্ত গুরুত্বপূর্ণ। শুধু লগ দেখা নয়, সার্ভিসের পারফরম্যান্স, লোড, রিকোয়েস্ট, ও এরর ট্র্যাক করতে হলে মেট্রিকস (Metrics) দরকার। Prometheus ও Grafana—এই দুইটি টুল—বিশ্বজুড়ে ক্লাউড-নেটিভ অ্যাপ্লিকেশন মনিটরিংয়ের জন্য স্ট্যান্ডার্ড। Traefik সহজেই Prometheus-এর সাথে ইন্টিগ্রেট হয় এবং Grafana দিয়ে ডেটা ভিজ্যুয়ালাইজ করা যায়।
+
+## কেন Prometheus ও Grafana?
+
+- **Prometheus:** ওপেন-সোর্স মেট্রিকস কালেক্টর ও ডেটাবেস। এটি সার্ভিসের বিভিন্ন পারফরম্যান্স ডেটা সংগ্রহ করে।
+- **Grafana:** ডেটা ভিজ্যুয়ালাইজেশন টুল, যা Prometheus থেকে ডেটা নিয়ে সুন্দর ড্যাশবোর্ড তৈরি করে।
+- **Use Case:** Google, Netflix, Uber-এর মতো বড় কোম্পানিগুলো সার্ভিস মনিটরিং, অ্যালার্টিং ও অ্যানালাইসিসে এই টুলগুলো ব্যবহার করে।
+
+## Traefik-এ Prometheus Integration
+
+Traefik-এর মেট্রিকস এক্সপোর্টার হিসেবে Prometheus কনফিগার করা খুব সহজ।
+
+### কনফিগারেশন উদাহরণ (YAML)
+
+```yaml
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+```
+
+- **addEntryPointsLabels:** EntryPoint অনুযায়ী মেট্রিকস ট্যাগ হবে।
+- **addRoutersLabels:** Router অনুযায়ী মেট্রিকস ট্যাগ হবে।
+- **addServicesLabels:** Service অনুযায়ী মেট্রিকস ট্যাগ হবে।
+
+### Docker Label Example
+
+```yaml
+labels:
+  - "traefik.metrics.prometheus=true"
+```
+
+## Prometheus কীভাবে ডেটা সংগ্রহ করে?
+
+- Traefik `/metrics` এন্ডপয়েন্টে মেট্রিকস এক্সপোজ করে।
+- Prometheus সার্ভার সেই এন্ডপয়েন্ট থেকে নির্দিষ্ট সময় পরপর ডেটা স্ক্র্যাপ করে।
+- মেট্রিকস: রিকোয়েস্ট কাউন্ট, রেসপন্স টাইম, এরর রেট, ইত্যাদি।
+
+### Prometheus Config Example
+
+```yaml
+scrape_configs:
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8080']
+```
+
+## Grafana দিয়ে ডেটা ভিজ্যুয়ালাইজেশন
+
+- Grafana-তে Prometheus Data Source যোগ করুন।
+- Traefik-এর জন্য রেডি-মেড ড্যাশবোর্ড আছে (Grafana.com-এ)।
+- কাস্টম ড্যাশবোর্ডও বানানো যায়: রিকোয়েস্ট গ্রাফ, এরর রেট, লোড, ইত্যাদি।
+
+### উদাহরণ: Netflix-এর মতো কোম্পানিতে
+- হাজার হাজার সার্ভিসের পারফরম্যান্স ট্র্যাক করতে Grafana ড্যাশবোর্ড ব্যবহার হয়।
+- অ্যালার্টিং: কোনো সার্ভিসে এরর বেড়ে গেলে ইমেইল/স্ল্যাক অ্যালার্ট যায়।
+
+## সহজ উদাহরণ ও অ্যানালজি
+
+- **Analogies:**
+    - Traefik হচ্ছে ট্রাফিক পুলিশ, আর Prometheus হচ্ছে সেই পুলিশের রিপোর্টিং সিস্টেম। Grafana সেই রিপোর্টগুলো সুন্দর গ্রাফে দেখায়।
+    - যেমন ব্যাংকে ট্রানজেকশন মনিটরিং হয়, তেমনি Traefik-এর মাধ্যমে API/ওয়েব রিকোয়েস্ট মনিটরিং করা যায়।
+
+## Common Pitfalls
+
+- **Scrape Interval বেশি ছোট হলে:** Prometheus সার্ভারে লোড বাড়ে।
+- **মেট্রিকস retention period কম হলে:** পুরনো ডেটা হারিয়ে যেতে পারে।
+- **Grafana ড্যাশবোর্ডে ভুল query:** ভুল ডেটা দেখাতে পারে।
+
+## Best Practices
+
+- **Label Properly:** EntryPoint, Router, Service অনুযায়ী লেবেল দিন।
+- **Alerting Setup করুন:** Critical মেট্রিকসের জন্য অ্যালার্ট কনফিগার করুন।
+- **Retention Policy ঠিক করুন:** কতদিন ডেটা রাখতে চান, সেটি নির্ধারণ করুন।
+- **ড্যাশবোর্ড শেয়ার করুন:** টিমের সবাই যেন দেখতে পারে।
+
+## Industry Trends
+
+- **Cloud-Native Monitoring:** Kubernetes, Docker, Microservices—সবখানে Prometheus ও Grafana স্ট্যান্ডার্ড।
+- **Distributed Tracing Integration:** Jaeger, Zipkin-এর মতো টুলের সাথে ইন্টিগ্রেশন বাড়ছে।
+- **AI-based Alerting:** অ্যানোমালি ডিটেকশন ও অটো-রেসপন্স ফিচার আসছে।
+
+## কখন ব্যবহার করবেন?
+
+- Production environment-এ সার্ভিসের health, performance, error rate, latency ট্র্যাক করতে।
+- SLA (Service Level Agreement) মনিটরিং ও রিপোর্টিংয়ের জন্য।
+- Capacity planning ও অটো-স্কেলিংয়ের জন্য।
+
+## উপসংহার
+
+Prometheus ও Grafana Integration দিয়ে Traefik-এর মনিটরিং ও অবজারভেবিলিটি অনেক সহজ ও শক্তিশালী হয়। সঠিকভাবে কনফিগার করলে, আপনার সার্ভিসের health, performance, ও security নিয়ে আর চিন্তা করতে হবে না।
+
+---
+
+**পরবর্তী পাঠ:** [Distributed Tracing (Jaeger, Zipkin, OpenTelemetry)](/traefik/tracing)

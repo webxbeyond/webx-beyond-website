@@ -1,0 +1,118 @@
+---
+title: "Host-based Routing (Subdomains, Wildcards)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Host-based Routing (Subdomains, Wildcards)
+
+## পরিচিতি
+
+Modern web architecture-এ একাধিক subdomain, app, বা tenant একসাথে চালাতে হয়। Host-based routing মানে—user কোন domain বা subdomain-এ request পাঠাচ্ছে, তার উপর ভিত্তি করে Traefik সেই request-কে নির্দিষ্ট backend-এ পাঠায়। এই পাঠে জানব, host-based routing কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Host-based Routing কী?
+
+- **Host-based Routing** হলো—request-এর Host header দেখে নির্দিষ্ট service-এ পাঠানো
+- উদাহরণ: `api.example.com`-এ গেলে API server, `blog.example.com`-এ গেলে blog app
+- Multi-tenant SaaS, microservices, বা multi-app platform-এ এটি must-have
+
+### Real-life Use Case
+Google, Netflix—`mail.google.com`, `drive.google.com`-এর মতো subdomain-এ আলাদা service চালায়
+
+---
+
+## Traefik-এ Host-based Routing কিভাবে কাজ করে?
+
+Traefik-এর router config-এ "rule" define করতে হয়—যেখানে Host match করলে কোন service-এ request যাবে
+
+### YAML Config Example
+
+```yaml
+http:
+  routers:
+    api-router:
+      rule: "Host(`api.example.com`)"
+      service: api-service
+      entryPoints:
+        - web
+    blog-router:
+      rule: "Host(`blog.example.com`)"
+      service: blog-service
+      entryPoints:
+        - web
+```
+
+- **Host:** নির্দিষ্ট domain/subdomain match করলে
+- **service:** কোন backend-এ request যাবে
+
+### Docker Labels Example
+
+```yaml
+labels:
+  - "traefik.http.routers.api-router.rule=Host(`api.example.com`)"
+  - "traefik.http.routers.api-router.service=api-service"
+  - "traefik.http.routers.blog-router.rule=Host(`blog.example.com`)"
+  - "traefik.http.routers.blog-router.service=blog-service"
+```
+
+---
+
+## Wildcard Subdomain Routing
+```
+- Wildcard দিয়ে multiple subdomain match করা যায়—যেমন `*.example.com`
+- Rule: `HostRegexp(`{subdomain:[a-z]+}.example.com`)`
+```
+
+### Example
+
+```yaml
+http:
+  routers:
+    tenant-router:
+      rule: "HostRegexp(`{tenant:[a-z]+}.example.com`)"
+      service: tenant-service
+      entryPoints:
+        - web
+```
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **DNS config ভুল:** Subdomain pointing না করলে routing কাজ করবে না
+- **Rule overlap:** Multiple host rule থাকলে ভুল service-এ request যেতে পারে
+- **Wildcard overuse:** Security risk—unintended subdomain serve হতে পারে
+
+---
+
+## Best Practices
+
+- Specific host rule আগে define করুন—priority ঠিক রাখুন
+- Wildcard ব্যবহার করলে security validate করুন
+- DNS config ও SSL certificate ঠিক রাখুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- SaaS platform—host-based routing দিয়ে tenant isolation
+- API gateway—multiple domain/subdomain serve
+- Cloud-native app—wildcard subdomain automation
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Host-based routing** হলো—"বড় অফিস বিল্ডিং-এর reception"—কোন visitor কোন company-তে যাবে, তা ঠিক করে দেয়
+
+---
+
+## Conclusion
+
+Host-based routing দিয়ে Traefik-এ একাধিক subdomain, tenant, বা app সহজে চালানো যায়। Proper rule, DNS config, এবং security validation—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Regex ও জটিল রুলস](/traefik/regex-routing)

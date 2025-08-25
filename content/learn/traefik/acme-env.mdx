@@ -1,0 +1,103 @@
+---
+title: "Staging বনাম Production সার্টিফিকেট (ACME Env)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Staging বনাম Production সার্টিফিকেট (ACME Env)
+
+## পরিচিতি
+
+Traefik-এ HTTPS সক্রিয় করতে Let's Encrypt-এর ACME (Automatic Certificate Management Environment) ব্যবহার করা হয়। কিন্তু সরাসরি Production সার্টিফিকেট নিয়ে কাজ শুরু করলে অনেক সময় ভুল, rate limit, বা misconfiguration-এর কারণে সমস্যা হয়। এজন্য Let's Encrypt দুই ধরনের environment দেয়—Staging ও Production। এই পাঠে আমরা জানব, কখন কোনটি ব্যবহার করবেন, কেন staging environment গুরুত্বপূর্ণ, এবং best practices কী।
+
+---
+
+## Staging Environment: পরীক্ষার জন্য নিরাপদ
+
+- **Staging Environment** হলো Let's Encrypt-এর test server, যেখানে আপনি certificate issue, renew, revoke—সবকিছু পরীক্ষা করতে পারেন।
+- এখানে "fake" (অপ্রকৃত) certificate দেওয়া হয়, যা browser-এ trusted নয়, কিন্তু configuration validate করার জন্য পারফেক্ট।
+- **Rate Limit** অনেক বেশি, তাই বারবার test করতে পারবেন—production-এর মতো block হবে না।
+
+### কখন ব্যবহার করবেন?
+- নতুন Traefik setup বা config পরিবর্তন করার সময়
+- Automation script, CI/CD pipeline, বা নতুন app deploy করার আগে
+- Certificate issue/renewal process validate করার জন্য
+
+### উদাহরণ:
+Netflix-এর মতো বড় কোম্পানি production-এ deploy করার আগে সবকিছু staging-এ automate করে test করে। এতে downtime বা security issue কমে যায়।
+
+---
+
+## Production Environment: লাইভ সার্ভিসের জন্য
+
+- **Production Environment** হলো Let's Encrypt-এর "real" server, যেখানে trusted certificate issue হয়।
+- এই certificate browser-এ trusted, user data secure থাকে।
+- **Rate Limit** কম, তাই ভুল করলে block হতে পারেন—বিশেষ করে automation-এ।
+
+### কখন ব্যবহার করবেন?
+- সবকিছু staging-এ test করে নিশ্চিত হলে
+- লাইভ user-facing app বা API deploy করার সময়
+- Security-critical environment (e.g., payment gateway, healthcare app)
+
+### উদাহরণ:
+Uber-এর মতো কোম্পানি staging-এ test করে, তারপর production-এ certificate issue করে। এতে user trust ও security বজায় থাকে।
+
+---
+
+## Traefik-এ কিভাবে ACME Env সেট করবেন?
+
+```yaml
+# traefik.yml
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "your@email.com"
+      storage: "acme.json"
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory" # Staging
+      # Production হলে caServer লাইনটি বাদ দিন বা
+      # "https://acme-v02.api.letsencrypt.org/directory" ব্যবহার করুন
+```
+
+- **Staging:** `caServer`-এ staging URL দিন
+- **Production:** `caServer` বাদ দিন বা production URL দিন
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Staging certificate দিয়ে production চালানো:** User browser-এ warning দেখাবে
+- **Production-এ বারবার test:** Rate limit-এ block হতে পারেন
+- **Config ভুল:** Automation-এ ভুল certificate issue হতে পারে
+
+---
+
+## Best Practices
+
+- প্রথমে সবকিছু staging-এ test করুন
+- Automation script বা CI/CD pipeline-এ staging ব্যবহার করুন
+- Production-এ deploy করার আগে config, logs, এবং certificate validate করুন
+- Rate limit monitor করুন—Let's Encrypt documentation দেখুন
+
+---
+
+## Industry Trends
+
+- Modern DevOps workflow-এ staging environment must-have
+- Automated deployment pipeline-এ staging certificate দিয়ে test, তারপর production
+- Security audit-এ staging log review করা হয়
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Staging certificate** হলো rehearsal—মঞ্চে practice, audience নেই
+- **Production certificate** হলো live show—audience আছে, ভুল করলে reputation যাবে
+
+---
+
+## Conclusion
+
+Staging বনাম Production সার্টিফিকেট ব্যবহারে সচেতনতা আপনাকে downtime, security issue, এবং rate limit problem থেকে রক্ষা করবে। Traefik-এ HTTPS automation করতে চাইলে, আগে staging-এ test করুন, তারপর production-এ deploy করুন—এটাই industry best practice।
+
+---
+
+**পরবর্তী পাঠ:** [HTTP → HTTPS রিডাইরেকশন](/traefik/https-redirect)

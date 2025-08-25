@@ -1,0 +1,84 @@
+---
+title: "Routing Issues Debugging"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Routing Issues Debugging: Traefik-এ সমস্যা সমাধানের কৌশল
+
+## পরিচিতি
+
+Traefik-এ Routing সমস্যা—যেমন ভুল রাউট, 404, SSL Error, Middleware Conflict—ডিবাগ করা অনেক সময় চ্যালেঞ্জিং। এই পাঠে জানব, কীভাবে Routing Issues দ্রুত ও কার্যকরভাবে ডিবাগ করবেন, এবং সিস্টেমকে আরও রিলায়েবল করবেন।
+
+## কেন Routing Debugging গুরুত্বপূর্ণ?
+
+- ইউজার Experience: ভুল রাউট, ডাউনটাইম, Error
+- Security: ভুল রাউটিং-এ Sensitive Data Leak
+- Scalability: Multi-app, Multi-domain, Complex Routing
+
+## Core Concepts
+
+### ১. Traefik Dashboard & Logs
+- Dashboard-এ Router, Service, Middleware Status দেখুন
+- Access Logs, Error Logs, Request Path, Response Code
+- Real-time Monitoring
+
+### ২. Rule Validation
+- Routing Rule (Host, Path, Regex) স্পষ্টভাবে লিখুন
+- Traefik Config File, Docker Label, Kubernetes YAML—সবকিছু চেক করুন
+- Typo, Case Sensitivity, Wildcard Issue
+
+### ৩. Middleware Conflict
+- একাধিক Middleware একসাথে ব্যবহার করলে Conflict হতে পারে
+- Priority, Chain, Order—সবকিছু চেক করুন
+
+### ৪. SSL/TLS Issues
+- Certificate Expired, Wrong Domain, HTTP→HTTPS Redirect
+- Dashboard ও Logs-এ SSL Error দেখুন
+
+### ৫. Service Discovery & Health
+- Service Down, Wrong Port, Network Issue
+- Traefik Health Check, Service Status
+
+### ৬. Debugging Tools
+- Traefik Dashboard, curl, Postman, Browser DevTools
+- Request Path, Header, Response Code চেক করুন
+
+## বাস্তব উদাহরণ
+
+- **E-commerce:** 404 Error, Wrong Routing Rule, Middleware Conflict
+- **SaaS Provider:** Multi-domain Routing, SSL Issue
+- **DevOps:** Health Check, Service Down, Real-time Debugging
+
+## Analogies
+
+- Routing Debugging মানে—বড় রাস্তার জ্যাম, কোথায় সমস্যা, কোন রাস্তায় Block, সবকিছু খুঁজে বের করা
+- Dashboard হলো—Google Map, সবকিছু এক নজরে দেখা যায়
+
+## Common Pitfalls
+
+- Logs না দেখলে Root Cause ধরা পড়ে না
+- Routing Rule Typo, Case Sensitivity Issue
+- Middleware Priority ভুল হলে Conflict
+- SSL Expired, Wrong Domain
+
+## Best Practices
+
+- Dashboard ও Logs Always Check করুন
+- Routing Rule স্পষ্ট ও Simple রাখুন
+- Middleware Chain ও Priority ভালোভাবে কনফিগার করুন
+- SSL/TLS Always On, Certificate Validity চেক করুন
+- Documentation ও Automated Testing
+
+## Industry Trends
+
+- Automated Debugging Tool, Real-time Monitoring
+- AI-driven Root Cause Analysis
+- Self-healing Routing Policy
+
+## উপসংহার
+
+Traefik-এ Routing Issues Debugging করলে, আপনার সিস্টেম হবে আরও রিলায়েবল, স্কেলেবল, ও ইউজার-ফ্রেন্ডলি। বড় SaaS, E-commerce, DevOps টিম—সবাই Debugging-এ গুরুত্ব দেয়। আপনার অ্যাপের স্কেল, Routing Complexity, ও Security অনুযায়ী Debugging Strategy ডিজাইন করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Logs & Tracing Analysis](/traefik/log-tracing)

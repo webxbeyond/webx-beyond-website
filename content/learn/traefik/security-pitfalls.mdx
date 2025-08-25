@@ -1,0 +1,83 @@
+---
+title: "Security Pitfalls এড়ানো"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Security Pitfalls এড়ানো: Traefik-এ নিরাপত্তা ঝুঁকি ও সমাধান
+
+## পরিচিতি
+
+Traefik-এ Security Pitfalls মানে—নানাভাবে সিস্টেমে নিরাপত্তা দুর্বলতা, ভুল কনফিগারেশন, ও Human Error। এই পাঠে জানব, কীভাবে সাধারণ Security Pitfalls এড়ানো যায় এবং সিস্টেমকে আরও নিরাপদ রাখা যায়।
+
+## কেন Security Pitfalls গুরুত্বপূর্ণ?
+
+- Sensitive Data Leak, Unauthorized Access
+- Compliance Violation (GDPR, PCI-DSS, HIPAA)
+- DDoS Attack, Service Disruption
+
+## Core Concepts
+
+### ১. SSL/TLS Misconfiguration
+- Certificate Expired, Wrong Domain, HTTP→HTTPS Redirect না থাকা
+- Always-on SSL/TLS, Certificate Validity চেক করুন
+
+### ২. Weak Authentication & Authorization
+- Default Password, No RBAC, No API Auth
+- Strong Password, RBAC, API Endpoint Auth চালু রাখুন
+
+### ৩. Middleware Misuse
+- Rate Limiting, IP Whitelist, Secure Headers না থাকলে Vulnerability
+- Middleware স্পষ্টভাবে কনফিগার করুন
+
+### ৪. Logging & Monitoring না থাকা
+- Suspicious Activity, Error, Attack ধরতে না পারা
+- Access/Error Logs, Real-time Monitoring চালু রাখুন
+
+### ৫. Outdated Software & Patch Management
+- Vulnerability Exploit, Security Patch না থাকলে Risk
+- Traefik ও Dependencies আপডেট রাখুন
+
+### ৬. Firewall & Network Policy
+- Public IP Open, Weak Firewall Rule
+- Firewall Rule স্পষ্টভাবে লিখুন, Only Required Port Allow
+
+## বাস্তব উদাহরণ
+
+- **E-commerce:** SSL Expired, API Auth না থাকা, DDoS Attack
+- **Healthcare:** Data Leak, Compliance Violation
+- **SaaS Provider:** Middleware Misuse, Logging না থাকা
+
+## Analogies
+
+- Security Pitfalls মানে—বাড়ির দরজা-জানালা খোলা রেখে বাইরে যাওয়া
+- Middleware হলো—বাড়ির তালা, সঠিকভাবে লাগানো না হলে চুরি হতে পারে
+
+## Common Pitfalls
+
+- SSL/TLS না থাকলে Data Intercept
+- Weak Password, No RBAC
+- Middleware Misuse, Logging না থাকা
+- Outdated Software, Weak Firewall
+
+## Best Practices
+
+- SSL/TLS Always On, Certificate Validity চেক করুন
+- Strong Authentication, RBAC, API Auth
+- Middleware (Rate Limit, IP Whitelist, Secure Headers) চালু রাখুন
+- Logging, Monitoring, Patch Management
+- Firewall Rule স্পষ্টভাবে লিখুন
+- Documentation ও Security Audit
+
+## Industry Trends
+
+- Automated Security Policy Management
+- Real-time Threat Detection & Response
+- Compliance Automation
+
+## উপসংহার
+
+Traefik-এ Security Pitfalls এড়াতে, আপনার সিস্টেম হবে আরও নিরাপদ, রিলায়েবল, ও কম Vulnerable। বড় SaaS, E-commerce, Healthcare—সবাই Security-তে গুরুত্ব দেয়। আপনার অ্যাপের স্কেল, Data Sensitivity, ও Compliance অনুযায়ী Security Strategy ডিজাইন করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Migration: Nginx → Traefik](/traefik/migration)

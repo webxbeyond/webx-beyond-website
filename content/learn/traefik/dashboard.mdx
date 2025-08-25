@@ -1,0 +1,97 @@
+---
+title: "Traefik Dashboard Overview"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Traefik Dashboard Overview
+
+## পরিচিতি
+
+Modern system design-এ observability মানে—app/server কীভাবে চলছে, কোথায় bottleneck, কোথায় error—সবকিছু real-time-এ দেখা। Traefik-এর dashboard হলো—live control panel, যেখানে routing, middleware, service status, ও health check দেখা যায়। এই পাঠে জানব, Traefik dashboard কী, কেন দরকার, কীভাবে ব্যবহার করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Dashboard কী?
+
+- **Traefik Dashboard**—web-based UI, যেখানে router, service, middleware, ও entrypoint status দেখা যায়
+- Real-time monitoring, troubleshooting, ও config validation-এ must-have
+
+### Real-life Use Case
+Netflix—API gateway-এ dashboard দিয়ে traffic flow, error, ও health check monitor করে
+
+---
+
+## Dashboard Features
+
+- **Routers:** কোন rule, কোন service-এ traffic যাচ্ছে
+- **Services:** backend server status, load balancing
+- **Middlewares:** কোন middleware active, order
+- **EntryPoints:** কোন port/endpoint active
+- **Health Checks:** service status, error, latency
+- **Logs:** request/response log, error trace
+
+---
+
+## Dashboard Setup
+
+Traefik config-এ dashboard enable করতে হয়
+
+### YAML Config Example
+
+```yaml
+api:
+  dashboard: true
+entryPoints:
+  traefik:
+    address: ":8080"
+```
+
+- **dashboard:** true—dashboard enable
+- **entryPoints:** dashboard port (default: 8080)
+
+---
+
+## Accessing the Dashboard
+
+- Browser-এ `http://localhost:8080/dashboard/`—dashboard UI
+- Production-এ secure access (auth middleware) enforce করুন
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Dashboard expose:** Public access দিলে security risk
+- **Config miss:** Dashboard enable না করলে UI আসবে না
+- **Monitoring miss:** Dashboard না দেখলে error/bottleneck detect হবে না
+
+---
+
+## Best Practices
+
+- Production-এ dashboard access restrict করুন (auth middleware)
+- Regularly dashboard monitor করুন—routing, error, latency
+- Config change/staging-এ dashboard validate করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—dashboard-based monitoring default
+- API gateway—dashboard দিয়ে traffic flow ও error trace
+- SaaS platform—dashboard-based health check
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Dashboard**—"airplane cockpit"—pilot real-time-এ সবকিছু দেখে control করে
+
+---
+
+## Conclusion
+
+Traefik dashboard দিয়ে app/server-এর routing, middleware, ও service status live monitor করা যায়। Proper setup, secure access, এবং regular monitoring—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Logs & Access Logs](/traefik/logs)

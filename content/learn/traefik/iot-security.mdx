@@ -1,0 +1,81 @@
+---
+title: "IoT Services (MQTT, TCP) Secure করা"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# IoT Services (MQTT, TCP) Secure করা: Traefik দিয়ে নিরাপদ ও স্কেলেবল IoT Deployment
+
+## পরিচিতি
+
+IoT (Internet of Things) অ্যাপ্লিকেশন—যেমন সেন্সর, স্মার্ট ডিভাইস, রিয়েল-টাইম ডেটা—বেশিরভাগ সময় MQTT ও TCP প্রোটোকল ব্যবহার করে। Traefik দিয়ে IoT Services নিরাপদ, স্কেলেবল, ও ম্যানেজেবলভাবে চালানো যায়। এই পাঠে জানব, কীভাবে Traefik দিয়ে IoT Services (MQTT, TCP) Secure করবেন।
+
+## কেন IoT Security গুরুত্বপূর্ণ?
+
+- Sensitive Data: সেন্সর, ডিভাইস, ইউজার ডেটা
+- Unauthorized Access, Data Breach, DDoS Attack
+- Compliance (GDPR, HIPAA, Industry Standards)
+
+## Core Concepts
+
+### ১. TCP/MQTT Routing
+- Traefik-এ TCP ও MQTT Service Routing
+- EntryPoint, Router, Service—সবকিছু কনফিগার করুন
+- উদাহরণ: `EntryPoints: mqtt`, `Router: HostSNI`, `Service: TCP`
+
+### ২. SSL/TLS Encryption
+- TCP/MQTT Communication-এ SSL/TLS চালু রাখুন
+- Let's Encrypt বা Custom Certificate
+- Data-in-transit Encryption
+
+### ৩. Authentication & Authorization
+- MQTT Broker-এ User Auth, ACL
+- Traefik Middleware দিয়ে IP Whitelist, Rate Limiting
+- Sensitive Endpoint-এ RBAC
+
+### ৪. Monitoring & Logging
+- Access Logs, Error Logs, Metrics—প্রতিটি সার্ভিসের জন্য
+- Real-time Dashboard, Alerting
+
+### ৫. DDoS Protection & Rate Limiting
+- Suspicious Traffic ব্লক করুন
+- Rate Limit Middleware
+- Automated Alerting
+
+## বাস্তব উদাহরণ
+
+- **Smart Home:** Sensor Data MQTT, Secure Routing
+- **Industrial IoT:** TCP Device Communication, SSL/TLS, Monitoring
+- **Healthcare IoT:** Sensitive Data, Compliance Logging
+
+## Analogies
+
+- IoT Security মানে—বাড়ির দরজা-জানালা, তালা, সিসিটিভি—সবকিছু ঠিকঠাক রাখা
+- TCP/MQTT Routing হলো—বিভিন্ন রুমে আলাদা প্রবেশপথ, নিরাপত্তা নিশ্চিত
+
+## Common Pitfalls
+
+- SSL/TLS না থাকলে Data Intercept হতে পারে
+- Weak Authentication: Default Password, No ACL
+- Monitoring না থাকলে Suspicious Activity ধরা পড়ে না
+
+## Best Practices
+
+- Always-on SSL/TLS
+- Strong Authentication & ACL
+- Rate Limiting ও IP Restriction
+- Monitoring ও Logging
+- Automated Updates ও Patch Management
+
+## Industry Trends
+
+- Edge Computing, Secure IoT Gateway
+- Automated Security Policy Management
+- Real-time Threat Detection & Response
+
+## উপসংহার
+
+Traefik দিয়ে IoT Services (MQTT, TCP) Secure করলে, আপনার IoT Platform হবে আরও নিরাপদ, স্কেলেবল, ও রিলায়েবল। Smart Home, Industrial IoT, Healthcare—সবই এই প্রযুক্তি ব্যবহার করে। আপনার IoT অ্যাপের স্কেল, Data Sensitivity, ও Compliance অনুযায়ী Security Design করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Traefik + Cloudflare Tunnel Integration](/traefik/cloudflare)

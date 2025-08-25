@@ -1,0 +1,101 @@
+---
+title: "Logs & Access Logs"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Logs & Access Logs
+
+## পরিচিতি
+
+Modern system design-এ logs মানে—app/server-এর "black box recorder"। Traefik-এর logs ও access logs দিয়ে request flow, error, latency, ও security event track করা যায়। এই পাঠে জানব, logs/access logs কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Logs ও Access Logs কী?
+
+- **Logs:** Traefik-এর internal event, error, warning, ও info message
+- **Access Logs:** প্রতিটি incoming request-এর details—source IP, path, response code, latency
+- Debugging, monitoring, ও security audit-এ must-have
+
+### Real-life Use Case
+Netflix—API gateway-এ logs/access logs দিয়ে traffic flow, error, ও abuse detect করে
+
+---
+
+## Logs Setup
+
+Traefik config-এ logs enable ও customize করা যায়
+
+### YAML Config Example
+
+```yaml
+log:
+  level: INFO
+  filePath: "/var/log/traefik.log"
+accessLog:
+  filePath: "/var/log/access.log"
+  bufferingSize: 100
+```
+
+- **level:** log detail—DEBUG, INFO, WARN, ERROR
+- **filePath:** log file location
+- **bufferingSize:** access log buffer
+
+---
+
+## Access Log Fields
+
+- **Client IP:** কে request পাঠিয়েছে
+- **Request Path:** কোন path-এ request গেছে
+- **Response Code:** success/fail status
+- **Latency:** response time
+- **User Agent:** browser/device info
+
+---
+
+## Log Analysis
+
+- Error/debug trace—bug fix, performance tuning
+- Security audit—abuse, attack detect
+- Traffic monitoring—load, bottleneck, latency
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Log disable:** Debugging/security audit কঠিন
+- **File size:** Log file বড় হলে disk full
+- **Sensitive info leak:** Access log-এ sensitive data না রাখুন
+
+---
+
+## Best Practices
+
+- Log level logically define করুন—production-এ INFO/WARN, debug-এ DEBUG
+- Log rotation/setup monitoring করুন—disk full এড়াতে
+- Sensitive info log-এ না রাখুন
+- Regularly log review করুন—error/security event detect করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—centralized log management (ELK, Loki)
+- API gateway—access log-based security audit
+- SaaS platform—real-time log analysis
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Logs/access logs**—"airplane black box"—flight-এর সব event record করে
+
+---
+
+## Conclusion
+
+Traefik-এর logs ও access logs দিয়ে app/server-এর request flow, error, ও security event track করা যায়। Proper setup, monitoring, ও regular review—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Prometheus ও Grafana Integration](/traefik/metrics-prometheus)

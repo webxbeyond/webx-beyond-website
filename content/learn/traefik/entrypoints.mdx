@@ -1,0 +1,128 @@
+---
+title: EntryPoints (HTTP, HTTPS, TCP, UDP)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# EntryPoints: HTTP, HTTPS, TCP, UDP — Traefik-এর দরজা
+
+## পরিচিতি
+
+Traefik-এর EntryPoints হচ্ছে সেই "দরজা" যেখানে বাইরের রিকোয়েস্ট প্রথমে আসে। EntryPoints ঠিকভাবে কনফিগার করলে আপনি একাধিক প্রোটোকল (HTTP, HTTPS, TCP, UDP) সাপোর্ট করতে পারবেন, সিকিউরিটি ও পারফরম্যান্স নিশ্চিত করতে পারবেন।
+
+---
+
+## ১. EntryPoints কী?
+
+- EntryPoint মানে—Traefik-এর network port, যেখানে বাইরের রিকোয়েস্ট ঢোকে।
+- প্রতিটি EntryPoint আলাদা port ও protocol (HTTP, HTTPS, TCP, UDP) সাপোর্ট করে।
+- EntryPoint-এ TLS/SSL, middleware, custom config অ্যাপ্লাই করা যায়।
+
+### সহজ উদাহরণ: স্কুলের গেট
+
+যেমন স্কুলে ঢোকার জন্য আলাদা গেট থাকে—ছাত্র, শিক্ষক, অতিথি—Traefik-এ EntryPoint মানে, আলাদা দরজা যেখান দিয়ে রিকোয়েস্ট ঢোকে।
+
+---
+
+## ২. HTTP EntryPoint
+
+- সবচেয়ে সাধারণ EntryPoint
+- Port 80-এ চলে
+- ওয়েব অ্যাপ, API, static site—সব HTTP EntryPoint দিয়ে অ্যাক্সেস হয়
+
+### বাস্তব উদাহরণ
+- Public website, REST API
+
+---
+
+## ৩. HTTPS EntryPoint
+
+- Secure HTTP—TLS/SSL দিয়ে এনক্রিপ্টেড
+- Port 443-এ চলে
+- Sensitive data, authentication, payment gateway—সব HTTPS EntryPoint দিয়ে
+
+### কেন গুরুত্বপূর্ণ?
+- Data encryption
+- User authentication
+- Compliance (GDPR, PCI)
+
+### বাস্তব উদাহরণ
+- Banking app, e-commerce site
+
+---
+
+## ৪. TCP EntryPoint
+
+- Non-HTTP protocol—for example, database, MQTT, custom app
+- Port customizable (3306 for MySQL, 1883 for MQTT)
+- Traefik TCP EntryPoint দিয়ে TCP traffic handle করে
+
+### বাস্তব উদাহরণ
+- Database proxy, IoT device communication
+
+---
+
+## ৫. UDP EntryPoint
+
+- Real-time, low-latency protocol—for example, DNS, VoIP, gaming
+- Port customizable (53 for DNS, 5060 for SIP)
+- Traefik UDP EntryPoint দিয়ে UDP traffic handle করে
+
+### বাস্তব উদাহরণ
+- DNS server, online gaming
+
+---
+
+## ৬. EntryPoints কনফিগারেশন
+
+### Static config (traefik.yml):
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: myresolver
+  mysql:
+    address: ":3306"
+  dns:
+    address: ":53/udp"
+```
+
+### Docker/Kubernetes label/annotation:
+- Docker container label: `traefik.http.routers.myapp.entrypoints=websecure`
+- Kubernetes annotation: `traefik.ingress.kubernetes.io/router.entrypoints: websecure`
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **HTTP:** Public web, API, static site
+- **HTTPS:** Secure app, authentication, payment
+- **TCP:** Database, custom protocol
+- **UDP:** DNS, gaming, VoIP
+
+## কমন পিটফল
+
+- EntryPoint port ভুল হলে রিকোয়েস্ট আসবে না
+- TLS/SSL config ভুল হলে HTTPS inaccessible
+- TCP/UDP EntryPoint না থাকলে non-HTTP traffic handle হবে না
+
+## বেস্ট প্র্যাকটিস
+
+- HTTPS/TLS এনাবল করুন
+- Port conflict এড়িয়ে চলুন
+- EntryPoint config version control-এ রাখুন
+- Docker/Kubernetes label/annotation ঠিকভাবে ব্যবহার করুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Multi-protocol support—HTTP, HTTPS, TCP, UDP
+- Automation—EntryPoint config dynamic provider দিয়ে
+- Security—TLS/SSL everywhere
+
+## উপসংহার
+
+Traefik-এর EntryPoints—HTTP, HTTPS, TCP, UDP—production-ready, scalable, ও secure রিভার্স প্রক্সি প্ল্যাটফর্মের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা Routers: রুলস ও প্রায়োরিটি নিয়ে বিস্তারিতভাবে দেখব।

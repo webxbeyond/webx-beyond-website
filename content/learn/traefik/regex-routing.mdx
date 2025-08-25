@@ -1,0 +1,105 @@
+---
+title: "Regex ও জটিল রুলস"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Regex ও জটিল রুলস
+
+## পরিচিতি
+
+Simple path বা host-based routing সবসময় যথেষ্ট নয়—complex app-এ advanced matching দরকার হয়। Traefik-এ regex (Regular Expression) দিয়ে জটিল rule define করা যায়, যাতে flexible ও powerful routing সম্ভব হয়। এই পাঠে জানব, regex-based routing কী, কখন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Regex-based Routing কী?
+
+- **Regex-based Routing** মানে—URL, path, বা host-এর উপর complex pattern match করে request route করা
+- উদাহরণ: `/api/v[0-9]+/users`—যে কোনো version-এর API match করবে
+- Multi-version API, dynamic tenant, বা custom rule-এ এটি must-have
+
+### Real-life Use Case
+Netflix, Uber—multiple API version, dynamic tenant, বা custom endpoint serve করতে regex-based rule ব্যবহার করে
+
+---
+
+## Traefik-এ Regex-based Routing কিভাবে কাজ করে?
+
+Traefik-এর router config-এ "rule" define করতে হয়—যেখানে PathRegexp বা HostRegexp দিয়ে pattern match করা হয়
+
+### YAML Config Example
+
+```yaml
+http:
+  routers:
+    api-v-router:
+      rule: "PathRegexp(`/api/v[0-9]+/users`)"
+      service: api-v-service
+      entryPoints:
+        - web
+    tenant-router:
+      rule: "HostRegexp(`{tenant:[a-z]+}.example.com`)"
+      service: tenant-service
+      entryPoints:
+        - web
+```
+
+- **PathRegexp:** path-এর উপর regex match
+- **HostRegexp:** host/subdomain-এর উপর regex match
+
+### Docker Labels Example
+
+```yaml
+labels:
+  - "traefik.http.routers.api-v-router.rule=PathRegexp(`/api/v[0-9]+/users`)"
+  - "traefik.http.routers.api-v-router.service=api-v-service"
+  - "traefik.http.routers.tenant-router.rule=HostRegexp(`{tenant:[a-z]+}.example.com`)"
+  - "traefik.http.routers.tenant-router.service=tenant-service"
+```
+
+---
+
+## Advanced Matching
+
+- Multiple condition combine করা যায়—AND/OR logic
+- Example: `PathRegexp(`/api/v[0-9]+/users`) && Host(`api.example.com`)`
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Regex ভুল:** Pattern match না হলে request drop হবে
+- **Complexity:** Overly complex regex performance slow করতে পারে
+- **Debugging:** Regex bug খুঁজে পাওয়া কঠিন
+
+---
+
+## Best Practices
+
+- Simple ও readable regex ব্যবহার করুন
+- Complex rule হলে comment দিয়ে explain করুন
+- Config change/staging-এ test করুন
+- Logs দেখে routing validate করুন
+
+---
+
+## Industry Trends
+
+- API gateway—multi-version, dynamic endpoint serve করতে regex-based rule
+- SaaS platform—dynamic tenant match করতে HostRegexp
+- Cloud-native app—advanced routing automation
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Regex-based routing** হলো—"airport security scanner"—specific pattern match করে pass/route করে
+
+---
+
+## Conclusion
+
+Regex ও জটিল রুলস দিয়ে Traefik-এ flexible, powerful, এবং automation-friendly routing করা যায়। Proper pattern, readable config, এবং staging-এ test—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [TCP/UDP Routing (Databases, MQTT)](/traefik/tcp-udp)

@@ -1,0 +1,176 @@
+---
+title: ট্র্যাফিক (Traefik) সিলেবাস
+icon: simple-icons:traefikproxy
+---
+
+## মডিউল ১: ট্র্যাফিক পরিচিতি  
+
+**লক্ষ্য:** ট্র্যাফিক কী, কেন ব্যবহার করা হয়, এবং এর আর্কিটেকচার বোঝা  
+
+### পাঠসমূহ:
+1. [ট্র্যাফিক কী ও কেন ব্যবহার করবেন](/traefik/what-is-traefik)  
+2. [ট্র্যাফিক বনাম Nginx / HAProxy / Envoy](/traefik/comparison)  
+3. [মূল ফিচার: ডাইনামিক রাউটিং, সার্ভিস ডিসকভারি, মিডলওয়্যার](/traefik/features)  
+4. [ইন্সটলেশন (Binary, Docker, Kubernetes)](/traefik/installation)  
+5. [আর্কিটেকচার: EntryPoints, Routers, Services, Providers](/traefik/architecture)  
+
+---
+
+## মডিউল ২: কোর কনসেপ্টস  
+
+**লক্ষ্য:** ট্র্যাফিকের মৌলিক কনফিগারেশন ও কম্পোনেন্ট শেখা  
+
+### পাঠসমূহ:
+1. [স্ট্যাটিক বনাম ডাইনামিক কনফিগারেশন](/traefik/static-vs-dynamic)  
+2. [EntryPoints (HTTP, HTTPS, TCP, UDP)](/traefik/entrypoints)  
+3. [Routers: রুলস ও প্রায়োরিটি](/traefik/routers)  
+4. [Services: লোড ব্যালেন্সিং স্ট্র্যাটেজি](/traefik/services)  
+5. [Middleware: রিকোয়েস্ট ও রেসপন্স পরিবর্তন](/traefik/middleware)  
+6. [হ্যান্ডস-অন: মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ](/traefik/reverse-proxy)  
+
+---
+
+## মডিউল ৩: ডিপ্লয়মেন্ট ফান্ডামেন্টালস  
+
+**লক্ষ্য:** ডকার ও ফাইল প্রোভাইডার ব্যবহার করে ট্র্যাফিক ডিপ্লয় করা  
+
+### পাঠসমূহ:
+1. [Docker কন্টেইনারে ট্র্যাফিক চালানো](/traefik/docker-deployment)  
+2. [File Provider কনফিগারেশন](/traefik/file-provider)  
+3. [Docker Provider দিয়ে ডাইনামিক কনফিগ](/traefik/docker-provider)  
+4. [ডকার লেবেল দিয়ে রাউটিং](/traefik/docker-labels)  
+5. [প্র্যাকটিক্যাল সেটআপ: মাল্টি-অ্যাপ সার্ভিসিং](/traefik/multi-app-setup)  
+
+---
+
+## মডিউল ৪: সিকিউরিটি ও HTTPS  
+
+**লক্ষ্য:** HTTPS সক্রিয় করা ও নিরাপত্তা মিডলওয়্যার ব্যবহার  
+
+### পাঠসমূহ:
+1. [Let's Encrypt (ACME) দিয়ে HTTPS](/traefik/https-letsencrypt)  
+2. [Staging বনাম Production সার্টিফিকেট](/traefik/acme-env)  
+3. [HTTP → HTTPS রিডাইরেকশন](/traefik/https-redirect)  
+4. [কাস্টম সার্টিফিকেট ব্যবহার](/traefik/custom-cert)  
+5. [সিকিউরিটি মিডলওয়্যার: Rate Limit, IP Whitelist, Headers](/traefik/security-middleware)  
+
+---
+
+## মডিউল ৫: অ্যাডভান্সড রাউটিং  
+
+**লক্ষ্য:** হোস্ট, পাথ, TCP/UDP ও অ্যাডভান্সড ম্যাচিং শেখা  
+
+### পাঠসমূহ:
+1. [Path-based Routing](/traefik/path-routing)  
+2. [Host-based Routing (Subdomains, Wildcards)](/traefik/host-routing)  
+3. [Regex ও জটিল রুলস](/traefik/regex-routing)  
+4. [TCP/UDP Routing (Databases, MQTT)](/traefik/tcp-udp)  
+5. [Weighted Load Balancing ও Canary Deployments](/traefik/canary)  
+6. [Blue/Green Deployment with Traefik](/traefik/blue-green)  
+
+---
+
+## মডিউল ৬: মিডলওয়্যার মাস্টারি  
+
+**লক্ষ্য:** বিল্ট-ইন ও কাস্টম মিডলওয়্যার আয়ত্ত করা  
+
+### পাঠসমূহ:
+1. [বিল্ট-ইন মিডলওয়্যার (Auth, Compression, Retry)](/traefik/builtin-middleware)  
+2. [চেইনড মিডলওয়্যার](/traefik/chained-middleware)  
+3. [অথেন্টিকেশন (Basic, Digest, ForwardAuth, OIDC)](/traefik/authentication)  
+4. [Rate Limiting ও Circuit Breaking](/traefik/rate-limit-circuit)  
+5. [Custom Headers দিয়ে Security & Performance](/traefik/custom-headers)  
+
+---
+
+## মডিউল ৭: মনিটরিং ও অবজারভেবিলিটি  
+
+**লক্ষ্য:** ড্যাশবোর্ড, লগস ও মেট্রিকস সেটআপ শেখা  
+
+### পাঠসমূহ:
+1. [Traefik Dashboard Overview](/traefik/dashboard)  
+2. [Logs & Access Logs](/traefik/logs)  
+3. [Prometheus ও Grafana Integration](/traefik/metrics-prometheus)  
+4. [Distributed Tracing (Jaeger, Zipkin, OpenTelemetry)](/traefik/tracing)  
+5. [Service Health Checks](/traefik/health-checks)  
+
+---
+
+## মডিউল ৮: স্কেলিং উইথ ট্র্যাফিক  
+
+**লক্ষ্য:** হাই এভেইলেবিলিটি ও ক্লাস্টার স্কেলিং শেখা  
+
+### পাঠসমূহ:
+1. [Load Balancing Strategies](/traefik/load-balancing)  
+2. [High Availability Setup](/traefik/ha-setup)  
+3. [Docker Swarm Integration](/traefik/docker-swarm)  
+4. [Kubernetes Scaling](/traefik/k8s-scali ng) 
+5. [Auto-discovery in Clusters](/traefik/auto-discovery)  
+
+---
+
+## মডিউল ৯: কুবেরনেটস ইন্টিগ্রেশন  
+
+**লক্ষ্য:** কুবেরনেটসে Traefik ব্যবহার করা  
+
+### পাঠসমূহ:
+1. [Traefik as Ingress Controller](/traefik/k8s-ingress)  
+2. [IngressRoute CRD বনাম Kubernetes Ingress](/traefik/ingress-crd)  
+3. [Kubernetes Middleware ব্যবহার](/traefik/k8s-middleware)  
+4. [Cert-Manager Integration](/traefik/cert-manager)  
+5. [Helm Chart দিয়ে ডিপ্লয়](/traefik/helm-deploy)  
+6. [Hands-on: মাইক্রোসার্ভিস অ্যাপ ডিপ্লয়মেন্ট](/traefik/k8s-microservices)  
+
+---
+
+## মডিউল ১০: এন্টারপ্রাইজ-গ্রেড ট্র্যাফিক  
+
+**লক্ষ্য:** ট্র্যাফিক এন্টারপ্রাইজ ফিচার আয়ত্ত করা  
+
+### পাঠসমূহ:
+1. [Traefik Enterprise বনাম OSS](/traefik/enterprise-vs-oss)  
+2. [API Gateway Use Cases](/traefik/api-gateway)  
+3. [Traefik Mesh (Service Mesh Mode)](/traefik/service-mesh)  
+4. [Hybrid Cloud ও Multi-Cluster Setup](/traefik/hybrid-multi)  
+5. [Security Hardening Best Practices](/traefik/security-hardening)  
+6. [CI/CD Integration (GitOps, ArgoCD, Flux)](/traefik/cicd)  
+
+---
+
+## মডিউল ১১: রিয়েল-ওয়ার্ল্ড প্রজেক্টস  
+
+**লক্ষ্য:** বাস্তব জীবনের অ্যাপ্লিকেশন ডিপ্লয়মেন্টে ট্র্যাফিক ব্যবহার  
+
+### পাঠসমূহ:
+1. [SaaS Multi-App with Subdomain Routing](/traefik/saas-routing)  
+2. [WordPress + Node.js + API Gateway Setup](/traefik/wordpress-node)  
+3. [Zero-Downtime Canary Release](/traefik/canary-project)  
+4. [IoT Services (MQTT, TCP) Secure করা](/traefik/iot-security)  
+5. [Traefik + Cloudflare Tunnel Integration](/traefik/cloudflare)  
+6. [Monitoring Stack (Prometheus + Grafana)](/traefik/monitoring-stack)  
+
+---
+
+## মডিউল ১২: ট্রাবলশুটিং ও বেস্ট প্র্যাকটিস  
+
+**লক্ষ্য:** সমস্যা সমাধান, টিউনিং ও মাইগ্রেশন কৌশল শেখা  
+
+### পাঠসমূহ:
+1. [Routing Issues Debugging](/traefik/debug-routing)  
+2. [Logs & Tracing Analysis](/traefik/log-tracing)  
+3. [Performance Tuning](/traefik/performance-tuning)  
+4. [Security Pitfalls এড়ানো](/traefik/security-pitfalls)  
+5. [Migration: Nginx → Traefik](/traefik/migration)  
+
+---
+
+## ক্যাপস্টোন প্রজেক্ট  
+
+**লক্ষ্য:** প্রোডাকশন-রেডি মাল্টি-সার্ভিস প্ল্যাটফর্ম তৈরি করা  
+
+### কাজসমূহ:
+[একাধিক অ্যাপ (Web, API, DB) ডিপ্লয়](/traefik/multi-app-deploy)  
+[HTTPS, Authentication ও Rate Limit সক্রিয় করা](/traefik/https-auth-ratelimit)  
+[Kubernetes-এ স্কেলিং](/traefik/k8s-scaling)  
+[Grafana দিয়ে মনিটরিং](/traefik/grafana-monitoring)  
+[GitOps-ভিত্তিক অটোমেটেড ডিপ্লয়মেন্ট](/traefik/gitops-automated-deploy)

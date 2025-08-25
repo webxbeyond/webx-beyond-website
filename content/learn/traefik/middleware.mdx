@@ -1,0 +1,106 @@
+---
+title: "Middleware: রিকোয়েস্ট ও রেসপন্স পরিবর্তন"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Traefik-এ কাস্টমাইজেশন ও সিকিউরিটি
+
+## পরিচিতি
+
+Traefik-এর Middleware হচ্ছে সেই "ফিল্টার" যা রিকোয়েস্ট ও রেসপন্সে কাস্টম লজিক, সিকিউরিটি, পারফরম্যান্স, এবং ইউজার এক্সপেরিয়েন্স নিশ্চিত করে। Middleware ঠিকভাবে বুঝলে আপনি authentication, rate limit, redirect, compression—সবকিছু সহজেই ম্যানেজ করতে পারবেন।
+
+---
+
+## ১. Middleware কী?
+
+- Middleware মানে—রিকোয়েস্ট/রেসপন্সে কাস্টম লজিক যোগ করা
+- Authentication, rate limit, redirect, header modification, compression—সব Middleware দিয়ে করা যায়
+- Router-এর সাথে Middleware অ্যাসাইন করা হয়
+
+### সহজ উদাহরণ: পানি ফিল্টার
+
+যেমন পানি পান করার আগে ফিল্টার দিয়ে পরিষ্কার করেন—Middleware ঠিক সেই কাজটাই করে, রিকোয়েস্ট/রেসপন্সে ফিল্টার, চেক, বা পরিবর্তন আনে।
+
+---
+
+## ২. Middleware-এর ধরন
+
+### সাধারণ Middleware
+1. **Authentication:** Basic, Digest, ForwardAuth, OIDC
+2. **Rate Limiting:** নির্দিষ্ট সময়/ইউজার/আইপি-তে রিকোয়েস্ট সংখ্যা সীমিত করা
+3. **Redirect:** HTTP → HTTPS, path-based redirect
+4. **Header Modification:** Custom header যোগ/পরিবর্তন
+5. **Compression:** Response compress করে পারফরম্যান্স বাড়ানো
+6. **Retry:** রিকোয়েস্ট fail হলে পুনরায় চেষ্টা
+
+### বাস্তব উদাহরণ
+- API gateway: authentication, rate limit
+- SaaS: custom header, redirect
+
+---
+
+## ৩. Middleware কনফিগারেশন
+
+### YAML/TOML (File Provider):
+```yaml
+http:
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "user:password"
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+    redirect-https:
+      redirectScheme:
+        scheme: https
+    compress:
+      compress: {}
+```
+
+### Docker label:
+```
+traefik.http.middlewares.auth.basicauth.users=user:password
+traefik.http.middlewares.ratelimit.ratelimit.average=100
+traefik.http.middlewares.redirect.redirectscheme.scheme=https
+```
+
+### Kubernetes annotation:
+```
+traefik.ingress.kubernetes.io/router.middlewares: "auth@file,ratelimit@file"
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- Security—authentication, rate limit
+- Performance—compression, retry
+- Customization—header modification, redirect
+
+## কমন পিটফল
+
+- Middleware miss করলে security/performance issue
+- Config ভুল হলে authentication bypass
+- Rate limit miss করলে abuse
+
+## বেস্ট প্র্যাকটিস
+
+- Sensitive path-এ authentication middleware ব্যবহার করুন
+- Rate limit ও retry middleware এনাবল করুন
+- Custom header ও redirect middleware ঠিকভাবে কনফিগার করুন
+- Config version control-এ রাখুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Advanced authentication—OIDC, ForwardAuth
+- Automation—dynamic middleware config
+- Security everywhere—middleware mandatory
+
+## উপসংহার
+
+Traefik-এর Middleware—রিকোয়েস্ট ও রেসপন্স পরিবর্তন—production-ready, secure, ও customizable অ্যাপ্লিকেশনের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা হ্যান্ডস-অন: মাল্টি-অ্যাপ রিভার্স প্রক্সি সেটআপ নিয়ে বিস্তারিতভাবে দেখব।

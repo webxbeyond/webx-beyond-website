@@ -1,0 +1,129 @@
+---
+title: "সিকিউরিটি মিডলওয়্যার: Rate Limit, IP Whitelist, Headers"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# সিকিউরিটি মিডলওয়্যার: Rate Limit, IP Whitelist, Headers
+
+## পরিচিতি
+
+Traefik-এর security middleware মানে—আপনার app-এর "security gatekeeper"। Middleware দিয়ে request limit, trusted IP filter, এবং security header enforce করা যায়। এই পাঠে জানব, কেন security middleware দরকার, কীভাবে Traefik-এ configure করবেন, এবং real-world example ও best practices।
+
+---
+
+## Rate Limit Middleware
+
+- **Rate Limit** হলো—একই IP বা user থেকে নির্দিষ্ট সময়ের মধ্যে কতগুলো request আসতে পারবে, তার সীমা নির্ধারণ করা।
+- DDoS (Distributed Denial of Service) বা brute-force attack থেকে app রক্ষা করতে এটি must-have।
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+```
+
+- **average:** প্রতি সেকেন্ডে কতটি request
+- **burst:** short time-এ কতটি extra request tolerate করবে
+
+### Real-life Use Case
+Netflix, Uber—API endpoint-এ rate limit enforce করে, যাতে automated abuse বা bot attack ঠেকানো যায়।
+
+---
+
+## IP Whitelist Middleware
+
+- **IP Whitelist** মানে—শুধু নির্দিষ্ট IP range থেকে request accept করা
+- Internal API, admin panel, বা sensitive service-এ এটি খুব গুরুত্বপূর্ণ
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    ip-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - "192.168.1.0/24"
+          - "10.0.0.0/8"
+```
+
+- **sourceRange:** যেসব IP থেকে request আসতে পারবে
+
+### Real-life Use Case
+Banking app, healthcare API—internal network ছাড়া অন্য IP থেকে request reject করে
+
+---
+
+## Headers Middleware
+
+- **Headers Middleware** দিয়ে security header add/modify করা যায়—যেমন HSTS, X-Frame-Options, Content-Security-Policy
+- Browser security, data leak, এবং clickjacking থেকে রক্ষা করতে এটি জরুরি
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        stsSeconds: 31536000
+        contentSecurityPolicy: "default-src 'self'"
+```
+
+- **frameDeny:** Clickjacking থেকে রক্ষা
+- **sslRedirect:** HTTP → HTTPS redirect
+- **stsSeconds:** HSTS (HTTP Strict Transport Security)
+- **contentSecurityPolicy:** Only trusted source থেকে content load
+
+### Real-life Use Case
+Google, Facebook—security header enforce করে, যাতে browser-level vulnerability minimize হয়
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Rate limit ভুল config:** Legitimate user block হতে পারে
+- **IP whitelist ভুল:** Admin নিজেই access করতে পারবে না
+- **Header miss:** Security vulnerability থেকে app exposed
+
+---
+
+## Best Practices
+
+- Rate limit value realistic রাখুন—user experience খারাপ না হয়
+- IP whitelist-এ emergency access IP add করুন
+- Security header industry standard অনুযায়ী enforce করুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Automated security audit—middleware config check করে
+- Cloud-native app-এ default-এ security middleware
+- API gateway—rate limit, IP filter, header enforce করা হয়
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Rate limit** হলো—"restaurant gatekeeper"—একসাথে বেশি লোক ঢুকতে দেয় না
+- **IP whitelist** হলো—"VIP list"—শুধু অনুমোদিত লোক ঢুকতে পারে
+- **Headers** হলো—"security signboard"—কীভাবে behave করতে হবে, তা বলে দেয়
+
+---
+
+## Conclusion
+
+Traefik-এর security middleware দিয়ে app, API, এবং user data নিরাপদ রাখা যায়। Rate limit, IP whitelist, এবং security header—সব modern app-এর জন্য must-have। Always best practice—proper config, staging-এ test, এবং industry standard follow করা।
+
+---
+
+**পরবর্তী পাঠ:** [Path-based Routing](/traefik/path-routing)

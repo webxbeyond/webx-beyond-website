@@ -1,0 +1,122 @@
+---
+title: "Routers: রুলস ও প্রায়োরিটি"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Traefik-এ রিকোয়েস্টের পথনির্দেশ
+
+## পরিচিতি
+
+Traefik-এর Routers হচ্ছে সেই "নির্দেশক" যা EntryPoint-এ আসা রিকোয়েস্টকে সঠিক সার্ভিসে পাঠায়। Routers-এর রুলস ও প্রায়োরিটি ঠিকভাবে বুঝলে আপনি কাস্টম রাউটিং, সিকিউরিটি, এবং পারফরম্যান্স সহজেই ম্যানেজ করতে পারবেন।
+
+---
+
+## ১. Router কী?
+
+- Router মানে—EntryPoint-এ আসা রিকোয়েস্ট কোন সার্ভিসে যাবে, সেটা ঠিক করে দেয়।
+- Host, Path, Header, Method—সবকিছু দিয়ে রিকোয়েস্ট ফিল্টার ও রাউট করা যায়।
+- Middleware অ্যাপ্লাই করা যায়, যেমন authentication, rate limit, redirect ইত্যাদি।
+
+### সহজ উদাহরণ: স্কুলের রিসেপশন
+
+যেমন রিসেপশনিস্ট ঠিক করে দেয়, কোন ছাত্র কোন ক্লাসে যাবে—Traefik-এর Router ঠিক সেই কাজটাই করে।
+
+---
+
+## ২. রুলস (Rules)
+
+### কী?
+
+- রুলস মানে—কোন Host, Path, Header, Method-এর রিকোয়েস্ট কোন সার্ভিসে যাবে, সেটা নির্ধারণ করা।
+- Traefik-এ রুলস YAML/TOML ফাইল, Docker label, Kubernetes annotation—সবকিছুতে লেখা যায়।
+
+### সাধারণ রুলস
+- Host: `Host(`api.example.com`)`
+- Path: `Path(`/login`)`
+- Method: `Method(`GET`)`
+- Header: `Headers(`X-Auth: true`)`
+- Combined: `Host(`api.example.com`) && Path(`/login`)`
+
+### বাস্তব উদাহরণ
+- SaaS: subdomain অনুযায়ী আলাদা সার্ভিসে রিকোয়েস্ট
+- API Gateway: path-based routing
+
+---
+
+## ৩. প্রায়োরিটি (Priority)
+
+### কী?
+
+- একাধিক রুল match করলে কোনটা আগে চলবে, সেটা নির্ধারণ করে প্রায়োরিটি।
+- Traefik-এ প্রায়োরিটি numeric value—বেশি value মানে বেশি প্রায়োরিটি।
+- Default: বেশি specific রুলের প্রায়োরিটি বেশি।
+
+### উদাহরণ
+- `/api/v1/*` vs `/api/*` — প্রথমটার প্রায়োরিটি বেশি
+- Custom priority: `priority: 10`
+
+### বাস্তব উদাহরণ
+- Multiple API version—specific path আগে match
+- Security—sensitive path আগে handle
+
+---
+
+## ৪. Router কনফিগারেশন
+
+### YAML/TOML (File Provider):
+```yaml
+http:
+  routers:
+    my-api:
+      rule: "Host(`api.example.com`) && Path(`/v1/login`)"
+      service: my-api-service
+      entryPoints:
+        - websecure
+      priority: 20
+      middlewares:
+        - auth
+```
+
+### Docker label:
+```
+traefik.http.routers.myapp.rule=Host(`myapp.com`)
+traefik.http.routers.myapp.priority=10
+```
+
+### Kubernetes annotation:
+```
+traefik.ingress.kubernetes.io/router.priority: "15"
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- Custom routing—multiple domain, path, header
+- API gateway—versioning, authentication
+- Security—sensitive path, middleware
+
+## কমন পিটফল
+
+- Overlapping rules—wrong service match
+- Priority ভুল হলে sensitive path exposed
+- Middleware miss করলে security/performance issue
+
+## বেস্ট প্র্যাকটিস
+
+- Specific rules লিখুন, overlapping এড়িয়ে চলুন
+- Priority ঠিকভাবে সেট করুন
+- Middleware দিয়ে authentication, rate limit ব্যবহার করুন
+- Config version control-এ রাখুন
+
+## ইন্ডাস্ট্রি ট্রেন্ডস
+
+- Advanced routing—regex, header-based, method-based
+- Automation—dynamic router config
+- Security—middleware everywhere
+
+## উপসংহার
+
+Traefik-এর Routers—রুলস ও প্রায়োরিটি—production-ready, scalable, ও secure রিভার্স প্রক্সি প্ল্যাটফর্মের জন্য অপরিহার্য।
+
+পরবর্তী পাঠে আমরা Services: লোড ব্যালেন্সিং স্ট্র্যাটেজি নিয়ে বিস্তারিতভাবে দেখব।

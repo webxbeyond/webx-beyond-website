@@ -1,0 +1,111 @@
+---
+title: "কাস্টম সার্টিফিকেট ব্যবহার"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# কাস্টম সার্টিফিকেট ব্যবহার
+
+## পরিচিতি
+
+সবসময় Let's Encrypt-এর automated certificate যথেষ্ট নয়—বিশেষ করে enterprise, internal network, বা organization-specific security policy থাকলে। তখন "custom certificate" ব্যবহার করতে হয়, যা নিজে issue করা বা trusted CA (Certificate Authority) থেকে পাওয়া। এই পাঠে জানব, কাস্টম সার্টিফিকেট কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং industry best practices।
+
+---
+
+## কাস্টম সার্টিফিকেট কেন দরকার?
+
+- **Enterprise Security:** অনেক কোম্পানি internal CA ব্যবহার করে—public CA নয়
+- **Wildcard/EV/SAN Certificate:** Let's Encrypt সব ধরনের certificate issue করে না
+- **Long Validity:** Custom certificate-এ validity period বেশি হয়
+- **Compliance:** PCI-DSS, HIPAA-এর মতো standard-এ custom CA দরকার হতে পারে
+
+### উদাহরণ:
+Netflix, Uber—internal API বা private network-এ custom certificate ব্যবহার করে, যাতে security policy বজায় থাকে।
+
+---
+
+## Traefik-এ কাস্টম সার্টিফিকেট কিভাবে সেটআপ করবেন?
+
+Traefik-এ static configuration-এ certificate file path ও key path define করতে হয়।
+
+### YAML Config Example
+
+```yaml
+entryPoints:
+  websecure:
+    address: ":443"
+    tls:
+      certResolver: ""
+      certificates:
+        - certFile: "/etc/ssl/certs/my-cert.crt"
+          keyFile: "/etc/ssl/private/my-key.key"
+```
+
+- **certFile:** Public certificate (.crt/.pem)
+- **keyFile:** Private key (.key/.pem)
+
+### Docker Labels Example
+
+```yaml
+labels:
+  - "traefik.http.routers.my-router.tls=true"
+  - "traefik.http.routers.my-router.tls.certificates[0].certFile=/etc/ssl/certs/my-cert.crt"
+  - "traefik.http.routers.my-router.tls.certificates[0].keyFile=/etc/ssl/private/my-key.key"
+```
+
+---
+
+## Multiple Certificates (SNI Support)
+
+- Traefik SNI (Server Name Indication) সাপোর্ট করে—multiple domain-এর জন্য আলাদা certificate define করা যায়
+- Example:
+
+```yaml
+certificates:
+  - certFile: "/etc/ssl/certs/domain1.crt"
+    keyFile: "/etc/ssl/private/domain1.key"
+  - certFile: "/etc/ssl/certs/domain2.crt"
+    keyFile: "/etc/ssl/private/domain2.key"
+```
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **File path ভুল:** Traefik certificate load করতে পারবে না
+- **Permission issue:** Private key readable না হলে error আসবে
+- **Mixed certificate:** Production-এ self-signed certificate ব্যবহার করলে browser warning দেখাবে
+
+---
+
+## Best Practices
+
+- Certificate ও key file secure location-এ রাখুন
+- File permission ঠিক রাখুন—private key শুধু root/readable user-এর জন্য
+- Production-এ trusted CA থেকে certificate নিন
+- Multiple domain হলে SNI properly configure করুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Enterprise app-এ custom certificate default
+- Automated renewal—certbot, vault, বা internal tool দিয়ে
+- Kubernetes/Cloud—secret manager-এ certificate store করা হয়
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Custom certificate** হলো—"নিজের ID card"—organization নিজে issue করে
+- **Let's Encrypt certificate** হলো—"public ID card"—government issue করে
+
+---
+
+## Conclusion
+
+Traefik-এ কাস্টম সার্টিফিকেট ব্যবহার মানে—আপনার app, API, বা internal network-এ security ও compliance বজায় রাখা। Static config-এ file path define করে সহজেই এটি করা যায়। Always best practice—trusted CA, proper permission, এবং staging-এ test করা।
+
+---
+
+**পরবর্তী পাঠ:** [সিকিউরিটি মিডলওয়্যার: Rate Limit, IP Whitelist, Headers](/traefik/security-middleware)

@@ -18,8 +18,8 @@ const tiroBangla = Tiro_Bangla({
 
 export const metadata = createMetadata({
   title: {
-    template: '%s | ওয়েবএক্স',
-    default: 'ওয়েবএক্স',
+    template: '%s | ওয়েবএক্স বিওয়ান্ড',
+    default: 'ওয়েবএক্স বিওয়ান্ড',
   },
   description: 'Learn DevOps, Networking, Cloud, AI and more in Bangla with WebX Beyond.',
   metadataBase: new URL(baseUrl),

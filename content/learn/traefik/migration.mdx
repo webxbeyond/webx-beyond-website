@@ -1,0 +1,79 @@
+---
+title: "Migration: Nginx → Traefik"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Migration: Nginx → Traefik — সহজ ও সফল মাইগ্রেশন কৌশল
+
+## পরিচিতি
+
+Nginx থেকে Traefik-এ মাইগ্রেশন মানে—পুরনো রিভার্স প্রক্সি/লোড ব্যালেন্সার থেকে আধুনিক, ক্লাউড-নেটিভ, ও API Gateway-এ রূপান্তর। এই পাঠে জানব, কীভাবে সহজে, নিরাপদে, ও সফলভাবে Nginx → Traefik মাইগ্রেশন করবেন।
+
+## কেন মাইগ্রেশন করবেন?
+
+- Dynamic Routing, Service Discovery, Middleware
+- Kubernetes, Docker, Cloud Integration
+- Automated SSL/TLS, Monitoring, API Gateway
+- Scalability, Automation, DevOps Friendly
+
+## Core Concepts
+
+### ১. Existing Architecture Audit
+- Nginx Config, Routing Rule, SSL, Middleware
+- Service Mapping, Traffic Flow, Bottleneck
+
+### ২. Traefik Architecture Design
+- EntryPoints, Routers, Services, Middleware
+- Static vs Dynamic Config, Provider Selection
+
+### ৩. Config Translation
+- Nginx Config → Traefik YAML/Label
+- Routing Rule, SSL/TLS, Middleware Mapping
+- Example: `server { ... }` → `router: rule, service, middleware`
+
+### ৪. Step-by-step Migration
+1. Small Service/Domain থেকে শুরু করুন
+2. Traefik-এ Config Deploy করুন
+3. Traffic Mirror/Test করুন
+4. Issue না থাকলে Full Migration
+
+### ৫. Testing & Validation
+- Automated Testing, Health Check, Monitoring
+- Rollback Plan, Documentation
+
+### ৬. Common Pitfalls
+- Routing Rule Typo, SSL Misconfiguration
+- Middleware Mapping ভুল, Monitoring না থাকা
+- Rollback Plan না থাকলে Risk
+
+## বাস্তব উদাহরণ
+
+- **E-commerce:** Legacy Nginx → Traefik, Canary Migration
+- **SaaS Provider:** Multi-domain, Multi-app, Automated SSL
+- **DevOps:** Docker/Kubernetes Integration, Monitoring
+
+## Analogies
+
+- Migration মানে—পুরনো বাড়ি থেকে নতুন বাড়িতে যাওয়া, সবকিছু ঠিকঠাক গুছিয়ে নেওয়া
+- Canary Migration হলো—প্রথমে ছোট অংশ, Issue না থাকলে পুরোপুরি
+
+## Best Practices
+
+- Architecture Audit ও Mapping
+- Step-by-step Migration, Canary Deployment
+- Automated Testing, Monitoring, Rollback Plan
+- Documentation ও Team Training
+
+## Industry Trends
+
+- Automated Migration Tool, Config Translator
+- Multi-cloud, Multi-cluster Migration
+- Zero-downtime, Canary Migration
+
+## উপসংহার
+
+Nginx → Traefik Migration করলে, আপনার সিস্টেম হবে আরও স্কেলেবল, ক্লাউড-নেটিভ, ও DevOps Friendly। বড় SaaS, E-commerce, DevOps টিম—সবাই মাইগ্রেশন-এ গুরুত্ব দেয়। আপনার অ্যাপের স্কেল, Architecture, ও Automation চাহিদা অনুযায়ী Migration Strategy ডিজাইন করুন।
+
+---
+
+**ক্যাপস্টোন প্রজেক্ট:** প্রোডাকশন-রেডি মাল্টি-সার্ভিস প্ল্যাটফর্ম তৈরি

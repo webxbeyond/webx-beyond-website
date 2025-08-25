@@ -1,0 +1,134 @@
+---
+title: "অথেন্টিকেশন (Basic, Digest, ForwardAuth, OIDC)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# অথেন্টিকেশন (Basic, Digest, ForwardAuth, OIDC)
+
+## পরিচিতি
+
+Modern app-এ security মানে—user কে, কীভাবে, কখন access দিতে হবে, তা ঠিক করা। Traefik-এর authentication middleware দিয়ে Basic, Digest, ForwardAuth, ও OIDC (OpenID Connect) authentication enforce করা যায়। এই পাঠে জানব, authentication-এর ধরন, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Basic Authentication
+
+- **Basic Authentication**—username/password দিয়ে simple access control
+- Internal dashboard, admin panel, বা low-risk API-তে ব্যবহার হয়
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    basic-auth:
+      basicAuth:
+        users:
+          - "user:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
+```
+
+- **users:** username:password (hashed)
+
+### Real-life Use Case
+Uber—internal dashboard-এ basic auth enforce করে
+
+---
+
+## Digest Authentication
+
+- **Digest Authentication**—hashed credentials, replay attack-resistant
+- Sensitive API, legacy app-এ বেশি ব্যবহার হয়
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    digest-auth:
+      digestAuth:
+        users:
+          - "user:password"
+```
+
+---
+
+## ForwardAuth Middleware
+
+- **ForwardAuth**—external authentication service-এ request পাঠায়, response দেখে access control
+- OAuth, SSO, custom auth provider-এ ব্যবহার হয়
+
+### Config Example
+
+```yaml
+http:
+  middlewares:
+    forward-auth:
+      forwardAuth:
+        address: "https://auth.example.com/validate"
+        trustForwardHeader: true
+```
+
+- **address:** external auth service URL
+
+### Real-life Use Case
+Netflix—SSO provider দিয়ে API authentication enforce করে
+
+---
+
+## OIDC (OpenID Connect) Integration
+
+- **OIDC**—modern, federated authentication protocol; Google, Microsoft, Okta-এর মতো provider support
+- Enterprise app, multi-tenant SaaS-এ must-have
+
+### Config Example (ForwardAuth + OIDC)
+
+```yaml
+http:
+  middlewares:
+    oidc-auth:
+      forwardAuth:
+        address: "https://oidc-provider.com/auth"
+        trustForwardHeader: true
+```
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Config ভুল:** Legitimate user block হতে পারে
+- **Credential leak:** Password/hash secure না রাখলে security risk
+- **External auth fail:** ForwardAuth/OIDC service unavailable হলে downtime
+
+---
+
+## Best Practices
+
+- Sensitive route-এ strong authentication enforce করুন
+- Credential/hash secure location-এ রাখুন
+- External auth service-এ health check/setup monitoring
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—OIDC/SAML authentication default
+- API gateway—ForwardAuth দিয়ে OAuth/SSO automate
+- SaaS platform—multi-tenant authentication must-have
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Basic/Digest auth**—"office gate pass"—simple check
+- **ForwardAuth/OIDC**—"passport control"—external authority validate করে
+
+---
+
+## Conclusion
+
+Traefik-এর authentication middleware দিয়ে app/API-তে strong, flexible, ও scalable access control enforce করা যায়। Proper config, credential security, এবং monitoring—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Rate Limiting ও Circuit Breaking](/traefik/rate-limit-circuit)

@@ -1,0 +1,76 @@
+---
+title: "Monitoring Stack (Prometheus + Grafana)"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Monitoring Stack (Prometheus + Grafana): Traefik-এ রিয়েল-টাইম অবজারভেবিলিটি
+
+## পরিচিতি
+
+Monitoring Stack মানে—Traefik, অ্যাপ, ও সার্ভিসের Health, Performance, ও Error রিয়েল-টাইমে ট্র্যাক করা। Prometheus (মেট্রিকস সংগ্রহ) ও Grafana (ভিজ্যুয়ালাইজেশন) দিয়ে Monitoring Stack তৈরি করলে, আপনার সিস্টেম হবে আরও রিলায়েবল, স্কেলেবল, ও ডিবাগ-ফ্রেন্ডলি।
+
+## কেন Monitoring Stack গুরুত্বপূর্ণ?
+
+- Health Check: সার্ভিস ডাউন হলে দ্রুত Action
+- Performance Tracking: Latency, Throughput, Error Rate
+- Alerting: Issue হলে রিয়েল-টাইম Notification
+- Capacity Planning: Resource Usage, Scalability
+
+## Core Concepts
+
+### ১. Prometheus Integration
+- Traefik-এ Prometheus Exporter চালু করুন
+- Metrics: Request Count, Response Time, Error Rate
+- Prometheus Server-এ Traefik Endpoint Scrape
+
+### ২. Grafana Visualization
+- Prometheus Data Source হিসেবে Grafana-তে Add করুন
+- Dashboard: Health, Traffic, Error, Latency
+- Custom Panel, Alerting Rule
+
+### ৩. Alerting & Notification
+- Grafana Alert: Threshold Cross হলে Email/Slack
+- Prometheus Alertmanager Integration
+
+### ৪. Best Practices
+- Dashboard স্পষ্ট ও সহজে পড়ার মতো করুন
+- Critical Metrics (Error Rate, Latency) Always Visible
+- Historical Data Retention
+
+## বাস্তব উদাহরণ
+
+- **E-commerce:** Traffic Spike, Error Rate, Real-time Alert
+- **SaaS Provider:** Multi-Cluster Monitoring, Custom Dashboard
+- **DevOps:** Capacity Planning, Automated Alerting
+
+## Analogies
+
+- Monitoring Stack হলো—গাড়ির ড্যাশবোর্ড, সবকিছু এক নজরে দেখা যায়
+- Alerting মানে—গাড়ির Warning Light, সমস্যা হলে সঙ্গে সঙ্গে জানানো
+
+## Common Pitfalls
+
+- Metrics না থাকলে Issue ধরা পড়ে না
+- Dashboard জটিল হলে পড়া কঠিন
+- Alerting না থাকলে Downtime বাড়ে
+
+## Best Practices
+
+- Prometheus Exporter Always On
+- Grafana Dashboard Customizable ও Simple
+- Automated Alerting ও Notification
+- Documentation ও Historical Data Retention
+
+## Industry Trends
+
+- Real-time Monitoring, Automated Alerting
+- Multi-Cluster, Multi-Cloud Monitoring
+- AI-driven Anomaly Detection
+
+## উপসংহার
+
+Traefik-এ Monitoring Stack (Prometheus + Grafana) ব্যবহার করলে, আপনার সিস্টেম হবে আরও রিলায়েবল, স্কেলেবল, ও ডিবাগ-ফ্রেন্ডলি। বড় SaaS, E-commerce, DevOps টিম—সবাই Monitoring Stack ব্যবহার করে। আপনার অ্যাপের স্কেল, Performance, ও Health চাহিদা অনুযায়ী Monitoring Design করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Routing Issues Debugging](/traefik/debug-routing)

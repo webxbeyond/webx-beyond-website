@@ -1,0 +1,89 @@
+---
+title: "Auto-discovery in Clusters"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## Traefik-এ সার্ভিস অটোমেটিক ডিটেকশন
+
+## পরিচিতি
+
+Microservices ও cloud-native architecture-এ সার্ভিসের সংখ্যা দ্রুত বাড়ে/কমে। Manual configuration করা সময়সাপেক্ষ ও error-prone। Auto-discovery—Traefik-এর মাধ্যমে—cluster-এ নতুন সার্ভিস অটোমেটিক detect ও route করা যায়, যা modern system design-এর জন্য অপরিহার্য।
+
+## Auto-discovery কী ও কেন?
+
+- **Auto-discovery:** Cluster-এ নতুন সার্ভিস, container, বা pod অটোমেটিক detect ও route করার পদ্ধতি।
+- **Use Case:** Google, Netflix, Uber—হাজার হাজার সার্ভিস, container—auto-discovery ছাড়া efficient routing অসম্ভব।
+- **Importance:** Manual config ছাড়াই, সার্ভিস scale, deploy, বা update করা যায়।
+
+## Traefik-এ Auto-discovery Integration
+
+Traefik বিভিন্ন provider (Docker, Kubernetes, Consul, etcd) থেকে অটোমেটিক সার্ভিস detect করে।
+
+### ১. Docker Provider
+- Docker container-এ Traefik label দিলে, container start হলে অটোমেটিক route তৈরি হয়।
+- Example label:
+```yaml
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.myapp.rule=Host(`myapp.local`)"
+```
+
+### ২. Kubernetes Provider
+- Kubernetes pod/service deploy হলে, Traefik অটোমেটিক detect ও route করে।
+- Example annotation:
+```yaml
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: "web"
+```
+
+### ৩. Consul/etcd Provider
+- Distributed KV store-এ config change হলে, Traefik অটোমেটিক update করে।
+
+## Core Concepts
+
+### Dynamic Configuration
+- Traefik static config দিয়ে provider enable করুন, dynamic config provider থেকে অটোমেটিক আসে।
+
+### Label/Annotation Convention
+- Docker/Kubernetes-এ label/annotation ঠিকভাবে দিলে, auto-discovery flawless হয়।
+
+### Real-time Update
+- সার্ভিস add/remove হলে, Traefik অটোমেটিক route update করে—downtime ছাড়াই।
+
+## Real-life Example & Analogy
+
+- **Netflix:** হাজার হাজার container—auto-discovery ছাড়া manual config অসম্ভব।
+- **Analogy:** Imagine a smart traffic system—নতুন রাস্তা তৈরি হলে, GPS অটোমেটিক map update করে। Traefik auto-discovery-ও ঠিক তেমন।
+
+## Common Pitfalls
+
+- **Label/annotation ভুল হলে:** Routing problem, traffic ভুল service-এ যায়।
+- **Provider misconfiguration:** Auto-discovery fail করে, manual intervention লাগে।
+- **Security risk:** Auto-discovered service-এ proper authentication না থাকলে vulnerability বাড়ে।
+
+## Best Practices
+
+- **Label/annotation convention maintain করুন:** Routing সহজ ও error-free হবে।
+- **Provider config ঠিক রাখুন:** Docker/Kubernetes/Consul/etcd ঠিকভাবে configure করুন।
+- **Security policy enforce করুন:** Auto-discovered service-এ authentication, authorization enable করুন।
+- **Monitoring করুন:** Auto-discovery status, error, traffic track করুন।
+
+## Industry Trends
+
+- **Service mesh integration:** Auto-discovery + advanced traffic management (Traefik Mesh)।
+- **Multi-cloud auto-discovery:** একাধিক cloud/provider—auto-discovery হচ্ছে।
+- **AI-based service mapping:** Machine learning দিয়ে intelligent service mapping হচ্ছে।
+
+## কখন ব্যবহার করবেন?
+
+- Rapid scaling, frequent deployment, zero downtime নিশ্চিত করতে।
+- Microservices, API gateway, cloud-native architecture-এ।
+
+## উপসংহার
+
+Traefik-এর Auto-discovery feature দিয়ে cluster-এ সার্ভিস deploy, scale, ও update অনেক সহজ হয়। সঠিকভাবে কনফিগার করলে, reliability, scalability, ও security নিশ্চিত করা যায়।
+
+---
+
+**পরবর্তী পাঠ:** [Traefik as Ingress Controller](/traefik/k8s-ingress)

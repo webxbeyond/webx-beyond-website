@@ -1,0 +1,117 @@
+---
+title: "Weighted Load Balancing ও Canary Deployments"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## পরিচিতি
+
+Modern app-এ high availability, zero-downtime deployment, এবং traffic control খুব গুরুত্বপূর্ণ। Traefik-এর weighted load balancing ও canary deployment—এই দুইটি technique দিয়ে smart traffic management ও safe rollout সম্ভব। এই পাঠে জানব, weighted load balancing ও canary deployment কী, কেন দরকার, কীভাবে Traefik-এ সেটআপ করবেন, এবং real-world example ও pitfalls।
+
+---
+
+## Weighted Load Balancing কী?
+
+- **Weighted Load Balancing** মানে—multiple backend server-এর মধ্যে traffic ভাগ করে দেওয়া, কিন্তু weight অনুযায়ী
+- উদাহরণ: 70% traffic server-1, 30% server-2
+- Traffic distribution, resource optimization, এবং gradual rollout-এ এটি must-have
+
+### Real-life Use Case
+Netflix—new feature rollout-এ কিছু user-কে নতুন server-এ পাঠায়, বাকিদের পুরনো server-এ
+
+---
+
+## Traefik-এ Weighted Load Balancing কিভাবে কাজ করে?
+
+Traefik-এর service config-এ multiple server ও weight define করতে হয়
+
+### YAML Config Example
+
+```yaml
+http:
+  services:
+    weighted-service:
+      weighted:
+        services:
+          - name: v1-service
+            weight: 80
+          - name: v2-service
+            weight: 20
+```
+
+- **weight:** traffic percentage—higher weight মানে বেশি traffic
+
+---
+
+## Canary Deployment কী?
+
+- **Canary Deployment** মানে—new version/app rollout করার সময়, কিছু user-কে নতুন version-এ পাঠানো, বাকিদের পুরনো version-এ
+- Safe rollout, bug detection, এবং rollback সহজ হয়
+
+### Real-life Use Case
+Uber—new payment gateway rollout-এ 5% user-কে নতুন version-এ পাঠায়, issue না হলে ধাপে ধাপে rollout বাড়ায়
+
+---
+
+## Traefik-এ Canary Deployment কিভাবে কাজ করে?
+
+Weighted service দিয়ে canary deployment সহজে করা যায়
+
+### YAML Config Example
+
+```yaml
+http:
+  services:
+    canary-service:
+      weighted:
+        services:
+          - name: stable-service
+            weight: 95
+          - name: canary-service
+            weight: 5
+```
+
+- **stable-service:** পুরনো version
+- **canary-service:** নতুন version
+- Weight adjust করে rollout control করুন
+
+---
+
+## Common Pitfalls (সাধারণ ভুল)
+
+- **Weight ভুল:** Traffic distribution expected মতো না হলে user experience খারাপ
+- **Monitoring miss:** Canary rollout-এ bug detect না হলে production impact
+- **Rollback plan না থাকলে:** Issue হলে downtime বাড়তে পারে
+
+---
+
+## Best Practices
+
+- Canary rollout-এ monitoring/logging setup করুন
+- Gradual rollout—weight ধাপে ধাপে বাড়ান
+- Rollback plan ready রাখুন
+- Config change/staging-এ test করুন
+
+---
+
+## Industry Trends
+
+- Cloud-native app—weighted load balancing ও canary deployment default
+- CI/CD pipeline—automated canary rollout ও rollback
+- API gateway—traffic control ও smart rollout
+
+---
+
+## Analogies (সহজ উদাহরণ)
+
+- **Weighted load balancing** হলো—"restaurant waiter"—বেশি guest-কে বড় টেবিলে পাঠায়, কম guest-কে ছোট টেবিলে
+- **Canary deployment** হলো—"new dish taste test"—কিছু guest-কে নতুন খাবার দেওয়া হয়, feedback ভালো হলে সবার জন্য rollout
+
+---
+
+## Conclusion
+
+Weighted load balancing ও canary deployment দিয়ে Traefik-এ smart traffic management ও safe feature rollout করা যায়। Proper weight, monitoring, এবং rollback—সব modern app-এর জন্য must-have।
+
+---
+
+**পরবর্তী পাঠ:** [Blue/Green Deployment with Traefik](/traefik/blue-green)

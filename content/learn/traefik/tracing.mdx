@@ -1,0 +1,99 @@
+---
+title: "Distributed Tracing: Jaeger, Zipkin, OpenTelemetry দিয়ে Traefik অবজারভেবিলিটি"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Distributed Tracing: Jaeger, Zipkin, OpenTelemetry দিয়ে Traefik অবজারভেবিলিটি
+
+## পরিচিতি
+
+আধুনিক মাইক্রোসার্ভিস আর্কিটেকচারে একটি রিকোয়েস্ট অনেকগুলো সার্ভিসের মধ্যে ঘুরে বেড়ায়। কোথায় কত সময় লাগছে, কোথায় bottleneck, কোন সার্ভিসে error—এসব বুঝতে হলে Distributed Tracing অপরিহার্য। Traefik-এর মতো API Gateway-এ Distributed Tracing ইন্টিগ্রেট করলে পুরো সিস্টেমের health ও performance সহজে track করা যায়।
+
+## Distributed Tracing কী ও কেন?
+
+- **Distributed Tracing:** একাধিক সার্ভিসে ছড়িয়ে থাকা একটি রিকোয়েস্টের "পথ" (trace) ট্র্যাক করা।
+- **Use Case:** Google, Netflix, Uber-এর মতো কোম্পানিতে হাজার হাজার সার্ভিসের latency, error, bottleneck খুঁজতে ব্যবহার হয়।
+- **Importance:** Debugging, performance tuning, SLA monitoring—সবকিছুতে tracing অপরিহার্য।
+
+## Traefik-এ Distributed Tracing Integration
+
+Traefik Jaeger, Zipkin, ও OpenTelemetry-এর মতো টুলের সাথে সহজেই ইন্টিগ্রেট হয়।
+
+### Jaeger Integration Example (YAML)
+
+```yaml
+tracing:
+  jaeger:
+    samplingServerURL: "http://jaeger-agent:5778/sampling"
+    localAgentHostPort: "jaeger-agent:6831"
+    samplingType: "const"
+    samplingParam: 1
+```
+
+### Zipkin Integration Example
+
+```yaml
+tracing:
+  zipkin:
+    httpEndpoint: "http://zipkin:9411/api/v2/spans"
+    sameSpan: false
+    id128Bit: true
+```
+
+### OpenTelemetry Integration Example
+
+```yaml
+tracing:
+  openTelemetry:
+    endpoint: "otel-collector:4317"
+    insecure: true
+```
+
+## Core Concepts
+
+### Trace, Span, Context
+- **Trace:** একটি রিকোয়েস্টের সম্পূর্ণ "পথ"।
+- **Span:** একটি নির্দিষ্ট সার্ভিসে রিকোয়েস্টের অংশ।
+- **Context:** Trace-এর metadata, যা পরবর্তী সার্ভিসে propagate হয়।
+
+### Visualization
+- Jaeger/Zipkin UI-তে trace গ্রাফিক্যালি দেখা যায়।
+- কোন সার্ভিসে কত latency, কোথায় error—সব দেখা যায়।
+
+## Real-life Example & Analogy
+
+- **Uber:** একটি রাইড বুকিং-এর রিকোয়েস্ট অনেক সার্ভিসে যায়—user, payment, map, notification। Distributed tracing ছাড়া latency ও error খুঁজে পাওয়া অসম্ভব।
+- **Analogy:** Imagine a courier package moving through multiple checkpoints. Distributed tracing is like tracking the package at every checkpoint.
+
+## Common Pitfalls
+
+- **Sampling Rate বেশি কম হলে:** অনেক trace হারিয়ে যায়, debugging কঠিন হয়।
+- **Trace Context propagate না হলে:** trace incomplete হয়।
+- **Storage retention কম হলে:** পুরনো trace ডেটা হারিয়ে যেতে পারে।
+
+## Best Practices
+
+- **Sampling Rate ঠিক রাখুন:** Production-এ 1%–10% যথেষ্ট, debugging-এ বেশি।
+- **Context Propagation নিশ্চিত করুন:** সব সার্ভিসে trace context pass করুন।
+- **Retention Policy ঠিক করুন:** গুরুত্বপূর্ণ trace ডেটা যেন হারিয়ে না যায়।
+- **UI Access:** Jaeger/Zipkin UI টিমের সবাই যেন দেখতে পারে।
+
+## Industry Trends
+
+- **OpenTelemetry:** Industry standard হচ্ছে, Jaeger/Zipkin-এর সাথে ইন্টিগ্রেটেড।
+- **Auto Instrumentation:** Modern frameworks (Spring, Express, Django) auto-tracing সাপোর্ট করছে।
+- **AI-based Root Cause Analysis:** Tracing data থেকে অ্যানোমালি ও root cause detect হচ্ছে।
+
+## কখন ব্যবহার করবেন?
+
+- Microservices architecture-এ latency, error, bottleneck খুঁজতে।
+- SLA monitoring, debugging, performance tuning-এর জন্য।
+- Production incident analysis ও RCA (Root Cause Analysis)-এর জন্য।
+
+## উপসংহার
+
+Distributed Tracing দিয়ে Traefik-centric architecture-এ debugging, performance tuning, ও SLA monitoring অনেক সহজ হয়। Jaeger, Zipkin, OpenTelemetry—যেকোনো টুল সঠিকভাবে কনফিগার করলে, আপনার সিস্টেমের "অদৃশ্য" সমস্যা সহজেই ধরা যাবে।
+
+---
+
+**পরবর্তী পাঠ:** [Service Health Checks](/traefik/health-checks)

@@ -1,0 +1,81 @@
+---
+title: "Logs & Tracing Analysis"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Logs & Tracing Analysis: Traefik-এ সমস্যা খুঁজে বের করার কৌশল
+
+## পরিচিতি
+
+Traefik-এ Logs ও Tracing হলো—সমস্যা, পারফরম্যান্স, ও সিকিউরিটি Issue খুঁজে বের করার সবচেয়ে কার্যকরী উপায়। এই পাঠে জানব, কীভাবে Logs ও Distributed Tracing ব্যবহার করে দ্রুত Root Cause Analysis করবেন।
+
+## কেন Logs & Tracing গুরুত্বপূর্ণ?
+
+- Real-time Issue Detection
+- Root Cause Analysis: কোথায়, কখন, কী সমস্যা
+- Performance Optimization
+- Security Monitoring
+
+## Core Concepts
+
+### ১. Access Logs
+- Request Path, Method, Response Code, Latency
+- User Activity, Suspicious Request
+- Example: `/api/login`, `POST`, `200`, `120ms`
+
+### ২. Error Logs
+- Routing Error, SSL Issue, Middleware Conflict
+- Stack Trace, Timestamp, Service Name
+- Example: `404 Not Found`, `SSL Handshake Failed`
+
+### ৩. Distributed Tracing
+- Request Flow: EntryPoint → Router → Middleware → Service
+- Trace ID, Span, Parent-Child Relationship
+- Tools: Jaeger, Zipkin, OpenTelemetry
+
+### ৪. Real-time Monitoring
+- Dashboard-এ Logs ও Tracing Panel
+- Alerting: Error Rate, Latency Spike
+
+### ৫. Best Practices
+- Logs Always On, Retention Policy
+- Trace ID Propagation, Context Logging
+- Automated Alerting ও Notification
+
+## বাস্তব উদাহরণ
+
+- **E-commerce:** Payment Failure, Error Logs, Trace Flow
+- **SaaS Provider:** Multi-service Request, Distributed Tracing
+- **DevOps:** Latency Spike, Root Cause Analysis
+
+## Analogies
+
+- Logs হলো—গাড়ির ব্ল্যাকবক্স, দুর্ঘটনার কারণ খুঁজে বের করা
+- Tracing মানে—গাড়ির যাত্রাপথ, কোথা থেকে কোথায় গেছে
+
+## Common Pitfalls
+
+- Logs না থাকলে Issue ধরা পড়ে না
+- Trace ID না থাকলে Request Flow ট্র্যাক করা কঠিন
+- Retention Policy ভুল হলে Historical Data হারিয়ে যায়
+
+## Best Practices
+
+- Access & Error Logs Always On
+- Distributed Tracing চালু রাখুন
+- Automated Alerting ও Dashboard
+- Documentation ও Retention Policy
+
+## Industry Trends
+
+- Real-time Log Analysis, AI-driven Root Cause Detection
+- Distributed Tracing, Multi-cloud Monitoring
+- Automated Alerting & Self-healing System
+
+## উপসংহার
+
+Traefik-এ Logs & Tracing Analysis করলে, আপনার সিস্টেম হবে আরও রিলায়েবল, স্কেলেবল, ও ডিবাগ-ফ্রেন্ডলি। বড় SaaS, E-commerce, DevOps টিম—সবাই Logs ও Tracing-এ গুরুত্ব দেয়। আপনার অ্যাপের স্কেল, Complexity, ও Security অনুযায়ী Logging & Tracing Strategy ডিজাইন করুন।
+
+---
+
+**পরবর্তী পাঠ:** [Performance Tuning](/traefik/performance-tuning)
