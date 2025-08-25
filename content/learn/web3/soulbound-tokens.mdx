@@ -1,0 +1,78 @@
+---
+title: "Soulbound টোকেন"
+icon: logos:web3js
+---
+
+# Soulbound টোকেন — Web3-এ Non-transferable Credential ও Identity
+
+## পরিচিতি
+
+Soulbound টোকেন—Web3 ও ব্লকচেইন-এ Non-transferable Credential, Achievement, ও Identity-এর জন্য নতুন ধারণা। যেমন Google বা Uber-এ User Profile ও Achievement থাকে, ঠিক তেমনই Soulbound Token দিয়ে Blockchain-এ User-এর Skill, Degree, Reputation, ও Identity Immutable ও Non-transferable হয়।
+
+## Core Concepts
+
+### ১. Soulbound Token কী?
+- Non-transferable Token
+- Credential, Achievement, Reputation
+- ERC-721/1155 Extension
+- Immutable, Unique
+
+### ২. Workflow
+1. Token Mint (Achievement, Degree)
+2. User Wallet-এ Store
+3. Non-transferable (No Transfer Function)
+4. Credential Verify
+
+### ৩. Real-life Use Cases
+- **Education Certificate:** Blockchain-based Degree
+- **Skill Badge:** Immutable Achievement
+- **DAO Membership:** Reputation Token
+- **Healthcare:** Medical Record
+
+### ৪. Examples & Analogies
+- Soulbound Token—"নিজস্ব ডিজিটাল মেডেল"
+- Non-transferable—"একবার পাওয়া, চিরকাল নিজের"
+- Credential—"সার্টিফিকেট"
+
+### ৫. Common Pitfalls
+- Credential Issue ভুল
+- Wallet Security
+- Revocation Policy
+- Privacy Concern
+
+### ৬. Best Practices
+- Trusted Issuer ব্যবহার করুন
+- Credential Properly Verify করুন
+- Revocation Policy Maintain করুন
+- Privacy-preserving Design
+
+### ৭. Industry Trends
+- Multi-chain Soulbound Token
+- Verifiable Credential Integration
+- Social Identity Link
+- Privacy-preserving Protocol
+
+## Installation & Usage
+
+**Soulbound Token Example (Solidity):**
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+contract SoulboundToken is ERC721 {
+    constructor() ERC721("SoulboundToken", "SBT") {}
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal pure override {
+        require(from == address(0), "Soulbound: Non-transferable");
+    }
+}
+```
+
+## উপসংহার
+
+Soulbound টোকেন—Web3 ও ব্লকচেইন-এ Non-transferable Credential, Achievement, ও Identity-এর জন্য নতুন ও গুরুত্বপূর্ণ ধারণা। সঠিকভাবে ব্যবহার করলে, User-এর Reputation, Skill, ও Identity Immutable ও Secure হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল Soulbound Token Solution তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ওয়েব৩ সোশ্যাল মিডিয়া: Lens, Farcaster

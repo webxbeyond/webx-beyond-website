@@ -1,0 +1,76 @@
+---
+title: "ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করা"
+icon: logos:web3js
+---
+
+# ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করা — dApp-এ ইউজার অথেন্টিকেশন ও নিরাপদ লেনদেন
+
+## পরিচিতি
+
+Web3 dApp-এ ইউজার যখন স্মার্ট কন্ট্রাক্টে ডেটা পাঠায় বা ট্রানজ্যাকশন করে, তখন "ট্রানজ্যাকশন সাইন" (Transaction Signing) অপরিহার্য। Google বা Uber যেমন ইউজার অথেন্টিকেশন ও API call-এর জন্য সিকিউরিটি চেক করে, ঠিক তেমনই dApp-এ ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করে নিরাপদ লেনদেন নিশ্চিত করা হয়। এই পাঠে জানব—কেন, কীভাবে, ও কখন ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করতে হয়।
+
+## Core Concepts
+
+### ১. Transaction Signing কী?
+- ইউজার Private Key দিয়ে ট্রানজ্যাকশন সাইন করে
+- Signature: ট্রানজ্যাকশনের "ডিজিটাল সিল"
+- Wallet (MetaMask, WalletConnect) ব্যবহার হয়
+- Contract Interaction, Token Transfer, Approval
+
+### ২. Workflow
+1. Wallet Connect করুন (MetaMask, WalletConnect)
+2. Transaction Data তৈরি করুন (to, value, data)
+3. Wallet-এ Sign Request পাঠান
+4. Signature Verify করুন
+5. Blockchain-এ Transaction Broadcast করুন
+
+### ৩. React-এ Transaction Signing Example
+```javascript
+if (window.ethereum) {
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+  const tx = {
+    to: '0xContractAddress',
+    value: '0x0',
+    data: '0x...', // Contract function call data
+  };
+  const txHash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+}
+```
+
+### ৪. Real-life Use Cases
+- **NFT Minting:** User Signature
+- **DeFi App:** Deposit, Withdraw
+- **Voting dApp:** Cast Vote
+- **Gaming dApp:** Asset Transfer
+
+### ৫. Analogies
+- Transaction Signing—"চেক-এ সিগনেচার"
+- Wallet—"ডিজিটাল মানিব্যাগ"
+- Signature—"ডিজিটাল সিল"
+
+### ৬. Common Pitfalls
+- Private Key leak—Asset loss
+- Wrong data—Transaction fail
+- Wallet not connected—dApp freeze
+- Unhandled error—User confusion
+
+### ৭. Best Practices
+- Error Handling করুন
+- Transaction Data ভালোভাবে চেক করুন
+- Wallet status UI-তে দেখান
+- Security: Phishing এড়ান
+
+### ৮. Industry Trends
+- Gasless Transaction (Meta-transactions)
+- Multi-chain Wallet Support
+- Social Login (Web3Auth)
+- Transaction Simulation
+
+## উপসংহার
+
+ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করা—dApp-এ ইউজার অথেন্টিকেশন, নিরাপদ লেনদেন, ও Contract Interaction-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, ইউজার Experience, Security, ও Scalability—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Infura, Alchemy বা QuickNode ব্যবহার

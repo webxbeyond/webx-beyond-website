@@ -1,0 +1,77 @@
+---
+title: "ওয়ালেট ইন্টিগ্রেশন ও MetaMask সেটআপ"
+icon: logos:web3js
+---
+
+# ওয়ালেট ইন্টিগ্রেশন ও MetaMask সেটআপ — dApp-এ ইউজার অথেন্টিকেশন ও ট্রানজ্যাকশন
+
+## পরিচিতি
+
+Web3 dApp-এ ইউজার অথেন্টিকেশন, ট্রানজ্যাকশন, ও অ্যাসেট ব্যবস্থাপনার জন্য প্রয়োজন "ওয়ালেট"। MetaMask হলো—সবচেয়ে জনপ্রিয় Ethereum Wallet, যা ব্রাউজার Extension ও Mobile App হিসেবে পাওয়া যায়। Google বা Uber যেমন OAuth দিয়ে ইউজার লগইন করায়, ঠিক তেমনই dApp-এ MetaMask দিয়ে ইউজার অথেন্টিকেশন ও ট্রানজ্যাকশন করা যায়। এই পাঠে জানব—ওয়ালেট ইন্টিগ্রেশন, MetaMask সেটআপ, ও dApp-এ ব্যবহার।
+
+## Core Concepts
+
+### ১. Wallet কী?
+- Digital Asset Storage: ETH, Token
+- Private Key Management
+- Transaction Sign & Send
+- dApp Integration
+
+### ২. MetaMask কী?
+- Ethereum Wallet (Browser Extension, Mobile)
+- Network Management (Mainnet, Testnet, Custom)
+- Contract Interaction
+- Security: Seed Phrase, Password
+
+### ৩. Workflow
+1. MetaMask Install করুন (Chrome/Firefox Extension, Mobile App)
+2. Wallet Create/Import করুন (Seed Phrase)
+3. Network Select করুন (Mainnet/Testnet)
+4. dApp-এ Wallet Connect করুন (window.ethereum)
+5. Transaction Sign ও Send করুন
+
+### ৪. React-এ MetaMask Integration Example
+```javascript
+if (window.ethereum) {
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+  // accounts[0] — ইউজারের Address
+}
+```
+
+### ৫. Real-life Use Cases
+- **NFT Marketplace:** Buy/Sell NFT
+- **DeFi App:** Deposit, Withdraw, Swap
+- **Voting dApp:** Cast Vote
+- **Gaming dApp:** Asset Transfer
+
+### ৬. Analogies
+- Wallet—"ডিজিটাল মানিব্যাগ"
+- MetaMask—"বিকাশ অ্যাপ"
+- Private Key—"এটিএম পিন"
+
+### ৭. Common Pitfalls
+- Seed Phrase leak—Asset loss
+- Wrong Network—Transaction fail
+- Wallet not connected—dApp freeze
+- Unhandled error—User confusion
+
+### ৮. Best Practices
+- Seed Phrase নিরাপদে রাখুন
+- Network status UI-তে দেখান
+- Error Handling করুন
+- Security: Phishing এড়ান
+
+### ৯. Industry Trends
+- Multi-chain Wallet Integration
+- WalletConnect, Coinbase Wallet Support
+- Gasless Transaction
+- Social Login (Web3Auth)
+
+## উপসংহার
+
+ওয়ালেট ইন্টিগ্রেশন ও MetaMask সেটআপ—dApp-এ ইউজার অথেন্টিকেশন, ট্রানজ্যাকশন, ও অ্যাসেট ব্যবস্থাপনার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, ইউজার Experience, Security, ও Scalability—সবকিছু সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ফ্রন্টএন্ড থেকে ট্রানজ্যাকশন সাইন করা

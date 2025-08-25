@@ -1,0 +1,74 @@
+---
+title: "ERC-1155 মাল্টি-টোকেন স্ট্যান্ডার্ড"
+icon: logos:web3js
+---
+
+# ERC-1155 মাল্টি-টোকেন স্ট্যান্ডার্ড — ফাঞ্জিবল ও NFT একসাথে
+
+## পরিচিতি
+
+ERC-1155 হলো—ইথেরিয়াম ব্লকচেইনে ফাঞ্জিবল (Fungible) ও নন-ফাঞ্জিবল (NFT) টোকেন একসাথে ব্যবস্থাপনার জন্য আধুনিক ও শক্তিশালী স্ট্যান্ডার্ড। Google বা Netflix যেমন এক অ্যাকাউন্টে একাধিক সাবস্ক্রিপশন বা পয়েন্ট রাখে, ঠিক তেমনই ERC-1155 দিয়ে এক কন্ট্রাক্টে একাধিক টোকেন টাইপ সহজে তৈরি ও ব্যবস্থাপনা করা যায়। এই পাঠে জানব—ERC-1155 কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. ERC-1155 কী?
+- Multi-token Standard: এক কন্ট্রাক্টে ফাঞ্জিবল ও NFT
+- Batch Transfer: একাধিক টোকেন একসাথে ট্রান্সফার
+- Gas Efficient: কম খরচে অপারেশন
+- Standard Functions: balanceOf, safeTransferFrom, setApprovalForAll
+
+### ২. Workflow
+1. Contract লিখুন (Solidity)
+2. ERC-1155 Interface Implement করুন
+3. Deploy করুন (Testnet/Mainnet)
+4. Mint, Transfer, Burn করুন
+5. Marketplace, Wallet-এ Integrate করুন
+
+### ৩. Solidity ERC-1155 Example
+```solidity
+pragma solidity ^0.8.0;
+
+interface IERC1155 {
+    function balanceOf(address account, uint256 id) external view returns (uint256);
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata data) external;
+    function setApprovalForAll(address operator, bool approved) external;
+    function isApprovedForAll(address account, address operator) external view returns (bool);
+}
+```
+
+### ৪. Real-life Use Cases
+- **Gaming:** Multiple asset types (Sword, Shield, Coin)
+- **Marketplace:** Batch NFT Mint/Transfer
+- **Ticketing:** Multiple event passes
+- **Loyalty Program:** Points + Unique Rewards
+
+### ৫. Analogies
+- ERC-1155—"একটি ব্যাগে অনেক ধরনের কয়েন"
+- Batch Transfer—"একসাথে অনেক জিনিস পাঠানো"
+
+### ৬. Common Pitfalls
+- Contract bug—Multiple asset loss
+- Batch operation ভুল—Partial transfer
+- Metadata mismatch—Asset confusion
+- No event emit—Marketplace integration সমস্যা
+
+### ৭. Best Practices
+- OpenZeppelin ERC-1155 Implementation ব্যবহার করুন
+- Testnet-এ Deploy ও Test করুন
+- Event emit করুন (TransferSingle, TransferBatch)
+- Metadata ঠিকভাবে সংরক্ষণ করুন
+- Security Audit করুন
+
+### ৮. Industry Trends
+- Cross-chain ERC-1155
+- Dynamic NFT
+- Fractional Ownership
+- GameFi Integration
+
+## উপসংহার
+
+ERC-1155 মাল্টি-টোকেন—Web3 ও ডিজিটাল ইকোসিস্টেমে ফাঞ্জিবল ও NFT একসাথে ব্যবস্থাপনার জন্য অপরিহার্য। Gaming, Marketplace, Loyalty—সবকিছু ERC-1155 দিয়ে সহজে ও দক্ষভাবে তৈরি ও ব্যবস্থাপনা করা যায়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল মাল্টি-টোকেন অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** টোকেন মিন্টিং ও বার্নিং

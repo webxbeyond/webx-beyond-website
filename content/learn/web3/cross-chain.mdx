@@ -1,0 +1,80 @@
+---
+title: "ব্রিজ ও ক্রস-চেইন মেসেজিং"
+icon: logos:web3js
+---
+
+# ব্রিজ ও ক্রস-চেইন মেসেজিং — Web3-এ Interoperability ও Asset Transfer
+
+## পরিচিতি
+
+ব্রিজ (Bridge) ও ক্রস-চেইন মেসেজিং (Cross-chain Messaging)—Web3 ও ব্লকচেইন ইকোসিস্টেমে Interoperability, Asset Transfer, ও Communication-এর জন্য অপরিহার্য। যেমন Google বা Uber-এ বিভিন্ন সার্ভার ও সিস্টেম একসাথে কাজ করে, ঠিক তেমনই ব্লকচেইন-এ এক চেইন থেকে অন্য চেইনে Asset, Data, ও Message পাঠানো যায়—ব্রিজ ও ক্রস-চেইন টেকনোলজি দিয়ে।
+
+## Core Concepts
+
+### ১. Bridge কী?
+- এক চেইন থেকে অন্য চেইনে Asset Transfer
+- Lock & Mint, Burn & Release
+- Trusted vs Trustless Bridge
+- Workflow: Deposit → Lock → Mint → Withdraw
+
+### ২. Cross-chain Messaging কী?
+- এক চেইন থেকে অন্য চেইনে Data/Message পাঠানো
+- Protocol: LayerZero, Wormhole, Axelar
+- Workflow: Message Encode → Send → Decode → Execute
+
+### ৩. Workflow
+1. Asset Deposit/Lock করা
+2. Mint/Release অন্য চেইনে
+3. Message Encode/Send
+4. Decode/Execute
+
+### ৪. Real-life Use Cases
+- **Asset Transfer:** ETH থেকে BSC-তে Token
+- **DeFi Arbitrage:** Multi-chain Liquidity
+- **NFT Transfer:** Cross-chain NFT Mint
+- **Gaming:** Multi-chain Asset
+
+### ৫. Examples & Analogies
+- Bridge—"ফেরি ঘাট"
+- Lock & Mint—"বাক্সে রেখে নতুন বানানো"
+- Cross-chain Messaging—"চিঠি পাঠানো"
+
+### ৬. Common Pitfalls
+- Bridge Hack—Fund Loss
+- Message Tampering—Data Manipulation
+- Delay—Withdrawal Time বেশি
+- Compatibility Issue
+
+### ৭. Best Practices
+- Trusted Bridge ব্যবহার করুন
+- Message Encryption ও Validation
+- Withdrawal Time বুঝে Asset Transfer
+- Compatibility Test করুন
+
+### ৮. Industry Trends
+- Multi-chain Bridge
+- Universal Messaging Protocol
+- zk-Bridge
+- Cross-chain DApp Ecosystem
+
+## Installation & Usage
+
+**LayerZero Example:**
+```js
+// LayerZero SDK দিয়ে Cross-chain Message
+import { sendMessage } from 'layerzero-sdk';
+
+sendMessage({
+  fromChain: 'Ethereum',
+  toChain: 'Polygon',
+  payload: 'Hello Web3!'
+});
+```
+
+## উপসংহার
+
+ব্রিজ ও ক্রস-চেইন মেসেজিং—Web3 ও ব্লকচেইন ইকোসিস্টেমে Interoperability, Asset Transfer, ও Communication-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Multi-chain DApp, DeFi, NFT—সবকিছু সহজ ও নিরাপদ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই সফল Cross-chain Solution তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Rollups ও zk-rollups

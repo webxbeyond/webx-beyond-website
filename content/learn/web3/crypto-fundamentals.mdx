@@ -1,0 +1,72 @@
+---
+title: "ক্রিপ্টোগ্রাফির বুনিয়াদ: হ্যাশিং, কী, ডিজিটাল সিগনেচার"
+icon: logos:web3js
+---
+
+# ক্রিপ্টোগ্রাফির বুনিয়াদ: হ্যাশিং, কী, ডিজিটাল সিগনেচার — নিরাপদ ও ট্রাস্টলেস ব্লকচেইনের মূল
+
+## পরিচিতি
+
+ক্রিপ্টোগ্রাফি (Cryptography) হলো—ব্লকচেইন, ক্রিপ্টোকারেন্সি, ও Web3-এর নিরাপত্তার ভিত্তি। হ্যাশিং, কী, ও ডিজিটাল সিগনেচার—এই তিনটি টপিক Web3-এ ডেটা সুরক্ষা, ইউজার অথেন্টিকেশন, ও ট্রাস্টলেস লেনদেন নিশ্চিত করে।
+
+## Core Concepts
+
+### ১. হ্যাশিং (Hashing)
+- Hash Function: ডেটা থেকে নির্দিষ্ট দৈর্ঘ্যের অদ্বিতীয় (unique) কোড তৈরি
+- One-way: Input থেকে Output, Output থেকে Input পাওয়া যায় না
+- Example: SHA-256, Bitcoin Address
+- Use Case: ব্লকচেইনে ব্লক/ট্রানজ্যাকশন যাচাই
+
+### ২. কী (Key)
+- Public Key: সবার জন্য উন্মুক্ত, Address হিসেবে ব্যবহৃত
+- Private Key: গোপন, Signature তৈরি ও ফান্ড নিয়ন্ত্রণে ব্যবহৃত
+- Key Pair: Public + Private Key
+- Example: Ethereum Wallet Address
+- Use Case: ইউজার অথেন্টিকেশন, ফান্ড ট্রান্সফার
+
+### ৩. ডিজিটাল সিগনেচার (Digital Signature)
+- Signature: Private Key দিয়ে ডেটা/ট্রানজ্যাকশন সাইন
+- Verification: Public Key দিয়ে যাচাই
+- Non-repudiation: ইউজার অস্বীকার করতে পারে না
+- Example: Bitcoin Transaction Signature
+- Use Case: ট্রানজ্যাকশন অথেন্টিকেশন, Contract Execution
+
+### ৪. কীভাবে কাজ করে?
+1. ইউজার Private Key দিয়ে ট্রানজ্যাকশন সাইন করে
+2. নোডগুলো Public Key দিয়ে Signature যাচাই করে
+3. Valid হলে—ট্রানজ্যাকশন ব্লকচেইনে যুক্ত হয়
+
+### ৫. Real-life Use Cases
+- **Cryptocurrency Wallet:** ফান্ড নিয়ন্ত্রণ, অথেন্টিকেশন
+- **Secure Messaging:** End-to-end Encryption
+- **Document Signing:** Digital Contract
+- **dApp Authentication:** Wallet Connect
+
+### ৬. Analogies
+- Hashing—ডেটার ফিঙ্গারপ্রিন্ট
+- Public/Private Key—তালা ও চাবি
+- Digital Signature—ডিজিটাল স্বাক্ষর, কেউ নকল করতে পারে না
+
+### ৭. Common Pitfalls
+- Private Key Leak: ফান্ড/ডেটা চুরি
+- Weak Hash Function: Collision, Security Issue
+- Signature Forgery: Poor Implementation
+
+### ৮. Best Practices
+- Private Key Secure রাখুন (Hardware Wallet)
+- Strong Hash Function ব্যবহার করুন (SHA-256, Keccak)
+- Signature Implementation ভালোভাবে Audit করুন
+- Backup, Recovery Plan
+
+### ৯. Industry Trends
+- Zero-knowledge Proof, zk-SNARKs
+- Multi-signature Wallet
+- Post-quantum Cryptography
+
+## উপসংহার
+
+হ্যাশিং, কী, ও ডিজিটাল সিগনেচার—Web3 ও ব্লকচেইনের নিরাপত্তার মূল স্তম্ভ। সঠিকভাবে ব্যবহার করলে—ডেটা, ফান্ড, ও ইউজার অথেন্টিকেশন নিরাপদ থাকে। বাস্তব উদাহরণ, Best Practices, ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ইথেরিয়াম ও EVM বেসিকস

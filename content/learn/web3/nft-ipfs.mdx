@@ -1,0 +1,81 @@
+---
+title: "NFT মেটাডাটা ও IPFS স্টোরেজ"
+icon: logos:web3js
+---
+
+# NFT মেটাডাটা ও IPFS স্টোরেজ — ইউনিক ডিজিটাল অ্যাসেটের তথ্য সংরক্ষণ
+
+## পরিচিতি
+
+NFT (Non-Fungible Token) শুধু স্মার্ট কন্ট্রাক্টেই সীমাবদ্ধ নয়—এর সাথে থাকে "মেটাডাটা" (Metadata) যেমন: নাম, ছবি, বিবরণ, ও অন্যান্য তথ্য। Google Drive বা Netflix যেমন ফাইল/ভিডিওর তথ্য সংরক্ষণ করে, ঠিক তেমনই NFT-র মেটাডাটা IPFS-এ সংরক্ষণ করা হয়। এই পাঠে জানব—NFT মেটাডাটা কী, কেন দরকার, এবং কিভাবে IPFS-এ সংরক্ষণ করতে হয়।
+
+## Core Concepts
+
+### ১. NFT মেটাডাটা (Metadata) কী?
+- Token URI: NFT-র তথ্যের লিংক
+- JSON Format: name, description, image, attributes
+- On-chain vs Off-chain Metadata
+- Image, Video, Audio, Document
+
+### ২. IPFS (InterPlanetary File System) কী?
+- Decentralized Storage Network
+- Content Addressed: Hash-based Link
+- Public, Immutable, Distributed
+- NFT Image, Metadata, Document সংরক্ষণ
+
+### ৩. Workflow
+1. NFT Image/Metadata তৈরি করুন (JSON)
+2. IPFS-এ Upload করুন (Pinata, Infura, Web3.Storage)
+3. Token URI-তে IPFS Link দিন
+4. Contract-এ Metadata URI সংরক্ষণ করুন
+5. Marketplace/Wallet-এ NFT দেখান
+
+### ৪. NFT Metadata Example
+```json
+{
+  "name": "My NFT",
+  "description": "This is a unique digital art.",
+  "image": "ipfs://Qm.../image.png",
+  "attributes": [
+    { "trait_type": "Color", "value": "Blue" },
+    { "trait_type": "Rarity", "value": "Legendary" }
+  ]
+}
+```
+
+### ৫. Real-life Use Cases
+- **Digital Art:** OpenSea, Rarible
+- **Gaming Asset:** Unique Sword, Skin
+- **Identity:** Domain Name (ENS)
+- **Ticketing:** Event Pass
+
+### ৬. Analogies
+- Metadata—"ফাইলের তথ্যপত্র"
+- IPFS—"ডিসেন্ট্রালাইজড Google Drive"
+- Token URI—"ফাইলের লিংক"
+
+### ৭. Common Pitfalls
+- Metadata ভুল—NFT Image/Description mismatch
+- IPFS link broken—NFT Marketplace-এ সমস্যা
+- On-chain storage ব্যয়বহুল
+- Duplicate metadata—Uniqueness নষ্ট
+
+### ৮. Best Practices
+- Metadata JSON ভালোভাবে তৈরি করুন
+- IPFS-এ Pin করুন (Permanent Storage)
+- Token URI ঠিকভাবে সংরক্ষণ করুন
+- Security: Sensitive Data না রাখুন
+
+### ৯. Industry Trends
+- Dynamic Metadata (On-chain Update)
+- Decentralized Storage: Arweave, Filecoin
+- NFT Utility Expansion (Gaming, Identity)
+- Cross-chain NFT Metadata
+
+## উপসংহার
+
+NFT মেটাডাটা ও IPFS স্টোরেজ—ডিজিটাল অ্যাসেটের তথ্য সংরক্ষণ ও প্রদর্শনের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, NFT Marketplace, Gaming, ও Identity—সবকিছু সহজে ও নিরাপদে পরিচালনা করা যায়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই শক্তিশালী ও নিরাপদ NFT ইকোসিস্টেম তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ডেসেন্ট্রালাইজড স্টোরেজ: IPFS, Arweave

@@ -1,0 +1,99 @@
+---
+title: "Truffle ফ্রেমওয়ার্ক"
+icon: logos:web3js
+---
+
+# Truffle ফ্রেমওয়ার্ক — স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্টের জন্য অল-ইন-ওয়ান টুল
+
+## পরিচিতি
+
+Truffle হলো—ইথেরিয়াম স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্টের জন্য সবচেয়ে পুরনো, জনপ্রিয় ও অল-ইন-ওয়ান ফ্রেমওয়ার্ক। Google বা Netflix যেমন তাদের সফটওয়্যার ডেভেলপমেন্টে ফ্রেমওয়ার্ক ব্যবহার করে, ঠিক তেমনই Web3 ডেভেলপমেন্টে Truffle অপরিহার্য। এই পাঠে জানব—Truffle কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. Truffle কী?
+- Contract Compile, Test, Deploy, Migrate
+- Built-in Testing (Mocha/Chai)
+- Network Management (Local/Testnet/Mainnet)
+- Truffle Console (REPL)
+- Integration: Ganache, OpenZeppelin
+
+### ২. Workflow
+1. Project Setup করুন
+2. Contract লিখুন (Solidity)
+3. Compile করুন
+4. Test লিখুন ও চালান
+5. Deploy/Migrate করুন
+6. Console-এ Interact করুন
+
+### ৩. Truffle Project Setup
+```bash
+mkdir my-truffle-project
+cd my-truffle-project
+npm init -y
+npm install -g truffle
+truffle init
+```
+
+### ৪. Compile Contract
+```bash
+truffle compile
+```
+
+### ৫. Test Contract
+```javascript
+const Counter = artifacts.require("Counter");
+contract("Counter", accounts => {
+  it("Should increment count", async () => {
+    const counter = await Counter.new();
+    await counter.increment();
+    const value = await counter.count();
+    assert.equal(value, 1);
+  });
+});
+```
+
+### ৬. Deploy/Migrate Contract
+```bash
+truffle migrate --network development
+```
+
+### ৭. Truffle Console
+```bash
+truffle console
+```
+
+### ৮. Real-life Use Cases
+- **Production Deployment:** DeFi, NFT, DAO
+- **Automated Testing:** Continuous Integration
+- **Scripted Migration:** Contract Upgrade
+- **Debugging:** Console Interaction
+
+### ৯. Analogies
+- Truffle—যেন Web3-এর "Swiss Army Knife"
+- Console—নিজস্ব "Command Center"
+
+### ১০. Common Pitfalls
+- Network config ভুল হলে—Deploy fail
+- Test coverage কম হলে—Bug থেকে যায়
+- Migration script ভুল হলে—Contract upgrade fail
+
+### ১১. Best Practices
+- Test লিখুন ও চালান
+- Network config ভালোভাবে চেক করুন
+- Migration script versioning করুন
+- Documentation ও Team Review
+
+### ১২. Industry Trends
+- Truffle + Ganache Integration
+- Automated Security Testing
+- Forked Mainnet Testing
+- Deployment Script Automation
+
+## উপসংহার
+
+Truffle—Web3 ডেভেলপমেন্টের জন্য শক্তিশালী ও অল-ইন-ওয়ান ফ্রেমওয়ার্ক। Contract Compile, Test, Deploy—সবকিছু সহজ ও অটোমেটেড। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্ট সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Ganache দিয়ে লোকাল ব্লকচেইন সিমুলেশন

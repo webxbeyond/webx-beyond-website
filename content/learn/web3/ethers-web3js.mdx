@@ -1,0 +1,78 @@
+---
+title: "Ethers.js ও Web3.js লাইব্রেরি"
+icon: logos:web3js
+---
+
+# Ethers.js ও Web3.js লাইব্রেরি — স্মার্ট কন্ট্রাক্টের সাথে ইন্টারঅ্যাক্ট করার আধুনিক টুল
+
+## পরিচিতি
+
+Ethers.js ও Web3.js হলো—ইথেরিয়াম ব্লকচেইনের সাথে ফ্রন্টএন্ড, ব্যাকএন্ড বা স্ক্রিপ্ট থেকে স্মার্ট কন্ট্রাক্ট ইন্টারঅ্যাক্ট করার জন্য সবচেয়ে জনপ্রিয় JavaScript লাইব্রেরি। Google বা Uber যেমন API দিয়ে ডেটা আদান-প্রদান করে, ঠিক তেমনই Web3 অ্যাপে এই লাইব্রেরি ব্যবহার হয়। এই পাঠে জানব—Ethers.js ও Web3.js কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. Ethers.js ও Web3.js কী?
+- Blockchain RPC (Remote Procedure Call) Interface
+- Contract Read/Write, Transaction Send, Event Listen
+- Wallet Integration (MetaMask, Hardware Wallet)
+- Network Management (Mainnet, Testnet, Local)
+
+### ২. Workflow
+1. Provider Setup করুন (Infura, Alchemy, Local)
+2. Contract ABI ও Address ব্যবহার করুন
+3. Contract Instance তৈরি করুন
+4. Function Call/Transaction Send করুন
+5. Event Listen করুন
+
+### ৩. Ethers.js Example
+```javascript
+import { ethers } from "ethers";
+const provider = new ethers.JsonRpcProvider("https://mainnet.infura.io/v3/YOUR_KEY");
+const abi = ["function count() view returns (uint)", "function increment()"];
+const contract = new ethers.Contract("0xContractAddress", abi, provider);
+const value = await contract.count();
+```
+
+### ৪. Web3.js Example
+```javascript
+import Web3 from "web3";
+const web3 = new Web3("https://mainnet.infura.io/v3/YOUR_KEY");
+const abi = [/* ABI Array */];
+const contract = new web3.eth.Contract(abi, "0xContractAddress");
+const value = await contract.methods.count().call();
+```
+
+### ৫. Real-life Use Cases
+- **dApp Frontend:** Contract Read/Write
+- **Wallet Integration:** MetaMask, WalletConnect
+- **Analytics Dashboard:** Event Listen
+- **Automated Script:** Token Transfer, Batch Transaction
+
+### ৬. Analogies
+- Ethers.js/Web3.js—যেন "Remote Control" দিয়ে Blockchain চালানো
+- Provider—"Internet Connection" Blockchain-এর
+
+### ৭. Common Pitfalls
+- Wrong ABI/Address—Function call fail
+- Network mismatch—Transaction fail
+- Unhandled error—User experience খারাপ
+
+### ৮. Best Practices
+- ABI ও Address ভালোভাবে চেক করুন
+- Error Handling করুন
+- Network config ঠিক রাখুন
+- Security: Private Key leak এড়ান
+
+### ৯. Industry Trends
+- Ethers.js: Lightweight, Modern API
+- Web3.js: Legacy Support, Wide Adoption
+- Wallet Integration: Multi-chain, Mobile
+- Event-driven UI: Real-time Update
+
+## উপসংহার
+
+Ethers.js ও Web3.js—Web3 অ্যাপ ডেভেলপমেন্টের জন্য অপরিহার্য লাইব্রেরি। Contract Read/Write, Transaction, Event—সবকিছু সহজ ও দ্রুত। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল dApp তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ফ্রন্টএন্ডের সাথে স্মার্ট কন্ট্রাক্ট কানেক্ট করা

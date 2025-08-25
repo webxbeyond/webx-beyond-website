@@ -1,0 +1,87 @@
+---
+title: "সাধারণ কন্ট্রাক্ট লেখা (HelloWorld, স্টোরেজ কন্ট্রাক্ট)"
+icon: logos:web3js
+---
+
+# সাধারণ কন্ট্রাক্ট লেখা (HelloWorld, স্টোরেজ কন্ট্রাক্ট) — স্মার্ট কন্ট্রাক্টের প্রথম ধাপ
+
+## পরিচিতি
+
+ইথেরিয়াম ও Web3 ডেভেলপমেন্টে স্মার্ট কন্ট্রাক্ট লেখা শেখা হলো—প্রথম ধাপ। HelloWorld ও Storage Contract—দুইটি সহজ উদাহরণ, যা দিয়ে Solidity, Contract Structure, ও Blockchain Interaction বোঝা যায়।
+
+## Core Concepts
+
+### ১. HelloWorld Contract
+- Basic Structure: Contract, State Variable, Function
+- Example:
+```solidity
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    string public message = "Hello, Web3!";
+    function setMessage(string memory newMessage) public {
+        message = newMessage;
+    }
+}
+```
+- Explanation:
+    - `message`: State Variable
+    - `setMessage`: Function, Public Access
+    - `public`: Anyone can call
+
+### ২. Storage Contract
+- Persistent Data Store: Blockchain-এ ডেটা সংরক্ষণ
+- Example:
+```solidity
+pragma solidity ^0.8.0;
+
+contract SimpleStorage {
+    uint256 public data;
+    function setData(uint256 newData) public {
+        data = newData;
+    }
+}
+```
+- Explanation:
+    - `data`: State Variable
+    - `setData`: Function, Value Update
+
+### ৩. Deployment Steps
+1. Contract লিখুন (Solidity)
+2. Compile করুন (Remix, Hardhat)
+3. Deploy করুন (Testnet/Mainnet)
+4. Interact করুন (Function Call)
+
+### ৪. Real-life Use Cases
+- **Token Contract:** ERC20, ERC721
+- **Voting:** DAO Contract
+- **Crowdfunding:** ICO Contract
+- **Gaming:** In-game Asset Contract
+
+### ৫. Analogies
+- Contract—একটি ফর্ম, Function—ফর্মের Submit Button
+- Storage Contract—ডিজিটাল খাতা, যেখানে ডেটা লিখে রাখা যায়
+
+### ৬. Common Pitfalls
+- Buggy Code: Security Issue
+- Public Function Abuse
+- Gas Inefficiency
+
+### ৭. Best Practices
+- Use Proven Standards (OpenZeppelin)
+- Thorough Testing, Audit
+- Optimize for Low Gas
+- Documentation ও Team Review
+
+### ৮. Industry Trends
+- Upgradeable Contract
+- Automated Testing
+- Formal Verification
+
+## উপসংহার
+
+HelloWorld ও Storage Contract—স্মার্ট কন্ট্রাক্ট শেখার প্রথম ধাপ। Solidity Structure, Deployment, ও Interaction—সবকিছু সহজে বোঝার জন্য এই উদাহরণগুলো ব্যবহার করুন। বাস্তব উদাহরণ, Best Practices, ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল স্মার্ট কন্ট্রাক্ট তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Remix IDE দিয়ে ডিপ্লয়মেন্ট

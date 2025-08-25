@@ -1,0 +1,71 @@
+---
+title: "সলিডিটি পরিচিতি"
+icon: logos:web3js
+---
+
+# সলিডিটি পরিচিতি — স্মার্ট কন্ট্রাক্ট লেখার ভাষা
+
+## পরিচিতি
+
+সলিডিটি (Solidity) হলো—ইথেরিয়াম ও Web3 স্মার্ট কন্ট্রাক্ট লেখার জন্য সবচেয়ে জনপ্রিয় প্রোগ্রামিং ভাষা। এই পাঠে জানব—সলিডিটি কী, কীভাবে কাজ করে, এবং কেন এটি Web3 ডেভেলপারদের জন্য অপরিহার্য।
+
+## Core Concepts
+
+### ১. Solidity কী?
+- Contract-oriented Language: স্মার্ট কন্ট্রাক্ট লেখার জন্য ডিজাইন
+- Syntax: JavaScript, C++, Python-এর মতো
+- Static Typing, Inheritance, Library Support
+- Example: ERC20, ERC721 Token Contract
+
+### ২. Solidity Structure
+1. **Contract:** কোডের মূল ইউনিট
+2. **State Variable:** ডেটা সংরক্ষণ
+3. **Function:** Logic/Action
+4. **Event:** Blockchain-এ Notification
+5. **Modifier:** Function Behavior Control
+
+### ৩. Basic Example
+```solidity
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    string public message = "Hello, Web3!";
+    function setMessage(string memory newMessage) public {
+        message = newMessage;
+    }
+}
+```
+
+### ৪. Real-life Use Cases
+- **Token Contract:** ERC20, ERC721
+- **Crowdfunding:** ICO Contract
+- **Voting:** DAO Contract
+- **Gaming:** In-game Asset Contract
+
+### ৫. Analogies
+- Solidity—চুক্তি লেখার ভাষা, Blockchain—নোটারি অফিস
+- Contract—একটি ফর্ম, Function—ফর্মের Action Button
+
+### ৬. Common Pitfalls
+- Buggy Code: Security Issue, Fund Loss
+- Gas Inefficiency: High Cost
+- Upgrade Issue: Immutable Contract
+
+### ৭. Best Practices
+- Use Proven Standards (OpenZeppelin)
+- Thorough Testing, Audit
+- Optimize for Low Gas
+- Documentation ও Team Review
+
+### ৮. Industry Trends
+- Vyper, Rust—Solidity Alternative
+- Upgradeable Contract Pattern
+- Formal Verification, Automated Audit
+
+## উপসংহার
+
+সলিডিটি—Web3 ও Ethereum স্মার্ট কন্ট্রাক্ট লেখার জন্য অপরিহার্য। Token, dApp, DAO—সবকিছু এই ভাষায় লেখা হয়। বাস্তব উদাহরণ, Best Practices, ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল স্মার্ট কন্ট্রাক্ট তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** সাধারণ কন্ট্রাক্ট লেখা (HelloWorld, স্টোরেজ কন্ট্রাক্ট)

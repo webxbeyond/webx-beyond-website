@@ -1,0 +1,78 @@
+---
+title: "OpenZeppelin লাইব্রেরি ব্যবহার"
+icon: logos:web3js
+---
+
+# OpenZeppelin লাইব্রেরি ব্যবহার — Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তার স্ট্যান্ডার্ড
+
+## পরিচিতি
+
+OpenZeppelin হলো—Web3 ও স্মার্ট কন্ট্রাক্ট ডেভেলপমেন্টে সবচেয়ে জনপ্রিয় ও নিরাপদ লাইব্রেরি। যেমন Google বা Netflix-এ Security Framework ব্যবহার হয়, ঠিক তেমনই OpenZeppelin-এর Contract, Library, ও Tool ব্যবহার করলে Contract Hack, Bug, ও Vulnerability এড়ানো সহজ হয়।
+
+## Core Concepts
+
+### ১. OpenZeppelin কী?
+- Solidity-তে Standard Contract Library
+- ERC-20, ERC-721, Access Control, SafeMath
+- Audit করা ও Community-verified
+- Upgradeable Contract Support
+
+### ২. Workflow
+1. Install OpenZeppelin (npm, yarn)
+2. Import Contract (ERC20, Ownable, SafeMath)
+3. Inherit Contract
+4. Deploy & Test
+
+### ৩. Real-life Use Cases
+- **Token Launch:** ERC-20 Contract
+- **NFT Mint:** ERC-721 Contract
+- **Access Control:** Ownable, Role-based
+- **Upgradeability:** Proxy Contract
+
+### ৪. Examples & Analogies
+- OpenZeppelin—"নিরাপত্তার Ready-made ফাউন্ডেশন"
+- Inherit—"বাবার সম্পত্তি পাওয়া"
+- SafeMath—"বালতি উপচে না পড়া"
+
+### ৫. Common Pitfalls
+- Custom Logic লিখে Vulnerability
+- Upgradeable Contract ভুল
+- Access Control Modifier Miss
+- Library Version পুরনো
+
+### ৬. Best Practices
+- Latest Version ব্যবহার করুন
+- Contract Inherit করুন, Custom Logic কম
+- Access Control Modifier ব্যবহার করুন
+- Upgradeable Contract Proxy Pattern
+- Automated Test লিখুন
+
+### ৭. Industry Trends
+- Automated Audit Tool Integration
+- Multi-chain Contract Support
+- Community-driven Security Update
+- Layer 2 Compatibility
+
+## Installation & Usage
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyToken is ERC20, Ownable {
+    constructor() ERC20("MyToken", "MTK") {
+        _mint(msg.sender, 1000 * 10 ** decimals());
+    }
+}
+```
+
+## উপসংহার
+
+OpenZeppelin লাইব্রেরি—Web3 ও স্মার্ট কন্ট্রাক্টে নিরাপত্তা, Standardization, ও Scalability-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Contract Hack, Bug, ও Vulnerability—সবকিছু এড়ানো সহজ হয়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল Web3 অ্যাপ তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** Slither ও MythX দিয়ে কন্ট্রাক্ট অডিটিং

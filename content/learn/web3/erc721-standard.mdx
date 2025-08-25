@@ -1,0 +1,76 @@
+---
+title: "ERC-721 NFT স্ট্যান্ডার্ড"
+icon: logos:web3js
+---
+
+# ERC-721 NFT স্ট্যান্ডার্ড — ইউনিক ডিজিটাল অ্যাসেটের ভিত্তি
+
+## পরিচিতি
+
+ERC-721 হলো—ইথেরিয়াম ব্লকচেইনে NFT (Non-Fungible Token) তৈরির জন্য সবচেয়ে জনপ্রিয় ও স্ট্যান্ডার্ড কন্ট্রাক্ট। Google বা Netflix যেমন ইউজারদের জন্য ইউনিক আইডি বা অ্যাসেট ব্যবহার করে, ঠিক তেমনই ERC-721 দিয়ে Web3-এ ইউনিক ডিজিটাল অ্যাসেট, আর্ট, বা গেমিং আইটেম তৈরি করা যায়। এই পাঠে জানব—ERC-721 কী, কেন দরকার, এবং কিভাবে ব্যবহার করতে হয়।
+
+## Core Concepts
+
+### ১. ERC-721 কী?
+- "Ethereum Request for Comment" (ERC) — NFT স্ট্যান্ডার্ড
+- Non-Fungible Token: প্রতিটি টোকেন ইউনিক
+- Standard Functions: ownerOf, transferFrom, safeTransferFrom, approve
+- Metadata: Token URI, Image, Description
+
+### ২. Workflow
+1. Contract লিখুন (Solidity)
+2. ERC-721 Interface Implement করুন
+3. Deploy করুন (Testnet/Mainnet)
+4. Mint, Transfer, Burn করুন
+5. Marketplace, Wallet-এ Integrate করুন
+
+### ৩. Solidity ERC-721 Example
+```solidity
+pragma solidity ^0.8.0;
+
+interface IERC721 {
+    function ownerOf(uint256 tokenId) external view returns (address);
+    function transferFrom(address from, address to, uint256 tokenId) external;
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function approve(address to, uint256 tokenId) external;
+    function getApproved(uint256 tokenId) external view returns (address);
+}
+```
+
+### ৪. Real-life Use Cases
+- **Digital Art:** NFT Marketplace (OpenSea)
+- **Gaming Asset:** Unique Sword, Skin
+- **Identity:** Domain Name (ENS)
+- **Ticketing:** Event Pass
+
+### ৫. Analogies
+- ERC-721—"ডিজিটাল জমির দলিল" (Digital Deed)
+- ownerOf—"জমির মালিকানা"
+- transferFrom—"জমি হস্তান্তর"
+
+### ৬. Common Pitfalls
+- Contract bug—NFT loss
+- Metadata ভুল—Image/Description mismatch
+- No event emit—Marketplace integration সমস্যা
+- Duplicate mint—Uniqueness নষ্ট
+
+### ৭. Best Practices
+- OpenZeppelin ERC-721 Implementation ব্যবহার করুন
+- Testnet-এ Deploy ও Test করুন
+- Event emit করুন (Transfer, Approval)
+- Metadata ঠিকভাবে সংরক্ষণ করুন
+- Security Audit করুন
+
+### ৮. Industry Trends
+- Dynamic NFT (On-chain Metadata)
+- Cross-chain NFT
+- Fractional NFT
+- Royalty Feature
+
+## উপসংহার
+
+ERC-721 NFT—Web3 ও ডিজিটাল ইকোসিস্টেমে ইউনিক অ্যাসেট, আর্ট, ও গেমিং আইটেমের ভিত্তি। সঠিকভাবে ব্যবহার করলে, NFT Marketplace, Gaming, ও Identity—সবকিছু ERC-721 দিয়ে সহজে তৈরি ও ব্যবস্থাপনা করা যায়। Best Practices ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল NFT তৈরি সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** ERC-1155 মাল্টি-টোকেন স্ট্যান্ডার্ড
