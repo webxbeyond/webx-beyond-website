@@ -24,7 +24,12 @@
     "ai",
     "pytorch",
 
+    "aws",
+    "vault",
+
     "blockchain",
-    "crypto-wallet"
+    "crypto-wallet",
+    "solidity",
+    "web3"
   ]
 }

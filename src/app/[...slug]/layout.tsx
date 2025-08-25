@@ -32,24 +32,25 @@ export default function Layout({ children }: LayoutProps<'/'>) {
         // ),
       }}
       sidebar={{
-        tabs: {
-          transform(option, node) {
-            const meta = source.getNodeMeta(node);
-            if (!meta || !node.icon) return option;
+        tabs: false,
+        // tabs: {
+        //   transform(option, node) {
+        //     const meta = source.getNodeMeta(node);
+        //     if (!meta || !node.icon) return option;
 
-            return {
-              ...option,
-              description: false,
-              icon: (
-                <div
+        //     return {
+        //       ...option,
+        //       description: false,
+        //       icon: (
+        //         <div
                   
-                >
-                  {node.icon}
-                </div>
-              ),
-            };
-          },
-        },
+        //         >
+        //           {node.icon}
+        //         </div>
+        //       ),
+        //     };
+        //   },
+        // },
       }}
      >
       {children}
