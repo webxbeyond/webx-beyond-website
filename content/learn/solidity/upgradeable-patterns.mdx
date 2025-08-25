@@ -1,0 +1,96 @@
+---
+title: "Upgradeable কন্ট্রাক্ট প্যাটার্ন (Proxy, UUPS)"
+icon: logos:solidity
+---
+
+# Upgradeable কন্ট্রাক্ট প্যাটার্ন (Proxy, UUPS) — Solidity-তে Future-Proof dApp Design
+
+## প্রস্তাবনা
+
+Google বা Netflix-এর মতো বড় টেক কোম্পানিতে Software Update, Bug Fix বা Feature Add করতে হলে System বন্ধ না করেই Upgrade করতে হয়। Solidity Smart Contract-এও Upgradeable Contract Pattern—Proxy, UUPS—ব্যবহার করে dApp Future-Proof, Maintainable ও Secure রাখা যায়।
+
+## Core Concepts
+
+### ১. Upgradeable Contract Pattern
+- **Definition:** Contract-এর address পরিবর্তন না করেই নতুন logic যুক্ত করার পদ্ধতি
+- **ব্যবহার:** dApp Maintenance, Feature Update, Bug Fix
+- **Techniques:**
+    - Proxy Pattern
+    - UUPS (Universal Upgradeable Proxy Standard)
+
+### ২. Proxy Pattern
+- **Definition:** Contract-এর address অপরিবর্তিত রেখে Logic Contract পরিবর্তন
+- **Workflow:**
+    1. Proxy Contract—User Interaction
+    2. Logic Contract—Business Logic
+    3. Admin—Upgrade Logic Contract
+- **উদাহরণ:**
+```solidity
+contract Proxy {
+    address public logic;
+    function upgrade(address _logic) public {
+        logic = _logic;
+    }
+    fallback() external payable {
+        (bool success, ) = logic.delegatecall(msg.data);
+        require(success, "Delegatecall failed");
+    }
+}
+```
+
+### ৩. UUPS Pattern
+- **Definition:** Logic Contract নিজেই Upgrade Functionality Handle করে
+- **Features:**
+    - Efficient
+    - Less Storage
+    - Industry Standard (OpenZeppelin)
+- **উদাহরণ:**
+```solidity
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+contract MyContract is UUPSUpgradeable {
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+}
+```
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Future-Proof dApp
+- Cost Efficiency
+- Security
+- User Experience
+
+### ৫. কখন ব্যবহার করবেন?
+- Long-term dApp
+- Frequent Update
+- Security Patch
+
+### ৬. Common Pitfalls
+- Storage Layout mismatch
+- Improper Access Control
+- Upgrade Function ভুল
+
+### ৭. Best Practices
+- Storage Layout Maintain করুন
+- Use OpenZeppelin Implementation
+- Proper Access Control
+- Audit before Upgrade
+
+### ৮. Industry Trends
+- UUPS—Efficient Upgrade
+- EIP-1967—Standardized Storage Slot
+- Automated Upgrade Script
+
+## উদাহরণ ও এনালজি
+- Proxy—"বাড়ির ঠিকানা একই, ভেতরের ডিজাইন বদলানো যায়"
+- UUPS—"গাড়ির ইঞ্জিন নিজেই আপগ্রেড করতে পারে"
+
+## Quick Reference
+- Proxy: `delegatecall` via Proxy Contract
+- UUPS: `UUPSUpgradeable` via OpenZeppelin
+
+## উপসংহার
+
+Upgradeable Contract Pattern—Solidity-তে dApp Future-Proof, Maintainable ও Secure করার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract দীর্ঘমেয়াদে নিরাপদ, Efficient ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Upgradeable Contract Pattern-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Gas-Efficient Data Structures

@@ -1,0 +1,92 @@
+---
+title: "পেমেন্ট রিসিভ ও ট্রান্সফার করা"
+icon: logos:solidity
+---
+
+# পেমেন্ট রিসিভ ও ট্রান্সফার করা — Solidity-তে Ether Handling
+
+## প্রস্তাবনা
+
+যেমন Uber-এ রাইডের জন্য পেমেন্ট নেওয়া ও পাঠানো হয়, তেমনই Ethereum Contract-এ Ether Receive ও Transfer করা হয়। Solidity-তে পেমেন্ট হ্যান্ডলিং বুঝলে Contract নিরাপদ, কার্যকর ও User-friendly হয়।
+
+## Core Concepts
+
+### ১. Ether Receive
+- **Contract-এ Ether পাঠানো:** Receive Function, Payable Modifier
+- **ব্যবহার:** Crowdfunding, Token Sale
+- **উদাহরণ:**
+```solidity
+receive() external payable {
+    // Ether Received
+}
+```
+
+### ২. Ether Transfer
+- **Contract থেকে Ether পাঠানো:** transfer, send, call
+- **ব্যবহার:** Payment, Refund, Withdrawal
+- **উদাহরণ:**
+```solidity
+function withdraw() public {
+    payable(msg.sender).transfer(address(this).balance);
+}
+```
+
+### ৩. Payable Function
+- **Ether Receive/Transfer-এর জন্য:** Function-এ payable Modifier
+- **উদাহরণ:**
+```solidity
+function deposit() public payable {
+    // Ether Deposited
+}
+```
+
+### ৪. Transfer Methods
+| Method    | Success/Error | Gas Limit | Usage         |
+|-----------|---------------|-----------|--------------|
+| transfer  | Error         | 2300      | Simple Send  |
+| send      | Boolean       | 2300      | Low-level    |
+| call      | Boolean/Data  | Custom    | Advanced     |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- User Payment
+- Contract Security
+- Refund/Withdrawal
+
+### ৬. বাস্তব উদাহরণ
+- Crowdfunding Contract: User Ether Receive
+- dApp Payment: Service Fee Transfer
+- Token Sale: Ether Receive, Token Issue
+
+### ৭. Common Pitfalls
+- Non-payable Function-এ Ether Send
+- transfer/send-এর Limit
+- call-এর Security Risk
+
+### ৮. Best Practices
+- Payable Modifier ব্যবহার করুন
+- Proper Error Handling
+- Minimal Ether Storage
+- Security Audit
+
+### ৯. Industry Trends
+- Pull Payment Pattern
+- Reentrancy Guard
+- Layer 2 Payment Integration
+
+## উদাহরণ ও এনালজি
+- Receive—"বিক্রেতা টাকা গ্রহণ করছে"
+- Transfer—"বিক্রেতা টাকা ফেরত দিচ্ছে"
+
+## Quick Reference
+
+- Receive: `receive() external payable {}`
+- Payable: `function name() public payable {}`
+- Transfer: `payable(address).transfer(amount)`
+
+## উপসংহার
+
+Ether Receive ও Transfer—Solidity-তে Contract-এর Payment Handling, Security ও User Experience-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, কার্যকর ও User-friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Ether Handling-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** payable ফাংশন ও fallback

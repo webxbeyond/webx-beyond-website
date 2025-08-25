@@ -1,0 +1,92 @@
+---
+title: "সলিডিটি সিনট্যাক্স বেসিকস"
+icon: logos:solidity
+---
+
+# সলিডিটি সিনট্যাক্স বেসিকস — শুরু থেকে আত্মবিশ্বাস
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ কোড লেখার জন্য নির্দিষ্ট সিনট্যাক্স (Syntax) জানা জরুরি, তেমনই Solidity-তে স্মার্ট কন্ট্রাক্ট লেখার জন্য কিছু মৌলিক সিনট্যাক্স জানা দরকার। এই পাঠে আমরা Solidity-র বেসিক সিনট্যাক্স, গঠন, এবং সাধারণ ভুলত্রুটি নিয়ে আলোচনা করব—যাতে আপনি শুরু থেকেই আত্মবিশ্বাসী থাকেন।
+
+## Core Concepts
+
+### ১. Solidity ফাইল স্ট্রাকচার
+- `.sol` এক্সটেনশন
+- প্রথম লাইনে `pragma solidity` দিয়ে ভার্সন ডিফাইন
+- SPDX-License-Identifier
+
+### ২. Contract ডিফিনিশন
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    string public greet = "Hello, Solidity!";
+}
+```
+- `contract` কীওয়ার্ড দিয়ে শুরু
+- ভেতরে ভেরিয়েবল, ফাংশন, ইভেন্ট
+
+### ৩. ভেরিয়েবল টাইপ
+- `string`, `uint`, `address`, `bool`
+- Public, Private, Internal, External
+
+### ৪. ফাংশন সিনট্যাক্স
+```solidity
+function setGreet(string memory _greet) public {
+    greet = _greet;
+}
+```
+- `function` কীওয়ার্ড
+- প্যারামিটার, রিটার্ন টাইপ
+- Visibility (public, private)
+
+### ৫. কমেন্ট
+- `//` এক লাইনের জন্য
+- `/* ... */` মাল্টিলাইন
+
+### ৬. ইভেন্ট ও লগিং
+```solidity
+event GreetChanged(string newGreet);
+```
+
+### ৭. কনস্ট্রাক্টর
+```solidity
+constructor() {
+    greet = "Welcome!";
+}
+```
+
+## উদাহরণ ও এনালজি
+- Contract—"ক্লাসের মতো"
+- Function—"মেথড"
+- Variable—"প্রপার্টি"
+
+## সাধারণ ভুলত্রুটি
+- `memory` ও `storage` ভুল ব্যবহার
+- Visibility ভুল
+- Syntax Error (মিসিং সেমিকোলন)
+
+## Best Practices
+- Remix IDE-তে কোড লিখে Compile ও Deploy করুন
+- Proper Comment ও Naming Convention
+- Test Contract Before Deploy
+
+## Industry Trends
+- Solidity সিনট্যাক্সে নতুন ফিচার (Custom Errors, Receive/Fallback)
+- Version Update (0.8.x)
+
+## Quick Reference
+
+- Contract শুরু: `contract ContractName {}`
+- ফাংশন: `function name(params) visibility returns(type) {}`
+- ভেরিয়েবল: `type visibility name;`
+
+## উপসংহার
+
+Solidity-র বেসিক সিনট্যাক্স জানা থাকলে, স্মার্ট কন্ট্রাক্ট লেখা সহজ ও নিরাপদ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করলে—আপনি দ্রুত একজন দক্ষ Solidity Developer হয়ে উঠতে পারবেন।
+
+---
+
+**পরবর্তী পাঠ:** প্রথম স্মার্ট কন্ট্রাক্ট লেখা ও ডিপ্লয় করা

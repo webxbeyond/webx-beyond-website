@@ -1,0 +1,77 @@
+---
+title: "OpenZeppelin লাইব্রেরি ব্যবহার"
+icon: logos:solidity
+---
+
+# OpenZeppelin লাইব্রেরি ব্যবহার — Solidity-তে নিরাপত্তা ও স্ট্যান্ডার্ড
+
+## প্রস্তাবনা
+
+Google বা Netflix-এর মতো বড় টেক কোম্পানিতে Security ও Standardization-এর জন্য Trusted Library ব্যবহার করা হয়। Solidity-তে ঠিক তেমনই OpenZeppelin Library—Security, Standardization ও Rapid Development-এর জন্য Industry Standard।
+
+## Core Concepts
+
+### ১. OpenZeppelin কী?
+- **Definition:** Solidity-তে Security ও Standard Contract-এর জন্য Open Source Library
+- **ব্যবহার:** ERC20, ERC721, Access Control, SafeMath
+- **উদাহরণ:**
+```solidity
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+contract MyToken is ERC20 {
+    constructor() ERC20("MyToken", "MTK") {
+        _mint(msg.sender, 1000 * 10 ** decimals());
+    }
+}
+```
+
+### ২. Security Features
+- ReentrancyGuard
+- Ownable
+- Pausable
+- SafeMath
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Industry Standard
+- Rapid Development
+- Audit Friendly
+
+### ৪. কখন ব্যবহার করবেন?
+- Token Contract
+- Access Control
+- Upgradeable Contract
+- Security Critical Logic
+
+### ৫. Common Pitfalls
+- Library Version mismatch
+- Custom Logic-এ Security Feature বাদ দেয়া
+- Proper Documentation না রাখা
+
+### ৬. Best Practices
+- Always use latest version
+- Properly inherit security modules
+- Document custom logic
+- Audit before deploy
+
+### ৭. Industry Trends
+- ERC Standards—OpenZeppelin Implementation
+- Upgradeable Contract—OpenZeppelin Proxy
+- Automated Security Audit
+
+## উদাহরণ ও এনালজি
+- OpenZeppelin—"বিশ্ববিদ্যালয়ের স্ট্যান্ডার্ড বই, সবাই ব্যবহার করে"
+- Ownable—"বাড়ির মালিকানা, কে কী করতে পারবে"
+- ReentrancyGuard—"দরজায় নিরাপত্তা তালা"
+
+## Quick Reference
+- ERC20: `import "@openzeppelin/contracts/token/ERC20/ERC20.sol";`
+- Ownable: `import "@openzeppelin/contracts/access/Ownable.sol";`
+- ReentrancyGuard: `import "@openzeppelin/contracts/security/ReentrancyGuard.sol";`
+
+## উপসংহার
+
+OpenZeppelin Library—Solidity-তে Security, Standardization ও Rapid Development-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, Maintainable ও Industry Standard হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে OpenZeppelin Library ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Auditing Tools: Slither, MythX

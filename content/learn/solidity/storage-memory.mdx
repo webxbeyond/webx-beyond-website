@@ -1,0 +1,95 @@
+---
+title: "স্টোরেজ বনাম মেমোরি বনাম ক্যালডাটা"
+icon: logos:solidity
+---
+
+# স্টোরেজ বনাম মেমোরি বনাম ক্যালডাটা — Solidity-তে ডাটা ব্যবস্থাপনার গভীরতা
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ ডাটা কোথায়, কতক্ষণ, কীভাবে রাখা হবে—তা নির্ধারণ করা হয়, তেমনই Solidity-তে ডাটা ব্যবস্থাপনায় Storage, Memory, ও Calldata-এর ভূমিকা অত্যন্ত গুরুত্বপূর্ণ। এই পাঠে আমরা এই তিনটি Data Location-এর পার্থক্য, ব্যবহার, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract নিরাপদ ও দক্ষ হয়।
+
+## Core Concepts
+
+### ১. Storage
+- **পার্মানেন্ট ডাটা:** Contract-এর State Variable এখানে থাকে
+- **ব্যবহার:** Long-term Data, Persistent State
+- **উদাহরণ:** User Balance, Token Supply
+
+#### Storage Example
+```solidity
+uint public totalSupply; // Storage
+```
+
+### ২. Memory
+- **টেম্পোরারি ডাটা:** Function Call-এর সময়, Execution শেষে মুছে যায়
+- **ব্যবহার:** Function-এর ভেতরে Temporary Calculation
+- **উদাহরণ:** Array Copy, String Manipulation
+
+#### Memory Example
+```solidity
+function getName() public view returns (string memory) {
+    string memory name = "Anis";
+    return name;
+}
+```
+
+### ৩. Calldata
+- **Read-only Input Data:** External Function Call-এর জন্য
+- **ব্যবহার:** Function Parameter, Gas Optimization
+- **উদাহরণ:** External Function-এর Array/String Input
+
+#### Calldata Example
+```solidity
+function setNames(string[] calldata names) external {
+    // names is calldata
+}
+```
+
+### ৪. পার্থক্য
+| বিষয়         | Storage           | Memory            | Calldata         |
+|--------------|-------------------|-------------------|------------------|
+| Lifetime     | পার্মানেন্ট        | টেম্পোরারি        | টেম্পোরারি (Input)|
+| Access       | Read/Write        | Read/Write        | Read-only        |
+| Use Case     | State Variable    | Function Variable | Function Input   |
+| Gas Cost     | বেশি              | মাঝারি            | কম               |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Contract Performance
+- Gas Optimization
+- Data Security
+
+### ৬. Common Pitfalls
+- Storage vs Memory ভুল ব্যবহার
+- Calldata-তে Write চেষ্টা
+- Uninitialized Variable
+
+### ৭. Best Practices
+- State Variable—Storage
+- Temporary Variable—Memory
+- External Input—Calldata
+- Proper Initialization
+
+### ৮. Industry Trends
+- Storage Optimization
+- Calldata Usage for Gas Saving
+- Advanced Data Location Patterns
+
+## উদাহরণ ও এনালজি
+- Storage—"ডাটাবেসে স্থায়ীভাবে রাখা"
+- Memory—"RAM-এ অস্থায়ীভাবে রাখা"
+- Calldata—"ইনপুট ফর্ম থেকে শুধু পড়া"
+
+## Quick Reference
+
+- Storage: State Variable
+- Memory: Function Variable
+- Calldata: External Function Input
+
+## উপসংহার
+
+Storage, Memory, Calldata—Solidity-তে ডাটা ব্যবস্থাপনার তিনটি স্তম্ভ। সঠিকভাবে ব্যবহার করলে Contract দ্রুত, নিরাপদ ও Gas-efficient হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে ডাটা ব্যবস্থাপনায় দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** অ্যারেজ, স্ট্রাক্ট, ম্যাপিংস

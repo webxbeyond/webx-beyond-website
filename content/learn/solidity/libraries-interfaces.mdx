@@ -1,0 +1,95 @@
+---
+title: "লাইব্রেরি ও ইন্টারফেস"
+icon: logos:solidity
+---
+
+# লাইব্রেরি ও ইন্টারফেস — Solidity-তে কোড রিইউজ ও স্ট্যান্ডার্ডাইজেশন
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ Common Functionality বা API-র জন্য Library ও Interface ব্যবহার হয়, তেমনই Solidity-তে Contract-এ কোড রিইউজ, স্ট্যান্ডার্ডাইজেশন ও নিরাপত্তার জন্য Library ও Interface অপরিহার্য। এই পাঠে আমরা Library ও Interface-এর ব্যবহার, গঠন, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract Efficient, Maintainable ও Secure হয়।
+
+## Core Concepts
+
+### ১. Library
+- **Reusable Code Block:** Common Logic, Utility Function
+- **ব্যবহার:** SafeMath, String Utils, Array Ops
+- **উদাহরণ:**
+```solidity
+library Math {
+    function add(uint a, uint b) internal pure returns (uint) {
+        return a + b;
+    }
+}
+contract Test {
+    function getSum(uint x, uint y) public pure returns (uint) {
+        return Math.add(x, y);
+    }
+}
+```
+
+### ২. Interface
+- **Contract Standardization:** Function Signature Only
+- **ব্যবহার:** ERC20, ERC721, External Contract Call
+- **উদাহরণ:**
+```solidity
+interface IERC20 {
+    function transfer(address to, uint amount) external returns (bool);
+}
+contract MyToken {
+    function sendToken(address to, uint amount) public {
+        IERC20(token).transfer(to, amount);
+    }
+}
+```
+
+### ৩. পার্থক্য ও গুরুত্ব
+| বিষয়         | Library            | Interface          |
+|--------------|--------------------|--------------------|
+| Use Case     | Utility/Logic      | Standard/API       |
+| Code         | Function Body      | Signature Only     |
+| Usage        | Internal/External  | External           |
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Code Reusability
+- Contract Standardization
+- Security
+
+### ৫. বাস্তব উদাহরণ
+- OpenZeppelin Library: SafeMath, Ownable
+- ERC20/ERC721 Interface: Token Standard
+- dApp Integration: External Contract Call
+
+### ৬. Common Pitfalls
+- Library-তে State Variable ব্যবহার
+- Interface-এ Function Body
+- Wrong Function Signature
+
+### ৭. Best Practices
+- Utility Logic—Library
+- Standard/API—Interface
+- Proper Naming
+- Version Control
+
+### ৮. Industry Trends
+- Modular Contract Design
+- OpenZeppelin Usage
+- Interface-based dApp Integration
+
+## উদাহরণ ও এনালজি
+- Library—"গণিতের বই, সবাই ব্যবহার করতে পারে"
+- Interface—"স্কুলের নিয়ম, সবাই মানতে বাধ্য"
+
+## Quick Reference
+
+- Library: `library Name { function ... }`
+- Interface: `interface Name { function ...; }`
+- Usage: `Library.function()` / `Interface.function()`
+
+## উপসংহার
+
+Library ও Interface—Solidity-তে Contract Efficient, Maintainable ও Secure করার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সহজ, দ্রুত ও Standard হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Library ও Interface ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Abstract কন্ট্রাক্ট ও Virtual ফাংশন

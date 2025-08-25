@@ -1,0 +1,93 @@
+---
+title: "সলিডিটি আপডেটস ও নতুন ফিচারস"
+icon: logos:solidity
+---
+
+# সলিডিটি আপডেটস ও নতুন ফিচারস — ভবিষ্যতের স্মার্ট কন্ট্রাক্ট
+
+## প্রস্তাবনা
+
+Google বা Netflix-এর মতো বড় টেক কোম্পানি সবসময় নতুন ফিচার, স্কেলিং ও নিরাপত্তা আপডেট নিয়ে কাজ করে। ঠিক তেমনি, Solidity ও স্মার্ট কন্ট্রাক্ট ইকোসিস্টেমও প্রতিনিয়ত আপডেট হচ্ছে—নতুন ফিচার, পারফরম্যান্স, নিরাপত্তা ও ডেভেলপার এক্সপেরিয়েন্স বাড়াতে।
+
+## Core Concepts
+
+### ১. Solidity Language Evolution
+- **নতুন ফিচার:** Custom Errors, User Defined Value Types, Inline Assembly
+- **উদ্দেশ্য:** Gas Optimization, Readability, Security
+- **উদাহরণ:**
+```solidity
+// Custom Error
+error Unauthorized();
+function withdraw() public {
+    if (msg.sender != owner) revert Unauthorized();
+}
+```
+
+### ২. Compiler Improvements
+- **নতুন ফিচার:** Yul Optimizer, ABI Encoder V2
+- **উদ্দেশ্য:** Efficient Bytecode, Better Data Handling
+- **উদাহরণ:**
+- ABI Encoder V2—Complex Data Structure সহজে Encode/Decode
+
+### ৩. Security Enhancements
+- **নতুন ফিচার:** Built-in Overflow Checks, Improved Reentrancy Protection
+- **উদ্দেশ্য:** Vulnerability কমানো, Safe Deployment
+- **উদাহরণ:**
+- Solidity 0.8+—Arithmetic Overflow/Underflow Default Checked
+
+### ৪. Developer Experience
+- **নতুন ফিচার:** NatSpec Comments, Error Messages, Debugging Tools
+- **উদ্দেশ্য:** Documentation, Easy Debugging
+- **উদাহরণ:**
+```solidity
+/// @notice Transfers Ether to user
+function transfer(address user, uint amount) public {}
+```
+
+### ৫. Industry Trends
+- **Layer 2 Integration:** Optimism, zkSync
+- **Cross-chain Compatibility:** EVM-compatible Chains
+- **Formal Verification:** Automated Contract Auditing
+
+## কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Efficient Development
+- Future-proof dApp
+
+## কীভাবে কাজ করে?
+- Solidity Team—Regular Release
+- Community Feedback—Feature Request
+- Industry Adoption—Best Practices
+
+## কখন ব্যবহার করবেন?
+- Latest Solidity Version
+- New Project Start
+- Security Critical Contract
+
+## Common Pitfalls
+- Deprecated Syntax
+- Ignoring Release Notes
+- Backward Compatibility Issues
+
+## Best Practices
+- Always Use Latest Stable Version
+- Read Release Notes
+- Test Thoroughly Before Deployment
+- Use Community Audited Libraries
+
+## উদাহরণ ও এনালজি
+- "Solidity আপডেট—Google Chrome-এর নতুন ভার্সন, আরও ফিচার, আরও নিরাপত্তা"
+- "নতুন ফিচার—Netflix-এর নতুন Recommendation Algorithm"
+
+## Quick Reference
+- Custom Error: `error Unauthorized();`
+- NatSpec: `/// @notice ...`
+- ABI Encoder V2: Complex Data Encode/Decode
+
+## উপসংহার
+
+Solidity ও স্মার্ট কন্ট্রাক্ট ইকোসিস্টেম—নিয়মিত আপডেট, নতুন ফিচার ও নিরাপত্তা উন্নয়নের মাধ্যমে আরও শক্তিশালী হচ্ছে। Latest Version ব্যবহার, Release Notes পড়া ও Best Practices অনুসরণ—আপনাকে ভবিষ্যতের dApp ডিজাইনে দক্ষ করে তুলবে।
+
+---
+
+**পরবর্তী পাঠ:** Vyper ও বিকল্প স্মার্ট কন্ট্রাক্ট ল্যাঙ্গুয়েজ

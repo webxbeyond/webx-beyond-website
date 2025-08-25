@@ -1,0 +1,93 @@
+---
+title: "Factory ও Registry প্যাটার্ন"
+icon: logos:solidity
+---
+
+# Factory ও Registry প্যাটার্ন — Solidity-তে স্কেলেবল ও অর্গানাইজড কন্ট্রাক্ট
+
+## প্রস্তাবনা
+
+Uber বা Netflix-এর মতো বড় টেক কোম্পানিতে হাজার হাজার ডেটা বা ইউজার ম্যানেজ করতে Factory ও Registry Pattern ব্যবহার হয়—যাতে নতুন instance তৈরি, tracking ও management সহজ হয়। Solidity-তে Factory ও Registry Pattern—dApp-এ স্কেল, অর্গানাইজেশন ও নিরাপত্তা নিশ্চিত করতে—Industry Standard।
+
+## Core Concepts
+
+### ১. Factory Pattern
+- **Definition:** Contract থেকে নতুন Contract instance তৈরি করার পদ্ধতি
+- **ব্যবহার:** Token Creation, User Wallet, NFT Minting
+- **উদাহরণ:**
+```solidity
+contract TokenFactory {
+    address[] public tokens;
+    function createToken(string memory name, string memory symbol) public {
+        address token = address(new ERC20Token(name, symbol));
+        tokens.push(token);
+    }
+}
+contract ERC20Token {
+    string public name;
+    string public symbol;
+    constructor(string memory _name, string memory _symbol) {
+        name = _name;
+        symbol = _symbol;
+    }
+}
+```
+
+### ২. Registry Pattern
+- **Definition:** Contract instance-গুলোর address, status, metadata track করার পদ্ধতি
+- **ব্যবহার:** Contract Listing, Access Control, dApp Management
+- **উদাহরণ:**
+```solidity
+contract Registry {
+    mapping(address => bool) public registered;
+    function register(address _contract) public {
+        registered[_contract] = true;
+    }
+    function isRegistered(address _contract) public view returns (bool) {
+        return registered[_contract];
+    }
+}
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Scalability
+- Organization
+- Security
+- User Management
+
+### ৪. কখন ব্যবহার করবেন?
+- Multiple Contract Creation
+- Contract Tracking
+- Access Control
+
+### ৫. Common Pitfalls
+- Factory-তে Proper Ownership না দেয়া
+- Registry-তে Data Update ভুল
+- Security Check বাদ দেয়া
+
+### ৬. Best Practices
+- Ownership/Access Control
+- Registry Data Validation
+- Event Logging
+- Regular Audit
+
+### ৭. Industry Trends
+- NFT Minting Factory
+- DAO Registry
+- Modular dApp Architecture
+
+## উদাহরণ ও এনালজি
+- Factory—"কারখানা, একাধিক পণ্য তৈরি"
+- Registry—"রেজিস্টার বই, কে কখন কী করেছে"
+
+## Quick Reference
+- Factory: `address(new Contract(args))`
+- Registry: `mapping(address => bool)`
+
+## উপসংহার
+
+Factory ও Registry Pattern—Solidity-তে Contract Scalability, Organization ও Security-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে dApp দ্রুত, অর্গানাইজড ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Factory ও Registry Pattern ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Upgradeable কন্ট্রাক্ট প্যাটার্ন (Proxy, UUPS)

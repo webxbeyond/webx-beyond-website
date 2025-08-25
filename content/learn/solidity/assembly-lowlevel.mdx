@@ -1,0 +1,83 @@
+---
+title: "Assembly ও Low-Level Calls"
+icon: logos:solidity
+---
+
+# Assembly ও Low-Level Calls — Solidity-তে পারফরম্যান্স ও কাস্টমাইজেশন
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে পারফরম্যান্স টিউনিং, কাস্টম অপারেশন বা ডিপ সিস্টেম ইন্টিগ্রেশনের জন্য Low-Level Programming ব্যবহার হয়। Solidity-তে Assembly ও Low-Level Calls ঠিক এই কাজেই ব্যবহৃত হয়—পারফরম্যান্স, কাস্টমাইজেশন ও ডিপ ব্লকচেইন ইন্টিগ্রেশনের জন্য।
+
+## Core Concepts
+
+### ১. Assembly
+- **Definition:** Solidity-তে Inline Assembly ব্যবহার করে EVM-এর Low-Level Instruction execute করা যায়।
+- **ব্যবহার:** Custom Logic, Gas Optimization, Direct Storage Access
+- **উদাহরণ:**
+```solidity
+contract Example {
+    function add(uint a, uint b) public pure returns (uint result) {
+        assembly {
+            result := add(a, b)
+        }
+    }
+}
+```
+
+### ২. Low-Level Calls
+- **Definition:** Solidity-তে contract address-এ সরাসরি call, delegatecall, staticcall, send, transfer করা যায়।
+- **ব্যবহার:** External Contract Interaction, Dynamic Function Call
+- **উদাহরণ:**
+```solidity
+contract Caller {
+    function callOther(address _target, bytes memory _data) public returns (bool) {
+        (bool success, ) = _target.call(_data);
+        return success;
+    }
+}
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Performance Tuning
+- Custom Blockchain Logic
+- Advanced dApp Feature
+
+### ৪. কখন ব্যবহার করবেন?
+- Gas Optimization
+- Custom Storage Access
+- Dynamic Contract Interaction
+
+### ৫. Common Pitfalls
+- Security Risk (Reentrancy, Unchecked Return)
+- Debugging Difficulty
+- Maintainability Issue
+
+### ৬. Best Practices
+- Use Assembly only when necessary
+- Validate Low-Level Call return value
+- Avoid raw call for Ether transfer
+- Proper Documentation
+
+### ৭. Industry Trends
+- Optimized dApp Logic
+- Advanced Contract Design
+- OpenZeppelin Safe Low-Level Call
+
+## উদাহরণ ও এনালজি
+- Assembly—"গাড়ির ইঞ্জিন খুলে নিজে টিউন করা"
+- Low-Level Call—"ফোনে সরাসরি ডেভেলপারকে কল করা, কোনো অপারেটর ছাড়াই"
+
+## Quick Reference
+- Assembly: `assembly { ... }`
+- Low-Level Call: `address.call(data)`
+- Delegatecall: `address.delegatecall(data)`
+- Staticcall: `address.staticcall(data)`
+
+## উপসংহার
+
+Assembly ও Low-Level Calls—Solidity-তে পারফরম্যান্স, কাস্টমাইজেশন ও ডিপ ব্লকচেইন ইন্টিগ্রেশনের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract দ্রুত, শক্তিশালী ও ফিচার-রিচ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Assembly ও Low-Level Calls ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Error Handling ও Security

@@ -1,0 +1,91 @@
+---
+title: "গ্যাস অপটিমাইজেশন টেকনিকস"
+icon: logos:solidity
+---
+
+# গ্যাস অপটিমাইজেশন টেকনিকস — Solidity-তে Contract Efficient করার কৌশল
+
+## প্রস্তাবনা
+
+যেমন Google বা Uber-এ কোড অপ্টিমাইজ করে সার্ভার খরচ কমানো হয়, তেমনই Solidity-তে Contract Efficient করলে Gas Fee কমে, User Experience ও Security বাড়ে। এই পাঠে আমরা Gas Optimization-এর টেকনিক, ব্যবহার, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract দ্রুত, সাশ্রয়ী ও নিরাপদ হয়।
+
+## Core Concepts
+
+### ১. Efficient Data Structure
+- **Storage Usage কমান:** Mapping, Struct, Array-এ অপ্টিমাইজ
+- **উদাহরণ:**
+```solidity
+mapping(address => uint256) public balances;
+```
+
+### ২. Minimize Storage Writes
+- **State Variable কম পরিবর্তন করুন:** Storage Write বেশি হলে Gas Fee বাড়ে
+- **উদাহরণ:**
+```solidity
+uint256 public total;
+function add(uint256 value) public {
+    total += value; // Storage Write
+}
+```
+
+### ৩. Loop Optimization
+- **Loop ছোট ও সীমিত রাখুন:** Nested Loop এড়িয়ে চলুন
+- **উদাহরণ:**
+```solidity
+for (uint i = 0; i < users.length; i++) {
+    // Avoid heavy computation
+}
+```
+
+### ৪. Constant ও Immutable ব্যবহার
+- **Fixed Value-তে Constant/Immutable ব্যবহার করুন:**
+```solidity
+uint256 public constant MAX_SUPPLY = 1000;
+```
+
+### ৫. Function Visibility ও Modifier
+- **Internal Function ব্যবহার করুন:** External Call বেশি হলে Gas Fee বাড়ে
+- **Modifier-এ Efficient Logic লিখুন**
+
+### ৬. Batch Processing
+- **Multiple Transaction একসাথে করুন:** Batch Transfer, Bulk Update
+
+### ৭. Remix IDE-তে Gas Estimate
+- **Deploy/Test করার আগে Gas Estimate দেখুন**
+
+### ৮. Industry Trends
+- Layer 2 Solution
+- EIP-1559 ও Dynamic Gas Pricing
+- Gas Token ও Refund
+
+## Common Pitfalls
+- Unoptimized Loop/Storage
+- Heavy Computation in Contract
+- Unused Variable/Function
+
+## Best Practices
+- Efficient Data Structure
+- Minimal Storage Write
+- Proper Function Visibility
+- Batch Processing
+- Remix IDE-তে Test
+
+## উদাহরণ ও এনালজি
+- Optimization—"গাড়ির Mileage বাড়ানো"
+- Storage Write—"বারবার ডাটাবেসে Save করা"
+- Loop—"একই কাজ বারবার করা"
+
+## Quick Reference
+
+- Use Mapping for Efficient Storage
+- Avoid Nested Loop
+- Use Constant/Immutable
+- Test Gas in Remix IDE
+
+## উপসংহার
+
+Gas Optimization Techniques—Solidity-তে Contract Efficient, সাশ্রয়ী ও নিরাপদ করার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract দ্রুত, Gas-efficient ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Optimization-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী মডিউল:** অ্যাডভান্সড কনসেপ্টস

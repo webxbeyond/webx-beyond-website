@@ -1,0 +1,77 @@
+---
+title: "গ্যাস কনসেপ্ট ও কস্ট ক্যালকুলেশন"
+icon: logos:solidity
+---
+
+# গ্যাস কনসেপ্ট ও কস্ট ক্যালকুলেশন — Solidity-তে লেনদেনের খরচ ও অপ্টিমাইজেশন
+
+## প্রস্তাবনা
+
+যেমন Uber-এ রাইডের জন্য ভাড়া দিতে হয়, তেমনই Ethereum Blockchain-এ Contract বা Transaction চালাতে গ্যাস ফি দিতে হয়। Solidity-তে গ্যাস কনসেপ্ট ও কস্ট ক্যালকুলেশন বুঝলে Contract অপ্টিমাইজ, নিরাপদ ও সাশ্রয়ী হয়।
+
+## Core Concepts
+
+### ১. গ্যাস (Gas) কী?
+- **Blockchain Transaction-এর খরচ:** Contract Execute, Data Store, Transfer
+- **ব্যবহার:** Miner Reward, Network Security
+- **উদাহরণ:** Contract Deploy, Token Transfer
+
+### ২. গ্যাস ইউনিট ও গ্যাস প্রাইস
+- **Gas Unit:** Transaction-এ কত কাজ হবে
+- **Gas Price:** প্রতি ইউনিটের মূল্য (Gwei)
+- **Total Cost:** Gas Used × Gas Price
+
+### ৩. কস্ট ক্যালকুলেশন
+- **Simple Transaction:**
+    - Ether Transfer: ~21,000 Gas
+    - Contract Deploy: 100,000+ Gas
+- **Calculation:**
+```solidity
+// Example: 21,000 Gas × 20 Gwei = 420,000 Gwei
+// 1 Ether = 1,000,000,000 Gwei
+```
+
+### ৪. গ্যাস কেন গুরুত্বপূর্ণ?
+- Transaction Fee
+- Contract Optimization
+- Network Efficiency
+
+### ৫. বাস্তব উদাহরণ
+- Token Transfer (ERC20): User-কে Token পাঠাতে Gas লাগে
+- dApp Interaction: Uniswap-এ Swap করতে Gas Fee
+- Contract Deploy: NFT Contract Deploy-এ High Gas
+
+### ৬. Common Pitfalls
+- Unoptimized Contract—High Gas
+- Loop/Storage-heavy Logic
+- Gas Price Fluctuation
+
+### ৭. Best Practices
+- Efficient Logic লিখুন
+- Storage Usage কমান
+- Loop ও Heavy Computation এড়িয়ে চলুন
+- Remix IDE-তে Gas Estimate দেখুন
+
+### ৮. Industry Trends
+- Layer 2 Solution—Low Gas
+- Gas Token ও Refund
+- EIP-1559—Dynamic Gas Pricing
+
+## উদাহরণ ও এনালজি
+- Gas—"গাড়ির জ্বালানি"
+- Gas Price—"জ্বালানির দাম"
+- Transaction—"গাড়ি চালানো"
+
+## Quick Reference
+
+- Ether Transfer: ~21,000 Gas
+- Contract Deploy: 100,000+ Gas
+- Gas Price: 1 Gwei = 0.000000001 Ether
+
+## উপসংহার
+
+Gas Concept ও Cost Calculation—Solidity-তে Contract ও Transaction-এর খরচ, অপ্টিমাইজেশন ও নিরাপত্তার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সাশ্রয়ী, দ্রুত ও নিরাপদ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Gas ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** পেমেন্ট রিসিভ ও ট্রান্সফার করা

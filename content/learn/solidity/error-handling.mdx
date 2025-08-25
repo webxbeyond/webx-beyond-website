@@ -1,0 +1,91 @@
+---
+title: "require, assert, revert ব্যবহার"
+icon: logos:solidity
+---
+
+# require, assert, revert — Solidity-তে এরর হ্যান্ডলিং ও নিরাপত্তা
+
+## প্রস্তাবনা
+
+Google বা Netflix-এর মতো বড় টেক কোম্পানিতে সফটওয়্যারে ভুল বা অনাকাঙ্ক্ষিত আচরণ হলে Error Handling অপরিহার্য। ঠিক তেমনই Solidity Smart Contract-এ নিরাপত্তা ও নির্ভরযোগ্যতা নিশ্চিত করতে require, assert, revert ব্যবহার করা হয়।
+
+## Core Concepts
+
+### ১. require
+- **Definition:** কোনো শর্ত (Condition) পূরণ না হলে Execution বন্ধ করে Error Message দেয়।
+- **ব্যবহার:** Input Validation, Access Control
+- **উদাহরণ:**
+```solidity
+function transfer(address to, uint amount) public {
+    require(amount > 0, "Amount must be positive");
+    // Transfer Logic
+}
+```
+
+### ২. assert
+- **Definition:** Internal Error বা Invariant Check-এর জন্য ব্যবহৃত হয়।
+- **ব্যবহার:** State Variable Check, Critical Logic
+- **উদাহরণ:**
+```solidity
+function update(uint x) public {
+    x++;
+    assert(x != 0);
+}
+```
+
+### ৩. revert
+- **Definition:** কোনো শর্ত পূরণ না হলে Execution বন্ধ করে Custom Error Message দেয়।
+- **ব্যবহার:** Complex Condition, Nested Logic
+- **উদাহরণ:**
+```solidity
+function withdraw(uint amount) public {
+    if (amount > balance) {
+        revert("Insufficient balance");
+    }
+    // Withdraw Logic
+}
+```
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Bug Prevention
+- User Experience
+
+### ৫. কখন ব্যবহার করবেন?
+- require: Input Validation, External Call
+- assert: Internal Error, Invariant
+- revert: Custom Error, Nested Condition
+
+### ৬. Common Pitfalls
+- assert-এর ভুল ব্যবহার (Gas Consumption বেশি)
+- require-এর Error Message না দেয়া
+- revert-এর Nested Logic জটিল করা
+
+### ৭. Best Practices
+- require—সব Input Validate করুন
+- assert—Invariant Check-এ ব্যবহার করুন
+- revert—Custom Error Message দিন
+- Proper Documentation
+
+### ৮. Industry Trends
+- Custom Error Type (Solidity 0.8+)
+- Gas Efficient Error Handling
+- OpenZeppelin Safe Contract
+
+## উদাহরণ ও এনালজি
+- require—"স্কুলে প্রবেশের আগে আইডি চেক"
+- assert—"গাড়ির ইঞ্জিনে সব পার্ট ঠিক আছে কিনা"
+- revert—"ভুল হলে পুরো কাজ বাতিল"
+
+## Quick Reference
+- require: `require(condition, message)`
+- assert: `assert(condition)`
+- revert: `revert(message)`
+
+## উপসংহার
+
+require, assert, revert—Solidity-তে Contract Security ও Error Handling-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, নির্ভরযোগ্য ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Error Handling-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Common Vulnerabilities: Reentrancy, Overflow

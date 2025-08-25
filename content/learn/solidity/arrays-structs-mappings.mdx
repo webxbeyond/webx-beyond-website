@@ -1,0 +1,90 @@
+---
+title: "অ্যারেজ, স্ট্রাক্ট, ম্যাপিংস"
+icon: logos:solidity
+---
+
+# অ্যারেজ, স্ট্রাক্ট, ম্যাপিংস — Solidity-তে ডাটা স্ট্রাকচার
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ ডাটা সংগঠিত রাখতে Array, Object, Dictionary ব্যবহার হয়, তেমনই Solidity-তে ডাটা স্ট্রাকচার হিসেবে Array, Struct, Mapping অপরিহার্য। এই পাঠে আমরা এই তিনটি ডাটা স্ট্রাকচারের ব্যবহার, পার্থক্য, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract-এ ডাটা সহজ, নিরাপদ ও দক্ষভাবে ব্যবহৃত হয়।
+
+## Core Concepts
+
+### ১. Array
+- **একই টাইপের ডাটা সংগ্রহ:** Sequential Collection
+- **ব্যবহার:** User List, Token IDs
+- **উদাহরণ:**
+```solidity
+uint[] public scores = [10, 20, 30];
+string[] public names;
+```
+- Dynamic ও Fixed Size
+
+### ২. Struct
+- **কাস্টম ডাটা টাইপ:** Multiple Properties
+- **ব্যবহার:** User Profile, Product Info
+- **উদাহরণ:**
+```solidity
+struct User {
+    string name;
+    uint age;
+}
+User public user = User("Anis", 25);
+```
+
+### ৩. Mapping
+- **Key-Value Store:** Dictionary/Hash Table
+- **ব্যবহার:** Balance Tracking, Ownership
+- **উদাহরণ:**
+```solidity
+mapping(address => uint) public balances;
+balances[msg.sender] = 100;
+```
+
+### ৪. পার্থক্য
+| বিষয়         | Array             | Struct            | Mapping           |
+|--------------|-------------------|-------------------|-------------------|
+| Data Type    | একটাই             | একাধিক            | Key-Value         |
+| Access       | Index             | Property          | Key               |
+| Use Case     | List              | Profile           | Balance/Ownership |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- ডাটা সংগঠন ও অপ্টিমাইজেশন
+- Contract Logic সহজ করা
+- Storage Efficiency
+
+### ৬. Common Pitfalls
+- Array Out of Bounds
+- Uninitialized Struct
+- Mapping-এ Key না পাওয়া
+
+### ৭. Best Practices
+- Proper Initialization
+- Access Control
+- Efficient Data Structure
+- Naming Convention
+
+### ৮. Industry Trends
+- Nested Struct ও Mapping
+- Iterable Mapping (Library)
+- Storage Optimization
+
+## উদাহরণ ও এনালজি
+- Array—"রোল নম্বরের তালিকা"
+- Struct—"ছাত্রের তথ্য"
+- Mapping—"রোল নম্বর থেকে নাম খোঁজা"
+
+## Quick Reference
+
+- Array: `type[] name;`
+- Struct: `struct Name { ... }`
+- Mapping: `mapping(keyType => valueType) name;`
+
+## উপসংহার
+
+Array, Struct, Mapping—Solidity-তে ডাটা সংগঠনের মূল হাতিয়ার। সঠিকভাবে ব্যবহার করলে Contract সহজ, দ্রুত ও নিরাপদ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে ডাটা স্ট্রাকচারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** কনস্ট্যান্ট, ইমিউটেবল ও গ্লোবাল ভেরিয়েবল

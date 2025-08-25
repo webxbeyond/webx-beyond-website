@@ -1,0 +1,81 @@
+---
+title: "ফাংশন মডিফায়ারস"
+icon: logos:solidity
+---
+
+# ফাংশন মডিফায়ারস — Solidity-তে কন্ট্রাক্টের নিরাপত্তা ও নিয়ন্ত্রণ
+
+## প্রস্তাবনা
+
+যেমন Google বা Uber-এ API-তে Access Control, Rate Limiting, Logging থাকে, তেমনই Solidity-তে Function Modifier ব্যবহার করে ফাংশনের আগে/পরে নির্দিষ্ট শর্ত, নিরাপত্তা, ও নিয়ন্ত্রণ দেওয়া যায়। এই পাঠে আমরা Modifier-এর ব্যবহার, গঠন, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract নিরাপদ ও নিয়ন্ত্রিত হয়।
+
+## Core Concepts
+
+### ১. Modifier কী?
+- **Function-এর আগে/পরে Logic:** Access Control, Validation
+- **ব্যবহার:** Only Owner, Input Validation, Reentrancy Guard
+- **উদাহরণ:**
+```solidity
+modifier onlyOwner() {
+    require(msg.sender == owner, "Not owner");
+    _;
+}
+function changeData(uint _data) public onlyOwner {
+    data = _data;
+}
+```
+
+### ২. Modifier Structure
+- **Definition:** `modifier name() { ... _; }`
+- **Usage:** Function-এর শেষে Modifier লিখুন
+- **Multiple Modifier:** Function-এ একাধিক Modifier ব্যবহার করা যায়
+
+### ৩. Common Use Cases
+- Access Control (Owner/Admin)
+- Input Validation
+- Pausable Contract
+- Reentrancy Protection
+
+### ৪. পার্থক্য ও গুরুত্ব
+| বিষয়         | Modifier           | Function           |
+|--------------|--------------------|--------------------|
+| Use Case     | Pre/Post Logic     | Main Logic         |
+| Example      | onlyOwner          | changeData         |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Logic Reusability
+- Code Cleanliness
+
+### ৬. Common Pitfalls
+- Modifier-এ `_` ভুল জায়গায়
+- Require Condition ভুল
+- Multiple Modifier Conflict
+
+### ৭. Best Practices
+- Access Control Modifier ব্যবহার করুন
+- Input Validation Modifier
+- Proper Error Message
+- Modifier Chain Order
+
+### ৮. Industry Trends
+- Custom Modifier Pattern
+- OpenZeppelin Modifier Usage
+- Advanced Security Modifier
+
+## উদাহরণ ও এনালজি
+- Modifier—"গেটকিপার, কে ঢুকতে পারবে"
+- Function—"রুমের ভেতরের কাজ"
+
+## Quick Reference
+
+- Modifier: `modifier name() { ... _; }`
+- Usage: `function name() public nameModifier {}`
+
+## উপসংহার
+
+Function Modifier—Solidity-তে Contract-এর নিরাপত্তা, নিয়ন্ত্রণ ও কোড রিইউজের জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, দ্রুত ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Modifier ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** ইভেন্ট ও লগিং

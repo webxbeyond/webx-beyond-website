@@ -1,0 +1,81 @@
+---
+title: "Oracle ইন্টিগ্রেশন ও Chainlink"
+icon: logos:solidity
+---
+
+# Oracle ইন্টিগ্রেশন ও Chainlink — Solidity-তে External Data Access
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Real-time Data Access, API Integration ও External Service ব্যবহার হয়—Business Logic ও User Experience উন্নত করতে। Solidity Smart Contract-এও Oracle Integration—External Data (Price, Weather, API) Access—Industry Standard। Chainlink—Most Popular Oracle Network—Secure, Reliable ও Decentralized Data Feed দেয়।
+
+## Core Concepts
+
+### ১. Oracle কী?
+- **Definition:** Blockchain-এর বাইরে থেকে Data এনে Contract-এ ব্যবহার করার পদ্ধতি
+- **ব্যবহার:** Price Feed, Weather Data, API Integration
+- **Challenges:** Trust, Security, Reliability
+
+### ২. Chainlink
+- **Definition:** Decentralized Oracle Network, Secure Data Feed
+- **Features:**
+    - Multiple Data Source
+    - Decentralized Node
+    - Secure & Reliable
+- **উদাহরণ:**
+```solidity
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+contract PriceConsumer {
+    AggregatorV3Interface internal priceFeed;
+    constructor(address _feed) {
+        priceFeed = AggregatorV3Interface(_feed);
+    }
+    function getLatestPrice() public view returns (int) {
+        (,int price,,,) = priceFeed.latestRoundData();
+        return price;
+    }
+}
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Real-time Data Access
+- dApp Functionality
+- User Experience
+- Security
+
+### ৪. কখন ব্যবহার করবেন?
+- Price Feed
+- External API Integration
+- Real-world Event Trigger
+
+### ৫. Common Pitfalls
+- Centralized Oracle
+- Data Manipulation
+- Integration Error
+
+### ৬. Best Practices
+- Decentralized Oracle Use করুন
+- Chainlink Integration
+- Data Validation
+- Regular Audit
+
+### ৭. Industry Trends
+- Cross-chain Oracle
+- Automated Data Feed
+- Community Node
+
+## উদাহরণ ও এনালজি
+- Oracle—"বাইরের খবর এনে ক্লাসে বলা"
+- Chainlink—"অনেক সাংবাদিক একসাথে খবর যাচাই করে দেয়"
+
+## Quick Reference
+- Chainlink Price Feed: `AggregatorV3Interface`
+- Integration: `import "@chainlink/contracts/..."`
+
+## উপসংহার
+
+Oracle Integration ও Chainlink—Solidity Contract-এ Real-time Data Access, dApp Functionality ও Security-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract শক্তিশালী, Maintainable ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Oracle Integration ও Chainlink-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** AMM (Automated Market Maker) কন্ট্রাক্ট

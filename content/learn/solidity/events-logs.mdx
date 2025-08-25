@@ -1,0 +1,82 @@
+---
+title: "ইভেন্ট ও লগিং"
+icon: logos:solidity
+---
+
+# ইভেন্ট ও লগিং — Solidity-তে Contract Activity Tracking
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ User Activity, Error, Transaction লগ করা হয়, তেমনই Solidity-তে ইভেন্ট ও লগিং ব্যবহার করে Contract-এর Activity Blockchain-এ ট্র্যাক করা যায়। এই পাঠে আমরা Event ও Logging-এর ব্যবহার, গঠন, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract-এর Transparency ও Debugging সহজ হয়।
+
+## Core Concepts
+
+### ১. Event কী?
+- **Blockchain Log:** Contract-এ Activity Record
+- **ব্যবহার:** Transaction, State Change, Notification
+- **উদাহরণ:**
+```solidity
+event DataChanged(address indexed user, uint newValue);
+function changeData(uint _data) public {
+    data = _data;
+    emit DataChanged(msg.sender, _data);
+}
+```
+
+### ২. Logging
+- **Blockchain Explorer-এ দেখা যায়:** Etherscan, BlockScout
+- **ব্যবহার:** Debugging, Monitoring, Analytics
+- **উদাহরণ:**
+- Remix IDE-তে Deploy করলে "Logs" Tab-এ Event দেখা যায়
+
+### ৩. Indexed Parameter
+- **Searchable Log:** Indexed Parameter দিয়ে Event Filter করা যায়
+- **উদাহরণ:**
+```solidity
+event Transfer(address indexed from, address indexed to, uint value);
+```
+
+### ৪. পার্থক্য ও গুরুত্ব
+| বিষয়         | Event              | Logging            |
+|--------------|--------------------|--------------------|
+| Use Case     | State Change       | Debug/Monitor      |
+| Example      | DataChanged        | Remix Logs         |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Contract Transparency
+- User Notification
+- Debugging
+
+### ৬. Common Pitfalls
+- Event Emit ভুল
+- Indexed Parameter Miss
+- Logging ছাড়া Deploy
+
+### ৭. Best Practices
+- Important Action-এ Event Emit করুন
+- Indexed Parameter ব্যবহার করুন
+- Proper Naming
+- Minimal Data Log
+
+### ৮. Industry Trends
+- Advanced Event Pattern
+- Analytics Integration
+- Real-time Notification
+
+## উদাহরণ ও এনালজি
+- Event—"স্কুলে Announcement"
+- Logging—"রেজিস্টারে নোট রাখা"
+
+## Quick Reference
+
+- Event: `event name(type param);`
+- Emit: `emit name(param);`
+- Indexed: `event name(type indexed param);`
+
+## উপসংহার
+
+Event ও Logging—Solidity-তে Contract-এর Activity Tracking, Transparency ও Debugging-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract সহজ, দ্রুত ও Maintainable হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Event ও Logging ব্যবহারে দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** কন্ট্রাক্ট ইনহেরিটেন্স

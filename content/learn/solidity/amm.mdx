@@ -1,0 +1,101 @@
+---
+title: "AMM (Automated Market Maker) কন্ট্রাক্ট"
+icon: logos:solidity
+---
+
+# AMM (Automated Market Maker) কন্ট্রাক্ট — Solidity-তে Decentralized Exchange Design
+
+## প্রস্তাবনা
+
+Google বা Uber-এর মতো বড় টেক কোম্পানিতে Real-time Matching, Pricing Algorithm ও Automated Service ব্যবহৃত হয়—Efficiency ও Scalability বাড়াতে। DeFi-তে AMM (Automated Market Maker)—Decentralized Exchange-এর জন্য—Liquidity, Price Discovery ও Trading Automation নিশ্চিত করে। Solidity-তে AMM Contract—Uniswap, SushiSwap-এর মতো Industry Standard।
+
+## Core Concepts
+
+### ১. AMM কী?
+- **Definition:** Order Book ছাড়াই Liquidity Pool ও Algorithmic Pricing-এ Token Swap
+- **ব্যবহার:** Decentralized Exchange, Liquidity Provision, Automated Trading
+- **Popular AMM:** Uniswap, SushiSwap, Balancer
+
+### ২. Liquidity Pool
+- **Definition:** User-রা Token Deposit করে Pool তৈরি করে
+- **Features:**
+    - Swap Fee
+    - Pool Share
+    - Impermanent Loss
+- **উদাহরণ:**
+```solidity
+contract AMM {
+    mapping(address => uint) public balancesA;
+    mapping(address => uint) public balancesB;
+    uint public reserveA;
+    uint public reserveB;
+    function addLiquidity(uint amountA, uint amountB) public {
+        balancesA[msg.sender] += amountA;
+        balancesB[msg.sender] += amountB;
+        reserveA += amountA;
+        reserveB += amountB;
+    }
+    function swapAtoB(uint amountA) public {
+        uint amountB = getAmountOut(amountA, reserveA, reserveB);
+        require(reserveB >= amountB, "Insufficient liquidity");
+        reserveA += amountA;
+        reserveB -= amountB;
+        // Transfer logic
+    }
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) public pure returns (uint) {
+        // Uniswap formula
+        return (amountIn * reserveOut) / (reserveIn + amountIn);
+    }
+}
+```
+
+### ৩. Pricing Algorithm
+- **Constant Product Formula:** x * y = k
+- **Features:**
+    - Automated Price Discovery
+    - No Order Book
+    - Slippage
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Decentralized Trading
+- Liquidity Provision
+- Automated Price Discovery
+- User Empowerment
+
+### ৫. কখন ব্যবহার করবেন?
+- Token Swap
+- Liquidity Pool
+- Decentralized Exchange
+
+### ৬. Common Pitfalls
+- Impermanent Loss
+- Low Liquidity
+- Slippage
+- Security Vulnerability
+
+### ৭. Best Practices
+- Audit Pricing Algorithm
+- Secure Liquidity Pool
+- User Education
+- Regular Update
+
+### ৮. Industry Trends
+- Multi-Token Pool
+- Layer 2 AMM
+- Automated Yield Farming
+
+## উদাহরণ ও এনালজি
+- AMM—"বাজারে দাম নিজে নিজে ঠিক হয়, কেউ নিয়ন্ত্রণ করে না"
+- Liquidity Pool—"অনেকেই টাকা জমা রাখে, সবাই ব্যবহার করতে পারে"
+
+## Quick Reference
+- AMM Formula: `x * y = k`
+- Swap: `getAmountOut(amountIn, reserveIn, reserveOut)`
+
+## উপসংহার
+
+AMM Contract—Solidity-তে Decentralized Exchange, Liquidity Provision ও Automated Trading-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract Efficient, Secure ও User Friendly হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে AMM Contract-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** Lending ও Borrowing কন্ট্রাক্ট

@@ -1,0 +1,90 @@
+---
+title: "কমন ভ্যালনারেবিলিটিস: Reentrancy, Overflow"
+icon: logos:solidity
+---
+
+# কমন ভ্যালনারেবিলিটিস: Reentrancy, Overflow — Solidity-তে নিরাপত্তার চ্যালেঞ্জ
+
+## প্রস্তাবনা
+
+Uber বা Netflix-এর মতো বড় টেক কোম্পানিতে সিকিউরিটি ব্রিচ হলে কোটি কোটি ডলার ক্ষতি হতে পারে। ঠিক তেমনই Solidity Smart Contract-এ Common Vulnerabilities—Reentrancy ও Overflow—দুর্বলতা থাকলে ফান্ড চুরি, ডেটা ম্যানিপুলেশন, বা সিস্টেম ক্র্যাশ হতে পারে।
+
+## Core Concepts
+
+### ১. Reentrancy
+- **Definition:** কোনো contract যখন অন্য contract-এ call করে এবং সেই contract আবার প্রথম contract-এ ফিরে আসে, তখন reentrancy vulnerability তৈরি হয়।
+- **ব্যবহার:** Ether Withdraw, External Call
+- **উদাহরণ:**
+```solidity
+contract Vulnerable {
+    mapping(address => uint) public balances;
+    function withdraw(uint amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer failed");
+        balances[msg.sender] -= amount; // Vulnerable!
+    }
+}
+```
+- **Fix:**
+    1. State Change আগে করুন
+    2. Reentrancy Guard ব্যবহার করুন
+
+### ২. Overflow
+- **Definition:** Variable-এর মান সীমা ছাড়িয়ে গেলে overflow vulnerability হয়।
+- **ব্যবহার:** Token Transfer, Math Operation
+- **উদাহরণ:**
+```solidity
+contract Overflow {
+    uint8 public x = 255;
+    function add(uint8 y) public {
+        x = x + y; // Overflow!
+    }
+}
+```
+- **Fix:**
+    1. SafeMath Library ব্যবহার করুন
+    2. Solidity 0.8+ built-in overflow check
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- User Fund Protection
+- Industry Reputation
+
+### ৪. কখন ব্যবহার করবেন?
+- Ether Transfer
+- Math Operation
+- External Contract Call
+
+### ৫. Common Pitfalls
+- State Change পরে করা
+- Unchecked Math Operation
+- External Call-এ Proper Guard না দেয়া
+
+### ৬. Best Practices
+- State Change আগে করুন
+- Reentrancy Guard ব্যবহার করুন
+- SafeMath/Checked Math ব্যবহার করুন
+- Proper Audit করুন
+
+### ৭. Industry Trends
+- OpenZeppelin ReentrancyGuard
+- Solidity 0.8+ Checked Math
+- Automated Security Audit Tools
+
+## উদাহরণ ও এনালজি
+- Reentrancy—"বাড়ির দরজা খুলে রেখে বাইরে যাওয়া, চোর ঢুকে যেতে পারে"
+- Overflow—"গ্লাসে পানি ঢালতে ঢালতে উপচে পড়া"
+
+## Quick Reference
+- Reentrancy Guard: `modifier nonReentrant { ... }`
+- SafeMath: `SafeMath.add(a, b)`
+- Checked Math: `x + y` (Solidity 0.8+)
+
+## উপসংহার
+
+Reentrancy ও Overflow—Solidity-তে Contract Security-এর জন্য সবচেয়ে গুরুত্বপূর্ণ Vulnerabilities। সঠিকভাবে প্রতিরোধ করলে Contract নিরাপদ, নির্ভরযোগ্য ও Industry Standard হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে Security Vulnerability-এ দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী পাঠ:** OpenZeppelin লাইব্রেরি ব্যবহার

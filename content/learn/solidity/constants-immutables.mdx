@@ -1,0 +1,92 @@
+---
+title: "কনস্ট্যান্ট, ইমিউটেবল ও গ্লোবাল ভেরিয়েবল"
+icon: logos:solidity
+---
+
+# কনস্ট্যান্ট, ইমিউটেবল ও গ্লোবাল ভেরিয়েবল — Solidity-তে নির্দিষ্ট ও বিশেষ ডাটা
+
+## প্রস্তাবনা
+
+যেমন Google বা Netflix-এ কিছু ডাটা কখনো পরিবর্তন হয় না (যেমন: API Key, Config), তেমনই Solidity-তে কনস্ট্যান্ট, ইমিউটেবল ও গ্লোবাল ভেরিয়েবল Contract-এ নির্দিষ্ট ও বিশেষ ডাটা ব্যবস্থাপনায় গুরুত্বপূর্ণ। এই পাঠে আমরা এই তিনটি ভেরিয়েবলের ব্যবহার, পার্থক্য, এবং Best Practices নিয়ে আলোচনা করব—যাতে Contract নিরাপদ, দক্ষ ও অপ্টিমাইজড হয়।
+
+## Core Concepts
+
+### ১. কনস্ট্যান্ট (Constant)
+- **চিরস্থায়ী মান:** ডিপ্লয়মেন্টের পর পরিবর্তন হয় না
+- **ব্যবহার:** Fixed Value, Config
+- **উদাহরণ:**
+```solidity
+uint public constant MAX_SUPPLY = 1000;
+string public constant NAME = "Token";
+```
+
+### ২. ইমিউটেবল (Immutable)
+- **একবার সেট, পরে পরিবর্তন হয় না:** Constructor-এ মান দেওয়া হয়
+- **ব্যবহার:** Owner Address, Initial Value
+- **উদাহরণ:**
+```solidity
+address public immutable owner;
+constructor() {
+    owner = msg.sender;
+}
+```
+
+### ৩. গ্লোবাল ভেরিয়েবল (Global Variable)
+- **Blockchain Context Data:** Transaction, Block, Contract Info
+- **ব্যবহার:** msg.sender, block.timestamp, tx.gasprice
+- **উদাহরণ:**
+```solidity
+function getSender() public view returns (address) {
+    return msg.sender;
+}
+function getTime() public view returns (uint) {
+    return block.timestamp;
+}
+```
+
+### ৪. পার্থক্য
+| বিষয়         | Constant           | Immutable         | Global Variable   |
+|--------------|--------------------|-------------------|------------------|
+| Value Set    | Compile Time       | Constructor Time  | Runtime          |
+| Changeable   | না                 | না                | হ্যাঁ            |
+| Use Case     | Fixed Config       | Owner, Initial    | Blockchain Info  |
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Contract Security
+- Gas Optimization
+- Predictable Logic
+
+### ৬. Common Pitfalls
+- Constant/Immutable ভুলভাবে ডিফাইন
+- Global Variable Misuse
+- Constructor-এ মান না দেওয়া
+
+### ৭. Best Practices
+- Fixed Value—Constant
+- Deployment-Dependent—Immutable
+- Blockchain Info—Global Variable
+- Proper Naming ও Initialization
+
+### ৮. Industry Trends
+- Custom Immutable Patterns
+- Global Variable Usage in dApps
+- Gas-efficient Contract Design
+
+## উদাহরণ ও এনালজি
+- Constant—"স্কুলের নাম, কখনো বদলায় না"
+- Immutable—"ভর্তির সময় রোল নম্বর, পরে বদলায় না"
+- Global Variable—"ক্লাসে কে উপস্থিত, প্রতিদিন বদলায়"
+
+## Quick Reference
+
+- Constant: `type constant name = value;`
+- Immutable: `type immutable name;`
+- Global: `msg.sender`, `block.timestamp`, `tx.gasprice`
+
+## উপসংহার
+
+Constant, Immutable, Global Variable—Solidity-তে নির্দিষ্ট ও বিশেষ ডাটা ব্যবস্থাপনার জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, দ্রুত ও Gas-efficient হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে ডাটা ব্যবস্থাপনায় দক্ষতা অর্জন করবেন।
+
+---
+
+**পরবর্তী মডিউল:** ফাংশন ও কন্ট্রাক্ট স্ট্রাকচার
