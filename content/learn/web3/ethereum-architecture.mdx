@@ -1,6 +1,6 @@
 ---
 title: "ইথেরিয়ামের আর্কিটেকচার"
-icon: logos:web3js
+icon: solar:alt-arrow-right-bold-duotone
 ---
 
 # ইথেরিয়ামের আর্কিটেকচার — স্মার্ট কন্ট্রাক্ট ও ডেসেন্ট্রালাইজড অ্যাপের ভিত্তি
@@ -9,56 +9,57 @@ icon: logos:web3js
 
 ইথেরিয়াম (Ethereum) হলো—Web3 ও স্মার্ট কন্ট্রাক্টের সবচেয়ে জনপ্রিয় প্ল্যাটফর্ম। এর আর্কিটেকচার বুঝলে, dApp, Token, NFT, DeFi—সবকিছু ডিজাইন ও ডিপ্লয় সহজ হয়। এই পাঠে জানব—ইথেরিয়ামের মূল কম্পোনেন্ট, কীভাবে কাজ করে, ও কেন এটি Web3-এ গুরুত্বপূর্ণ।
 
-## Core Concepts
 
-### ১. Ethereum Network Structure
-- Peer-to-peer Network: হাজার হাজার নোড
-- Decentralized: কোনো একক কর্তৃপক্ষ নেই
-- Public Ledger: সবাই দেখতে পারে
+## মূল ধারণা
 
-### ২. Main Components
-1. **Node:** Ethereum Client (Geth, OpenEthereum)
-2. **Account:** Externally Owned Account (EOA), Contract Account
-3. **Smart Contract:** Blockchain-এ Deploy হওয়া কোড
-4. **Transaction:** Value/Instruction Transfer
-5. **Block:** Transaction Bundle
-6. **Consensus Layer:** Proof of Stake (PoS)
+### ১. ইথেরিয়াম নেটওয়ার্কের গঠন
+- পিয়ার-টু-পিয়ার নেটওয়ার্ক: হাজার হাজার নোড
+- বিকেন্দ্রীকৃত: কোনো একক কর্তৃপক্ষ নেই
+- পাবলিক লেজার: সবাই দেখতে পারে
+
+### ২. প্রধান কম্পোনেন্ট
+1. **নোড:** Ethereum ক্লায়েন্ট (Geth, OpenEthereum)
+2. **অ্যাকাউন্ট:** এক্সটার্নালি ওউনড অ্যাকাউন্ট (EOA), কনট্রাক্ট অ্যাকাউন্ট
+3. **স্মার্ট কনট্রাক্ট:** ব্লকচেইনে ডিপ্লয় হওয়া কোড
+4. **ট্রানজ্যাকশন:** ভ্যালু/ইনস্ট্রাকশন ট্রান্সফার
+5. **ব্লক:** ট্রানজ্যাকশনের বান্ডল
+6. **কনসেনসাস লেয়ার:** প্রুফ-অফ-স্টেক (PoS)
 
 ### ৩. EVM (Ethereum Virtual Machine)
-- Smart Contract Execution Engine
-- Solidity কোড → Bytecode → EVM-এ রান
-- Deterministic Execution
+- স্মার্ট কনট্রাক্ট এক্সিকিউশন ইঞ্জিন
+- Solidity কোড → বাইটকোড → EVM-এ রান
+- নির্ধারিত (Deterministic) এক্সিকিউশন
 
-### ৪. State, Storage, ও Gas
-- State: Account Balance, Contract Data
-- Storage: Persistent Data
-- Gas: Transaction Fee, Computation Cost
+### ৪. স্টেট, স্টোরেজ ও গ্যাস
+- স্টেট: অ্যাকাউন্ট ব্যালেন্স, কনট্রাক্ট ডেটা
+- স্টোরেজ: স্থায়ী ডেটা
+- গ্যাস: ট্রানজ্যাকশন ফি, কম্পিউটেশন খরচ
 
-### ৫. Real-life Use Cases
+### ৫. বাস্তব জীবনের প্রয়োগ
 - **DeFi:** Uniswap, MakerDAO
-- **NFT Marketplace:** OpenSea
-- **Gaming:** Axie Infinity
-- **DAO:** Decentralized Governance
+- **NFT মার্কেটপ্লেস:** OpenSea
+- **গেমিং:** Axie Infinity
+- **DAO:** বিকেন্দ্রীভূত গভর্ন্যান্স
 
-### ৬. Analogies
-- Ethereum Network—একটি বড় শহর, সবাই বাস করে, ট্রানজ্যাকশন মানে—একজন থেকে অন্যজনের কাছে টাকা/তথ্য পাঠানো
+### ৬. উপমা
+- Ethereum নেটওয়ার্ক—একটি বড় শহর, যেখানে সবাই বাস করে; ট্রানজ্যাকশন মানে—একজন থেকে অন্যজনের কাছে টাকা/তথ্য পাঠানো
 - EVM—শহরের আদালত, নিয়ম মেনে সবকিছু যাচাই করে
 
-### ৭. Common Pitfalls
-- Gas Fee High: Network Congestion
-- Security Issue: Buggy Contract
-- Scalability: Slow Transaction
+### ৭. সাধারণ সমস্যা
+- গ্যাস ফি বেশি: নেটওয়ার্কে ভিড়
+- সিকিউরিটি সমস্যা: বাগযুক্ত কনট্রাক্ট
+- স্কেলেবিলিটি: ধীর ট্রানজ্যাকশন
 
-### ৮. Best Practices
-- Contract Optimization (Low Gas)
-- Thorough Testing, Audit
-- Use Proven Standards (ERC20, ERC721)
-- Documentation ও Team Review
+### ৮. সেরা অনুশীলন
+- কনট্রাক্ট অপ্টিমাইজেশন (কম গ্যাস)
+- ব্যাপক টেস্টিং ও অডিট
+- প্রমাণিত স্ট্যান্ডার্ড ব্যবহার (ERC20, ERC721)
+- ভালো ডকুমেন্টেশন ও টিম রিভিউ
 
-### ৯. Industry Trends
-- Layer 2 Scaling (Polygon, Optimism)
-- Sharding, Rollups
-- EVM-compatible Blockchain (BSC, Avalanche)
+### ৯. শিল্পের প্রবণতা
+- লেয়ার ২ স্কেলিং (Polygon, Optimism)
+- শার্ডিং, রোলআপ
+- EVM-কম্প্যাটিবল ব্লকচেইন (BSC, Avalanche)
 
 ## উপসংহার
 

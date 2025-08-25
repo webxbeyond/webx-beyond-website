@@ -1,6 +1,6 @@
 ---
 title: "সাধারণ কন্ট্রাক্ট লেখা (HelloWorld, স্টোরেজ কন্ট্রাক্ট)"
-icon: logos:web3js
+icon: solar:alt-arrow-right-bold-duotone
 ---
 
 # সাধারণ কন্ট্রাক্ট লেখা (HelloWorld, স্টোরেজ কন্ট্রাক্ট) — স্মার্ট কন্ট্রাক্টের প্রথম ধাপ
@@ -9,11 +9,11 @@ icon: logos:web3js
 
 ইথেরিয়াম ও Web3 ডেভেলপমেন্টে স্মার্ট কন্ট্রাক্ট লেখা শেখা হলো—প্রথম ধাপ। HelloWorld ও Storage Contract—দুইটি সহজ উদাহরণ, যা দিয়ে Solidity, Contract Structure, ও Blockchain Interaction বোঝা যায়।
 
-## Core Concepts
+## মূল ধারণা
 
-### ১. HelloWorld Contract
-- Basic Structure: Contract, State Variable, Function
-- Example:
+### ১. HelloWorld কনট্রাক্ট
+- মৌলিক গঠন: কনট্রাক্ট, স্টেট ভ্যারিয়েবল, ফাংশন
+- উদাহরণ:
 ```solidity
 pragma solidity ^0.8.0;
 
@@ -25,13 +25,13 @@ contract HelloWorld {
 }
 ```
 - Explanation:
-    - `message`: State Variable
-    - `setMessage`: Function, Public Access
-    - `public`: Anyone can call
+    - `message`: স্টেট ভ্যারিয়েবল
+    - `setMessage`: ফাংশন, পাবলিক অ্যাক্সেস
+    - `public`: যেকেউ কল করতে পারে
 
-### ২. Storage Contract
-- Persistent Data Store: Blockchain-এ ডেটা সংরক্ষণ
-- Example:
+### ২. স্টোরেজ কনট্রাক্ট
+- স্থায়ী ডেটা সংরক্ষণ: ব্লকচেইনে ডেটা রাখা
+- উদাহরণ:
 ```solidity
 pragma solidity ^0.8.0;
 
@@ -43,40 +43,40 @@ contract SimpleStorage {
 }
 ```
 - Explanation:
-    - `data`: State Variable
-    - `setData`: Function, Value Update
+    - `data`: স্টেট ভ্যারিয়েবল
+    - `setData`: ফাংশন, মান আপডেট
 
-### ৩. Deployment Steps
-1. Contract লিখুন (Solidity)
-2. Compile করুন (Remix, Hardhat)
-3. Deploy করুন (Testnet/Mainnet)
-4. Interact করুন (Function Call)
+### ৩. ডিপ্লয়মেন্ট ধাপ
+1. কনট্রাক্ট লিখুন (Solidity)
+2. কম্পাইল করুন (Remix, Hardhat)
+3. ডিপ্লয় করুন (Testnet/Mainnet)
+4. ইন্টার‍্যাক্ট করুন (ফাংশন কল)
 
-### ৪. Real-life Use Cases
-- **Token Contract:** ERC20, ERC721
-- **Voting:** DAO Contract
-- **Crowdfunding:** ICO Contract
-- **Gaming:** In-game Asset Contract
+### ৪. বাস্তব জীবনের প্রয়োগ
+- **টোকেন কনট্রাক্ট:** ERC20, ERC721
+- **ভোটিং:** DAO কনট্রাক্ট
+- **ক্রাউডফান্ডিং:** ICO কনট্রাক্ট
+- **গেমিং:** ইন-গেম অ্যাসেট কনট্রাক্ট
 
-### ৫. Analogies
-- Contract—একটি ফর্ম, Function—ফর্মের Submit Button
-- Storage Contract—ডিজিটাল খাতা, যেখানে ডেটা লিখে রাখা যায়
+### ৫. উপমা
+- কনট্রাক্ট—একটি ফর্ম, ফাংশন—ফর্মের সাবমিট বাটন
+- স্টোরেজ কনট্রাক্ট—ডিজিটাল খাতা, যেখানে ডেটা লিখে রাখা যায়
 
-### ৬. Common Pitfalls
-- Buggy Code: Security Issue
-- Public Function Abuse
-- Gas Inefficiency
+### ৬. সাধারণ সমস্যা
+- বাগযুক্ত কোড: সিকিউরিটি সমস্যা
+- পাবলিক ফাংশনের অপব্যবহার
+- গ্যাস অপচয়
 
-### ৭. Best Practices
-- Use Proven Standards (OpenZeppelin)
-- Thorough Testing, Audit
-- Optimize for Low Gas
-- Documentation ও Team Review
+### ৭. সেরা অনুশীলন
+- প্রমাণিত স্ট্যান্ডার্ড ব্যবহার করুন (OpenZeppelin)
+- ব্যাপক টেস্টিং ও অডিট
+- কম গ্যাসে অপ্টিমাইজ করুন
+- ভালো ডকুমেন্টেশন ও টিম রিভিউ
 
-### ৮. Industry Trends
-- Upgradeable Contract
-- Automated Testing
-- Formal Verification
+### ৮. শিল্পের প্রবণতা
+- আপগ্রেডেবল কনট্রাক্ট
+- অটোমেটেড টেস্টিং
+- ফরমাল ভেরিফিকেশন
 
 ## উপসংহার
 

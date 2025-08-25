@@ -1,6 +1,6 @@
 ---
 title: "সলিডিটি পরিচিতি"
-icon: logos:web3js
+icon: solar:alt-arrow-right-bold-duotone
 ---
 
 # সলিডিটি পরিচিতি — স্মার্ট কন্ট্রাক্ট লেখার ভাষা
@@ -9,22 +9,22 @@ icon: logos:web3js
 
 সলিডিটি (Solidity) হলো—ইথেরিয়াম ও Web3 স্মার্ট কন্ট্রাক্ট লেখার জন্য সবচেয়ে জনপ্রিয় প্রোগ্রামিং ভাষা। এই পাঠে জানব—সলিডিটি কী, কীভাবে কাজ করে, এবং কেন এটি Web3 ডেভেলপারদের জন্য অপরিহার্য।
 
-## Core Concepts
+## মূল ধারণা
 
-### ১. Solidity কী?
-- Contract-oriented Language: স্মার্ট কন্ট্রাক্ট লেখার জন্য ডিজাইন
-- Syntax: JavaScript, C++, Python-এর মতো
-- Static Typing, Inheritance, Library Support
-- Example: ERC20, ERC721 Token Contract
+### ১. সলিডিটি কী?
+- চুক্তি-ভিত্তিক ভাষা (Contract-oriented): স্মার্ট কনট্রাক্ট লেখার জন্য ডিজাইন করা হয়েছে
+- সিনট্যাক্স: JavaScript, C++, Python-এর মতো পরিচিত স্টাইল
+- স্ট্যাটিক টাইপিং, ইনহেরিট্যান্স এবং লাইব্রেরি সাপোর্ট
+- উদাহরণ: ERC20, ERC721 টোকেন কনট্রাক্ট
 
-### ২. Solidity Structure
-1. **Contract:** কোডের মূল ইউনিট
-2. **State Variable:** ডেটা সংরক্ষণ
-3. **Function:** Logic/Action
-4. **Event:** Blockchain-এ Notification
-5. **Modifier:** Function Behavior Control
+### ২. সলিডিটির কাঠামো
+1. **Contract (কনট্রাক্ট):** কোডের প্রধান ইউনিট
+2. **State Variable (স্টেট ভ্যারিয়েবল):** ব্লকচেইনে ডেটা সংরক্ষণ করে
+3. **Function (ফাংশন):** লজিক ও অ্যাকশন সম্পাদন করে
+4. **Event (ইভেন্ট):** ব্লকচেইনে নোটিফিকেশন প্রকাশ করে
+5. **Modifier (মডিফায়ার):** ফাংশনের আচরণ নিয়ন্ত্রণ করে
 
-### ৩. Basic Example
+### ৩. মৌলিক উদাহরণ
 ```solidity
 pragma solidity ^0.8.0;
 
@@ -42,29 +42,35 @@ contract HelloWorld {
 - **Voting:** DAO Contract
 - **Gaming:** In-game Asset Contract
 
-### ৫. Analogies
-- Solidity—চুক্তি লেখার ভাষা, Blockchain—নোটারি অফিস
-- Contract—একটি ফর্ম, Function—ফর্মের Action Button
+### ৪. বাস্তব জীবনের প্রয়োগ
+- **টোকেন কনট্রাক্ট:** ERC20, ERC721
+- **ক্রাউডফান্ডিং:** ICO কনট্রাক্ট
+- **ভোটিং:** DAO কনট্রাক্ট
+- **গেমিং:** ইন-গেম অ্যাসেট কনট্রাক্ট
 
-### ৬. Common Pitfalls
-- Buggy Code: Security Issue, Fund Loss
-- Gas Inefficiency: High Cost
-- Upgrade Issue: Immutable Contract
+### ৫. উপমা
+- সলিডিটি — চুক্তি লেখার ভাষা; ব্লকচেইন — নোটারি অফিসের মতো
+- কনট্রাক্ট — একটি ফর্ম; ফাংশন — ফর্মের অ্যাকশন বাটন
 
-### ৭. Best Practices
-- Use Proven Standards (OpenZeppelin)
-- Thorough Testing, Audit
-- Optimize for Low Gas
-- Documentation ও Team Review
+### ৬. সাধারণ সমস্যা
+- বাগযুক্ত কোড → সিকিউরিটি ইস্যু ও ফান্ড লস
+- গ্যাস অকার্যকর ব্যবহার → উচ্চ খরচ
+- আপগ্রেড সমস্যা → কনট্রাক্ট সাধারণত ইমিউটেবল
 
-### ৮. Industry Trends
-- Vyper, Rust—Solidity Alternative
-- Upgradeable Contract Pattern
-- Formal Verification, Automated Audit
+### ৭. সেরা অনুশীলন
+- প্রমাণিত স্ট্যান্ডার্ড ব্যবহার করুন (OpenZeppelin)
+- ব্যাপক টেস্টিং ও অডিট করান
+- গ্যাস অপটিমাইজ করা কোড লিখুন
+- ভালো ডকুমেন্টেশন ও টিম রিভিউ নিশ্চিত করুন
+
+### ৮. শিল্পের প্রবণতা
+- Vyper, Rust — সলিডিটির বিকল্প ভাষা
+- আপগ্রেডেবল কনট্রাক্ট প্যাটার্ন
+- ফরমাল ভেরিফিকেশন ও অটোমেটেড অডিট টুলিং
 
 ## উপসংহার
 
-সলিডিটি—Web3 ও Ethereum স্মার্ট কন্ট্রাক্ট লেখার জন্য অপরিহার্য। Token, dApp, DAO—সবকিছু এই ভাষায় লেখা হয়। বাস্তব উদাহরণ, Best Practices, ও Industry Trends অনুসরণ করুন—তাহলেই নিরাপদ ও সফল স্মার্ট কন্ট্রাক্ট তৈরি সম্ভব।
+সলিডিটি হলো Web3 ও Ethereum স্মার্ট কন্ট্রাক্ট লেখায় মৌলিক ভাষা। টোকেন, dApp, DAO—এগুলো তৈরিতে সলিডিটির দক্ষতা অপরিহার্য। বাস্তব উদাহরণ, সেরা অনুশীলন এবং শিল্পের প্রবণতা অনুসরণ করলে নিরাপদ ও কার্যকরী স্মার্ট কন্ট্রাক্ট তৈরি করা সম্ভব।
 
 ---
 
