@@ -1,91 +1,222 @@
 ---
-title: "Docker Images: Pull, Build, Tag"
+title: "ডকার ইমেজ"
 icon: uim:docker
 ---
 
-
-Google, Netflix, Uber—সবাই Docker Images ব্যবহার করে তাদের অ্যাপ্লিকেশন দ্রুত Deploy ও Scale করে। Docker Image—Application-এর Blueprint, Container তৈরির মূল উপাদান। এই লেসনে আমরা Image Pull, Build ও Tagging-এর Workflow জানব।
-
-## Core Concepts
-
-### ১. Docker Image কী?
-- **Definition:** Application, Dependencies ও Configuration-সহ Packaged File
-- **Features:**
-    - Portable
-    - Versioned
-    - Reproducible
-- **উদাহরণ:**
-    - "Netflix-এর Video Streaming Image, Google-এর Search Service Image"
-
-### ২. Image Pull
-- **Definition:** Docker Hub বা Private Registry থেকে Image Download করা
-- **Command:**
-```bash
-$ docker pull nginx:latest
-```
-- **Tip:** Always Use Official Image
-
-### ৩. Image Build
-- **Definition:** Dockerfile থেকে Custom Image তৈরি করা
-- **Command:**
-```bash
-$ docker build -t myapp:v1 .
-```
-- **Tip:** Dockerfile-এ App Instruction লিখুন
-
-### ৪. Image Tag
-- **Definition:** Image-এর Version বা Identifier
-- **Command:**
-```bash
-$ docker tag myapp:v1 myrepo/myapp:prod
-```
-- **Tip:** Meaningful Tag ব্যবহার করুন (latest, dev, prod)
-
-### ৫. Workflow
-1. Pull Official Image
-2. Build Custom Image
-3. Tag Image Properly
-4. Push to Registry (Optional)
-
-### ৬. কেন গুরুত্বপূর্ণ?
-- Fast Deployment
-- Version Control
-- Collaboration
-
-### ৭. কখন ব্যবহার করবেন?
-- New App Deployment
-- Update Existing App
-- Multi-environment Setup
-
-### ৮. Common Pitfalls
-- Unoptimized Dockerfile
-- Wrong Tag Usage
-- Large Image Size
-
-### ৯. Best Practices
-- Use Small Base Image (Alpine)
-- Clean Up Unused Files
-- Tag Clearly
-- Scan for Vulnerabilities
-
-### ১০. Industry Trends
-- Multi-stage Build
-- Automated Image Scanning
-- Immutable Images
-
-## উদাহরণ ও এনালজি
-- Docker Image—"একটি রেসিপি, Container রান করলে খাবার তৈরি"
-- Tag—"রেসিপির Version, কোনটা Lunch, কোনটা Dinner"
-
-## Quick Reference
-- Pull: `docker pull nginx:latest`
-- Build: `docker build -t myapp:v1 .`
-- Tag: `docker tag myapp:v1 myrepo/myapp:prod`
-
-## উপসংহার
-
-Docker Image—Application Packaging-এর জন্য অপরিহার্য। Pull, Build, Tag—এই তিনটি ধাপ ঠিকভাবে জানলে, Efficient Deployment ও Collaboration সহজ হবে।
+## এই লেসনে আমরা জানবো:
+- Image কী এবং কেন গুরুত্বপূর্ণ
+- `pull`, `build`, `tag`, `push` কিভাবে কাজ করে
+- Multi-stage build, optimization ও cleanup টিপস
+- Registry ও CI/CD নিয়ে ছোট গাইড
 
 ---
 
-**পরবর্তী পাঠ:** কন্টেইনার লাইফসাইকেল: Run, Stop, Remove
+## ১। Docker Image — সংক্ষিপ্ত ব্যাখ্যা
+
+- Image হলো layered, immutable artifact যা থেকে কনটেইনার তৈরি হয়। প্রতিটি Dockerfile কমান্ড (`RUN`, `COPY`, ইত্যাদি) একটি লেয়ার তৈরি করে।
+- কেন গুরুত্বপূর্ণ: Image নিশ্চিত করে যে একই environment যেকোনো host-এ পুনরায় তৈরি করা যাবে — development → CI → production consistency।
+
+---
+
+## ইমেজের ধরন (Types of images)
+
+Docker ইমেজ সাধারণত কয়েকটি পরিচিত শ্রেণিতে পড়ে। প্রতিটি শ্রেণির উদ্দেশ্য, সুবিধা এবং সীমাবদ্ধতা আছে — নিচে প্রতিটি টাইপ-এর সংক্ষিপ্ত ব্যাখ্যা, উদাহরণ ও প্র্যাকটিক্যাল টিপস দেওয়া হলো।
+
+### Base / Distribution images
+এগুলো হলো একটি পূর্ণ বা লাইটওয়েট ইউজারল্যান্ড filesystem যা আপনার অ্যাপে ভিত্তি হিসেবে কাজ করে (উদাহরণ: `ubuntu`, `debian`, `alpine`)।
+- কখন ব্যবহার করবেন: যখন আপনার অ্যাপে পুরোনো লাইব্রেরি বা নির্দিষ্ট OS ফিচার দরকার হয়।
+- সুবিধা: compatibility বেশি, পরিচিত টুলিং পাওয়া যায়।
+- কনস: সাইজ বড় হতে পারে (বিশেষ করে full Debian/Ubuntu)।
+
+টিপ: ছোট সাইজ চাইলে `alpine` ব্যবহার করা যায়, কিন্তু musl vs glibc compatibility সমস্যা হতে পারে — যদি native binaries বা নির্দিষ্ট লাইব্রেরি থাকে, আগে পরীক্ষা করুন।
+
+### Runtime images
+Runtime ইমেজে কেবল অ্যাপ চালাতে প্রয়োজনীয় runtime ও লাইব্রেরি থাকে (উদাহরণ: `node:18-alpine`), build টুলস সেখানে থাকে না।
+- উদ্দেশ্য: প্রোডাকশনে বিন্যাসে ছোট ও নিরাপদ পরিবেশ প্রদান।
+- সুবিধা: attack surface কমে, সাইজ ছোট থাকে।
+- কনস: লিভ-টাইম সমস্যায় ডিবাগ করা কঠিন হতে পারে কারণ বিল্ড-টাইম টুলস নেই।
+
+রাস্তায় ব্যবহার: multi-stage build-এ final stage হিসেবে runtime ইমেজ ব্যবহার করা শ্রেয়।
+
+### Builder / Development images
+Builder ইমেজে build-time ডিপেন্ডেন্সি ও টুলস থাকে (যেমন `node:18`, `golang` বা `python:3.11` যেখানে build tools ইনস্টল করা)।
+- যখন ব্যবহার করবেন: কোড compile, asset build বা native extension তৈরির সময়।
+- সুবিধা: বিল্ড সহজ ও পুনরুত্পাদনযোগ্য হয়।
+- কনস: প্রোডাকশনে ব্যবহার করলে সাইজ ও attack surface বাড়ে, সেইজন্য multi-stage build-এ আলাদা করা উত্তম।
+
+উদাহরণ: multi-stage Dockerfile-এ `AS builder` ব্যবহার করে build stage আলাদা করে, এরপর final stage-এ কেবল runtime artifacts কপি করবেন।
+
+### Minimal / Scratch / Distroless images
+Scratch হলো একেবারেই খালি ইমেজ (no filesystem) এবং Distroless হলো Google-এর curated minimal images যা কেবল runtime libraries রাখে, 쉘 বা package manager নেই।
+- সুবিধা: অত্যন্ত ছোট সাইজ ও কম attack surface।
+- কনস: debugging কঠিন (no shell), কিছু native dependencies আনতে সমস্যা হতে পারে।
+
+সালাহ: debugging-এর জন্য একটি বর্ধিত ডিবাগ ইমেজ তৈরি রাখুন অথবা build time এ extra tooling ব্যবহার করুন এবং production-এ minimal ইমেজ deploy করুন।
+
+### Application / Service images
+এগুলো আপনার অ্যাপের বিল্ড আউটপুট ধরে রাখে (উদাহরণ: `myrepo/myapp:1.2.3`) — সাধারণত CI pipeline-এ তৈরি ও ট্যাগ করা হয়।
+- ব্যবহার: deployable artifact।
+- টিপ: tag-এ commit SHA বা semantic version ব্যবহার করুন (e.g., `myapp:sha-abcdef` বা `myapp:1.2.3`)।
+
+### Multi-arch / Manifest images
+একই ট্যাগের পিছনে বিভিন্ন আর্কিটেকচারের ইমেজ থাকতে পারে — AMD64, ARM64 ইত্যাদি। Registry manifest-list (multi-arch manifest) ক্লায়েন্টের আর্কিটেকচারের উপযোগী ইমেজ pull করে।
+- ব্যবহার: যখন একই ইমেজ বিভিন্ন হার্ডওয়্যার প্ল্যাটফর্মে চালাতে চান (যেমন Raspberry Pi বা Apple Silicon)।
+
+টিপ: `docker buildx` ও `docker manifest` ব্যবহার করে multi-arch ইমেজ বানান এবং test করে নিন।
+
+### Official / Verified / Community images
+Registry-এ official বা vendor-verified images আছে (উদাহরণ: Docker Hub-এর `library/` namespace)। এগুলো সাধারণত নিরাপত্তা ও maintenance-এর দিক থেকে বিশ্বাসযোগ্য।
+- টিপ: production-এ সম্ভব হলে official/verified images ব্যবহার করুন এবং নিয়মিত vulnerability scan চালান।
+
+কোনটি কখন ব্যবহার করবেন (সংক্ষেপ):
+- Development/build: Builder images
+- Production runtime: Runtime বা minimal images
+- ছোট footprint বা embedded: scratch/distroless
+- Multi-platform deployment: multi-arch images
+
+সাধারণ টিপস:
+- production-এ সবসময় explicit tag ব্যবহার করুন (avoid `:latest`).
+- trusted sources থেকে images নিন, regular vulnerability scans চালান (`trivy`, `docker scan`)।
+- multi-stage builds ব্যবহার করে build-এ থাকা অপ্রয়োজনীয় টুলস final image থেকে বাদ দিন।
+
+
+
+## ২। Pull — কিভাবে ইমেজ আনা হয়
+
+`docker pull <name>:<tag>` দিয়ে আপনি Docker Hub বা প্রাইভেট রেজিস্ট্রি থেকে ইমেজ নামিয়ে আনেন।
+
+উদাহরণ:
+
+```bash
+docker pull nginx:latest
+```
+
+টিপ: যদি tag উল্লেখ না করেন, ডিফল্টভাবে `:latest` ধরা হয় — কিন্তু production-এ explicit tag ব্যবহার করাই নিরাপদ।
+
+---
+
+## ৩। Build — কাস্টম ইমেজ তৈরি (Dockerfile)
+
+Dockerfile একটি টেক্সট ফাইল যেখানে আপনার অ্যাপ কিভাবে প্যাক হবে তা ধাপে ধাপে লেখা থাকে।
+
+সাধারণ একটি Node.js উদাহরণ:
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
+
+বিল্ড কমান্ড:
+
+```bash
+docker build -t myapp:1.0.0 .
+```
+
+কিছু গুরুত্বপূর্ণ পয়েন্ট:
+- Build context (`.`) এ শুধুমাত্র প্রয়োজনীয় ফাইল রাখুন এবং `.dockerignore` ব্যবহার করুন।
+- ছোট base image (Alpine) ব্যবহার করুন যদি compatibility অনুমতি দেয়।
+- layer ordering গুরুত্বপুর্ন: কম পরিবর্তনশীল স্টেপগুলো আগে রাখলে ক্যাশিং কাজে লাগে।
+
+---
+
+## ৪। Tag — ভের্সনিং ও রেজিস্ট্রি আইডেন্টিফায়ার
+
+Tag হলো ইমেজের পরিচয়; সাধারণ প্যাটার্ন `registry/username/repo:tag`।
+
+উদাহরণ:
+
+```bash
+docker tag myapp:1.0.0 myrepo/myapp:prod
+docker push myrepo/myapp:prod
+```
+
+টিপ: semantic versioning (e.g., `1.2.3`) এবং environment tags (`prod`, `staging`) ব্যবহার করুন।
+
+---
+
+## ৫। Push/Pull — রেজিস্ট্রিতে কাজ করা
+
+প্রাইভেট রেজিস্ট্রি বা Docker Hub-এ পুশ করার আগে লগইন করতে হবে:
+
+```bash
+docker login registry.example.com
+docker push registry.example.com/myapp:prod
+```
+
+CI টিপ: CI pipeline-এ registry credentials secret হিসেবে রাখুন এবং build → test → tag → push flow অটোমেট করুন।
+
+---
+
+## ৬। Multi-stage builds ও অপ্টিমাইজেশন
+
+Multi-stage build দিয়ে আপনি build-time dependencies আলাদা করে ফেলে প্রোডাকশনে শুধু runtime আর্টিফ্যাক্ট রাখবেন — এতে ইমেজ ছোট হয় এবং attack surface কমে।
+
+```dockerfile
+# build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# final stage
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+RUN npm install --production
+CMD ["node", "dist/index.js"]
+```
+
+আরেকটি অপ্টিমাইজেশন টিপ: multi-stage ছাড়াও `--no-cache` অপশন বা BuildKit ব্যবহার করে বিল্ড দ্রুত ও পুড়োটে।
+
+---
+
+## ৭। ইমেজ পরিদর্শন ও ব্যবস্থাপনা
+
+- ইমেজ তালিকা: `docker images` / `docker image ls`
+- ইমেজের লেয়ার দেখুন: `docker history myapp:1.0.0`
+- ইমেজের ভিতরের ফাইল দেখার জন্য কনটেইনার চালিয়ে `docker run --rm -it myapp:1.0.0 sh` ব্যবহার করুন (শেল থাকলে)।
+
+অপ্রয়োজনীয় ইমেজ ও স্পেস মুক্ত করতে:
+
+```bash
+docker image prune         # unused dangling images
+docker system prune -a      # সাবধানে: unused images, containers, networks সব মুছে দেয়
+```
+
+---
+
+## ৮। নিরাপত্তা ও স্ক্যানিং
+
+- ইমেজ স্ক্যানিং: `trivy`, `docker scan` ইত্যাদি টুল ব্যবহার করে vulnerabilities চেক করুন।
+- প্রাইভেট রেজিস্ট্রির জন্য TLS এবং proper auth সেটআপ করুন।
+- base image provenance: official বা verified images ব্যবহার করুন।
+
+---
+
+## ৯। সাধারণ ত্রুটি ও সমাধান
+
+- Build fails because of large context: `.dockerignore` আপডেট করুন।
+- Cache সমস্যা: `--no-cache` বা BuildKit enabled করে আবার চেষ্টা করুন।
+- Push permission denied: নিশ্চিত করুন registry এ proper credentials ও permissions আছে।
+
+---
+
+## ১০। CI/CD-এ ইমেজ ও ট্যাগিং কাঠামো (ছোট গাইড)
+
+- Build artifacts কে immutable রাখুন: tag with commit SHA (e.g., `myapp:sha-<commit>`) এবং `latest` আলাদাভাবে ব্যবহার করুন।
+- Pipeline: build → test → tag → push → deploy।
+
+---
+
+## উপসংহার
+
+Docker Images ঠিকভাবে বোঝা ও অপ্টিমাইজ করা মানেই দ্রুত ডিপ্লয়মেন্ট, কম স্পেস ব্যবহার ও নিরাপদ রিলিজ প্রক্রিয়া। আজ শেখা Pull/Build/Tag/Push—এসবই production-ready delivery এর ভিত্তি।
+

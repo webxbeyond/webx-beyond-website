@@ -1,68 +1,161 @@
 ---
 title: "ডকার ইনস্টলেশন"
-icon: uim:docker
+icon: "uim:docker"
 ---
 
-Google, Netflix, Uber—সবাই Docker ব্যবহার করে তাদের অ্যাপ্লিকেশন চালায়। Docker শুরু করতে হলে, সঠিকভাবে ইনস্টল করা জরুরি। এই লেসনে আমরা Linux, Mac ও Windows-এ Docker ইনস্টলেশন Step-by-step জানব।
+Docker ইনস্টল করা হলো প্রথম পদক্ষেপ। এই পৃষ্ঠায় প্রত্যেক অপারেটিং সিস্টেমের জন্য কেন সেই ধাপগুলো দরকার, প্রত্যেক কমান্ডের ছোট কারণ, যাচাই পদ্ধতি এবং সমস্যা হলে কীভাবে খুঁজে বের করবেন — সেসব স্পষ্টভাবে দেখানো আছে।
 
-## Core Concepts
+---
 
-### ১. Linux-এ Docker ইনস্টলেশন
-- **Steps:**
-    1. Update Package Index
-    2. Docker Repository Add
-    3. Docker Engine Install
-    4. User Permission Setup
-- **Command Example:**
+## ১। সাধারণ যাচাই (Before you start)
+
+- CPU virtualization (VT-x/AMD-V) অন আছে কি না: অনেক ল্যাপটপ/বর্চুয়ালাইজড হোস্টে এই বিকল্প BIOS/UEFI-এ বন্ধ থাকে। এটি অন না থাকলে Docker Desktop/WSL2/VM-ভিত্তিক ব্যাকএন্ড ঠিক মতো কাজ নাও করতে পারে।
+- মেমরি ও ডিস্ক: ডকার ইমেজ ও ভলিউম দ্রুত জায়গা নেবে—কমপক্ষে 4GB RAM ও পর্যাপ্ত ডিস্ক স্পেস রাখুন।
+- নেটওয়ার্ক ও প্রোক্সি: corporate নেটওয়ার্কে থাকলে registry access ব্লক থাকতে পারে; আগে নেটওয়ার্ক/প্রোক্সি রাজনৈতিকতা জানুন।
+
+টিপ: ইনস্টল শুরুর আগে `docker --version` ও `docker info` চালিয়ে পরিবেশ পরীক্ষা করুন (কিছু সিস্টেমে পূর্বে ইনস্টল করা অপর্যাপ্ত বা corrupt ভার্সন থাকলে সমস্যা হতে পারে)।
+
+---
+
+## ২। Ubuntu / Debian — ধাপে ধাপে (কেন কী)
+
 ```bash
 sudo apt update
-sudo apt install ca-certificates curl gnupg
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
+sudo apt install -y ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo usermod -aG docker $USER
 ```
-- **Tip:** Installation শেষে `docker --version` দিয়ে চেক করুন।
 
-### ২. Mac-এ Docker ইনস্টলেশন
-- **Steps:**
-    1. Docker Desktop Download করুন (https://www.docker.com/products/docker-desktop)
-    2. Installer চালান
-    3. Docker Desktop Launch করুন
-- **Tip:** Mac-এ GUI ও CLI—দুটোই সহজে ব্যবহার করা যায়।
+কমান্ডের ব্যাখ্যা ও কারণ:
+- `ca-certificates`, `gnupg`: নিরাপদ HTTPs ও GPG verification-এর জন্য দরকার।
+- GPG কী যোগ করা: ডাউনলোড কৃত প্যাকেজ যাচাই করার জন্য প্রয়োজন।
+- `signed-by=...`: প্যাকেজ সোর্স নির্দিষ্ট কী দিয়ে validate করায় সিকিউরিটি বাড়ে।
+- `docker-ce` ও `containerd.io`: ডকার ইঞ্জিন ও কনটেইনার রন্টাইম।
+- `docker-compose-plugin`: Compose V2-র জন্য।
 
-### ৩. Windows-এ Docker ইনস্টলেশন
-- **Steps:**
-    1. Docker Desktop Download করুন
-    2. Installer চালান
-    3. WSL 2 Enable করুন (Windows Subsystem for Linux)
-    4. Docker Desktop Launch করুন
-- **Tip:** Windows-এ WSL 2 ব্যবহার করলে Performance ভালো হয়।
+গ্রুপ আপডেট কার্যকর করতে লগআউট/লগইন করুন বা `newgrp docker` রান করান।
 
-### ৪. Common Pitfalls
-- Permission Issue (Linux)
-- WSL 2 Not Enabled (Windows)
-- Outdated Version
+যাচাই:
 
-### ৫. Best Practices
-- Always Download Latest Version
-- Installation শেষে System Restart করুন
-- Official Documentation Follow করুন
+```bash
+docker --version
+docker info
+docker run --rm hello-world
+```
 
-### ৬. Industry Trends
-- Docker Desktop—Cross-platform
-- Cloud-based Docker Setup
+যদি `docker run --rm hello-world` ত্রুটি দেয়:
+- `sudo journalctl -u docker` চালিয়ে ডেমন লগ দেখুন।
+- স্টোরেজ driver সমস্যা হলে `docker info` থেকে `Storage Driver` চেক করুন।
 
-## উদাহরণ ও এনালজি
-- Docker Install—"নতুন ফোন কিনে সেটআপ করা, সব Feature Unlock"
+---
 
-## Quick Reference
-- Linux: `curl -fsSL https://get.docker.com -o get-docker.sh`
-- Mac/Windows: Docker Desktop
+## ৩। Fedora / CentOS / RHEL — ছোট অতিরিক্ত টিপস
+
+```bash
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```
+
+নোট:
+- RHEL/CentOS-এ প্যাকেজ/রেপো পলিসি আলাদা—Enterprise পরিবেশে subscription-based repos ব্যবহার হতে পারে।
+- SELinux বা firewall কনফিগারেশন ইস্যু হলে `ausearch` বা `firewall-cmd` দিয়ে লগ দেখুন।
+
+যাচাই:
+
+```bash
+docker --version
+docker run --rm hello-world
+```
+
+---
+
+## ৪। macOS (Intel ও Apple Silicon) — কেন ভিন্ন
+
+Docker Desktop macOS-এ virtualization framework ব্যবহার করে (Intel → HyperKit, M1/M2 → Apple Virtualization). এজন্য:
+
+1. https://www.docker.com/products/docker-desktop থেকে আপনার আর্কিটেকচারের ইনস্টলার ডাউনলোড করুন।
+2. DMG খুলে অ্যাপ্লিকেশন ফোল্ডারে ড্র্যাগ করুন।
+3. প্রথমবারে কিছু system permission চাইতে পারে (network access, filesystem)।
+
+যাচাই:
+
+```bash
+docker --version
+docker run --rm hello-world
+```
+
+টিপস:
+- Preferences → Resources থেকে CPU/Memory/Swap কনফিগার করে বড় Compose সেটআপে রিসোর্স বাড়ান।
+- Apple Silicon-এ কিছুকাল আগে পর্যন্ত কিছু প্যাকেজ/ইমেজ compatibility সমস্যা দেখেছে — প্রয়োজন হলে `--platform` ফ্ল্যাগ ব্যবহার করুন।
+
+---
+
+## ৫। Windows (Docker Desktop + WSL2) — ধাপে ধাপে (PowerShell উদাহরণ)
+
+WSL2-enabled Docker Desktop Windows-এ সবচেয়ে নির্ভরযোগ্য ও পারফরম্যান্ট পদ্ধতি। দ্রুত সেটআপ (Admin PowerShell):
+
+```powershell
+# WSL2 ইনস্টল (Windows 10/11):
+wsl --install -d Ubuntu
+# অথবা ম্যানুয়ালি:
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+wsl --set-default-version 2
+```
+
+এরপর Microsoft Store থেকে Ubuntu ইনস্টল করে একটি ইউজার তৈরি করুন। তারপর Docker Desktop ইনস্টল করুন এবং Settings → Resources → WSL Integration-এ আপনার distro এনাবল করুন।
+
+যাচাই (PowerShell):
+
+```powershell
+docker --version
+docker run --rm hello-world
+```
+
+টিপ: corporate proxy থাকলে Docker Desktop Settings → Resources → Proxies-এ সেট করুন এবং WSL-এর জন্যENV ভ্যারিয়েবল সেট করতে হতে পারে।
+
+---
+
+## ৬। ডিটেইলড ট্রাবলশুটিং
+
+1) Permission denied (socket)
+- লক্ষণ: `Got permission denied while trying to connect to the Docker daemon socket`।
+- সমাধান: `sudo usermod -aG docker $USER` → লগআউট/লগইন অথবা `newgrp docker`। বিকল্প: `sudo` দিয়ে চালাতে পারেন যদি গ্রুপ না বদলাতে চান।
+
+2) Daemon not running
+- লক্ষণ: `Cannot connect to the Docker daemon`।
+- সমাধান: `sudo systemctl start docker`; লগ দেখুন: `journalctl -u docker --no-pager`।
+
+3) Image pull/registry errors
+- লক্ষণ: timeout, TLS error, বা 401/403।
+- সমাধান: network/proxy চেক করুন; `curl -v https://registry-1.docker.io/v2/` দিয়ে রেজিস্ট্রি অ্যাক্সেস যাচাই করুন।
+
+4) Disk space / overlay errors
+- লক্ষণ: `no space left on device` বা overlayfs errors।
+- সমাধান: `docker system df` দেখে স্পেস ব্যবহার বুঝে `docker system prune` চালান (সতর্কতা!).
+
+5) Windows-specific issues
+- WSL2 kernel update দরকার হতে পারে — Microsoft-এর নির্দেশনা অনুসরণ করে kernel আপডেট করুন।
+
+---
+
+## ৭। নিরাপত্তা ও পরে করার কাজ
+
+- Secrets: কোনো সিক্রেটকে Dockerfile-এ হার্ডকোড করবেন না। CI-এ secret management বা orchestration secrets ব্যবহার করুন।
+- Rootless Docker: production-এ চিন্তা করুন — এটি attack surface কমায়, তবে কিছু ফিচার ভিন্ন হতে পারে।
+- Image scanning: CI pipeline-এ `trivy`, `docker scan` বা অনুরূপ টুল ব্যবহার করে vulnerability scan চালান।
+- Immutable infrastructure: runtime পরিবর্তন না করে ইমেজ build → tag → push → deploy প্যাটার্ন অনুসরণ করুন।
+
+---
 
 ## উপসংহার
 
-Docker ইনস্টলেশন—প্রথম ধাপ, সফল Container Deployment-এর জন্য অপরিহার্য। সঠিকভাবে Install করলে, Development থেকে Production—সবকিছু সহজ ও Efficient হবে।
-
----
-
-**পরবর্তী পাঠ:** Hello World: প্রথম কন্টেইনার চালানো
+এই পৃষ্ঠায় আমি ইনস্টলেশন ধাপগুলোর কারণ, যাচাই পদ্ধতি এবং বিস্তারিত ট্রাবলশুটিং টিপস যোগ করেছি। যদি আপনার সিস্টেমে কোনো নির্দিষ্ট ত্রুটি দেখেন, ত্রুটির আউটপুট এখানে পেস্ট করুন—আমি সেটি দেখে পরবর্তী সুনির্দিষ্ট সমাধান দেব।
