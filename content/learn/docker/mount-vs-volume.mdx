@@ -1,0 +1,103 @@
+---
+title: Bind Mount বনাম Volumes
+icon: uim:docker
+---
+
+Docker কন্টেইনারে ডেটা পার্সিস্টেন্স ও ম্যানেজমেন্ট—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। Bind Mount ও Volumes-এর সঠিক ব্যবহার ছাড়া, production app-এ ডেটা নিরাপদ, স্কেলেবল ও রিলায়েবল রাখা যায় না। এই লেসনে আমরা Bind Mount ও Volumes-এর পার্থক্য, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Bind Mount: কী, কেন ও কিভাবে?
+
+**Bind Mount** হচ্ছে host machine-এর নির্দিষ্ট ফোল্ডার বা ফাইল কন্টেইনারে "মাউন্ট" করা।
+
+- Host-এর path কন্টেইনারে mapped হয়
+- Development environment-এ কোড, config, log ফাইল শেয়ার করতে সুবিধা
+
+**বাস্তব উদাহরণ:**
+- Uber-এর dev team local কোড কন্টেইনারে bind mount করে—live edit/test করা যায়
+
+**এনালজি:**
+- ধরুন, আপনি আপনার ডেস্কে একটা drawer খুলে বাড়ির ফাইল রাখলেন—drawer (container) থেকে সরাসরি বাড়ির ফাইল (host) access করা যায়
+
+**Example:**
+```bash
+docker run -v /host/path:/container/path nginx
+```
+
+**কখন ব্যবহার করবেন?**
+- Development, debugging, local testing
+- Host-এর ফাইল কন্টেইনারে live access দরকার হলে
+
+---
+
+## Volumes: কী, কেন ও কিভাবে?
+
+**Volumes** হচ্ছে Docker-managed storage, যা কন্টেইনারের বাইরে থাকে, কিন্তু host-এর ফাইল সিস্টেমে managed হয়।
+
+- Docker নিজে volume তৈরি, manage, delete করে
+- Production environment-এ ডেটা পার্সিস্টেন্স, backup, migration-এর জন্য আদর্শ
+
+**বাস্তব উদাহরণ:**
+- Netflix production database container-এ volume ব্যবহার করে—ডেটা কন্টেইনার ডিলিট হলেও volume-এ থাকে
+
+**এনালজি:**
+- ধরুন, আপনি অফিসে আলাদা locker নিলেন—locker (volume) শুধু আপনার জন্য, অফিস manage করে
+
+**Example:**
+```bash
+docker volume create mydata
+docker run -v mydata:/container/path nginx
+```
+
+**কখন ব্যবহার করবেন?**
+- Production, database, persistent storage
+- Multiple container-এ ডেটা শেয়ার করতে
+
+---
+
+## Bind Mount বনাম Volumes: পার্থক্য
+
+| বৈশিষ্ট্য         | Bind Mount                | Volume                  |
+|-------------------|---------------------------|-------------------------|
+| Management        | Host-managed              | Docker-managed          |
+| Use-case          | Dev, debug, local         | Prod, persistent, share |
+| Backup/Restore    | Manual                    | Docker CLI-supported    |
+| Security          | কম                         | বেশি                    |
+| Performance       | কম                         | বেশি                    |
+
+---
+
+## Workflow: Bind Mount ও Volume ব্যবহার
+
+1. **Bind Mount:**
+    ```bash
+    docker run -v /host/path:/container/path nginx
+    ```
+2. **Volume:**
+    ```bash
+    docker volume create mydata
+    docker run -v mydata:/container/path nginx
+    ```
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Bind mount-এ host path ভুল দিলে container fail করে
+- Volume না ব্যবহার করলে production ডেটা হারানোর risk বাড়ে
+- Volume delete করলে ডেটা হারাতে পারেন—backup রাখুন
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Production-এ Volume:** Netflix, Google production-এ volume ব্যবহার করে
+- **Backup Automation:** Docker CLI দিয়ে volume backup/restore automate করা হচ্ছে
+- **Security:** Volume-এ access control, encryption ব্যবহার হচ্ছে
+
+---
+
+## উপসংহার
+
+Bind Mount ও Volumes—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker-এ ডেটা পার্সিস্টেন্স, security ও scalability নিশ্চিত করা যায়। বাস্তব সিস্টেম ডিজাইনে এই storage model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker data management skill আরও শক্তিশালী হবে!

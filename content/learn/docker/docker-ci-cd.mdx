@@ -1,0 +1,123 @@
+---
+title: CI/CD পাইপলাইনে Docker ব্যবহার
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container deploy করে। Manual build, test, deploy—slow, error-prone, insecure। "CI/CD Pipeline"-এ Docker ব্যবহার—automation, speed, reliability, security—সবকিছু নিশ্চিত করতে industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Automation:** Manual intervention ছাড়া code build, test, deploy হয়।
+- **Speed:** Faster release cycle—feature, bug fix দ্রুত production-এ যায়।
+- **Reliability:** Automated test, scan—production-এ bug/vulnerability কমে।
+- **Security:** Image scan, secret management—pipeline-এ enforced হয়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Jenkins pipeline-এ Docker build/test/deploy—millions of container auto-manage হয়।
+- **Uber:** GitHub Actions-এ Docker image build, scan, push—production-এ deploy হয়।
+- **Google:** Cloud Build/Kubernetes pipeline—Docker-based automation enforced।
+
+## মূল ধারণা
+
+### ১. CI/CD Pipeline: কী?
+
+- **CI (Continuous Integration):** Code change commit হলে automated build/test হয়।
+- **CD (Continuous Delivery/Deployment):** Automated deploy—production/staging-এ image push হয়।
+- **Pipeline:** Step-by-step automation—build, test, scan, push, deploy।
+
+### ২. Docker Integration Workflow
+
+1. **Build:** Source code থেকে Docker image build করুন।
+2. **Test:** Container-এ automated/unit/integration test run করুন।
+3. **Scan:** Image vulnerability scan enforced করুন (Trivy/Snyk)।
+4. **Push:** Image registry-তে push করুন (Docker Hub/Private Registry)।
+5. **Deploy:** Production/staging-এ image deploy করুন।
+
+### ৩. Example: GitHub Actions Workflow
+
+```yaml
+# .github/workflows/docker-ci-cd.yml
+name: Docker CI/CD
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker build -t myapp .
+      - name: Run tests
+        run: docker run myapp npm test
+      - name: Scan image
+        run: trivy image myapp
+      - name: Push image
+        run: docker push myapp
+```
+
+### ৪. Secrets Management ও Security Gates
+
+- **Secrets:** Registry credentials, API key—pipeline-এ encrypted secret হিসেবে store করুন।
+- **Security Gates:** Vulnerability scan/pass না হলে deploy না করুন।
+- **Example:** GitHub Actions-এ secrets:
+
+```yaml
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+### ৫. Best Practices
+
+- Automated test, scan, deploy enforced করুন।
+- Secrets pipeline-এ encrypted store করুন।
+- Vulnerability scan/pass না হলে deploy block করুন।
+- Rollback strategy pipeline-এ add করুন।
+- Monitoring/logging pipeline-এ integrate করুন।
+
+## সাধারণ ভুলত্রুটি
+
+- Manual build/deploy—error, delay, security risk বাড়ে।
+- Secrets pipeline-এ plaintext store করা।
+- Vulnerability scan/pass enforced না করা।
+- Rollback/monitoring/logging pipeline-এ না রাখা।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **GitOps:** Deployment automation code দিয়ে manage হচ্ছে।
+- **Security Gates:** Automated vulnerability scan enforced হচ্ছে।
+- **Multi-cloud Pipeline:** Multiple cloud provider-এ automated deploy হচ্ছে।
+
+## সহজ এনালজি
+
+- "CI/CD pipeline মানে—কারখানার assembly line, যেখানে প্রতিটি ধাপে quality check, automation, security enforced হয়। Docker—assembly line-এর container।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ automated pipeline enforced করুন।
+- Feature release, bug fix, security patch—সব workflow-তে pipeline ব্যবহার করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Source code commit করুন।
+2. Automated build/test/scan/push/deploy pipeline run করুন।
+3. Secrets encrypted store ও use করুন।
+4. Vulnerability scan/pass enforced করুন।
+5. Monitoring/logging pipeline-এ integrate করুন।
+
+## Quick Checklist
+
+- [x] Automated build/test/scan/push/deploy আছে?
+- [x] Secrets encrypted store হয়েছে?
+- [x] Vulnerability scan/pass enforced?
+- [x] Rollback/monitoring/logging আছে?
+- [x] Multi-cloud pipeline configured?
+
+---
+
+## উপসংহার
+
+CI/CD pipeline-এ Docker ব্যবহার—production automation, speed, reliability, security-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার app/container always up-to-date, secure ও efficient থাকবে।
+

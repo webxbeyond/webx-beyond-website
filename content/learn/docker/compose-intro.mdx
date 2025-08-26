@@ -1,0 +1,115 @@
+---
+title: Docker Compose পরিচিতি ও YAML স্ট্রাকচার
+icon: uim:docker
+---
+
+# Docker Compose পরিচিতি ও YAML স্ট্রাকচার: বহু-কন্টেইনার অ্যাপ্লিকেশন সহজে পরিচালনা
+
+## প্রস্তাবনা
+
+Docker Compose—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর production environment-এ বহু-কন্টেইনার অ্যাপ্লিকেশন সহজে deploy, manage ও scale করার জন্য অপরিহার্য। একাধিক কন্টেইনারের environment, network, volume, dependency—সবকিছু এক YAML ফাইলে define করা যায়। এই লেসনে আমরা Docker Compose-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Docker Compose: কী, কেন ও কিভাবে?
+
+**Docker Compose** হচ্ছে একটি টুল, যা YAML ফাইলের মাধ্যমে একাধিক কন্টেইনারের configuration, network, volume, environment variable—সবকিছু একসাথে define ও manage করতে দেয়।
+
+- `docker-compose.yml` ফাইলে service, network, volume, env define করা যায়
+- এক কমান্ডে (`docker compose up`) সব কন্টেইনার চালানো যায়
+
+**বাস্তব উদাহরণ:**
+- Netflix production app-এ web, db, cache, worker—সবকিছু Compose দিয়ে orchestration করা হয়
+
+**এনালজি:**
+- ধরুন, আপনি একটি orchestra পরিচালনা করছেন—সব বাদ্যযন্ত্র একসাথে বাজে, conductor (Compose) সবকিছু manage করে
+
+---
+
+## Core Concepts: Compose ও YAML
+
+1. **Service:**
+    - প্রতিটি container/app একটি service হিসেবে define হয়
+2. **Network:**
+    - Service-গুলো নিজেদের মধ্যে network-এ communicate করে
+3. **Volume:**
+    - Persistent data store করার জন্য volume define করা যায়
+4. **Environment Variable:**
+    - Service-specific env variable set করা যায়
+5. **Dependency:**
+    - Service-গুলোর dependency ও order define করা যায়
+
+---
+
+## Workflow: Compose YAML Structure
+
+**Basic Example:**
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - webdata:/usr/share/nginx/html
+    environment:
+      - NGINX_HOST=localhost
+    depends_on:
+      - db
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+    volumes:
+      - dbdata:/var/lib/mysql
+volumes:
+  webdata:
+  dbdata:
+```
+
+**কীভাবে কাজ করে?**
+- `web` ও `db`—দুইটি service
+- `depends_on` দিয়ে dependency
+- `volumes` দিয়ে persistent storage
+- `environment` দিয়ে config
+- `ports` দিয়ে external access
+
+**Run Command:**
+```bash
+docker compose up -d
+```
+
+---
+
+## YAML Structure: Key Elements
+
+- **version:** Compose file version
+- **services:** সব container/app define
+- **volumes:** persistent storage
+- **networks:** custom network (optional)
+- **environment:** env variable
+- **depends_on:** dependency/order
+- **build:** custom image build (optional)
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- YAML indentation ভুল হলে compose fail করে
+- Service name/type mismatch হলে dependency কাজ করে না
+- Volume/network define না করলে data/network issue হতে পারে
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Production Workflow:** Netflix, Google production-এ Compose দিয়ে multi-container orchestration
+- **Modular YAML:** বড় app-এ multiple YAML file, override, extension ব্যবহার হচ্ছে
+- **CI/CD Integration:** Compose file-কে pipeline-এ ব্যবহার করা হচ্ছে
+
+---
+
+## উপসংহার
+
+Docker Compose ও YAML Structure—এই ধারণা দক্ষভাবে ব্যবহার করলে বহু-কন্টেইনার অ্যাপ্লিকেশন সহজে deploy, manage ও scale করা যায়। বাস্তব সিস্টেম ডিজাইনে এই orchestration model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker deployment skill আরও শক্তিশালী হবে!

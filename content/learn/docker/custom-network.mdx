@@ -1,0 +1,74 @@
+---
+title: Custom User-defined Networks
+icon: uim:docker
+---
+
+Docker কন্টেইনারের মধ্যে নিরাপদ, স্কেলেবল ও ফ্লেক্সিবল যোগাযোগ—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। Default bridge network ছাড়াও, Custom User-defined Networks ব্যবহার করে অ্যাপ্লিকেশন আর্কিটেকচার আরও শক্তিশালী ও কনফিগারেবল করা যায়। এই লেসনে আমরা Custom Network-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Custom User-defined Network: কী, কেন ও কিভাবে?
+
+**Custom User-defined Network** হচ্ছে Docker-এ ইউজার নিজে network তৈরি করে, যেখানে কন্টেইনারগুলো DNS নাম, isolation, security, এবং communication সুবিধা পায়।
+
+- Default bridge network-এ DNS resolution কাজ করে না, কিন্তু custom network-এ container name দিয়ে resolve করা যায়।
+- Isolation ও security বাড়ে—এক network-এর কন্টেইনার অন্য network-এর কন্টেইনারের সঙ্গে সরাসরি যোগাযোগ করতে পারে না।
+
+**বাস্তব উদাহরণ:**
+- Google-এর microservices architecture-এ প্রতিটি সার্ভিস আলাদা custom network-এ থাকে—internal communication সহজ ও নিরাপদ হয়।
+
+**এনালজি:**
+- ধরুন, আপনি একটি অফিস বিল্ডিংয়ে আলাদা team-এর জন্য আলাদা conference room তৈরি করলেন—team members শুধু নিজেদের মধ্যে কথা বলতে পারে, বাইরের কেউ ঢুকতে পারে না। Custom network-ও তেমন—নিজস্ব "room"।
+
+---
+
+## Core Concepts: Custom Network
+
+1. **Network Creation:**
+    - `docker network create my-network`
+2. **DNS Resolution:**
+    - কন্টেইনারের নাম দিয়ে resolve করা যায় (যেমন: `web`, `db`)
+3. **Isolation:**
+    - এক network-এর কন্টেইনার অন্য network-এর কন্টেইনারের সঙ্গে সরাসরি যোগাযোগ করতে পারে না
+4. **Security:**
+    - Internal traffic বাইরের world থেকে isolate থাকে
+5. **Scalability:**
+    - Microservices, multi-container app-এ সহজে scale করা যায়
+
+---
+
+## Workflow: Custom Network ব্যবহার
+
+1. **নতুন Network তৈরি করুন:**
+    ```bash
+    docker network create my-network
+    ```
+2. **কন্টেইনার চালান ও network-এ যুক্ত করুন:**
+    ```bash
+    docker run -d --name web --network my-network nginx
+    docker run -d --name db --network my-network mysql
+    ```
+3. **কন্টেইনারের মধ্যে DNS নাম দিয়ে যোগাযোগ:**
+    - `web` কন্টেইনার থেকে `db:3306`-এ কানেক্ট করা যাবে
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Default bridge network-এ DNS resolution কাজ করে না—custom network ব্যবহার করুন
+- Network isolation ভুল হলে security risk বাড়ে
+- Network তৈরি না করে কন্টেইনার চালালে communication সমস্যা হতে পারে
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Microservices Architecture:** Modern production-এ প্রতিটি সার্ভিস আলাদা custom network-এ deploy করা হয়
+- **Network Automation:** CI/CD pipeline-এ network creation ও configuration automate করা হচ্ছে
+- **Security:** Custom network-এ internal traffic isolate করে security বাড়ানো হচ্ছে
+
+---
+
+## উপসংহার
+
+Custom User-defined Networks—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker কন্টেইনারের মধ্যে নিরাপদ, স্কেলেবল ও ফ্লেক্সিবল যোগাযোগ সম্ভব। বাস্তব সিস্টেম ডিজাইনে এই network model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker networking skill আরও শক্তিশালী হবে!

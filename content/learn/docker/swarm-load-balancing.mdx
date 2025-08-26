@@ -1,0 +1,113 @@
+---
+title: লোড ব্যালান্সিং ও রোলিং আপডেট
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Traffic distribute, downtime ছাড়া update—এই দুইটি concept modern system design-এ অপরিহার্য। Docker Swarm-এ "Load Balancing" ও "Rolling Update"—production-grade deployment-এর মূল স্তম্ভ।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Load Balancing:** Traffic multiple container-এ distribute হয়, performance ও availability বাড়ে।
+- **Rolling Update:** Service update downtime ছাড়া হয়, user experience uninterrupted থাকে।
+- **High Availability:** Container crash হলেও service চলতে থাকে।
+- **Scalability:** Traffic বাড়লে container সংখ্যা বাড়ানো যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Load balancer দিয়ে millions of user request distribute হয়।
+- **Uber:** Rolling update-এ downtime ছাড়া নতুন feature deploy হয়।
+- **Google:** Kubernetes-এ rolling update ও load balancing—Swarm-এর advanced version।
+
+## মূল ধারণা
+
+### ১. Load Balancing: Traffic Distribution
+
+- **Built-in Load Balancer:** Docker Swarm service-level load balancing দেয়।
+- **Ingress Network:** External traffic service replica-তে distribute হয়।
+- **DNS-based Service Discovery:** Service name দিয়ে traffic route হয়।
+
+- **Example:**
+
+```bash
+docker service create --name webapp --replicas 3 -p 80:80 nginx:alpine
+```
+
+- **How it works:**
+  - User request Swarm ingress network-এ আসে
+  - Load balancer request container replica-তে distribute করে
+
+### ২. Rolling Update: Zero Downtime Deployment
+
+- **Rolling Update:** Service update হলে container instance sequentially replace হয়, downtime ছাড়া।
+- **Parallelism:** কতগুলো container একসাথে update হবে তা set করা যায়।
+- **Delay:** Update-এর মাঝে কত সময় gap থাকবে তা set করা যায়।
+
+- **Example:**
+
+```bash
+docker service update --image nginx:latest --update-parallelism 2 --update-delay 10s webapp
+```
+
+- **Rollback:** Update-এ সমস্যা হলে আগের version-এ ফেরত যাওয়া যায়।
+
+```bash
+docker service rollback webapp
+```
+
+### ৩. Health Check ও Auto-restart
+
+- **Health Check:** Update-এর সময় container healthy কিনা check হয়।
+- **Auto-restart:** Crash হলে container auto-restart হয়।
+
+## সাধারণ ভুলত্রুটি
+
+- Load balancer configure না করা।
+- Rolling update-এ parallelism/delay না দেয়া।
+- Health check না configure করা।
+- Update-এ downtime তৈরি করা।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Service deploy করার সময় replica ও resource limit set করুন।
+- Rolling update-এ parallelism ও delay configure করুন।
+- Health check configure করুন।
+- Regularly service status monitor করুন।
+- Rollback strategy প্রস্তুত রাখুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Automated Load Balancing:** Traffic pattern অনুযায়ী auto-tune হচ্ছে।
+- **Canary Deployment:** Rolling update-এ কিছু user-কে নতুন version দেয়া হচ্ছে।
+- **Blue-Green Deployment:** Production-এ দুই version parallel run হচ্ছে, switch করা যায়।
+
+## সহজ এনালজি
+
+- "Load balancing মানে—একটি রেস্টুরেন্টে অনেক waiter, সবাই মিলে guest-দের serve করে। Rolling update মানে—waiter-দের sequentially training দেয়া, যাতে কেউ absent হলে সার্ভিস বন্ধ না হয়।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ load balancing ও rolling update ব্যবহার করুন।
+- New feature deploy, bug fix—downtime ছাড়া update করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Service deploy করুন (replica সহ)।
+2. Load balancer configure করুন।
+3. Rolling update-এ parallelism ও delay set করুন।
+4. Health check configure করুন।
+5. Status monitor ও rollback strategy রাখুন।
+
+## Quick Checklist
+
+- [x] Load balancer configured?
+- [x] Rolling update parallelism/delay set?
+- [x] Health check configured?
+- [x] Status monitor হচ্ছে?
+- [x] Rollback strategy আছে?
+
+---
+
+## উপসংহার
+
+লোড ব্যালান্সিং ও রোলিং আপডেট—Docker Swarm-এ production-grade deployment-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার অ্যাপ্লিকেশন scalable, resilient ও zero downtime থাকবে।
+

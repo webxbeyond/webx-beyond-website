@@ -1,0 +1,113 @@
+---
+title: Security Gates in CI/CD
+icon: uim:docker
+---
+
+Google, Netflix, Uber—modern app-এ code change থেকে production deploy—security breach, vulnerability—critical impact ফেলে। CI/CD pipeline-এ Security Gates—automated checkpoint—production-এ only safe, secure code/image deploy হয়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Security:** Early vulnerability detect—production-এ unsafe code/image deploy আটকানো যায়।
+- **Compliance:** Industry standard—GDPR, SOC2, PCI-DSS—automated security enforced।
+- **Reliability:** Automated gate—manual error কমে, consistent security policy।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Automated security gate—Trivy, Snyk—CI/CD pipeline-এ enforced।
+- **Uber:** Code/image scan—security gate—production deploy-এ only safe artifact।
+- **Google:** Kubernetes/Docker—security gate—compliance enforced।
+
+## মূল ধারণা
+
+### ১. Security Gate Explained
+
+- **Security Gate:** Automated checkpoint—CI/CD pipeline-এ—code/image scan, policy check, approval enforced।
+- **Benefit:** Unsafe code/image—production-এ deploy হয় না।
+
+#### সহজ এনালজি
+
+- "Security gate মানে—একটি বিমানবন্দরের স্ক্যানার, যেখানে unsafe item detect হলে boarding হয় না।"
+
+### ২. Typical Workflow
+
+1. **Code/image change—push করুন।**
+2. **CI/CD pipeline—security gate trigger—scan/test/policy check।**
+3. **Pass হলে—deploy; fail হলে—block/alert।**
+4. **Audit log—compliance/documentation maintained।**
+
+### ৩. Example: Docker Image Vulnerability Scan (Trivy)
+
+1. **CI/CD pipeline-এ Trivy integrate করুন:**
+   ```yaml
+   jobs:
+     scan:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Scan Docker image
+           run: |
+             docker pull myapp:latest
+             trivy image --exit-code 1 --severity HIGH myapp:latest
+   ```
+2. **High severity vulnerability detect হলে—pipeline fail/block।**
+
+### ৪. Example: Code Security Scan (Snyk)
+
+1. **Snyk CLI integrate করুন:**
+   ```yaml
+   jobs:
+     security:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Snyk scan
+           run: snyk test
+   ```
+2. **Vulnerability detect হলে—pipeline fail/block।**
+
+### ৫. Best Practices
+
+- **Automated scan—every build/test/deploy-এ enforced করুন।**
+- **Severity threshold—production deploy-এ strict policy।**
+- **Audit log/documentation—compliance maintain করুন।**
+- **Rollback strategy—deploy fail হলে restore করুন।**
+- **Secrets—codebase-এ না রেখে secret manager-এ store করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Manual scan—automation miss—late vulnerability detect।
+- Severity threshold miss—unsafe code/image deploy।
+- Audit/documentation miss—compliance fail।
+- Secrets—codebase-এ store—security risk।
+
+### ৭. Industry Trends
+
+- **Automated security gate—CI/CD pipeline-এ default।**
+- **Multi-tool integration—Trivy, Snyk, Aqua, Clair।**
+- **Compliance automation—audit log, policy enforcement।**
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production/staging deploy—security, compliance essential।
+- Microservices—multiple app/service—parallel scan/enforcement।
+- Industry standard—GDPR, SOC2, PCI-DSS—compliance enforced।
+
+## সংক্ষিপ্ত workflow
+
+1. Code/image change—push করুন।
+2. CI/CD pipeline—security gate trigger—scan/test/policy check।
+3. Pass হলে—deploy; fail হলে—block/alert।
+4. Audit log/documentation maintain করুন।
+
+## Quick Checklist
+
+- [x] Security gate automated?
+- [x] Severity threshold enforced?
+- [x] Audit log/documentation maintained?
+- [x] Secrets managed securely?
+- [x] Rollback strategy?
+
+---
+
+## উপসংহার
+
+Security Gates in CI/CD—production workflow-এ automated, reliable, industry-standard security—unsafe code/image deploy আটকানো, compliance enforced—robust, secure, confident release নিশ্চিত করতে essential।
+

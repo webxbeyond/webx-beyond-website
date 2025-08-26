@@ -1,0 +1,91 @@
+---
+title: "Docker Images: Pull, Build, Tag"
+icon: uim:docker
+---
+
+
+Google, Netflix, Uber—সবাই Docker Images ব্যবহার করে তাদের অ্যাপ্লিকেশন দ্রুত Deploy ও Scale করে। Docker Image—Application-এর Blueprint, Container তৈরির মূল উপাদান। এই লেসনে আমরা Image Pull, Build ও Tagging-এর Workflow জানব।
+
+## Core Concepts
+
+### ১. Docker Image কী?
+- **Definition:** Application, Dependencies ও Configuration-সহ Packaged File
+- **Features:**
+    - Portable
+    - Versioned
+    - Reproducible
+- **উদাহরণ:**
+    - "Netflix-এর Video Streaming Image, Google-এর Search Service Image"
+
+### ২. Image Pull
+- **Definition:** Docker Hub বা Private Registry থেকে Image Download করা
+- **Command:**
+```bash
+$ docker pull nginx:latest
+```
+- **Tip:** Always Use Official Image
+
+### ৩. Image Build
+- **Definition:** Dockerfile থেকে Custom Image তৈরি করা
+- **Command:**
+```bash
+$ docker build -t myapp:v1 .
+```
+- **Tip:** Dockerfile-এ App Instruction লিখুন
+
+### ৪. Image Tag
+- **Definition:** Image-এর Version বা Identifier
+- **Command:**
+```bash
+$ docker tag myapp:v1 myrepo/myapp:prod
+```
+- **Tip:** Meaningful Tag ব্যবহার করুন (latest, dev, prod)
+
+### ৫. Workflow
+1. Pull Official Image
+2. Build Custom Image
+3. Tag Image Properly
+4. Push to Registry (Optional)
+
+### ৬. কেন গুরুত্বপূর্ণ?
+- Fast Deployment
+- Version Control
+- Collaboration
+
+### ৭. কখন ব্যবহার করবেন?
+- New App Deployment
+- Update Existing App
+- Multi-environment Setup
+
+### ৮. Common Pitfalls
+- Unoptimized Dockerfile
+- Wrong Tag Usage
+- Large Image Size
+
+### ৯. Best Practices
+- Use Small Base Image (Alpine)
+- Clean Up Unused Files
+- Tag Clearly
+- Scan for Vulnerabilities
+
+### ১০. Industry Trends
+- Multi-stage Build
+- Automated Image Scanning
+- Immutable Images
+
+## উদাহরণ ও এনালজি
+- Docker Image—"একটি রেসিপি, Container রান করলে খাবার তৈরি"
+- Tag—"রেসিপির Version, কোনটা Lunch, কোনটা Dinner"
+
+## Quick Reference
+- Pull: `docker pull nginx:latest`
+- Build: `docker build -t myapp:v1 .`
+- Tag: `docker tag myapp:v1 myrepo/myapp:prod`
+
+## উপসংহার
+
+Docker Image—Application Packaging-এর জন্য অপরিহার্য। Pull, Build, Tag—এই তিনটি ধাপ ঠিকভাবে জানলে, Efficient Deployment ও Collaboration সহজ হবে।
+
+---
+
+**পরবর্তী পাঠ:** কন্টেইনার লাইফসাইকেল: Run, Stop, Remove

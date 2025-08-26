@@ -1,0 +1,114 @@
+---
+title: Least Privilege ও Non-root Containers
+icon: uim:docker
+---
+
+ডকার কন্টেইনারের নিরাপত্তা নিশ্চিত করতে "Least Privilege" ও "Non-root Containers" ধারণা অত্যন্ত গুরুত্বপূর্ণ। বাস্তব জীবনের উদাহরণ—Google, Netflix, Uber—এরা তাদের সিস্টেমে সর্বনিম্ন অনুমতি (least privilege) নীতিমালা অনুসরণ করে, যাতে কোনো একটি কম্পোনেন্ট হ্যাক হলে পুরো সিস্টেম ক্ষতিগ্রস্ত না হয়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Least Privilege:** প্রতিটি কন্টেইনার, ইউজার বা প্রসেসকে শুধুমাত্র তার কাজের জন্য প্রয়োজনীয় অনুমতি দিন।
+- **Non-root Containers:** কন্টেইনারের ভেতরে root ইউজার ব্যবহার না করে সাধারণ ইউজার ব্যবহার করুন।
+- **রিস্ক কমানো:** Root ইউজার থাকলে কন্টেইনার ব্রেক হলে হোস্ট সিস্টেমও ঝুঁকিতে পড়ে।
+- **Industry Standard:** আধুনিক DevOps ও Cloud সিকিউরিটি পলিসিতে এটি বাধ্যতামূলক।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Microservices-এ প্রতিটি কন্টেইনারের জন্য আলাদা ইউজার ও মিনিমাল পারমিশন সেট করা হয়।
+- **Uber:** Sensitive ডেটা প্রসেসিং কন্টেইনারে root access নিষিদ্ধ।
+- **Google:** Production কন্টেইনারে root privilege একেবারেই নেই।
+
+## মূল ধারণা
+
+### ১. Least Privilege কী?
+
+- **সংজ্ঞা:** কোনো ইউজার/প্রসেসকে শুধুমাত্র তার কাজের জন্য প্রয়োজনীয় পারমিশন দেওয়া।
+- **উদাহরণ:** ফাইল পড়ার জন্য write পারমিশন না দেওয়া।
+- **এনালজি:** অফিসে সবাইকে master key না দিয়ে, যার যা দরকার সেই key দেওয়া।
+
+### ২. Non-root Containers
+
+- **Root ইউজার:** কন্টেইনারে ডিফল্টভাবে root ইউজার থাকে, যা ঝুঁকিপূর্ণ।
+- **Non-root ইউজার:** Dockerfile-এ USER নির্দেশনা দিয়ে সাধারণ ইউজার সেট করুন।
+- **উদাহরণ:**
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine
+RUN adduser -D appuser
+USER appuser
+CMD ["node", "app.js"]
+```
+
+### ৩. Privilege Escalation ও ঝুঁকি
+
+- **Privilege Escalation:** কন্টেইনারে root privilege থাকলে, কোনো vulnerability exploit করে attacker হোস্টে root access পেতে পারে।
+- **Industry Incident:** ২০১৯ সালে একটি Docker vulnerability-তে root privilege escalation হয়েছিল।
+
+### ৪. Capability Drop
+
+- **Linux Capabilities:** কন্টেইনারে অপ্রয়োজনীয় capabilities ড্রপ করুন।
+- **Docker Run Example:**
+
+```bash
+docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE myapp
+```
+
+### ৫. Read-only Filesystem
+
+- **Filesystem read-only করলে:** Attacker কন্টেইনারে কিছু লিখতে পারবে না।
+- **Example:**
+
+```bash
+docker run --read-only myapp
+```
+
+## সাধারণ ভুলত্রুটি
+
+- কন্টেইনারে root ইউজার রেখে দেয়া।
+- সব capability enable রাখা।
+- Sensitive ফাইল/ডেটা কন্টেইনারে writeable রাখা।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Dockerfile-এ USER ব্যবহার করুন।
+- কন্টেইনারে শুধুমাত্র প্রয়োজনীয় capability enable করুন।
+- Read-only filesystem ব্যবহার করুন।
+- Secrets ও sensitive data কন্টেইনারে hardcode করবেন না।
+- Regularly ইমেজ vulnerability scan করুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Rootless Docker:** Docker Engine এখন rootless mode সাপোর্ট করে, যাতে হোস্টে root privilege না লাগে।
+- **Policy as Code:** Open Policy Agent (OPA) দিয়ে কন্টেইনার privilege enforce করা হচ্ছে।
+- **Automated Scanning:** Trivy, Clair ইত্যাদি টুল দিয়ে ইমেজ vulnerability ও privilege audit হচ্ছে।
+
+## সহজ এনালজি
+
+- "Root ইউজার মানে master key—যদি হারিয়ে যায়, পুরো বিল্ডিং ঝুঁকিতে। Non-root ইউজার মানে দরকারি রুমের key—হারালেও ক্ষতি সীমিত।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging, sensitive data processing—সব জায়গায় non-root ও least privilege policy ব্যবহার করুন।
+- Development environment-এও অভ্যাস গড়ে তুলুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Dockerfile-এ USER নির্দেশনা যোগ করুন।
+2. Docker run-এ capability drop ও read-only flag ব্যবহার করুন।
+3. Regularly vulnerability scan করুন।
+
+## Quick Checklist
+
+- [x] USER নির্দেশনা আছে?
+- [x] Capability drop করা হয়েছে?
+- [x] Filesystem read-only?
+- [x] Secrets hardcoded নয়?
+- [x] Vulnerability scan হয়েছে?
+
+---
+
+## উপসংহার
+
+Least Privilege ও Non-root Containers—এই দুটি ধারণা Docker security-র মূল স্তম্ভ। এগুলো ঠিকভাবে বাস্তবায়ন করলে আপনার কন্টেইনার ও হোস্ট সিস্টেম অনেক বেশি নিরাপদ থাকবে।
+

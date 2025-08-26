@@ -1,0 +1,110 @@
+---
+title: Docker Desktop ও Docker Hub টুলস
+icon: uim:docker
+---
+
+Google, Netflix, Uber—modern app-এ container development, image management, collaboration—critical। Docker Desktop ও Docker Hub—beginner থেকে pro—efficient workflow, automation, sharing—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Development:** Local container build/test—easy, fast—Docker Desktop-এ।
+- **Image management:** Public/private image—store, share, automate—Docker Hub-এ।
+- **Collaboration:** Team/project—image/version—easy share/manage।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Developer team—Docker Desktop-এ local build/test—Docker Hub-এ image share।
+- **Uber:** Microservices—Docker Hub-এ versioned image—team-wide deploy।
+- **Google:** Hybrid cloud—Docker Desktop-এ dev/test—Docker Hub-এ production image।
+
+## মূল ধারণা
+
+### ১. Docker Desktop
+
+- **Docker Desktop:** GUI-based tool—local container/image/network/volume manage—Windows/Mac-এ।
+- **Benefit:** Beginner-friendly, easy setup, resource monitoring, troubleshooting।
+
+#### Workflow
+
+1. **Install করুন:** Windows/Mac-এ Docker Desktop install করুন।
+2. **GUI-তে container/image/network/volume manage করুন।**
+3. **Resource usage, logs, troubleshooting—easy visualize।**
+4. **CLI integration—advanced workflow—possible।**
+
+#### সহজ এনালজি
+
+- "Docker Desktop মানে—একটি স্মার্টফোনের app, যেখানে সবকিছু touch-এ control করা যায়।"
+
+### ২. Docker Hub
+
+- **Docker Hub:** Public/private registry—image store, share, automate—version/tag manage।
+- **Benefit:** Team/project-wide image collaboration, automation, security।
+
+#### Workflow
+
+1. **Account create করুন:** https://hub.docker.com
+2. **Image push/pull করুন:**
+   ```bash
+   docker login
+   docker push username/myapp:latest
+   docker pull username/myapp:latest
+   ```
+3. **Version/tag—manage করুন:**
+   ```bash
+   docker tag myapp:latest username/myapp:v1.0.0
+   docker push username/myapp:v1.0.0
+   ```
+4. **Automated build/test—Docker Hub integration—possible।**
+
+#### সহজ এনালজি
+
+- "Docker Hub মানে—একটি Google Drive, যেখানে ফাইল (image) store/share করা যায়।"
+
+### ৩. Best Practices
+
+- **Docker Desktop—local build/test—always use করুন।**
+- **Docker Hub—version/tag—manage করুন।**
+- **Private repo—sensitive image—security enforced করুন।**
+- **Automated build/test—Docker Hub integration—enable করুন।**
+- **Documentation—image/version/workflow clear রাখুন।**
+
+### ৪. সাধারণ ভুলত্রুটি
+
+- Docker Desktop install/config miss—workflow slow/debugging কঠিন।
+- Docker Hub—latest tag—production-এ use—rollback/trace কঠিন।
+- Private repo/documentation miss—security/collaboration issue।
+- Automated build/test miss—manual error/break।
+
+### ৫. Industry Trends
+
+- **GUI-based management—Docker Desktop default।**
+- **Cloud-native registry—Docker Hub integration।**
+- **Automated build/test—Docker Hub-এ enforced।**
+
+### ৬. কখন ব্যবহার করবেন?
+
+- Local development/test—Docker Desktop essential।
+- Team/project-wide image share/manage—Docker Hub must-have।
+- Production/staging—version/tag/security—Docker Hub enforced।
+
+## সংক্ষিপ্ত workflow
+
+1. Docker Desktop install/config করুন।
+2. Local build/test—GUI/CLI-তে manage করুন।
+3. Docker Hub-এ image push/pull/version/tag manage করুন।
+4. Automated build/test/documentation maintain করুন।
+
+## Quick Checklist
+
+- [x] Docker Desktop installed/configured?
+- [x] Local build/test managed?
+- [x] Docker Hub account/image/version/tag managed?
+- [x] Private repo/security enforced?
+- [x] Automated build/test/documentation?
+
+---
+
+## উপসংহার
+
+Docker Desktop ও Docker Hub—container development, image management, collaboration—industry standard। Workflow follow করলে—efficient, secure, beginner-friendly, production-ready app/image manage/share করা সম্ভব।
+

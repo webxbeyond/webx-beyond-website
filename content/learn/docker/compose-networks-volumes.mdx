@@ -1,0 +1,122 @@
+---
+title: Compose-এ Networks ও Volumes ব্যবহার
+icon: uim:docker
+---
+
+# Compose-এ Networks ও Volumes ব্যবহার: বহু-কন্টেইনার অ্যাপ্লিকেশনে ডেটা ও যোগাযোগের দক্ষতা
+
+## প্রস্তাবনা
+
+Docker Compose-এ networks ও volumes—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর production environment-এ বহু-কন্টেইনার অ্যাপ্লিকেশনে নিরাপদ, স্কেলেবল ও ফ্লেক্সিবল ডেটা ও যোগাযোগ নিশ্চিত করতে অপরিহার্য। এই লেসনে আমরা Compose-এ networks ও volumes-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Networks: কী, কেন ও কিভাবে?
+
+**Network** হচ্ছে container-গুলোর মধ্যে যোগাযোগের মাধ্যম। Compose-এ custom network define করে container-গুলোর isolation, security ও DNS resolution নিশ্চিত করা যায়।
+
+- Default network-এ সব service communicate করতে পারে
+- Custom network-এ isolation, security বাড়ে
+
+**বাস্তব উদাহরণ:**
+- Uber-এর microservices architecture-এ প্রতিটি service আলাদা network-এ থাকে—internal communication সহজ ও নিরাপদ হয়
+
+**এনালজি:**
+- ধরুন, অফিসে আলাদা team-এর জন্য আলাদা conference room—team members শুধু নিজেদের মধ্যে কথা বলতে পারে
+
+**Example:**
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - frontend
+  db:
+    image: mysql:8
+    networks:
+      - backend
+networks:
+  frontend:
+  backend:
+```
+
+---
+
+## Volumes: কী, কেন ও কিভাবে?
+
+**Volume** হচ্ছে container-এর persistent storage। Compose-এ volume define করে data durability, sharing ও backup নিশ্চিত করা যায়।
+
+- Named volume-এ data container delete হলেও থাকে
+- Multiple service-এ volume share করা যায়
+
+**বাস্তব উদাহরণ:**
+- Netflix production database container-এ named volume ব্যবহার করে—multiple app container একই ডেটা শেয়ার করে
+
+**এনালজি:**
+- অফিসে "shared drive"—সবাই নির্দিষ্ট নামে access করতে পারে
+
+**Example:**
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    volumes:
+      - webdata:/usr/share/nginx/html
+  db:
+    image: mysql:8
+    volumes:
+      - dbdata:/var/lib/mysql
+volumes:
+  webdata:
+  dbdata:
+```
+
+---
+
+## Workflow: Compose-এ Networks ও Volumes ব্যবহার
+
+1. **Custom Network ও Volume define করুন:**
+    - YAML-এ `networks` ও `volumes` section লিখুন
+2. **Service-এ network ও volume যুক্ত করুন:**
+    - `networks:` ও `volumes:` section-এ reference দিন
+3. **Run Command:**
+    ```bash
+    docker compose up -d
+    ```
+
+---
+
+## Core Concepts: Networks ও Volumes
+
+1. **Isolation:**
+    - Custom network-এ service isolate করা যায়
+2. **Security:**
+    - Internal traffic বাইরের world থেকে isolate থাকে
+3. **Persistence:**
+    - Named volume-এ data container delete হলেও থাকে
+4. **Sharing:**
+    - Multiple service-এ volume share করা যায়
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Network/volume define না করলে data/network issue হতে পারে
+- Volume delete করলে data হারাতে পারেন—backup রাখুন
+- Network misconfiguration হলে service communicate করতে পারে না
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Microservices Architecture:** Modern production-এ প্রতিটি service আলাদা network-এ deploy করা হয়
+- **Cloud Volume Driver:** Production-এ cloud volume driver ব্যবহার হচ্ছে
+- **Backup Automation:** Docker CLI দিয়ে volume backup/restore automate করা হচ্ছে
+
+---
+
+## উপসংহার
+
+Compose-এ Networks ও Volumes—এই ধারণা দক্ষভাবে ব্যবহার করলে বহু-কন্টেইনার অ্যাপ্লিকেশনে নিরাপদ, স্কেলেবল ও ফ্লেক্সিবল ডেটা ও যোগাযোগ নিশ্চিত করা যায়। বাস্তব সিস্টেম ডিজাইনে এই config model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker orchestration skill আরও শক্তিশালী হবে!

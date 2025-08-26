@@ -1,0 +1,134 @@
+---
+title: Image Build & Push Automation
+icon: uim:docker
+---
+
+Google, Netflix, Uber—modern app-এ code change থেকে production deploy—speed, reliability, security—critical। Docker image build & push—automation—CI/CD pipeline-এ industry standard। Manual build/push—slow, error-prone; automation—fast, repeatable, secure।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Speed:** Manual build/push—slow; automation—seconds/minutes-এ complete।
+- **Reliability:** Human error কমে; same workflow—every deploy-এ।
+- **Security:** Automated scan/test—production-এ only safe image push হয়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of microservices—auto build/push—Jenkins/GitHub Actions-এ।
+- **Uber:** Real-time deploy—auto image build/push—GitLab CI enforced।
+- **Google:** Kubernetes/Docker—auto build/push—production workflow।
+
+## মূল ধারণা
+
+### ১. Automation Workflow Explained
+
+- **Build automation:** Code change—auto Docker image build।
+- **Push automation:** Build complete—auto image registry-তে push।
+- **Benefit:** Faster release, less error, confident deploy।
+
+#### সহজ এনালজি
+
+- "Automation মানে—একটি রোবট, যেটা নিজে নিজে কাজ করে—মানুষকে বারবার একই কাজ করতে হয় না।"
+
+### ২. Typical Workflow
+
+1. **Code change—push করুন (GitHub/GitLab)।**
+2. **CI/CD pipeline—auto trigger—Docker image build।**
+3. **Build complete—auto push—Docker Hub/Private Registry-তে।**
+4. **Automated test/security scan—production-এ only safe image।**
+
+### ৩. Example: GitHub Actions-এ Build & Push Automation
+
+1. **.github/workflows/docker.yml লিখুন:**
+   ```yaml
+   name: Build & Push Docker Image
+   on:
+     push:
+       branches: [ main ]
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v2
+         - name: Build Docker image
+           run: docker build -t myapp:${{ github.sha }} .
+         - name: Login to Docker Hub
+           run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+         - name: Push Docker image
+           run: docker push myapp:${{ github.sha }}
+   ```
+2. **Push করলে—workflow auto trigger—build/push।**
+
+### ৪. Example: Jenkins-এ Build & Push Automation
+
+1. **Jenkinsfile লিখুন:**
+   ```groovy
+   pipeline {
+     agent any
+     stages {
+       stage('Build') {
+         steps {
+           sh 'docker build -t myapp:${BUILD_NUMBER} .'
+         }
+       }
+       stage('Push') {
+         steps {
+           withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+             sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+             sh 'docker push myapp:${BUILD_NUMBER}'
+           }
+         }
+       }
+     }
+   }
+   ```
+2. **Build/push—auto trigger—every code change-এ।**
+
+### ৫. Best Practices
+
+- **Unique tag/version—every build-এ use করুন।**
+- **Secrets—environment variable/secret manager-এ store করুন।**
+- **Automated test/security scan—pipeline-এ enforce করুন।**
+- **Rollback strategy—deploy fail হলে restore করুন।**
+- **Documentation—workflow config clear রাখুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Latest tag—production-এ use—rollback/trace কঠিন।
+- Manual build/push—automation miss—bug detect late।
+- Secrets—codebase-এ store—security risk।
+- Pipeline config/documentation miss—debugging কঠিন।
+
+### ৭. Industry Trends
+
+- **Multi-stage build—Dockerfile-এ enforced।**
+- **Automated security scan—pipeline-এ integrated।**
+- **Cloud-native automation—Kubernetes, serverless deploy।**
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production/staging deploy—automation, reliability essential।
+- Microservices—multiple app/service—parallel build/push।
+- Security—automated scan/test enforced।
+
+## সংক্ষিপ্ত workflow
+
+1. Code change—push করুন।
+2. CI/CD pipeline—auto build/push।
+3. Docker image—unique tag/version-এ registry-তে push করুন।
+4. Automated test/security scan enforced করুন।
+5. Documentation/rollback strategy maintain করুন।
+
+## Quick Checklist
+
+- [x] Build/push automation configured?
+- [x] Unique tag/version used?
+- [x] Secrets managed securely?
+- [x] Automated test/security scan?
+- [x] Documentation/rollback strategy?
+
+---
+
+## উপসংহার
+
+Image Build & Push Automation—Docker workflow-এ speed, reliability, security—production-ready deployment, confident release—industry standard। Workflow follow করলে—robust, secure, efficient automation pipeline build করা সম্ভব।
+

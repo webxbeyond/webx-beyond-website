@@ -1,0 +1,86 @@
+---
+title: "Multi-stage Builds ও ইমেজ সাইজ অপ্টিমাইজেশন"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সবাই Production-এ Lightweight ও Secure Docker Image ব্যবহার করে। Multi-stage Build—একটি Dockerfile-এ একাধিক Stage ব্যবহার করে Final Image ছোট ও Efficient করা যায়। এই লেসনে আমরা Multi-stage Build ও Image Optimization-এর Workflow জানব।
+
+## Core Concepts
+
+### ১. Multi-stage Build কী?
+- **Definition:** Dockerfile-এ একাধিক Build Stage, Final Image-এ শুধু দরকারি ফাইল
+- **Features:**
+    - Small Image Size
+    - Security
+    - Clean Build
+- **Example:**
+```dockerfile
+# Stage 1: Build
+FROM node:18 AS builder
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+
+# Stage 2: Production
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+```
+
+### ২. Image Size Optimization
+- **Techniques:**
+    - Use Small Base Image (Alpine)
+    - Remove Unused Files
+    - Minimize Layers
+    - Use `.dockerignore`
+- **Command:**
+```bash
+$ docker images
+```
+- **Tip:** Image Size Regularly Check করুন
+
+### ৩. Workflow
+1. Dockerfile-এ Multi-stage Setup করুন
+2. Build Command দিন: `docker build -t myapp .`
+3. Final Image Size Check করুন
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Fast Deployment
+- Low Resource Usage
+- Security
+
+### ৫. কখন ব্যবহার করবেন?
+- Production Deployment
+- CI/CD Pipeline
+- Cloud Hosting
+
+### ৬. Common Pitfalls
+- Unused File/Image Stage
+- Large Base Image
+- Ignoring `.dockerignore`
+
+### ৭. Best Practices
+- Use Multi-stage Build
+- Clean Up Temporary Files
+- Use Alpine Base Image
+- Regularly Audit Image Size
+
+### ৮. Industry Trends
+- Automated Image Optimization
+- Security Scanning
+- Immutable Image Deployment
+
+## উদাহরণ ও এনালজি
+- Multi-stage Build—"রান্নার শেষে শুধু পরিবেশনযোগ্য খাবার, বাকি উপকরণ বাদ"
+- Alpine Image—"ডায়েট খাবার, কম Resource"
+
+## Quick Reference
+- Multi-stage: `FROM ... AS builder`, `COPY --from=builder ...`
+- Size Check: `docker images`
+
+## উপসংহার
+
+Multi-stage Build ও Image Optimization—Efficient, Secure ও Lightweight Docker Deployment-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Production ও Cloud-এ Resource ও Security নিশ্চিত হয়।
+
+---
+
+**পরবর্তী পাঠ:** Build Context ও Cache Layers

@@ -1,0 +1,82 @@
+---
+title: "Dockerfile বেসিক ও নির্দেশনা (FROM, RUN, COPY, CMD)"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সবাই Dockerfile ব্যবহার করে কাস্টম ইমেজ তৈরি করে, যাতে অ্যাপ্লিকেশন দ্রুত Deploy ও Scale করা যায়। Dockerfile—Application Packaging-এর Script, Efficient Deployment-এর জন্য অপরিহার্য।
+
+## Core Concepts
+
+### ১. Dockerfile কী?
+- **Definition:** Text File, Step-by-step Instruction—কিভাবে Image তৈরি হবে
+- **Features:**
+    - Repeatable Build
+    - Version Control
+    - Automation Friendly
+
+### ২. Dockerfile-এর মূল নির্দেশনা
+- **FROM:** Base Image নির্ধারণ
+    - Example: `FROM node:18`
+- **RUN:** Command Execute করে Image-এ Change আনে
+    - Example: `RUN npm install`
+- **COPY:** Source File/Image-এ Copy করে
+    - Example: `COPY . /app`
+- **CMD:** Container Start হলে Default Command
+    - Example: `CMD ["node", "app.js"]`
+
+### ৩. Workflow
+1. Dockerfile লিখুন
+2. Build Command দিন: `docker build -t myapp .`
+3. Container Run করুন: `docker run myapp`
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Customization
+- Automation
+- Efficient Deployment
+
+### ৫. কখন ব্যবহার করবেন?
+- New App Packaging
+- Multi-environment Setup
+- CI/CD Pipeline
+
+### ৬. Common Pitfalls
+- Unoptimized Dockerfile
+- Wrong Base Image
+- Unused File Copy
+
+### ৭. Best Practices
+- Use Official Base Image
+- Minimize Layer Count
+- Clean Up Temporary Files
+- Use `.dockerignore`
+
+### ৮. Industry Trends
+- Multi-stage Build
+- Automated Dockerfile Linting
+- Security Scanning
+
+## উদাহরণ ও এনালজি
+- Dockerfile—"রান্নার রেসিপি, Step-by-step কীভাবে খাবার তৈরি হবে"
+- FROM—"রান্নার উপকরণ"
+- RUN—"রান্নার Action"
+- COPY—"উপকরণ যোগ করা"
+- CMD—"খাবার পরিবেশন"
+
+## Quick Reference
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY . /app
+RUN npm install
+CMD ["node", "app.js"]
+```
+- Build: `docker build -t myapp .`
+- Run: `docker run myapp`
+
+## উপসংহার
+
+Dockerfile—কাস্টম ইমেজ তৈরির জন্য অপরিহার্য। FROM, RUN, COPY, CMD—এই চারটি নির্দেশনা ঠিকভাবে জানলে, Efficient ও Secure Deployment সহজ হবে।
+
+---
+
+**পরবর্তী পাঠ:** Multi-stage Builds ও ইমেজ সাইজ অপ্টিমাইজেশন

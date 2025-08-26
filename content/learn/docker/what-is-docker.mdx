@@ -1,0 +1,84 @@
+---
+title: "ডকার কী এবং কিভাবে কাজ করে"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সবাই তাদের অ্যাপ্লিকেশন দ্রুত, স্কেলেবল ও সহজে ডিপ্লয় করতে চায়। Docker—এই চাহিদা পূরণের জন্য সবচেয়ে জনপ্রিয় Containerization টুল। এই লেসনে আমরা জানব Docker কী, কেন গুরুত্বপূর্ণ, এবং এটি কিভাবে কাজ করে।
+
+## Core Concepts
+
+### ১. Docker কী?
+- **Definition:** Docker একটি ওপেন-সোর্স প্ল্যাটফর্ম, যা অ্যাপ্লিকেশনকে Container-এ প্যাক, ডিপ্লয় ও রান করতে দেয়
+- **Features:**
+    - Lightweight
+    - Portable
+    - Fast Deployment
+- **উদাহরণ:**
+    - "Google-এর সার্ভারে হাজার হাজার Container, Netflix-এর ভিডিও স্ট্রিমিং Docker-এ"
+
+### ২. Docker কিভাবে কাজ করে?
+- **Architecture:**
+    - Docker Engine: Core Service, Container চালায়
+    - Docker CLI: Command Line Interface
+    - Docker Daemon: Background Process
+- **Workflow:**
+    1. Dockerfile লিখুন (App-এর Instruction)
+    2. Image Build করুন
+    3. Container Run করুন
+- **উদাহরণ:**
+```bash
+# Dockerfile
+FROM node:18
+COPY . /app
+CMD ["node", "app.js"]
+```
+```bash
+# Build Image
+$ docker build -t myapp .
+# Run Container
+$ docker run -p 3000:3000 myapp
+```
+
+### ৩. কেন গুরুত্বপূর্ণ?
+- Fast Deployment
+- Resource Efficiency
+- Scalability
+- Consistency (Development to Production)
+
+### ৪. কখন ব্যবহার করবেন?
+- Microservices
+- Cloud Deployment
+- DevOps Automation
+
+### ৫. Common Pitfalls
+- Improper Image Size
+- Security Misconfiguration
+- Ignoring Best Practices
+
+### ৬. Best Practices
+- Use Official Images
+- Keep Dockerfile Simple
+- Regularly Update Images
+- Scan for Vulnerabilities
+
+### ৭. Industry Trends
+- Kubernetes Integration
+- Serverless Containers
+- Multi-cloud Deployment
+
+## উদাহরণ ও এনালজি
+- Docker—"একটি ট্রেন, প্রতিটি বগি আলাদা, কিন্তু একই লাইনে চলে"
+- VM—"একটি বাস, সব যাত্রী একসাথে, Resource Heavy"
+
+## Quick Reference
+- Dockerfile: App Instruction
+- Image: Packaged App
+- Container: Running Instance
+
+## উপসংহার
+
+Docker—আধুনিক অ্যাপ ডেলিভারির জন্য অপরিহার্য। এটি অ্যাপ্লিকেশনকে দ্রুত, নিরাপদ ও স্কেলেবলভাবে চালাতে সাহায্য করে। সঠিকভাবে ব্যবহার করলে, Development থেকে Production—সবকিছু সহজ ও Efficient হয়।
+
+---
+
+**পরবর্তী পাঠ:** Docker Engine, CLI ও Daemon পরিচিতি

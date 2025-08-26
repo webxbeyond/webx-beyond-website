@@ -1,0 +1,112 @@
+---
+title: "Docker Architecture: Components & Flow"
+icon: uim:docker
+---
+
+# ডকারের স্থাপত্য: কম্পোনেন্টস ও কার্যপ্রবাহ
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ Docker ব্যবহার হয়। কিন্তু Docker কিভাবে কাজ করে, কোন কোন কম্পোনেন্ট involved—এই ধারণা clear না থাকলে production-এ troubleshooting, optimization, security—সবকিছু risky।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Troubleshooting:** Architecture বুঝলে error/source সহজে খুঁজে পাওয়া যায়।
+- **Optimization:** Resource usage, performance tune করা যায়।
+- **Security:** Attack surface, privilege boundary বোঝা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** হাজার হাজার container orchestration—Docker architecture deep understanding essential।
+- **Uber:** Custom monitoring/logging—Docker internals modify করে।
+- **Google:** Kubernetes—Docker architecture-কে base করে build।
+
+## মূল ধারণা
+
+### ১. Docker Architecture Overview
+
+- **Client:** User command দেয় (CLI, API)।
+- **Daemon:** Main engine—container/image/network/volume manage করে।
+- **REST API:** Client-এ command—Daemon-এ request যায়।
+- **Objects:** Image, container, network, volume—সব Docker object।
+
+### ২. Component Breakdown
+
+- **Docker CLI:** Command-line interface—user command দেয়।
+- **Docker Daemon (dockerd):** Background process—container/image/network/volume manage করে।
+- **Docker REST API:** Client-এ command—Daemon-এ request যায়।
+- **Docker Objects:**
+  - **Image:** Container তৈরির blueprint।
+  - **Container:** Running instance—image থেকে তৈরি।
+  - **Network:** Container-এ communication enable করে।
+  - **Volume:** Persistent data store করে।
+
+### ৩. Workflow: How Docker Works
+
+1. **User command দেয়:**
+   ```bash
+   docker run nginx
+   ```
+2. **CLI—REST API-তে request পাঠায়।**
+3. **Daemon—image pull/check করে।**
+4. **Container create/run করে।**
+5. **Network/volume attach করে।**
+6. **Container run/start হয়।**
+
+### ৪. Component Interaction Diagram
+
+- **User (CLI/API) → Docker Daemon → Container/Image/Network/Volume**
+- **REST API:** Communication bridge—CLI/Daemon
+
+### ৫. সহজ এনালজি
+
+- "Docker architecture মানে—একটি বড় কারখানা, যেখানে user order দেয় (CLI), manager order process করে (Daemon), worker কাজ করে (container/image/network/volume)।"
+
+### ৬. Best Practices
+
+- **Daemon security:** TLS, access control enforced করুন।
+- **Resource limit:** Container-এ CPU/memory limit set করুন।
+- **Monitoring/logging:** Daemon/container activity track করুন।
+- **Version compatibility:** CLI/Daemon version mismatch avoid করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Daemon expose করা—security risk।
+- Resource limit না দেয়া—host overload।
+- Monitoring/logging না রাখা—issue detect করা যায় না।
+- Version mismatch—command/feature কাজ করে না।
+
+### ৮. Industry Trends
+
+- **Rootless Docker:** Daemon/container—non-root user-এ run।
+- **Containerd integration:** Lightweight runtime—Kubernetes-এ use হয়।
+- **API-first architecture:** Automation, integration সহজ।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production workload—security, performance, troubleshooting essential।
+- Custom integration—API/CLI-তে automation।
+- Monitoring/logging—architecture বুঝে implement করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. User command দেয় (CLI/API)।
+2. REST API-তে request যায়।
+3. Daemon process করে।
+4. Container/image/network/volume manage হয়।
+5. Monitoring/logging enforced করুন।
+
+## Quick Checklist
+
+- [x] Daemon security enforced?
+- [x] Resource limit configured?
+- [x] Monitoring/logging enabled?
+- [x] Version compatibility checked?
+- [x] API integration possible?
+
+---
+
+## উপসংহার
+
+Docker architecture—components, flow—production-grade deployment, troubleshooting, optimization, security—সবকিছু deeply বুঝতে essential। Industry standard workflow—CLI, Daemon, REST API, object—সবকিছু clear থাকলে confident deployment ও management সম্ভব।
+

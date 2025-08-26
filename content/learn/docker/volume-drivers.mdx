@@ -1,0 +1,110 @@
+---
+title: Named Volumes ও Volume Drivers
+icon: uim:docker
+---
+
+Docker কন্টেইনারে ডেটা পার্সিস্টেন্স, শেয়ারিং ও এক্সটেন্ডেবিলিটি—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। Named Volumes ও Volume Drivers-এর সঠিক ব্যবহার ছাড়া, production app-এ ডেটা নিরাপদ, স্কেলেবল ও ফ্লেক্সিবল রাখা যায় না। এই লেসনে আমরা Named Volumes ও Volume Drivers-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Named Volumes: কী, কেন ও কিভাবে?
+
+**Named Volume** হচ্ছে Docker-managed storage, যার জন্য একটি নির্দিষ্ট নাম দেয়া হয়।
+
+- Docker নিজে volume তৈরি, manage, delete করে
+- Named volume-এ ডেটা কন্টেইনার ডিলিট হলেও থাকে
+- Multiple container-এ একই volume শেয়ার করা যায়
+
+**বাস্তব উদাহরণ:**
+- Netflix production database container-এ named volume ব্যবহার করে—multiple app container একই ডেটা শেয়ার করে
+
+**এনালজি:**
+- ধরুন, অফিসে "shared drive" আছে—সবাই নির্দিষ্ট নামে access করতে পারে
+
+**Example:**
+```bash
+docker volume create mydata
+docker run -v mydata:/container/path nginx
+```
+
+**কখন ব্যবহার করবেন?**
+- Production, database, persistent storage
+- Multiple container-এ ডেটা শেয়ার করতে
+
+---
+
+## Volume Drivers: কী, কেন ও কিভাবে?
+
+**Volume Driver** হচ্ছে Docker-এর storage backend, যা volume কোথায় ও কীভাবে store হবে তা নির্ধারণ করে।
+
+- Default driver: local (host machine)
+- Third-party driver: cloud storage, NFS, Ceph, etc.
+- Volume driver দিয়ে remote, encrypted, clustered storage configure করা যায়
+
+**বাস্তব উদাহরণ:**
+- Google production environment-এ cloud volume driver ব্যবহার করে—multi-host, encrypted storage
+
+**এনালজি:**
+- ধরুন, অফিসে আলাদা storage provider—local drive, cloud drive, network drive
+
+**Example:**
+```bash
+docker volume create --driver local mydata
+# Third-party driver
+# docker volume create --driver rexray mycloudvol
+```
+
+**কখন ব্যবহার করবেন?**
+- Multi-host, cloud, encrypted storage দরকার হলে
+- Production-এ advanced storage feature চাইলে
+
+---
+
+## Core Concepts: Named Volumes ও Drivers
+
+1. **Persistence:**
+    - Named volume-এ ডেটা container delete হলেও থাকে
+2. **Sharing:**
+    - Multiple container-এ একই volume শেয়ার করা যায়
+3. **Driver Flexibility:**
+    - Local, cloud, network storage configure করা যায়
+4. **Security:**
+    - Driver-এ encryption, access control configure করা যায়
+
+---
+
+## Workflow: Named Volume ও Driver ব্যবহার
+
+1. **Named Volume তৈরি করুন:**
+    ```bash
+    docker volume create mydata
+    docker run -v mydata:/container/path nginx
+    ```
+2. **Custom Driver দিয়ে Volume তৈরি করুন:**
+    ```bash
+    docker volume create --driver local mydata
+    # Third-party driver
+    # docker volume create --driver rexray mycloudvol
+    ```
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Volume delete করলে ডেটা হারাতে পারেন—backup রাখুন
+- Driver configure ভুল হলে container fail করতে পারে
+- Multiple container-এ volume শেয়ার করার সময় data corruption risk—access control ব্যবহার করুন
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Cloud Volume Driver:** Google, Netflix production-এ cloud volume driver ব্যবহার করে
+- **Encryption:** Production-এ encrypted volume driver ব্যবহার হচ্ছে
+- **Backup Automation:** Docker CLI দিয়ে volume backup/restore automate করা হচ্ছে
+
+---
+
+## উপসংহার
+
+Named Volumes ও Volume Drivers—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker-এ ডেটা পার্সিস্টেন্স, শেয়ারিং ও এক্সটেন্ডেবিলিটি নিশ্চিত করা যায়। বাস্তব সিস্টেম ডিজাইনে এই storage model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker data management skill আরও শক্তিশালী হবে!

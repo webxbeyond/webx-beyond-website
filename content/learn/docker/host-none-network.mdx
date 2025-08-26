@@ -1,0 +1,96 @@
+---
+title: Host ও None Network Drivers
+icon: uim:docker
+---
+
+Docker কন্টেইনারের মধ্যে যোগাযোগ ও নেটওয়ার্কিং ডিজাইন—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। Bridge Network ছাড়াও, Host ও None Network Drivers ব্যবহার করে বিশেষ ধরনের নেটওয়ার্কিং ও আইসোলেশন অর্জন করা যায়। এই লেসনে আমরা Host ও None Network Drivers-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Host Network Driver: কী, কেন ও কিভাবে?
+
+**Host Network Driver** ব্যবহার করলে কন্টেইনার সরাসরি হোস্ট মেশিনের network stack ব্যবহার করে—কোনো আলাদা virtual network তৈরি হয় না।
+
+- কন্টেইনারের network interface = host machine-এর network interface
+- Port mapping (`-p`) দরকার হয় না—host-এর port সরাসরি কন্টেইনারে এক্সেস হয়
+
+**বাস্তব উদাহরণ:**
+- Netflix-এর মতো কোম্পানি performance-critical app (যেমন: monitoring agent) host network-এ চালায়, যাতে latency কমে।
+
+**এনালজি:**
+- ধরুন, আপনি বাড়ির বাইরে কোনো দেয়াল ছাড়াই সরাসরি রাস্তায় বেরিয়ে গেলেন—host network-এ কন্টেইনারও তেমন, সরাসরি "রাস্তায়" (host network) চলে আসে।
+
+**কখন ব্যবহার করবেন?**
+- High performance, low latency দরকার হলে
+- Network isolation দরকার না হলে
+- Monitoring, logging, network tool কন্টেইনারে
+
+**Example:**
+```bash
+docker run --network host nginx
+```
+
+---
+
+## None Network Driver: কী, কেন ও কিভাবে?
+
+**None Network Driver** ব্যবহার করলে কন্টেইনারের কোনো network interface থাকে না—network isolation extreme হয়।
+
+- কন্টেইনার বাইরের world বা অন্য কন্টেইনারের সঙ্গে কোনো network communication করতে পারে না
+- Security-sensitive workload, testing, sandboxing-এর জন্য উপযোগী
+
+**এনালজি:**
+- ধরুন, আপনি একটি ঘরে ঢুকে দরজা-জানালা সব বন্ধ করে দিলেন—কেউ ঢুকতে বা বের হতে পারবে না। None network-ও তেমন—কন্টেইনার পুরোপুরি "বিচ্ছিন্ন"।
+
+**Example:**
+```bash
+docker run --network none nginx
+```
+
+---
+
+## Core Concepts: Host ও None Network
+
+- **Host Network:**
+    - Performance boost, no network isolation
+    - Port mapping দরকার নেই
+    - Security risk বাড়ে
+- **None Network:**
+    - Extreme isolation
+    - No network connectivity
+    - Security-sensitive workload
+
+---
+
+## Workflow: Host ও None Network ব্যবহার
+
+1. **Host Network:**
+    ```bash
+    docker run --network host myapp
+    ```
+2. **None Network:**
+    ```bash
+    docker run --network none myapp
+    ```
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Host network ব্যবহার করলে security risk বাড়ে—production-এ সাবধানে ব্যবহার করুন
+- None network-এ কন্টেইনারে network connectivity থাকবে না—application hang বা fail করতে পারে
+- Port mapping host network-এ কাজ করে না
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Host Network:** Monitoring, logging, network tool-এর জন্য industry-তে ব্যবহার হয়
+- **None Network:** Sandbox, security testing, extreme isolation-এর জন্য ব্যবহার হয়
+- Production-এ host network সাবধানে ব্যবহার করুন—security audit করুন
+
+---
+
+## উপসংহার
+
+Host ও None Network Drivers—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker কন্টেইনারের network model customize করা যায়। বাস্তব সিস্টেম ডিজাইনে এই network driver আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker networking skill আরও শক্তিশালী হবে!

@@ -1,0 +1,106 @@
+---
+title: Immutable Images ও Tagging কৌশল
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব modern app-এ Docker image version, update, rollback—confidently manage করতে হয়। Immutable image ও tagging strategy—industry standard best practice—production-এ reliability, security, automation নিশ্চিত করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Reliability:** Same image/version—production/test/dev-এ deploy হয়।
+- **Security:** Immutable image—unexpected change, vulnerability avoid।
+- **Automation:** CI/CD pipeline-এ version/tag-based deploy, rollback সহজ।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Tag-based deploy—production-এ specific version push/pull।
+- **Uber:** Immutable image—rollback, audit trail সহজ।
+- **Google:** Automated tagging—CI/CD pipeline-এ version control enforced।
+
+## মূল ধারণা
+
+### ১. Immutable Image: কী ও কেন?
+
+- **Immutable image:** Once built/pushed—change করা যায় না।
+- **Benefit:**
+  - Predictable deploy
+  - Rollback possible
+  - Audit trail
+- **Example:**
+  - `myapp:1.0.0`—same image/version everywhere
+
+### ২. Tagging Strategy Explained
+
+- **Tag:** Image-এর unique identifier—version, environment, build info
+- **Best practice:**
+  - Semantic versioning: `myapp:1.0.0`, `myapp:2.1.3`
+  - Environment tag: `myapp:prod`, `myapp:dev`
+  - Build info: `myapp:20250826-commit1234`
+- **Example:**
+  ```bash
+  docker build -t myapp:1.0.0 .
+  docker push myapp:1.0.0
+  docker run myapp:1.0.0
+  ```
+
+### ৩. Workflow: Versioned Deploy & Rollback
+
+1. **Image build—specific tag/version**
+2. **Image push—registry-তে version/tag সহ**
+3. **Deploy—specific tag/version pull/run**
+4. **Rollback—previous tag/version deploy**
+
+### ৪. সহজ এনালজি
+
+- "Immutable image মানে—একটি সিল করা বাক্স, যেটা খুললে আর পরিবর্তন করা যায় না। Tagging—প্রতিটি বাক্সে label, version, date লিখে রাখা।"
+
+### ৫. Best Practices
+
+- **Semantic versioning:** Major.minor.patch—predictable version
+- **Automated tagging:** CI/CD pipeline-এ build info/date/tag add করুন
+- **Immutable image enforced:** Once pushed—change না করুন
+- **Audit trail:** Tag/version-based deploy/rollback
+- **Environment-specific tag:** Prod/dev/test—clear separation
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Latest tag—production-এ use করা—unexpected change risk
+- Manual tag/version—confusion, rollback issue
+- Immutable image না enforced—unexpected change
+- Audit trail/logging না রাখা—deploy history নেই
+
+### ৭. Industry Trends
+
+- **Automated tagging:** Git commit/date-based tag—CI/CD pipeline-এ
+- **Immutable registry:** Image overwrite block—security enforced
+- **Rollback automation:** Tag/version-based deploy—fast recovery
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production deploy—version/tag-based image essential
+- CI/CD pipeline—automated tagging, rollback
+- Audit trail—deploy history/version control
+
+## সংক্ষিপ্ত workflow
+
+1. Image build—specific tag/version
+2. Image push—registry-তে version/tag সহ
+3. Deploy—specific tag/version pull/run
+4. Rollback—previous tag/version deploy
+5. Audit trail/logging enforced
+
+## Quick Checklist
+
+- [x] Semantic versioning used?
+- [x] Automated tagging configured?
+- [x] Immutable image enforced?
+- [x] Audit trail/logging enabled?
+- [x] Environment-specific tag used?
+- [x] Rollback automation possible?
+
+---
+
+## উপসংহার
+
+Immutable image ও tagging strategy—Docker image management, reliability, security, automation—production-grade deployment-এর জন্য essential। Industry standard workflow—confident build, deploy, rollback, audit সম্ভব।
+

@@ -1,0 +1,111 @@
+---
+title: ইমেজ লেয়ারিং ও কেচ মেকানিজম (Docker Image Layering & Cache)
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব modern app-এ Docker image build, deploy, update—fast, efficient, scalable। এর পেছনে আছে Docker-এর image layering ও cache mechanism—industry standard storage optimization।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Storage efficiency:** Common layer reuse—space save, fast deploy।
+- **Build speed:** Cache mechanism—repeat build দ্রুত হয়।
+- **Update efficiency:** Only changed layer pull/push—bandwidth save।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Frequent app update—layer cache দিয়ে build time কমানো।
+- **Uber:** Multi-stage build—layer reuse করে efficient deploy।
+- **Google:** Image cache—CI/CD pipeline-এ build speed boost।
+
+## মূল ধারণা
+
+### ১. Docker Image Layering Explained
+
+- **Image:** Multiple layer-এ store হয়—base image, app code, config, dependency।
+- **Layer:** Each Dockerfile instruction—new layer create করে।
+- **Layer Reuse:** Common layer—multiple image/container-এ reuse হয়।
+- **Example:**
+  - **Base layer:** FROM ubuntu
+  - **Dependency layer:** RUN apt-get install
+  - **App layer:** COPY . /app
+  - **Config layer:** ENV, CMD
+
+### ২. Cache Mechanism: Build Speed Boost
+
+- **Build cache:** Docker build—previous layer cache use করে।
+- **Benefit:** Unchanged layer—rebuild হয় না, time save।
+- **Example:**
+  ```dockerfile
+  FROM node:18-alpine
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm install
+  COPY . .
+  CMD ["npm", "start"]
+  ```
+  - package*.json unchanged—npm install layer cache use হবে।
+
+### ৩. Workflow: Typical Build & Deploy
+
+1. **Dockerfile লিখুন—layered instruction।**
+2. **docker build—cache mechanism enable।**
+3. **Image push/pull—only changed layer transfer।**
+4. **Container run—layer reuse/storage efficient।**
+
+### ৪. State Transition Diagram
+
+- **Dockerfile → Layered image → Cache use → Fast build/deploy**
+
+### ৫. সহজ এনালজি
+
+- "Image layering মানে—একটি burger, যেখানে প্রতিটি উপাদান (layer) আলাদা। Cache mechanism—আগের burger-এর bread, sauce reuse করলে নতুন burger দ্রুত তৈরি হয়।"
+
+### ৬. Best Practices
+
+- **Layer order optimize করুন:** Frequently changed file নিচে রাখুন—cache efficiency বাড়ে।
+- **Multi-stage build:** Unused file/layer avoid করুন—image size কমে।
+- **Small base image:** Alpine, slim—storage save।
+- **Cache busting:** Dependency change হলে cache invalidate করুন।
+- **Monitoring:** Build time, image size track করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Layer order ভুল—cache efficiency কমে।
+- Unused file/layer—image size বাড়ে।
+- Cache busting না করা—old dependency/image deploy হয়।
+- Monitoring/logging না রাখা—build issue detect করা যায় না।
+
+### ৮. Industry Trends
+
+- **BuildKit integration:** Faster, more efficient build/cache।
+- **Immutable image/tag:** Layer change track, rollback সহজ।
+- **Remote cache:** Cloud-based cache—multi-stage build speed boost।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Frequent build/update—cache mechanism essential।
+- Production deploy—layered image efficiency, speed, storage save।
+- CI/CD pipeline—build speed, bandwidth optimize।
+
+## সংক্ষিপ্ত workflow
+
+1. Dockerfile লিখুন—layered instruction।
+2. docker build—cache mechanism enable করুন।
+3. Image push/pull—only changed layer transfer।
+4. Monitoring/logging—build time, image size track করুন।
+
+## Quick Checklist
+
+- [x] Layer order optimized?
+- [x] Multi-stage build used?
+- [x] Small base image selected?
+- [x] Cache busting configured?
+- [x] Monitoring/logging enabled?
+- [x] BuildKit integration possible?
+
+---
+
+## উপসংহার
+
+ইমেজ লেয়ারিং ও কেচ মেকানিজম—Docker-এর storage efficiency, build speed, deploy optimization—production-grade deployment-এর জন্য essential। Industry standard workflow—confident build, deploy, update সম্ভব।
+

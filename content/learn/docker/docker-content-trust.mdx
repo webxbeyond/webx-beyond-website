@@ -1,0 +1,104 @@
+---
+title: Image Signing & Verification (Docker Content Trust)
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব modern app-এ Docker image security, authenticity, integrity—production-এ critical। Image signing ও verification—industry standard best practice—supply chain attack, unauthorized image deploy, vulnerability avoid করতে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Security:** Only signed, verified image—production-এ deploy হয়।
+- **Authenticity:** Image source, author, version—verify করা যায়।
+- **Integrity:** Image tamper/change—detect করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Docker Content Trust—production-এ only signed image deploy।
+- **Uber:** Automated image signing—CI/CD pipeline-এ enforced।
+- **Google:** Image verification—supply chain security boost।
+
+## মূল ধারণা
+
+### ১. Docker Content Trust (DCT): কী?
+
+- **DCT:** Docker-এর built-in image signing/verification feature।
+- **Enable:**
+  ```bash
+  export DOCKER_CONTENT_TRUST=1
+  ```
+- **Benefit:** Only signed image pull/push/run
+
+### ২. Image Signing Workflow
+
+1. **Enable DCT:**
+   ```bash
+   export DOCKER_CONTENT_TRUST=1
+   ```
+2. **Image build/push:** Docker Notary—image sign করে registry-তে push
+   ```bash
+   docker push myapp:1.0.0
+   ```
+3. **Image pull/run:** Only signed image pull/run possible
+   ```bash
+   docker pull myapp:1.0.0
+   docker run myapp:1.0.0
+   ```
+
+### ৩. Verification Explained
+
+- **Image pull:** Signature verify—author/source/version match
+- **Tamper detection:** Signature mismatch—pull/run block
+- **Audit trail:** Deploy history, author, version track
+
+### ৪. সহজ এনালজি
+
+- "Image signing মানে—একটি চিঠিতে digital signature, যেটা verify করলে চিঠি authentic কিনা বোঝা যায়। Verification—signature mismatch হলে চিঠি reject।"
+
+### ৫. Best Practices
+
+- **Always enable DCT:** Production-এ only signed image deploy
+- **Automated signing:** CI/CD pipeline-এ image sign enforced
+- **Audit trail:** Deploy history, author/version track
+- **Key management:** Signing key secure location-এ store
+- **Monitoring/logging:** Signature verification event track
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- DCT disable—unsigned image deploy—security risk
+- Key management ভুল—signing key leak
+- Audit trail/logging না রাখা—deploy history নেই
+- Automated signing না করা—manual error
+
+### ৭. Industry Trends
+
+- **Supply chain security:** Automated image signing/verification enforced
+- **Notary v2 integration:** Advanced signing, multi-signer support
+- **Immutable registry:** Only signed image overwrite possible
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production deploy—image authenticity, integrity essential
+- CI/CD pipeline—automated signing/verification
+- Audit trail—deploy history/version control
+
+## সংক্ষিপ্ত workflow
+
+1. DCT enable করুন
+2. Image build/push—sign enforced
+3. Image pull/run—signature verify
+4. Audit trail, key management, monitoring enforced
+
+## Quick Checklist
+
+- [x] DCT enabled?
+- [x] Automated signing configured?
+- [x] Key management secure?
+- [x] Audit trail/logging enabled?
+- [x] Notary v2 integration possible?
+
+---
+
+## উপসংহার
+
+Image signing ও verification—Docker Content Trust—security, authenticity, integrity—production-grade deployment-এর জন্য essential। Industry standard workflow—confident build, deploy, audit, rollback সম্ভব।
+

@@ -1,0 +1,83 @@
+---
+title: Docker ব্যাকআপ ও রিস্টোর কৌশল
+icon: uim:docker
+---
+
+Docker কন্টেইনারে ডেটা নিরাপত্তা, ব্যাকআপ ও রিকভারি—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। Production environment-এ ডেটা হারানো মানে বড় ক্ষতি, downtime, বা user impact। এই লেসনে আমরা Docker-এ ব্যাকআপ ও রিস্টোরের গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## কেন ব্যাকআপ ও রিস্টোর গুরুত্বপূর্ণ?
+
+- Production app-এ ডেটা হারানো মানে business impact
+- Database, logs, uploads—সবকিছু নিরাপদ রাখতে হবে
+- Disaster recovery, migration, upgrade—সবকিছুতে ব্যাকআপ দরকার
+
+**বাস্তব উদাহরণ:**
+- Netflix production database container-এ automated volume backup configure করা থাকে—downtime বা failure হলে দ্রুত restore করা যায়
+
+**এনালজি:**
+- ধরুন, আপনি অফিসে গুরুত্বপূর্ণ ফাইলের কপি আলাদা locker-এ রাখলেন—মূল locker হারালে backup locker থেকে restore করা যাবে
+
+---
+
+## Core Concepts: Docker-এ ব্যাকআপ ও রিস্টোর
+
+1. **Volume Backup:**
+    - Docker volume-এ থাকা ডেটা backup করা যায়
+2. **Bind Mount Backup:**
+    - Host path-এর ডেটা manual backup করা যায়
+3. **Automated Backup:**
+    - Script, cron job, CI/CD pipeline-এ automated backup
+4. **Restore:**
+    - Backup file থেকে volume/bind mount restore করা যায়
+
+---
+
+## Workflow: Docker Volume Backup ও Restore
+
+1. **Volume Backup:**
+    ```bash
+    docker run --rm -v mydata:/data -v $(pwd):/backup busybox tar czf /backup/mydata-backup.tar.gz -C /data .
+    ```
+2. **Volume Restore:**
+    ```bash
+    docker run --rm -v mydata:/data -v $(pwd):/backup busybox tar xzf /backup/mydata-backup.tar.gz -C /data
+    ```
+3. **Bind Mount Backup:**
+    - Host path manual copy/rsync/tar দিয়ে backup করুন
+
+---
+
+## Automated Backup: Best Practices
+
+- Cron job, CI/CD pipeline-এ automated backup schedule করুন
+- Cloud storage (S3, GCS) বা remote server-এ backup রাখুন
+- Backup retention policy configure করুন
+
+**Example (cron job):**
+```bash
+0 2 * * * docker run --rm -v mydata:/data -v /backup:/backup busybox tar czf /backup/mydata-$(date +\%F).tar.gz -C /data .
+```
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Volume/bind mount backup না রাখলে disaster recovery সম্ভব নয়
+- Manual backup ভুল হলে ডেটা incomplete হতে পারে
+- Restore করার সময় path mismatch হলে container fail করতে পারে
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Automated Backup:** Netflix, Google production-এ automated volume backup configure করা হয়
+- **Cloud Backup:** Production-এ cloud storage-এ backup রাখা হয়
+- **Restore Automation:** CI/CD pipeline-এ restore/test automation
+
+---
+
+## উপসংহার
+
+Docker-এ ব্যাকআপ ও রিস্টোর—এই ধারণা দক্ষভাবে ব্যবহার করলে production app-এ ডেটা নিরাপত্তা, disaster recovery ও migration নিশ্চিত করা যায়। বাস্তব সিস্টেম ডিজাইনে এই backup strategy আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker data management skill আরও শক্তিশালী হবে!

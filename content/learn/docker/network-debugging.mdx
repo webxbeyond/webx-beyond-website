@@ -1,0 +1,141 @@
+---
+title: "Network Troubleshooting Tools: netshoot, curl, ping"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—distributed app-এ network issue—performance, connectivity, security—critical impact ফেলে। Docker-এ network debugging—production-ready deployment, microservices communication—ensure করতে must-have।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Connectivity:** Container-এ network issue—app downtime, data loss, user impact।
+- **Performance:** Slow network—latency, throughput problem—user experience degrade করে।
+- **Security:** Misconfigured network—exposed service, data leak—risk বাড়ায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of microservices—network debugging tool/netshoot—issue detect করে।
+- **Uber:** Real-time ride matching—ping/curl/netshoot—connectivity test essential।
+- **Google:** Kubernetes/Docker—network troubleshooting—production incident resolve।
+
+## মূল ধারণা
+
+### ১. netshoot: All-in-one Network Debugging Container
+
+- **netshoot:** Special Docker image—network troubleshooting tool (ping, curl, dig, traceroute, etc.) pre-installed।
+- **Benefit:** Any container/network—quick debug—no extra install needed।
+
+#### Workflow
+
+1. **netshoot container run করুন:**
+   ```bash
+   docker run -it --rm --network my_network nicolaka/netshoot
+   ```
+2. **Tools available:** ping, curl, dig, traceroute, nslookup, ip, etc.
+3. **Example:**
+   ```bash
+   ping google.com
+   curl http://my-service:8080
+   dig my-service
+   traceroute my-service
+   ```
+
+#### সহজ এনালজি
+
+- "netshoot মানে—একটি সুপার টুলবক্স, যেখানে সব network tool একসাথে আছে।"
+
+### ২. ping: Connectivity Test
+
+- **ping:** Container থেকে অন্য container/service-এ connectivity test—packet loss, latency check।
+- **Benefit:** Network reachability, firewall issue, DNS resolution—quick test।
+
+#### Workflow
+
+1. **Container-এ ping install করুন (Debian/Ubuntu):**
+   ```bash
+   apt-get update && apt-get install iputils-ping
+   ping my-service
+   ```
+2. **netshoot-এ ping use করুন:**
+   ```bash
+   ping my-service
+   ```
+
+#### সহজ এনালজি
+
+- "ping মানে—একটি ডাক পাঠানো, উত্তর এলে জানবেন যোগাযোগ হচ্ছে।"
+
+### ৩. curl: HTTP Connectivity & API Test
+
+- **curl:** Container/service-এ HTTP request—API, web service test—response, latency, error code check।
+- **Benefit:** Web/API connectivity, authentication, SSL—debug করা সহজ।
+
+#### Workflow
+
+1. **Container-এ curl install করুন (Debian/Ubuntu):**
+   ```bash
+   apt-get update && apt-get install curl
+   curl http://my-service:8080
+   ```
+2. **netshoot-এ curl use করুন:**
+   ```bash
+   curl http://my-service:8080
+   ```
+
+#### সহজ এনালজি
+
+- "curl মানে—একটি চিঠি পাঠানো, উত্তর এলে জানবেন service ঠিক আছে।"
+
+### ৪. Common Debugging Scenarios
+
+- **DNS issue:** dig/nslookup/netshoot-এ test করুন।
+- **Firewall issue:** ping/curl—connectivity test করুন।
+- **Service discovery:** ping/curl—service name-based communication test করুন।
+- **Latency/performance:** ping/traceroute—delay/source detect করুন।
+
+### ৫. Best Practices
+
+- **Always netshoot use করুন—quick debug, all tool available।**
+- **Minimal container—ping/curl install করুন—debug সহজ করুন।**
+- **Network monitoring—performance bottleneck detect করুন।**
+- **Documentation—debugging steps clearly maintain করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- netshoot না use করা—tool install করতে সময় নষ্ট।
+- ping/curl install miss—debugging fail।
+- Wrong network attach—service unreachable।
+- Debugging steps/documentation miss—issue reproduce কঠিন।
+
+### ৭. Industry Trends
+
+- **netshoot—industry standard debugging container।**
+- **Automated network test—CI/CD pipeline-এ enforced।**
+- **Advanced tool—tcpdump, iperf—performance/security debug।**
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Container/service connectivity issue—production incident, deployment fail।
+- Microservices—service discovery, DNS, API connectivity test।
+- Performance/security debug—latency, packet loss, firewall issue।
+
+## সংক্ষিপ্ত workflow
+
+1. netshoot container run করুন—all tool available।
+2. ping/curl/dig/traceroute—issue test করুন।
+3. Debugging/documentation maintain করুন।
+4. Network monitoring—performance/security ensure করুন।
+
+## Quick Checklist
+
+- [x] netshoot container run?
+- [x] ping/curl/dig/traceroute used?
+- [x] Network attach/config correct?
+- [x] Debugging/documentation maintained?
+- [x] Performance/security validated?
+
+---
+
+## উপসংহার
+
+Network Troubleshooting Tools—netshoot, curl, ping—Docker container/network issue—quick, efficient, industry-standard debug—production-ready deployment, robust microservices communication ensure করতে essential।
+

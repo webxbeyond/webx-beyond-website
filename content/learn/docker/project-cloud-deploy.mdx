@@ -1,0 +1,130 @@
+---
+title: "Cloud-এ Dockerized App ডিপ্লয়"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সব modern app cloud-এ deploy হয়। Dockerized app—cloud-এ deploy করলে—scalability, automation, portability, security—industry standard solution। AWS, GCP, Azure—সব provider-এ Docker container deploy supported।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** Traffic বাড়লে auto-scale করা যায়।
+- **Portability:** Local থেকে cloud—একই Docker image deploy করা যায়।
+- **Automation:** CI/CD pipeline-এ auto-deploy, update, rollback।
+- **Security:** Cloud-native security—network, IAM, secret management enforced।
+
+## বাস্তব উদাহরণ
+
+- **Startup:** MVP launch—AWS ECS-এ Docker container deploy।
+- **Enterprise:** Production workload—GCP GKE/Kubernetes-এ container orchestration।
+- **Cloud Provider:** Managed service—Azure Container Instances-এ quick deploy।
+
+## মূল ধারণা
+
+### ১. Cloud Deployment Options
+
+- **AWS ECS/EKS:** Elastic Container Service/Kubernetes—managed orchestration, auto-scaling।
+- **GCP GKE:** Google Kubernetes Engine—production-grade container orchestration।
+- **Azure Container Instances/AKS:** Quick deploy, managed Kubernetes।
+
+### ২. Workflow: Step-by-step
+
+1. **Docker image build করুন।**
+   ```bash
+   docker build -t myapp .
+   ```
+2. **Image registry-তে push করুন (Docker Hub/AWS ECR/GCP GCR/Azure ACR)।**
+   ```bash
+   docker tag myapp <registry-url>/myapp
+   docker push <registry-url>/myapp
+   ```
+3. **Cloud provider-এ container service configure করুন।**
+   - AWS ECS Task Definition
+   - GCP GKE Deployment YAML
+   - Azure Container Instance config
+4. **Deploy command/run করুন।**
+   - AWS ECS: Console/CLI
+   - GCP GKE: `kubectl apply -f deployment.yaml`
+   - Azure: Portal/CLI
+5. **App accessible—cloud endpoint-এ।**
+
+### ৩. Example: AWS ECS Deployment
+
+- **ECR-এ image push:**
+  ```bash
+  aws ecr create-repository --repository-name myapp
+  docker tag myapp <aws-account-id>.dkr.ecr.<region>.amazonaws.com/myapp
+  docker push <aws-account-id>.dkr.ecr.<region>.amazonaws.com/myapp
+  ```
+- **ECS Task Definition:**
+  ```json
+  {
+    "containerDefinitions": [
+      {
+        "name": "myapp",
+        "image": "<aws-account-id>.dkr.ecr.<region>.amazonaws.com/myapp",
+        "memory": 512,
+        "cpu": 256,
+        "essential": true,
+        "portMappings": [{ "containerPort": 80 }]
+      }
+    ],
+    "family": "myapp-task"
+  }
+  ```
+- **Deploy:** ECS Console/CLI-তে task run করুন।
+
+### ৪. সহজ এনালজি
+
+- "Cloud-এ Dockerized app deploy মানে—একটি বড় বাসে আপনার app container উঠিয়ে, destination (AWS/GCP/Azure) পৌঁছে দেয়া।"
+
+### ৫. Best Practices
+
+- **Multi-stage build:** Lightweight, secure image build করুন।
+- **Secrets management:** Cloud-native secret store (AWS Secrets Manager, GCP Secret Manager, Azure Key Vault)।
+- **Auto-scaling:** Traffic spike হলে container auto-scale করুন।
+- **Monitoring/logging:** Cloud-native tools (CloudWatch, Stackdriver, Azure Monitor)।
+- **IAM/Access control:** Principle of least privilege enforced করুন।
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Hardcoded credentials/image tag।
+- Security group/network misconfiguration—public exposure risk।
+- Monitoring/logging না রাখা—issue detect করা যায় না।
+- Auto-scaling configure না করা—traffic spike handle হয় না।
+- Rollback strategy না রাখা—deploy fail হলে recovery নেই।
+
+### ৭. Industry Trends
+
+- **Serverless containers:** AWS Fargate, GCP Cloud Run, Azure Container Apps—no server management।
+- **Multi-cloud deployment:** Same image—multiple cloud provider-এ deploy।
+- **GitOps:** Deployment automation—code দিয়ে manage।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production workload—scalable, secure deployment।
+- MVP/Prototype—quick cloud launch।
+- Multi-cloud strategy—portability, redundancy।
+
+## সংক্ষিপ্ত workflow
+
+1. Docker image build করুন।
+2. Registry-তে push করুন।
+3. Cloud provider-এ container service configure করুন।
+4. Deploy/run করুন।
+5. Monitoring/logging, auto-scaling, IAM enforced করুন।
+
+## Quick Checklist
+
+- [x] Multi-stage build configured?
+- [x] Secrets management enabled?
+- [x] Auto-scaling configured?
+- [x] Monitoring/logging enabled?
+- [x] IAM/access control enforced?
+- [x] Rollback strategy আছে?
+
+---
+
+## উপসংহার
+
+Cloud-এ Dockerized app deploy—production-grade, scalable, secure, portable solution। Industry standard workflow—AWS, GCP, Azure—সব provider-এ একইভাবে ব্যবহারযোগ্য।
+

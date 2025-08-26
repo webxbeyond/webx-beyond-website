@@ -1,0 +1,88 @@
+---
+title: "কন্টেইনার লাইফসাইকেল"
+icon: uim:docker
+---
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সবাই Docker Container ব্যবহার করে অ্যাপ্লিকেশন চালায়, বন্ধ করে, আবার নতুন করে Deploy করে। Docker Container-এর লাইফসাইকেল—Run, Stop, Remove—এই তিনটি ধাপ জানলে, Production থেকে Development—সবকিছু সহজ হয়।
+
+## Core Concepts
+
+### ১. Container Run
+- **Definition:** Docker Image থেকে নতুন Container তৈরি ও চালানো
+- **Command:**
+```bash
+$ docker run -d -p 8080:80 nginx:latest
+```
+- **Features:**
+    - Detached Mode
+    - Port Mapping
+    - Name Assignment
+
+### ২. Container Stop
+- **Definition:** চলমান Container বন্ধ করা
+- **Command:**
+```bash
+$ docker stop <container_id>
+```
+- **Features:**
+    - Graceful Shutdown
+    - Resource Release
+
+### ৩. Container Remove
+- **Definition:** বন্ধ হওয়া Container Delete করা
+- **Command:**
+```bash
+$ docker rm <container_id>
+```
+- **Features:**
+    - Storage Cleanup
+    - Resource Optimization
+
+### ৪. Workflow
+1. Run: Image থেকে Container তৈরি ও চালান
+2. Stop: Container বন্ধ করুন
+3. Remove: Container Delete করুন
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Resource Management
+- Efficient Deployment
+- Clean Environment
+
+### ৬. কখন ব্যবহার করবেন?
+- New App Launch
+- Update/Upgrade
+- Debugging
+
+### ৭. Common Pitfalls
+- Unused Container জমে থাকা
+- Resource Waste
+- Wrong Container Remove
+
+### ৮. Best Practices
+- Regularly Remove Unused Container
+- Use Meaningful Container Name
+- Monitor Resource Usage
+
+### ৯. Industry Trends
+- Automated Lifecycle Management
+- Orchestration Tools (Kubernetes, Swarm)
+
+## উদাহরণ ও এনালজি
+- Container Run—"নতুন গাড়ি চালানো"
+- Container Stop—"গাড়ি পার্কিং করা"
+- Container Remove—"পুরনো গাড়ি বিক্রি করা"
+
+## Quick Reference
+- Run: `docker run -d -p 8080:80 nginx:latest`
+- Stop: `docker stop <container_id>`
+- Remove: `docker rm <container_id>`
+
+## উপসংহার
+
+Docker Container-এর লাইফসাইকেল—Run, Stop, Remove—Workflow-এর মূল ধাপ। সঠিকভাবে জানলে, Resource Efficient ও Clean Deployment Environment তৈরি করা সহজ হবে।
+
+---
+
+**পরবর্তী পাঠ:** Docker Hub ও প্রাইভেট রেজিস্ট্রি

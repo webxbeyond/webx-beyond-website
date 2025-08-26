@@ -1,0 +1,69 @@
+---
+title: "Hello World"
+icon: uim:docker
+---
+
+Google, Netflix, Uber—সবাই Docker ব্যবহার করে তাদের অ্যাপ্লিকেশন দ্রুত ও স্কেলেবলভাবে চালায়। Docker-এ "Hello World" Container চালানো—শুরু থেকে Production পর্যন্ত Journey-র প্রথম ধাপ। এই লেসনে আমরা Docker-এ প্রথম Container কীভাবে চালাতে হয়, Step-by-step জানব।
+
+## Core Concepts
+
+### ১. Docker Container কী?
+- **Definition:** Docker Image থেকে তৈরি হওয়া Lightweight, Isolated Application Environment
+- **Features:**
+    - Fast Startup
+    - Resource Efficient
+    - Portable
+
+### ২. Hello World Container চালানোর ধাপ
+- **Step 1:** Docker Install করুন (Linux, Mac, Windows)
+- **Step 2:** Terminal/CLI খুলুন
+- **Step 3:** নিচের Command দিন:
+```bash
+$ docker run hello-world
+```
+- **Step 4:** Output দেখুন—"Hello from Docker!"
+
+### ৩. কীভাবে কাজ করে?
+- Docker CLI-তে `docker run hello-world` Command দিলে:
+    1. Docker Daemon Image Pull করে (যদি Local-এ না থাকে)
+    2. Container Create ও Start করে
+    3. Container Message Print করে
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Docker Setup Validate
+- CLI ও Daemon Communication Test
+- Container Workflow বোঝা
+
+### ৫. কখন ব্যবহার করবেন?
+- Docker Installation Test
+- Beginner Practice
+- Troubleshooting
+
+### ৬. Common Pitfalls
+- Permission Issue (Linux)
+- Docker Daemon Not Running
+- Network Problem (Image Pull Fail)
+
+### ৭. Best Practices
+- Installation শেষে Always Hello World চালান
+- Error Message পড়ে Troubleshoot করুন
+- Official Documentation Follow করুন
+
+### ৮. Industry Trends
+- Ready-made Test Containers
+- Automated Setup Validation
+
+## উদাহরণ ও এনালজি
+- "Hello World Container—নতুন ফোনে প্রথম কল করা, সবকিছু ঠিক আছে কিনা চেক"
+
+## Quick Reference
+- Command: `docker run hello-world`
+- Output: "Hello from Docker!"
+
+## উপসংহার
+
+Docker-এ "Hello World" Container চালানো—Setup Validate ও Container Workflow বোঝার জন্য অপরিহার্য। এই ধাপ সফল হলে, আপনি Docker Journey-র পরবর্তী ধাপে যেতে প্রস্তুত।
+
+---
+
+**পরবর্তী পাঠ:** Docker Images: Pull, Build, Tag

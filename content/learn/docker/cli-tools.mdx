@@ -1,0 +1,179 @@
+---
+title: Docker Compose, Swarm, Kubernetes CLI Tools
+icon: uim:docker
+---
+
+# Docker Compose, Swarm, Kubernetes CLI Tools: কন্টেইনার অর্কেস্ট্রেশন ও ম্যানেজমেন্টের আধুনিক হাতিয়ার
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—modern app-এ container orchestration, automation, scaling—critical। CLI tools—Docker Compose, Swarm, Kubernetes—production workflow-এ efficiency, reliability, automation—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Automation:** Manual container management—slow, error-prone; CLI tools—fast, repeatable, scalable।
+- **Orchestration:** Multi-container app—easy deploy, scale, manage—CLI tools-এ।
+- **Troubleshooting:** Real-time status, logs, resource usage—CLI tools-এ track করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of microservices—Kubernetes CLI—auto scale/manage।
+- **Uber:** Docker Compose—multi-service app—local/test deploy।
+- **Google:** Swarm/Kubernetes CLI—production orchestration enforced।
+
+## মূল ধারণা
+
+### ১. Docker Compose CLI
+
+- **Docker Compose:** Multi-container app—YAML config—single command-এ deploy/manage।
+- **Benefit:** Local/test/prod—same workflow—easy automation।
+
+#### Workflow
+
+1. **docker-compose.yml লিখুন:**
+   ```yaml
+   version: '3'
+   services:
+     web:
+       image: nginx
+       ports:
+         - "80:80"
+     db:
+       image: mysql
+       environment:
+         MYSQL_ROOT_PASSWORD: example
+   ```
+2. **Deploy করুন:**
+   ```bash
+   docker compose up -d
+   ```
+3. **Manage করুন:**
+   ```bash
+   docker compose ps
+   docker compose logs
+   docker compose down
+   ```
+
+#### সহজ এনালজি
+
+- "Docker Compose মানে—একটি orchestra conductor, যিনি একসাথে সব যন্ত্র বাজান।"
+
+### ২. Docker Swarm CLI
+
+- **Docker Swarm:** Built-in orchestration—multi-host cluster—service deploy, scale, manage—CLI-এ।
+- **Benefit:** Production-grade scaling, rolling update, load balancing।
+
+#### Workflow
+
+1. **Swarm init করুন:**
+   ```bash
+   docker swarm init
+   ```
+2. **Service deploy করুন:**
+   ```bash
+   docker service create --name web --replicas 3 nginx
+   ```
+3. **Manage করুন:**
+   ```bash
+   docker service ls
+   docker service ps web
+   docker service scale web=5
+   docker service rm web
+   ```
+
+#### সহজ এনালজি
+
+- "Swarm CLI মানে—একটি ট্রাফিক পুলিশ, যিনি সব গাড়ি (container) ঠিকভাবে চলাচল করান।"
+
+### ৩. Kubernetes CLI (kubectl)
+
+- **kubectl:** Kubernetes cluster—deploy, manage, troubleshoot—single command-এ।
+- **Benefit:** Industry standard orchestration—auto scale, self-heal, rolling update।
+
+#### Workflow
+
+1. **Deployment YAML লিখুন:**
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: web
+   spec:
+     replicas: 3
+     selector:
+       matchLabels:
+         app: web
+     template:
+       metadata:
+         labels:
+           app: web
+       spec:
+         containers:
+         - name: nginx
+           image: nginx
+           ports:
+           - containerPort: 80
+   ```
+2. **Deploy করুন:**
+   ```bash
+   kubectl apply -f deployment.yaml
+   ```
+3. **Manage করুন:**
+   ```bash
+   kubectl get pods
+   kubectl logs web-xxxx
+   kubectl scale deployment web --replicas=5
+   kubectl delete deployment web
+   ```
+
+#### সহজ এনালজি
+
+- "kubectl মানে—একটি রিমোট কন্ট্রোল, যেটা দিয়ে cluster-এর সব কিছু নিয়ন্ত্রণ করা যায়।"
+
+### ৪. Best Practices
+
+- **YAML config—clear, versioned, documented রাখুন।**
+- **CLI tool—automation/script-এ integrate করুন।**
+- **Monitoring/logging—CLI tool-এ status/logs track করুন।**
+- **Rollback strategy—deploy fail হলে restore করুন।**
+
+### ৫. সাধারণ ভুলত্রুটি
+
+- Manual container manage—automation miss—slow/error-prone।
+- YAML config/documentation miss—debugging কঠিন।
+- Monitoring/logging miss—issue detect late।
+- Rollback strategy miss—deploy fail হলে recovery কঠিন।
+
+### ৬. Industry Trends
+
+- **CLI tool automation—CI/CD pipeline-এ default।**
+- **Multi-cloud orchestration—Kubernetes CLI enforced।**
+- **Advanced monitoring/logging—CLI tool integration।**
+
+### ৭. কখন ব্যবহার করবেন?
+
+- Multi-container/multi-host app—deploy, scale, manage করতে।
+- Production/test/local—same workflow—automation essential।
+- Monitoring/troubleshooting—real-time status/logs track করতে।
+
+## সংক্ষিপ্ত workflow
+
+1. YAML config লিখুন।
+2. CLI tool-এ deploy/manage করুন।
+3. Monitoring/logging—status/error track করুন।
+4. Rollback/documentation maintain করুন।
+
+## Quick Checklist
+
+- [x] YAML config documented?
+- [x] CLI tool automation/script-এ integrated?
+- [x] Monitoring/logging enabled?
+- [x] Rollback/documentation maintained?
+- [x] Production/test/local—same workflow?
+
+---
+
+## উপসংহার
+
+Docker Compose, Swarm, Kubernetes CLI Tools—container orchestration/management-এ automation, reliability, scalability—industry standard। Workflow follow করলে—robust, efficient, production-ready app deploy/manage করা সম্ভব।
+
