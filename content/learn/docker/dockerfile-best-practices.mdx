@@ -1,11 +1,7 @@
 ---
 title: ডকার ইমেজের সেরা অনুশীলন
-slug: /docker/dockerfile-best-practices
+icon: uim:docker
 ---
-
-# ডকার ইমেজের সেরা অনুশীলন: দক্ষ, নিরাপদ ও ছোট ইমেজ তৈরির কৌশল
-
-## প্রস্তাবনা
 
 ডকার ইমেজের সেরা অনুশীলন (Best Practices) জানা না থাকলে, আপনার অ্যাপ্লিকেশন ধীর, ভারী, অনিরাপদ বা অপ্রয়োজনীয়ভাবে জটিল হতে পারে। Google, Netflix, Uber-এর মতো কোম্পানিগুলো তাদের ডকার ইমেজ অপ্টিমাইজ করতে এই অনুশীলনগুলো অনুসরণ করে—ফলে ডিপ্লয়মেন্ট দ্রুত, স্কেলিং সহজ এবং নিরাপত্তা নিশ্চিত হয়।
 
@@ -44,7 +40,7 @@ temp/
 - Final ইমেজে শুধু দরকারি ফাইল ও ডিপেন্ডেন্সি রাখুন।
 
 **Example:**
-```Dockerfile
+```bash
 FROM node:18-alpine AS build
 WORKDIR /app
 COPY . .
@@ -66,7 +62,7 @@ CMD ["node", "dist/index.js"]
 - বেশি পরিবর্তনশীল (যেমন: সোর্স কোড কপি) পরে রাখুন—এতে ক্যাশ ভালোভাবে কাজ করে।
 
 **Example:**
-```Dockerfile
+```bash
 COPY package.json .
 RUN npm install
 COPY . .
@@ -80,7 +76,7 @@ COPY . .
 - `USER` নির্দেশনা দিয়ে non-root user ব্যবহার করুন।
 
 **Example:**
-```Dockerfile
+```bash
 RUN adduser -D appuser
 USER appuser
 ```
@@ -107,7 +103,7 @@ USER appuser
 - `LABEL` দিয়ে ইমেজের metadata (maintainer, version) যোগ করুন।
 
 **Example:**
-```Dockerfile
+```bash
 LABEL maintainer="your@email.com"
 HEALTHCHECK CMD curl --fail http://localhost:3000 || exit 1
 ```
@@ -120,7 +116,7 @@ HEALTHCHECK CMD curl --fail http://localhost:3000 || exit 1
 - `RUN` কমান্ডে multiple action একসাথে লিখুন—layer কমবে।
 
 **Example:**
-```Dockerfile
+```bash
 RUN apt-get update && apt-get install -y git \
     && rm -rf /var/lib/apt/lists/*
 ```
