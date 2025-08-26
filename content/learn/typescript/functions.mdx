@@ -1,0 +1,115 @@
+---
+title: ফাংশন টাইপ অ্যানোটেশন ও ডিফল্ট প্যারামিটার
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ফাংশন টাইপ অ্যানোটেশন ও ডিফল্ট প্যারামিটার
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ function—type safety, maintainability—essential। TypeScript-এর function type annotation ও default parameter—bug কমানো, efficient workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Function parameter/return type—early error detect—bug কমে।
+- **Maintainability:** Clear function signature—codebase maintain, refactor সহজ।
+- **Productivity:** Default parameter—flexible function—fast coding, error avoid।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API handler—function type annotation—type safety, maintainability।
+- **Netflix:** Data processing—default parameter—flexible workflow।
+- **Uber:** Ride calculation—function type annotation—bug কমানো।
+
+## মূল ধারণা
+
+### ১. Function Type Annotation
+
+- **Parameter/return type—manually define করা।**
+- **Usage:**
+  ```typescript
+  function add(a: number, b: number): number {
+    return a + b;
+  }
+
+  const greet: (name: string) => string = (name) => `Hello, ${name}`;
+  ```
+
+#### সহজ এনালজি
+
+- "Function type annotation—একটি contract—কোন input দিলে, কী output পাবেন—সব স্পষ্ট।"
+
+### ২. Default Parameter
+
+- **Parameter-এ default value—function call-এ value না দিলে default use হবে।**
+- **Usage:**
+  ```typescript
+  function register(name: string, role: string = "user"): string {
+    return `${name} registered as ${role}`;
+  }
+
+  register("Anis"); // "Anis registered as user"
+  register("Sara", "admin"); // "Sara registered as admin"
+  ```
+
+#### সহজ এনালজি
+
+- "Default parameter—একটি restaurant menu—order না দিলে, default dish দেয়া হয়।"
+
+### ৩. Practical Example
+
+```typescript
+function calculateTotal(price: number, quantity: number = 1): number {
+  return price * quantity;
+}
+
+const total1 = calculateTotal(100); // 100
+const total2 = calculateTotal(100, 3); // 300
+```
+
+### ৪. Industry Trends
+
+- **Function type annotation—critical workflow-এ default।**
+- **Default parameter—flexible API/function—industry standard।**
+- **Clear function signature—maintainability, productivity বাড়ায়।**
+
+### ৫. Best Practices
+
+- **Parameter/return type—clear define করুন।**
+- **Default parameter—flexible function-এ use করুন।**
+- **Documentation/readme—function usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Type annotation miss—runtime bug আসে।
+- Default parameter miss—unexpected value আসে।
+- Function signature unclear—codebase/readability কমে।
+- Documentation/readme unclear—new developer confused।
+
+### ৭. কখন ব্যবহার করবেন?
+
+- Critical workflow/function—type safety দরকার হলে।
+- Flexible API/function—default parameter দরকার হলে।
+- Production workflow—bug কমাতে, maintainability বাড়াতে।
+
+## সংক্ষিপ্ত workflow
+
+1. Function parameter/return type annotation করুন।
+2. Default parameter—flexible function-এ use করুন।
+3. Documentation/readme update করুন।
+4. Team/project standard maintain করুন।
+
+## Quick Checklist
+
+- [x] Function parameter/return type annotation আছে?
+- [x] Default parameter used?
+- [x] Function signature clear?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর function type annotation ও default parameter—bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

@@ -1,0 +1,135 @@
+---
+title: রিটার্ন টাইপ ও void বনাম never
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# রিটার্ন টাইপ ও `void` বনাম `never`
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ function return type—type safety, maintainability—essential। TypeScript-এর return type, `void` ও `never`—bug কমানো, efficient workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Function return type—early error detect—bug কমে।
+- **Maintainability:** Clear return type—codebase maintain, refactor সহজ।
+- **Productivity:** `void`/`never`—special case handle—fast coding, error avoid।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API handler—return type—type safety, maintainability।
+- **Netflix:** Data processing—`void` function—side effect handle।
+- **Uber:** Error handler—`never` function—unexpected case handle।
+
+## মূল ধারণা
+
+### ১. Function Return Type
+
+- **Return type:** Function কী ধরনের value return করবে—type define করা।
+- **Usage:**
+  ```typescript
+  function add(a: number, b: number): number {
+    return a + b;
+  }
+
+  function getUser(): { name: string; age: number } {
+    return { name: "Anis", age: 25 };
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Return type—একটি বাক্স—function শেষে কী ধরনের জিনিস বের হবে, তা স্পষ্টভাবে লেখা থাকে।"
+
+### ২. `void` Return Type
+
+- **`void`:** Function কিছুই return করে না—side effect (console, API call) handle করে।
+- **Usage:**
+  ```typescript
+  function logMessage(message: string): void {
+    console.log(message);
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "void—একটি megaphone—শুধু আওয়াজ বের হয়, কিছু হাতে আসে না।"
+
+### ৩. `never` Return Type
+
+- **`never`:** Function কখনোই return করে না—error throw, infinite loop—handle করে।
+- **Usage:**
+  ```typescript
+  function throwError(msg: string): never {
+    throw new Error(msg);
+  }
+
+  function infinite(): never {
+    while (true) {}
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "never—একটি maze—কখনোই বের হওয়া যায় না, function শেষ হয় না।"
+
+### ৪. Practical Example
+
+```typescript
+function processData(data: string): string {
+  if (!data) throwError("No data");
+  return data.toUpperCase();
+}
+
+function throwError(msg: string): never {
+  throw new Error(msg);
+}
+```
+
+### ৫. Industry Trends
+
+- **Return type—critical workflow-এ default।**
+- **`void`/`never`—special case handle—industry standard।**
+- **Clear function signature—maintainability, productivity বাড়ায়।**
+
+### ৬. Best Practices
+
+- **Function return type—clear define করুন।**
+- **`void`/`never`—special case-এ use করুন।**
+- **Documentation/readme—function usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Return type miss—runtime bug আসে।
+- `void`/`never` miss—unexpected value/error আসে।
+- Function signature unclear—codebase/readability কমে।
+- Documentation/readme unclear—new developer confused।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Critical workflow/function—type safety দরকার হলে।
+- Side effect function—`void` দরকার হলে।
+- Error/infinite loop—`never` দরকার হলে।
+- Production workflow—bug কমাতে, maintainability বাড়াতে।
+
+## সংক্ষিপ্ত workflow
+
+1. Function return type annotation করুন।
+2. `void`/`never`—special case-এ use করুন।
+3. Documentation/readme update করুন।
+4. Team/project standard maintain করুন।
+
+## Quick Checklist
+
+- [x] Function return type annotation আছে?
+- [x] `void`/`never` used?
+- [x] Function signature clear?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর function return type, `void` ও `never`—bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

@@ -1,0 +1,139 @@
+---
+title: টাইপ গার্ডস ও typeof / instanceof
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# টাইপ গার্ডস ও typeof / instanceof
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর ডেটা প্রসেসিং, Uber-এর রাইড অপশন—সবখানে dynamic data আসে। TypeScript-এর টাইপ গার্ডস—type-safe branching, bug-free workflow—industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type-safe Branching:** টাইপ গার্ড—runtime error কমায়, compile time-এ bug ধরতে সাহায্য করে।
+- **Flexible Workflow:** Dynamic input/output—type narrowing—safe handle করা যায়।
+- **Maintainability:** Complex codebase—type guard—easy debug ও maintain।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API response—type guard দিয়ে success/error branch।
+- **Netflix:** Video object—type narrowing—safe property access।
+- **Uber:** Ride option—dynamic type—type guard দিয়ে handle।
+
+## মূল ধারণা
+
+### ১. টাইপ গার্ড (Type Guard)
+
+- **সংজ্ঞা:** TypeScript-এ type narrowing করার জন্য condition—type-specific branch।
+- **Usage:**
+  ```typescript
+  function printValue(value: number | string) {
+    if (typeof value === "string") {
+      console.log("String value:", value.toUpperCase());
+    } else {
+      console.log("Number value:", value.toFixed(2));
+    }
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "টাইপ গার্ড—একটি চেকপয়েন্ট—কোন পথ ধরে এগোতে হবে তা ঠিক করে।"
+
+### ২. typeof অপারেটর
+
+- **সংজ্ঞা:** Primitive type check—string, number, boolean, object
+- **Usage:**
+  ```typescript
+  function isString(x: any): x is string {
+    return typeof x === "string";
+  }
+  ```
+
+### ৩. instanceof অপারেটর
+
+- **সংজ্ঞা:** Object/class instance check
+- **Usage:**
+  ```typescript
+  class Car {
+    drive() {}
+  }
+  class Bike {
+    ride() {}
+  }
+
+  function move(vehicle: Car | Bike) {
+    if (vehicle instanceof Car) {
+      vehicle.drive();
+    } else {
+      vehicle.ride();
+    }
+  }
+  ```
+
+### ৪. Custom টাইপ গার্ড
+
+- **সংজ্ঞা:** Function—type-specific return—type narrowing
+- **Usage:**
+  ```typescript
+  type ApiResponse = { type: "success"; data: string } | { type: "error"; message: string };
+
+  function isSuccess(res: ApiResponse): res is { type: "success"; data: string } {
+    return res.type === "success";
+  }
+
+  function handleResponse(res: ApiResponse) {
+    if (isSuccess(res)) {
+      console.log("Data:", res.data);
+    } else {
+      console.log("Error:", res.message);
+    }
+  }
+  ```
+
+### ৫. কখন ব্যবহার করবেন?
+
+- Multiple type handle করতে
+- Dynamic input/output—safe branch করতে
+- Complex object/class—property access safe রাখতে
+
+### ৬. Common Pitfalls
+
+- Type guard ভুল declare—runtime bug
+- typeof/operator miss—unexpected value
+- instanceof—prototype mismatch হলে—error
+
+### ৭. Best Practices
+
+- Custom type guard—clear define করুন
+- typeof/operator—properly use করুন
+- Documentation/readme—clear রাখুন
+- Exhaustiveness check—implement করুন
+
+### ৮. Industry Trends
+
+- API design—type guard—error/success branch
+- Complex workflow—custom type guard—safe property access
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Type requirement clear করুন
+2. Type guard/typeof/instanceof—properly use করুন
+3. Custom type guard—implement করুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Type guard/typeof/instanceof used?
+- [x] Custom type guard implemented?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর টাইপ গার্ডস, typeof, instanceof—type-safe, scalable, bug-free workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

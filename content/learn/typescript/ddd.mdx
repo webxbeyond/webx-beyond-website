@@ -1,0 +1,151 @@
+---
+title: Domain-driven Design (DDD) সাথে TypeScript
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Domain-driven Design (DDD) সাথে TypeScript
+
+## প্রস্তাবনা
+
+ধরা যাক, Uber-এর মতো একটি বড় অ্যাপ—যেখানে রাইড, পেমেন্ট, ইউজার, ড্রাইভার, ম্যাপ, নোটিফিকেশন—সব আলাদা domain।
+যদি সবকিছু একসাথে, অগোছালোভাবে ডিজাইন করা হয়, তাহলে কোড maintain করা, নতুন ফিচার যোগ করা, বা bug fix করা কঠিন হয়ে যাবে।
+
+এজন্য **Domain-driven Design (DDD)** ব্যবহার করা হয়—যাতে বড়, জটিল সিস্টেমকে ছোট ছোট domain-এ ভাগ করে, প্রতিটি domain-এর জন্য আলাদা model, logic, এবং boundary define করা যায়।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** বড় অ্যাপ সহজে scale করা যায়—প্রতিটি domain আলাদাভাবে grow করতে পারে।
+- **Maintainability:** কোডবেস পরিষ্কার, সহজে বুঝা ও maintain করা যায়।
+- **Team Collaboration:** বড় টিমে সবাই নিজের domain-এ কাজ করতে পারে—conflict কমে যায়।
+- **Business Logic Separation:** business rule, validation, calculation—সব আলাদা থাকে।
+
+---
+
+## মূল ধারণা
+
+### ১. Domain-driven Design (DDD) কী?
+
+- **Domain:** business-এর একটি অংশ—যেমন, Uber-এর জন্য রাইড, পেমেন্ট, ইউজার।
+- **Entity:** domain-এর core object—যেমন, User, Ride, Payment।
+- **Value Object:** identity নেই, value দিয়ে define—যেমন, Address, Money।
+- **Aggregate:** একাধিক entity/value object-এর group—যেমন, Ride aggregate-এ User, Driver, Payment থাকতে পারে।
+- **Repository:** data access logic—database থেকে entity read/write।
+- **Service:** business logic—যেমন, ride calculate, payment process।
+
+#### এনালজি:
+> যেমন, বড় কোম্পানিতে HR, Finance, Operations—সব আলাদা টিম; তেমনি DDD-তে domain আলাদা করা হয়।
+
+---
+
+## কিভাবে TypeScript-এ DDD ইমপ্লিমেন্ট করবেন?
+
+### ১. Domain Model
+
+```ts
+// entities/User.ts
+export class User {
+  constructor(
+    public readonly id: string,
+    public name: string,
+    public email: string
+  ) {}
+}
+
+// value-objects/Address.ts
+export class Address {
+  constructor(
+    public readonly street: string,
+    public readonly city: string,
+    public readonly zip: string
+  ) {}
+}
+```
+
+### ২. Aggregate
+
+```ts
+// aggregates/Ride.ts
+import { User } from '../entities/User';
+import { Address } from '../value-objects/Address';
+
+export class Ride {
+  constructor(
+    public readonly id: string,
+    public readonly rider: User,
+    public readonly driver: User,
+    public readonly pickup: Address,
+    public readonly drop: Address
+  ) {}
+}
+```
+
+### ৩. Repository
+
+```ts
+// repositories/UserRepository.ts
+import { User } from '../entities/User';
+
+export interface UserRepository {
+  findById(id: string): Promise<User | null>;
+  save(user: User): Promise<void>;
+}
+```
+
+### ৪. Service
+
+```ts
+// services/RideService.ts
+import { Ride } from '../aggregates/Ride';
+
+export class RideService {
+  calculateFare(ride: Ride): number {
+    // business logic
+    return 100;
+  }
+}
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **বড়, জটিল অ্যাপে:** অনেক ফিচার, অনেক টিম—domain ভাগ করে কাজ সহজ করুন।
+- **Business Logic-heavy অ্যাপে:** যেখানে rule, validation, calculation বেশি।
+- **Microservices:** প্রতিটি service আলাদা domain handle করে।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **সবকিছু একসাথে রাখা:** domain boundary না মানলে কোড অগোছালো হয়।
+- **Entity/Value Object না আলাদা করা:** সবকিছু entity করলে value object-এর সুবিধা হারান।
+- **Repository/service না ব্যবহার করা:** data access ও business logic mix করলে maintain করা কঠিন হয়।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **প্রতিটি domain-এর জন্য আলাদা model, service, repository রাখুন।**
+- **Entity ও Value Object আলাদা করুন।**
+- **Business logic service-এ রাখুন, data access repository-তে রাখুন।**
+- **Boundary ও dependency পরিষ্কার রাখুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Uber, Netflix, Google—সব বড় কোম্পানিই DDD ব্যবহার করে।**
+- **Microservices architecture-এ DDD খুব জনপ্রিয়।**
+- **TypeScript-এ DDD pattern community-তে widely adopt হচ্ছে।**
+
+---
+
+## উপসংহার
+
+Domain-driven Design (DDD) TypeScript প্রজেক্টে scalability, maintainability ও business logic separation নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টটি আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

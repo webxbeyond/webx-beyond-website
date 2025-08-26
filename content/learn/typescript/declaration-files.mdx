@@ -1,0 +1,105 @@
+---
+title: "`.d.ts` ফাইল ব্যবহার এবং Declaration Merging"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# `.d.ts` ফাইল ব্যবহার এবং Declaration Merging
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর external library, Uber-এর third-party integration—সবখানে type-safe JS integration দরকার। TypeScript-এর `.d.ts` declaration file ও declaration merging—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** External JS library—type definition—runtime bug কমায়।
+- **Integration:** Third-party code—type-safe integration—easy debug ও maintain।
+- **Extensibility:** Declaration merging—multiple type/interface/class—extend করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Google:** External API—custom `.d.ts` file—type definition।
+- **Netflix:** Third-party video library—declaration merging—custom property add।
+- **Uber:** Payment gateway—`.d.ts` file—type-safe integration।
+
+## মূল ধারণা
+
+### ১. `.d.ts` ফাইল (Declaration File)
+
+- **সংজ্ঞা:** TypeScript-এ type definition—external JS code/object/function/class-এর জন্য।
+- **Usage:**
+  ```typescript
+  // math-lib.d.ts
+  declare function add(a: number, b: number): number;
+  ```
+  ```typescript
+  // main.ts
+  add(2, 3); // 5
+  ```
+
+#### সহজ এনালজি
+
+- "`.d.ts` ফাইল—একটি ডিকশনারি—বাইরের ভাষা বুঝতে সাহায্য করে।"
+
+### ২. Declaration Merging
+
+- **সংজ্ঞা:** Type/interface/class—multiple declaration—merge/extend করা যায়।
+- **Usage:**
+  ```typescript
+  interface User {
+    name: string;
+  }
+  interface User {
+    age: number;
+  }
+  // Merged: { name: string; age: number }
+  ```
+
+#### সহজ এনালজি
+
+- "Declaration merging—একটি পাজল—বিভিন্ন টুকরা একসাথে মিলিয়ে সম্পূর্ণ ছবি।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- External JS library—type definition দরকার হলে
+- Third-party code—type-safe integration করতে
+- Custom property/function/class—extend করতে
+
+### ৪. Common Pitfalls
+
+- Wrong type definition—runtime bug
+- Declaration merging—conflicting property—error
+- `.d.ts` file—miss করলে—type error
+
+### ৫. Best Practices
+
+- External library—proper `.d.ts` file লিখুন
+- Declaration merging—conflicting property avoid করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—`.d.ts` file—type-safe integration
+- Declaration merging—extensible workflow
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. External library/code—type requirement clear করুন
+2. Proper `.d.ts` file লিখুন
+3. Declaration merging—conflicting property avoid করুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Proper `.d.ts` file written?
+- [x] Declaration merging used?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর `.d.ts` ফাইল ও declaration merging—type-safe, extensible, maintainable JS integration build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

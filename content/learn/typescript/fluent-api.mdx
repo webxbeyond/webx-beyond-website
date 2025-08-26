@@ -1,0 +1,128 @@
+---
+title: Type-safe Builders ও Fluent API ডিজাইন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Type-safe Builders ও Fluent API ডিজাইন
+
+## প্রস্তাবনা
+
+Google-এর Form Builder, Netflix-এর Recommendation Pipeline, Uber-এর Ride Configurator—সবখানে readable, chainable, এবং type-safe API দরকার। TypeScript-এর Type-safe Builders ও Fluent API ডিজাইন—modern system design-এ industry-standard, যা robust, maintainable, এবং developer-friendly codebase তৈরি করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Readability:** Chainable API—code পড়া ও লেখা সহজ
+- **Type Safety:** Builder pattern—type-safe configuration
+- **Extensibility:** Fluent API—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Form builder—fluent API দিয়ে dynamic form config
+- **Netflix:** Recommendation builder—type-safe chainable config
+- **Uber:** Ride builder—fluent API দিয়ে multiple option handle
+
+## মূল ধারণা
+
+### ১. Type-safe Builder Pattern
+
+- **সংজ্ঞা:** Step-by-step configuration—type-safe object build
+- **Usage:**
+  ```typescript
+  class UserBuilder {
+    private user: { name?: string; age?: number } = {};
+    setName(name: string) {
+      this.user.name = name;
+      return this;
+    }
+    setAge(age: number) {
+      this.user.age = age;
+      return this;
+    }
+    build() {
+      return this.user;
+    }
+  }
+
+  const user = new UserBuilder().setName("Anis").setAge(25).build();
+  ```
+
+#### সহজ এনালজি
+
+- "Builder pattern—একটি কনস্ট্রাকশন লাইন—step-by-step item add করে final product তৈরি হয়।"
+
+### ২. Fluent API Design
+
+- **সংজ্ঞা:** Chainable method—readable, expressive API
+- **Usage:**
+  ```typescript
+  class Query {
+    private query: string = "";
+    select(fields: string) {
+      this.query += `SELECT ${fields} `;
+      return this;
+    }
+    from(table: string) {
+      this.query += `FROM ${table} `;
+      return this;
+    }
+    where(condition: string) {
+      this.query += `WHERE ${condition} `;
+      return this;
+    }
+    build() {
+      return this.query.trim();
+    }
+  }
+
+  const sql = new Query().select("*").from("users").where("age > 18").build();
+  ```
+
+#### সহজ এনালজি
+
+- "Fluent API—একটি conversation—একটি প্রশ্নের পর আরেকটি প্রশ্ন, সবশেষে উত্তর।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Complex configuration/object build করতে
+- Readable, expressive API design করতে
+- Extensible/future-proof codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Method chaining—wrong order—unexpected result
+- Type safety miss—runtime bug
+- Over-complex builder—readability কমে যায়
+
+### ৫. Best Practices
+
+- Method chaining—logical order maintain করুন
+- Type safety—properly enforce করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—fluent API—developer productivity
+- Extensible codebase—builder pattern—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Configuration requirement clear করুন
+2. Type-safe builder/fluent API—properly design করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Configuration requirement clear?
+- [x] Type-safe builder/fluent API used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Type-safe Builders ও Fluent API ডিজাইন—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

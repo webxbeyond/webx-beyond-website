@@ -1,0 +1,119 @@
+---
+title: Monorepo-এ TypeScript (Nx, Turborepo)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Monorepo-এ TypeScript (Nx, Turborepo)
+
+## প্রস্তাবনা
+
+Google-এর Workspace, Netflix-এর Microservices, Uber-এর Platform—সবখানে multiple project/package একসাথে manage করার দরকার পড়ে। Monorepo-এ TypeScript—industry-standard tools (Nx, Turborepo) দিয়ে scalable, maintainable, এবং type-safe codebase build করা যায়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** Multiple app/package—একসাথে manage করা যায়
+- **Type Safety:** Shared code—type-safe, predictable
+- **Developer Experience:** Easy refactor, dependency management
+
+## বাস্তব উদাহরণ
+
+- **Google:** Workspace—monorepo-তে multiple service
+- **Netflix:** Microservices—shared code ও type
+- **Uber:** Platform—Nx/Turborepo দিয়ে scalable monorepo
+
+## মূল ধারণা
+
+### ১. Monorepo কী?
+
+- **সংজ্ঞা:** একাধিক app/package—একই repo-তে manage করা
+- **Usage:**
+  - Common code—shared package/library
+  - Dependency—easy manage
+
+#### সহজ এনালজি
+
+- "Monorepo—একটি বড় apartment—সব পরিবার একসাথে থাকে, কিন্তু নিজের নিজের ঘর আছে।"
+
+### ২. Nx ও Turborepo
+
+- **Nx:** Advanced monorepo tool—TypeScript support, code sharing, caching
+- **Turborepo:** Lightweight monorepo tool—fast build, remote caching
+
+#### Example: Nx
+```bash
+npx create-nx-workspace@latest
+# TypeScript, React, Node.js app add করুন
+```
+
+#### Example: Turborepo
+```bash
+npx create-turbo@latest
+# TypeScript, React, Node.js app add করুন
+```
+
+### ৩. TypeScript-এ Monorepo Structure
+
+- **Common Structure:**
+  ```
+  /apps
+    /web
+    /api
+  /packages
+    /ui
+    /utils
+  /tsconfig.base.json
+  ```
+- **Shared tsconfig:** Type reference ও path mapping
+
+### ৪. Dependency Management
+
+- **Nx/Turborepo:** Dependency graph, affected build/test
+- **Type Safety:** Shared code—type-safe contract
+
+### ৫. কখন ব্যবহার করবেন?
+
+- Multiple app/service/package—একসাথে manage করতে
+- Shared code—type-safe রাখতে
+- Large-scale team/project—easy collaboration
+
+### ৬. Common Pitfalls
+
+- Dependency conflict—version mismatch
+- Improper tsconfig—type error
+- Build/test—slow/complex
+
+### ৭. Best Practices
+
+- tsconfig/base—properly configure করুন
+- Dependency—clear/manage করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৮. Industry Trends
+
+- Large-scale app—monorepo—default choice
+- Nx/Turborepo—developer productivity
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. Monorepo tool (Nx/Turborepo)—properly setup করুন
+3. tsconfig/base—properly configure করুন
+4. Documentation/readme—update করুন
+5. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Monorepo tool used?
+- [x] tsconfig/base configured?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+Monorepo-এ TypeScript (Nx, Turborepo)—scalable, type-safe, maintainable codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready platform তৈরি করা সম্ভব।
+

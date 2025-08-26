@@ -1,0 +1,138 @@
+---
+title: অবজেক্ট টাইপ ও টাইপ অ্যালিয়াস
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# অবজেক্ট টাইপ ও টাইপ অ্যালিয়াস
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ complex data model—type safety, maintainability—essential। TypeScript-এর object type ও type alias—codebase-এ strong foundation—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Object/type alias—complex data model-এ bug কমানো, early error detect।
+- **Maintainability:** Type alias—reusable, readable code—easy refactor, long-term maintain।
+- **Productivity:** IntelliSense, auto-complete—fast coding, error avoid।
+
+## বাস্তব উদাহরণ
+
+- **Google:** User profile—object type/type alias—type safety, maintainability।
+- **Netflix:** Movie data—type alias—reusable model—bug কমানো।
+- **Uber:** Ride info—object type—complex structure—type safety।
+
+## মূল ধারণা
+
+### ১. Object টাইপ
+
+- **Object type:** Multiple property—complex data—type define করতে।
+- **Usage:**
+  ```typescript
+  let user: { name: string; age: number; isActive: boolean } = {
+    name: "Anis",
+    age: 25,
+    isActive: true
+  };
+  ```
+
+#### সহজ এনালজি
+
+- "Object type—একটি ফাইল, যেখানে অনেক তথ্য (property) একসাথে রাখা যায়।"
+
+### ২. Type Alias
+
+- **Type alias:** Complex/reusable type—একটি নাম দিয়ে define করা।
+- **Usage:**
+  ```typescript
+  type Product = {
+    name: string;
+    price: number;
+    tags?: string[];
+  };
+
+  let item: Product = {
+    name: "Laptop",
+    price: 999,
+    tags: ["electronics", "tech"]
+  };
+  ```
+
+#### সহজ এনালজি
+
+- "Type alias—একটি shortcut—বড় address-এর বদলে ছোট নাম ব্যবহার করা।"
+
+### ৩. Optional Property
+
+- **Optional property:** Object/type alias-এ property না থাকলেও চলবে—`?` দিয়ে define।
+- **Usage:**
+  ```typescript
+  type User = {
+    name: string;
+    email?: string;
+  };
+  ```
+
+### ৪. Practical Example
+
+```typescript
+// Type alias
+type Order = {
+  id: number;
+  product: string;
+  quantity: number;
+  delivered?: boolean;
+};
+
+let order1: Order = {
+  id: 101,
+  product: "Book",
+  quantity: 2
+};
+```
+
+### ৫. Industry Trends
+
+- **Type alias—reusable, readable code—industry standard।**
+- **Object type—complex data model—type safety।**
+- **Optional property—flexible model—fast coding।**
+
+### ৬. Best Practices
+
+- **Object/type alias-এ clear type define করুন।**
+- **Optional property—flexible model-এ use করুন।**
+- **Documentation/readme—type usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Type annotation miss—type safety কমে।
+- Optional property miss—runtime bug আসে।
+- Type alias unclear—codebase/readability কমে।
+- Documentation/readme unclear—new developer confused।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Complex data model/object—type safety দরকার হলে।
+- Reusable model—type alias—fast coding, maintainability বাড়াতে।
+- Optional property—flexible structure—production workflow-এ।
+
+## সংক্ষিপ্ত workflow
+
+1. Object/type alias-এ type annotation করুন।
+2. Optional property—flexible model-এ use করুন।
+3. Data model/interface-এ clear type define করুন।
+4. Documentation/readme update করুন।
+
+## Quick Checklist
+
+- [x] Object/type alias-এ type annotation আছে?
+- [x] Optional property used?
+- [x] Data model/interface-এ clear type আছে?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর object type ও type alias—complex data model-এ bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

@@ -1,0 +1,126 @@
+---
+title: Node.js-এ TypeScript (Express, Fastify)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Node.js-এ TypeScript (Express, Fastify)
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর Backend, Uber-এর Real-time Service—সবখানে scalable, maintainable, এবং bug-free server দরকার। Node.js-এ TypeScript—modern backend-এ industry-standard, যা robust, readable, এবং type-safe API তৈরি করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** API, service, middleware—type-safe, predictable
+- **Developer Experience:** Autocomplete, error checking—productivity boost
+- **Maintainability:** Large-scale app—easy refactor ও extend
+
+## বাস্তব উদাহরণ
+
+- **Google:** API—type-safe Express/Fastify server
+- **Netflix:** Backend—typed request/response
+- **Uber:** Real-time service—typed event/data
+
+## মূল ধারণা
+
+### ১. Express-এ TypeScript
+
+- **সংজ্ঞা:** Express—popular Node.js framework—type-safe API build করা যায়
+- **Usage:**
+  ```typescript
+  import express, { Request, Response } from 'express';
+  const app = express();
+
+  app.get('/user/:id', (req: Request, res: Response) => {
+    const id: string = req.params.id;
+    res.json({ id });
+  });
+
+  app.listen(3000, () => console.log('Server running'));
+  ```
+
+#### সহজ এনালজি
+
+- "Express-এ TypeScript—একটি traffic police—সব request/response type-check করে।"
+
+### ২. Fastify-তে TypeScript
+
+- **সংজ্ঞা:** Fastify—high-performance Node.js framework—type-safe API build করা যায়
+- **Usage:**
+  ```typescript
+  import fastify from 'fastify';
+  const app = fastify();
+
+  app.get<{ Params: { id: string } }>('/user/:id', (request, reply) => {
+    const id = request.params.id;
+    reply.send({ id });
+  });
+
+  app.listen({ port: 3000 }, err => {
+    if (err) throw err;
+    console.log('Server running');
+  });
+  ```
+
+#### সহজ এনালজি
+
+- "Fastify-তে TypeScript—একটি security gate—সব data type-check করে।"
+
+### ৩. Typed Middleware
+
+- **সংজ্ঞা:** Middleware—type-safe logic add করা যায়
+- **Usage:**
+  ```typescript
+  import { Request, Response, NextFunction } from 'express';
+
+  function logger(req: Request, res: Response, next: NextFunction) {
+    console.log(req.method, req.url);
+    next();
+  }
+  ```
+
+### ৪. কখন ব্যবহার করবেন?
+
+- API/service—type-safe request/response/middleware handle করতে
+- Large-scale app—easy refactor ও maintain করতে
+- Developer experience—boost করতে
+
+### ৫. Common Pitfalls
+
+- Wrong type—unexpected bug/error
+- Optional/nullable param—type miss করলে runtime bug
+- Middleware—type mismatch
+
+### ৬. Best Practices
+
+- Request/response/middleware—clear type define করুন
+- Optional/nullable—properly handle করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৭. Industry Trends
+
+- Large-scale app—Node.js + TypeScript—default choice
+- Typed Express/Fastify—developer productivity
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. API/service/middleware—properly type করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Typed API/service/middleware used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+Node.js-এ TypeScript—type-safe, readable, extensible backend build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready server তৈরি করা সম্ভব।
+

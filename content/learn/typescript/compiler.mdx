@@ -1,0 +1,113 @@
+---
+title: TypeScript কম্পাইলার (tsc) ও বিল্ড প্রক্রিয়া
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# TypeScript কম্পাইলার (tsc) ও বিল্ড প্রক্রিয়া
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ TypeScript—build process—codebase maintain, bug কমানো, automation—essential। TypeScript compiler (tsc)—code compile, error detect, efficient workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Compile time-এ error detect—production bug কমে।
+- **Automation:** Build process—codebase-এ automation—fast, reliable deploy।
+- **Compatibility:** TypeScript code—JavaScript-এ compile—browser, Node.js-এ run।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Angular project—tsc build—strict type, fast deploy।
+- **Netflix:** Microservice—tsc automation—bug কমানো, codebase maintain।
+- **Uber:** Real-time app—tsc build—performance, compatibility ensure।
+
+## মূল ধারণা
+
+### ১. TypeScript Compiler (tsc) কী?
+
+- **tsc:** TypeScript compiler—.ts file-কে .js-এ compile করে।
+- **Benefit:** Type error—compile time-এ detect—runtime bug কমে।
+- **Integration:** Node.js, React, Angular—tsc build process-এ use হয়।
+
+#### সহজ এনালজি
+
+- "tsc—একটি translator—বাংলা (TypeScript) থেকে ইংরেজি (JavaScript) করে—সবাই বুঝতে পারে।"
+
+### ২. tsc Basic Usage
+
+- **Single file compile:**
+  ```bash
+  tsc file.ts
+  ```
+- **Project compile (tsconfig.json):**
+  ```bash
+  tsc
+  ```
+- **Watch mode (auto compile):**
+  ```bash
+  tsc --watch
+  ```
+
+### ৩. Build Process Workflow
+
+1. **Source code লিখুন (.ts file)।**
+2. **tsc run করুন—type check, compile।**
+3. **Output (.js file)—browser/Node.js-এ run করুন।**
+4. **Error detect—fix করুন—rebuild করুন।**
+
+### ৪. Common Compiler Flags
+
+- **--watch:** Auto compile on file change
+- **--outDir:** Output directory define
+- **--rootDir:** Source directory define
+- **--strict:** Maximum type safety
+- **--noEmitOnError:** Error হলে output না দেয়
+
+### ৫. Industry Trends
+
+- **Automated build—CI/CD pipeline-এ tsc use—fast deploy।**
+- **Strict type—production workflow-এ default।**
+- **Monorepo—multiple build config—large codebase maintain।**
+
+### ৬. Best Practices
+
+- **tsc—build automation-এ integrate করুন।**
+- **Strict mode—enable করুন।**
+- **Error fix—build fail হলে—output না deploy করুন।**
+- **Documentation/readme—build process clear রাখুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- tsc miss—type error runtime-এ আসে।
+- Strict mode disable—bug বাড়ে।
+- Build automation miss—manual deploy—human error বাড়ে।
+- Documentation/readme unclear—new developer confused।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- TypeScript project—build/deploy-এ tsc use করুন।
+- Automation—CI/CD pipeline-এ tsc integrate করুন।
+- Large codebase—strict type, build config maintain করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Source code লিখুন।
+2. tsc run করুন—type check, compile।
+3. Error fix করুন—rebuild করুন।
+4. Output (.js file) deploy/run করুন।
+5. Automation—build process integrate করুন।
+
+## Quick Checklist
+
+- [x] tsc installed?
+- [x] Strict mode enabled?
+- [x] Build automation configured?
+- [x] Error fix before deploy?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript compiler (tsc)—efficient, bug-free, scalable build process—production-ready app build-এর জন্য essential। Automated build workflow—industry standard—robust, maintainable codebase তৈরি করতে সাহায্য করে।
+

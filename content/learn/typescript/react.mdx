@@ -1,0 +1,129 @@
+---
+title: React-এ TypeScript (Hooks, Props, Context API)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# React-এ TypeScript (Hooks, Props, Context API)
+
+## প্রস্তাবনা
+
+Google-এর Gmail, Netflix-এর UI, Uber-এর Dashboard—সবখানে scalable, maintainable, এবং bug-free frontend দরকার। React-এ TypeScript—modern web app-এ industry-standard, যা robust, readable, এবং type-safe UI তৈরি করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Component, props, state—type-safe, predictable
+- **Developer Experience:** Autocomplete, error checking—productivity boost
+- **Maintainability:** Large-scale app—easy refactor ও extend
+
+## বাস্তব উদাহরণ
+
+- **Google:** Gmail—type-safe React component
+- **Netflix:** UI—typed props ও context
+- **Uber:** Dashboard—typed hooks ও state
+
+## মূল ধারণা
+
+### ১. Typed Props
+
+- **সংজ্ঞা:** Component-এর input (props)—type-safe করা যায়
+- **Usage:**
+  ```typescript
+  type UserProps = {
+    name: string;
+    age?: number;
+  };
+
+  function User({ name, age }: UserProps) {
+    return <div>{name} ({age})</div>;
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Typed props—একটি contract—component কী data expect করবে, তা স্পষ্ট।"
+
+### ২. Typed State ও Hooks
+
+- **সংজ্ঞা:** State ও hooks—type-safe করা যায়
+- **Usage:**
+  ```typescript
+  import { useState } from 'react';
+
+  const [count, setCount] = useState<number>(0);
+  setCount(5); // OK
+  // setCount('five'); // Error
+  ```
+
+#### Example: Custom Hook
+```typescript
+function useUser(): [string, (name: string) => void] {
+  const [name, setName] = useState<string>("");
+  return [name, setName];
+}
+```
+
+### ৩. Context API
+
+- **সংজ্ঞা:** Global state—type-safe context দিয়ে manage করা যায়
+- **Usage:**
+  ```typescript
+  import { createContext, useContext } from 'react';
+
+  type Theme = 'light' | 'dark';
+  const ThemeContext = createContext<Theme>('light');
+
+  function App() {
+    const theme = useContext(ThemeContext);
+    return <div>{theme}</div>;
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Context API—একটি global address book—সব component context থেকে data নিতে পারে।"
+
+### ৪. কখন ব্যবহার করবেন?
+
+- Component—type-safe props/state/context handle করতে
+- Large-scale app—easy refactor ও maintain করতে
+- Developer experience—boost করতে
+
+### ৫. Common Pitfalls
+
+- Wrong type—unexpected bug/error
+- Optional/nullable prop—type miss করলে runtime bug
+- Context value—type mismatch
+
+### ৬. Best Practices
+
+- Props/state/context—clear type define করুন
+- Optional/nullable—properly handle করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৭. Industry Trends
+
+- Large-scale app—React + TypeScript—default choice
+- Typed hooks/context—developer productivity
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. Props/state/context—properly type করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Typed props/state/context used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+React-এ TypeScript—type-safe, readable, extensible UI build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready web app তৈরি করা সম্ভব।
+

@@ -1,0 +1,130 @@
+---
+title: বড় রিপোজিটরির জন্য প্রজেক্ট রেফারন্স
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# বড় রিপোজিটরির জন্য প্রজেক্ট রেফারন্স
+
+## প্রস্তাবনা
+
+ধরা যাক, Microsoft-এর মতো একটি organization—যেখানে হাজার হাজার TypeScript ফাইল, অনেকগুলো সাব-প্রজেক্ট, এবং শত শত ডেভেলপার একসাথে কাজ করছেন।
+এখানে সবকিছু একসাথে কম্পাইল করলে বিল্ড টাইম অনেক বেড়ে যায়, dependency management কঠিন হয়।
+
+এজন্য TypeScript-এর **Project References** ফিচার ব্যবহার করা হয়—যাতে বড় কোডবেস efficient, scalable এবং maintainable হয়।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** বড় কোডবেসে সাব-প্রজেক্ট/প্যাকেজ আলাদাভাবে manage করা যায়।
+- **Performance:** শুধু পরিবর্তিত অংশ কম্পাইল হয়—বিল্ড টাইম কমে যায়।
+- **Dependency Management:** এক সাব-প্রজেক্ট অন্যটিকে reference করতে পারে—dependency clear থাকে।
+- **Monorepo Support:** Nx, Turborepo-এর মতো টুলে সহজে integration হয়।
+
+---
+
+## মূল ধারণা
+
+### ১. Project References কী?
+
+- **সংজ্ঞা:** একাধিক TypeScript প্রজেক্টকে একে অপরের সাথে reference করা—যাতে dependency ও বিল্ড efficient হয়।
+- **tsconfig.json:** প্রতিটি সাব-প্রজেক্টে আলাদা tsconfig, এবং references array থাকে।
+- **composite:** Project References-এ `composite: true` অপশন বাধ্যতামূলক।
+
+#### এনালজি:
+> যেমন, বড় বিল্ডিংয়ে আলাদা আলাদা ফ্লোর—প্রতিটি ফ্লোরের নিজস্ব কাজ, আবার সব মিলিয়ে পুরো বিল্ডিং; তেমনি Project References।
+
+---
+
+## কিভাবে কাজ করে?
+
+### ১. Monorepo Structure
+
+```
+my-monorepo/
+  packages/
+    api/
+      tsconfig.json
+    shared/
+      tsconfig.json
+  tsconfig.json
+```
+
+### ২. tsconfig.json-এ Reference
+
+```json
+// packages/api/tsconfig.json
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../shared" }
+  ]
+}
+```
+
+### ৩. Root tsconfig.json
+
+```json
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/api" },
+    { "path": "./packages/shared" }
+  ]
+}
+```
+
+### ৪. বিল্ড কমান্ড
+
+```bash
+npx tsc -b
+```
+
+- `-b` (build mode) দিয়ে সব referenced project একসাথে বিল্ড হয়।
+- শুধু পরিবর্তিত অংশ কম্পাইল হয়—বিল্ড দ্রুত হয়।
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **বড় কোডবেসে:** অনেক সাব-প্রজেক্ট, প্যাকেজ, monorepo structure—efficient বিল্ড দরকার।
+- **Dependency Management:** এক সাব-প্রজেক্ট অন্যটিকে reference করলে dependency clear থাকে।
+- **CI/CD pipeline-এ:** দ্রুত বিল্ড ও deploy সম্ভব।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **composite: true না দেওয়া:** Project References কাজ করবে না।
+- **references array ভুল:** path ভুল হলে dependency resolve হবে না।
+- **সবকিছু একসাথে কম্পাইল করা:** references না দিলে বিল্ড টাইম বেড়ে যায়।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **প্রতিটি সাব-প্রজেক্টে আলাদা tsconfig.json রাখুন।**
+- **composite: true ও references ঠিকভাবে কনফিগার করুন।**
+- **Root tsconfig-এ সব reference যোগ করুন।**
+- **npx tsc -b দিয়ে বিল্ড চালান।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Monorepo Everywhere:** Google, Microsoft, Uber—সব বড় কোম্পানিই monorepo structure ও Project References ব্যবহার করছে।
+- **Nx, Turborepo Integration:** Modern tooling-এ Project References default হয়ে যাচ্ছে।
+- **Incremental Build:** শুধু পরিবর্তিত অংশ কম্পাইল—speed ও reliability বাড়ে।
+
+---
+
+## উপসংহার
+
+বড় রিপোজিটরির জন্য Project References TypeScript প্রজেক্টে scalability, performance ও maintainability নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টটি আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

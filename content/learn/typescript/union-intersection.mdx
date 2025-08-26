@@ -1,0 +1,120 @@
+---
+title: Union ও Intersection টাইপ বিস্তারিত
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Union ও Intersection টাইপ বিস্তারিত
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর ডেটা মডেল, Uber-এর রাইড অপশন—সবখানে flexible, type-safe data structure দরকার। TypeScript-এর Union ও Intersection টাইপ—complex workflow-এ powerful tool।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Flexible Data Structure:** Real-world app-এ data বিভিন্ন format-এ আসতে পারে—Union টাইপ handle করে।
+- **Feature Composition:** Multiple feature/class/object combine করতে Intersection টাইপ—industry standard।
+- **Type Safety:** Compile time-এ error detect—runtime bug কমায়।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API response—success/error—Union টাইপে handle।
+- **Netflix:** Movie/Series—common property—Intersection টাইপে combine।
+- **Uber:** Ride option—multiple type—Union টাইপে flexible handle।
+
+## মূল ধারণা
+
+### ১. Union টাইপ (সংযুক্ত টাইপ)
+
+- **সংজ্ঞা:** একাধিক টাইপের মধ্যে যেকোনো একটি হতে পারে—`|` (pipe) দিয়ে declare।
+- **Usage:**
+  ```typescript
+  let payment: "cash" | "card" | "upi";
+  payment = "card";
+  payment = "upi";
+  // payment = "bitcoin"; // Error
+  ```
+- **Function Example:**
+  ```typescript
+  function printId(id: number | string) {
+    console.log("ID:", id);
+  }
+  printId(101);
+  printId("A101");
+  ```
+
+#### সহজ এনালজি
+
+- "Union টাইপ—একটি সুইচ—যে কোনো একটি অপশন অন করা যায়।"
+
+### ২. Intersection টাইপ (ছেদ টাইপ)
+
+- **সংজ্ঞা:** একাধিক টাইপের সবগুলো property combine—`&` (ampersand) দিয়ে declare।
+- **Usage:**
+  ```typescript
+  type User = { name: string };
+  type Admin = { role: string };
+  type AdminUser = User & Admin;
+
+  const person: AdminUser = {
+    name: "Anis",
+    role: "admin"
+  };
+  ```
+
+#### সহজ এনালজি
+
+- "Intersection টাইপ—একটি মিশ্র বাক্স—সব ধরনের জিনিস একসাথে রাখা যায়।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- **Union টাইপ:**
+  - Multiple input/output type handle করতে
+  - API response—success/error—handle করতে
+  - Flexible function/class design করতে
+- **Intersection টাইপ:**
+  - Multiple feature/object/property combine করতে
+  - Complex data model তৈরি করতে
+  - Type composition—scalable workflow-এ
+
+### ৪. Common Pitfalls
+
+- **Union টাইপ:**
+  - Type narrowing না করলে—runtime bug আসতে পারে
+  - Exhaustiveness check না করলে—unexpected value
+- **Intersection টাইপ:**
+  - Conflicting property—type error
+  - Over-composition—complexity বাড়ে
+
+### ৫. Best Practices
+
+- Type narrowing—`typeof`, `instanceof`—use করুন
+- Exhaustiveness check—`never`—use করুন
+- Intersection—only compatible property combine করুন
+- Documentation/readme—clear রাখুন
+
+### ৬. Industry Trends
+
+- API design—Union টাইপ—error/success handle
+- Feature composition—Intersection টাইপ—scalable workflow
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Data structure/design—type requirement clear করুন
+2. Union/Intersection টাইপ—properly declare করুন
+3. Type narrowing/exhaustiveness check—implement করুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Union/Intersection টাইপ used?
+- [x] Type narrowing/exhaustiveness check?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Union ও Intersection টাইপ—flexible, scalable, type-safe data structure build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

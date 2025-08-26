@@ -1,0 +1,115 @@
+---
+title: "`strict` মোড ও `noImplicitAny`"
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Implicit any—runtime bug বাড়ায়; strict mode—type error ধরতে সাহায্য করে
+- **Developer Experience:** Early error—fast fix, productivity boost
+- **Maintainability:** Large-scale app—easy refactor ও extend
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—strict mode-এ type-safe algorithm
+- **Netflix:** Recommendation—noImplicitAny-এ bug-free logic
+- **Uber:** Ride Calculation—strict mode-এ predictable workflow
+
+## মূল ধারণা
+
+### ১. `strict` মোড কী?
+
+- **সংজ্ঞা:** TypeScript-এর strict mode—type checking কড়া করে
+- **Usage:**
+  ```json
+  // tsconfig.json
+  {
+    "compilerOptions": {
+      "strict": true
+    }
+  }
+  ```
+- **Effect:**
+  - noImplicitAny
+  - strictNullChecks
+  - strictFunctionTypes
+  - আরও অনেক strict check
+
+#### সহজ এনালজি
+
+- "strict mode—একটি security guard—সব entry type-check করে।"
+
+### ২. `noImplicitAny` কী?
+
+- **সংজ্ঞা:** Variable/function parameter—type না দিলে implicit any assign হয়; noImplicitAny—এটা block করে
+- **Usage:**
+  ```json
+  // tsconfig.json
+  {
+    "compilerOptions": {
+      "noImplicitAny": true
+    }
+  }
+  ```
+- **Effect:**
+  - Type না দিলে error
+  - Type-safe codebase
+
+#### Example:
+```typescript
+function add(a, b) {
+  return a + b;
+}
+// Error: Parameter 'a' implicitly has an 'any' type.
+
+function add(a: number, b: number) {
+  return a + b;
+}
+// OK
+```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Large-scale app—type safety বাড়াতে
+- Early error—fast fix করতে
+- Maintainable codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Strict mode—legacy code-এ error বাড়াতে পারে
+- noImplicitAny—type না দিলে compilation fail
+- Over-strict—flexibility কমে যায়
+
+### ৫. Best Practices
+
+- strict/noImplicitAny—new project-এ default রাখুন
+- Legacy code—step-by-step strict mode enable করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—strict mode—default choice
+- noImplicitAny—developer productivity
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. tsconfig.json—strict/noImplicitAny enable করুন
+2. Type—properly define করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] tsconfig.json configured?
+- [x] Type properly defined?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর `strict` মোড ও `noImplicitAny`—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready app তৈরি করা সম্ভব।
+

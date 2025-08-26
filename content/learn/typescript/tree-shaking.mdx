@@ -1,0 +1,136 @@
+---
+title: কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript
+
+## প্রস্তাবনা
+
+ধরা যাক, Uber-এর মতো একটি অ্যাপ—যেখানে হাজার হাজার ফিচার, অনেকগুলো পেজ, এবং heavy JavaScript bundle।
+যদি সব কোড একসাথে লোড হয়, তাহলে অ্যাপ স্লো হয়ে যাবে, ইউজার এক্সপেরিয়েন্স খারাপ হবে।
+
+এজন্য **কোড স্প্লিটিং** ও **ট্রি-শেকিং** ব্যবহার করা হয়—যাতে প্রয়োজনীয় কোডই শুধু লোড হয়, অপ্রয়োজনীয় কোড বাদ পড়ে।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Performance:** ছোট bundle মানে দ্রুত লোড, ভালো UX।
+- **Scalability:** বড় কোডবেসেও efficient delivery সম্ভব।
+- **Optimization:** অপ্রয়োজনীয় কোড বাদ দিলে security ও maintainability বাড়ে।
+- **SEO:** দ্রুত লোডিং ওয়েবসাইটে SEO ranking ভালো হয়।
+
+---
+
+## মূল ধারণা
+
+### ১. কোড স্প্লিটিং কী?
+
+- **সংজ্ঞা:** কোডকে ছোট ছোট অংশে ভাগ করা—যাতে প্রয়োজন অনুযায়ী লোড হয়।
+- **Dynamic Import:** JavaScript/TypeScript-এ `import()` দিয়ে runtime-এ কোড লোড করা যায়।
+- **Framework Support:** React, Next.js, Webpack—সবই কোড স্প্লিটিং সাপোর্ট করে।
+
+#### এনালজি:
+> যেমন, বড় বইয়ের সব পৃষ্ঠা একসাথে না পড়ে, প্রয়োজন অনুযায়ী পৃষ্ঠা পড়া—তেমনি কোড স্প্লিটিং।
+
+### ২. ট্রি-শেকিং কী?
+
+- **সংজ্ঞা:** অপ্রয়োজনীয় (unused) কোড bundle থেকে বাদ দেওয়া।
+- **ES Module:** `import`/`export` ব্যবহার করলে bundler (Webpack, Rollup, Vite) সহজে unused কোড বাদ দিতে পারে।
+- **Dead Code Elimination:** শুধু দরকারি কোডই final bundle-এ থাকে।
+
+#### এনালজি:
+> যেমন, ফলের গাছ থেকে শুধু পাকা ফল তুলে আনা—অপ্রয়োজনীয় ডাল-পাতা ফেলে দেওয়া—তেমনি ট্রি-শেকিং।
+
+---
+
+## কিভাবে কাজ করে?
+
+### ১. TypeScript-এ কোড স্প্লিটিং
+
+- **Dynamic Import:**
+
+```ts
+// page.ts
+async function loadFeature() {
+  const feature = await import('./feature');
+  feature.init();
+}
+```
+
+- **React Lazy Loading:**
+
+```ts
+import React, { lazy, Suspense } from 'react';
+const LazyComponent = lazy(() => import('./MyComponent'));
+
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </Suspense>
+  );
+}
+```
+
+### ২. ট্রি-শেকিং
+
+- **ES Module Usage:**
+
+```ts
+// utils.ts
+export function used() {}
+export function unused() {}
+
+// main.ts
+import { used } from './utils';
+used(); // 'unused' function bundle-এ থাকবে না
+```
+
+- **Bundler Config:**
+  - Webpack: `mode: 'production'`
+  - Rollup/Vite: default tree-shaking enabled
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **বড় কোডবেসে:** অনেক ফিচার, পেজ, heavy bundle—efficient delivery দরকার।
+- **SPA/React/Next.js অ্যাপে:** পেজ/কম্পোনেন্ট lazy load করতে।
+- **Production build-এ:** অপ্রয়োজনীয় কোড বাদ দিতে।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **সবকিছু একসাথে import করা:** কোড স্প্লিটিং না করলে bundle বড় হয়।
+- **CommonJS ব্যবহার:** ES Module না হলে ট্রি-শেকিং ঠিকমতো হয় না।
+- **Dynamic require:** `require()` ব্যবহার করলে bundler কোড স্প্লিট/ট্রি-শেকিং করতে পারে না।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **ES Module (`import`/`export`) ব্যবহার করুন।**
+- **Dynamic Import ও Lazy Loading চালু রাখুন।**
+- **Bundler-এ production mode ব্যবহার করুন।**
+- **Unused কোড/ডিপেন্ডেন্সি সরিয়ে ফেলুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Next.js, Vite, Webpack—সবই কোড স্প্লিটিং ও ট্রি-শেকিং সাপোর্ট করে।**
+- **Micro-frontend:** বড় অ্যাপে আলাদা আলাদা bundle—efficient delivery।
+- **Automatic Tree-shaking:** Modern bundler-এ default tree-shaking চালু।
+
+---
+
+## উপসংহার
+
+কোড স্প্লিটিং ও ট্রি-শেকিং TypeScript প্রজেক্টে পারফরম্যান্স, স্কেলেবিলিটি ও maintainability নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

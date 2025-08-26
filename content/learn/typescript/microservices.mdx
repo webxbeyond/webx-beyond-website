@@ -1,0 +1,159 @@
+---
+title: মাইক্রোসার্ভিসে টাইপ-সেফ gRPC ও ইভেন্ট-ড্রিভেন সিস্টেম
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# মাইক্রোসার্ভিসে টাইপ-সেফ gRPC ও ইভেন্ট-ড্রিভেন সিস্টেম
+
+## প্রস্তাবনা
+
+ধরা যাক, Google-এর মতো একটি বড় প্ল্যাটফর্ম—যেখানে হাজার হাজার সার্ভিস, প্রতিটি আলাদা টিমে, আলাদা ফিচার নিয়ে কাজ করছে।
+সব সার্ভিস একে অপরের সাথে communicate করে—কখনো API call, কখনো event-driven message।
+
+এখানে **টাইপ-সেফ gRPC** ও **ইভেন্ট-ড্রিভেন আর্কিটেকচার** ব্যবহার করলে communication efficient, bug-free, scalable হয়।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** সার্ভিস-টু-সার্ভিস communication-এ ভুল data, bug, mismatch কমে যায়।
+- **Performance:** gRPC-তে binary protocol—fast, efficient communication।
+- **Scalability:** ইভেন্ট-ড্রিভেন হলে loosely coupled, easily scalable system হয়।
+- **Resilience:** সার্ভিস fail করলে event-driven system fallback/manage করতে পারে।
+
+---
+
+## মূল ধারণা
+
+### ১. gRPC কী?
+
+- **gRPC:** Google-এর তৈরি high-performance, open-source RPC (Remote Procedure Call) framework।
+- **Protocol Buffers (protobuf):** gRPC-এর জন্য টাইপ-সেফ message format—.proto ফাইলে schema define করা হয়।
+- **TypeScript Integration:** proto থেকে TypeScript টাইপ/ক্লায়েন্ট/সার্ভার code auto generate করা যায়।
+
+#### এনালজি:
+> যেমন, দুই দেশের মধ্যে চুক্তি অনুযায়ী message পাঠানো—তেমনি gRPC-তে contract অনুযায়ী টাইপ-সেফ message যায়।
+
+### ২. ইভেন্ট-ড্রিভেন আর্কিটেকচার কী?
+
+- **Event:** সার্ভিস কোনো action নিলে event publish করে—অন্যান্য সার্ভিস সেই event consume করে।
+- **Loose Coupling:** সার্ভিসগুলো একে অপরের ওপর নির্ভরশীল নয়—scalable, resilient system হয়।
+- **Type Safety:** event-এর structure/type TypeScript দিয়ে enforce করা যায়।
+
+#### এনালজি:
+> যেমন, স্কুলে ঘণ্টা বাজলে সবাই action নেয়—তেমনি event publish হলে সার্ভিসগুলো action নেয়।
+
+---
+
+## কিভাবে TypeScript-এ ইমপ্লিমেন্ট করবেন?
+
+### ১. gRPC + TypeScript
+
+- **Proto file লিখুন:**
+
+```proto
+// ride.proto
+syntax = "proto3";
+package ride;
+
+message RideRequest {
+  string user_id = 1;
+  string pickup = 2;
+  string drop = 3;
+}
+
+message RideResponse {
+  string ride_id = 1;
+  string status = 2;
+}
+
+service RideService {
+  rpc CreateRide(RideRequest) returns (RideResponse);
+}
+```
+
+- **Code Generation:**
+
+```bash
+npm install grpc-tools @grpc/proto-loader ts-proto --save-dev
+npx ts-proto ride.proto --ts_out=src/generated
+```
+
+- **ব্যবহার:**
+
+```ts
+import { RideService } from './generated/ride';
+// টাইপ-সেফ client/server code
+```
+
+### ২. ইভেন্ট-ড্রিভেন + TypeScript
+
+- **Event Structure:**
+
+```ts
+// events/RideCreated.ts
+export type RideCreatedEvent = {
+  rideId: string;
+  userId: string;
+  pickup: string;
+  drop: string;
+};
+```
+
+- **Publish/Consume:**
+
+```ts
+// publisher.ts
+import { RideCreatedEvent } from './events/RideCreated';
+function publishRideCreated(event: RideCreatedEvent) {
+  // event bus/message broker-এ publish
+}
+
+// consumer.ts
+function onRideCreated(event: RideCreatedEvent) {
+  // event consume করে action নেয়
+}
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **বড়, distributed system:** অনেক সার্ভিস, অনেক টিম—efficient, type-safe communication দরকার।
+- **Microservices architecture:** service-টু-service communication, event-driven workflow।
+- **High performance/real-time app:** fast, efficient data exchange দরকার।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **Type contract না মানা:** proto/event structure mismatch হলে bug/security issue হয়।
+- **Manual টাইপ লিখা:** auto generate না করলে mismatch হতে পারে।
+- **Tightly coupled service:** event-driven না হলে scalability কমে যায়।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **Proto file দিয়ে টাইপ-সেফ contract enforce করুন।**
+- **TypeScript টাইপ auto generate করুন।**
+- **Event structure/type TypeScript দিয়ে enforce করুন।**
+- **Loose coupling রাখুন—event-driven architecture ব্যবহার করুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Google, Netflix, Uber—সব বড় কোম্পানিই gRPC ও event-driven architecture ব্যবহার করে।**
+- **Proto থেকে TypeScript টাইপ, client/server code auto generate হচ্ছে।**
+- **Event sourcing, CQRS—modern distributed system-এ জনপ্রিয়।**
+
+---
+
+## উপসংহার
+
+মাইক্রোসার্ভিসে টাইপ-সেফ gRPC ও ইভেন্ট-ড্রিভেন সিস্টেম TypeScript প্রজেক্টে scalability, performance, resilience ও type safety নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

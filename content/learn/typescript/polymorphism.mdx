@@ -1,0 +1,136 @@
+---
+title: পলিমরফিজম ও ডিজাইন প্যাটার্ন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# পলিমরফিজম ও ডিজাইন প্যাটার্ন
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Video Player, Uber-এর Ride Management—সবখানে flexible, extensible, maintainable code দরকার। TypeScript-এর পলিমরফিজম ও ডিজাইন প্যাটার্ন—robust, scalable, efficient codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Flexibility:** Polymorphism—multiple object/class—same interface/contract—different behavior implement করা যায়।
+- **Extensibility:** Design pattern—code structure—easy extend ও maintain।
+- **Maintainability:** Common workflow—polymorphism/design pattern—easy debug ও refactor।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—polymorphic search module—strategy pattern implement।
+- **Netflix:** Video Player—polymorphic player—factory pattern implement।
+- **Uber:** Ride Management—polymorphic ride type—observer pattern implement।
+
+## মূল ধারণা
+
+### ১. পলিমরফিজম (Polymorphism)
+
+- **সংজ্ঞা:** Multiple object/class—same interface/contract—different behavior implement।
+- **Usage:**
+  ```typescript
+  interface Animal {
+    speak(): void;
+  }
+
+  class Dog implements Animal {
+    speak() {
+      console.log("Dog barks");
+    }
+  }
+
+  class Cat implements Animal {
+    speak() {
+      console.log("Cat meows");
+    }
+  }
+
+  function makeSound(animal: Animal) {
+    animal.speak();
+  }
+
+  makeSound(new Dog()); // Dog barks
+  makeSound(new Cat()); // Cat meows
+  ```
+
+#### সহজ এনালজি
+
+- "পলিমরফিজম—একটি রিমোট—একই বোতাম, আলাদা ডিভাইস—আলাদা কাজ।"
+
+### ২. ডিজাইন প্যাটার্ন (Design Pattern)
+
+- **সংজ্ঞা:** Common code structure—problem solve—industry-standard solution।
+- **Strategy Pattern:** Multiple algorithm—runtime-এ select করা যায়।
+  ```typescript
+  interface SearchStrategy {
+    search(query: string): string;
+  }
+
+  class GoogleSearch implements SearchStrategy {
+    search(query: string) {
+      return `Google searching for ${query}`;
+    }
+  }
+
+  class BingSearch implements SearchStrategy {
+    search(query: string) {
+      return `Bing searching for ${query}`;
+    }
+  }
+
+  function runSearch(strategy: SearchStrategy, query: string) {
+    return strategy.search(query);
+  }
+
+  runSearch(new GoogleSearch(), "TypeScript"); // Google searching for TypeScript
+  runSearch(new BingSearch(), "TypeScript"); // Bing searching for TypeScript
+  ```
+
+#### সহজ এনালজি
+
+- "ডিজাইন প্যাটার্ন—একটি রেসিপি বই—একই উপকরণ, আলাদা রান্না।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Multiple object/class—same contract—different behavior দরকার হলে
+- Common workflow—extensible/maintainable structure দরকার হলে
+- Large codebase—debug/refactor সহজ করতে
+
+### ৪. Common Pitfalls
+
+- Contract/interface miss—unexpected behavior
+- Wrong pattern implement—complexity বাড়ে
+- Polymorphic method/property—name mismatch—bug
+
+### ৫. Best Practices
+
+- Interface/contract—clear define করুন
+- Design pattern—problem-specific implement করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—polymorphism/design pattern—flexible workflow
+- Maintainability—pattern-based structure—easy debug/refactor
+- Extensibility—polymorphic contract—easy feature add
+
+## সংক্ষিপ্ত workflow
+
+1. Contract/structure requirement clear করুন
+2. Polymorphism/design pattern—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Contract/structure requirement clear?
+- [x] Polymorphism/design pattern used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর পলিমরফিজম ও ডিজাইন প্যাটার্ন—flexible, extensible, maintainable codebase build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

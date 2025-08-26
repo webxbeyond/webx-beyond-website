@@ -1,0 +1,98 @@
+---
+title: Variadic Tuple টাইপ
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Variadic Tuple টাইপ
+
+## প্রস্তাবনা
+
+Google-এর Logging System, Netflix-এর Recommendation Pipeline, Uber-এর Route Calculation—সবখানে flexible yet type-safe data structure দরকার। TypeScript-এর Variadic Tuple টাইপ—modern system design-এ powerful tool, যা dynamic, reusable, এবং maintainable codebase তৈরি করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Dynamic data—type-safe tuple structure
+- **Flexibility:** Variable-length data—type-level control
+- **Extensibility:** Complex workflow—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Logging—variadic tuple দিয়ে dynamic log entry
+- **Netflix:** Recommendation—variadic tuple দিয়ে multiple content type handle
+- **Uber:** Route calculation—variadic tuple দিয়ে multiple stop handle
+
+## মূল ধারণা
+
+### ১. Variadic Tuple টাইপ কী?
+
+- **সংজ্ঞা:** Tuple—variable-length—type-level-এ handle করা যায়
+- **Usage:**
+  ```typescript
+  type LogEntry<T extends unknown[]> = [string, ...T];
+  const entry1: LogEntry<[number, boolean]> = ["Start", 1, true];
+  const entry2: LogEntry<[string, number, boolean]> = ["End", "Done", 42, false];
+  ```
+
+#### সহজ এনালজি
+
+- "Variadic tuple—একটি expandable box—যেখানে নির্দিষ্ট কিছু item-এর পর variable-length item রাখা যায়।"
+
+### ২. কিভাবে কাজ করে?
+
+- Tuple-এর মধ্যে `...T`—rest parameter-এর মতো—multiple type/value handle করে
+- TypeScript—type inference—tuple-এর length/type automatically manage করে
+
+#### Example: Function Arguments
+```typescript
+function log<T extends unknown[]>(...args: [string, ...T]) {
+  console.log(args);
+}
+
+log("Start", 1, true);
+log("End", "Done", 42, false);
+```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Function/class—variable-length argument/type handle করতে
+- Dynamic workflow—type-safe data structure build করতে
+- Extensible/future-proof codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Variadic tuple—wrong type—unexpected value/error
+- Rest parameter—type miss—type error
+- Complex tuple—readability কমে যায়
+
+### ৫. Best Practices
+
+- Variadic tuple—clear structure/type use করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—variadic tuple—dynamic workflow
+- Extensible codebase—variadic tuple—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Data structure requirement clear করুন
+2. Variadic tuple—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Data structure requirement clear?
+- [x] Variadic tuple used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Variadic Tuple টাইপ—type-safe, flexible, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

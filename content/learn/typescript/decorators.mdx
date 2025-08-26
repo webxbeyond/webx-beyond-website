@@ -1,0 +1,115 @@
+---
+title: ডেকোরেটর কী ও কিভাবে কাজ করে
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# ডেকোরেটর কী ও কিভাবে কাজ করে
+
+## প্রস্তাবনা
+
+Google-এর Angular Framework, Netflix-এর Custom Logging, Uber-এর Dynamic Permission—সবখানে code-এর behavior modify বা enhance করার দরকার পড়ে। TypeScript-এর ডেকোরেটর—modern system design-এ powerful, expressive, এবং maintainable solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Code Enhancement:** ডেকোরেটর—code-এর behavior modify/add করতে দেয়
+- **Reusability:** Common logic—multiple class/method/property-এ reuse করা যায়
+- **Extensibility:** Framework/library—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Angular—component/class/property/method-এ ডেকোরেটর
+- **Netflix:** Logging—method/property-এ custom ডেকোরেটর
+- **Uber:** Permission—class/property-এ dynamic ডেকোরেটর
+
+## মূল ধারণা
+
+### ১. ডেকোরেটর কী?
+
+- **সংজ্ঞা:** ডেকোরেটর—একটি special function—class, method, property, বা parameter-এর behavior modify/add করে
+- **Usage:**
+  ```typescript
+  function Log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+      console.log(`Calling ${propertyKey} with`, args);
+      return original.apply(this, args);
+    };
+  }
+
+  class User {
+    @Log
+    save(data: string) {
+      console.log("Saving", data);
+    }
+  }
+
+  const user = new User();
+  user.save("Profile");
+  // Output: Calling save with ["Profile"]
+  //         Saving Profile
+  ```
+
+#### সহজ এনালজি
+
+- "ডেকোরেটর—একটি gift wrap—code-এর উপরে নতুন feature add করে।"
+
+### ২. কিভাবে কাজ করে?
+
+- ডেকোরেটর—function হিসেবে কাজ করে—target class/method/property-এর behavior modify/add করে
+- TypeScript—ডেকোরেটর syntax—@ দিয়ে declare করা হয়
+
+#### Example: Class Decorator
+```typescript
+function Controller(constructor: Function) {
+  console.log("Controller initialized");
+}
+
+@Controller
+class App {}
+```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Common logic—multiple class/method/property-এ reuse করতে
+- Framework/library—extensible design build করতে
+- Code behavior—dynamic modify/add করতে
+
+### ৪. Common Pitfalls
+
+- Decorator—wrong usage—unexpected behavior
+- Multiple decorator—order miss—bug/error
+- Experimental feature—production-এ careful use
+
+### ৫. Best Practices
+
+- Decorator—clear/documented use করুন
+- Multiple decorator—logical order maintain করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—decorator—code enhancement
+- Extensible codebase—decorator—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. Decorator—properly design/use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Decorator used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর ডেকোরেটর—code enhancement, reusability, extensibility-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

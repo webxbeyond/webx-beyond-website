@@ -1,0 +1,96 @@
+---
+title: কাস্টম টাইপ ডেফিনিশন তৈরি করা
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# কাস্টম টাইপ ডেফিনিশন তৈরি করা
+
+## প্রস্তাবনা
+
+Google-এর API integration, Netflix-এর custom JS library, Uber-এর payment gateway—সবখানে type-safe integration দরকার। TypeScript-এ কাস্টম টাইপ ডেফিনিশন—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Custom JS library—type definition—runtime bug কমায়।
+- **Integration:** Third-party code—type-safe integration—easy debug ও maintain।
+- **Extensibility:** Custom type definition—workflow flexible করে।
+
+## বাস্তব উদাহরণ
+
+- **Google:** External API—custom type definition—type-safe integration।
+- **Netflix:** Custom video library—type definition—safe usage।
+- **Uber:** Payment gateway—custom type definition—type-safe integration।
+
+## মূল ধারণা
+
+### ১. কাস্টম টাইপ ডেফিনিশন (Custom Type Definition)
+
+- **সংজ্ঞা:** JS library/function/object—type definition—TypeScript-এ `.d.ts` file লিখে declare করা হয়।
+- **Usage:**
+  ```typescript
+  // my-lib.d.ts
+  declare module "my-lib" {
+    export function greet(name: string): string;
+    export interface User {
+      id: number;
+      name: string;
+    }
+  }
+  ```
+  ```typescript
+  // main.ts
+  import { greet, User } from "my-lib";
+  const user: User = { id: 1, name: "Anis" };
+  greet(user.name); // Type-safe
+  ```
+
+#### সহজ এনালজি
+
+- "কাস্টম টাইপ ডেফিনিশন—একটি অনুবাদক—বাইরের ভাষা বুঝতে সাহায্য করে।"
+
+### ২. Integration Workflow
+
+1. JS library/function/object—type requirement clear করুন
+2. Proper `.d.ts` file লিখুন
+3. Type definition—property/function/interface/class—declare করুন
+4. Type-safe integration/documentation—maintain করুন
+
+### ৩. Common Pitfalls
+
+- Type definition miss—runtime bug
+- Wrong type definition—unexpected value/error
+- `.d.ts` file—miss করলে—type error
+
+### ৪. Best Practices
+
+- Custom library—proper `.d.ts` file লিখুন
+- Type definition—clear/property/function/interface/class define করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৫. Industry Trends
+
+- Large-scale app—custom type definition—type-safe integration
+- Type safety—production workflow-এ default
+- Community-driven—custom type definition share
+
+## সংক্ষিপ্ত workflow
+
+1. Type requirement clear করুন
+2. Proper `.d.ts` file লিখুন
+3. Type-safe integration/documentation—maintain করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Proper `.d.ts` file written?
+- [x] Type-safe integration/documentation clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এ কাস্টম টাইপ ডেফিনিশন—type-safe, extensible, maintainable JS integration build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

@@ -1,0 +1,164 @@
+---
+title: লিন্টার ও ফরম্যাটার (ESLint, Prettier)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# লিন্টার ও ফরম্যাটার (ESLint, Prettier)
+
+## প্রস্তাবনা
+
+ধরা যাক, Google-এর মতো একটি বড় টিমে কাজ করছেন—প্রতিদিন শত শত ডেভেলপার কোড লিখছেন। যদি সবাই নিজের মতো করে কোড লেখে, তাহলে কোডবেস অগোছালো, ভুলে ভরা এবং রক্ষণাবেক্ষণ কঠিন হয়ে যাবে।
+
+এজন্য **লিন্টার** (Linting) ও **ফরম্যাটার** (Formatting) ব্যবহার করা হয়—যাতে কোড সবসময় পরিষ্কার, একরকম এবং ভুলবিহীন থাকে।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Consistency:** সবাই একরকম স্টাইল ও নিয়মে কোড লিখলে কোডবেস পড়া, বুঝা ও রক্ষণাবেক্ষণ সহজ হয়।
+- **Error Prevention:** লিন্টার ছোট ছোট ভুল (যেমন: টাইপো, ভুল টাইপ, অপ্রয়োজনীয় কোড) আগেভাগে ধরতে সাহায্য করে।
+- **Automation:** ফরম্যাটার দিয়ে এক ক্লিকে পুরো কোডবেস সুন্দরভাবে সাজানো যায়।
+- **Collaboration:** বড় টিমে কোড রিভিউ সহজ হয়।
+
+---
+
+## মূল ধারণা
+
+### ১. লিন্টার (ESLint) কী?
+
+- **লিন্টার:** কোডে ভুল, ইনকনসিস্টেন্সি, বেস্ট প্র্যাকটিস না মানা—এসব ধরার জন্য টুল।
+- **ESLint:** JavaScript/TypeScript-এর জন্য সবচেয়ে জনপ্রিয় লিন্টার।
+- **রুলস:** যেমন—no-unused-vars, no-console, eqeqeq, etc.
+- **Config:** `.eslintrc.json` বা `.eslintrc.js` ফাইলে কনফিগার করা হয়।
+
+#### এনালজি:
+> যেমন, পরীক্ষার খাতায় বানান ভুল, গ্রামার ভুল ধরার জন্য টিচার চেক করেন—তেমনি লিন্টার কোডে ভুল ধরেন।
+
+### ২. ফরম্যাটার (Prettier) কী?
+
+- **ফরম্যাটার:** কোডের স্টাইল (indentation, spacing, quotes, ইত্যাদি) ঠিক রাখে।
+- **Prettier:** সবচেয়ে জনপ্রিয় ফরম্যাটার—JS, TS, CSS, HTML, ইত্যাদি সাপোর্ট করে।
+- **Config:** `.prettierrc` বা `prettier.config.js` ফাইলে কনফিগার করা হয়।
+
+#### এনালজি:
+> যেমন, বইয়ের পৃষ্ঠা সুন্দরভাবে সাজানো থাকলে পড়তে ভালো লাগে—তেমনি ফরম্যাটার কোড সুন্দরভাবে সাজায়।
+
+---
+
+## কিভাবে কাজ করে?
+
+### ১. ESLint সেটআপ
+
+```bash
+npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+npx eslint --init
+```
+
+- `.eslintrc.json` ফাইলে TypeScript-এর জন্য parser ও plugin যোগ করুন:
+
+```json
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ]
+}
+```
+
+### ২. Prettier সেটআপ
+
+```bash
+npm install --save-dev prettier
+```
+
+- `.prettierrc` ফাইলে কনফিগার করুন:
+
+```json
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2
+}
+```
+
+### ৩. ESLint + Prettier ইন্টিগ্রেশন
+
+- দুই টুল একসাথে ব্যবহার করতে চাইলে:
+
+```bash
+npm install --save-dev eslint-config-prettier eslint-plugin-prettier
+```
+
+- `.eslintrc.json`-এ যোগ করুন:
+
+```json
+{
+  "extends": ["plugin:prettier/recommended"]
+}
+```
+
+---
+
+## বাস্তব উদাহরণ
+
+### উদাহরণ: TypeScript ফাইল লিন্ট ও ফরম্যাট
+
+```ts
+// ভুল:
+function add(a:number,b:number){return a+b}
+
+// লিন্টার ও ফরম্যাটার চালানোর পর:
+function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+### VS Code-এ অটো-ফরম্যাট
+
+- VS Code-এ Prettier extension ইনস্টল করুন।
+- "Format on Save" অপশন চালু করুন—ফাইল সেভ করলেই অটো-ফরম্যাট হবে।
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **প্রতিদিন কোড লেখার সময়।**
+- **PR/commit করার আগে।**
+- **CI/CD pipeline-এ:** কোড push/deploy করার আগে লিন্ট ও ফরম্যাট চেক করুন।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **লিন্টার/ফরম্যাটার না চালানো:** কোডবেস অগোছালো, ভুলে ভরা হয়ে যায়।
+- **রুলস কনফিগ না করা:** টিমের জন্য উপযুক্ত রুলস না থাকলে ইনকনসিস্টেন্সি হয়।
+- **লিন্ট error ignore করা:** error bypass করলে production-এ সমস্যা হতে পারে।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **লিন্টার ও ফরম্যাটার বাধ্যতামূলক করুন।**
+- **CI/CD pipeline-এ লিন্ট/ফরম্যাট চেক রাখুন।**
+- **VS Code-এ অটো-ফরম্যাট চালু করুন।**
+- **রুলস টিমের প্রয়োজন অনুযায়ী কাস্টমাইজ করুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Automated Linting/Formatting:** Google, Netflix, Uber—সব বড় কোম্পানিই অটোমেটেড লিন্ট/ফরম্যাট pipeline-এ চালায়।
+- **Pre-commit Hooks:** Husky, lint-staged দিয়ে commit করার আগেই লিন্ট/ফরম্যাট চেক হয়।
+- **Custom ESLint Rules:** বড় টিমে নিজেদের জন্য কাস্টম রুলস তৈরি করা হয়।
+
+---
+
+## উপসংহার
+
+লিন্টার ও ফরম্যাটার TypeScript প্রজেক্টে কোডের গুণগত মান, consistency এবং maintainability নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

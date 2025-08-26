@@ -1,0 +1,124 @@
+---
+title: TypeScript ইনস্টল ও tsconfig.json কনফিগারেশন
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# TypeScript ইনস্টল ও `tsconfig.json` কনফিগারেশন
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ TypeScript—setup/config—codebase maintain, bug কমানো, scalable workflow—essential। TypeScript install/config—right way—developer experience, project stability বাড়ায়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Easy setup:** TypeScript install/config—quick start—codebase-এ type safety add করা সহজ।
+- **Custom config:** `tsconfig.json`—project-specific rule, strictness, compatibility—define করে।
+- **Scalability:** বড় টিম/প্রজেক্ট—configurable TypeScript—maintainability, refactor সহজ।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Angular project—custom `tsconfig.json`—strict type, fast build।
+- **Netflix:** Microservice—TypeScript install/config—bug কমানো, codebase maintain।
+- **Uber:** Real-time app—TypeScript config—performance, compatibility ensure।
+
+## মূল ধারণা
+
+### ১. TypeScript Install
+
+- **Node.js/npm install:**
+  ```bash
+  npm install -g typescript
+  # অথবা
+  npm install --save-dev typescript
+  ```
+- **Check version:**
+  ```bash
+  tsc --version
+  ```
+
+### ২. tsconfig.json কী?
+
+- **tsconfig.json:** TypeScript project config file—compiler option, include/exclude file, strictness—define করে।
+- **Benefit:** Custom rule—project-specific—easy maintain, scalable workflow।
+
+#### সহজ এনালজি
+
+- "tsconfig.json—একটি রোডম্যাপ—project-এ কোন রাস্তা (file, rule) follow হবে—সব define করে।"
+
+### ৩. tsconfig.json তৈরি
+
+- **Auto generate:**
+  ```bash
+  tsc --init
+  ```
+- **Basic structure:**
+  ```json
+  {
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "commonjs",
+      "strict": true,
+      "outDir": "dist",
+      "rootDir": "src"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+  }
+  ```
+
+### ৪. Common Compiler Options
+
+- **target:** কোন JS version-এ compile হবে (উদা: ES6)
+- **module:** কোন module system (উদা: commonjs, esnext)
+- **strict:** maximum type safety
+- **outDir/rootDir:** compiled file কোথায় যাবে, source file কোথায়
+- **include/exclude:** কোন folder/file compile হবে/হবে না
+
+### ৫. Industry Trends
+
+- **Strict mode—industry standard—bug কমাতে।**
+- **Custom config—project-specific—scalable workflow।**
+- **Monorepo—multiple tsconfig—large codebase maintain।**
+
+### ৬. Best Practices
+
+- **tsconfig.json—version control-এ রাখুন।**
+- **Strict mode—enable করুন।**
+- **Project-specific config—maintain করুন।**
+- **Documentation/readme—config usage clear রাখুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- tsconfig.json miss—compiler error, type safety কমে।
+- Strict mode disable—runtime bug বাড়ে।
+- Include/exclude unclear—unwanted file compile হয়।
+- Documentation/readme unclear—new developer confused।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- নতুন TypeScript project—setup/config শুরুতেই করুন।
+- বড় টিম/প্রজেক্ট—custom config maintain করুন।
+- Monorepo/large codebase—multiple tsconfig use করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. TypeScript install করুন।
+2. `tsc --init` চালিয়ে tsconfig.json তৈরি করুন।
+3. Compiler option customize করুন।
+4. Strict mode enable করুন।
+5. Documentation/readme update করুন।
+
+## Quick Checklist
+
+- [x] TypeScript install হয়েছে?
+- [x] tsconfig.json আছে?
+- [x] Strict mode enabled?
+- [x] Compiler option customize?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript install/config—right way—maintainable, scalable, bug-free project build-এর জন্য essential। tsconfig.json—project-specific rule—workflow efficient, codebase robust রাখে।
+

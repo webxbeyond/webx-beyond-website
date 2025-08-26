@@ -1,0 +1,113 @@
+---
+title: মেটাডাটা রিফ্লেকশন API (reflect-metadata)
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# মেটাডাটা রিফ্লেকশন API (reflect-metadata)
+
+## প্রস্তাবনা
+
+Google-এর Angular, Netflix-এর Custom Analytics, Uber-এর Permission System—সবখানে code-এর behavior ও property সম্পর্কে extra তথ্য (metadata) দরকার পড়ে। TypeScript-এর reflect-metadata API—modern system design-এ powerful, expressive, এবং maintainable solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Metadata Storage:** Extra তথ্য—class/property/method-এ সংরক্ষণ করা যায়
+- **Dynamic Behavior:** Runtime-এ code behavior/readability enhance করা যায়
+- **Extensibility:** Framework/library—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Angular—dependency injection-এ metadata
+- **Netflix:** Analytics—method/property-এ custom metadata
+- **Uber:** Permission—class/property-এ dynamic metadata
+
+## মূল ধারণা
+
+### ১. reflect-metadata API কী?
+
+- **সংজ্ঞা:** reflect-metadata—একটি library—class/property/method-এ metadata সংরক্ষণ ও access করতে দেয়
+- **Usage:**
+  ```typescript
+  import 'reflect-metadata';
+
+  function Required(target: any, propertyKey: string) {
+    Reflect.defineMetadata('required', true, target, propertyKey);
+  }
+
+  class User {
+    @Required
+    name: string = "Anis";
+  }
+
+  // Metadata read
+  const isRequired = Reflect.getMetadata('required', User.prototype, 'name');
+  console.log(isRequired); // true
+  ```
+
+#### সহজ এনালজি
+
+- "Metadata—একটি sticky note—code-এর উপরে extra info add করা যায়।"
+
+### ২. কিভাবে কাজ করে?
+
+- reflect-metadata—metadata define/read/delete করতে Reflect API ব্যবহার করে
+- Decorator—metadata attach/read করতে ব্যবহৃত হয়
+
+#### Example: Parameter Metadata
+```typescript
+function LogParam(target: any, propertyKey: string, parameterIndex: number) {
+  Reflect.defineMetadata('log', true, target, propertyKey);
+}
+
+class User {
+  save(@LogParam data: string) {
+    // ...
+  }
+}
+```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Framework/library—dependency injection, validation, analytics-এ
+- Dynamic code behavior—metadata-driven logic build করতে
+- Extensible/future-proof codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Metadata—wrong key/value—unexpected behavior
+- Multiple metadata—conflict/error
+- Experimental feature—production-এ careful use
+
+### ৫. Best Practices
+
+- Metadata—clear/documented use করুন
+- Key/value—logical order maintain করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—metadata—dynamic workflow
+- Extensible codebase—metadata—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. Metadata—properly design/use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Metadata used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর reflect-metadata API—code enhancement, dynamic behavior, extensibility-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

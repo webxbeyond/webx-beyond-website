@@ -1,0 +1,118 @@
+---
+title: Readonly ও Static প্রপার্টি
+icon: solar:alt-arrow-right-bold-duotone
+---
+
+# Readonly ও Static প্রপার্টি
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Video Player, Uber-এর Ride Management—সবখানে predictable, secure, efficient object property দরকার। TypeScript-এর readonly ও static property—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Predictability:** Readonly property—value change হয় না—bug কমায়।
+- **Efficiency:** Static property—class-level value—memory efficient।
+- **Security:** Sensitive data—readonly/static—accidental change থেকে রক্ষা।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—readonly config/static constant—manage।
+- **Netflix:** Video Player—readonly property—video info, static property—player config।
+- **Uber:** Ride Management—readonly fare/static company info—secure।
+
+## মূল ধারণা
+
+### ১. Readonly প্রপার্টি
+
+- **সংজ্ঞা:** Object/class property—once set, change করা যায় না।
+- **Usage:**
+  ```typescript
+  class User {
+    readonly id: number;
+    name: string;
+    constructor(id: number, name: string) {
+      this.id = id;
+      this.name = name;
+    }
+  }
+
+  const user = new User(101, "Anis");
+  // user.id = 102; // Error
+  user.name = "Fahim"; // OK
+  ```
+
+#### সহজ এনালজি
+
+- "readonly—একটি সিল করা বাক্স—একবার ভেতরে জিনিস ঢুকলে আর বের করা যায় না।"
+
+### ২. Static প্রপার্টি
+
+- **সংজ্ঞা:** Class-level property—object ছাড়াই access করা যায়।
+- **Usage:**
+  ```typescript
+  class Car {
+    static wheels = 4;
+    brand: string;
+    constructor(brand: string) {
+      this.brand = brand;
+    }
+    getWheels() {
+      return Car.wheels;
+    }
+  }
+
+  console.log(Car.wheels); // 4
+  const myCar = new Car("Toyota");
+  console.log(myCar.getWheels()); // 4
+  ```
+
+#### সহজ এনালজি
+
+- "static—একটি কমন স্টোররুম—সব object এক জায়গা থেকে জিনিস নেয়।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Sensitive/config data—readonly property
+- Common/shared value—static property
+- Predictable workflow—bug-free codebase
+
+### ৪. Common Pitfalls
+
+- Readonly property—change করতে গেলে—error
+- Static property—object থেকে access করলে—confusion
+- Static property—instance-specific value store করলে—bug
+
+### ৫. Best Practices
+
+- Sensitive/config data—readonly/static property ব্যবহার করুন
+- Static property—class-level value রাখুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—readonly/static property—predictable workflow
+- Security—readonly property—data protect
+- Efficiency—static property—memory optimize
+
+## সংক্ষিপ্ত workflow
+
+1. Property requirement clear করুন
+2. Readonly/static property—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Property requirement clear?
+- [x] Readonly/static property used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর readonly ও static property—predictable, secure, efficient codebase build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+
