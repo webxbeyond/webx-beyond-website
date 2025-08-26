@@ -3,14 +3,6 @@ title: "কমন ভ্যালনারেবিলিটিস: Reentrancy, 
 icon: vscode-icons:file-type-solidity
 ---
 
-# কমন ভ্যালনারেবিলিটিস: Reentrancy, Overflow — Solidity-তে নিরাপত্তার চ্যালেঞ্জ
-
-## প্রস্তাবনা
-
-Uber বা Netflix-এর মতো বড় টেক কোম্পানিতে সিকিউরিটি ব্রিচ হলে কোটি কোটি ডলার ক্ষতি হতে পারে। ঠিক তেমনই Solidity Smart Contract-এ Common Vulnerabilities—Reentrancy ও Overflow—দুর্বলতা থাকলে ফান্ড চুরি, ডেটা ম্যানিপুলেশন, বা সিস্টেম ক্র্যাশ হতে পারে।
-
-## Core Concepts
-
 ### ১. Reentrancy
 - **Definition:** কোনো contract যখন অন্য contract-এ call করে এবং সেই contract আবার প্রথম contract-এ ফিরে আসে, তখন reentrancy vulnerability তৈরি হয়।
 - **ব্যবহার:** Ether Withdraw, External Call

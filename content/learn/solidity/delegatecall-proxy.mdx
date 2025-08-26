@@ -3,14 +3,6 @@ title: "Delegatecall ও Proxy প্যাটার্ন"
 icon: vscode-icons:file-type-solidity
 ---
 
-# Delegatecall ও Proxy প্যাটার্ন — Solidity-তে আপগ্রেডেবিলিটি ও ডাইনামিক লজিক
-
-## প্রস্তাবনা
-
-Uber বা Netflix-এর মতো বড় প্ল্যাটফর্মে Backend Service বা Microservice-এ নতুন ফিচার যোগ করতে হলে পুরো সিস্টেম বন্ধ না করেই আপডেট করতে হয়। ঠিক তেমনই Ethereum-এ deployed smart contract-এ সরাসরি পরিবর্তন করা যায় না। এই সমস্যার সমাধান—Proxy Pattern ও Delegatecall।
-
-## Core Concepts
-
 ### ১. Delegatecall
 - **Definition:** Solidity-তে একটি contract অন্য contract-এর কোড নিজের context-এ execute করতে পারে—এটিই delegatecall।
 - **ব্যবহার:** Logic Separation, Upgradeability
