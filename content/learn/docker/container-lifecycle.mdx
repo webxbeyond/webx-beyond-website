@@ -3,86 +3,202 @@ title: "কন্টেইনার লাইফসাইকেল"
 icon: uim:docker
 ---
 
-## প্রস্তাবনা
+## ১। Container Run — চালানোর বিস্তারিত নির্দেশ
 
-Google, Netflix, Uber—সবাই Docker Container ব্যবহার করে অ্যাপ্লিকেশন চালায়, বন্ধ করে, আবার নতুন করে Deploy করে। Docker Container-এর লাইফসাইকেল—Run, Stop, Remove—এই তিনটি ধাপ জানলে, Production থেকে Development—সবকিছু সহজ হয়।
+মূল উদাহরণ:
 
-## Core Concepts
-
-### ১. Container Run
-- **Definition:** Docker Image থেকে নতুন Container তৈরি ও চালানো
-- **Command:**
 ```bash
-$ docker run -d -p 8080:80 nginx:latest
+docker run -d --name web -p 8080:80 nginx:latest
 ```
-- **Features:**
-    - Detached Mode
-    - Port Mapping
-    - Name Assignment
 
-### ২. Container Stop
-- **Definition:** চলমান Container বন্ধ করা
-- **Command:**
+কেন এই অপশনগুলো দরকার:
+- `-d` (detached): ব্যাকগ্রাউন্ডে সার্ভিস চালাবে — ডেভ/প্রোড পরিবেশে সাধারণভাবে daemon-এর মতো কাজ করাতে ব্যবহৃত হয়।
+- `--name web`: নাম দিলে পরে stop/remove/exec চালাতে সহজ হয়; ID ব্যবহার না করে নাম ব্যবহার করা নিরাপদ।
+- `-p 8080:80`: হোস্টের 8080 পোর্টকে কনটেইনারের 80 পোর্টে পাঠায় — ব্রাউজারে `http://localhost:8080` দিয়ে অ্যাক্সেস করা যাবে।
+
+আরেকটি সাধারণ প্যাটার্ন:
+
 ```bash
-$ docker stop <container_id>
+docker run -d --name api --env NODE_ENV=production -v /data/logs:/app/logs myapp:1.0
 ```
-- **Features:**
-    - Graceful Shutdown
-    - Resource Release
 
-### ৩. Container Remove
-- **Definition:** বন্ধ হওয়া Container Delete করা
-- **Command:**
+- `--env` বা `-e`: environment variables দিয়ে কনফিগারেশন পাঠান।
+- `-v`: হোস্ট ভলিউম মাউন্ট করে persistent data রাখুন (DB, লগ)।
+
+Debugging run (ইন্টারেক্টিভ):
+
 ```bash
-$ docker rm <container_id>
+docker run --rm -it alpine sh
 ```
-- **Features:**
-    - Storage Cleanup
-    - Resource Optimization
 
-### ৪. Workflow
-1. Run: Image থেকে Container তৈরি ও চালান
-2. Stop: Container বন্ধ করুন
-3. Remove: Container Delete করুন
-
-### ৫. কেন গুরুত্বপূর্ণ?
-- Resource Management
-- Efficient Deployment
-- Clean Environment
-
-### ৬. কখন ব্যবহার করবেন?
-- New App Launch
-- Update/Upgrade
-- Debugging
-
-### ৭. Common Pitfalls
-- Unused Container জমে থাকা
-- Resource Waste
-- Wrong Container Remove
-
-### ৮. Best Practices
-- Regularly Remove Unused Container
-- Use Meaningful Container Name
-- Monitor Resource Usage
-
-### ৯. Industry Trends
-- Automated Lifecycle Management
-- Orchestration Tools (Kubernetes, Swarm)
-
-## উদাহরণ ও এনালজি
-- Container Run—"নতুন গাড়ি চালানো"
-- Container Stop—"গাড়ি পার্কিং করা"
-- Container Remove—"পুরনো গাড়ি বিক্রি করা"
-
-## Quick Reference
-- Run: `docker run -d -p 8080:80 nginx:latest`
-- Stop: `docker stop <container_id>`
-- Remove: `docker rm <container_id>`
-
-## উপসংহার
-
-Docker Container-এর লাইফসাইকেল—Run, Stop, Remove—Workflow-এর মূল ধাপ। সঠিকভাবে জানলে, Resource Efficient ও Clean Deployment Environment তৈরি করা সহজ হবে।
+এই কমান্ড দিয়ে কনটেইনারের ভিতরে ঢুকে লগ/ফাইল পরীক্ষা করা যায়।
 
 ---
 
-**পরবর্তী পাঠ:** Docker Hub ও প্রাইভেট রেজিস্ট্রি
+## ২। Container Stop — graceful shutdown ও timeout
+
+`docker stop <name|id>` কমান্ড ডিফল্টে контейনারকে SIGTERM পাঠায় এবং 10 সেকেন্ড অপেক্ষা করে; যদি কন্টেইনার না থামে তাহলে SIGKILL পাঠায়।
+
+আপনি কাস্টম টাইমআউট দিতে পারেন:
+
+```bash
+docker stop -t 30 web
+```
+
+এখানে Docker 30 সেকেন্ড অপেক্ষা করবে graceful shutdown-এর জন্য।
+
+কেন গুরুত্বপূর্ণ:
+- abrupt SIGKILL করলে processen সেভ/ক্লিনআপ করা হয় না—এ কারণে ডেটা কোরাপশন বা unfinished tasks হতে পারে। তাই প্রোডাকশনে graceful shutdown নিশ্চিত করুন।
+
+---
+
+## ৩। Container Remove — বান্ডিল কিভাবে নিরাপদে মুছবেন
+
+কনটেইনার মুছার পূর্বে নিশ্চিত হন कि কোন ভলিউম/ডেটা প্রয়োজন নেই। বন্ধ কনটেইনার মুছতে:
+
+```bash
+docker rm web
+```
+
+ফোর্স মুছে দিতে (যদি চলমান থাকে):
+
+```bash
+docker rm -f web
+```
+
+ভলিউমও একসাথে মুছতে:
+
+```bash
+docker rm -v web
+```
+
+সঞ্চিত পদ্ধতি:
+- `docker ps -a --filter "status=exited" --format "{{.ID}}\t{{.Names}}\t{{.Status}}"` — শুধুমাত্র exited কনটেইনার দেখায়।
+
+---
+
+## ৪। Inspect, Logs ও Exec — বিস্তারিত টুলস
+
+Inspect:
+
+```bash
+docker inspect web --format '{{json .State}}' | jq
+```
+
+- `docker inspect` আউটপুটে `State`, `NetworkSettings.IPAddress`, `Mounts` ও `Config.Env` দেখতে পারবেন।
+
+Logs:
+
+```bash
+docker logs -f --tail 200 web
+```
+
+- `-f` লাইভ ফলো করে, `--tail` শেষের N লাইন দেখায়।
+
+Exec (প্রসেস চালাতে):
+
+```bash
+docker exec -it web sh
+```
+
+- `docker top web` দিয়ে কনটেইনারের চলতি প্রসেস দেখুন।
+- `docker stats web` লাইভ resource metrics দেখায় (CPU/MEM/NET/IO)।
+
+---
+
+## ৫। Restart policies — কখন কোনটি ব্যবহার করবেন
+
+Restart policy নির্বাচন কন্টেক্সট অনুযায়ী:
+- `on-failure` — যদি অ্যাপ শুধুমাত্র ক্র্যাশ করে এবং আপনি retry চান (CI jobs ইত্যাদি)।
+- `unless-stopped` — সার্ভিস ম্যানেজড হোস্টে ভালো, কারণ ম্যানুয়ালি স্টপ করলে তা আর শুরু হবে না।
+- `always` — রিমোট হোস্টে প্রক্রিয়া নিশ্চিত রাখতে, কিন্তু কনফিগারেশন পরিবর্তন হলে কনটেইনার বারবার রিস্টার্ট হতে পারে।
+
+চেক করতে:
+
+```bash
+docker inspect -f '{{.Name}} {{.HostConfig.RestartPolicy.Name}}' $(docker ps -q)
+```
+
+---
+
+## ৬। Resource limits ও runtime update
+
+Container চালানোর সময়ই রিসোর্স লিমিট দেয়া ভালো, কিন্তু চলতি কনটেইনারেও পরবর্তীতে `docker update` দিয়ে পরিবর্তন করা যায়:
+
+```bash
+docker run -d --name web --memory=256m --cpus=0.5 nginx:latest
+docker update --memory 512m web
+```
+
+Tip: অবশ্যই host resource বিবেচনা করে লিমিট দিন; কনটেইনারগুলোর মধ্যে রেসোর্স কনটেনশন হলে latency বা OOM ঘটতে পারে।
+
+---
+
+## ৭। ক্লিনআপ ও স্টোরেজ নিরাপদ ব্যবহার
+
+নিরাপদ শুদ্ধিকরণ কৌশল:
+
+1. কোন কনটেইনার exited আছে তা দেখুন:
+
+```bash
+docker ps -a --filter "status=exited"
+```
+
+2. প্রথমে dangling images পরীক্ষা:
+
+```bash
+docker images -f dangling=true
+```
+
+3. পরিষ্কার করার সময় ধাপে ধাপে কাজ করুন:
+
+```bash
+docker image prune       # dangling images
+docker container prune   # stopped containers
+docker volume ls         # review volumes before rm
+```
+
+চূড়ান্ত ক্লিনআপ (সতর্কতা):
+
+```bash
+docker system prune -a --volumes
+```
+
+ব্যাকআপ ভলিউম: production এ ভলিউম ডিলিট করার আগে ব্যাকআপ রাখুন `docker run --rm -v <vol>:/v -v $(pwd):/backup alpine tar czf /backup/vol.tar.gz -C /v .`
+
+---
+
+## ৮। Healthchecks ও graceful deployments
+
+Dockerfile-এ `HEALTHCHECK` যুক্ত করলে orchestration বা monitoring সহজ হয়:
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -f http://localhost:3000/health || exit 1
+```
+
+Deployment tip: rolling updates এর সময় readiness/health checks ব্যবহার করুন যাতে ট্রাফিক শুধুমাত্র রেডি ইনস্ট্যান্সে যায়।
+
+---
+
+## ৯। ওর্কেস্ট্রেশন ও প্রোডাকশন পার্থক্য
+
+Local lifecycle commands দ্রুত development এ কাজ করে; কিন্তু প্রোডাকশনে:
+- Kubernetes: pod lifecycle, liveness/readiness probes, ReplicaSets, Deployments ব্যবহার করা হয়।
+- Rolling updates, rollout undo, autoscaling ইত্যাদি orchestration-এ থাকে।
+
+Migration tip: local-tested `docker run` কনফিগারেশনকে Helm/Manifests এ কনভার্ট করুন এবং small cluster এ staging করে দেখুন।
+
+---
+
+## ১০। Common pitfalls ও Best practices (সারমর্ম)
+
+- নাম দিন এবং ট্যাগ করুন: `--name` ও `image:tag` ব্যবহার করে accidental operations থেকে বাঁচুন।
+- Graceful shutdown নিশ্চিত করুন (SIGTERM handler) — background কাজগুলো clean ভাবে বন্ধ হবে।
+- Healthchecks সংযোজন ও restart policy কনফিগার করে production resilience বাড়ান।
+- prune বা rm করার আগে সবসময় তালিকা দেখে নিন; volumes ব্যাকআপ করুন।
+
+---
+
+## উপসংহার
+
+কনটেইনার লাইফসাইকেল নিয়ে স্পষ্ট ধারণা থাকলে development ও production দুই ক্ষেত্রেই নিরাপদ, predictable ও পরিচ্ছন্ন অপারেশন নিশ্চিত করা যায়। লোগ, ইন্সপেক্ট, হেলথচেক এবং resource লিমিট—এইগুলো নিয়মিত ব্যবহার করুন।

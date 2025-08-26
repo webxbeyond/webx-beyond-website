@@ -3,82 +3,165 @@ title: "ডকার কী এবং কিভাবে কাজ করে"
 icon: uim:docker
 ---
 
-Google, Netflix, Uber—সবাই তাদের অ্যাপ্লিকেশন দ্রুত, স্কেলেবল ও সহজে ডিপ্লয় করতে চায়। Docker—এই চাহিদা পূরণের জন্য সবচেয়ে জনপ্রিয় Containerization টুল। এই লেসনে আমরা জানব Docker কী, কেন গুরুত্বপূর্ণ, এবং এটি কিভাবে কাজ করে।
 
-## Core Concepts
+Google, Netflix, Uber — সবাই তাদের অ্যাপ্লিকেশন দ্রুত, নির্ভরযোগ্য ও স্কেলেবলভাবে চালাতে চায়। Docker এই চাহিদা পূরণে জনপ্রিয় প্ল্যাটফর্ম। এই টিউটোরিয়ালে আমরা Docker কী, এর আর্কিটেকচার, প্র্যাকটিক্যাল উদাহরণ এবং ডেপলয়মেন্ট/সিকিউরিটি-বেস্ট প্র্যাকটিস কিভাবে করতে হয় তা শিখব।
 
-### ১. Docker কী?
-- **Definition:** Docker একটি ওপেন-সোর্স প্ল্যাটফর্ম, যা অ্যাপ্লিকেশনকে Container-এ প্যাক, ডিপ্লয় ও রান করতে দেয়
-- **Features:**
-    - Lightweight
-    - Portable
-    - Fast Deployment
-- **উদাহরণ:**
-    - "Google-এর সার্ভারে হাজার হাজার Container, Netflix-এর ভিডিও স্ট্রিমিং Docker-এ"
+## সারাংশ
 
-### ২. Docker কিভাবে কাজ করে?
-- **Architecture:**
-    - Docker Engine: Core Service, Container চালায়
-    - Docker CLI: Command Line Interface
-    - Docker Daemon: Background Process
-- **Workflow:**
-    1. Dockerfile লিখুন (App-এর Instruction)
-    2. Image Build করুন
-    3. Container Run করুন
-- **উদাহরণ:**
-```bash
-# Dockerfile
-FROM node:18
-COPY . /app
-CMD ["node", "app.js"]
-```
-```bash
-# Build Image
-$ docker build -t myapp .
-# Run Container
-$ docker run -p 3000:3000 myapp
-```
-
-### ৩. কেন গুরুত্বপূর্ণ?
-- Fast Deployment
-- Resource Efficiency
-- Scalability
-- Consistency (Development to Production)
-
-### ৪. কখন ব্যবহার করবেন?
-- Microservices
-- Cloud Deployment
-- DevOps Automation
-
-### ৫. Common Pitfalls
-- Improper Image Size
-- Security Misconfiguration
-- Ignoring Best Practices
-
-### ৬. Best Practices
-- Use Official Images
-- Keep Dockerfile Simple
-- Regularly Update Images
-- Scan for Vulnerabilities
-
-### ৭. Industry Trends
-- Kubernetes Integration
-- Serverless Containers
-- Multi-cloud Deployment
-
-## উদাহরণ ও এনালজি
-- Docker—"একটি ট্রেন, প্রতিটি বগি আলাদা, কিন্তু একই লাইনে চলে"
-- VM—"একটি বাস, সব যাত্রী একসাথে, Resource Heavy"
-
-## Quick Reference
-- Dockerfile: App Instruction
-- Image: Packaged App
-- Container: Running Instance
-
-## উপসংহার
-
-Docker—আধুনিক অ্যাপ ডেলিভারির জন্য অপরিহার্য। এটি অ্যাপ্লিকেশনকে দ্রুত, নিরাপদ ও স্কেলেবলভাবে চালাতে সাহায্য করে। সঠিকভাবে ব্যবহার করলে, Development থেকে Production—সবকিছু সহজ ও Efficient হয়।
+Docker হচ্ছে একটি containerization প্রযুক্তি যা অ্যাপ্লিকেশন ও তার ডিপেন্ডেন্সিগুলোকে একটি ইমেজে প্যাক করে, এবং সেই ইমেজ থেকে হালকা ও দ্রুত চলমান কনটেইনার তৈরি করে। এটি ডেভেলপারদের জন্য একটি consistent runtime environment নিশ্চিত করে—যার ফলে "এটা আমার মেশিনে চলে" সমস্যা কমে যায় এবং ডেভ/প্রোড উভয় পরিবেশে মিল পাওয়া সহজ হয়।
 
 ---
 
-**পরবর্তী পাঠ:** Docker Engine, CLI ও Daemon পরিচিতি
+## ১। Docker কীভাবে কাজ করে — ধাপে ধাপে (বিস্তারিত এবং কেন গুরুত্বপূর্ণ)
+
+1) Docker Engine / Daemon
+- Docker Engine (daemon) হোস্ট মেশিনে রান করে। এটি ইমেজ তৈরি, কনটেইনার স্টার্ট/স্টপ, নেটওয়ার্ক ও ভলিউম ম্যানেজ করে। যখন আপনি `docker run` চালান, CLI ডেমনকে নির্দেশ দেয়।
+
+2) Images — লেয়ার্ড ও immutable
+- একটি Docker ইমেজ বেশ কয়েকটি লেয়ার নিয়ে গঠিত। প্রতিটি কমাণ্ড (যেমন `RUN`, `COPY`) একটি নতুন লেয়ার তৈরি করে। লেয়ারগুলো immutable — অর্থাৎ build-পর্বে লেয়ার চেইন অপরিবর্তিত থাকে এবং ক্যাশিং ব্যবহৃত হয়।
+- কেন গুরুত্বপূর্ণ: লেয়ার ক্যাশিং দ্রুত বিল্ড দেয় এবং ছোট পরিবর্তনে পুনরায় সম্পূর্ণ বিল্ড না করেই সময় বাঁচায়।
+
+3) Containers — রানটাইম ইনস্ট্যান্স
+- কনটেইনার হলো ইমেজের একটি রানটাইম ইনস্ট্যান্স। এটি filesystem, process namespace, network ইত্যাদি আলাদা করে চালায় কিন্তু হোস্ট কের্নেল শেয়ার করে।
+- কেন গুরুত্বপূর্ণ: কনটেইনার খুব দ্রুত স্টার্ট হয় এবং হালকা হওয়ায় একাধিক কনটেইনার একই হোস্টে চলে।
+
+4) Docker CLI / Registry
+- CLI দিয়ে আপনি ইমেজ তৈরি ও পুশ/পুল করতে পারবেন। Registry (যেমন Docker Hub) হলো ইমেজ শেয়ার করার জায়গা।
+
+---
+
+## ২। Workflow — ছোট ব্যাখ্যা ও প্রতিটি ধাপের টিপস
+
+1. Dockerfile লিখুন
+- কেন: Dockerfile হল reproducible build-এর specification। এতে কীভাবে আপনার অ্যাপ প্যাক হবে তা ধাপে ধাপে লেখা থাকে।
+- টিপস: `COPY` ও `RUN` স্টেপগুলোকে এমনভাবে সাজান যাতে লেয়ারিং কাজে লাগে (dependency ইনস্টল প্রথমে)।
+
+2. `docker build` করুন
+- কেন: ইমেজ তৈরি করে deployable artifact পাওয়া যায়।
+- টিপস: ট্যাগ (e.g., `myapp:1.0.0`) ব্যবহার করুন, এবং build arguments/secret ব্যবহার করে সিক্রেট এক্সপোজ করা এড়ান।
+
+3. `docker run` বা orchestration ব্যবহার করুন
+- কেন: কনটেইনার রান করালে অ্যাপ বাস্তবে কাজ করে। প্রোডাকশনে সাধারণত orchestration (Kubernetes, Docker Swarm) ব্যবহার করা হয়।
+
+---
+
+## ৩। উদাহরণ: বোঝার জন্য অ্যাপ-প্রয়োজন অনুযায়ী ব্যাখ্যা
+
+নিচের Dockerfile লেয়ারিং, ক্যাশ এবং রানটাইম কনসেপ্টগুলো দেখায়:
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+# package.json আগে কপি করলে dependency লেয়ার ক্যাশে রয়ে যাবে
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
+
+- এখানে `COPY package*.json` ও `RUN npm install` আলাদা লেয়ারে রাখলে কোড পরিবর্তন হলেও dependency লেয়ার রি-ইউজ করা যায়।
+
+`docker build -t myapp:latest .` — ইমেজ বানায়।
+
+`docker run --rm -p 3000:3000 myapp:latest` — লোকালে পোর্ট 3000-এ অ্যাপ পাওয়া যাবে।
+
+---
+
+## ৪। Multi-stage builds — কেন ও কখন ব্যবহার করবেন
+
+- সমস্যা: ডেভ-ডিপেন্ডেন্সি (যেমন build tools) প্রোডাকশন ইমেজে থাকা উচিত না, কারণ তা ইমেজ বাড়িয়ে দেয় এবং আক্রমণের রিস্ক বাড়ায়।
+- সমাধান: Multi-stage build দিয়ে আপনি একটি build stage-এ সব বিল্ড সম্পন্ন করে final stage-এ শুধুমাত্র রানটাইম ফাইল কপি করবেন।
+
+ফায়দা: ছোট ইমেজ, নিরাপদ ও ডিপ্লয়মেন্ট-ফ্রেন্ডলি আর দ্রুত পুল টাইম।
+
+---
+
+## ৫। Docker Compose — কখন ব্যবহার করবেন এবং কী জানা জরুরি
+
+- Compose একগুচ্ছ কনটেইনার সার্ভিসকে একসাথে স্টার্ট/স্টপ করতে সাহায্য করে (dev ও small infra-এ খুবই উপযোগী)।
+- `depends_on` কেবল স্টার্ট-অর্ডার নিশ্চিত করে, কিন্তু সার্ভিস রেডি হওয়া চেক করে না — তাই healthchecks বা wait-for-it-শেল-স্ক্রিপ্ট প্রয়োজন হতে পারে।
+
+উদাহরণ (সংক্ষিপ্ত):
+
+```yaml
+version: '3.8'
+services:
+    web:
+        build: .
+        ports:
+            - "3000:3000"
+        depends_on:
+            - db
+    db:
+        image: postgres:15-alpine
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+volumes:
+    pgdata:
+```
+
+---
+
+## ৬। Image layering, caching এবং ভালো ডিজাইন প্যাটার্ন (ব্যাখ্যামূলক)
+
+- Layering: প্রতিটি Dockerfile কমান্ড একটি লেয়ার তৈরি করে। ছোট, ধ্রুব (deterministic) কমান্ডগুলো উপরের দিকে রাখুন যাতে কেশ ভাল কাজ করে।
+- Cache invalidation: যদি `COPY . .` আগে রাখেন, পরে আপনার বাকি সব কমান্ড বারবার রান হবে — তাই dependency-ইনস্টল আগে রাখুন।
+
+ওপরের কৌশলগুলো build সময় কমায় এবং CI-তে দ্রুততা আনে।
+
+---
+
+## ৭। নিরাপত্তা — আরো স্পষ্ট নির্দেশনা
+
+1. Image provenance: official অথবা verified images ব্যবহার করুন।
+2. Vulnerability scanning: CI-তে `trivy` বা `docker scan` চালান।
+3. Secrets management: কনটেইনার ইমেজে credentials হার্ডকোড করবেন না; orchestration secrets বা secret manager ব্যবহার করুন।
+4. Runtime constraints: non-root user, read-only filesystem, এবং seccomp/AppArmor প্রোফাইল প্রয়োগ করুন।
+
+সংক্ষিপ্ত কমান্ড উদাহরণ (রানটাইম লিমিট):
+
+```bash
+docker run --memory=256m --cpus=0.5 myapp:latest
+```
+
+---
+
+## ৮। ডিবাগিং — কিভাবে দ্রুত সমস্যা খুঁজবেন
+
+- `docker ps` — চলমান কনটেইনার দেখুন।
+- `docker logs <container>` — কনটেইনার লগ দেখুন।
+- `docker exec -it <container> sh` — কনটেইনারের ভেতরে ঢুকুন এবং প্রাসঙ্গিক ফাইল/লগ পরীক্ষা করুন।
+- Network সমস্যা: `docker network ls` ও `docker network inspect <network>` ব্যবহার করুন।
+
+অতিরিক্ত: যদি Compose সার্ভিস স্টার্ট না করে, প্রথমে `docker-compose logs` দেখে কনটেইনার হেলথ স্টেটাস যাচাই করুন।
+
+---
+
+## ৯। পরিষ্কারকরণ এবং রিসোর্স ব্যবস্থাপনা
+
+- অপ্রয়োজনীয় কনটেইনার, ইমেজ ও ভলিউম ক্লিন করতে:
+
+```bash
+docker system prune -a --volumes
+```
+
+সতর্কতা: এই কমান্ড সব unused ইমেজ/নন-অ্যাটাচড ভলিউম মুছে ফেলবে — production data-এ সাবধান হোন।
+
+---
+
+## ১০। সাধারণ ভুল ও কিভাবে এড়াবেন
+
+- Sensitive data কমিট করা: `.dockerignore` ব্যবহার করে প্রয়োজনীয় ফাইল বাদ দিন।
+- বড় ইমেজ: multi-stage build ব্যবহার করুন।
+- Improper readiness checks: `depends_on` কে healthcheck বা wait-script দিয়ে সাপোর্ট করুন।
+
+---
+
+## উপসংহার
+
+Docker আপনাকে দ্রুত, পুনরাবৃত্তিমূলক এবং স্কেলেবল পরিবেশ দেয়। এখানে সবচেয়ে গুরুত্বপূর্ণ হল — কনটেইনারিং শুধু টুল নয়, workflow ও best-practice মানতে হবে: security, small images, proper healthchecks এবং secrets management। এটি মেনে চললে Docker দিয়ে production-গ্রেড সিস্টেম তৈরি করা সম্ভব।
+
+---
+
+**পরবর্তী পাঠ:** `ডকার ইঞ্জিন, CLI ও Daemon` — Docker runtime আর্কিটেকচারের আরো বিস্তারিত ব্যাখ্যা

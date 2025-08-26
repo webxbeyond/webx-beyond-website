@@ -1,86 +1,168 @@
 ---
-title: "Multi-stage Builds ও ইমেজ সাইজ অপ্টিমাইজেশন"
+title: "মাল্টি স্টেজ ও ইমেজ সাইজ অপ্টিমাইজেশন"
 icon: uim:docker
 ---
 
-Google, Netflix, Uber—সবাই Production-এ Lightweight ও Secure Docker Image ব্যবহার করে। Multi-stage Build—একটি Dockerfile-এ একাধিক Stage ব্যবহার করে Final Image ছোট ও Efficient করা যায়। এই লেসনে আমরা Multi-stage Build ও Image Optimization-এর Workflow জানব।
-
-## Core Concepts
+## মূল ধারণা
 
 ### ১. Multi-stage Build কী?
-- **Definition:** Dockerfile-এ একাধিক Build Stage, Final Image-এ শুধু দরকারি ফাইল
-- **Features:**
-    - Small Image Size
-    - Security
-    - Clean Build
-- **Example:**
+
+**সংজ্ঞা:** Dockerfile-এ একাধিক Build Stage ব্যবহার করা হয়, যাতে Final Image-এ শুধু দরকারি ফাইল থাকে—অপ্রয়োজনীয় টুলস, ডিপেন্ডেন্সি, ও temp ফাইল বাদ পড়ে।
+
+**ফিচার:**
+- ছোট ইমেজ সাইজ
+- নিরাপত্তা (অপ্রয়োজনীয় টুলস নেই)
+- পরিষ্কার ও দ্রুত বিল্ড
+
+**কেন দরকার?**
+- Production-এ শুধু অ্যাপ চালানোর জন্য দরকারি ফাইল রাখুন, build tools/secret/config বাদ দিন।
+
+**উদাহরণ:**
 ```dockerfile
 # Stage 1: Build
 FROM node:18 AS builder
 WORKDIR /app
 COPY . .
-RUN npm install && npm run build
 
 # Stage 2: Production
+title: "মাল্টি-স্টেজ বিল্ড ও ইমেজ সাইজ অপ্টিমাইজেশন"
+icon: uim:docker
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 ```
+**সংজ্ঞা:** ডকারফাইলে একাধিক বিল্ড স্টেজ ব্যবহার করা হয়, যাতে ফাইনাল ইমেজে শুধু দরকারি ফাইল থাকে—অপ্রয়োজনীয় টুলস, ডিপেন্ডেন্সি, ও temp ফাইল বাদ পড়ে।
+**Bangla ব্যাখ্যা:** প্রথম স্টেজে কোড build হয়, দ্বিতীয় স্টেজে শুধু build output (dist) রাখা হয়—build tools, source code, test ফাইল কিছুই থাকে না।
 
-### ২. Image Size Optimization
-- **Techniques:**
-    - Use Small Base Image (Alpine)
-    - Remove Unused Files
-    - Minimize Layers
-    - Use `.dockerignore`
-- **Command:**
+**বৈশিষ্ট্য:**
+- ছোট ইমেজ সাইজ
+- নিরাপত্তা (অপ্রয়োজনীয় টুলস নেই)
+- পরিষ্কার ও দ্রুত বিল্ড
+- ছোট বেস ইমেজ ব্যবহার করুন (যেমন: Alpine)
+- অপ্রয়োজনীয় ফাইল build শেষে মুছে ফেলুন
+**কেন দরকার?**
+- প্রোডাকশনে শুধু অ্যাপ চালানোর জন্য দরকারি ফাইল রাখুন, build tools/secret/config বাদ দিন।
+- `.dockerignore` ব্যবহার করুন—node_modules, test, docs, temp ফাইল বাদ দিন
+
+**কমান্ড:**
 ```bash
-$ docker images
+docker images
 ```
-- **Tip:** Image Size Regularly Check করুন
+
+**টিপ:** ইমেজ সাইজ নিয়মিত চেক করুন—বড় হলে কোথায় বাড়ছে দেখুন, prune করুন
 
 ### ৩. Workflow
-1. Dockerfile-এ Multi-stage Setup করুন
-2. Build Command দিন: `docker build -t myapp .`
-3. Final Image Size Check করুন
+
+১. Dockerfile-এ Multi-stage Build setup করুন
+২. বিল্ড করুন: `docker build -t myapp .`
+**উদাহরণ:**
+```dockerfile
+# বিল্ড স্টেজ: অ্যাপ বিল্ড
+FROM node:18 AS builder
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+
+# প্রোডাকশন স্টেজ: শুধু build output
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+```
+৩. ইমেজ সাইজ চেক করুন: `docker images`
+৪. প্রয়োজনে `docker image prune` দিয়ে অপ্রয়োজনীয় ইমেজ/লেয়ার মুছে ফেলুন
+**ব্যাখ্যা:** প্রথম স্টেজে কোড build হয়, দ্বিতীয় স্টেজে শুধু build output (dist) রাখা হয়—build tools, source code, test ফাইল কিছুই থাকে না।
 
 ### ৪. কেন গুরুত্বপূর্ণ?
-- Fast Deployment
-- Low Resource Usage
-- Security
+**ইমেজ ছোট করার উপায়:**
+- ছোট বেস ইমেজ ব্যবহার করুন (যেমন: Alpine)
+- অপ্রয়োজনীয় ফাইল build শেষে মুছে ফেলুন
+- কম লেয়ার রাখুন—একই ধরনের কাজ একসাথে লিখুন
+- `.dockerignore` ব্যবহার করুন—node_modules, test, docs, temp ফাইল বাদ দিন
 
 ### ৫. কখন ব্যবহার করবেন?
-- Production Deployment
-- CI/CD Pipeline
-- Cloud Hosting
 
-### ৬. Common Pitfalls
-- Unused File/Image Stage
-- Large Base Image
-- Ignoring `.dockerignore`
+**কখন ব্যবহার করবেন?**
+- Production ডিপ্লয়মেন্ট
+**কমান্ড:**
+```bash
+docker images
+```
+- CI/CD pipeline
+- ক্লাউড/কন্টেইনার হোস্টিং
+**পরামর্শ:** ইমেজ সাইজ নিয়মিত চেক করুন—বড় হলে কোথায় বাড়ছে দেখুন, prune করুন
+- যখন ইমেজ সাইজ, নিরাপত্তা, এবং স্পিড গুরুত্বপূর্ণ
 
-### ৭. Best Practices
-- Use Multi-stage Build
-- Clean Up Temporary Files
-- Use Alpine Base Image
-- Regularly Audit Image Size
+### ৩. কাজের ধাপ
 
-### ৮. Industry Trends
-- Automated Image Optimization
-- Security Scanning
-- Immutable Image Deployment
+১. ডকারফাইলে মাল্টি-স্টেজ বিল্ড সেটআপ করুন
+২. বিল্ড করুন: `docker build -t myapp .`
+৩. ইমেজ সাইজ চেক করুন: `docker images`
+৪. প্রয়োজনে `docker image prune` দিয়ে অপ্রয়োজনীয় ইমেজ/লেয়ার মুছে ফেলুন
+- বড় বেস ইমেজ ব্যবহার
+- `.dockerignore` ব্যবহার না করা
+### ৪. কেন গুরুত্বপূর্ণ?
 
+**কারণ:**
+- দ্রুত ডিপ্লয়মেন্ট
+- কম রিসোর্স ব্যবহার
+- নিরাপত্তা (আক্রমণের সুযোগ কম)
+- Multi-stage Build ব্যবহার করুন
+- বিল্ড শেষে temp/cache ফাইল পরিষ্কার করুন
+### ৫. কখন ব্যবহার করবেন?
+
+**কখন ব্যবহার করবেন?**
+- প্রোডাকশন ডিপ্লয়মেন্ট
+- CI/CD পাইপলাইন
+- ক্লাউড/কনটেইনার হোস্টিং
+- যখন ইমেজ সাইজ, নিরাপত্তা, এবং স্পিড গুরুত্বপূর্ণ
+
+**ইন্ডাস্ট্রি ট্রেন্ড:**
+### ৬. সাধারণ ভুল
+
+**ভুল:**
+- অপ্রয়োজনীয় ফাইল/স্টেজ রেখে দেওয়া
+- বড় বেস ইমেজ ব্যবহার
+- `.dockerignore` ব্যবহার না করা
 ## উদাহরণ ও এনালজি
-- Multi-stage Build—"রান্নার শেষে শুধু পরিবেশনযোগ্য খাবার, বাকি উপকরণ বাদ"
-- Alpine Image—"ডায়েট খাবার, কম Resource"
 
-## Quick Reference
+### ৭. সেরা চর্চা
+
+**সেরা চর্চা:**
+- মাল্টি-স্টেজ বিল্ড ব্যবহার করুন
+- বিল্ড শেষে temp/cache ফাইল পরিষ্কার করুন
+- Alpine বা ছোট বেস ইমেজ ব্যবহার করুন
+- `.dockerignore` দিয়ে অপ্রয়োজনীয় ফাইল বাদ দিন
+- ইমেজ সাইজ নিয়মিত চেক করুন ও অপ্টিমাইজ করুন
+## দ্রুত রেফারেন্স
 - Multi-stage: `FROM ... AS builder`, `COPY --from=builder ...`
-- Size Check: `docker images`
+### ৮. ইন্ডাস্ট্রি ট্রেন্ড
+
+**ইন্ডাস্ট্রি ট্রেন্ড:**
+- অটোমেটেড ইমেজ অপ্টিমাইজেশন টুল (BuildKit, DockerSlim)
+- নিরাপত্তা স্ক্যানিং (Trivy, Snyk)
+- ইমিউটেবল ইমেজ ডিপ্লয়মেন্ট—একবার build, বারবার deploy
+## সম্পূর্ণ Multi-stage Dockerfile উদাহরণ
+```dockerfile
+## উদাহরণ ও তুলনা
+- মাল্টি-স্টেজ বিল্ড—"রান্নার শেষে শুধু পরিবেশনযোগ্য খাবার, বাকি উপকরণ বাদ" (build tools/test/source বাদ)
+- Alpine ইমেজ—"ডায়েট খাবার, কম রিসোর্স, দ্রুত রান"
+WORKDIR /app
+COPY . .
+## দ্রুত রেফারেন্স
+- মাল্টি-স্টেজ: `FROM ... AS builder`, `COPY --from=builder ...`
+- সাইজ চেক: `docker images`
+# প্রোডাকশন স্টেজ: শুধু build output
+FROM nginx:alpine
+## উপসংহার
+
+মাল্টি-স্টেজ বিল্ড ব্যবহার করলে ডকার ইমেজ ছোট, দ্রুত, এবং নিরাপদ হয়। প্রোডাকশনে অপ্রয়োজনীয় ফাইল, টুলস, ও সিক্রেট বাদ দিন—শুধু দরকারি ফাইল রাখুন।
+সঠিক `.dockerignore`, ছোট বেস ইমেজ, এবং নিয়মিত ইমেজ সাইজ চেক—এসব চর্চা অনুসরণ করলে আপনার ডিপ্লয়মেন্ট হবে দ্রুত, নিরাপদ, এবং রিসোর্স-সাশ্রয়ী!
+HEALTHCHECK --interval=30s CMD curl -f http://localhost/ || exit 1
+```
+
+**Bangla ব্যাখ্যা:** প্রথম স্টেজে কোড build হয়, দ্বিতীয় স্টেজে শুধু build output (dist) রাখা হয়—build tools, source code, test ফাইল কিছুই থাকে না।
 
 ## উপসংহার
 
+Multi-stage Build ব্যবহার করলে ডকার ইমেজ ছোট, দ্রুত, এবং নিরাপদ হয়। Production-এ অপ্রয়োজনীয় ফাইল, টুলস, ও সিক্রেট বাদ দিন—শুধু দরকারি ফাইল রাখুন।
+সঠিক `.dockerignore`, ছোট বেস ইমেজ, এবং নিয়মিত ইমেজ সাইজ চেক—এসব চর্চা follow করলে আপনার ডিপ্লয়মেন্ট হবে দ্রুত, নিরাপদ, এবং resource-efficient!
+
 Multi-stage Build ও Image Optimization—Efficient, Secure ও Lightweight Docker Deployment-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Production ও Cloud-এ Resource ও Security নিশ্চিত হয়।
-
----
-
-**পরবর্তী পাঠ:** Build Context ও Cache Layers

@@ -1,69 +1,53 @@
 ---
-title: "Hello World"
+title: হ্যালো ওয়ার্ল্ড
 icon: uim:docker
 ---
 
-Google, Netflix, Uber—সবাই Docker ব্যবহার করে তাদের অ্যাপ্লিকেশন দ্রুত ও স্কেলেবলভাবে চালায়। Docker-এ "Hello World" Container চালানো—শুরু থেকে Production পর্যন্ত Journey-র প্রথম ধাপ। এই লেসনে আমরা Docker-এ প্রথম Container কীভাবে চালাতে হয়, Step-by-step জানব।
+## ১। কি উদ্দেশ্য
 
-## Core Concepts
+`docker run hello-world` হলো Docker ইনস্টলেশন সঠিক আছে কি না তা দ্রুত যাচাই করার সবচেয়ে সহজ উপায়। এটি একটি ছোট টেস্ট কনটেইনার রান করে এবং একটি প্রোবিং মেসেজ প্রিন্ট করে।
 
-### ১. Docker Container কী?
-- **Definition:** Docker Image থেকে তৈরি হওয়া Lightweight, Isolated Application Environment
-- **Features:**
-    - Fast Startup
-    - Resource Efficient
-    - Portable
+## ২। কিভাবে চালাবেন — ধাপে ধাপে
 
-### ২. Hello World Container চালানোর ধাপ
-- **Step 1:** Docker Install করুন (Linux, Mac, Windows)
-- **Step 2:** Terminal/CLI খুলুন
-- **Step 3:** নিচের Command দিন:
+1. নিশ্চিত করুন Docker ইনস্টল ও Daemon চলছে (`docker --version`, `docker info`)।
+2. টার্মিনাল খুলে নিচের কমান্ড দিন:
+
 ```bash
-$ docker run hello-world
+docker run hello-world
 ```
-- **Step 4:** Output দেখুন—"Hello from Docker!"
 
-### ৩. কীভাবে কাজ করে?
-- Docker CLI-তে `docker run hello-world` Command দিলে:
-    1. Docker Daemon Image Pull করে (যদি Local-এ না থাকে)
-    2. Container Create ও Start করে
-    3. Container Message Print করে
+3. আপনি দেখতে পাবেন কিছুটা এমন আউটপুট:
 
-### ৪. কেন গুরুত্বপূর্ণ?
-- Docker Setup Validate
-- CLI ও Daemon Communication Test
-- Container Workflow বোঝা
+```
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+```
 
-### ৫. কখন ব্যবহার করবেন?
-- Docker Installation Test
-- Beginner Practice
-- Troubleshooting
+এই কমান্ডের কাজ: যদি লোকাল মেশিনে `hello-world` ইমেজ না থাকে, Docker ইমেজটি registry থেকে pull করে এবং কনটেইনার চালায়; কনটেইনারটি নিজে থেকে চেক করে একটি মেইসেজ প্রিন্ট করে এবং শেষ হয়ে যায়।
 
-### ৬. Common Pitfalls
-- Permission Issue (Linux)
-- Docker Daemon Not Running
-- Network Problem (Image Pull Fail)
+## ৩। বিকল্প এবং বেশি তথ্যপূর্ণ রান
 
-### ৭. Best Practices
-- Installation শেষে Always Hello World চালান
-- Error Message পড়ে Troubleshoot করুন
-- Official Documentation Follow করুন
+- `docker run --rm hello-world` — কনটেইনার শেষ হলে নিজে থেকেই মুছে যাবে।
+- `docker run -it alpine sh` — ইন্টারেক্টিভ শেল চালিয়ে কনটেইনার ইনসাইট দেখতে পারবেন (প্রায়শই ডিবাগিংয়ে কাজে লাগে)।
 
-### ৮. Industry Trends
-- Ready-made Test Containers
-- Automated Setup Validation
+## ৪। কীভাবে এটা কাজ করে (আর্কিটেকচারিক্যাল সংক্ষিপ্ত)
 
-## উদাহরণ ও এনালজি
-- "Hello World Container—নতুন ফোনে প্রথম কল করা, সবকিছু ঠিক আছে কিনা চেক"
+- CLI: আপনি `docker run` টাইপ করেন।
+- Daemon: যদি লোকাল ইমেজ না থাকে, Daemon ইমেজ pull করে।
+- Engine: কনটেইনার তৈরি ও রান করে, আউটপুট stdout এ প্রিন্ট হয়।
 
-## Quick Reference
-- Command: `docker run hello-world`
-- Output: "Hello from Docker!"
+## ৫। সাধারণ সমস্যা ও সমাধান
 
-## উপসংহার
+- Permission denied (socket): `Got permission denied while trying to connect to the Docker daemon socket` — Linux-এ আপনার ইউজার `docker` গ্রুপে আছে কি না চেক করুন বা `sudo` দিয়ে চালান।
+- Daemon not running: `Cannot connect to the Docker daemon` — `sudo systemctl start docker` বা Docker Desktop চালু করুন।
+- Image pull fails: নেটওয়ার্ক / proxy চেক করুন; `docker pull hello-world` চালিয়ে error message দেখুন।
 
-Docker-এ "Hello World" Container চালানো—Setup Validate ও Container Workflow বোঝার জন্য অপরিহার্য। এই ধাপ সফল হলে, আপনি Docker Journey-র পরবর্তী ধাপে যেতে প্রস্তুত।
+## ৬। কেন এই টেস্টটি গুরুত্বপূর্ণ
 
----
+- দ্রুত নিশ্চয়তা দেয় যে Docker CLI ও Daemon একসাথে কাজ করছে।
+- নতুন সিস্টেম বা CI agent-এ অটোমেটেড healthcheck হিসেবে ব্যবহার করা যায়।
 
-**পরবর্তী পাঠ:** Docker Images: Pull, Build, Tag
+## ৭। পরবর্তী ধাপ
+
+এই টেস্ট পাস করলে: `Docker Images: Pull, Build, Tag` লেসনে যান যেখানে আমরা কিভাবে ইমেজ বানাবেন ও ট্যাগ করবেন তা দেখব।
+
