@@ -3,75 +3,194 @@ title: "ভ্যালু ও রেফারেন্স টাইপস"
 icon: vscode-icons:file-type-solidity
 ---
 
-### ১. Value Types কী?
-- **সরাসরি ডাটা স্টোর:** ভেরিয়েবল নিজেই ডাটা ধারণ করে
-- **উদাহরণ:** `uint`, `int`, `bool`, `address`, `bytes`
-- **ব্যবহার:** Simple Calculation, State Variable
 
-#### Value Type Example
+### ১. ভ্যালু টাইপ (Value Types) কী?
+
+- ভ্যালু টাইপগুলো হচ্ছে সহজ, fixed-size ডাটা টাইপ — ভেরিয়েবল নিজেই মান ধারণ করে।
+- যখন একটি ভ্যালু টাইপ ভেরিয়েবল অন্য ভেরিয়েবলে অ্যাসাইন করা হয়, পুরো মানটি কপি হয়।
+
+সাধারণ ভ্যালু টাইপ: `uint`, `int`, `bool`, `address`, `bytes1..32`, `enum`
+
+#### গুরুত্বপূর্ণ কনসেপ্টসমূহ
+
+- Signed vs Unsigned:
+    - `uint` হলো unsigned integer (কারণ নেতিবাচক মান থাকে না)।
+    - `int` হলো signed integer (নেতিবাচক সংখ্যা থাকতে পারে)।
+- Size (bit width): `uint8` থেকে `uint256` পর্যন্ত; প্রায়ই `uint256` ব্যবহার করা হয় (EVM word size = 32 bytes)।
+- Default values:
+    - সংখ্যা টাইপের ডিফল্ট মান = `0`
+    - `bool`-এর ডিফল্ট = `false`
+    - `address`-এর ডিফল্ট = `0x000...0`
+
+#### ভ্যালু টাইপ উদাহরণ
 ```solidity
-uint age = 25;
+uint256 age = 25;             // unsigned integer
+int8 temperature = -5;        // signed integer
 bool isActive = true;
-address owner = 0x123...;
+address owner = 0x1234567890AbCdEf1234567890aBCdeF12345678;
+bytes32 dataHash = keccak256(abi.encodePacked("hello"));
+enum State { Created, Active, Closed }
 ```
 
-### ২. Reference Types কী?
-- **ডাটা অন্য কোথাও স্টোর:** ভেরিয়েবল শুধু রেফারেন্স রাখে
-- **উদাহরণ:** `array`, `struct`, `mapping`
-- **ব্যবহার:** Complex Data Structure, Storage Management
+#### নিরাপত্তা ও আচরণ (Edge cases)
 
-#### Reference Type Example
+- Overflow/Underflow: Solidity ^0.8.0 এর পরে বহুলাংশে overflow/underflow নিজে থেকেই check করে এবং exception ফেলে। ছোট uint টাইপ ব্যবহার করলে conversion/range সমস্যা এড়াতে সাবধানতা অবলম্বন করুন।
+- Casting: বড় থেকে ছোট টাইপে কাস্ট করলে ডেটা কাটা যেতে পারে (`uint256` -> `uint8`) — যেখানে পরিসর নিশ্চিত নয় সেখানে বিরত থাকুন।
+
+#### ভালো প্র্যাকটিস
+
+- স্পষ্ট সাইজ ব্যবহার করুন (`uint256`), বিশেষ করে পাবলিক/স্টোরেজ ভেরিয়েবলে।
+- যেখানে উপযুক্ত সেখানে `constant` ও `immutable` ব্যবহার করুন (এগুলো gas-রে উপকার দেয়):
 ```solidity
-string name = "Anis";
-uint[] scores = [10, 20, 30];
-struct User {
-    string name;
-    uint age;
-}
-User user = User("Anis", 25);
-mapping(address => uint) balances;
+uint256 public constant FEE_PERCENT = 1; // compile-time constant
+address public immutable owner; // set in constructor, cheaper than storage write later
 ```
-
-### ৩. Value vs Reference — পার্থক্য
-| বিষয়         | Value Type         | Reference Type         |
-|--------------|-------------------|-----------------------|
-| Storage      | সরাসরি            | রেফারেন্স             |
-| Copy         | ডাটা কপি হয়       | রেফারেন্স কপি হয়      |
-| Example      | uint, bool        | array, struct, mapping|
-
-### ৪. কেন গুরুত্বপূর্ণ?
-- ডাটা নিরাপত্তা ও অপ্টিমাইজেশন
-- Storage vs Memory ব্যবস্থাপনা
-- Contract Performance
-
-### ৫. Common Pitfalls
-- Reference Type ভুলভাবে কপি করা
-- Storage vs Memory ভুল ব্যবহার
-- Mapping-এ ডাটা Access Error
-
-### ৬. Best Practices
-- Value Type—Simple Variable, Reference Type—Complex Structure
-- Storage ও Memory স্পষ্টভাবে ডিফাইন করুন
-- Proper Initialization
-
-### ৭. Industry Trends
-- Custom Struct ও Mapping
-- Nested Data Structure
-- Storage Optimization
-
-## উদাহরণ ও এনালজি
-- Value Type—"টিফিন বক্সে খাবার"
-- Reference Type—"খাবারের ঠিকানা লিখে দেওয়া"
-
-## Quick Reference
-
-- Value Type: `uint`, `int`, `bool`, `address`, `bytes`
-- Reference Type: `string`, `array`, `struct`, `mapping`
-
-## উপসংহার
-
-Value ও Reference টাইপ—Solidity-তে ডাটা ব্যবস্থাপনার মূল ভিত্তি। সঠিকভাবে ব্যবহার করলে Contract নিরাপদ, দ্রুত ও দক্ষ হয়। ভুলত্রুটি এড়িয়ে, Best Practices অনুসরণ করুন—তাহলেই Solidity-তে ডাটা ব্যবস্থাপনায় দক্ষতা অর্জন করবেন।
+- অপ্রয়োজনীয় ছোট টাইপ (`uint8`) দিয়ে অপ্টিমাইজেশনের আগে gas এবং packing ইফেক্ট বিবেচনা করুন — কখনও কখনও `uint256` ব্যবহার করাই সেরা।
 
 ---
 
-**পরবর্তী পাঠ:** স্টোরেজ বনাম মেমোরি বনাম ক্যালডাটা
+---
+
+### ২. রেফারেন্স টাইপ (Reference Types) কী?
+
+- রেফারেন্স টাইপগুলো ভেরিয়েবল নিজে সম্পূর্ণ ডাটা রাখে না; এটি ডাটা যেখানে আছে সেখানে একটি রেফারেন্স/পয়েন্টার রাখে।
+- সাধারণ রেফারেন্স টাইপ: `string`, `bytes` (dynamic), `array` (fixed বা dynamic), `struct`, `mapping`।
+
+#### রেফারেন্স টাইপ উদাহরণ
+```solidity
+string name = "Anis";
+uint256[] scores = [10, 20, 30];
+struct User {
+    string name;
+    uint256 age;
+}
+User memory user = User("Anis", 25);
+mapping(address => uint256) balances;
+```
+
+রেফারেন্স টাইপগুলো সাধারণত storage/memory/callData কনটেক্সটে ভিন্নভাবে আচরণ করে — পরবর্তীতে বিস্তারিত দেখানো হবে।
+
+---
+
+### ৩. ভ্যালু বনাম রেফারেন্স — প্রধান পার্থক্য
+
+| বিষয়                 | ভ্যালু টাইপ (Value)          | রেফারেন্স টাইপ (Reference)       |
+|---------------------|-----------------------------|----------------------------------|
+| স্টোরেজ পদ্ধতি        | নিজেই মান ধরে রাখে             | ডাটা অন্য কোথাও রাখা থাকে (pointer)|
+| কপি করলে ঘটে যাওয়া   | সম্পূর্ণ মান কপি হয়            | কেবল রেফারেন্স/পয়েন্টার কপি হয়   |
+| উদাহরণ               | `uint`, `bool`, `address`     | `array`, `struct`, `mapping`     |
+
+এটা গুরুত্বপূর্ণ কারণ কপি বা অ্যাসাইনমেন্ট করলে আপনার যে আশা সেটি মিলছে কিনা তা উপর নির্ভর করে ডাটা সুরক্ষা ও বাগ হতে পারে।
+
+---
+
+### ৪. স্টোরেজ, মেমোরি ও ক্যালডাটা (Storage vs Memory vs Calldata)
+
+- `storage`: কন্ট্রাক্ট স্টোরেজ — ব্লকচেইনে স্থায়ীভাবে সংরক্ষিত (স্বল্প/দীর্ঘমেয়াদী)।
+- `memory`: ফাংশন কল কালে রানটাইমে অস্থায়ীভাবে ব্যবহার হয়; ফাংশন শেষ হলে মুছে যায়।
+- `calldata`: external ফাংশনে পাঠানো ইনপুট ডাটা — non-modifiable ও gas-দর কমাতে ভালো।
+
+কোন টাইপ কোথায় থাকবে তা নির্ভর করে আপনি কীভাবে ডিক্লেয়ার করছেন এবং কীভাবে প্যারামিটার পাঠাচ্ছেন।
+
+#### স্টোরেজ বনাম মেমোরি উদাহরণ (পিটফল ও আচরণ)
+```solidity
+pragma solidity ^0.8.0;
+
+contract StorageMemoryExample {
+    struct Person { string name; uint256 age; }
+    Person public person = Person("Anis", 25);
+
+    function changeWithStorage() public {
+        // এখানে p একটি storage রেফারেন্স — person কে সরাসরি পরিবর্তন করবে
+        Person storage p = person;
+        p.age = 30; // person.age এখন 30 হবে (state পরিবর্তন)
+    }
+
+    function changeWithMemory() public view returns (uint256) {
+        // m একটি memory কপি — মূল state পরিবর্তিত হবে না
+        Person memory m = person;
+        m.age = 40; // কেবল কপি আপডেট হচ্ছে
+        return person.age; // ফেরত দিবে 25 (মূল মান অপরিবর্তিত)
+    }
+}
+```
+
+টীকা: storage ব্যবহার করলে state পরিবর্তন হবে এবং gas খরচ হবে; memory কেবল ফাংশনের ভিতরে কপি হিসেবে ব্যবহার করে। ভুল ব্যবহারে অনিচ্ছাকৃত state পরিবর্তন বা অতিরিক্ত gas খরচ হতে পারে।
+
+---
+
+### ৫. Mapping এর ধারণা ও সতর্কতা
+
+- `mapping(keyType => valueType)` হলো hash টেবিলের মত একটি স্ট্রাকচার; এটি ডাটা স্টোরেজের জন্য দ্রুত lookup দেয়।
+- কিন্তু mapping-কে iterate করা যায় না এবং ডিফল্ট ভ্যালু রিটার্ন করে যদি কি না থাকে (numeric হলে 0, address হলে 0x0, bool হলে false)।
+
+#### Mapping উদাহরণ
+```solidity
+mapping(address => uint256) public balances;
+
+function deposit() external payable {
+    balances[msg.sender] += msg.value;
+}
+
+function withdraw(uint256 amount) external {
+    require(balances[msg.sender] >= amount, "Insufficient");
+    balances[msg.sender] -= amount;
+    payable(msg.sender).transfer(amount);
+}
+```
+
+সতর্কতা:
+- mapping থেকে কোন কী মুছে দিলেও gas খরচ আছে না থাকে না — শুধু স্টোরেজ অপারেশন।
+- iterate করার দরকার হলে আলাদা array বা enumerable mapping প্যাটার্ন ব্যবহার করুন (যেমন OpenZeppelin এর EnumerableMap)।
+
+---
+
+### ৬. Bytes ও String এর পার্থক্য
+
+- `string` হলো UTF-8 টেক্সট; `bytes` হলো বাইনারি ডেটা।
+- `bytes32` একটি fixed-size টাইপ; `bytes` বা `string` dynamic।
+- gas অপ্টিমাইজেশনের জন্য যেখানে সম্ভব fixed-size `bytes32` ব্যবহার করুন, কিন্তু human-readable টেক্সট হলে `string` ব্যবহার করবেন।
+
+---
+
+### ৭. গ্যাস (Gas) সম্পর্কিত দিক
+
+- storage write/modify সবচেয়ে খরচবহুল অপারেশন।
+- memory ব্যবহার করলে gas কমে কিন্তু কপি করার কারণে বড় ডেটা হলে gas বাড়তে পারে।
+- অপরিহার্য না হলে অপ্রয়োজনীয় স্টোরেজ অপারেশন এড়ান, এবং যথাযথ টাইপ সিলেক্ট করুন (`uint256` vs `uint8` ইত্যাদি)।
+
+---
+
+### ৮. সাধারণ ভুল ও কেস (Common Pitfalls) এবং কিভাবে এড়াবেন
+
+- Storage রেফারেন্স-অ্যাসাইনমেন্ট ভুল: `Person storage p = person;` লেখলে আপনি মূল স্টেট পরিবর্তন করবেন — যদি কপি চান তাহলে `memory` ব্যবহার করুন।
+- Mapping iterate করার চেষ্টা করলে অসম্পূর্ণ বা ব্যয়বহুল সমাধান পাবেন — পরিবর্তে index-array রাখুন।
+- Uninitialized storage variables default to zero/empty — যাচাই না করলে ভুল লজিক ঘটতে পারে।
+
+উদাহরণ (ভুল কপি):
+```solidity
+function buggy() public {
+    uint256[] storage a = new uint256[](3); // ভুল — new দিয়ে storage এ ডিরেক্ট তৈরি নয়
+}
+```
+
+---
+
+### ৯. অনুশীলনী ও চ্যালেঞ্জ
+
+1. একটি কন্ট্রাক্ট লিখুন যেখানে `User` struct ব্যবহার করে address ভিত্তিক একটি তালিকা ও mapping রাখা থাকবে; যোগ, মুছা ও আপডেটের ফাংশন তৈরি করুন, এবং দেখুন কিভাবে storage/memory প্রভাব ফেলে।
+2. একটি ছোট টোকেন ব্যালেন্স মেকানিজম তৈরী করুন যেখানে ডিপোজিট/উইথড্র লজিক থাকবে এবং mapping কিভাবে কাজ করে তা প্রদর্শন করুন।
+
+---
+
+### ১০. দ্রুত রেফারেন্স (Quick Reference)
+
+- ভ্যালু টাইপ: `uint`, `int`, `bool`, `address`, `bytes1..32`
+- রেফারেন্স টাইপ: `string`, `bytes`, `array`, `struct`, `mapping`
+- স্টোরেজ কিওয়ার্ড: `storage`, `memory`, `calldata`
+
+---
+
+## উপসংহার
+
+ভ্যালু এবং রেফারেন্স টাইপ বোঝা Solidity-তে নিরাপদ, দক্ষ এবং ভুল-মুক্ত স্মার্ট কন্ট্রাক্ট লিখতে খুব গুরুত্বপূর্ণ। স্টোরেজ ও মেমোরি কনসেপ্টগুলো বিশেষভাবে মনে রাখবেন কারণ এগুলো বাগ ও গ্যাস খরচ উভয়ের ক্ষেত্রেই প্রভাব ফেলে। অনুশীলন করুন, ছোট কন্ট্রাক্ট লিখুন এবং আচরণ পর্যবেক্ষণ করুন।
