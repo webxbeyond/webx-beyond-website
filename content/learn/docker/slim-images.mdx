@@ -1,0 +1,119 @@
+---
+title: Slim Images & Multi-stage Builds গভীর আলোচনা
+icon: logos:docker-icon
+---
+
+# Slim Images & Multi-stage Builds: Docker Image Optimization
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ Docker image ছোট, efficient, secure—production-এ deploy হয়। Slim image ও multi-stage build—industry standard optimization technique।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Security:** Small image—attack surface কমে।
+- **Performance:** Fast pull/deploy—bandwidth, storage save।
+- **Cost efficiency:** Small image—cloud/storage cost কমে।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Multi-stage build—production image থেকে dev/test tool exclude।
+- **Uber:** Alpine-based slim image—fast deploy, low resource usage।
+- **Google:** Multi-stage build—CI/CD pipeline-এ efficient build।
+
+## মূল ধারণা
+
+### ১. Slim Images: কী ও কেন?
+
+- **Slim image:** Minimal base image—unnecessary package/file নেই।
+- **Example:** Alpine Linux—5MB base image।
+- **Benefit:**
+  - Small size
+  - Fast deploy
+  - Low attack surface
+
+### ২. Multi-stage Build: Efficient Workflow
+
+- **Multi-stage build:** Dockerfile-এ multiple FROM—build tool, test, production image আলাদা stage-এ।
+- **Benefit:**
+  - Build dependency/test tool exclude
+  - Final image—only production file/binary
+- **Example:**
+  ```dockerfile
+  # Stage 1: Build
+  FROM node:18-alpine AS builder
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm install
+  COPY . .
+  RUN npm run build
+
+  # Stage 2: Production
+  FROM nginx:alpine
+  COPY --from=builder /app/build /usr/share/nginx/html
+  EXPOSE 80
+  CMD ["nginx", "-g", "daemon off;"]
+  ```
+
+### ৩. Workflow: Typical Optimization
+
+1. **Dockerfile লিখুন—multi-stage build।**
+2. **Minimal base image select করুন (Alpine, slim)।**
+3. **Build tool/test dependency—build stage-এ রাখুন।**
+4. **Production file/binary—final stage-এ copy করুন।**
+5. **docker build—optimized image create করুন।**
+
+### ৪. সহজ এনালজি
+
+- "Slim image মানে—একটি ছোট ব্যাগ, যেখানে শুধু দরকারি জিনিস আছে। Multi-stage build—একটি কারখানা, যেখানে raw material থেকে final product আলাদা stage-এ তৈরি হয়।"
+
+### ৫. Best Practices
+
+- **Minimal base image:** Alpine, slim—unnecessary package avoid করুন।
+- **Multi-stage build:** Build tool/test dependency exclude করুন।
+- **.dockerignore:** Unused file/image exclude করুন।
+- **Security scan:** Final image scan করুন (Trivy, Snyk)।
+- **Tagging strategy:** Production/dev image আলাদা tag করুন।
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Unused package/file—image size বাড়ে, security risk।
+- Build tool/test dependency—production image-এ রেখে দেয়া।
+- .dockerignore না রাখা—unnecessary file/image-এ চলে আসে।
+- Security scan না করা—vulnerability deploy হয়।
+
+### ৭. Industry Trends
+
+- **Distroless image:** Only app binary—no shell/package manager।
+- **Immutable image/tag:** Production image—change track, rollback সহজ।
+- **Automated security scan:** CI/CD pipeline-এ enforced।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Production deploy—slim, secure, efficient image essential।
+- CI/CD pipeline—fast build/deploy।
+- Cloud deploy—storage/bandwidth optimize।
+
+## সংক্ষিপ্ত workflow
+
+1. Minimal base image select করুন।
+2. Multi-stage build Dockerfile লিখুন।
+3. Build tool/test dependency exclude করুন।
+4. .dockerignore configure করুন।
+5. Security scan enforced করুন।
+
+## Quick Checklist
+
+- [x] Minimal base image used?
+- [x] Multi-stage build configured?
+- [x] .dockerignore present?
+- [x] Security scan enforced?
+- [x] Tagging strategy followed?
+- [x] Distroless image possible?
+
+---
+
+## উপসংহার
+
+Slim image ও multi-stage build—Docker image optimization, security, efficiency—production-grade deployment-এর জন্য essential। Industry standard workflow—confident build, deploy, update সম্ভব।
+

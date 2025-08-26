@@ -1,0 +1,155 @@
+---
+title: Macvlan, IPVLAN, Custom DNS ও IPAM
+icon: logos:docker-icon
+---
+
+# Macvlan, IPVLAN, Custom DNS ও IPAM: ডকার নেটওয়ার্কিং-এর উন্নত কৌশল
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—enterprise-level app-এ container networking-এ advanced control, performance, এবং customizability—critical। Macvlan/IPVLAN—direct network access, Custom DNS/IPAM—flexible addressing—production-grade deployment-এ must-have।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Performance:** Direct network access—low latency, high throughput।
+- **Customizability:** Own IP, custom DNS—complex topology possible।
+- **Compatibility:** Legacy network integration—physical network-এ container add করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** High-performance streaming—Macvlan/IPVLAN—direct network access।
+- **Uber:** Real-time microservices—custom DNS/IPAM—dynamic addressing।
+- **Google:** Hybrid cloud—physical network integration—Macvlan enforced।
+
+## মূল ধারণা
+
+### ১. Macvlan Explained
+
+- **Macvlan:** Physical network-এ container-কে direct IP assign করে।
+- **Each container—own MAC address, own IP—like real device।**
+- **Benefit:** Legacy network integration, direct access, high performance।
+
+#### Workflow
+
+1. **Macvlan network create করুন:**
+   ```bash
+   docker network create -d macvlan \
+     --subnet=192.168.1.0/24 \
+     --gateway=192.168.1.1 \
+     -o parent=eth0 my_macvlan
+   ```
+2. **Container run করুন—network attach করুন:**
+   ```bash
+   docker run -d --name myapp --network my_macvlan nginx
+   ```
+
+#### সহজ এনালজি
+
+- "Macvlan মানে—একটি নতুন ফোন নম্বর, যেটা দিয়ে সরাসরি কল করা যায়—no extension needed।"
+
+### ২. IPVLAN Explained
+
+- **IPVLAN:** Physical network-এ multiple container—same MAC, different IP—assign করে।
+- **Benefit:** Efficient, less network overhead, cloud/VM-friendly।
+
+#### Workflow
+
+1. **IPVLAN network create করুন:**
+   ```bash
+   docker network create -d ipvlan \
+     --subnet=192.168.2.0/24 \
+     --gateway=192.168.2.1 \
+     -o parent=eth0 my_ipvlan
+   ```
+2. **Container run করুন—network attach করুন:**
+   ```bash
+   docker run -d --name myapp2 --network my_ipvlan nginx
+   ```
+
+#### সহজ এনালজি
+
+- "IPVLAN মানে—একটি অফিসে সবাই একই ল্যান্ডলাইন (MAC), কিন্তু আলাদা extension (IP) পায়।"
+
+### ৩. Custom DNS Configuration
+
+- **Custom DNS:** Container-এ নিজের DNS server set করা যায়—service discovery, internal/external resolution।
+- **Benefit:** Microservices, hybrid cloud—flexible name resolution।
+
+#### Workflow
+
+1. **Container run করুন—custom DNS set করুন:**
+   ```bash
+   docker run -d --name web --dns 8.8.8.8 nginx
+   ```
+2. **docker-compose.yml-এ DNS set করুন:**
+   ```yaml
+   services:
+     app:
+       image: nginx
+       dns:
+         - 8.8.8.8
+         - 1.1.1.1
+   ```
+
+### ৪. IPAM (IP Address Management)
+
+- **IPAM:** Custom IP allocation—subnet, gateway, IP range—define করা যায়।
+- **Benefit:** Complex topology, multi-subnet, overlapping network—manage করা সহজ।
+
+#### Workflow
+
+1. **Custom IPAM network create করুন:**
+   ```bash
+   docker network create -d bridge \
+     --subnet=10.10.0.0/16 \
+     --ip-range=10.10.1.0/24 \
+     --gateway=10.10.0.1 my_custom_net
+   ```
+
+### ৫. Best Practices
+
+- **Production-এ Macvlan/IPVLAN—direct access, high performance।**
+- **Custom DNS/IPAM—complex topology, microservices-এ must-have।**
+- **Network monitoring—performance/security ensure করুন।**
+- **Documentation—network config clearly maintain করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Parent interface ভুল—network create fail।
+- Overlapping subnet—IP conflict।
+- Custom DNS/IPAM ভুল—service discovery break।
+- Security config miss—exposed network risk।
+
+### ৭. Industry Trends
+
+- **Hybrid cloud/network integration—Macvlan/IPVLAN enforced।**
+- **Dynamic microservices—custom DNS/IPAM essential।**
+- **Network automation—API-driven config।**
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Legacy network integration—physical network-এ container add করতে হলে।
+- High-performance app—direct access, low latency দরকার হলে।
+- Complex topology—custom IP/DNS allocation দরকার হলে।
+
+## সংক্ষিপ্ত workflow
+
+1. Macvlan/IPVLAN network create করুন।
+2. Container run করুন—network attach করুন।
+3. Custom DNS/IPAM config করুন।
+4. Network monitoring/documentation maintain করুন।
+
+## Quick Checklist
+
+- [x] Macvlan/IPVLAN network created?
+- [x] Custom DNS/IPAM configured?
+- [x] Network monitoring/documentation?
+- [x] Security config checked?
+- [x] Production performance validated?
+
+---
+
+## উপসংহার
+
+Macvlan, IPVLAN, Custom DNS ও IPAM—advanced Docker networking-এ direct access, flexible addressing, high performance—production-ready, scalable, secure architecture build করতে essential।
+

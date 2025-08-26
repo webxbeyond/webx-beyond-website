@@ -1,0 +1,156 @@
+---
+title: ডকার ইমেজের সেরা অনুশীলন
+slug: /docker/dockerfile-best-practices
+---
+
+# ডকার ইমেজের সেরা অনুশীলন: দক্ষ, নিরাপদ ও ছোট ইমেজ তৈরির কৌশল
+
+## প্রস্তাবনা
+
+ডকার ইমেজের সেরা অনুশীলন (Best Practices) জানা না থাকলে, আপনার অ্যাপ্লিকেশন ধীর, ভারী, অনিরাপদ বা অপ্রয়োজনীয়ভাবে জটিল হতে পারে। Google, Netflix, Uber-এর মতো কোম্পানিগুলো তাদের ডকার ইমেজ অপ্টিমাইজ করতে এই অনুশীলনগুলো অনুসরণ করে—ফলে ডিপ্লয়মেন্ট দ্রুত, স্কেলিং সহজ এবং নিরাপত্তা নিশ্চিত হয়।
+
+---
+
+## ১. ছোট ও লাইটওয়েট বেস ইমেজ ব্যবহার করুন
+
+- **Alpine Linux**-এর মতো ছোট বেস ইমেজ ব্যবহার করুন (যেমন: `node:18-alpine`, `python:3.11-alpine`)।
+- বড় ইমেজ (যেমন: `ubuntu`, `debian`) শুধু বিশেষ দরকারে ব্যবহার করুন।
+
+**বাস্তব উদাহরণ:** Netflix তাদের microservices-এ Alpine-based ইমেজ ব্যবহার করে বিল্ড টাইম ও সাইজ কমায়।
+
+**এনালজি:** ছোট ব্যাগে ভ্রমণ করলে চলাফেরা সহজ—তেমনি ছোট ইমেজ দ্রুত ডিপ্লয় হয়।
+
+---
+
+## ২. Dockerfile-এ অপ্রয়োজনীয় ফাইল কপি করবেন না
+
+- `.dockerignore` ফাইল ব্যবহার করুন—`node_modules`, `.git`, `*.log` বাদ দিন।
+- শুধু দরকারি সোর্স কোড, কনফিগ, ডিপেন্ডেন্সি কপি করুন।
+
+**Best Practice:**
+```bash
+# .dockerignore
+node_modules
+.git
+*.log
+temp/
+```
+
+---
+
+## ৩. Multi-stage Build ব্যবহার করুন
+
+- Build ও Production আলাদা Stage-এ রাখুন।
+- Final ইমেজে শুধু দরকারি ফাইল ও ডিপেন্ডেন্সি রাখুন।
+
+**Example:**
+```Dockerfile
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+
+FROM node:18-alpine AS prod
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY package.json .
+RUN npm install --only=production
+CMD ["node", "dist/index.js"]
+```
+
+---
+
+## ৪. Layer Optimization: Dockerfile-এর কমান্ডের অর্ডার
+
+- কম পরিবর্তনশীল কমান্ড (যেমন: ডিপেন্ডেন্সি ইনস্টল) আগে রাখুন।
+- বেশি পরিবর্তনশীল (যেমন: সোর্স কোড কপি) পরে রাখুন—এতে ক্যাশ ভালোভাবে কাজ করে।
+
+**Example:**
+```Dockerfile
+COPY package.json .
+RUN npm install
+COPY . .
+```
+
+---
+
+## ৫. কম privilege ও নিরাপদ কনফিগারেশন
+
+- Production ইমেজে root user ব্যবহার করবেন না।
+- `USER` নির্দেশনা দিয়ে non-root user ব্যবহার করুন।
+
+**Example:**
+```Dockerfile
+RUN adduser -D appuser
+USER appuser
+```
+
+---
+
+## ৬. Secrets ও Sensitive Data Dockerfile-এ রাখবেন না
+
+- API Key, Password, Token কখনো Dockerfile-এ লিখবেন না।
+- Environment Variable বা Docker Secrets ব্যবহার করুন।
+
+---
+
+## ৭. Version Pinning ও নির্দিষ্ট Tag ব্যবহার করুন
+
+- বেস ইমেজে নির্দিষ্ট version/tag ব্যবহার করুন (যেমন: `node:18-alpine`)—`latest` ব্যবহার করবেন না।
+- ডিপেন্ডেন্সি ইনস্টল করার সময়ও version pin করুন।
+
+---
+
+## ৮. Healthcheck ও Metadata যোগ করুন
+
+- Dockerfile-এ `HEALTHCHECK` ব্যবহার করুন—কন্টেইনারের স্টেট মনিটর করতে সহজ হবে।
+- `LABEL` দিয়ে ইমেজের metadata (maintainer, version) যোগ করুন।
+
+**Example:**
+```Dockerfile
+LABEL maintainer="your@email.com"
+HEALTHCHECK CMD curl --fail http://localhost:3000 || exit 1
+```
+
+---
+
+## ৯. Clean Up: অপ্রয়োজনীয় ফাইল ও ক্যাশ রিমুভ করুন
+
+- Build শেষে temp ফাইল, ক্যাশ, unnecessary package রিমুভ করুন।
+- `RUN` কমান্ডে multiple action একসাথে লিখুন—layer কমবে।
+
+**Example:**
+```Dockerfile
+RUN apt-get update && apt-get install -y git \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+---
+
+## ১০. Security Scan ও Vulnerability Check
+
+- ইমেজ বিল্ডের পরে Trivy, Snyk-এর মতো টুল দিয়ে vulnerability scan করুন।
+- Industry-তে CI/CD pipeline-এ automated scan চালানো হয়।
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- বড় বেস ইমেজ ব্যবহার করলে ইমেজ ভারী ও ধীর হয়।
+- `.dockerignore` না থাকলে অপ্রয়োজনীয় ফাইল ইমেজে চলে আসে।
+- root user ব্যবহার করলে security risk বাড়ে।
+- `latest` tag ব্যবহার করলে version mismatch হতে পারে।
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Slim Images:** Google, Uber lightweight ইমেজ ব্যবহার করে ডিপ্লয়মেন্ট দ্রুত করে।
+- **Automated Security Scan:** CI/CD pipeline-এ ইমেজ vulnerability scan বাধ্যতামূলক।
+- **Multi-stage Build:** Modern production workflow-এ multi-stage build default practice।
+
+---
+
+## উপসংহার
+
+ডকার ইমেজের সেরা অনুশীলন অনুসরণ করলে আপনার অ্যাপ্লিকেশন দ্রুত, নিরাপদ ও স্কেলেবল হবে। বাস্তব সিস্টেম ডিজাইনে এই কৌশলগুলো আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার DevOps দক্ষতা আরও বাড়বে!

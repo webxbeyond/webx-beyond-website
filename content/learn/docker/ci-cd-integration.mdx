@@ -1,0 +1,178 @@
+---
+title: Docker in Jenkins, GitHub Actions & GitLab CI
+icon: logos:docker-icon
+---
+
+# Docker in Jenkins, GitHub Actions & GitLab CI: আধুনিক DevOps Pipeline
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ code change থেকে production deploy—automation, speed, reliability—critical। Docker—CI/CD pipeline-এ integration—build, test, deploy—industry standard। Jenkins, GitHub Actions, GitLab CI—popular automation tool—Docker workflow-এ essential।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Automation:** Manual build/deploy—slow, error-prone; CI/CD—fast, reliable, repeatable।
+- **Consistency:** Docker—same environment—local, staging, production—guarantee করে।
+- **Scalability:** Parallel build/test/deploy—multiple app/service—easy।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of microservices—Docker-based CI/CD pipeline—Jenkins, GitHub Actions use করে।
+- **Uber:** Real-time deploy—GitLab CI—Docker image build/test/deploy automated।
+- **Google:** Kubernetes/Docker—GitHub Actions—production workflow enforced।
+
+## মূল ধারণা
+
+### ১. CI/CD Explained
+
+- **CI (Continuous Integration):** Code change—auto build/test—early bug detect।
+- **CD (Continuous Delivery/Deployment):** Auto deploy—production/staging—manual intervention ছাড়াই।
+- **Benefit:** Faster release, less error, confident deploy।
+
+#### সহজ এনালজি
+
+- "CI/CD মানে—একটি ফ্লাইটের অটোপাইলট, যেখানে গন্তব্যে পৌঁছাতে মানুষকে বারবার হস্তক্ষেপ করতে হয় না।"
+
+### ২. Docker Integration Workflow
+
+1. **Code change—push করুন (GitHub/GitLab)।**
+2. **CI/CD tool—auto trigger—Docker image build/test।**
+3. **Image registry-তে push—production/staging-এ deploy।**
+4. **Automated test—quality/security ensure।**
+
+### ৩. Jenkins-এ Docker Integration
+
+- **Jenkins:** Open-source automation server—custom pipeline, plugin-rich।
+- **Docker plugin:** Build, run, push Docker image—Jenkinsfile-এ define।
+
+#### Workflow
+
+1. **Jenkinsfile লিখুন:**
+   ```groovy
+   pipeline {
+     agent any
+     stages {
+       stage('Build') {
+         steps {
+           sh 'docker build -t myapp:latest .'
+         }
+       }
+       stage('Test') {
+         steps {
+           sh 'docker run --rm myapp:latest npm test'
+         }
+       }
+       stage('Push') {
+         steps {
+           sh 'docker push myapp:latest'
+         }
+       }
+     }
+   }
+   ```
+2. **Jenkins server—auto build/test/push—trigger করে।**
+
+### ৪. GitHub Actions-এ Docker Integration
+
+- **GitHub Actions:** Workflow automation—YAML-based—easy integration।
+- **Docker build/push/test—workflow file-এ define।**
+
+#### Workflow
+
+1. **.github/workflows/docker.yml লিখুন:**
+   ```yaml
+   name: Docker CI/CD
+   on:
+     push:
+       branches: [ main ]
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v2
+         - name: Build Docker image
+           run: docker build -t myapp:latest .
+         - name: Test
+           run: docker run --rm myapp:latest npm test
+         - name: Push
+           run: docker push myapp:latest
+   ```
+2. **Push করলে—workflow auto trigger—build/test/push।**
+
+### ৫. GitLab CI-তে Docker Integration
+
+- **GitLab CI:** Built-in CI/CD—YAML-based—Docker integration সহজ।
+- **Docker build/test/push—.gitlab-ci.yml-এ define।**
+
+#### Workflow
+
+1. **.gitlab-ci.yml লিখুন:**
+   ```yaml
+   stages:
+     - build
+     - test
+     - push
+   build:
+     stage: build
+     script:
+       - docker build -t myapp:latest .
+   test:
+     stage: test
+     script:
+       - docker run --rm myapp:latest npm test
+   push:
+     stage: push
+     script:
+       - docker push myapp:latest
+   ```
+2. **Code push করলে—pipeline auto run—build/test/push।**
+
+### ৬. Best Practices
+
+- **Docker image—version/tag—always use করুন।**
+- **Automated test—pipeline-এ enforce করুন।**
+- **Secrets—environment variable/secret manager-এ store করুন।**
+- **Rollback strategy—deploy fail হলে restore করুন।**
+- **Documentation—pipeline config clear রাখুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Latest tag—production-এ use—rollback/trace কঠিন।
+- Manual test—automation miss—bug detect late।
+- Secrets—codebase-এ store—security risk।
+- Pipeline config/documentation miss—debugging কঠিন।
+
+### ৮. Industry Trends
+
+- **Multi-stage build—Dockerfile-এ enforced।**
+- **Automated security scan—pipeline-এ integrated।**
+- **Cloud-native CI/CD—Kubernetes, serverless deploy।**
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production/staging deploy—automation, reliability essential।
+- Microservices—multiple app/service—parallel build/test/deploy।
+- Security—automated scan/test enforced।
+
+## সংক্ষিপ্ত workflow
+
+1. Code change—push করুন।
+2. CI/CD pipeline—auto build/test/deploy।
+3. Docker image—registry-তে push করুন।
+4. Automated test/security scan enforced করুন।
+5. Documentation/rollback strategy maintain করুন।
+
+## Quick Checklist
+
+- [x] CI/CD pipeline configured?
+- [x] Docker build/test/push automated?
+- [x] Version/tag used?
+- [x] Secrets managed securely?
+- [x] Automated test/security scan?
+
+---
+
+## উপসংহার
+
+Docker in Jenkins, GitHub Actions & GitLab CI—modern DevOps pipeline-এ automation, reliability, scalability—production-ready deployment, confident release—industry standard। Workflow follow করলে—robust, secure, efficient CI/CD pipeline build করা সম্ভব।
+

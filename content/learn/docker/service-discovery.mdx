@@ -1,0 +1,100 @@
+---
+title: DNS রেজলিউশন ও সার্ভিস ডিসকভারি
+slug: /docker/service-discovery
+---
+
+# DNS রেজলিউশন ও সার্ভিস ডিসকভারি: Docker কন্টেইনারের মধ্যে স্মার্ট যোগাযোগ
+
+## প্রস্তাবনা
+
+Docker কন্টেইনারের মধ্যে স্মার্ট, অটোমেটেড ও স্কেলেবল যোগাযোগ—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। DNS Resolution ও Service Discovery ছাড়া, microservices architecture, auto-scaling, ও dynamic deployment সম্ভব নয়। এই লেসনে আমরা DNS Resolution ও Service Discovery-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## DNS Resolution: কী, কেন ও কিভাবে?
+
+**DNS Resolution** হচ্ছে কন্টেইনারের মধ্যে নাম (name) দিয়ে অন্য কন্টেইনারের IP address খুঁজে বের করার পদ্ধতি।
+
+- Custom user-defined network-এ কন্টেইনারের নাম দিয়ে resolve করা যায় (যেমন: `db`, `web`)
+- Default bridge network-এ DNS resolution কাজ করে না
+
+**বাস্তব উদাহরণ:**
+- Netflix-এর microservices architecture-এ প্রতিটি সার্ভিস DNS নাম দিয়ে একে অপরকে খুঁজে পায়—hardcoded IP দরকার হয় না
+
+**এনালজি:**
+- ধরুন, আপনি অফিসে কারো নাম বললেই তার ডেস্কে পৌঁছে যান—IP address মনে রাখার দরকার নেই
+
+**Example:**
+```bash
+docker network create my-network
+docker run -d --name db --network my-network mysql
+docker run -d --name web --network my-network nginx
+```
+- `web` কন্টেইনার থেকে `db:3306`-এ DNS নাম দিয়ে কানেক্ট করা যাবে
+
+---
+
+## Service Discovery: কী, কেন ও কিভাবে?
+
+**Service Discovery** হচ্ছে কন্টেইনার বা সার্ভিসের অবস্থান (location) অটোমেটেডভাবে খুঁজে বের করার পদ্ধতি।
+
+- Docker network-এ DNS-based service discovery by default
+- Docker Compose, Swarm, Kubernetes-এ built-in service discovery
+- Dynamic scaling, auto-restart, rolling update—সবকিছুতে service discovery দরকার
+
+**বাস্তব উদাহরণ:**
+- Google-এর production environment-এ হাজার হাজার কন্টেইনার—service discovery ছাড়া auto-scaling ও failover সম্ভব নয়
+
+**এনালজি:**
+- ধরুন, আপনি একটি বড় হোটেলে গেস্টদের নাম বললেই তাদের রুম নম্বর পেয়ে যান—service discovery-ও তেমন
+
+---
+
+## Core Concepts: DNS ও Service Discovery
+
+1. **Name-based Communication:**
+    - IP address মনে রাখার দরকার নেই—name দিয়ে যোগাযোগ
+2. **Dynamic Scaling:**
+    - নতুন কন্টেইনার এলে DNS auto-update হয়
+3. **Health Check & Failover:**
+    - Service discovery দিয়ে unhealthy কন্টেইনার bypass করা যায়
+4. **Multi-host Networking:**
+    - Swarm/Kubernetes-এ multi-host DNS ও service discovery
+
+---
+
+## Workflow: DNS ও Service Discovery ব্যবহার
+
+1. **Custom Network তৈরি করুন:**
+    ```bash
+    docker network create app-net
+    ```
+2. **কন্টেইনার চালান ও network-এ যুক্ত করুন:**
+    ```bash
+    docker run -d --name db --network app-net mysql
+    docker run -d --name web --network app-net nginx
+    ```
+3. **DNS নাম দিয়ে যোগাযোগ:**
+    - `web` কন্টেইনার থেকে `db:3306`-এ কানেক্ট করুন
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Default bridge network-এ DNS resolution কাজ করে না—custom network ব্যবহার করুন
+- Hardcoded IP ব্যবহার করলে scaling ও failover সমস্যা হয়
+- Service discovery না থাকলে manual configuration করতে হয়
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Built-in Service Discovery:** Docker Compose, Swarm, Kubernetes-এ DNS-based discovery default
+- **Dynamic Scaling:** Production-এ auto-scaling ও rolling update-এ service discovery বাধ্যতামূলক
+- **Health-aware Routing:** Unhealthy container bypass করতে service discovery ব্যবহার হচ্ছে
+
+---
+
+## উপসংহার
+
+DNS Resolution ও Service Discovery—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker কন্টেইনারের মধ্যে স্মার্ট, অটোমেটেড ও স্কেলেবল যোগাযোগ সম্ভব। বাস্তব সিস্টেম ডিজাইনে এই network model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker networking skill আরও শক্তিশালী হবে!

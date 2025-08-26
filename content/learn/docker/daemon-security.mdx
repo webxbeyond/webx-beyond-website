@@ -1,0 +1,82 @@
+---
+title: Docker Daemon সিকিউরিটি
+slug: /docker/daemon-security
+---
+
+# Docker Daemon সিকিউরিটি: কন্টেইনার প্ল্যাটফর্মের নিরাপত্তার মূল স্তম্ভ
+
+## প্রস্তাবনা
+
+Docker Daemon—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর production environment-এ কন্টেইনার orchestration ও management-এর মূল প্ল্যাটফর্ম। Daemon-এর নিরাপত্তা নিশ্চিত না করলে পুরো সিস্টেম compromise হতে পারে। এই লেসনে আমরা Docker Daemon security-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Docker Daemon: কী, কেন ও কিভাবে?
+
+**Docker Daemon** হচ্ছে Docker-এর মূল সার্ভার, যা container, image, network, volume—সবকিছু manage করে।
+
+- Daemon root privilege-এ চলে, তাই security risk বেশি
+- Remote API, socket, network—সবকিছু Daemon-এর মাধ্যমে access হয়
+
+**বাস্তব উদাহরণ:**
+- Google production cluster-এ Daemon security hardening করা হয়—unauthorized access হলে পুরো cluster compromise হতে পারে
+
+**এনালজি:**
+- ধরুন, অফিসের main gate—gatekeeper (Daemon) যদি দুর্বল হয়, পুরো অফিসে কেউ ঢুকে পড়তে পারে
+
+---
+
+## Core Concepts: Daemon Security
+
+1. **Socket Security:**
+    - `/var/run/docker.sock`—root privilege, unauthorized access হলে system compromise
+2. **Remote API Security:**
+    - TCP API expose করলে TLS, authentication, firewall configure করুন
+3. **User Privilege:**
+    - Docker group-এ user add করলে root privilege পায়—caution
+4. **Audit Logging:**
+    - Daemon-এর action log করুন—suspicious activity detect করুন
+5. **Resource Limiting:**
+    - Daemon-এর resource usage limit করুন—DoS attack mitigate
+
+---
+
+## Workflow: Daemon Security Best Practices
+
+1. **Socket Permission:**
+    - Docker socket শুধু trusted user/group-এ accessible করুন
+2. **Remote API Hardening:**
+    - TLS, firewall, authentication configure করুন
+    - Example:
+      ```bash
+      dockerd --tlsverify --tlscacert=ca.pem --tlscert=server-cert.pem --tlskey=server-key.pem -H=0.0.0.0:2376
+      ```
+3. **User Management:**
+    - Docker group-এ user add করার আগে security audit করুন
+4. **Audit Logging:**
+    - Daemon log file monitor করুন
+5. **Resource Limiting:**
+    - Daemon config-এ resource limit set করুন
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Docker socket public করলে system compromise হতে পারে
+- Remote API TLS ছাড়া expose করলে attacker access পায়
+- Docker group-এ untrusted user add করলে root privilege leak হয়
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **TLS Everywhere:** Production-এ remote API-তে TLS বাধ্যতামূলক
+- **Audit Logging Automation:** Suspicious activity detect করতে automated logging
+- **Least Privilege Principle:** Docker group-এ শুধু trusted user
+- **Firewall Integration:** Daemon API firewall দিয়ে protect করা হচ্ছে
+
+---
+
+## উপসংহার
+
+Docker Daemon security—এই ধারণা দক্ষভাবে ব্যবহার করলে container platform-এর মূল স্তম্ভ নিরাপদ রাখা যায়। বাস্তব সিস্টেম ডিজাইনে এই security model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker security skill আরও শক্তিশালী হবে!

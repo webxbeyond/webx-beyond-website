@@ -1,0 +1,107 @@
+---
+title: OCI Image Specification নিয়ে কাজ
+icon: logos:docker-icon
+---
+
+# OCI Image Specification: Docker Image Standardization
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ container image portability, compatibility, security—critical। OCI (Open Container Initiative) Image Specification—industry standard—Docker, Kubernetes, container runtime-এ universal compatibility নিশ্চিত করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Portability:** Same image—multiple platform/runtime-এ deploy করা যায়।
+- **Compatibility:** Docker, Kubernetes, Podman—সব runtime-এ image run হয়।
+- **Security:** Standardized format—supply chain security boost।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** OCI image—Kubernetes, Docker, CI/CD pipeline-এ use।
+- **Uber:** Multi-cloud deploy—OCI image compatibility essential।
+- **Google:** Container runtime—OCI spec enforced।
+
+## মূল ধারণা
+
+### ১. OCI Image Specification Explained
+
+- **OCI:** Open Container Initiative—industry standard image format/specification।
+- **Image structure:** Manifest, config, layer—standardized format।
+- **Benefit:** Universal compatibility, security, automation।
+
+### ২. Image Structure: Manifest, Config, Layer
+
+- **Manifest:** Image metadata—layer info, config, digest।
+- **Config:** Runtime config—env, cmd, entrypoint, user।
+- **Layer:** Filesystem changes—each Dockerfile instruction-এ new layer।
+- **Example:**
+  - Manifest.json
+  - Config.json
+  - Layer.tar.gz
+
+### ৩. Workflow: OCI Image Build & Deploy
+
+1. **Dockerfile লিখুন—OCI compatible instruction।**
+2. **docker build—OCI image create।**
+3. **Image registry-তে push—OCI format enforced।**
+4. **Any runtime-এ deploy—Docker, Kubernetes, Podman।**
+
+### ৪. Validation & Security
+
+- **Image validation:** OCI spec compatible—tool দিয়ে check করুন।
+- **Security scan:** Standardized format—supply chain vulnerability detect।
+- **Automation:** CI/CD pipeline-এ OCI image build/test/deploy enforced।
+
+### ৫. সহজ এনালজি
+
+- "OCI image spec মানে—একটি আন্তর্জাতিক পাসপোর্ট, যেটা সব দেশে (runtime/platform) accept হয়।"
+
+### ৬. Best Practices
+
+- **Always OCI compatible image build করুন।**
+- **Manifest/config/layer—standard format enforced।**
+- **Validation tool:** OCI image validator/tool use করুন।
+- **Security scan:** Standardized format-এ vulnerability detect করুন।
+- **Multi-cloud deploy:** Same image—multiple platform-এ run করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Non-standard image build—runtime/platform-এ compatibility issue।
+- Manifest/config/layer format mismatch—deploy fail।
+- Security scan না করা—supply chain vulnerability।
+- Validation tool না use করা—hidden issue।
+
+### ৮. Industry Trends
+
+- **Universal image registry:** OCI spec enforced—Docker Hub, Harbor, ECR, GCR।
+- **Multi-runtime compatibility:** Docker, Podman, containerd—same image run।
+- **Automated validation:** CI/CD pipeline-এ enforced।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production deploy—multi-cloud, multi-runtime compatibility essential।
+- CI/CD pipeline—automated build/test/deploy।
+- Security—standardized format enforced।
+
+## সংক্ষিপ্ত workflow
+
+1. Dockerfile লিখুন—OCI compatible instruction।
+2. docker build—OCI image create করুন।
+3. Registry-তে push—standard format enforced।
+4. Any runtime/platform-এ deploy করুন।
+5. Validation/security scan enforced করুন।
+
+## Quick Checklist
+
+- [x] OCI compatible image build?
+- [x] Manifest/config/layer standard format?
+- [x] Validation tool used?
+- [x] Security scan enforced?
+- [x] Multi-cloud/runtime deploy possible?
+
+---
+
+## উপসংহার
+
+OCI Image Specification—Docker image portability, compatibility, security—production-grade deployment-এর জন্য essential। Industry standard workflow—confident build, deploy, validate, scan, automate সম্ভব।
+

@@ -1,0 +1,110 @@
+---
+title: Monitoring & Logging in CI/CD Pipelines
+icon: logos:docker-icon
+---
+
+# Monitoring & Logging in CI/CD Pipelines: Production Workflow-এ Visibility ও Reliability
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—modern app-এ code change থেকে production deploy—visibility, reliability, troubleshooting—critical। CI/CD pipeline-এ monitoring & logging—issue detect, performance tune, audit maintain—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Visibility:** Automated build/test/deploy—real-time status, error, success—track করা যায়।
+- **Troubleshooting:** Issue detect—root cause analysis—fast recovery।
+- **Audit/Compliance:** Deploy history, error log—compliance/documentation maintained।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of deploy—real-time monitoring/logging—Jenkins/GitHub Actions-এ।
+- **Uber:** Automated pipeline—logging—issue detect, rollback—fast recovery।
+- **Google:** Kubernetes/Docker—monitoring/logging—production workflow enforced।
+
+## মূল ধারণা
+
+### ১. Monitoring Explained
+
+- **Monitoring:** Automated pipeline—build/test/deploy—real-time status, resource usage, error—track করা যায়।
+- **Benefit:** Issue early detect, performance tune, SLA maintain।
+
+#### সহজ এনালজি
+
+- "Monitoring মানে—একটি গাড়ির ড্যাশবোর্ড, যেখানে সব status real-time দেখা যায়।"
+
+### ২. Logging Explained
+
+- **Logging:** Pipeline-এ build/test/deploy—error, warning, info—record হয়।
+- **Benefit:** Issue reproduce, audit, compliance—easy।
+
+#### সহজ এনালজি
+
+- "Logging মানে—একটি ডায়েরি, যেখানে প্রতিদিনের ঘটনা লেখা থাকে—পরবর্তীতে পড়ে issue খুঁজে পাওয়া যায়।"
+
+### ৩. Typical Workflow
+
+1. **Code change—push করুন।**
+2. **CI/CD pipeline—build/test/deploy—monitoring/logging enabled।**
+3. **Real-time dashboard—status/error/performance track করুন।**
+4. **Log file—error/warning/info—audit/documentation maintained।**
+
+### ৪. Example: Jenkins Monitoring & Logging
+
+1. **Jenkins dashboard—build status, error, log—real-time দেখা যায়।**
+2. **Pipeline log—build/test/push—error/warning/info—record হয়।**
+3. **External tool—Prometheus/Grafana—Jenkins metrics visualize।**
+
+### ৫. Example: GitHub Actions Logging
+
+1. **Workflow run—real-time status, log—dashboard-এ দেখা যায়।**
+2. **Log file—error/warning/info—download/analyze করা যায়।**
+3. **External integration—Datadog, ELK Stack—advanced monitoring/logging।**
+
+### ৬. Best Practices
+
+- **Monitoring/logging—every pipeline-এ enforced করুন।**
+- **Real-time dashboard—status/error/performance track করুন।**
+- **Log retention—audit/compliance/documentation maintain করুন।**
+- **Alert/notification—issue/error detect হলে auto alert।**
+- **Documentation—monitoring/logging config clear রাখুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Monitoring/logging miss—issue detect late, recovery slow।
+- Log retention miss—audit/compliance fail।
+- Alert/notification miss—critical issue unnoticed।
+- Documentation miss—config/debugging কঠিন।
+
+### ৮. Industry Trends
+
+- **Real-time monitoring/logging—CI/CD pipeline-এ default।**
+- **External tool integration—Prometheus, Grafana, ELK Stack, Datadog।**
+- **Automated alert/notification—Slack, Email, PagerDuty।**
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production/staging deploy—visibility, reliability essential।
+- Microservices—multiple app/service—parallel monitoring/logging।
+- Audit/compliance—deploy history, error log maintain।
+
+## সংক্ষিপ্ত workflow
+
+1. Code change—push করুন।
+2. CI/CD pipeline—build/test/deploy—monitoring/logging enabled।
+3. Real-time dashboard—status/error/performance track করুন।
+4. Log file—audit/compliance/documentation maintained।
+
+## Quick Checklist
+
+- [x] Monitoring/logging enabled?
+- [x] Real-time dashboard available?
+- [x] Log retention/audit maintained?
+- [x] Alert/notification configured?
+- [x] Documentation/config clear?
+
+---
+
+## উপসংহার
+
+Monitoring & Logging in CI/CD Pipelines—production workflow-এ visibility, reliability, troubleshooting—industry standard। Workflow follow করলে—robust, secure, efficient pipeline build করা সম্ভব—issue early detect, fast recovery, confident release নিশ্চিত।
+

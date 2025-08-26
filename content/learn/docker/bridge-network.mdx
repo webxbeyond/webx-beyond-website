@@ -1,0 +1,88 @@
+---
+title: Bridge Network ও Container Linking
+slug: /docker/bridge-network
+---
+
+# Bridge Network ও Container Linking: ডকার কন্টেইনারের মধ্যে যোগাযোগের মূল ভিত্তি
+
+## প্রস্তাবনা
+
+ডকার কন্টেইনারের মধ্যে যোগাযোগ (Communication) ও নেটওয়ার্কিং ডিজাইন—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর জন্য অত্যন্ত গুরুত্বপূর্ণ। সঠিক নেটওয়ার্কিং ছাড়া, অ্যাপ্লিকেশন স্কেল করা, নিরাপত্তা বজায় রাখা, ও মাইক্রোসার্ভিস আর্কিটেকচার বাস্তবায়ন সম্ভব নয়। এই লেসনে আমরা Bridge Network ও Container Linking-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Bridge Network: কী, কেন ও কিভাবে?
+
+**Bridge Network** হচ্ছে ডকারের ডিফল্ট নেটওয়ার্ক ড্রাইভার, যা কন্টেইনারগুলোকে একই হোস্টে একে অপরের সঙ্গে যোগাযোগ করতে দেয়।
+
+- যখন আপনি কোনো কন্টেইনার চালান (যেমন: `docker run nginx`), সেটি ডিফল্ট bridge নেটওয়ার্কে যুক্ত হয়।
+- Bridge Network-এ থাকা কন্টেইনারগুলো নিজেদের মধ্যে IP address দিয়ে যোগাযোগ করতে পারে।
+
+**বাস্তব উদাহরণ:**
+- Uber-এর microservices একাধিক কন্টেইনারে চলে, যেগুলো bridge network-এ যুক্ত থাকে এবং নিজেদের মধ্যে API call করে।
+
+**এনালজি:**
+- ধরুন, একটি অ্যাপার্টমেন্ট বিল্ডিং—সব ফ্ল্যাট একই বিল্ডিংয়ে, তাই সহজেই একে অপরের সঙ্গে যোগাযোগ করা যায়। Bridge Network-ও তেমন—একই "বিল্ডিং"-এ থাকা কন্টেইনার সহজে কথা বলে।
+
+---
+
+## Container Linking: পুরনো পদ্ধতি
+
+**Container Linking** ছিল ডকারের পুরনো পদ্ধতি, যেখানে এক কন্টেইনারকে অন্য কন্টেইনারের সঙ্গে "লিঙ্ক" করা যেত, যাতে তারা সহজে একে অপরের IP/Env info পায়।
+
+- `--link` ফ্ল্যাগ দিয়ে কন্টেইনার চালানো হত (যেমন: `docker run --link db:db nginx`)
+- এখন এটি deprecated—modern network ব্যবহার করুন।
+
+**Best Practice:**
+- Container Linking-এর পরিবর্তে Bridge Network বা User-defined Network ব্যবহার করুন।
+
+---
+
+## Bridge Network-এর Core Concepts
+
+1. **IP Addressing:**
+    - প্রতিটি কন্টেইনারকে bridge network-এ একটি internal IP দেয়া হয়।
+2. **Port Mapping:**
+    - Host machine-এর port কন্টেইনারের port-এর সঙ্গে ম্যাপ করা যায় (যেমন: `-p 8080:80`)
+3. **DNS Resolution:**
+    - User-defined bridge network-এ কন্টেইনারের নাম দিয়ে resolve করা যায় (যেমন: `web`, `db`)।
+4. **Isolation:**
+    - Bridge network-এ থাকা কন্টেইনারগুলো বাইরের network থেকে isolate থাকে—security বাড়ে।
+
+---
+
+## Workflow: Bridge Network ব্যবহার
+
+1. **নতুন Bridge Network তৈরি করুন:**
+    ```bash
+    docker network create my-bridge
+    ```
+2. **কন্টেইনার চালান ও network-এ যুক্ত করুন:**
+    ```bash
+    docker run -d --name web --network my-bridge nginx
+    docker run -d --name db --network my-bridge mysql
+    ```
+3. **কন্টেইনারের মধ্যে যোগাযোগ:**
+    - `web` কন্টেইনার থেকে `db`-তে DNS নাম দিয়ে (যেমন: `db:3306`) কানেক্ট করা যাবে।
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Default bridge network-এ DNS resolution কাজ করে না—user-defined network ব্যবহার করুন।
+- Container Linking deprecated—নতুন network ব্যবহার করুন।
+- Port mapping ভুল হলে কন্টেইনারে বাইরের world থেকে access করা যায় না।
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **User-defined Network:** Modern production-এ user-defined bridge network ব্যবহার করা হয়—DNS, isolation, security সুবিধা পাওয়া যায়।
+- **Microservices Communication:** Netflix, Uber-এর মতো কোম্পানি bridge network-এ microservices deploy করে—internal communication সহজ হয়।
+- **Network Automation:** CI/CD pipeline-এ network creation ও configuration automate করা হচ্ছে।
+
+---
+
+## উপসংহার
+
+Bridge Network ও Container Linking—এই ধারণা দক্ষভাবে ব্যবহার করলে কন্টেইনারের মধ্যে নিরাপদ, দ্রুত ও স্কেলেবল যোগাযোগ সম্ভব। বাস্তব সিস্টেম ডিজাইনে এই network model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker networking skill আরও শক্তিশালী হবে!

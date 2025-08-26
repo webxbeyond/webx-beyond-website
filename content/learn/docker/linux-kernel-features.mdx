@@ -1,0 +1,117 @@
+---
+title: Namespaces, Cgroups & UnionFS ব্যাখ্যা (Docker Kernel Features)
+icon: logos:docker-icon
+---
+
+# Namespaces, Cgroups & UnionFS: ডকারের ভেতরের ম্যাজিক
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ হাজার হাজার container deploy হয়। Docker-এর isolation, resource control, efficient storage—Linux kernel-এর তিনটি feature: Namespaces, Cgroups, UnionFS—industry standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Isolation:** Container-এ process/network/file—সব আলাদা থাকে।
+- **Resource control:** CPU/memory/network—limit/set করা যায়।
+- **Efficient storage:** Image/container—layered storage, fast deploy।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Resource limit—Cgroups দিয়ে enforce।
+- **Uber:** Container isolation—Namespaces দিয়ে security।
+- **Google:** Image storage—UnionFS দিয়ে efficient deploy।
+
+## মূল ধারণা
+
+### ১. Namespaces: Isolation Explained
+
+- **Namespaces:** Linux kernel feature—process, network, mount, user, IPC, UTS—সব আলাদা করে।
+- **Types:**
+  - **PID Namespace:** Process ID আলাদা—host/container mix হয় না।
+  - **NET Namespace:** Network stack আলাদা—container-এ নিজস্ব IP, port।
+  - **MNT Namespace:** Filesystem mount point আলাদা।
+  - **USER Namespace:** User/group ID আলাদা—privilege boundary।
+  - **IPC Namespace:** Inter-process communication আলাদা।
+  - **UTS Namespace:** Hostname/domainname আলাদা।
+
+### ২. Cgroups: Resource Control
+
+- **Cgroups (Control Groups):** CPU, memory, network—resource usage limit/set করা যায়।
+- **Use case:**
+  - **CPU limit:**
+    ```bash
+    docker run --cpus=1 nginx
+    ```
+  - **Memory limit:**
+    ```bash
+    docker run -m 512m nginx
+    ```
+- **Benefit:** Host overload, noisy neighbor problem avoid।
+
+### ৩. UnionFS: Layered Storage Explained
+
+- **UnionFS (Union File System):** Image/container—multiple layer-এ store হয়।
+- **Benefit:**
+  - **Efficient storage:** Common layer reuse—space save।
+  - **Fast deploy:** Only changed layer pull/push।
+- **Example:**
+  - **Base image:** Ubuntu layer
+  - **App layer:** Node.js/React layer
+  - **Config layer:** Custom config layer
+
+### ৪. Workflow: How Docker Uses These Features
+
+1. **Container create:** Namespaces-এ isolation, Cgroups-এ resource limit, UnionFS-এ layered storage।
+2. **Container run:** Process/network/file/user—সব আলাদা, resource usage controlled, storage efficient।
+3. **Container stop/remove:** Resource release, layer reuse।
+
+### ৫. সহজ এনালজি
+
+- "Namespaces মানে—একটি apartment complex, যেখানে প্রতিটি flat আলাদা (isolation)। Cgroups—flat owner utility limit set করে (resource control)। UnionFS—building-এর floorগুলো layer হিসেবে store হয় (layered storage)।"
+
+### ৬. Best Practices
+
+- **Resource limit:** Always CPU/memory/network limit set করুন।
+- **Isolation enforced:** Privilege boundary, user namespace enable করুন।
+- **Efficient image build:** Multi-stage build, layer reuse করুন।
+- **Monitoring:** Resource usage, isolation event track করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Resource limit না দেয়া—host overload।
+- User namespace disable—privilege escalation risk।
+- Inefficient image build—layer reuse না করা।
+- Monitoring/logging না রাখা—issue detect করা যায় না।
+
+### ৮. Industry Trends
+
+- **Rootless containers:** User namespace enforced—security boost।
+- **Advanced Cgroups v2:** Resource control granular, hierarchical।
+- **OverlayFS integration:** Faster, more efficient layered storage।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production workload—security, performance, resource control essential।
+- Multi-tenant environment—isolation enforced।
+- Efficient image build/deploy—layered storage।
+
+## সংক্ষিপ্ত workflow
+
+1. Container create/run—Namespaces isolation, Cgroups resource limit, UnionFS layered storage enforced।
+2. Resource limit, privilege boundary, efficient image build/configure করুন।
+3. Monitoring/logging enabled করুন।
+
+## Quick Checklist
+
+- [x] Resource limit configured?
+- [x] User namespace enabled?
+- [x] Efficient image build/layer reuse?
+- [x] Monitoring/logging enabled?
+- [x] OverlayFS integration possible?
+
+---
+
+## উপসংহার
+
+Namespaces, Cgroups, UnionFS—Docker-এর ভেতরের ম্যাজিক—isolation, resource control, efficient storage—production-grade deployment, security, optimization-এর জন্য essential। Industry standard workflow—confident deployment ও management সম্ভব।
+

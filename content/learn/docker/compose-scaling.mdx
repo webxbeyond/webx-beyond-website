@@ -1,0 +1,115 @@
+---
+title: Service Scaling ও Auto-restart কনফিগারেশন
+slug: /docker/compose-scaling
+---
+
+# Service Scaling ও Auto-restart কনফিগারেশন: Docker Compose-এ Highly Available App
+
+## প্রস্তাবনা
+
+Docker Compose-এ service scaling ও auto-restart—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর production environment-এ highly available, fault-tolerant ও scalable app deploy করতে অপরিহার্য। একাধিক instance, auto-restart, health check—সবকিছু সহজে handle করা যায়। এই লেসনে আমরা Compose-এ service scaling ও auto-restart-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Service Scaling: কী, কেন ও কিভাবে?
+
+**Service Scaling** হচ্ছে এক service/app-এর একাধিক instance চালানো—load balancing, high availability, fault tolerance নিশ্চিত করতে।
+
+- Compose-এ `scale` বা `deploy.replicas` দিয়ে instance সংখ্যা বাড়ানো যায়
+- Production-এ web, worker, API—সব service scale করা হয়
+
+**বাস্তব উদাহরণ:**
+- Netflix-এর web service production-এ 10+ instance scale করা থাকে—traffic spike হলে downtime হয় না
+
+**এনালজি:**
+- ধরুন, অফিসে একাধিক receptionist—একসাথে অনেক visitor handle করা যায়
+
+**Example:**
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    deploy:
+      replicas: 3
+```
+
+**Run Command:**
+```bash
+docker compose up --scale web=3
+```
+
+---
+
+## Auto-restart Configuration: কী, কেন ও কিভাবে?
+
+**Auto-restart** হচ্ছে container/service crash করলে নিজে নিজে পুনরায় চালু হওয়ার কনফিগারেশন।
+
+- Compose-এ `restart` policy দিয়ে configure করা যায়
+- Production-এ critical service-এ always restart policy রাখা হয়
+
+**বাস্তব উদাহরণ:**
+- Uber-এর payment service crash হলে auto-restart—downtime কমে, user impact হয় না
+
+**এনালজি:**
+- ধরুন, অফিসে generator আছে—power চলে গেলে নিজে নিজে চালু হয়
+
+**Example:**
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    restart: always
+```
+
+**Restart Policy Options:**
+- `no` (default): restart হবে না
+- `always`: container stop/crash হলে restart হবে
+- `on-failure`: error code দিলে restart হবে
+- `unless-stopped`: stop না করলে restart হবে
+
+---
+
+## Workflow: Scaling ও Auto-restart
+
+1. **Service Scaling:**
+    - YAML-এ `deploy.replicas` বা CLI-তে `--scale` ব্যবহার করুন
+2. **Auto-restart:**
+    - YAML-এ `restart` policy configure করুন
+3. **Run Command:**
+    ```bash
+    docker compose up --scale web=3
+    ```
+
+---
+
+## Core Concepts: Scaling ও Auto-restart
+
+1. **High Availability:**
+    - Multiple instance, auto-restart—downtime কমে
+2. **Fault Tolerance:**
+    - Crash হলে service নিজে নিজে চালু হয়
+3. **Load Balancing:**
+    - Multiple instance traffic efficiently handle করে
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- Scaling না করলে traffic spike-এ downtime হয়
+- Restart policy না দিলে crash হলে manual intervention লাগে
+- Resource limit না দিলে multiple instance overload হতে পারে
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Production Workflow:** Netflix, Google production-এ scaling ও auto-restart default practice
+- **Health Check Integration:** Restart policy-তে health check configure করা হচ্ছে
+- **CI/CD Integration:** Pipeline-এ scaling ও restart policy automate করা হচ্ছে
+
+---
+
+## উপসংহার
+
+Service Scaling ও Auto-restart—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker Compose-এ highly available, fault-tolerant ও scalable app deploy করা যায়। বাস্তব সিস্টেম ডিজাইনে এই config model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker orchestration skill আরও শক্তিশালী হবে!

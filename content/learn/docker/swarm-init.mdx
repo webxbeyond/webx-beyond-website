@@ -1,0 +1,123 @@
+---
+title: Swarm Init, Nodes ও Managers
+icon: logos:docker-icon
+---
+
+# Swarm Init, Nodes ও Managers: Docker Cluster-এর ভিত্তি
+
+## প্রস্তাবনা
+
+আধুনিক অ্যাপ্লিকেশন—Google, Netflix, Uber—production-এ হাজার হাজার container চালায়। একাধিক server-এ container orchestration করতে হলে cluster তৈরি করতে হয়। Docker Swarm-এ cluster তৈরি, node যোগ, এবং manager নির্বাচন—এই তিনটি ধাপ সবচেয়ে গুরুত্বপূর্ণ।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Cluster Formation:** একাধিক server-কে একসাথে group করে container orchestration সম্ভব হয়।
+- **Manager Node:** Cluster control, scheduling, security—সবকিছু manage করে।
+- **Worker Node:** Container run ও workload handle করে।
+- **High Availability:** Manager node fail হলেও cluster চলতে থাকে।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Multiple manager node দিয়ে cluster redundancy নিশ্চিত করে।
+- **Uber:** Worker node-এ real-time workload distribute করে।
+- **Google:** Kubernetes-এ manager/worker node concept—Swarm-এর advanced version।
+
+## মূল ধারণা
+
+### ১. Swarm Init: Cluster তৈরি
+
+- **Swarm Init Command:** Cluster শুরু করার জন্য manager node-এ run করুন:
+
+```bash
+docker swarm init
+```
+
+- **Output:** Join token ও manager IP পাবেন।
+
+### ২. Node: Cluster Member
+
+- **Manager Node:** Cluster control, service scheduling, security manage করে।
+- **Worker Node:** Container run ও workload handle করে।
+- **Node Join Command:** Worker/manager node cluster-এ যোগ করতে:
+
+```bash
+docker swarm join --token <worker/manager-token> <manager-ip>:2377
+```
+
+- **Node List:** Cluster-এর সব node দেখতে:
+
+```bash
+docker node ls
+```
+
+### ৩. Manager Election ও Redundancy
+
+- **Multiple Manager:** Production-এ ৩+ manager node রাখুন (odd number)।
+- **Raft Consensus:** Manager node-এ data sync ও failover হয়।
+- **Manager Failover:** এক manager fail করলে অন্য manager auto-promote হয়।
+
+### ৪. Node Maintenance
+
+- **Drain Mode:** Maintenance-এর সময় node-কে workload থেকে exclude করুন:
+
+```bash
+docker node update --availability drain <node-name>
+```
+
+- **Active Mode:** Node-কে workload-এ ফেরত আনতে:
+
+```bash
+docker node update --availability active <node-name>
+```
+
+## সাধারণ ভুলত্রুটি
+
+- Production-এ একমাত্র manager node রাখা।
+- Worker node-এ manager token ব্যবহার করা।
+- Node drain না করে maintenance করা।
+- Cluster status monitor না করা।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Production-এ ৩+ manager node রাখুন (odd number)।
+- Manager node-এ resource limit enforce করুন।
+- Node drain করে maintenance করুন।
+- Regularly cluster status monitor করুন।
+- Manager/worker token নিরাপদে রাখুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Multi-manager Cluster:** High availability ও zero downtime নিশ্চিত করতে।
+- **Automated Node Scaling:** Workload অনুযায়ী node auto-scale হচ্ছে।
+- **Cloud-based Swarm Cluster:** AWS, Azure, GCP-তে managed Swarm cluster deploy হচ্ছে।
+
+## সহজ এনালজি
+
+- "Manager node মানে—স্কুলের প্রধান শিক্ষক, worker node মানে—শিক্ষকরা। প্রধান শিক্ষক না থাকলে স্কুল চলবে না, কিন্তু একাধিক প্রধান শিক্ষক থাকলে redundancy বাড়ে।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging, large-scale deployment—সব জায়গায় multi-manager cluster ব্যবহার করুন।
+- Maintenance, scaling, workload distribution—node management করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Manager node-এ `docker swarm init` করুন।
+2. Worker/manager node-এ join command run করুন।
+3. Cluster status monitor করুন।
+4. Maintenance-এর সময় node drain করুন।
+
+## Quick Checklist
+
+- [x] Cluster init হয়েছে?
+- [x] Node join হয়েছে?
+- [x] Multiple manager node আছে?
+- [x] Node drain/active status ঠিক আছে?
+- [x] Token নিরাপদে আছে?
+
+---
+
+## উপসংহার
+
+Swarm Init, Nodes ও Managers—Docker cluster-এর ভিত্তি। সঠিকভাবে configure করলে আপনার container orchestration হবে highly available, scalable ও secure।
+

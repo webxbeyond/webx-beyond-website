@@ -1,0 +1,124 @@
+---
+title: রিসোর্স সীমা (CPU, Memory)
+icon: logos:docker-icon
+---
+
+# রিসোর্স সীমা (CPU, Memory): Production-Grade Docker Optimization
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Container-এ কত CPU, memory ব্যবহার হবে—"Resource Limit" না দিলে performance degrade, crash, security risk—সবকিছু হতে পারে। Production-Grade deployment-এ resource limit অপরিহার্য।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Performance Optimization:** Resource limit না দিলে container host overload বা অন্য container slow হয়ে যায়।
+- **Security:** Resource abuse হলে denial-of-service (DoS) attack হতে পারে।
+- **Cost Control:** Cloud-এ resource limit না দিলে billing বাড়ে।
+- **Predictability:** Resource usage fix থাকলে scaling ও troubleshooting সহজ হয়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Container-এ strict CPU/memory limit দিয়ে auto-scaling ও cost optimize করে।
+- **Uber:** Resource abuse prevent করতে container-এ limit enforced হয়।
+- **Google:** Kubernetes/Docker-এ resource quota enforced—production standard।
+
+## মূল ধারণা
+
+### ১. Resource Limit কী?
+
+- **CPU Limit:** Container কত % CPU ব্যবহার করতে পারবে তা fix করা।
+- **Memory Limit:** Container কত MB/GB memory ব্যবহার করতে পারবে তা fix করা।
+- **Quota:** Resource usage upper bound—container cross করতে পারবে না।
+
+### ২. Docker-এ Resource Limit কিভাবে সেট করবেন?
+
+- **Run Command:**
+
+```bash
+docker run -d --name webapp --memory="256m" --cpus="0.5" nginx
+```
+
+- **Compose File:**
+
+```yaml
+services:
+  web:
+    image: nginx
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"
+        reservations:
+          cpus: "0.25"
+          memory: "128M"
+```
+
+### ৩. Resource Reservation vs Limit
+
+- **Reservation:** Minimum resource container guaranteed পাবে।
+- **Limit:** Maximum resource container use করতে পারবে।
+- **Example:** Reservation 128M, limit 256M—container 128M guaranteed, 256M cross করতে পারবে না।
+
+### ৪. Monitoring ও Alerting
+
+- **docker stats:** Real-time resource usage monitor করুন।
+- **Prometheus/Grafana:** Advanced monitoring ও alerting configure করুন।
+- **Alert:** Resource usage limit cross করলে automated alert trigger করুন।
+
+### ৫. Resource Abuse ও Security
+
+- **Abuse Prevention:** Resource limit enforced না করলে container maliciously host overload করতে পারে।
+- **Security Policy:** Production-এ strict resource policy enforced করুন।
+
+## সাধারণ ভুলত্রুটি
+
+- Resource limit না দেয়া—host overload, billing spike, crash।
+- Reservation/limit ভুল configure করা—container slow বা kill হয়ে যায়।
+- Monitoring/alerting না করা—resource abuse unnoticed থাকে।
+- Production-এ unlimited resource দেয়া।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Production-এ সব container-এ resource limit ও reservation set করুন।
+- Regularly resource usage monitor ও alert configure করুন।
+- Cloud deployment-এ cost optimize করতে limit enforced করুন।
+- Reservation/limit value workload অনুযায়ী tune করুন।
+- Resource abuse prevent করতে security policy enforced করুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Auto-scaling:** Resource usage দেখে container সংখ্যা auto-scale হচ্ছে।
+- **AI-based Optimization:** Machine learning দিয়ে resource allocation optimize হচ্ছে।
+- **Quota Management:** Multi-tenant environment-এ resource quota enforced হচ্ছে।
+
+## সহজ এনালজি
+
+- "Resource limit মানে—বাসে প্রতিটি সিটের জন্য টিকিট, কেউ বেশি সিট দখল করতে পারবে না। Reservation মানে—কিছু সিট reserve, guarantee আছে।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ resource limit/reservation enforced করুন।
+- Cloud deployment, multi-tenant app—quota management করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Container run/compose file-এ resource limit/reservation set করুন।
+2. Resource usage monitor ও alert configure করুন।
+3. Value workload অনুযায়ী tune করুন।
+4. Security policy enforced করুন।
+
+## Quick Checklist
+
+- [x] Resource limit/reservation set হয়েছে?
+- [x] Monitoring/alerting configured?
+- [x] Value workload অনুযায়ী tuned?
+- [x] Security policy enforced?
+- [x] Cost optimize হয়েছে?
+
+---
+
+## উপসংহার
+
+রিসোর্স সীমা (CPU, Memory)—production-grade Docker deployment-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার container efficient, secure ও predictable থাকবে।
+

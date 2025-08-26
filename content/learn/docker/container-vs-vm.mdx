@@ -1,0 +1,85 @@
+---
+title: "Containerization বনাম Virtualization"
+icon: logos:docker-icon
+---
+
+# Containerization বনাম Virtualization — আধুনিক সফটওয়্যার ডেলিভারির দুই পথ
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সবাই তাদের অ্যাপ্লিকেশন দ্রুত, স্কেলেবল ও নিরাপদভাবে চালাতে চায়। এজন্য তারা Containerization ও Virtualization—দুইটি প্রযুক্তি ব্যবহার করে। এই লেসনে আমরা Containerization ও Virtualization-এর পার্থক্য, গুরুত্ব ও ব্যবহারিক দিকগুলো সহজভাবে জানব।
+
+## Core Concepts
+
+### ১. Virtualization কী?
+- **Definition:** একাধিক Virtual Machine (VM) তৈরি করে, প্রতিটি VM-এ আলাদা OS রান করে
+- **Features:**
+    - Hardware-level Isolation
+    - Resource Heavy
+    - Slow Boot Time
+- **উদাহরণ:**
+    - VMware, VirtualBox
+    - "একটি বড় বিল্ডিং, প্রতিটি ফ্ল্যাটে আলাদা পরিবার"
+
+### ২. Containerization কী?
+- **Definition:** Host OS-এর ওপর Lightweight Container তৈরি, Application-level Isolation
+- **Features:**
+    - Fast Startup
+    - Lightweight
+    - Shared Kernel
+- **উদাহরণ:**
+    - Docker, Kubernetes
+    - "একটি বড় ঘরে Partition, সবাই আলাদা কিন্তু একই ছাদের নিচে"
+
+### ৩. পার্থক্য (Differences)
+- **Resource Usage:** VM বেশি, Container কম
+- **Startup Time:** VM ধীর, Container দ্রুত
+- **Isolation Level:** VM Hardware, Container Application
+- **Portability:** Container সহজে Move করা যায়
+
+| Aspect           | Virtualization (VM) | Containerization |
+|------------------|---------------------|-----------------|
+| Isolation        | Hardware            | Application     |
+| Resource Usage   | High                | Low             |
+| Startup Time     | Slow                | Fast            |
+| Portability      | Medium              | High            |
+| Use Case         | Legacy Apps, Full OS| Microservices, Cloud |
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Modern Cloud Apps—Containerization
+- Legacy System—Virtualization
+- Scalability, Efficiency, Cost
+
+### ৫. কখন ব্যবহার করবেন?
+- VM: Full OS, Legacy App, High Security
+- Container: Microservices, Fast Deployment, Cloud Native
+
+### ৬. Common Pitfalls
+- VM: Resource Waste, Slow Performance
+- Container: Shared Kernel Vulnerability
+
+### ৭. Best Practices
+- Use Container for Modern Apps
+- VM for Legacy/Heavy Apps
+- Security Hardening
+
+### ৮. Industry Trends
+- Hybrid Approach
+- Kubernetes, Docker Adoption
+- Serverless Containers
+
+## উদাহরণ ও এনালজি
+- VM—"একটি আলাদা বাড়ি, সবকিছু আলাদা"
+- Container—"একই বাড়িতে Partition, Resource Efficient"
+
+## Quick Reference
+- VM: VMware, VirtualBox
+- Container: Docker, Kubernetes
+
+## উপসংহার
+
+Containerization ও Virtualization—দুইটি প্রযুক্তি, দুইটি উদ্দেশ্য। Modern App Development-এ Containerization—Speed, Efficiency ও Scalability-এর জন্য অপরিহার্য। Legacy System বা High Security-তে Virtualization—Best Choice। সঠিক Context-এ সঠিক প্রযুক্তি ব্যবহার—আপনার সফটওয়্যার ডেলিভারি আরও সফল করবে।
+
+---
+
+**পরবর্তী পাঠ:** ডকার কী এবং কিভাবে কাজ করে

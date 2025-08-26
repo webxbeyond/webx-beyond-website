@@ -1,0 +1,117 @@
+---
+title: স্টোরেজ ড্রাইভার: Overlay2, AUFS, Device Mapper, Btrfs
+icon: logos:docker-icon
+---
+
+# Docker Storage Drivers: Overlay2, AUFS, Device Mapper, Btrfs
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ Docker storage efficiency, performance, compatibility—critical। Docker storage driver—image/container data manage করে, performance/security/storage optimize করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Performance:** Fast read/write—app speed boost।
+- **Compatibility:** Different OS/kernel—driver select করা যায়।
+- **Storage efficiency:** Layered storage, space save, snapshot/rollback।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Overlay2—high performance, efficient storage।
+- **Uber:** Device Mapper—enterprise-grade snapshot/rollback।
+- **Google:** Btrfs—advanced feature, multi-tenant storage।
+
+## মূল ধারণা
+
+### ১. Overlay2: Modern Default
+
+- **Overlay2:** Most Linux distro-তে default, fast, efficient layered storage।
+- **Benefit:**
+  - Low resource usage
+  - Fast image/container create/delete
+  - Layer reuse
+- **Use case:** Production workload, CI/CD pipeline
+
+### ২. AUFS: Legacy Driver
+
+- **AUFS:** Older Linux kernel-এ use হয়, layered storage support করে।
+- **Benefit:**
+  - Multiple branch/layer support
+  - Legacy system compatibility
+- **Limitation:** New kernel-এ support নেই, performance lower
+
+### ৩. Device Mapper: Enterprise Snapshot
+
+- **Device Mapper:** Block-level storage, snapshot/rollback feature
+- **Benefit:**
+  - Enterprise-grade data management
+  - Snapshot, rollback, thin provisioning
+- **Limitation:** Complex setup, performance lower than Overlay2
+
+### ৪. Btrfs: Advanced Feature
+
+- **Btrfs:** Modern filesystem, snapshot, compression, multi-tenant storage
+- **Benefit:**
+  - Advanced feature (compression, deduplication)
+  - Multi-tenant, scalable storage
+- **Limitation:** Not default, kernel compatibility required
+
+### ৫. Workflow: How Storage Drivers Work
+
+1. **Image/container create:** Storage driver—layer/data manage করে
+2. **Read/write:** Driver—data access optimize করে
+3. **Snapshot/rollback:** Device Mapper/Btrfs—data restore possible
+4. **Delete:** Layer/data efficiently remove
+
+### ৬. সহজ এনালজি
+
+- "Storage driver মানে—একটি warehouse manager, যে data store, organize, move, restore efficiently manage করে। Overlay2—modern manager, AUFS—old manager, Device Mapper—enterprise manager, Btrfs—advanced manager।"
+
+### ৭. Best Practices
+
+- **Overlay2 use করুন:** Modern Linux-এ default, efficient
+- **Device Mapper/Btrfs:** Enterprise, advanced feature দরকার হলে
+- **Monitoring:** Storage usage, performance track করুন
+- **Compatibility check:** OS/kernel-এ driver support আছে কিনা
+- **Backup strategy:** Snapshot/rollback feature use করুন
+
+### ৮. সাধারণ ভুলত্রুটি
+
+- Wrong driver select—performance/storage issue
+- Monitoring/logging না রাখা—storage issue detect করা যায় না
+- Snapshot/rollback configure না করা—data loss risk
+- Compatibility না দেখা—driver error
+
+### ৯. Industry Trends
+
+- **Overlay2 adoption:** Most production workload-এ use
+- **Advanced filesystem:** Btrfs, ZFS—feature-rich storage
+- **Cloud-native storage:** Multi-tenant, scalable driver
+
+### ১০. কখন ব্যবহার করবেন?
+
+- Production workload—Overlay2
+- Enterprise feature—Device Mapper/Btrfs
+- Legacy system—AUFS
+- Advanced feature—Btrfs/ZFS
+
+## সংক্ষিপ্ত workflow
+
+1. Storage driver select/configure করুন
+2. Image/container create/read/write/snapshot/delete—driver manage করে
+3. Monitoring, backup, compatibility enforced করুন
+
+## Quick Checklist
+
+- [x] Overlay2 configured?
+- [x] Device Mapper/Btrfs needed?
+- [x] Monitoring/logging enabled?
+- [x] Snapshot/rollback configured?
+- [x] Compatibility checked?
+
+---
+
+## উপসংহার
+
+Docker storage driver—Overlay2, AUFS, Device Mapper, Btrfs—performance, efficiency, compatibility, advanced feature—production-grade deployment-এর জন্য essential। Industry standard workflow—confident storage management সম্ভব।
+

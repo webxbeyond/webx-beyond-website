@@ -1,0 +1,122 @@
+---
+title: Overlay Networking & Swarm Service Discovery
+icon: logos:docker-icon
+---
+
+# Overlay Networking ও Swarm Service Discovery: আধুনিক কন্টেইনার কমিউনিকেশন
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব distributed app-এ container-গুলোকে আলাদা host/server-এ deploy করতে হয়। Overlay Networking—multi-host communication, security, scalability—enable করে। Swarm Service Discovery—dynamic service location—production-grade orchestration-এ critical।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Distributed Systems:** Multi-host/container communication—essential for microservices, cloud-native apps।
+- **Scalability:** Easily add/remove containers—network auto-configure হয়।
+- **Security:** Overlay network—encrypted communication possible।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Thousands of containers—multiple hosts—overlay network-এ communicate করে।
+- **Uber:** Real-time ride matching—distributed microservices—overlay network-এ run।
+- **Google:** Kubernetes/Docker Swarm—overlay network enforced।
+
+## মূল ধারণা
+
+### ১. Overlay Networking Explained
+
+- **Overlay Network:** Virtual network—multiple Docker hosts-এ container-গুলোকে logically connect করে।
+- **Physical network-এর উপর virtual network—"overlay"।**
+- **Benefit:** Containers—different servers-এ থেকেও—same network-এ communicate করতে পারে।
+
+#### সহজ এনালজি
+
+- "Overlay network মানে—একটি WhatsApp গ্রুপ, যেখানে সবাই আলাদা শহরে থেকেও একসাথে কথা বলতে পারে।"
+
+### ২. Overlay Network Workflow
+
+1. **Swarm cluster init করুন।**
+2. **Overlay network create করুন:**
+   ```bash
+   docker network create -d overlay my_overlay
+   ```
+3. **Service deploy করুন—network attach করুন:**
+   ```bash
+   docker service create --name web --network my_overlay nginx
+   ```
+4. **Multiple host/container—same overlay network-এ communicate করে।**
+
+### ৩. Swarm Service Discovery
+
+- **Service Discovery:** Container/services—auto-discover—dynamic IP allocation, DNS-based name resolution।
+- **Swarm manager—service registry maintain করে।**
+- **Benefit:** Scale up/down—service location auto-update হয়।
+
+#### Workflow
+
+1. **Service deploy করুন:**
+   ```bash
+   docker service create --name api --network my_overlay my_api_image
+   ```
+2. **web container—api নামে DNS resolve করে:**
+   ```bash
+   ping api
+   ```
+3. **No manual IP—service name-based communication।**
+
+### ৪. Security & Performance
+
+- **Encrypted overlay network:**
+   ```bash
+   docker network create -d overlay --opt encrypted my_secure_overlay
+   ```
+- **Performance tuning:** Network driver, MTU, service placement—optimize করুন।
+
+### ৫. Best Practices
+
+- **Always overlay network use করুন—multi-host deployment-এ।**
+- **Service name-based communication—manual IP avoid করুন।**
+- **Encryption enable করুন—production-এ।**
+- **Network monitoring—performance bottleneck detect করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Overlay network না use করা—multi-host communication fail।
+- Manual IP—service discovery break করে।
+- Encryption না enable—security risk।
+- Network size/driver mismatch—performance issue।
+
+### ৭. Industry Trends
+
+- **Kubernetes, Docker Swarm—overlay network default।**
+- **Service mesh (Istio, Linkerd)—advanced service discovery/networking।**
+- **Cloud-native apps—multi-host overlay enforced।**
+
+### ৮. কখন ব্যবহার করবেন?
+
+- Multi-host/container deployment—production-grade app।
+- Microservices—dynamic scaling/service discovery essential।
+- Security—encrypted communication required।
+
+## সংক্ষিপ্ত workflow
+
+1. Swarm init করুন।
+2. Overlay network create করুন।
+3. Service deploy করুন—network attach করুন।
+4. Service name-based communication করুন।
+5. Encryption/monitoring enable করুন।
+
+## Quick Checklist
+
+- [x] Overlay network created?
+- [x] Service deployed—network attached?
+- [x] Service name-based communication?
+- [x] Encryption enabled?
+- [x] Performance monitored?
+
+---
+
+## উপসংহার
+
+Overlay Networking ও Swarm Service Discovery—distributed container app-এ seamless, secure, scalable communication—industry standard। Workflow follow করলে—production-ready, robust, auto-discoverable network architecture build করা সম্ভব।
+

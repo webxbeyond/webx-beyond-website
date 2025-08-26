@@ -1,0 +1,137 @@
+---
+title: Docker Logs ও Log Drivers
+icon: logos:docker-icon
+---
+
+# Docker Logs ও Log Drivers: কন্টেইনার মনিটরিং ও ডিবাগিং
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Container-এ কী হচ্ছে, error/debug message, performance—সবকিছু জানতে "Logging" অপরিহার্য। Docker-এ log management ও log driver—modern system design-এর core part।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Debugging:** Error, warning, info log দেখে সমস্যা দ্রুত সমাধান করা যায়।
+- **Monitoring:** Performance, usage, security issue track করা যায়।
+- **Audit Trail:** কে কখন কী করেছে, তা log-এ থাকে।
+- **Compliance:** Security standard (PCI-DSS, SOC2) অনুযায়ী log management বাধ্যতামূলক।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Centralized logging (ELK stack) দিয়ে millions of log process করে।
+- **Uber:** Real-time log analysis দিয়ে ride tracking ও fraud detection হয়।
+- **Google:** Stackdriver logging—Kubernetes/Docker log collect ও visualize করে।
+
+## মূল ধারণা
+
+### ১. Docker Logs: কীভাবে কাজ করে?
+
+- **Container Log:** stdout/stderr-এ যা আসে, Docker log হিসেবে collect করে।
+- **Log Access:**
+
+```bash
+docker logs <container-id>
+```
+
+- **Follow Mode:** Real-time log দেখতে:
+
+```bash
+docker logs -f <container-id>
+```
+
+### ২. Log Drivers: Log Management
+
+- **Log Driver:** Docker log collect/store/forward করার জন্য বিভিন্ন driver দেয়।
+- **Default Driver:** json-file (local file-এ log store হয়)।
+- **Other Drivers:** syslog, journald, fluentd, awslogs, gelf, splunk, etc.
+
+- **Driver Set করা:**
+
+```bash
+docker run --log-driver=syslog nginx
+```
+
+- **Compose File-এ Driver:**
+
+```yaml
+services:
+  web:
+    image: nginx
+    logging:
+      driver: "fluentd"
+```
+
+### ৩. Centralized Logging
+
+- **ELK Stack (Elasticsearch, Logstash, Kibana):** Log collect, process, visualize করা যায়।
+- **Fluentd/Logspout:** Docker log forward করা যায়।
+- **Cloud Logging:** AWS CloudWatch, Google Stackdriver, Azure Monitor—cloud log management।
+
+### ৪. Log Rotation ও Retention
+
+- **Log Rotation:** Log file বড় হলে automatic rotate/backup/delete করা যায়।
+- **Retention Policy:** কতদিন log store থাকবে তা set করা যায়।
+
+- **Example:**
+
+```bash
+docker run --log-opt max-size=10m --log-opt max-file=3 nginx
+```
+
+### ৫. Log Filtering ও Analysis
+
+- **Filtering:** Error, warning, info—specific log filter করা যায়।
+- **Analysis:** Log-এ pattern, anomaly, security issue detect করা যায়।
+
+## সাধারণ ভুলত্রুটি
+
+- Default log driver ছাড়া অন্য driver configure না করা।
+- Log rotation/retention policy না দেয়া।
+- Sensitive data log-এ রেখে দেয়া।
+- Centralized logging না করা—production-এ log হারিয়ে যায়।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Production-এ centralized logging ব্যবহার করুন।
+- Log rotation ও retention policy configure করুন।
+- Sensitive data log-এ না রাখুন।
+- Log filtering ও alerting চালু রাখুন।
+- Regularly log analysis করুন security ও performance issue detect করতে।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Cloud Logging:** Cloud provider-managed logging solution ব্যবহার হচ্ছে।
+- **Real-time Log Analysis:** Machine learning দিয়ে anomaly detect হচ্ছে।
+- **Log as Event Source:** Log থেকে automated alert/action trigger হচ্ছে।
+
+## সহজ এনালজি
+
+- "Logging মানে—বইয়ের ডায়েরি, যেখানে প্রতিদিনের ঘটনা লেখা থাকে। ডায়েরি না থাকলে ভুল, সমস্যা, অপরাধ খুঁজে পাওয়া যায় না।"
+
+## কখন ব্যবহার করবেন?
+
+- Development, staging, production—সব environment-এ logging ব্যবহার করুন।
+- Debugging, monitoring, auditing—সব workflow-তে log collect করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Container run করুন (log driver সহ)।
+2. Log access করুন (docker logs)।
+3. Centralized logging configure করুন।
+4. Log rotation/retention policy set করুন।
+5. Log filtering ও analysis করুন।
+
+## Quick Checklist
+
+- [x] Log driver configured?
+- [x] Centralized logging আছে?
+- [x] Log rotation/retention policy আছে?
+- [x] Sensitive data log-এ নেই?
+- [x] Log filtering/alerting আছে?
+
+---
+
+## উপসংহার
+
+Docker Logs ও Log Drivers—container monitoring, debugging ও auditing-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার অ্যাপ্লিকেশন নিরাপদ, efficient ও maintainable থাকবে।
+

@@ -1,0 +1,138 @@
+---
+title: Docker দিয়ে WordPress + MySQL: বাস্তব-জীবন প্রজেক্ট
+icon: logos:docker-icon
+---
+
+# Docker দিয়ে WordPress + MySQL: Production-Ready Deployment
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ container ব্যবহার করে। WordPress—বিশ্বের সবচেয়ে জনপ্রিয় CMS, আর MySQL—robust database। Docker-এ এই দুইটি একসাথে deploy করলে—scalability, portability, automation—সবকিছু সহজ হয়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Portability:** Local থেকে cloud—একই configuration-এ deploy করা যায়।
+- **Scalability:** Traffic বাড়লে container scale করা যায়।
+- **Automation:** Manual install/configuration ছাড়া দ্রুত setup হয়।
+- **Security:** Isolation—একটি container compromise হলেও অন্যটি safe থাকে।
+
+## বাস্তব উদাহরণ
+
+- **Freelancer/Startup:** Client-এর জন্য দ্রুত WordPress site launch—Docker Compose দিয়ে।
+- **Enterprise:** Production-এ multiple WordPress instance—container orchestration দিয়ে manage।
+- **Cloud Provider:** Managed WordPress hosting—backend-এ Docker ব্যবহার।
+
+## মূল ধারণা
+
+### ১. Docker Compose: Multi-container Orchestration
+
+- **Compose:** YAML ফাইল দিয়ে একাধিক container (WordPress, MySQL) একসাথে deploy করা যায়।
+- **Service:** প্রতিটি app/database আলাদা service হিসেবে define হয়।
+- **Network:** Default network—container-এ communication সহজ করে।
+
+### ২. Project Structure
+
+```plaintext
+project-wordpress/
+├── docker-compose.yml
+└── README.md
+```
+
+### ৩. docker-compose.yml Explained
+
+```yaml
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db_data:/var/lib/mysql
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data:/var/www/html
+volumes:
+  db_data:
+  wp_data:
+```
+
+### ৪. Workflow: Step-by-step
+
+1. **Clone/Download project structure।**
+2. **docker-compose.yml** ফাইল customize করুন (password, port)।
+3. Terminal-এ:
+   ```bash
+   docker compose up -d
+   ```
+4. Browser-এ `http://localhost:8080`—WordPress setup wizard দেখবেন।
+5. Database info দিন—setup complete!
+
+### ৫. সহজ এনালজি
+
+- "Docker Compose মানে—একটি orchestra conductor, যে একসাথে WordPress ও MySQL বাজায়।"
+
+### ৬. Best Practices
+
+- **Environment variables**—.env ফাইলে store করুন, hardcode করবেন না।
+- **Volumes**—data persistency নিশ্চিত করুন।
+- **Restart policy**—production-এ always restart enable করুন।
+- **Secrets management**—production-এ credentials encrypt করুন।
+- **Backup strategy**—db_data volume periodic backup করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Database credentials hardcode করা।
+- Volumes ব্যবহার না করা—data loss risk।
+- Restart policy না দেয়া—container crash হলে auto-recover হবে না।
+- Network misconfiguration—WordPress database connect করতে পারবে না।
+
+### ৮. Industry Trends
+
+- **Managed WordPress hosting:** Backend-এ container orchestration (Kubernetes, Docker Swarm)।
+- **Multi-cloud deployment:** AWS, GCP, Azure—same Docker Compose file-এ deploy।
+- **CI/CD integration:** Automated build/test/deploy pipeline—WordPress site update সহজ।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Local development—quick WordPress setup।
+- Production—scalable, secure deployment।
+- Cloud migration—easy portability।
+
+## সংক্ষিপ্ত workflow
+
+1. Project structure clone/download করুন।
+2. docker-compose.yml customize করুন।
+3. `docker compose up -d` চালান।
+4. Browser-এ WordPress setup complete করুন।
+5. Volumes backup ও security best practices follow করুন।
+
+## Quick Checklist
+
+- [x] Volumes configured?
+- [x] Environment variables secure?
+- [x] Restart policy enabled?
+- [x] Database credentials encrypted?
+- [x] Backup strategy আছে?
+
+---
+
+## উপসংহার
+
+Docker দিয়ে WordPress + MySQL deploy—production-ready, scalable, portable, secure solution। এই প্রজেক্ট—industry standard workflow—local থেকে cloud—সব জায়গায় ব্যবহারযোগ্য।
+

@@ -1,0 +1,124 @@
+---
+title: Prometheus + Grafana দিয়ে মনিটরিং
+icon: logos:docker-icon
+---
+
+# Prometheus + Grafana দিয়ে মনিটরিং: Docker Performance Visualization
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Container-এ কী হচ্ছে, resource usage, error, latency—সবকিছু জানতে real-time monitoring অপরিহার্য। Prometheus + Grafana—industry-standard monitoring stack—Docker performance visualize ও alert করতে ব্যবহৃত হয়।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Real-time Monitoring:** Container performance, resource usage, error—সবকিছু live track করা যায়।
+- **Visualization:** Metrics graph/chart-এ দেখে bottleneck, anomaly, trend detect করা যায়।
+- **Alerting:** Threshold cross করলে automated alert trigger হয়।
+- **Capacity Planning:** Historical data দেখে future resource estimate করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Prometheus + Grafana দিয়ে millions of container monitor ও visualize হয়।
+- **Uber:** Real-time alerting দিয়ে latency, error rate detect ও fix হয়।
+- **Google:** Kubernetes/Docker monitoring—Prometheus/Grafana industry standard।
+
+## মূল ধারণা
+
+### ১. Prometheus: Metrics Collector
+
+- **Prometheus:** Open-source metrics collector ও time-series database।
+- **Exporter:** Docker metrics collect করতে exporter (cAdvisor, node-exporter) ব্যবহার হয়।
+- **Scraping:** Prometheus regular interval-এ metrics collect করে।
+
+- **Docker Compose Example:**
+
+```yaml
+version: '3.8'
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    ports:
+      - "8080:8080"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+```
+
+### ২. Grafana: Visualization Tool
+
+- **Grafana:** Open-source visualization tool—Prometheus metrics graph/chart-এ দেখায়।
+- **Dashboard:** Custom dashboard create করে CPU, memory, network, error visualize করা যায়।
+- **Alerting:** Dashboard-এ alert rule set করা যায়।
+
+### ৩. Monitoring Workflow
+
+1. **Exporter Deploy:** cAdvisor/node-exporter container run করুন।
+2. **Prometheus Configure:** prometheus.yml-এ exporter endpoint add করুন।
+3. **Grafana Setup:** Prometheus data source add করুন, dashboard create করুন।
+4. **Alerting Configure:** Threshold set করুন, email/slack alert enable করুন।
+
+### ৪. Advanced Features
+
+- **Query Language (PromQL):** Custom metrics query করা যায়।
+- **Retention Policy:** Historical data কতদিন store থাকবে তা set করা যায়।
+- **Integration:** Slack, email, webhook—alert integration করা যায়।
+
+## সাধারণ ভুলত্রুটি
+
+- Exporter/container run না করা—metrics collect হয় না।
+- Prometheus scrape interval ভুল set করা—data delay/overload হয়।
+- Grafana dashboard customize না করা—important metrics miss হয়।
+- Alerting configure না করা—critical issue unnoticed থাকে।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Exporter/container properly run ও configure করুন।
+- Prometheus scrape interval optimize করুন।
+- Grafana dashboard customize ও regularly review করুন।
+- Alerting rule set ও test করুন।
+- Historical data retention policy configure করুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Cloud Monitoring:** Managed Prometheus/Grafana service (AWS, GCP, Azure) ব্যবহার হচ্ছে।
+- **AI-based Alerting:** Machine learning দিয়ে anomaly detect ও alert হচ্ছে।
+- **Self-healing System:** Alert trigger হলে automated remediation হচ্ছে।
+
+## সহজ এনালজি
+
+- "Monitoring মানে—হাসপাতালের ICU monitor, যেখানে heart rate, oxygen, pressure—সবকিছু live দেখা যায়। Docker monitoring—container-এর health live দেখা।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ monitoring stack deploy করুন।
+- Performance tuning, troubleshooting, capacity planning—সব workflow-তে monitoring ব্যবহার করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Exporter/container run করুন।
+2. Prometheus configure করুন।
+3. Grafana setup ও dashboard create করুন।
+4. Alerting configure করুন।
+5. Historical data retention policy set করুন।
+
+## Quick Checklist
+
+- [x] Exporter/container run হয়েছে?
+- [x] Prometheus configure হয়েছে?
+- [x] Grafana dashboard আছে?
+- [x] Alerting rule set হয়েছে?
+- [x] Retention policy configured?
+
+---
+
+## উপসংহার
+
+Prometheus + Grafana—Docker monitoring-এর জন্য industry standard। সঠিকভাবে configure করলে আপনার container performance, health ও security live monitor ও optimize করতে পারবেন।
+

@@ -1,0 +1,114 @@
+---
+title: Environment Variables ও Overrides
+slug: /docker/compose-env
+---
+
+# Environment Variables ও Overrides: Docker Compose-এ কনফিগারেশন ফ্লেক্সিবিলিটি
+
+## প্রস্তাবনা
+
+Docker Compose-এ environment variable ও override—Google, Netflix, Uber-এর মতো কোম্পানিগুলোর production environment-এ app configuration, security, এবং deployment flexibility নিশ্চিত করতে অপরিহার্য। একাধিক environment (development, staging, production) সহজে handle করতে environment variable ও override structure ব্যবহার করা হয়। এই লেসনে আমরা Compose-এ environment variable ও override-এর গুরুত্ব, কাজের পদ্ধতি, এবং বাস্তব উদাহরণ দেখব।
+
+---
+
+## Environment Variables: কী, কেন ও কিভাবে?
+
+**Environment Variable** হচ্ছে external configuration, যা container/app-এর behavior নির্ধারণ করে।
+
+- Compose YAML-এ `environment` section-এ variable define করা যায়
+- `.env` ফাইল ব্যবহার করে sensitive data, config, secret manage করা যায়
+
+**বাস্তব উদাহরণ:**
+- Netflix production app-এ database password, API key, debug mode—সবকিছু environment variable দিয়ে manage হয়
+
+**এনালজি:**
+- ধরুন, আপনি অফিসে dress code, lunch time, wifi password—সবকিছু notice board-এ লিখে দিলেন; সবাই নিজের মতো ব্যবহার করতে পারে
+
+**Example:**
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+```
+
+**.env ফাইল:**
+```env
+NGINX_HOST=localhost
+NGINX_PORT=80
+MYSQL_ROOT_PASSWORD=secret
+```
+
+---
+
+## Override Structure: কী, কেন ও কিভাবে?
+
+**Override** হচ্ছে মূল Compose YAML-এর configuration পরিবর্তন বা extend করার পদ্ধতি।
+
+- `docker-compose.override.yml` ফাইল দিয়ে default config override করা যায়
+- Development, staging, production—প্রতিটি environment-এর জন্য আলাদা override file রাখা যায়
+
+**বাস্তব উদাহরণ:**
+- Google production app-এ override file দিয়ে resource limit, debug mode, logging config environment অনুযায়ী পরিবর্তন করা হয়
+
+**এনালজি:**
+- ধরুন, অফিসে Friday-তে dress code override—সবাই casual পোশাক পরে
+
+**Example:**
+- `docker-compose.yml` (main config)
+- `docker-compose.override.yml` (override config)
+
+**docker-compose.override.yml:**
+```yaml
+services:
+  web:
+    environment:
+      - NGINX_PORT=8080
+```
+
+**Run Command:**
+```bash
+docker compose -f docker-compose.yml -f docker-compose.override.yml up
+```
+
+---
+
+## Core Concepts: Env ও Override
+
+1. **Configuration Flexibility:**
+    - একাধিক environment সহজে manage
+2. **Security:**
+    - Sensitive data `.env`-এ রাখুন
+3. **Modular Deployment:**
+    - Override file দিয়ে config extend/modify করুন
+4. **Best Practice:**
+    - Production-এ secret/env variable `.env`-এ রাখুন
+    - Override file দিয়ে environment-specific config handle করুন
+
+---
+
+## সাধারণ ভুলত্রুটি ও সমাধান
+
+- `.env` ফাইল version control-এ push করলে secret leak হতে পারে
+- Override file ভুল হলে config mismatch হয়
+- Environment variable না দিলে app fail করতে পারে
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড ও Best Practices
+
+- **Modular YAML:** Netflix, Google production-এ multiple override file ব্যবহার হচ্ছে
+- **Secret Management:** `.env`-এ sensitive data, production-এ secret manager integration
+- **CI/CD Integration:** Pipeline-এ environment variable ও override file dynamic handle হচ্ছে
+
+---
+
+## উপসংহার
+
+Environment Variables ও Overrides—এই ধারণা দক্ষভাবে ব্যবহার করলে Docker Compose-এ app configuration, security ও deployment flexibility নিশ্চিত করা যায়। বাস্তব সিস্টেম ডিজাইনে এই config model আত্মবিশ্বাসের সঙ্গে প্রয়োগ করুন—আপনার Docker orchestration skill আরও শক্তিশালী হবে!

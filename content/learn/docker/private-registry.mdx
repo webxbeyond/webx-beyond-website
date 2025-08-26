@@ -1,0 +1,136 @@
+---
+title: রেজিস্ট্রি ম্যানেজমেন্ট: প্রাইভেট রেজিস্ট্রি, Harbor
+icon: logos:docker-icon
+---
+
+# রেজিস্ট্রি ম্যানেজমেন্ট: প্রাইভেট রেজিস্ট্রি, Harbor
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার Docker image ব্যবহার করে। Public registry (Docker Hub) ছাড়াও "Private Registry" ও "Harbor"—production-grade image management, security, compliance, automation—সবকিছু নিশ্চিত করতে অপরিহার্য।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Security:** Sensitive/private image public registry-তে রাখা নিরাপদ নয়।
+- **Compliance:** Industry standard অনুযায়ী image access, audit, retention policy enforced করতে হয়।
+- **Performance:** Private registry-তে image pull/push দ্রুত হয়, network latency কমে।
+- **Automation:** CI/CD pipeline-এ image build, test, push—সবকিছু automate করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Private registry-তে production image store ও manage করে।
+- **Uber:** Harbor দিয়ে image vulnerability scan, access control enforce করে।
+- **Google:** Kubernetes-এ private registry mandatory—security ও compliance নিশ্চিত করতে।
+
+## মূল ধারণা
+
+### ১. Private Registry: Secure Image Store
+
+- **Private Registry:** Organization-specific Docker image store—access control, audit, retention policy enforced।
+- **Docker Registry:** Official open-source registry—self-host করা যায়।
+- **Run Private Registry:**
+
+```bash
+docker run -d -p 5000:5000 --name registry registry:2
+```
+
+- **Push Image:**
+
+```bash
+docker tag myapp localhost:5000/myapp
+
+docker push localhost:5000/myapp
+```
+
+- **Pull Image:**
+
+```bash
+docker pull localhost:5000/myapp
+```
+
+### ২. Harbor: Enterprise Registry Solution
+
+- **Harbor:** CNCF-graduated, enterprise-grade registry—security, vulnerability scan, RBAC, replication, UI—সবকিছু built-in।
+- **Features:**
+  - Image vulnerability scanning
+  - Role-based access control (RBAC)
+  - LDAP/AD integration
+  - Image replication
+  - Web UI
+- **Deploy Harbor:**
+  - Docker Compose, Helm, Kubernetes—সব platform-এ deploy করা যায়।
+
+### ৩. Registry Authentication ও Access Control
+
+- **Authentication:** Username/password, LDAP/AD, token-based—access control enforced।
+- **TLS/SSL:** Registry-তে HTTPS enforced করুন—data security নিশ্চিত করতে।
+- **Example:**
+
+```bash
+docker login localhost:5000
+```
+
+### ৪. Vulnerability Scanning ও Policy Enforcement
+
+- **Harbor:** Image push/pull-এর সময় vulnerability scan enforced হয়।
+- **Policy:** Only scanned/passed image deploy করা যায়।
+- **Audit Trail:** কে কখন কোন image push/pull করেছে—track করা যায়।
+
+### ৫. Automation ও CI/CD Integration
+
+- **CI/CD Pipeline:** Image build, test, scan, push—সবকিছু automate করুন।
+- **Webhook:** Registry-তে image push হলে automated deployment trigger করুন।
+
+## সাধারণ ভুলত্রুটি
+
+- Sensitive image public registry-তে রাখা।
+- Registry-তে authentication/TLS enforced না করা।
+- Vulnerability scan/policy enforced না করা।
+- Audit trail/retention policy না রাখা।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Production-এ private registry ব্যবহার করুন।
+- Harbor বা enterprise-grade registry deploy করুন।
+- Authentication/TLS enforced করুন।
+- Vulnerability scan/policy enforced করুন।
+- Audit trail ও retention policy configure করুন।
+- CI/CD pipeline-এ registry integration করুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Cloud Registry:** AWS ECR, GCP Artifact Registry, Azure Container Registry—managed registry ব্যবহার হচ্ছে।
+- **Image Signing/Verification:** Image authenticity verify করতে Notary/DCT enforced হচ্ছে।
+- **Multi-region Replication:** Global deployment-এ registry replication হচ্ছে।
+
+## সহজ এনালজি
+
+- "Private registry মানে—নিজস্ব locker, যেখানে sensitive জিনিস নিরাপদে রাখা যায়। Harbor মানে—enterprise-level locker, security, monitoring, automation—সবকিছু built-in।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ private registry ব্যবহার করুন।
+- Sensitive, proprietary, enterprise image—public registry-তে না রেখে private registry-তে রাখুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Private registry/Harbor deploy করুন।
+2. Authentication/TLS enforced করুন।
+3. Vulnerability scan/policy configure করুন।
+4. CI/CD pipeline-এ registry integration করুন।
+5. Audit trail ও retention policy set করুন।
+
+## Quick Checklist
+
+- [x] Private registry/Harbor deployed?
+- [x] Authentication/TLS enforced?
+- [x] Vulnerability scan/policy configured?
+- [x] CI/CD integration আছে?
+- [x] Audit trail/retention policy আছে?
+
+---
+
+## উপসংহার
+
+রেজিস্ট্রি ম্যানেজমেন্ট—private registry, Harbor—production-grade Docker image management-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার image security, compliance, automation ও performance নিশ্চিত হবে।
+

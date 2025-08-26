@@ -1,0 +1,87 @@
+---
+title: "Docker Hub ও প্রাইভেট রেজিস্ট্রি"
+icon: logos:docker-icon
+---
+
+# Docker Hub ও প্রাইভেট রেজিস্ট্রি — ইমেজ শেয়ারিং ও Collaboration
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সবাই Docker Hub ও Private Registry ব্যবহার করে তাদের Application Image শেয়ার ও Deploy করে। Docker Hub—Public Image Repository, Private Registry—Organization-specific Secure Storage। এই লেসনে আমরা Image Management ও Collaboration-এর জন্য Hub ও Registry-এর Workflow জানব।
+
+## Core Concepts
+
+### ১. Docker Hub
+- **Definition:** Public Image Repository, Free ও Paid Plan
+- **Features:**
+    - Official Images
+    - Community Images
+    - Easy Sharing
+- **Command:**
+```bash
+$ docker pull nginx:latest
+$ docker push myrepo/myapp:prod
+```
+- **উদাহরণ:**
+    - "Netflix-এর DevOps টিম Docker Hub থেকে Image Pull করে"
+
+### ২. Private Registry
+- **Definition:** Organization-specific Secure Image Storage
+- **Features:**
+    - Access Control
+    - Custom Domain
+    - Enhanced Security
+- **Command:**
+```bash
+$ docker login myregistry.com
+$ docker push myregistry.com/myapp:prod
+```
+- **উদাহরণ:**
+    - "Google-এর Internal App Image Private Registry-তে Store করা হয়"
+
+### ৩. Workflow
+1. Build Image
+2. Tag Image
+3. Push to Hub/Registry
+4. Pull from Hub/Registry
+
+### ৪. কেন গুরুত্বপূর্ণ?
+- Collaboration
+- Version Control
+- Secure Deployment
+
+### ৫. কখন ব্যবহার করবেন?
+- Public App: Docker Hub
+- Private/Enterprise App: Private Registry
+
+### ৬. Common Pitfalls
+- Unauthorized Access
+- Wrong Tag Usage
+- Outdated Image
+
+### ৭. Best Practices
+- Use Official Images
+- Secure Private Registry
+- Regularly Update Images
+- Access Control Setup
+
+### ৮. Industry Trends
+- Hybrid Registry Setup
+- Automated Image Scanning
+- Multi-cloud Registry Integration
+
+## উদাহরণ ও এনালজি
+- Docker Hub—"Public Library, সবাই ব্যবহার করতে পারে"
+- Private Registry—"Personal Bookshelf, শুধু Owner ব্যবহার করতে পারে"
+
+## Quick Reference
+- Hub: `docker pull nginx:latest`, `docker push myrepo/myapp:prod`
+- Registry: `docker login`, `docker push myregistry.com/myapp:prod`
+
+## উপসংহার
+
+Docker Hub ও Private Registry—Image Management ও Collaboration-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Efficient Deployment ও Security নিশ্চিত হয়।
+
+---
+
+**পরবর্তী পাঠ:** Volumes ও Bind Mounts

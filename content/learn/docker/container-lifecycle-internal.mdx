@@ -1,0 +1,127 @@
+---
+title: Container Lifecycle in Detail (কন্টেইনার লাইফসাইকেল বিস্তারিত)
+icon: logos:docker-icon
+---
+
+# কন্টেইনার লাইফসাইকেল: ডকারের ভেতরের কাজ
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern app-এ হাজার হাজার container deploy হয়। Container lifecycle—start থেকে stop, pause, remove—production-এ troubleshooting, automation, optimization-এর জন্য critical।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Troubleshooting:** Lifecycle বুঝলে error/source সহজে খুঁজে পাওয়া যায়।
+- **Automation:** CI/CD pipeline-এ container state manage করা যায়।
+- **Optimization:** Resource usage, performance tune করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Auto-scaling—container lifecycle deep understanding essential।
+- **Uber:** Custom monitoring—container state track করে।
+- **Google:** Kubernetes—container lifecycle automate করে।
+
+## মূল ধারণা
+
+### ১. Container Lifecycle: Key States
+
+- **Created:** Image থেকে container তৈরি হয়েছে, কিন্তু run হয়নি।
+- **Running:** Container active—process/app চলছে।
+- **Paused:** Container freeze—resource usage বন্ধ, state preserved।
+- **Stopped/Exited:** Container বন্ধ—process/app আর চলছে না।
+- **Removed:** Container delete—data/state আর নেই।
+
+### ২. Lifecycle Commands
+
+- **Create:**
+  ```bash
+  docker create nginx
+  ```
+- **Start:**
+  ```bash
+  docker start <container-id>
+  ```
+- **Pause:**
+  ```bash
+  docker pause <container-id>
+  ```
+- **Unpause:**
+  ```bash
+  docker unpause <container-id>
+  ```
+- **Stop:**
+  ```bash
+  docker stop <container-id>
+  ```
+- **Remove:**
+  ```bash
+  docker rm <container-id>
+  ```
+
+### ৩. Workflow: Typical Lifecycle
+
+1. **Image pull/create**
+2. **Container create**
+3. **Container start/run**
+4. **Pause/unpause (optional)**
+5. **Stop/exit**
+6. **Remove/delete**
+
+### ৪. State Transition Diagram
+
+- **Created → Running → Paused/Stopped → Removed**
+- **Paused → Unpaused → Running**
+
+### ৫. সহজ এনালজি
+
+- "Container lifecycle মানে—একটি বাস, যেটা তৈরি হয় (created), যাত্রা শুরু করে (running), মাঝে মাঝে থামে (paused), যাত্রা শেষ করে (stopped), এবং শেষে গ্যারেজে চলে যায় (removed)।"
+
+### ৬. Best Practices
+
+- **Resource limit:** Container-এ CPU/memory limit set করুন।
+- **Health check:** Container state monitor করুন।
+- **Graceful stop:** SIGTERM/SIGKILL handle করুন—data loss avoid করুন।
+- **Auto-restart policy:** Crash হলে container auto-recover করুন।
+- **Monitoring/logging:** Lifecycle event track করুন।
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Resource limit না দেয়া—host overload।
+- Health check না রাখা—container crash unnoticed।
+- Graceful stop handle না করা—data loss।
+- Auto-restart policy না দেয়া—crash হলে recovery নেই।
+- Monitoring/logging না রাখা—issue detect করা যায় না।
+
+### ৮. Industry Trends
+
+- **Auto-scaling:** Container lifecycle—load অনুযায়ী automate।
+- **Self-healing:** Crash হলে container auto-recover।
+- **Event-driven automation:** Lifecycle event-এ custom action trigger।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Production workload—state management, troubleshooting essential।
+- CI/CD pipeline—automation, monitoring, recovery।
+- Custom integration—event-driven workflow।
+
+## সংক্ষিপ্ত workflow
+
+1. Image pull/create করুন।
+2. Container create/start/run করুন।
+3. Pause/unpause/stop/remove/manage করুন।
+4. Resource limit, health check, auto-restart, monitoring enforced করুন।
+
+## Quick Checklist
+
+- [x] Resource limit configured?
+- [x] Health check enabled?
+- [x] Graceful stop handled?
+- [x] Auto-restart policy configured?
+- [x] Monitoring/logging enabled?
+
+---
+
+## উপসংহার
+
+Container lifecycle—production-grade deployment, troubleshooting, automation, optimization—সবকিছু deeply বুঝতে essential। Industry standard workflow—state management, event-driven automation—confident deployment ও management সম্ভব।
+

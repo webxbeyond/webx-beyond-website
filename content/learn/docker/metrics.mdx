@@ -1,0 +1,130 @@
+---
+title: Container Metrics (docker stats)
+icon: logos:docker-icon
+---
+
+# Container Metrics (docker stats): পারফরম্যান্স মনিটরিং ও অপ্টিমাইজেশন
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Container-এ কত CPU, memory, network, I/O ব্যবহার হচ্ছে—এই "metrics" জানা না থাকলে performance issue, resource bottleneck, security risk—সবকিছু অজানা থেকে যায়। Docker-এ `docker stats`—container metrics monitor করার সহজ ও শক্তিশালী টুল।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Performance Monitoring:** Container slow, overloaded, resource leak—সবকিছু দ্রুত detect করা যায়।
+- **Resource Optimization:** CPU, memory, network usage দেখে resource allocation ঠিক করা যায়।
+- **Troubleshooting:** Bottleneck, crash, abnormal behavior—metrics দেখে root cause খুঁজে পাওয়া যায়।
+- **Capacity Planning:** Production-এ কত resource লাগবে তা metrics দেখে estimate করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Real-time container metrics দেখে auto-scaling ও load balancing করে।
+- **Uber:** Ride tracking service-এ latency, throughput, error rate—সবকিছু metrics দিয়ে monitor হয়।
+- **Google:** Kubernetes/Docker metrics—Prometheus/Grafana দিয়ে visualize ও alert করা হয়।
+
+## মূল ধারণা
+
+### ১. docker stats: Metrics Command
+
+- **docker stats:** Real-time container metrics দেখার command।
+
+```bash
+docker stats
+```
+
+- **Output:**
+  - CONTAINER ID
+  - NAME
+  - CPU %
+  - MEM USAGE / LIMIT
+  - MEM %
+  - NET I/O
+  - BLOCK I/O
+  - PIDS
+
+- **Specific Container:**
+
+```bash
+docker stats <container-id>
+```
+
+### ২. Metrics Explained
+
+- **CPU %:** Container কত % CPU ব্যবহার করছে।
+- **MEM USAGE / LIMIT:** Memory usage ও limit কত।
+- **NET I/O:** Network input/output কত।
+- **BLOCK I/O:** Disk read/write কত।
+- **PIDS:** Container-এ কত process চলছে।
+
+### ৩. Resource Limit ও Optimization
+
+- **Resource Limit:** Container run করার সময় CPU/memory limit set করুন।
+
+```bash
+docker run -d --name webapp --memory="256m" --cpus="0.5" nginx
+```
+
+- **Optimization:** Metrics দেখে resource allocation adjust করুন।
+
+### ৪. Metrics Visualization ও Alerting
+
+- **Prometheus + Grafana:** Advanced metrics collect, visualize, alert করা যায়।
+- **Integration:** Docker metrics exporter দিয়ে Prometheus-এ data পাঠানো যায়।
+
+### ৫. Automated Monitoring
+
+- **Alerting:** Metrics threshold cross করলে automated alert trigger হয়।
+- **Auto-scaling:** Metrics দেখে container সংখ্যা auto-scale করা যায়।
+
+## সাধারণ ভুলত্রুটি
+
+- Resource limit না দেয়া—container crash বা host overload হয়।
+- Metrics monitor না করা—performance issue late detect হয়।
+- Metrics data store না করা—historical analysis সম্ভব নয়।
+- Alerting না configure করা—critical issue unnoticed থাকে।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Container run করার সময় resource limit set করুন।
+- Regularly docker stats দিয়ে metrics monitor করুন।
+- Advanced monitoring tool (Prometheus, Grafana) integrate করুন।
+- Automated alerting ও auto-scaling configure করুন।
+- Metrics data store ও visualize করুন historical analysis-এর জন্য।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Real-time Monitoring:** Production-এ real-time metrics collect ও alert হচ্ছে।
+- **AI-based Optimization:** Machine learning দিয়ে resource allocation optimize হচ্ছে।
+- **Self-healing System:** Metrics দেখে automated remediation হচ্ছে।
+
+## সহজ এনালজি
+
+- "Metrics মানে—গাড়ির ড্যাশবোর্ড, যেখানে speed, fuel, temperature—সবকিছু দেখা যায়। ড্যাশবোর্ড না থাকলে গাড়ি চালানো ঝুঁকিপূর্ণ।"
+
+## কখন ব্যবহার করবেন?
+
+- Development, staging, production—সব environment-এ metrics monitor করুন।
+- Performance tuning, troubleshooting, capacity planning—সব workflow-তে metrics collect করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Container run করুন (resource limit সহ)।
+2. docker stats দিয়ে metrics monitor করুন।
+3. Advanced monitoring tool integrate করুন।
+4. Automated alerting ও auto-scaling configure করুন।
+5. Metrics data store ও visualize করুন।
+
+## Quick Checklist
+
+- [x] Resource limit set হয়েছে?
+- [x] docker stats দিয়ে monitor হচ্ছে?
+- [x] Advanced monitoring tool আছে?
+- [x] Alerting/auto-scaling configured?
+- [x] Metrics data store হচ্ছে?
+
+---
+
+## উপসংহার
+
+Container Metrics—docker stats—performance monitoring, optimization ও troubleshooting-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার অ্যাপ্লিকেশন efficient, scalable ও resilient থাকবে।
+

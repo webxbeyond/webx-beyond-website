@@ -1,0 +1,177 @@
+---
+title: Docker Compose দিয়ে Full-stack MERN App: বাস্তব-জীবন প্রজেক্ট
+icon: logos:docker-icon
+---
+
+# Docker Compose দিয়ে Full-stack MERN App: Production-Grade Workflow
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব modern web app-এ scalable, portable, automated deployment দরকার। MERN stack (MongoDB, Express, React, Node.js)—industry-standard full-stack solution। Docker Compose দিয়ে MERN app deploy—local থেকে cloud—সব জায়গায় সহজ, দ্রুত, secure।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** Traffic বাড়লে container scale করা যায়।
+- **Portability:** Local dev থেকে cloud—একই config-এ deploy।
+- **Automation:** Manual setup ছাড়া দ্রুত multi-service app deploy।
+- **Isolation:** Backend, frontend, database—সব আলাদা container-এ run হয়।
+
+## বাস্তব উদাহরণ
+
+- **Startup:** MVP launch—Docker Compose দিয়ে দ্রুত deploy।
+- **Enterprise:** Production-এ multiple MERN app—container orchestration দিয়ে manage।
+- **Cloud Provider:** Managed app hosting—backend-এ Docker ব্যবহার।
+
+## মূল ধারণা
+
+### ১. MERN Stack: Components
+
+- **MongoDB:** NoSQL database—data store করে।
+- **Express:** Node.js backend framework—API serve করে।
+- **React:** Frontend—user interface build করে।
+- **Node.js:** Backend runtime—Express app run করে।
+
+### ২. Docker Compose: Multi-container Orchestration
+
+- **Compose:** YAML ফাইল—সব service (frontend, backend, database) define করে।
+- **Network:** Default network—container-এ communication সহজ।
+- **Volumes:** Data persistency—MongoDB data loss হবে না।
+
+### ৩. Project Structure
+
+```plaintext
+project-mern/
+├── docker-compose.yml
+├── backend/
+│   └── Dockerfile
+├── frontend/
+│   └── Dockerfile
+└── README.md
+```
+
+### ৪. docker-compose.yml Explained
+
+```yaml
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      MONGO_URL: mongodb://mongo:27017/mernapp
+    depends_on:
+      - mongo
+    ports:
+      - "5000:5000"
+  frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+volumes:
+  mongo_data:
+```
+
+### ৫. Backend Dockerfile (Node.js + Express)
+
+```dockerfile
+# backend/Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 5000
+CMD ["npm", "start"]
+```
+
+### ৬. Frontend Dockerfile (React)
+
+```dockerfile
+# frontend/Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### ৭. Workflow: Step-by-step
+
+1. **Project structure clone/download করুন।**
+2. Backend/frontend Dockerfile customize করুন।
+3. docker-compose.yml environment/config update করুন।
+4. Terminal-এ:
+   ```bash
+   docker compose up -d
+   ```
+5. Browser-এ `http://localhost:3000`—React app দেখবেন।
+6. Backend API—`http://localhost:5000`।
+7. MongoDB—`localhost:27017` (MongoDB client দিয়ে connect করুন)।
+
+### ৮. সহজ এনালজি
+
+- "Docker Compose মানে—একটি orchestra conductor, যে একসাথে MongoDB, backend, frontend বাজায়।"
+
+### ৯. Best Practices
+
+- **Environment variables**—.env ফাইলে store করুন, hardcode করবেন না।
+- **Volumes**—MongoDB data persistency নিশ্চিত করুন।
+- **Restart policy**—production-এ always restart enable করুন।
+- **Secrets management**—production-এ credentials encrypt করুন।
+- **Health checks**—service crash হলে auto-recover করুন।
+
+### ১০. সাধারণ ভুলত্রুটি
+
+- Database credentials hardcode করা।
+- Volumes ব্যবহার না করা—data loss risk।
+- Restart policy না দেয়া—container crash হলে auto-recover হবে না।
+- Network misconfiguration—backend/database/frontend connect করতে পারবে না।
+- Build context ভুল—Dockerfile ঠিকমতো copy/install না হলে build fail।
+
+### ১১. Industry Trends
+
+- **Microservices architecture:** Backend/frontend/database—সব আলাদা container/service।
+- **CI/CD integration:** Automated build/test/deploy pipeline—app update সহজ।
+- **Multi-cloud deployment:** AWS, GCP, Azure—same Docker Compose file-এ deploy।
+
+### ১২. কখন ব্যবহার করবেন?
+
+- Local development—quick MERN setup।
+- Production—scalable, secure deployment।
+- Cloud migration—easy portability।
+
+## সংক্ষিপ্ত workflow
+
+1. Project structure clone/download করুন।
+2. Dockerfile ও docker-compose.yml customize/configure করুন।
+3. `docker compose up -d` চালান।
+4. Browser-এ React app ও API test করুন।
+5. Volumes backup ও security best practices follow করুন।
+
+## Quick Checklist
+
+- [x] Volumes configured?
+- [x] Environment variables secure?
+- [x] Restart policy enabled?
+- [x] Database credentials encrypted?
+- [x] Health checks configured?
+- [x] Build context ঠিক আছে?
+
+---
+
+## উপসংহার
+
+Docker Compose দিয়ে Full-stack MERN app deploy—production-ready, scalable, portable, secure solution। এই প্রজেক্ট—industry standard workflow—local থেকে cloud—সব জায়গায় ব্যবহারযোগ্য।
+

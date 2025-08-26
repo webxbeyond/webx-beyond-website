@@ -1,0 +1,142 @@
+---
+title: Health Checks ও Auto-restart নীতিমালা
+icon: logos:docker-icon
+---
+
+# Health Checks ও Auto-restart নীতিমালা: Production-Grade Docker Reliability
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Container/app কখনো crash, hang, slow হয়ে যেতে পারে। "Health Check" ও "Auto-restart Policy"—production-grade deployment-এ reliability ও uptime নিশ্চিত করতে অপরিহার্য।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Reliability:** Container/app crash করলে auto-restart হয়, downtime কমে।
+- **Self-healing:** Health check fail হলে container restart বা replace হয়।
+- **Monitoring:** Health status দেখে automated alert trigger করা যায়।
+- **User Experience:** Service always available থাকে, user impact কমে।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Health check ও auto-restart দিয়ে millions of container 24/7 চালায়।
+- **Uber:** Real-time ride tracking service-এ health check enforced—downtime কমে।
+- **Google:** Kubernetes/Docker-এ health check ও restart policy—industry standard।
+
+## মূল ধারণা
+
+### ১. Health Check: Container/App Status
+
+- **Health Check:** Container/app expected behavior test—healthy/failed status দেয়।
+- **Dockerfile-এ Health Check:**
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+```
+
+- **Compose File-এ Health Check:**
+
+```yaml
+services:
+  web:
+    image: nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+- **Status Check:**
+
+```bash
+docker inspect --format='{{json .State.Health}}' <container-id>
+```
+
+### ২. Auto-restart Policy: Self-healing
+
+- **Restart Policy:** Container/app crash, exit, health check fail—auto-restart হয়।
+- **Run Command-এ Policy:**
+
+```bash
+docker run --restart=always nginx
+```
+
+- **Policy Types:**
+  - no: Never restart
+  - always: Always restart
+  - unless-stopped: Restart unless manually stopped
+  - on-failure: Restart only on non-zero exit code
+
+- **Compose File-এ Policy:**
+
+```yaml
+services:
+  web:
+    image: nginx
+    restart: always
+```
+
+### ৩. Advanced Self-healing Workflow
+
+1. Health check configure করুন (Dockerfile/Compose)।
+2. Restart policy set করুন (run/compose)।
+3. Monitoring tool দিয়ে health status track করুন।
+4. Alerting configure করুন—health fail হলে notification।
+
+### ৪. Monitoring ও Alerting
+
+- **Prometheus/Grafana:** Health status visualize ও alert trigger করা যায়।
+- **Integration:** Slack/email/webhook—alert integration।
+
+## সাধারণ ভুলত্রুটি
+
+- Health check configure না করা—container/app hang/crash unnoticed থাকে।
+- Restart policy না দেয়া—crash হলে manual intervention লাগে।
+- Health check/test ভুল—false positive/negative হয়।
+- Monitoring/alerting না করা—downtime unnoticed থাকে।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Production-এ সব container/app-এ health check configure করুন।
+- Restart policy always/enforced করুন।
+- Health check/test workload অনুযায়ী tune করুন।
+- Monitoring ও alerting চালু রাখুন।
+- Health check/test script secure ও efficient রাখুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Self-healing System:** Health check fail হলে automated remediation হচ্ছে।
+- **AI-based Monitoring:** Machine learning দিয়ে anomaly detect ও auto-restart হচ্ছে।
+- **Cloud-native Policy:** Managed service-এ health check/restart policy enforced হচ্ছে।
+
+## সহজ এনালজি
+
+- "Health check মানে—রোগীর pulse, temperature, pressure—নিয়মিত চেক করা। Auto-restart মানে—problem detect হলে ডাক্তার সঙ্গে সঙ্গে চিকিৎসা শুরু করেন।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging—সব environment-এ health check ও auto-restart policy enforced করুন।
+- Mission-critical app/service—reliability নিশ্চিত করতে policy ব্যবহার করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Health check configure করুন।
+2. Restart policy set করুন।
+3. Monitoring ও alerting চালু রাখুন।
+4. Test script workload অনুযায়ী tune করুন।
+
+## Quick Checklist
+
+- [x] Health check configured?
+- [x] Restart policy set হয়েছে?
+- [x] Monitoring/alerting আছে?
+- [x] Test script tuned?
+- [x] Self-healing workflow আছে?
+
+---
+
+## উপসংহার
+
+Health Checks ও Auto-restart—production-grade Docker reliability-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার container/app always available, resilient ও self-healing থাকবে।
+

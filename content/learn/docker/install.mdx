@@ -1,0 +1,72 @@
+---
+title: "ডকার ইনস্টলেশন (Linux, Mac, Windows)"
+icon: logos:docker-icon
+---
+
+# ডকার ইনস্টলেশন (Linux, Mac, Windows) — শুরু থেকে সফল সেটআপ
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সবাই Docker ব্যবহার করে তাদের অ্যাপ্লিকেশন চালায়। Docker শুরু করতে হলে, সঠিকভাবে ইনস্টল করা জরুরি। এই লেসনে আমরা Linux, Mac ও Windows-এ Docker ইনস্টলেশন Step-by-step জানব।
+
+## Core Concepts
+
+### ১. Linux-এ Docker ইনস্টলেশন
+- **Steps:**
+    1. Update Package Index
+    2. Docker Repository Add
+    3. Docker Engine Install
+    4. User Permission Setup
+- **Command Example:**
+```bash
+sudo apt update
+sudo apt install ca-certificates curl gnupg
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+```
+- **Tip:** Installation শেষে `docker --version` দিয়ে চেক করুন।
+
+### ২. Mac-এ Docker ইনস্টলেশন
+- **Steps:**
+    1. Docker Desktop Download করুন (https://www.docker.com/products/docker-desktop)
+    2. Installer চালান
+    3. Docker Desktop Launch করুন
+- **Tip:** Mac-এ GUI ও CLI—দুটোই সহজে ব্যবহার করা যায়।
+
+### ৩. Windows-এ Docker ইনস্টলেশন
+- **Steps:**
+    1. Docker Desktop Download করুন
+    2. Installer চালান
+    3. WSL 2 Enable করুন (Windows Subsystem for Linux)
+    4. Docker Desktop Launch করুন
+- **Tip:** Windows-এ WSL 2 ব্যবহার করলে Performance ভালো হয়।
+
+### ৪. Common Pitfalls
+- Permission Issue (Linux)
+- WSL 2 Not Enabled (Windows)
+- Outdated Version
+
+### ৫. Best Practices
+- Always Download Latest Version
+- Installation শেষে System Restart করুন
+- Official Documentation Follow করুন
+
+### ৬. Industry Trends
+- Docker Desktop—Cross-platform
+- Cloud-based Docker Setup
+
+## উদাহরণ ও এনালজি
+- Docker Install—"নতুন ফোন কিনে সেটআপ করা, সব Feature Unlock"
+
+## Quick Reference
+- Linux: `curl -fsSL https://get.docker.com -o get-docker.sh`
+- Mac/Windows: Docker Desktop
+
+## উপসংহার
+
+Docker ইনস্টলেশন—প্রথম ধাপ, সফল Container Deployment-এর জন্য অপরিহার্য। সঠিকভাবে Install করলে, Development থেকে Production—সবকিছু সহজ ও Efficient হবে।
+
+---
+
+**পরবর্তী পাঠ:** Hello World: প্রথম কন্টেইনার চালানো

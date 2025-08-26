@@ -1,0 +1,92 @@
+---
+title: "Volumes ও Bind Mounts"
+icon: logos:docker-icon
+---
+
+# Volumes ও Bind Mounts — Docker-এ ডেটা পার্সিস্টেন্স ও শেয়ারিং
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সবাই Docker Container-এ ডেটা পার্সিস্ট ও শেয়ার করতে Volumes ও Bind Mounts ব্যবহার করে। Docker Container—Ephemeral, Restart করলে ডেটা হারিয়ে যায়। Volumes ও Bind Mounts—ডেটা পার্মানেন্ট ও শেয়ার করার জন্য অপরিহার্য।
+
+## Core Concepts
+
+### ১. Volumes কী?
+- **Definition:** Docker Managed Storage, Container Restart হলেও ডেটা থাকে
+- **Features:**
+    - Easy Backup
+    - Multiple Container Access
+    - Managed by Docker
+- **Command:**
+```bash
+$ docker volume create mydata
+$ docker run -v mydata:/data nginx
+```
+- **উদাহরণ:**
+    - "Netflix-এর Streaming Logs Volumes-এ Store হয়"
+
+### ২. Bind Mounts কী?
+- **Definition:** Host Machine-এর Specific Path Container-এ Attach করা
+- **Features:**
+    - Direct Host Access
+    - Manual Control
+    - Fast Development
+- **Command:**
+```bash
+$ docker run -v /host/path:/container/path nginx
+```
+- **উদাহরণ:**
+    - "Google-এর Dev Team Source Code Bind Mount দিয়ে Container-এ Test করে"
+
+### ৩. পার্থক্য
+| Aspect         | Volumes           | Bind Mounts         |
+|----------------|-------------------|---------------------|
+| Managed By     | Docker            | Host OS             |
+| Backup         | Easy              | Manual              |
+| Use Case       | Production, Data  | Dev, Config         |
+| Flexibility    | High              | Medium              |
+
+### ৪. Workflow
+1. Create Volume/Bind Mount
+2. Attach to Container
+3. Access/Share Data
+
+### ৫. কেন গুরুত্বপূর্ণ?
+- Data Persistence
+- Multi-container Collaboration
+- Easy Backup & Restore
+
+### ৬. কখন ব্যবহার করবেন?
+- Volumes: Production Data, Database
+- Bind Mounts: Development, Config File
+
+### ৭. Common Pitfalls
+- Wrong Path Mapping
+- Permission Issue
+- Unused Volume জমে থাকা
+
+### ৮. Best Practices
+- Use Volumes for Production
+- Clean Up Unused Volumes
+- Proper Permission Setup
+
+### ৯. Industry Trends
+- Named Volumes
+- Volume Drivers
+- Cloud Storage Integration
+
+## উদাহরণ ও এনালজি
+- Volumes—"Locker, ডেটা নিরাপদ ও পার্মানেন্ট"
+- Bind Mounts—"Desk Drawer, দ্রুত Access, Manual Control"
+
+## Quick Reference
+- Volume: `docker volume create`, `docker run -v mydata:/data nginx`
+- Bind Mount: `docker run -v /host/path:/container/path nginx`
+
+## উপসংহার
+
+Volumes ও Bind Mounts—Docker-এ ডেটা পার্সিস্টেন্স ও শেয়ারিং-এর জন্য অপরিহার্য। সঠিকভাবে ব্যবহার করলে, Production ও Development—দুটোই Efficient ও Reliable হবে।
+
+---
+
+**পরবর্তী পাঠ:** Port Mapping ও নেটওয়ার্ক বেসিকস

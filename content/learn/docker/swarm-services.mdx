@@ -1,0 +1,166 @@
+---
+title: Services, Stacks ও স্কেলিং
+icon: logos:docker-icon
+---
+
+# Services, Stacks ও স্কেলিং: Docker Swarm-এ অ্যাপ্লিকেশন পরিচালনা
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—সব বড় কোম্পানি production-এ হাজার হাজার container চালায়। Docker Swarm-এ "Service", "Stack" ও "Scaling"—এই তিনটি concept অ্যাপ্লিকেশন orchestration-এর মূল ভিত্তি।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Service:** একাধিক container instance deploy ও manage করা যায়।
+- **Stack:** Multi-service app (web, db, cache) একসাথে deploy করা যায়।
+- **Scaling:** Traffic বা workload বাড়লে container সংখ্যা auto/incremental বাড়ানো যায়।
+- **High Availability:** Service crash করলে auto-restart ও load balancing হয়।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Stack-এ web, API, database—সব service একসাথে deploy হয়।
+- **Uber:** Real-time workload অনুযায়ী service scale হয়।
+- **Google:** Kubernetes-এ service/stack concept—Swarm-এর advanced version।
+
+## মূল ধারণা
+
+### ১. Service: Deployable Unit
+
+- **Service:** একাধিক container instance—replica—deploy ও manage করা যায়।
+- **Create Service:**
+
+```bash
+docker service create --name webapp --replicas 3 nginx:alpine
+```
+
+- **List Service:**
+
+```bash
+docker service ls
+```
+
+- **Service Update:**
+
+```bash
+docker service update --image nginx:latest webapp
+```
+
+### ২. Stack: Multi-service Deployment
+
+- **Stack:** Multiple service (web, db, cache) একসাথে deploy করা যায়।
+- **Compose File:** YAML-এ service define করুন।
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+```
+
+- **Deploy Stack:**
+
+```bash
+docker stack deploy -c docker-compose.yml mystack
+```
+
+- **List Stack:**
+
+```bash
+docker stack ls
+```
+
+### ৩. Scaling: Container সংখ্যা বাড়ানো/কমানো
+
+- **Service Scale:**
+
+```bash
+docker service scale webapp=5
+```
+
+- **Stack Scale:** Compose file-এ replica সংখ্যা বাড়ান।
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    deploy:
+      replicas: 5
+```
+
+- **Auto-scaling:** Manual scaling Swarm-এ, auto-scaling advanced orchestration-এ (Kubernetes)।
+
+### ৪. Health Check ও Auto-restart
+
+- **Health Check:** Service healthy কিনা check করা যায়।
+- **Auto-restart:** Crash হলে container auto-restart হয়।
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+## সাধারণ ভুলত্রুটি
+
+- Service deploy করার সময় replica সংখ্যা না দেয়া।
+- Stack-এ environment variable ভুল configure করা।
+- Health check না configure করা।
+- Service update-এ downtime তৈরি করা।
+
+## সেরা অনুশীলন (Best Practices)
+
+- Service deploy করার সময় replica ও resource limit set করুন।
+- Stack-এ environment variable ও secret properly configure করুন।
+- Health check configure করুন।
+- Rolling update ব্যবহার করুন downtime কমাতে।
+- Regularly service/stack status monitor করুন।
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Multi-service Stack:** Complex app-এ multiple service একসাথে deploy হচ্ছে।
+- **Declarative Deployment:** YAML/Compose file-এ configuration manage হচ্ছে।
+- **Auto-scaling:** Advanced orchestration-এ workload অনুযায়ী container সংখ্যা auto-scale হচ্ছে।
+
+## সহজ এনালজি
+
+- "Service মানে—একটি দোকান, Stack মানে—একটি শপিং মল (অনেক দোকান একসাথে)। Scaling মানে—দোকানের কর্মচারী সংখ্যা বাড়ানো/কমানো।"
+
+## কখন ব্যবহার করবেন?
+
+- Production, staging, development—সব environment-এ service/stack ব্যবহার করুন।
+- Traffic/workload বাড়লে scaling করুন।
+
+## সংক্ষিপ্ত workflow
+
+1. Service create করুন।
+2. Stack deploy করুন।
+3. Scaling করুন।
+4. Health check configure করুন।
+5. Status monitor করুন।
+
+## Quick Checklist
+
+- [x] Service/stack deploy হয়েছে?
+- [x] Replica সংখ্যা ঠিক আছে?
+- [x] Health check configured?
+- [x] Environment variable/secret ঠিক আছে?
+- [x] Status monitor হচ্ছে?
+
+---
+
+## উপসংহার
+
+Services, Stacks ও স্কেলিং—Docker Swarm-এ production-grade app orchestration-এর জন্য অপরিহার্য। সঠিকভাবে configure করলে আপনার অ্যাপ্লিকেশন scalable, resilient ও efficient থাকবে।
+

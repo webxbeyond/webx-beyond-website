@@ -1,0 +1,100 @@
+---
+title: Serverless Containers ও Docker
+icon: logos:docker-icon
+---
+
+# Serverless Containers ও Docker: ভবিষ্যতের স্কেলেবল, ইভেন্ট-ড্রিভেন অ্যাপ্লিকেশন
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—modern app-এ serverless/container fusion—scalability, cost-efficiency, automation—critical। Docker—serverless workload-এ integration—industry trend—production workflow-এ impact ফেলে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Scalability:** Serverless—auto scale—event-driven workload—cost-efficient।
+- **Simplicity:** No server manage—only code/function deploy—Docker container-এ।
+- **Cost-efficiency:** Pay-per-use—idle resource waste কমে।
+
+## বাস্তব উদাহরণ
+
+- **Netflix:** Serverless container—auto scale—video processing, analytics workload।
+- **Uber:** Event-driven microservices—serverless container—real-time ride matching।
+- **Google:** Cloud Functions/Run—Docker container—serverless deploy/manage।
+
+## মূল ধারণা
+
+### ১. Serverless Explained
+
+- **Serverless:** No server manage—only code/function deploy—cloud provider auto scale/manage।
+- **Benefit:** Developer focus—code/function—no infra headache।
+
+#### সহজ এনালজি
+
+- "Serverless মানে—একটি ride-sharing app, যেখানে গাড়ি (server) নিজে নিজে আসে—user শুধু ride book করে।"
+
+### ২. Docker Integration in Serverless
+
+- **Docker container—serverless workload-এ deploy:** Any language/runtime—Docker image—cloud provider-এ run।
+- **Benefit:** Custom runtime, dependency, environment—easy package/deploy।
+
+#### Workflow
+
+1. **Docker image build করুন:**
+   ```bash
+   docker build -t myfunction .
+   ```
+2. **Cloud provider-এ deploy করুন:**
+   - AWS Lambda (container image)
+   - Google Cloud Run
+   - Azure Functions (custom container)
+3. **Event trigger—auto scale/manage—pay-per-use।**
+
+### ৩. Industry Trends
+
+- **Serverless container—multi-cloud provider—default support।**
+- **Event-driven architecture—real-time workload—serverless enforced।**
+- **Hybrid workflow—serverless + container orchestration—Kubernetes integration।**
+- **Security/monitoring—serverless container—auto policy/enforcement।**
+
+### ৪. Best Practices
+
+- **Small, fast container image—serverless workload-এ use করুন।**
+- **Event-driven trigger—auto scale/manage—configure করুন।**
+- **Security—least privilege, secrets management enforced করুন।**
+- **Monitoring/logging—real-time status/error track করুন।**
+- **Documentation—workflow/config clear রাখুন।**
+
+### ৫. সাধারণ ভুলত্রুটি
+
+- Large container image—slow cold start, high cost।
+- Manual server manage—serverless benefit miss।
+- Security/config/documentation miss—production risk।
+- Monitoring/logging miss—issue detect late।
+
+### ৬. কখন ব্যবহার করবেন?
+
+- Event-driven workload—auto scale/manage essential।
+- Cost-efficiency—pay-per-use—idle resource avoid করতে।
+- Multi-cloud/hybrid workflow—serverless/container fusion দরকার হলে।
+
+## সংক্ষিপ্ত workflow
+
+1. Docker image build/config করুন।
+2. Cloud provider-এ serverless deploy করুন।
+3. Event trigger—auto scale/manage—configure করুন।
+4. Security/monitoring/documentation maintain করুন।
+
+## Quick Checklist
+
+- [x] Small, fast container image?
+- [x] Event-driven trigger configured?
+- [x] Security/monitoring/documentation maintained?
+- [x] Multi-cloud/hybrid workflow?
+- [x] Cost-efficiency validated?
+
+---
+
+## উপসংহার
+
+Serverless Containers ও Docker—future-proof, scalable, cost-efficient, event-driven app—industry standard। Workflow follow করলে—robust, efficient, production-ready serverless/container fusion architecture build করা সম্ভব।
+
