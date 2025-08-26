@@ -1,0 +1,103 @@
+---
+title: ডিফল্ট জেনেরিক টাইপ
+icon: logos:typescript-icon
+---
+
+# ডিফল্ট জেনেরিক টাইপ
+
+## প্রস্তাবনা
+
+Google-এর Search API, Netflix-এর Recommendation Engine, Uber-এর Ride Matching—সবখানে flexible yet predictable function/class দরকার। TypeScript-এর ডিফল্ট জেনেরিক টাইপ—industry-standard solution, যেখানে flexibility ও usability একসাথে আসে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **User-friendly API:** ডিফল্ট generic—function/class ব্যবহার সহজ করে তোলে।
+- **Code Reusability:** কমন কেসে বারবার টাইপ না লিখে—default value দিয়ে code DRY রাখা যায়।
+- **Extensibility:** Future-proof design—default generic দিয়ে নতুন feature add করা সহজ।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search API—default generic result type
+- **Netflix:** Recommendation—default generic content type
+- **Uber:** Ride Matching—default generic ride type
+
+## মূল ধারণা
+
+### ১. ডিফল্ট জেনেরিক টাইপ কী?
+
+- **সংজ্ঞা:** Generic type parameter—default value assign—type না দিলে default টাইপ ব্যবহার হবে।
+- **Usage:**
+  ```typescript
+  function identity<T = string>(value: T): T {
+    return value;
+  }
+
+  identity("Anis"); // "Anis" (string)
+  identity(123); // 123 (number)
+  ```
+
+#### সহজ এনালজি
+
+- "ডিফল্ট generic—একটি fallback—যদি কিছু specify না করা হয়, তাহলে default value automatically assign হবে।"
+
+### ২. কিভাবে কাজ করে?
+
+- Function/class/interface-এর generic parameter—`=` দিয়ে default value set করা যায়।
+- TypeScript—type inference—default value automatically assign করে দেয়।
+
+#### Example:
+```typescript
+interface ApiResponse<T = any> {
+  data: T;
+  error?: string;
+}
+
+const response: ApiResponse = { data: "Success" };
+// এখানে T = any
+```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Function/class/interface—most cases-এ common type থাকে
+- User-friendly API design করতে
+- Extensible/future-proof codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Default generic—overuse করলে type safety কমে যায়
+- Wrong default value—unexpected behavior
+- Multiple generic—default value miss করলে error
+
+### ৫. Best Practices
+
+- Default generic—carefully use করুন
+- Type safety—maintain করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—default generic—user-friendly API
+- Extensible codebase—default generic—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Type requirement clear করুন
+2. Generic parameter—default value assign করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Default generic used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর ডিফল্ট জেনেরিক টাইপ—flexible, user-friendly, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

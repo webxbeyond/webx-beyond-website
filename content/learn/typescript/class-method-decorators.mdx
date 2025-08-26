@@ -1,0 +1,133 @@
+---
+title: ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর
+icon: logos:typescript-icon
+---
+
+# ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর
+
+## প্রস্তাবনা
+
+Google-এর Angular, Netflix-এর Custom Analytics, Uber-এর Permission System—সবখানে class, property, ও method-এর behavior enhance বা modify করার দরকার পড়ে। TypeScript-এর ডেকোরেটর—code-কে expressive, reusable, এবং maintainable করে তোলে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Code Enhancement:** Class/property/method—custom logic add/modify করা যায়
+- **Reusability:** Common logic—multiple জায়গায় reuse
+- **Extensibility:** Framework/library—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Angular—@Component, @Injectable, @Input, @Output
+- **Netflix:** Analytics—method/property-এ custom decorator
+- **Uber:** Permission—class/property-এ dynamic decorator
+
+## মূল ধারণা
+
+### ১. ক্লাস ডেকোরেটর
+
+- **সংজ্ঞা:** Class-এর behavior modify/add করা যায়
+- **Usage:**
+  ```typescript
+  function Controller(constructor: Function) {
+    console.log("Controller initialized");
+  }
+
+  @Controller
+  class App {}
+  ```
+
+#### সহজ এনালজি
+
+- "Class decorator—একটি supervisor—class-এর behavior monitor/modify করে।"
+
+### ২. প্রপার্টি ডেকোরেটর
+
+- **সংজ্ঞা:** Property-এর behavior modify/add করা যায়
+- **Usage:**
+  ```typescript
+  function Readonly(target: any, propertyKey: string) {
+    Object.defineProperty(target, propertyKey, {
+      writable: false
+    });
+  }
+
+  class User {
+    @Readonly
+    name = "Anis";
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Property decorator—একটি lock—property-কে readonly করে দেয়।"
+
+### ৩. মেথড ডেকোরেটর
+
+- **সংজ্ঞা:** Method-এর behavior modify/add করা যায়
+- **Usage:**
+  ```typescript
+  function Log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+      console.log(`Calling ${propertyKey} with`, args);
+      return original.apply(this, args);
+    };
+  }
+
+  class User {
+    @Log
+    save(data: string) {
+      console.log("Saving", data);
+    }
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Method decorator—একটি CCTV—method call monitor করে।"
+
+### ৪. কখন ব্যবহার করবেন?
+
+- Common logic—multiple class/property/method-এ reuse করতে
+- Framework/library—extensible design build করতে
+- Code behavior—dynamic modify/add করতে
+
+### ৫. Common Pitfalls
+
+- Decorator—wrong usage—unexpected behavior
+- Multiple decorator—order miss—bug/error
+- Experimental feature—production-এ careful use
+
+### ৬. Best Practices
+
+- Decorator—clear/documented use করুন
+- Multiple decorator—logical order maintain করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৭. Industry Trends
+
+- Large-scale app—decorator—code enhancement
+- Extensible codebase—decorator—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Requirement clear করুন
+2. Decorator—properly design/use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Requirement clear?
+- [x] Decorator used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর—code enhancement, reusability, extensibility-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

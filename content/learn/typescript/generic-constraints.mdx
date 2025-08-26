@@ -1,0 +1,101 @@
+---
+title: Generic Constraints ও extends
+icon: logos:typescript-icon
+---
+
+# Generic Constraints ও extends
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর data model, Uber-এর ride calculation—সবখানে flexible, type-safe, context-aware function/class দরকার। TypeScript-এর Generic Constraints ও extends—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Generic constraint—specific type enforce—runtime bug কমায়।
+- **Flexibility:** Generic function/class—multiple type handle—constraint দিয়ে control করা যায়।
+- **Extensibility:** Constraint—future-proof code—easy extend ও maintain।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API response—generic constraint—specific property/type enforce।
+- **Netflix:** Data model—generic constraint—type-safe transformation।
+- **Uber:** Ride calculation—generic constraint—dynamic input/output control।
+
+## মূল ধারণা
+
+### ১. Generic Constraints
+
+- **সংজ্ঞা:** Generic type parameter—specific type/property enforce—`extends` keyword দিয়ে।
+- **Usage:**
+  ```typescript
+  function getLength<T extends { length: number }>(item: T): number {
+    return item.length;
+  }
+
+  getLength([1, 2, 3]); // 3
+  getLength("Anis"); // 4
+  // getLength(123); // Error
+  ```
+
+#### সহজ এনালজি
+
+- "Generic constraint—একটি ফিল্টার—শুধু নির্দিষ্ট বৈশিষ্ট্যযুক্ত জিনিসই যেতে পারে।"
+
+### ২. extends কী?
+
+- **সংজ্ঞা:** Generic type parameter—specific type/property inherit/extend—constraint enforce।
+- **Usage:**
+  ```typescript
+  function merge<T extends object, U extends object>(a: T, b: U): T & U {
+    return { ...a, ...b };
+  }
+
+  merge({ name: "Anis" }, { age: 25 }); // { name: "Anis", age: 25 }
+  // merge(123, { age: 25 }); // Error
+  ```
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Generic function/class—specific property/type enforce করতে
+- Type-safe workflow—runtime bug কমাতে
+- Extensible/future-proof codebase build করতে
+
+### ৪. Common Pitfalls
+
+- Constraint miss—unexpected value/error
+- Wrong extends logic—type error
+- Over-constraining—flexibility কমে যায়
+
+### ৫. Best Practices
+
+- Constraint—clear/property/type define করুন
+- extends—properly use/document করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—generic constraint—type-safe workflow
+- Extensible codebase—extends—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Type/property requirement clear করুন
+2. Generic constraint/extends—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Type/property requirement clear?
+- [x] Generic constraint/extends used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Generic Constraints ও extends—type-safe, flexible, extensible codebase build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

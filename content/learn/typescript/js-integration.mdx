@@ -1,0 +1,105 @@
+---
+title: থার্ড-পার্টি JS লাইব্রেরি কাজে লাগানো
+icon: logos:typescript-icon
+---
+
+# থার্ড-পার্টি JS লাইব্রেরি কাজে লাগানো
+
+## প্রস্তাবনা
+
+Google-এর API integration, Netflix-এর video library, Uber-এর payment gateway—সবখানে third-party JS library—type-safe integration দরকার। TypeScript-এর JS integration—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Third-party library—type definition—runtime bug কমায়।
+- **Integration:** External code—type-safe integration—easy debug ও maintain।
+- **Extensibility:** Custom type definition—workflow flexible করে।
+
+## বাস্তব উদাহরণ
+
+- **Google:** External API—type definition—type-safe integration।
+- **Netflix:** Video library—DefinitelyTyped—type definition—safe usage।
+- **Uber:** Payment gateway—custom type definition—type-safe integration।
+
+## মূল ধারণা
+
+### ১. DefinitelyTyped ও @types
+
+- **সংজ্ঞা:** Popular JS library—type definition—@types/package—npm-এ available।
+- **Usage:**
+  ```bash
+  npm install lodash @types/lodash
+  ```
+  ```typescript
+  import _ from "lodash";
+  const arr = [1, 2, 3];
+  const doubled = _.map(arr, x => x * 2); // Type-safe
+  ```
+
+#### সহজ এনালজি
+
+- "DefinitelyTyped—একটি অনুবাদক—বাইরের ভাষা বুঝতে সাহায্য করে।"
+
+### ২. Custom Type Definition
+
+- **সংজ্ঞা:** JS library—type definition না থাকলে—custom `.d.ts` file লিখতে হয়।
+- **Usage:**
+  ```typescript
+  // my-lib.d.ts
+  declare module "my-lib" {
+    export function greet(name: string): string;
+  }
+  ```
+  ```typescript
+  // main.ts
+  import { greet } from "my-lib";
+  greet("Anis"); // Type-safe
+  ```
+
+### ৩. Integration Workflow
+
+1. Library install করুন
+2. Type definition আছে কিনা দেখুন
+3. @types/package install করুন (যদি available)
+4. না থাকলে—custom `.d.ts` file লিখুন
+5. Type-safe integration করুন
+
+### ৪. Common Pitfalls
+
+- Type definition miss—runtime bug
+- Wrong type definition—unexpected value/error
+- Custom `.d.ts` file—miss করলে—type error
+
+### ৫. Best Practices
+
+- Popular library—@types/package install করুন
+- Custom library—proper `.d.ts` file লিখুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—third-party JS library—type-safe integration
+- DefinitelyTyped—community-driven type definition
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Library/type requirement clear করুন
+2. @types/package/custom `.d.ts` file—properly use করুন
+3. Type-safe integration/documentation—maintain করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Library/type requirement clear?
+- [x] @types/package/custom `.d.ts` file used?
+- [x] Type-safe integration/documentation clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর third-party JS library integration—type-safe, extensible, maintainable workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

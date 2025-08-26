@@ -1,0 +1,143 @@
+---
+title: Contract-first API ডিজাইন (OpenAPI + TS)
+description: TypeScript-এ Contract-first API ডিজাইন, OpenAPI, টাইপ সেফটি, বাস্তব উদাহরণ, কনসেপ্ট, এনালজি, সেরা অনুশীলন
+---
+
+# Contract-first API ডিজাইন (OpenAPI + TS)
+
+## প্রস্তাবনা
+
+ধরা যাক, Netflix-এর মতো একটি প্ল্যাটফর্ম—যেখানে backend/frontend, mobile/web, অনেক টিম একসাথে কাজ করছে।
+যদি API-এর contract (structure, type, rules) আগে ঠিক না করা হয়, তাহলে communication mismatch, bug, security issue—সব হতে পারে।
+
+এজন্য **Contract-first API Design** ব্যবহার করা হয়—API-এর structure, type, validation আগে ঠিক করা হয়, তারপর কোড লেখা হয়।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Consistency:** সব টিম এক API contract ফলো করলে mismatch কমে যায়।
+- **Type Safety:** TypeScript দিয়ে API contract enforce করলে ভুল data, bug, security issue কমে যায়।
+- **Automation:** OpenAPI দিয়ে documentation, client/server code, test—সব auto generate করা যায়।
+- **Scalability:** বড় টিমে, বড় কোডবেসে API contract maintain করা সহজ হয়।
+
+---
+
+## মূল ধারণা
+
+### ১. Contract-first API Design কী?
+
+- **Contract:** API-এর structure, type, rules—যেমন, endpoint, request/response shape, validation।
+- **Contract-first:** আগে contract define, পরে কোড—যেমন, OpenAPI spec লিখে, তারপর backend/frontend implement।
+- **OpenAPI:** industry-standard format—YAML/JSON-এ API contract define করা হয়।
+- **TypeScript Integration:** OpenAPI spec থেকে TypeScript টাইপ auto generate করা যায়।
+
+#### এনালজি:
+> যেমন, বাড়ি বানানোর আগে blueprint তৈরি করা হয়—তেমনি API contract আগে define করা হয়।
+
+---
+
+## কিভাবে কাজ করে?
+
+### ১. OpenAPI Spec লিখুন
+
+```yaml
+# openapi.yaml
+openapi: 3.0.0
+info:
+  title: Movie API
+  version: 1.0.0
+paths:
+  /movies:
+    get:
+      summary: Get all movies
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        year:
+          type: integer
+```
+
+### ২. TypeScript টাইপ জেনারেট করুন
+
+- **Tool:** `openapi-typescript` package ব্যবহার করুন।
+
+```bash
+npm install openapi-typescript --save-dev
+npx openapi-typescript openapi.yaml -o types/api.d.ts
+```
+
+- **ব্যবহার:**
+
+```ts
+import { paths } from './types/api';
+
+// Response টাইপ
+const movies: paths['/movies']['get']['responses']['200']['content']['application/json'] = [
+  { id: '1', title: 'Inception', year: 2010 }
+];
+```
+
+### ৩. Contract Validation
+
+- Backend/frontend দুই জায়গায় একই টাইপ enforce হয়—bug, mismatch কমে যায়।
+- Test, documentation, client—all auto generate করা যায়।
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **বড় টিমে:** backend/frontend, mobile/web—সব টিম এক API contract ফলো করলে communication সহজ হয়।
+- **Microservices:** service-to-service communication contract-first হলে bug/security issue কমে যায়।
+- **Public API:** third-party developer-দের জন্য clear contract দরকার।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **Contract না লিখে কোড শুরু করা:** backend/frontend mismatch, bug, security issue হয়।
+- **Contract update না করা:** contract বদলালে সব টিমকে জানাতে হবে।
+- **TypeScript টাইপ manual লিখা:** auto generate না করলে mismatch হতে পারে।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **Contract আগে লিখুন, পরে কোড করুন।**
+- **OpenAPI spec ব্যবহার করুন।**
+- **TypeScript টাইপ auto generate করুন।**
+- **Contract change হলে সব টিমকে জানান।**
+- **Test, documentation, client—all auto generate করুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Netflix, Google, Uber—সব বড় কোম্পানিই contract-first API design ফলো করে।**
+- **OpenAPI spec থেকে TypeScript টাইপ, client/server code auto generate হচ্ছে।**
+- **API-first development:** contract-driven workflow industry-standard হয়ে যাচ্ছে।
+
+---
+
+## উপসংহার
+
+Contract-first API Design (OpenAPI + TypeScript) বড় প্রজেক্টে consistency, type safety, automation ও scalability নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টটি আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

@@ -1,0 +1,113 @@
+---
+title: অপশনাল ও রেস্ট প্যারামিটার
+icon: logos:typescript-icon
+---
+
+# অপশনাল ও রেস্ট প্যারামিটার
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ function—flexibility, scalability—essential। TypeScript-এর optional ও rest parameter—dynamic function signature—bug কমানো, efficient workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Flexibility:** Function call-এ parameter optional/rest—dynamic input handle করা সহজ।
+- **Type safety:** Optional/rest parameter—type define—early error detect।
+- **Productivity:** Flexible function—fast coding, error avoid।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API handler—optional parameter—flexible request handle।
+- **Netflix:** Data processing—rest parameter—multiple input process।
+- **Uber:** Ride calculation—optional/rest parameter—dynamic workflow।
+
+## মূল ধারণা
+
+### ১. Optional Parameter
+
+- **Parameter-এ `?`—value না দিলে undefined হবে।**
+- **Usage:**
+  ```typescript
+  function greet(name: string, title?: string): string {
+    return title ? `${title} ${name}` : name;
+  }
+
+  greet("Anis"); // "Anis"
+  greet("Sara", "Dr."); // "Dr. Sara"
+  ```
+
+#### সহজ এনালজি
+
+- "Optional parameter—একটি gift box—চাইলে বাড়তি উপহার নিতে পারেন, না নিলেও সমস্যা নেই।"
+
+### ২. Rest Parameter
+
+- **Parameter-এ `...`—multiple value array আকারে handle।**
+- **Usage:**
+  ```typescript
+  function sum(...numbers: number[]): number {
+    return numbers.reduce((acc, curr) => acc + curr, 0);
+  }
+
+  sum(1, 2, 3); // 6
+  sum(5, 10); // 15
+  ```
+
+#### সহজ এনালজি
+
+- "Rest parameter—একটি ব্যাগ—যত খুশি জিনিস রাখতে পারেন, সব একসাথে নিয়ে কাজ করা যায়।"
+
+### ৩. Practical Example
+
+```typescript
+function createUser(name: string, age?: number, ...roles: string[]): object {
+  return { name, age, roles };
+}
+
+const user1 = createUser("Anis");
+const user2 = createUser("Sara", 30, "admin", "editor");
+```
+
+### ৪. Industry Trends
+
+- **Optional/rest parameter—flexible API/function—industry standard।**
+- **Dynamic function signature—scalable workflow।**
+- **Type safety—production workflow-এ default।**
+
+### ৫. Best Practices
+
+- **Optional/rest parameter-এ clear type define করুন।**
+- **Function signature/documentation—usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৬. সাধারণ ভুলত্রুটি
+
+- Type annotation miss—runtime bug আসে।
+- Optional/rest parameter miss—unexpected value আসে।
+- Function signature unclear—codebase/readability কমে।
+- Documentation/readme unclear—new developer confused।
+
+### ৭. কখন ব্যবহার করবেন?
+
+- Flexible API/function—dynamic input handle করতে।
+- Multiple value—rest parameter দরকার হলে।
+- Optional value—parameter না থাকলেও function চলবে—production workflow-এ।
+
+## সংক্ষিপ্ত workflow
+
+1. Optional/rest parameter-এ type annotation করুন।
+2. Function signature/documentation update করুন।
+3. Team/project standard maintain করুন।
+
+## Quick Checklist
+
+- [x] Optional/rest parameter-এ type annotation আছে?
+- [x] Function signature/documentation clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর optional ও rest parameter—flexible, scalable, bug-free function build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

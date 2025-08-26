@@ -1,0 +1,115 @@
+---
+title: Literal টাইপ ও Discriminated Unions
+icon: logos:typescript-icon
+---
+
+# Literal টাইপ ও Discriminated Unions
+
+## প্রস্তাবনা
+
+Google-এর API response, Netflix-এর ভিডিও স্টেট, Uber-এর রাইড স্ট্যাটাস—সবখানে নির্দিষ্ট মান (literal value) ও type-safe branching দরকার। TypeScript-এর Literal টাইপ ও Discriminated Unions—robust, predictable workflow-এর জন্য industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Predictable Data:** Literal টাইপ—নির্দিষ্ট মান enforce করে—bug কমায়।
+- **Type-safe Branching:** Discriminated Unions—multiple type handle—safe branching নিশ্চিত করে।
+- **Error Handling:** Compile time-এ error detect—runtime bug কমায়।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API response—success/error—literal টাইপ ও discriminated union দিয়ে handle।
+- **Netflix:** Video state—"playing", "paused", "ended"—literal টাইপে define।
+- **Uber:** Ride status—"pending", "active", "completed"—literal টাইপে manage।
+
+## মূল ধারণা
+
+### ১. Literal টাইপ (নির্দিষ্ট মান টাইপ)
+
+- **সংজ্ঞা:** নির্দিষ্ট মান (value) টাইপ হিসেবে declare—string, number, boolean
+- **Usage:**
+  ```typescript
+  let status: "pending" | "active" | "completed";
+  status = "active";
+  // status = "cancelled"; // Error
+  ```
+
+#### সহজ এনালজি
+
+- "Literal টাইপ—একটি তালা—শুধু নির্দিষ্ট চাবি দিয়ে খোলা যায়।"
+
+### ২. Discriminated Unions (ভিন্নকরণযুক্ত সংযুক্ত টাইপ)
+
+- **সংজ্ঞা:** Multiple object type—common property (discriminant)—type-safe branching
+- **Usage:**
+  ```typescript
+  type Success = {
+    type: "success";
+    data: string;
+  };
+  type Error = {
+    type: "error";
+    message: string;
+  };
+  type ApiResponse = Success | Error;
+
+  function handleResponse(res: ApiResponse) {
+    if (res.type === "success") {
+      console.log("Data:", res.data);
+    } else {
+      console.log("Error:", res.message);
+    }
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "Discriminated Union—একটি ট্রাফিক সিগনাল—রঙ দেখে পথ নির্ধারণ করা যায়।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- **Literal টাইপ:**
+  - নির্দিষ্ট মান enforce করতে
+  - State/status/value—predictable রাখতে
+- **Discriminated Unions:**
+  - Multiple object type—safe branching করতে
+  - API response/error/state—handle করতে
+
+### ৪. Common Pitfalls
+
+- Discriminant property miss—type narrowing fail
+- Exhaustiveness check না করলে—unexpected value
+- Literal টাইপ ভুল declare—runtime bug
+
+### ৫. Best Practices
+
+- Discriminant property—clear define করুন
+- Exhaustiveness check—`never`—use করুন
+- Literal টাইপ—enum-like constant হিসেবে ব্যবহার করুন
+- Documentation/readme—clear রাখুন
+
+### ৬. Industry Trends
+
+- API design—discriminated union—error/success/state handle
+- State management—literal টাইপ—predictable workflow
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. State/status/value—literal টাইপে declare করুন
+2. Multiple object type—discriminant property define করুন
+3. Type narrowing/exhaustiveness check—implement করুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Literal টাইপ clear?
+- [x] Discriminant property defined?
+- [x] Type narrowing/exhaustiveness check?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Literal টাইপ ও Discriminated Unions—predictable, type-safe, scalable workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

@@ -1,0 +1,122 @@
+---
+title: ইনহেরিট্যান্স ও মেথড ওভাররাইডিং
+icon: logos:typescript-icon
+---
+
+# ইনহেরিট্যান্স ও মেথড ওভাররাইডিং
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Video Player, Uber-এর Ride Management—সবখানে code reuse, extensibility, এবং custom behavior দরকার। TypeScript-এর ইনহেরিট্যান্স ও মেথড ওভাররাইডিং—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Code Reuse:** Common feature/logic—parent class-এ লিখে child class-এ reuse করা যায়।
+- **Extensibility:** নতুন feature—child class-এ add করা যায়—parent class modify না করেই।
+- **Custom Behavior:** Method override—specific behavior implement করা যায়।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—base class—custom search logic—method override।
+- **Netflix:** Video Player—base class—different player—method override।
+- **Uber:** Ride Management—base class—different ride type—method override।
+
+## মূল ধারণা
+
+### ১. ইনহেরিট্যান্স (Inheritance)
+
+- **সংজ্ঞা:** Parent/base class-এর property/method—child/subclass-এ inherit/reuse করা যায়।
+- **Usage:**
+  ```typescript
+  class Vehicle {
+    move() {
+      console.log("Vehicle is moving");
+    }
+  }
+
+  class Car extends Vehicle {
+    brand: string;
+    constructor(brand: string) {
+      super();
+      this.brand = brand;
+    }
+  }
+
+  const myCar = new Car("Toyota");
+  myCar.move(); // Vehicle is moving
+  ```
+
+#### সহজ এনালজি
+
+- "ইনহেরিট্যান্স—একটি পারিবারিক ঐতিহ্য—বাবার সম্পত্তি ছেলেকে পাওয়া।"
+
+### ২. মেথড ওভাররাইডিং (Method Overriding)
+
+- **সংজ্ঞা:** Parent/base class-এর method—child/subclass-এ redefine/customize করা যায়।
+- **Usage:**
+  ```typescript
+  class Animal {
+    speak() {
+      console.log("Animal speaks");
+    }
+  }
+
+  class Dog extends Animal {
+    speak() {
+      console.log("Dog barks");
+    }
+  }
+
+  const pet = new Dog();
+  pet.speak(); // Dog barks
+  ```
+
+#### সহজ এনালজি
+
+- "মেথড ওভাররাইডিং—একই নামের রেসিপি—প্রতিটি পরিবারে আলাদা স্বাদ।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Common feature/logic—reuse করতে
+- Specific/custom behavior—implement করতে
+- Large codebase—extensibility ও maintainability বাড়াতে
+
+### ৪. Common Pitfalls
+
+- Parent method override—wrong logic—unexpected behavior
+- super() call miss—constructor error
+- Property/method name mismatch—bug
+
+### ৫. Best Practices
+
+- Parent/base class—common logic/property রাখুন
+- Method override—clear/custom logic লিখুন
+- super()—constructor-এ call করুন
+- Documentation/readme—clear রাখুন
+
+### ৬. Industry Trends
+
+- Large-scale app—inheritance—code reuse
+- Custom workflow—method override—specific behavior
+- Maintainability—class structure—easy extend
+
+## সংক্ষিপ্ত workflow
+
+1. Class structure/design—requirement clear করুন
+2. Inheritance—properly use করুন
+3. Method override—custom logic implement করুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Class structure/design clear?
+- [x] Inheritance used?
+- [x] Method override/custom logic?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর ইনহেরিট্যান্স ও মেথড ওভাররাইডিং—code reuse, extensibility, custom behavior build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

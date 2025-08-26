@@ -1,0 +1,112 @@
+---
+title: Keyof, Lookup ও Indexed Access টাইপ
+icon: logos:typescript-icon
+---
+
+# Keyof, Lookup ও Indexed Access টাইপ
+
+## প্রস্তাবনা
+
+Google-এর Data API, Netflix-এর Content Model, Uber-এর Ride Object—সবখানে dynamic yet type-safe property access দরকার। TypeScript-এর keyof, lookup, ও indexed access টাইপ—modern system design-এ powerful tool, যা flexible, safe, এবং maintainable codebase তৈরি করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type Safety:** Property access—type-safe, predictable
+- **Flexibility:** Dynamic property—type-level control
+- **Extensibility:** Complex data model—easy extend ও maintain
+
+## বাস্তব উদাহরণ
+
+- **Google:** Data API—keyof দিয়ে dynamic property access
+- **Netflix:** Content model—lookup টাইপ দিয়ে type-safe mapping
+- **Uber:** Ride object—indexed access টাইপ দিয়ে nested property handle
+
+## মূল ধারণা
+
+### ১. keyof টাইপ
+
+- **সংজ্ঞা:** Object-এর property name—type হিসেবে ব্যবহার করা যায়
+- **Usage:**
+  ```typescript
+  type User = { name: string; age: number; active: boolean };
+  type UserKeys = keyof User; // "name" | "age" | "active"
+  ```
+
+#### সহজ এনালজি
+
+- "keyof—একটি তালিকা—object-এর property name গুলো type হিসেবে পাওয়া যায়।"
+
+### ২. Lookup টাইপ
+
+- **সংজ্ঞা:** Object-এর property-এর টাইপ—type-level-এ access করা যায়
+- **Usage:**
+  ```typescript
+  type User = { name: string; age: number };
+  type NameType = User["name"]; // string
+  type AgeType = User["age"]; // number
+  ```
+
+#### সহজ এনালজি
+
+- "lookup টাইপ—একটি চাবি—type-level-এ property-এর value type বের করা যায়।"
+
+### ৩. Indexed Access টাইপ
+
+- **সংজ্ঞা:** Array/object-এর property—type-level-এ dynamically access করা যায়
+- **Usage:**
+  ```typescript
+  type User = { name: string; age: number };
+  type ValueType = User[keyof User]; // string | number
+  ```
+
+#### Example: Nested Object
+```typescript
+  type Config = { db: { host: string; port: number } };
+  type HostType = Config["db"]["host"]; // string
+```
+
+### ৪. কখন ব্যবহার করবেন?
+
+- Dynamic property access—type-safe করতে
+- Complex data model—type-level mapping করতে
+- Extensible/future-proof codebase build করতে
+
+### ৫. Common Pitfalls
+
+- keyof—wrong object—unexpected value
+- Lookup—property miss—type error
+- Indexed access—nested property miss—runtime bug
+
+### ৬. Best Practices
+
+- keyof/lookup—clear object/property use করুন
+- Indexed access—nested property properly handle করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৭. Industry Trends
+
+- Large-scale app—keyof/lookup—type-safe workflow
+- Extensible codebase—indexed access—future-proof design
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Object/property requirement clear করুন
+2. keyof/lookup/indexed access—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Object/property requirement clear?
+- [x] keyof/lookup/indexed access used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর keyof, lookup, ও indexed access টাইপ—type-safe, flexible, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

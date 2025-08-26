@@ -1,0 +1,121 @@
+---
+title: Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং
+icon: logos:typescript-icon
+---
+
+# Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Recommendation System, Uber-এর Ride Calculation—সবখানে bug-free, predictable, এবং maintainable codebase দরকার। Jest দিয়ে TypeScript ইউনিট টেস্টিং—industry-standard, যা robust, readable, এবং scalable app build করতে সাহায্য করে।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Bug Prevention:** Early test—runtime bug কমায়
+- **Confidence:** Refactor/feature add—test coverage থাকলে নিশ্চিন্ত
+- **Maintainability:** Large-scale app—easy update ও extend
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—Jest-এ type-safe algorithm test
+- **Netflix:** Recommendation—Jest-এ content logic test
+- **Uber:** Ride Calculation—Jest-এ edge case test
+
+## মূল ধারণা
+
+### ১. Jest কী?
+
+- **সংজ্ঞা:** Jest—popular JavaScript/TypeScript testing framework
+- **Usage:**
+  - Unit test, integration test, snapshot test
+  - TypeScript support—ts-jest
+
+#### সহজ এনালজি
+
+- "Jest—একটি quality inspector—code-এর প্রতিটি অংশ পরীক্ষা করে।"
+
+### ২. TypeScript-এ Jest সেটআপ
+
+- **Step-by-step:**
+  1. Install Jest, ts-jest, @types/jest
+     ```bash
+     npm install --save-dev jest ts-jest @types/jest
+     npx ts-jest config:init
+     ```
+  2. Update package.json
+     ```json
+     "scripts": {
+       "test": "jest"
+     }
+     ```
+  3. Create test file: `sum.test.ts`
+     ```typescript
+     import { sum } from './sum';
+     test('adds 1 + 2 = 3', () => {
+       expect(sum(1, 2)).toBe(3);
+     });
+     ```
+
+### ৩. Type-safe টেস্ট লিখুন
+
+- **Usage:**
+  ```typescript
+  function multiply(a: number, b: number): number {
+    return a * b;
+  }
+
+  test('multiply two numbers', () => {
+    expect(multiply(2, 3)).toBe(6);
+    // expect(multiply('2', 3)).toBe(6); // Type error
+  });
+  ```
+
+#### সহজ এনালজি
+
+- "Type-safe test—একটি checklist—সব input/output ঠিক আছে কিনা verify করে।"
+
+### ৪. কখন ব্যবহার করবেন?
+
+- Function/class/module—logic test করতে
+- Refactor/feature add—bug-free রাখতে
+- Maintainable codebase build করতে
+
+### ৫. Common Pitfalls
+
+- Type mismatch—test fail/error
+- Missing test—runtime bug
+- Over-complex test—readability কমে যায়
+
+### ৬. Best Practices
+
+- Test—clear/simple/atomic রাখুন
+- Type-safe input/output test করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৭. Industry Trends
+
+- Large-scale app—Jest + TypeScript—default choice
+- Type-safe test—developer productivity
+- Test coverage—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Jest/ts-jest—properly setup করুন
+2. Type-safe test—properly লিখুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Jest/ts-jest setup?
+- [x] Type-safe test written?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+Jest দিয়ে TypeScript ইউনিট টেস্টিং—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready app তৈরি করা সম্ভব।
+

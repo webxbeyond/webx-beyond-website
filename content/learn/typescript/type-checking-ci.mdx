@@ -1,0 +1,121 @@
+---
+title: CI/CD-তে টাইপ চেকিং
+description: TypeScript প্রজেক্টে CI/CD pipeline-এ টাইপ চেকিং কেন, কীভাবে, কখন এবং সেরা অনুশীলন
+---
+
+# CI/CD-তে টাইপ চেকিং
+
+## প্রস্তাবনা
+
+ধরা যাক, Uber-এর মতো একটি অ্যাপ—যেখানে প্রতিদিন হাজার হাজার কোড চেঞ্জ হয়।  
+এখানে যদি ভুল টাইপের ডেটা চলে যায়, তাহলে রাইড বুকিং, পেমেন্ট, নোটিফিকেশন—সবকিছুতেই সমস্যা হতে পারে।  
+এজন্য বড় কোম্পানিগুলো **CI/CD pipeline**-এ টাইপ চেকিং বাধ্যতামূলক করে—যাতে ডেভেলপাররা ভুল টাইপের কোড push করলে সেটা আগেভাগে ধরা যায়।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Code Quality:** টাইপ চেকিং ছাড়া production-এ ভুল চলে যেতে পারে।
+- **Automation:** ম্যানুয়ালি চেক না করে, অটোমেটেডভাবে প্রতিটি কোড চেঞ্জে টাইপ চেক হয়।
+- **Collaboration:** বড় টিমে সবাই একসাথে কাজ করলে টাইপ চেকিং কোডের consistency বজায় রাখে।
+- **Security:** ভুল টাইপের ডেটা থেকে security vulnerability হতে পারে।
+
+---
+
+## মূল ধারণা
+
+### ১. CI/CD কী?
+
+- **CI (Continuous Integration):** ডেভেলপাররা যখনই কোড চেঞ্জ করেন, অটোমেটেড টেস্ট, বিল্ড, টাইপ চেক ইত্যাদি চলে।
+- **CD (Continuous Delivery/Deployment):** কোড চেকিং, বিল্ড, টেস্ট—সব পাস করলে অটোমেটেডভাবে production-এ deploy হয়।
+
+#### এনালজি:
+> যেমন, ফ্যাক্টরিতে প্রতিটি পণ্য বের হওয়ার আগে quality check হয়, তেমনি CI/CD pipeline-এ প্রতিটি কোড চেঞ্জে টাইপ চেক হয়।
+
+### ২. টাইপ চেকিং কীভাবে কাজ করে?
+
+- **TypeScript Compiler (`tsc`)** ব্যবহার করে টাইপ চেকিং করা হয়।
+- CI/CD pipeline-এ `tsc --noEmit` কমান্ড চালানো হয়—এতে শুধু টাইপ চেক হয়, কোনো জাভাস্ক্রিপ্ট ফাইল তৈরি হয় না।
+- টাইপ error থাকলে pipeline fail হয়—deploy হয় না।
+
+---
+
+## বাস্তব উদাহরণ
+
+### উদাহরণ ১: GitHub Actions-এ টাইপ চেকিং
+
+```yaml
+# .github/workflows/type-check.yml
+name: TypeScript Type Check
+
+on: [push, pull_request]
+
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+```
+
+### উদাহরণ ২: GitLab CI-তে টাইপ চেকিং
+
+```yaml
+# .gitlab-ci.yml
+type_check:
+  image: node:18
+  script:
+    - npm ci
+    - npx tsc --noEmit
+```
+
+---
+
+## কখন ব্যবহার করবেন?
+
+- **প্রতিটি push/pull request-এ:** যাতে ভুল টাইপের কোড main branch-এ না যায়।
+- **Production deploy-এর আগে:** টাইপ error থাকলে deploy বন্ধ হয়ে যাবে।
+- **বড় টিমে:** সবাই একসাথে কাজ করলে consistency বজায় রাখতে।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **টাইপ চেকিং pipeline-এ না রাখা:** শুধু local-এ টাইপ চেক করলে production-এ ভুল চলে যেতে পারে।
+- **`tsc`-এর সাথে `--noEmit` না ব্যবহার করা:** এতে অপ্রয়োজনীয় JS ফাইল তৈরি হয়।
+- **CI/CD-তে টাইপ error ignore করা:** pipeline fail হলে error fix না করে bypass করা ঠিক নয়।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **Pipeline-এ বাধ্যতামূলক টাইপ চেকিং রাখুন।**
+- **`tsc --noEmit` ব্যবহার করুন:** শুধু টাইপ চেক, কোনো JS ফাইল তৈরি হবে না।
+- **PR-এ টাইপ চেকিং চালান:** pull request merge করার আগে টাইপ চেকিং pass করতে হবে।
+- **Error হলে দ্রুত fix করুন:** bypass না করে error ঠিক করুন।
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Automated Type Checking:** Google, Netflix, Uber—সব বড় কোম্পানিই CI/CD pipeline-এ টাইপ চেকিং বাধ্যতামূলক করেছে।
+- **Monorepo-তে টাইপ চেকিং:** Nx, Turborepo-এর মতো টুল দিয়ে বড় কোডবেসে টাইপ চেকিং স্কেল করা হচ্ছে।
+- **Fail Fast Principle:** টাইপ error থাকলে deploy বন্ধ—quality নিশ্চিত।
+
+---
+
+## উপসংহার
+
+CI/CD pipeline-এ টাইপ চেকিং TypeScript প্রজেক্টে কোডের quality, security এবং maintainability নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই কনসেপ্টটি আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

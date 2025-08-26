@@ -1,0 +1,98 @@
+---
+title: Conditional টাইপ ও infer
+icon: logos:typescript-icon
+---
+
+# Conditional টাইপ ও infer
+
+## প্রস্তাবনা
+
+Google-এর API, Netflix-এর ডেটা প্রসেসিং, Uber-এর রাইড অপশন—সবখানে dynamic, context-aware type transformation দরকার। TypeScript-এর Conditional টাইপ ও infer—complex, intelligent type workflow—industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Dynamic Type Logic:** Real-world app-এ type conditionally change—conditional type handle করে।
+- **Type Inference:** infer—type extract/derive—complex workflow-এ essential।
+- **Type Safety:** Compile time-এ error detect—runtime bug কমায়।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API response—conditional type দিয়ে error/success branch।
+- **Netflix:** Video object—property extract—infer দিয়ে handle।
+- **Uber:** Ride option—dynamic type—conditional type দিয়ে manage।
+
+## মূল ধারণা
+
+### ১. Conditional টাইপ (শর্তাধীন টাইপ)
+
+- **সংজ্ঞা:** TypeScript-এ type conditionally change—`extends` ও ternary operator
+- **Usage:**
+  ```typescript
+  type IsString<T> = T extends string ? true : false;
+  type A = IsString<string>; // true
+  type B = IsString<number>; // false
+  ```
+
+#### সহজ এনালজি
+
+- "Conditional টাইপ—একটি ট্রাফিক সিগনাল—শর্ত অনুযায়ী পথ নির্ধারণ।"
+
+### ২. infer কী?
+
+- **সংজ্ঞা:** TypeScript-এর infer—type extract/derive—conditional type-এর মধ্যে
+- **Usage:**
+  ```typescript
+  type ElementType<T> = T extends (infer U)[] ? U : T;
+  type A = ElementType<string[]>; // string
+  type B = ElementType<number>; // number
+  ```
+
+#### সহজ এনালজি
+
+- "infer—একটি ডিটেক্টর—বড় বাক্স থেকে নির্দিষ্ট জিনিস বের করে আনে।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Complex type transformation দরকার হলে
+- Type extract/derive করতে
+- API response/model—dynamic type logic handle করতে
+
+### ৪. Common Pitfalls
+
+- Conditional type—wrong logic—unexpected value
+- infer—type miss করলে—type error
+- Type nesting—complexity বাড়ে
+
+### ৫. Best Practices
+
+- Conditional type—clear logic লিখুন
+- infer—properly use/document করুন
+- Type nesting—simple রাখুন
+- Documentation/readme—clear রাখুন
+
+### ৬. Industry Trends
+
+- API design—conditional type—dynamic response
+- Data processing—infer—property extract
+- Type safety—production workflow-এ default
+
+## সংক্ষিপ্ত workflow
+
+1. Type requirement clear করুন
+2. Conditional type/infer—properly use করুন
+3. Type safety/documentation—maintain করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Type requirement clear?
+- [x] Conditional type/infer used?
+- [x] Type safety/documentation clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর Conditional টাইপ ও infer—dynamic, intelligent, type-safe workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

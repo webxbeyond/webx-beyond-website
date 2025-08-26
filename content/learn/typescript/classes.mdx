@@ -1,0 +1,133 @@
+---
+title: ক্লাস ও অ্যাক্সেস মডিফায়ার (public, private, protected)
+icon: logos:typescript-icon
+---
+
+# ক্লাস ও অ্যাক্সেস মডিফায়ার (public, private, protected)
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Video Player, Uber-এর Ride Management—সবখানে object-oriented design, encapsulation, এবং data security দরকার। TypeScript-এর ক্লাস ও অ্যাক্সেস মডিফায়ার—robust, scalable, secure codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Encapsulation:** Data hide/secure—class ও access modifier দিয়ে সম্ভব।
+- **Code Organization:** Large codebase—class structure—easy maintain ও extend।
+- **Security:** Sensitive data—private/protected—expose হয় না।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—class-based module—public/private property দিয়ে manage।
+- **Netflix:** Video Player—class-based object—protected/private method/property।
+- **Uber:** Ride Management—class-based workflow—access modifier দিয়ে secure।
+
+## মূল ধারণা
+
+### ১. ক্লাস (Class)
+
+- **সংজ্ঞা:** Object-oriented programming-এর core—blueprint/template—object তৈরি।
+- **Usage:**
+  ```typescript
+  class Car {
+    brand: string;
+    constructor(brand: string) {
+      this.brand = brand;
+    }
+    drive() {
+      console.log(`${this.brand} is driving`);
+    }
+  }
+
+  const myCar = new Car("Toyota");
+  myCar.drive(); // Toyota is driving
+  ```
+
+#### সহজ এনালজি
+
+- "ক্লাস—একটি ছাঁচ—যে ছাঁচে গিয়ে অনেক object তৈরি করা যায়।"
+
+### ২. অ্যাক্সেস মডিফায়ার (Access Modifier)
+
+- **public:** সব জায়গা থেকে access করা যায়।
+- **private:** শুধু class-এর ভিতরে access করা যায়—বাইরে থেকে নয়।
+- **protected:** class ও subclass-এর ভিতরে access করা যায়—বাইরে থেকে নয়।
+
+#### Usage:
+```typescript
+class User {
+  public name: string;
+  private password: string;
+  protected email: string;
+
+  constructor(name: string, password: string, email: string) {
+    this.name = name;
+    this.password = password;
+    this.email = email;
+  }
+
+  public getName() {
+    return this.name;
+  }
+  private getPassword() {
+    return this.password;
+  }
+  protected getEmail() {
+    return this.email;
+  }
+}
+
+const user = new User("Anis", "1234", "anis@gmail.com");
+console.log(user.name); // OK
+// console.log(user.password); // Error
+// console.log(user.email); // Error
+```
+
+#### সহজ এনালজি
+
+- "public—খোলা দরজা, private—লকড রুম, protected—পারিবারিক এলাকা।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Sensitive data hide করতে—private/protected
+- Public API/property expose করতে—public
+- Large codebase—encapsulation ও security maintain করতে
+
+### ৪. Common Pitfalls
+
+- Private property/method—বাইরে থেকে access করলে—error
+- Protected property—subclass ছাড়া access করলে—error
+- Public property—sensitive data expose হলে—security risk
+
+### ৫. Best Practices
+
+- Sensitive data—private/protected রাখুন
+- Public API/property—clear define করুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—class-based design—encapsulation
+- Security—access modifier—data hide
+- Maintainability—class structure—easy extend
+
+## সংক্ষিপ্ত workflow
+
+1. Class structure/design—requirement clear করুন
+2. Access modifier—properly use করুন
+3. Sensitive data—private/protected রাখুন
+4. Documentation/readme—update করুন
+
+## Quick Checklist
+
+- [x] Class structure/design clear?
+- [x] Access modifier used?
+- [x] Sensitive data hide?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর ক্লাস ও অ্যাক্সেস মডিফায়ার—encapsulation, security, scalable codebase build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

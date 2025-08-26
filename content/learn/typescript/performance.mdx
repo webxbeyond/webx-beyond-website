@@ -1,0 +1,109 @@
+---
+title: অ্যাডভান্সড টাইপ বনাম সরল থাকার ট্রেড-অফ
+description: TypeScript-এ অ্যাডভান্সড টাইপ ও সরল থাকার ট্রেড-অফ, বাস্তব উদাহরণ, কনসেপ্ট, এনালজি, সেরা অনুশীলন
+---
+
+# অ্যাডভান্সড টাইপ বনাম সরল থাকার ট্রেড-অফ
+
+## প্রস্তাবনা
+
+ধরা যাক, Google-এর মতো একটি বড় টিমে কাজ করছেন—কোডবেসে হাজারো ফিচার, অনেক ডেভেলপার।
+কখনো কখনো জটিল টাইপ (advanced types) ব্যবহার করলে কোড অনেক বেশি type-safe, flexible হয়; আবার কখনো খুব জটিল টাইপ কোডকে অপ্রয়োজনীয়ভাবে জটিল করে তোলে, maintain করা কঠিন হয়।
+
+এজন্য TypeScript-এ **অ্যাডভান্সড টাইপ** (যেমন: mapped types, conditional types, infer, template literal types) আর **সরল থাকা**—এই দুইয়ের মধ্যে trade-off বোঝা জরুরি।
+
+---
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Maintainability:** খুব জটিল টাইপ future-এ বুঝতে ও maintain করতে সমস্যা হতে পারে।
+- **Team Collaboration:** বড় টিমে সবাই যেন সহজে কোড বুঝতে পারে—এজন্য সরলতা দরকার।
+- **Type Safety vs. Simplicity:** বেশি type-safe করতে গিয়ে কোড জটিল না হয়ে যায়, সেটা খেয়াল রাখতে হয়।
+- **Performance:** জটিল টাইপে কম্পাইল টাইম বাড়তে পারে।
+
+---
+
+## মূল ধারণা
+
+### ১. অ্যাডভান্সড টাইপ কী?
+
+- **Mapped Types:** `Partial<T>`, `Pick<T, K>`, `Record<K, T>` ইত্যাদি—টাইপকে ডাইনামিকভাবে পরিবর্তন করা যায়।
+- **Conditional Types:** টাইপের মধ্যে শর্ত (if-else) দেওয়া যায়—`T extends U ? X : Y`।
+- **Infer Keyword:** টাইপ ইনফারেন্স—type-level logic।
+- **Template Literal Types:** টাইপে string manipulation—`User_${ID}`।
+
+#### উদাহরণ:
+```ts
+type ApiResponse<T> = T extends Error ? { error: string } : { data: T };
+```
+
+### ২. সরল থাকার সুবিধা
+
+- **Readable Code:** সহজ টাইপ সবাই দ্রুত বুঝতে পারে।
+- **Less Bugs:** কম জটিলতা মানে কম ভুল।
+- **Faster Onboarding:** নতুন ডেভেলপার সহজে টিমে যোগ দিতে পারে।
+
+#### উদাহরণ:
+```ts
+type User = {
+  id: string;
+  name: string;
+};
+```
+
+### ৩. ট্রেড-অফ কী?
+
+- **Type Safety vs. Simplicity:**
+  - বেশি type-safe করতে গিয়ে কোড জটিল হয়ে গেলে future-এ maintain করা কঠিন হয়।
+  - খুব বেশি সরল করলে type error production-এ চলে যেতে পারে।
+- **Performance:**
+  - জটিল টাইপে TypeScript compiler-slow হতে পারে, বিল্ড টাইম বাড়ে।
+- **Team Skill:**
+  - টিমে সবাই advanced type বুঝে না—তাহলে সরল রাখা ভালো।
+
+#### এনালজি:
+> যেমন, গাড়িতে অনেক ফিচার দিলে চালানো জটিল হয়; আবার খুব কম ফিচার দিলে নিরাপত্তা কমে যায়—তেমনি টাইপে trade-off।
+
+---
+
+## কিভাবে ব্যালেন্স করবেন?
+
+- **Core Logic-এ Type Safety:** critical logic-এ advanced type ব্যবহার করুন।
+- **API/Model-এ Simplicity:** data model, API response-এ সহজ টাইপ রাখুন।
+- **Documentation:** জটিল টাইপ হলে ভালোভাবে ডকুমেন্ট করুন।
+- **Team Discussion:** টিমের skill অনুযায়ী টাইপের জটিলতা ঠিক করুন।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- **অপ্রয়োজনীয়ভাবে জটিল টাইপ:** শুধু type-safe করার জন্য অপ্রয়োজনীয় mapped/conditional type ব্যবহার করা।
+- **ডকুমেন্টেশন না রাখা:** জটিল টাইপে comment/documentation না দিলে future-এ সমস্যা হয়।
+- **সবকিছু সরল রাখা:** critical logic-এ type-safety sacrifice করা ঠিক নয়।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- **Critical Logic-এ advanced type ব্যবহার করুন।**
+- **Simple Model/DTO-তে সহজ টাইপ রাখুন।**
+- **জটিল টাইপে comment/documentation দিন।**
+- **Team skill অনুযায়ী টাইপের জটিলতা ঠিক করুন।**
+
+---
+
+## ইন্ডাস্ট্রি ট্রেন্ড
+
+- **Google, Uber, Microsoft—critical logic-এ advanced type, model-এ simplicity।**
+- **TypeScript community-তে readable, maintainable টাইপের দিকে ঝোঁক।**
+- **Type-level testing:** জটিল টাইপে type-level test লিখা হচ্ছে।
+
+---
+
+## উপসংহার
+
+অ্যাডভান্সড টাইপ বনাম সরল থাকার trade-off TypeScript প্রজেক্টে maintainability, scalability ও type-safety নিশ্চিত করে।  
+শিক্ষার্থীরা যেন এই ব্যালেন্সটা বুঝে, প্রয়োগ করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
+
+---
+

@@ -1,0 +1,127 @@
+---
+title: প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)
+icon: logos:typescript-icon
+---
+
+# প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ data model—type safety—bug কমানো, efficient workflow—essential। TypeScript-এর প্রিমিটিভ টাইপ—codebase-এ strong foundation—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Data model—type mismatch, bug—early detect।
+- **Maintainability:** Clear type—codebase maintain, refactor সহজ।
+- **Productivity:** IntelliSense, auto-complete—fast coding।
+
+## বাস্তব উদাহরণ
+
+- **Google:** User profile—string, number, boolean—type define—bug কমানো।
+- **Netflix:** Movie rating—number, boolean—type safety—production workflow।
+- **Uber:** Ride status—boolean, null—type mismatch avoid।
+
+## মূল ধারণা
+
+### ১. String টাইপ
+
+- **string:** Text data—name, email, message—define করতে।
+- **Usage:**
+  ```typescript
+  let username: string = "Anis";
+  let email: string = "anis@example.com";
+  ```
+
+#### সহজ এনালজি
+
+- "string—একটি বাক্স, যেখানে শুধু লেখা (text) রাখা যায়।"
+
+### ২. Number টাইপ
+
+- **number:** Numeric data—age, price, rating—define করতে।
+- **Usage:**
+  ```typescript
+  let age: number = 25;
+  let price: number = 99.99;
+  ```
+
+### ৩. Boolean টাইপ
+
+- **boolean:** True/false value—status, flag, condition—define করতে।
+- **Usage:**
+  ```typescript
+  let isActive: boolean = true;
+  let isAdmin: boolean = false;
+  ```
+
+### ৪. Null ও Undefined টাইপ
+
+- **null:** Value নেই—intentional empty—variable/object property-এ use।
+- **undefined:** Value assign হয়নি—default state—variable/object property-এ use।
+- **Usage:**
+  ```typescript
+  let data: null = null;
+  let result: undefined = undefined;
+  ```
+
+#### সহজ এনালজি
+
+- "null—একটি খালি বাক্স, যেখানে কিছুই নেই। undefined—বাক্স আছে, কিন্তু কিছু রাখা হয়নি।"
+
+### ৫. Practical Example
+
+```typescript
+interface User {
+  name: string;
+  age: number;
+  isActive: boolean;
+  email?: string;
+  lastLogin: null | string;
+}
+```
+
+### ৬. Industry Trends
+
+- **Strongly-typed data model—industry standard।**
+- **Type safety—production workflow-এ default।**
+- **IntelliSense—fast coding, error avoid।**
+
+### ৭. Best Practices
+
+- **Variable/property-এ clear type define করুন।**
+- **Optional property-এ null/undefined handle করুন।**
+- **Type annotation—codebase-এ maintain করুন।**
+- **Documentation/readme—type usage clear রাখুন।**
+
+### ৮. সাধারণ ভুলত্রুটি
+
+- Type annotation miss—type safety কমে।
+- Null/undefined handle না করলে—runtime bug বাড়ে।
+- Documentation/readme unclear—new developer confused।
+
+### ৯. কখন ব্যবহার করবেন?
+
+- Data model—user, product, status—type safety দরকার হলে।
+- Function/variable—clear type define করতে চাইলে।
+- Production workflow—bug কমাতে, maintainability বাড়াতে।
+
+## সংক্ষিপ্ত workflow
+
+1. Variable/property-এ type annotation করুন।
+2. Null/undefined handle করুন।
+3. Data model/interface-এ clear type define করুন।
+4. Documentation/readme update করুন।
+
+## Quick Checklist
+
+- [x] Variable/property-এ type annotation আছে?
+- [x] Null/undefined handle হয়েছে?
+- [x] Data model/interface-এ clear type আছে?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর প্রিমিটিভ টাইপ—codebase-এ strong foundation—bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

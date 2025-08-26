@@ -1,0 +1,121 @@
+---
+title: অ্যারে, টাপল ও readonly টাইপ
+icon: logos:typescript-icon
+---
+
+# অ্যারে, টাপল ও readonly টাইপ
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ data structure—type safety, maintainability—essential। TypeScript-এর array, tuple, readonly type—complex data model-এ bug কমানো, efficient workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Type safety:** Array/tuple—data structure-এ type mismatch, bug—early detect।
+- **Maintainability:** Readonly type—immutable data—codebase maintain, refactor সহজ।
+- **Productivity:** IntelliSense, auto-complete—fast coding, error avoid।
+
+## বাস্তব উদাহরণ
+
+- **Google:** User list—array of object—type define—bug কমানো।
+- **Netflix:** Movie genre—tuple—fixed structure—type safety।
+- **Uber:** Ride status/history—readonly array—immutable data—production workflow।
+
+## মূল ধারণা
+
+### ১. Array টাইপ
+
+- **Array:** একই ধরনের data—list আকারে store করতে।
+- **Usage:**
+  ```typescript
+  let numbers: number[] = [1, 2, 3, 4];
+  let names: string[] = ["Anis", "Fahim", "Sara"];
+  ```
+- **Generic syntax:**
+  ```typescript
+  let flags: Array<boolean> = [true, false, true];
+  ```
+
+#### সহজ এনালজি
+
+- "Array—একটি ট্রেন, যেখানে প্রতিটি বগি একই ধরনের জিনিস বহন করে।"
+
+### ২. Tuple টাইপ
+
+- **Tuple:** Fixed length, ordered data—different type—store করতে।
+- **Usage:**
+  ```typescript
+  let user: [string, number, boolean] = ["Anis", 25, true];
+  let point: [number, number] = [10, 20];
+  ```
+
+#### সহজ এনালজি
+
+- "Tuple—একটি gift box set, যেখানে প্রতিটি বাক্সে নির্দিষ্ট ধরনের জিনিস থাকে—order/fixed।"
+
+### ৩. Readonly টাইপ
+
+- **Readonly array/tuple:** Data modify করা যাবে না—immutable guarantee।
+- **Usage:**
+  ```typescript
+  const roles: readonly string[] = ["admin", "user", "guest"];
+  const coordinates: readonly [number, number] = [15, 30];
+  ```
+
+### ৪. Practical Example
+
+```typescript
+interface Product {
+  name: string;
+  price: number;
+  tags: readonly string[];
+  location: [number, number];
+}
+```
+
+### ৫. Industry Trends
+
+- **Immutable data—readonly type—industry standard।**
+- **Tuple—API response, fixed structure—type safety।**
+- **Array—dynamic data—fast coding, error avoid।**
+
+### ৬. Best Practices
+
+- **Array/tuple-এ clear type define করুন।**
+- **Readonly type—immutable data model-এ use করুন।**
+- **Documentation/readme—type usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৭. সাধারণ ভুলত্রুটি
+
+- Type annotation miss—type safety কমে।
+- Readonly miss—unexpected data modify হয়।
+- Tuple structure mismatch—runtime bug আসে।
+- Documentation/readme unclear—new developer confused।
+
+### ৮. কখন ব্যবহার করবেন?
+
+- List/array—dynamic data—type safety দরকার হলে।
+- Tuple—fixed structure, ordered data—API response, config-এ।
+- Readonly—immutable data—critical model-এ।
+
+## সংক্ষিপ্ত workflow
+
+1. Array/tuple-এ type annotation করুন।
+2. Readonly type—immutable data-এ use করুন।
+3. Data model/interface-এ clear type define করুন।
+4. Documentation/readme update করুন।
+
+## Quick Checklist
+
+- [x] Array/tuple-এ type annotation আছে?
+- [x] Readonly type used?
+- [x] Data model/interface-এ clear type আছে?
+- [x] Documentation/readme clear?
+
+---
+
+## উপসংহার
+
+TypeScript-এর array, tuple, readonly type—complex data model-এ bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

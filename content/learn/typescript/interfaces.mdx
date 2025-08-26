@@ -1,0 +1,119 @@
+---
+title: অ্যাবস্ট্রাক্ট ক্লাস ও ইন্টারফেস
+icon: logos:typescript-icon
+---
+
+# অ্যাবস্ট্রাক্ট ক্লাস ও ইন্টারফেস
+
+## প্রস্তাবনা
+
+Google-এর Search Engine, Netflix-এর Video Player, Uber-এর Ride Management—সবখানে contract-driven design, code reusability, এবং flexible architecture দরকার। TypeScript-এর অ্যাবস্ট্রাক্ট ক্লাস ও ইন্টারফেস—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Contract-driven Design:** Interface—structure enforce করে—team workflow streamline।
+- **Code Reusability:** Abstract class—common logic/property—reuse করা যায়।
+- **Flexibility:** Interface—multiple class implement করতে পারে—extensible architecture।
+
+## বাস্তব উদাহরণ
+
+- **Google:** Search Engine—interface contract—multiple search module implement।
+- **Netflix:** Video Player—abstract class—common logic, interface—different player implement।
+- **Uber:** Ride Management—interface—different ride type implement, abstract class—common logic।
+
+## মূল ধারণা
+
+### ১. ইন্টারফেস (Interface)
+
+- **সংজ্ঞা:** Structure/contract—property/method define—class/object implement করতে পারে।
+- **Usage:**
+  ```typescript
+  interface Drivable {
+    speed: number;
+    drive(): void;
+  }
+
+  class Car implements Drivable {
+    speed = 100;
+    drive() {
+      console.log("Car is driving at", this.speed);
+    }
+  }
+  ```
+
+#### সহজ এনালজি
+
+- "ইন্টারফেস—একটি চুক্তিপত্র—যে চুক্তি অনুযায়ী কাজ করতে হবে।"
+
+### ২. অ্যাবস্ট্রাক্ট ক্লাস (Abstract Class)
+
+- **সংজ্ঞা:** Common logic/property—abstract method—child class implement করতে বাধ্য।
+- **Usage:**
+  ```typescript
+  abstract class Animal {
+    abstract speak(): void;
+    eat() {
+      console.log("Animal is eating");
+    }
+  }
+
+  class Dog extends Animal {
+    speak() {
+      console.log("Dog barks");
+    }
+  }
+
+  const pet = new Dog();
+  pet.speak(); // Dog barks
+  pet.eat(); // Animal is eating
+  ```
+
+#### সহজ এনালজি
+
+- "অ্যাবস্ট্রাক্ট ক্লাস—একটি অসম্পূর্ণ ছাঁচ—বাকিটা subclass-এ পূরণ করতে হবে।"
+
+### ৩. কখন ব্যবহার করবেন?
+
+- Common logic/property—reuse করতে—abstract class
+- Structure/contract enforce করতে—interface
+- Multiple class/object—same contract implement করতে—interface
+
+### ৪. Common Pitfalls
+
+- Interface—property/method miss—error
+- Abstract method—child class-এ implement না করলে—error
+- Multiple interface implement—conflicting property
+
+### ৫. Best Practices
+
+- Interface—clear contract/property/method define করুন
+- Abstract class—common logic/property রাখুন
+- Documentation/readme—clear রাখুন
+- Team/project standard—follow করুন
+
+### ৬. Industry Trends
+
+- Large-scale app—interface—contract-driven workflow
+- Common logic—abstract class—code reuse
+- Flexibility—interface—multiple implementation
+
+## সংক্ষিপ্ত workflow
+
+1. Contract/structure requirement clear করুন
+2. Interface/abstract class—properly use করুন
+3. Documentation/readme—update করুন
+4. Team/project standard—follow করুন
+
+## Quick Checklist
+
+- [x] Contract/structure requirement clear?
+- [x] Interface/abstract class used?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর অ্যাবস্ট্রাক্ট ক্লাস ও ইন্টারফেস—contract-driven, reusable, scalable codebase build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+

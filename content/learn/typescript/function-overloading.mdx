@@ -1,0 +1,102 @@
+---
+title: ফাংশন ওভারলোডিং
+icon: logos:typescript-icon
+---
+
+# ফাংশন ওভারলোডিং
+
+## প্রস্তাবনা
+
+Google, Netflix, Uber—production app-এ flexible API/function—type safety, maintainability—essential। TypeScript-এর function overloading—multiple signature—dynamic workflow—industry standard।
+
+## কেন গুরুত্বপূর্ণ?
+
+- **Flexibility:** Function—multiple input/output—different signature—handle করা যায়।
+- **Type safety:** Overload signature—type define—early error detect।
+- **Maintainability:** Clear overload—codebase maintain, refactor সহজ।
+
+## বাস্তব উদাহরণ
+
+- **Google:** API handler—function overloading—different request type handle।
+- **Netflix:** Data processing—overload—multiple input/output process।
+- **Uber:** Ride calculation—overload—dynamic workflow।
+
+## মূল ধারণা
+
+### ১. Function Overloading কী?
+
+- **Function—multiple signature—different input/output—handle।**
+- **Usage:**
+  ```typescript
+  function greet(name: string): string;
+  function greet(name: string, title: string): string;
+  function greet(name: string, title?: string): string {
+    return title ? `${title} ${name}` : name;
+  }
+
+  greet("Anis"); // "Anis"
+  greet("Sara", "Dr."); // "Dr. Sara"
+  ```
+
+#### সহজ এনালজি
+
+- "Function overloading—একটি সুইস আর্মি নাইফ—একই টুল দিয়ে অনেক কাজ করা যায়, input/output অনুযায়ী।"
+
+### ২. Practical Example
+
+```typescript
+function add(a: number, b: number): number;
+function add(a: string, b: string): string;
+function add(a: any, b: any): any {
+  return a + b;
+}
+
+add(2, 3); // 5
+add("Hello, ", "World!"); // "Hello, World!"
+```
+
+### ৩. Industry Trends
+
+- **Function overloading—flexible API/function—industry standard।**
+- **Multiple signature—dynamic workflow—scalable codebase।**
+- **Type safety—production workflow-এ default।**
+
+### ৪. Best Practices
+
+- **Overload signature—clear define করুন।**
+- **Implementation—type check, error handle করুন।**
+- **Documentation/readme—usage clear রাখুন।**
+- **Team/project standard—maintain করুন।**
+
+### ৫. সাধারণ ভুলত্রুটি
+
+- Overload signature miss—runtime bug আসে।
+- Implementation unclear—unexpected value/error আসে।
+- Documentation/readme unclear—new developer confused।
+
+### ৬. কখন ব্যবহার করবেন?
+
+- Flexible API/function—multiple input/output handle করতে।
+- Dynamic workflow—overload দরকার হলে।
+- Production workflow—bug কমাতে, maintainability বাড়াতে।
+
+## সংক্ষিপ্ত workflow
+
+1. Overload signature clear define করুন।
+2. Implementation-এ type check, error handle করুন।
+3. Documentation/readme update করুন।
+4. Team/project standard maintain করুন।
+
+## Quick Checklist
+
+- [x] Overload signature clear?
+- [x] Implementation type check, error handle?
+- [x] Documentation/readme clear?
+- [x] Team/project standard maintained?
+
+---
+
+## উপসংহার
+
+TypeScript-এর function overloading—flexible, scalable, bug-free function build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
+
