@@ -1,0 +1,158 @@
+---
+title: এনক্রিপশন ও ডিক্রিপশন পদ্ধতি
+icon: mdi:lock
+---
+
+## মডিউল ১: সিমেট্রিক এনক্রিপশন (Symmetric Encryption)
+
+**লক্ষ্য:** এক কী দিয়ে এনক্রিপ্ট ও ডিক্রিপ্ট করার পদ্ধতি শেখা
+
+### পাঠসমূহ:
+1. [ব্লক সাইফার (Block Ciphers)](/encryption/block-ciphers)  
+   - DES (পুরনো, নিরাপদ নয়)  
+   - 3DES / TDEA (লেগাসি)  
+   - AES (AES-128, AES-192, AES-256 — আধুনিক ও সবচেয়ে জনপ্রিয়)  
+   - Blowfish (পুরনো, দ্রুত)  
+   - Twofish (Blowfish-এর উন্নত সংস্করণ)  
+   - Camellia (AES-এর সমমানের, এশিয়ায় জনপ্রিয়)  
+   - IDEA (PGP-তে ব্যবহৃত, এখন লেগাসি)  
+
+2. [স্ট্রিম সাইফার (Stream Ciphers)](/encryption/stream-ciphers)  
+   - RC4 (ভালনারেবল, ব্যবহার অনুপযোগী)  
+   - ChaCha20 (আধুনিক, দ্রুত ও নিরাপদ)  
+   - Salsa20 (ChaCha20-এর পূর্বসূরি)  
+
+---
+
+## মডিউল ২: অ্যাসিমেট্রিক এনক্রিপশন (Asymmetric Encryption)
+
+**লক্ষ্য:** পাবলিক কী ও প্রাইভেট কী ব্যবহার করে নিরাপদ যোগাযোগ শেখা
+
+### পাঠসমূহ:
+1. [RSA](/encryption/rsa)  
+2. [DSA](/encryption/dsa)  
+3. [Diffie-Hellman (Key Exchange)](/encryption/diffie-hellman)  
+4. [Elliptic Curve Cryptography (ECC)](/encryption/ecc)  
+   - ECDSA  
+   - Ed25519 (দ্রুত, নিরাপদ, আধুনিক)  
+   - Curve25519 (Key Exchange)  
+5. [ElGamal](/encryption/elgamal)  
+6. [Post-Quantum অ্যালগরিদম](/encryption/post-quantum)  
+   - Kyber, Dilithium, Falcon, NTRU, SPHINCS+  
+
+---
+
+## মডিউল ৩: হাইব্রিড এনক্রিপশন (Hybrid Encryption)
+
+**লক্ষ্য:** বাস্তবে ব্যবহৃত মিশ্র পদ্ধতি শেখা
+
+### পাঠসমূহ:
+1. [অ্যাসিমেট্রিক কী দিয়ে সেশন কী আদানপ্রদান](/encryption/hybrid-session-key)  
+2. [সিমেট্রিক কী দিয়ে আসল ডেটা এনক্রিপ্ট](/encryption/hybrid-symmetric)  
+3. [উদাহরণ: HTTPS, SSH, GPG, OpenPGP, S/MIME, Signal Protocol](/encryption/hybrid-examples)  
+
+---
+
+## মডিউল ৪: হ্যাশ ফাংশন (Hash Functions)
+
+**লক্ষ্য:** ডেটার অখণ্ডতা যাচাই শেখা
+
+### পাঠসমূহ:
+1. [MD5](/encryption/md5)  
+2. [SHA-1](/encryption/sha1)  
+3. [SHA-2 (SHA-224, SHA-256, SHA-512)](/encryption/sha2)  
+4. [SHA-3 (Keccak ভিত্তিক)](/encryption/sha3)  
+5. [BLAKE2 / BLAKE3](/encryption/blake2-blake3)  
+
+---
+
+## মডিউল ৫: মেসেজ অথেন্টিকেশন কোড (MAC)
+
+**লক্ষ্য:** এনক্রিপশনের পাশাপাশি ডেটার সততা যাচাই করা
+
+### পাঠসমূহ:
+1. [HMAC (যেমন HMAC-SHA256)](/encryption/hmac)  
+2. [Poly1305 (ChaCha20 এর সাথে ব্যবহৃত)](/encryption/poly1305)  
+3. [GMAC (AES-GCM এর সাথে)](/encryption/gmac)  
+
+---
+
+## মডিউল ৬: ব্লক সাইফারের মোড অব অপারেশন (Modes of Operation)
+
+**লক্ষ্য:** ব্লক সাইফারকে বাস্তব ডেটায় প্রয়োগ করার পদ্ধতি শেখা
+
+### পাঠসমূহ:
+1. [ECB (অনিরাপদ)](/encryption/ecb)  
+2. [CBC (পুরনো কিন্তু এখনও ব্যবহৃত)](/encryption/cbc)  
+3. [CFB](/encryption/cfb)  
+4. [OFB](/encryption/ofb)  
+5. [CTR (দ্রুত, নিরাপদ)](/encryption/ctr)  
+6. [GCM (এনক্রিপশন + ইন্টিগ্রিটি, আধুনিক)](/encryption/gcm)  
+7. [XTS (ডিস্ক এনক্রিপশনে ব্যবহৃত, যেমন BitLocker, LUKS)](/encryption/xts)  
+
+---
+
+## মডিউল ৭: Authenticated Encryption
+
+**লক্ষ্য:** এনক্রিপশন ও অথেন্টিকেশন একসাথে নিশ্চিত করা
+
+### পাঠসমূহ:
+1. [AEAD (Authenticated Encryption with Associated Data)](/encryption/aead)  
+2. [SIV (Synthetic IV)](/encryption/siv)  
+
+---
+
+## মডিউল ৮: Password-based Encryption
+
+**লক্ষ্য:** পাসওয়ার্ড থেকে কী ডেরিভেশন ও এনক্রিপশন
+
+### পাঠসমূহ:
+1. [PBKDF2](/encryption/pbkdf2)  
+2. [Argon2](/encryption/argon2)  
+3. [bcrypt](/encryption/bcrypt)  
+4. [scrypt](/encryption/scrypt)  
+
+---
+
+## মডিউল ৯: Format-Preserving Encryption
+
+**লক্ষ্য:** ডেটার ফরম্যাট বজায় রেখে এনক্রিপশন
+
+### পাঠসমূহ:
+1. [FPE (Format-Preserving Encryption)](/encryption/fpe)  
+
+---
+
+## মডিউল ১০: Homomorphic Encryption
+
+**লক্ষ্য:** এনক্রিপ্টেড ডেটার উপর গণনা
+
+### পাঠসমূহ:
+1. [Homomorphic Encryption Overview](/encryption/homomorphic)  
+
+---
+
+## মডিউল ১১: Steganography
+
+**লক্ষ্য:** ডেটা লুকানো ও স্টেগানোগ্রাফি
+
+### পাঠসমূহ:
+1. [Steganography Basics](/encryption/steganography)  
+
+---
+
+## মডিউল ১২: Secure Key Management
+
+**লক্ষ্য:** কী ম্যানেজমেন্ট, স্টোরেজ ও নিরাপত্তা
+
+### পাঠসমূহ:
+1. [Key Management Systems (KMS)](/encryption/kms)  
+2. [Hardware Security Modules (HSM)](/encryption/hsm)  
+3. [Vaults & Secure Storage](/encryption/vaults)  
+
+---
+
+## আরও পড়ুন
+
+- [এনক্রিপশন ও ডিক্রিপশন সংক্রান্ত প্রশ্নোত্তর](/encryption/qna)
+- [অতিরিক্ত রিসোর্স ও স্টাডি ম্যাটেরিয়াল](/encryption/additional-resources)
