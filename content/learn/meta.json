@@ -32,6 +32,7 @@
     "blockchain",
     "crypto-wallet",
     "solidity",
-    "web3"
+    "web3",
+    "encryption"
   ]
 }
