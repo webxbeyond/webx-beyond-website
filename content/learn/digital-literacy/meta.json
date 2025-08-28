@@ -5,6 +5,7 @@
   "root": true,
   "pages": [
     "index",
+    "daily-apps",
     "---মডিউল ১: ডিজিটাল লিটারেসি পরিচিতি---",
     "intro",
     "digital-divide",
