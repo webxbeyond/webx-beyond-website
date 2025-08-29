@@ -1,120 +1,98 @@
 ---
 title: Exhaustiveness চেকিং `never` দিয়ে
-icon: solar:alt-arrow-right-bold-duotone
+icon: ph:flag-checkered
 ---
 
-# Exhaustiveness চেকিং `never` দিয়ে
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি হাসপাতালের ওষুধের তালিকা তৈরি করছেন—প্রতিটি রোগের জন্য নির্দিষ্ট ওষুধ, কোনো রোগ বাদ গেলে ভুল চিকিৎসা হতে পারে। TypeScript-এ Exhaustiveness চেকিং ঠিক এমনই—সবকিছু কভার হয়েছে কিনা, কোনো "কেস" বাদ পড়েছে কিনা, তা নিশ্চিত করে।
 
-Google-এর Search Engine, Netflix-এর Recommendation System, Uber-এর Ride Calculation—সবখানে complex logic, multiple case, এবং edge case handle করতে হয়। Exhaustiveness checking—TypeScript-এর `never` টাইপ—industry-standard, যা bug-free, predictable, এবং maintainable codebase build করতে সাহায্য করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Exhaustiveness চেকিং-কে ভাবুন "চেকলিস্ট" হিসেবে—প্রতিটি আইটেম টিক দেওয়া হয়েছে কিনা, কোনো কিছু বাদ পড়লে warning আসে।
 
-- **Type Safety:** All cases handle না করলে runtime bug/crash
-- **Developer Experience:** Early error—fast fix, productivity boost
-- **Maintainability:** Large-scale app—easy refactor ও extend
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+### ১. Exhaustiveness চেকিং কী?
+- Union টাইপ, Enum, Discriminated Union—সবকিছু কভার হয়েছে কিনা চেক
+- Switch/case বা if/else-এ সবকিছু handle হয়েছে কিনা
+- কোনো কেস বাদ পড়লে TypeScript error দেখায়
 
-- **Google:** Search Engine—exhaustiveness check-এ all query type handle
-- **Netflix:** Recommendation—exhaustiveness check-এ all content type handle
-- **Uber:** Ride Calculation—exhaustiveness check-এ all ride status handle
+### ২. `never` টাইপ
+- TypeScript-এর special টাইপ, কোনো value নেই
+- Exhaustiveness চেকিং-এ `never` ব্যবহার করে "unreachable code" বা "missing case" ধরানো যায়
 
-## মূল ধারণা
+### ৩. কোড উদাহরণ
 
-### ১. Exhaustiveness Checking কী?
-
-- **সংজ্ঞা:** All possible case/type—handle করা হয়েছে কিনা check করা
-- **Usage:**
-  ```typescript
-  type Status = 'pending' | 'active' | 'done';
-
-  function handleStatus(status: Status) {
-    switch (status) {
-      case 'pending':
-        return 'Wait';
-      case 'active':
-        return 'Go';
-      case 'done':
-        return 'Finish';
-      default:
-        // Exhaustiveness check
-        const _exhaustive: never = status;
-        throw new Error('Unknown status');
-    }
-  }
-  ```
-
-#### সহজ এনালজি
-
-- "Exhaustiveness checking—একটি checklist—সব item checked হয়েছে কিনা verify করে।"
-
-### ২. `never` টাইপ কী?
-
-- **সংজ্ঞা:** TypeScript-এর never—impossible value/type—exhaustiveness check-এ use হয়
-- **Usage:**
-  - Default case-এ: const _exhaustive: never = value;
-  - Type error—unhandled case
-
-#### Example:
 ```typescript
-type Shape = 'circle' | 'square';
-function draw(shape: Shape) {
-  switch (shape) {
-    case 'circle':
-      return 'Drawing circle';
-    case 'square':
-      return 'Drawing square';
+// Discriminated Union
+interface Cat {
+  type: "cat";
+  meow: () => void;
+}
+interface Dog {
+  type: "dog";
+  bark: () => void;
+}
+interface Bird {
+  type: "bird";
+  chirp: () => void;
+}
+
+type Animal = Cat | Dog | Bird;
+
+function handleAnimal(animal: Animal) {
+  switch (animal.type) {
+    case "cat":
+      animal.meow();
+      break;
+    case "dog":
+      animal.bark();
+      break;
+    case "bird":
+      animal.chirp();
+      break;
     default:
-      const _exhaustive: never = shape; // Error if new type added but not handled
-      throw new Error('Unknown shape');
+      // Exhaustiveness check
+      const _exhaustive: never = animal;
+      throw new Error("Unknown animal type");
   }
 }
 ```
 
-### ৩. কখন ব্যবহার করবেন?
+### ৪. ভুল কেস ধরার সুবিধা
+- নতুন টাইপ যোগ করলে, switch/case-এ handle না করলে error
+- বড় কোডবেসে ভুল বা missing case runtime-এ বাগ আনার আগেই ধরা যায়
 
-- Union/discriminated union—all case/type handle করতে
-- Complex logic—edge case handle করতে
-- Maintainable codebase build করতে
+## সুবিধা
 
-### ৪. Common Pitfalls
+- সবকিছু handle হয়েছে কিনা নিশ্চিত
+- বাগ, ভুল, missing case—runtime-এ আসার আগেই error
+- বড় প্রজেক্টে reliability ও maintainability বাড়ে
 
-- Exhaustiveness check miss—runtime bug/error
-- never type—wrong usage—unexpected error
-- Over-complex switch—readability কমে যায়
+## ব্যবহার
 
-### ৫. Best Practices
+- Discriminated Union, Enum, Union টাইপে Exhaustiveness চেক
+- Switch/case-এ default-এ `never` টাইপ ব্যবহার
+- নতুন টাইপ যোগ করলে, সবকিছু handle হয়েছে কিনা চেক
 
-- All case/type—properly handle করুন
-- never type—exhaustiveness check-এ use করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+## গুরুত্বপূর্ণ পয়েন্ট
 
-### ৬. Industry Trends
+- Exhaustiveness চেকিং বড় কোডবেসে must-have
+- `never` টাইপ দিয়ে missing case ধরানো যায়
+- TypeScript-এর type system runtime error কমায়
 
-- Large-scale app—exhaustiveness check—default choice
-- never type—developer productivity
-- Type safety—production workflow-এ default
+## অনুশীলন
 
-## সংক্ষিপ্ত workflow
+1. একটি Discriminated Union টাইপ তৈরি করুন
+2. Switch/case-এ সবকিছু handle করুন, default-এ `never` টাইপ ব্যবহার করুন
+3. নতুন টাইপ যোগ করে দেখুন, error আসে কিনা
 
-1. All case/type—properly handle করুন
-2. never type—exhaustiveness check-এ use করুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] All case/type handled?
-- [x] never type used for exhaustiveness?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [`strict` মোড ও noImplicitAny](/typescript/strict-mode)
+- [নাল সেফটি ও strictNullChecks](/typescript/null-safety)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-TypeScript-এর exhaustiveness checking ও never—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready app তৈরি করা সম্ভব।
-
+Exhaustiveness চেকিং ও `never` টাইপ TypeScript-এ কোডকে আরও নিরাপদ, নির্ভরযোগ্য ও maintainable করে তোলে।

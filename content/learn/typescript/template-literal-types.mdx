@@ -1,97 +1,62 @@
 ---
 title: Template Literal টাইপ
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Template Literal টাইপ
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি নাম্বার প্লেট ডিজাইন করছেন—"AB-1234" বা "XY-5678"। প্রতিটি প্লেটের ফরম্যাট নির্দিষ্ট, কিন্তু কিছু অংশ পরিবর্তনশীল। TypeScript-এ "Template Literal টাইপ" ঠিক এমন—টাইপের মধ্যে স্ট্রিং প্যাটার্ন নির্ধারণ করা যায়, যাতে নির্দিষ্ট ফরম্যাটে ডাটা থাকে।
 
-Google-এর API, Netflix-এর ডেটা প্রসেসিং, Uber-এর রাইড অপশন—সবখানে dynamic string manipulation দরকার। TypeScript-এর Template Literal টাইপ—type-safe, flexible string pattern—industry-standard solution।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"নাম্বার প্লেট ডিজাইন"—একই ফরম্যাট, কিন্তু কিছু অংশ পরিবর্তনশীল। Template Literal টাইপ মানে, টাইপের মধ্যে স্ট্রিং প্যাটার্ন নির্ধারণ।
 
-- **Dynamic String Pattern:** Real-world app-এ dynamic key/property—template literal type handle করে।
-- **Type Safety:** Compile time-এ error detect—runtime bug কমায়।
-- **Code Reusability:** Flexible pattern—multiple use case—reuse করা যায়।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
-
-- **Google:** API endpoint—dynamic string—template literal type দিয়ে handle।
-- **Netflix:** Video object—property name—dynamic pattern।
-- **Uber:** Ride option—status key—template literal type দিয়ে manage।
-
-## মূল ধারণা
-
-### ১. Template Literal টাইপ (টেমপ্লেট লিটারাল টাইপ)
-
-- **সংজ্ঞা:** TypeScript-এ string pattern—backtick (`) ও `${}` syntax—type-level string manipulation
-- **Usage:**
+### Template Literal টাইপ কী?
+- স্ট্রিং টাইপের মধ্যে নির্দিষ্ট প্যাটার্ন
+- Syntax: `type Plate = `${string}-${number}`;`
+- উদাহরণ:
   ```typescript
-  type Status = "pending" | "active" | "completed";
-  type StatusMessage = `ride-${Status}`;
+  type Plate = `${string}-${number}`;
+  const valid: Plate = "AB-1234"; // ঠিক আছে
+  const invalid: Plate = "1234-AB"; // ভুল
+  ```
+- API, ডাটা ভ্যালিডেশন, ও স্ট্রং টাইপড স্ট্রিং-এর জন্য ব্যবহার হয়
 
-  const msg: StatusMessage = "ride-active"; // Valid
-  // const msg2: StatusMessage = "ride-cancelled"; // Error
+### Advanced Usage
+- Nested template literals
+- Multiple variable parts
+- উদাহরণ:
+  ```typescript
+  type Greeting = `Hello, ${string}!`;
+  const msg: Greeting = "Hello, Rahim!";
   ```
 
-#### সহজ এনালজি
+### কখন ব্যবহার করবেন?
+- যখন নির্দিষ্ট স্ট্রিং ফরম্যাট দরকার
+- যখন টাইপ-লেভেলে স্ট্রিং প্যাটার্ন চেক করতে হবে
 
-- "Template Literal টাইপ—একটি ছাঁচ—নির্দিষ্ট ফরম্যাটে জিনিস তৈরি।"
+## মূল পয়েন্ট
 
-### ২. Complex Pattern
+- Template Literal টাইপ: স্ট্রিং প্যাটার্ন নির্ধারণ
+- Type-safe ও readable কোডের জন্য গুরুত্বপূর্ণ
+- API ও ডাটা ভ্যালিডেশনে ব্যবহার হয়
 
-- **Usage:**
-  ```typescript
-  type Lang = "en" | "bn";
-  type FileName = `data.${Lang}.json`;
+## ব্যবহারিক অনুশীলন
 
-  const file: FileName = "data.en.json"; // Valid
-  // const file2: FileName = "data.fr.json"; // Error
-  ```
+১. **ভাবুন:**
+   - আপনার প্রজেক্টে কোথায় Template Literal টাইপ দরকার হতে পারে?
 
-### ৩. কখন ব্যবহার করবেন?
+২. **গবেষণা করুন:**
+   - TypeScript-এর Template Literal টাইপ সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html
 
-- Dynamic key/property/string pattern দরকার হলে
-- API endpoint/model—type-safe string pattern handle করতে
-- Config/status mapping—predictable format রাখতে
-
-### ৪. Common Pitfalls
-
-- Pattern mismatch—type error
-- Value miss—runtime bug
-- Complex nesting—readability কমে
-
-### ৫. Best Practices
-
-- Pattern—clear define করুন
-- Type nesting—simple রাখুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
-
-### ৬. Industry Trends
-
-- API design—template literal type—dynamic endpoint
-- Data processing—type-safe string pattern
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. String pattern requirement clear করুন
-2. Template literal type—properly use করুন
-3. Type safety/documentation—maintain করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] String pattern requirement clear?
-- [x] Template literal type used?
-- [x] Type safety/documentation clear?
-- [x] Team/project standard maintained?
+৩. **আলোচনা করুন:**
+   - Template Literal টাইপ ব্যবহার করলে কী সুবিধা?
 
 ---
 
-## উপসংহার
-
-TypeScript-এর Template Literal টাইপ—dynamic, type-safe, scalable string pattern build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [Conditional টাইপ ও infer](/typescript/conditional-types)
+- [Mapped টাইপ ও Utility টাইপ](/typescript/utility-types)
+- [টাইপ গার্ডস ও typeof / instanceof](/typescript/type-guards)

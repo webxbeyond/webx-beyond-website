@@ -1,136 +1,81 @@
 ---
 title: কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript
-icon: solar:alt-arrow-right-bold-duotone
+icon: ph:tree-structure
 ---
 
-# কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বড় বই লিখেছেন—সব অধ্যায় একসাথে পাঠালে পাঠক ক্লান্ত হয়ে যায়। তাই বইয়ের অধ্যায় আলাদা আলাদা পাঠানো হয়, অপ্রয়োজনীয় অংশ বাদ দেওয়া হয়। TypeScript-এ কোড স্প্লিটিং ও ট্রি-শেকিং ঠিক এমনই—অ্যাপের প্রয়োজনীয় অংশ আলাদা করে, অপ্রয়োজনীয় কোড বাদ দিয়ে, দ্রুত ও ছোট বানানো হয়।
 
-ধরা যাক, Uber-এর মতো একটি অ্যাপ—যেখানে হাজার হাজার ফিচার, অনেকগুলো পেজ, এবং heavy JavaScript bundle।
-যদি সব কোড একসাথে লোড হয়, তাহলে অ্যাপ স্লো হয়ে যাবে, ইউজার এক্সপেরিয়েন্স খারাপ হবে।
+## অ্যানালজি
 
-এজন্য **কোড স্প্লিটিং** ও **ট্রি-শেকিং** ব্যবহার করা হয়—যাতে প্রয়োজনীয় কোডই শুধু লোড হয়, অপ্রয়োজনীয় কোড বাদ পড়ে।
+কোড স্প্লিটিং-কে ভাবুন "বইয়ের অধ্যায় আলাদা আলাদা পাঠানো" হিসেবে—প্রয়োজনীয় অংশ পাঠানো হয়, অপ্রয়োজনীয় অংশ বাদ। ট্রি-শেকিং মানে "গাছ ঝাঁকিয়ে শুকনো পাতা ফেলা"—অপ্রয়োজনীয় কোড বাদ দেওয়া।
 
----
+## বিস্তারিত ব্যাখ্যা
 
-## কেন গুরুত্বপূর্ণ?
-
-- **Performance:** ছোট bundle মানে দ্রুত লোড, ভালো UX।
-- **Scalability:** বড় কোডবেসেও efficient delivery সম্ভব।
-- **Optimization:** অপ্রয়োজনীয় কোড বাদ দিলে security ও maintainability বাড়ে।
-- **SEO:** দ্রুত লোডিং ওয়েবসাইটে SEO ranking ভালো হয়।
-
----
-
-## মূল ধারণা
-
-### ১. কোড স্প্লিটিং কী?
-
-- **সংজ্ঞা:** কোডকে ছোট ছোট অংশে ভাগ করা—যাতে প্রয়োজন অনুযায়ী লোড হয়।
-- **Dynamic Import:** JavaScript/TypeScript-এ `import()` দিয়ে runtime-এ কোড লোড করা যায়।
-- **Framework Support:** React, Next.js, Webpack—সবই কোড স্প্লিটিং সাপোর্ট করে।
-
-#### এনালজি:
-> যেমন, বড় বইয়ের সব পৃষ্ঠা একসাথে না পড়ে, প্রয়োজন অনুযায়ী পৃষ্ঠা পড়া—তেমনি কোড স্প্লিটিং।
-
-### ২. ট্রি-শেকিং কী?
-
-- **সংজ্ঞা:** অপ্রয়োজনীয় (unused) কোড bundle থেকে বাদ দেওয়া।
-- **ES Module:** `import`/`export` ব্যবহার করলে bundler (Webpack, Rollup, Vite) সহজে unused কোড বাদ দিতে পারে।
-- **Dead Code Elimination:** শুধু দরকারি কোডই final bundle-এ থাকে।
-
-#### এনালজি:
-> যেমন, ফলের গাছ থেকে শুধু পাকা ফল তুলে আনা—অপ্রয়োজনীয় ডাল-পাতা ফেলে দেওয়া—তেমনি ট্রি-শেকিং।
-
----
-
-## কিভাবে কাজ করে?
-
-### ১. TypeScript-এ কোড স্প্লিটিং
-
-- **Dynamic Import:**
-
-```ts
-// page.ts
-async function loadFeature() {
-  const feature = await import('./feature');
-  feature.init();
-}
-```
-
-- **React Lazy Loading:**
-
-```ts
-import React, { lazy, Suspense } from 'react';
-const LazyComponent = lazy(() => import('./MyComponent'));
-
-function App() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LazyComponent />
-    </Suspense>
-  );
-}
-```
+### ১. কোড স্প্লিটিং
+- অ্যাপের বড় অংশ আলাদা আলাদা bundle/চাঙ্কে ভাগ
+- প্রয়োজন অনুযায়ী লোড হয় (lazy loading)
+- Initial load দ্রুত, resource usage কম
 
 ### ২. ট্রি-শেকিং
+- Unused/অপ্রয়োজনীয় কোড বাদ দেওয়া
+- Production build ছোট, দ্রুত
+- Modern bundler (Webpack, Vite, Rollup) tree-shaking support
 
-- **ES Module Usage:**
+### ৩. TypeScript-এ কোড স্প্লিটিং
+- Dynamic import (`import()`), lazy loading
+- React, Next.js, Vite—সবকিছুতে কোড স্প্লিটিং
 
-```ts
-// utils.ts
-export function used() {}
-export function unused() {}
-
-// main.ts
-import { used } from './utils';
-used(); // 'unused' function bundle-এ থাকবে না
+```typescript
+// Dynamic import
+const UserComponent = React.lazy(() => import('./UserComponent'));
 ```
 
-- **Bundler Config:**
-  - Webpack: `mode: 'production'`
-  - Rollup/Vite: default tree-shaking enabled
+### ৪. TypeScript-এ ট্রি-শেকিং
+- ES Module (`export/import`) ব্যবহার করুন
+- Side-effect-free কোড লিখুন
+- Production build-এ unused code বাদ
+
+```typescript
+// Only used function will be included
+export function add(a: number, b: number) { return a + b; }
+export function unused() { /* ... */ }
+```
+
+### ৫. Bundler config
+- Webpack/Vite/Rollup-এ tree-shaking ও code splitting config
+- Production build-এ optimization
+
+## সুবিধা
+
+- অ্যাপ দ্রুত লোড হয়
+- Production bundle ছোট
+- Resource usage ও performance বাড়ে
+
+## ব্যবহার
+
+- Dynamic import ও lazy loading
+- ES Module ও side-effect-free কোড
+- Bundler config-এ optimization
+
+## গুরুত্বপূর্ণ পয়েন্ট
+
+- Modern bundler ব্যবহার করুন
+- Production build-এ optimization চালু করুন
+- Unused code ও side-effect-free কোড লিখুন
+
+## অনুশীলন
+
+1. একটি React/Vite/Next.js অ্যাপে dynamic import ও lazy loading ব্যবহার করুন
+2. Production build-এ bundle size চেক করুন
+3. Unused code বাদ দিতে tree-shaking config দেখুন
+
+## আরও জানুন
+- [বিল্ড পারফরম্যান্স টিউনিং ও tsc অপশন](/typescript/build-optimization)
+- [Monorepo-এ TypeScript](/typescript/monorepo)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## কখন ব্যবহার করবেন?
-
-- **বড় কোডবেসে:** অনেক ফিচার, পেজ, heavy bundle—efficient delivery দরকার।
-- **SPA/React/Next.js অ্যাপে:** পেজ/কম্পোনেন্ট lazy load করতে।
-- **Production build-এ:** অপ্রয়োজনীয় কোড বাদ দিতে।
-
----
-
-## সাধারণ ভুলত্রুটি
-
-- **সবকিছু একসাথে import করা:** কোড স্প্লিটিং না করলে bundle বড় হয়।
-- **CommonJS ব্যবহার:** ES Module না হলে ট্রি-শেকিং ঠিকমতো হয় না।
-- **Dynamic require:** `require()` ব্যবহার করলে bundler কোড স্প্লিট/ট্রি-শেকিং করতে পারে না।
-
----
-
-## সেরা অনুশীলন (Best Practices)
-
-- **ES Module (`import`/`export`) ব্যবহার করুন।**
-- **Dynamic Import ও Lazy Loading চালু রাখুন।**
-- **Bundler-এ production mode ব্যবহার করুন।**
-- **Unused কোড/ডিপেন্ডেন্সি সরিয়ে ফেলুন।**
-
----
-
-## ইন্ডাস্ট্রি ট্রেন্ড
-
-- **Next.js, Vite, Webpack—সবই কোড স্প্লিটিং ও ট্রি-শেকিং সাপোর্ট করে।**
-- **Micro-frontend:** বড় অ্যাপে আলাদা আলাদা bundle—efficient delivery।
-- **Automatic Tree-shaking:** Modern bundler-এ default tree-shaking চালু।
-
----
-
-## উপসংহার
-
-কোড স্প্লিটিং ও ট্রি-শেকিং TypeScript প্রজেক্টে পারফরম্যান্স, স্কেলেবিলিটি ও maintainability নিশ্চিত করে।  
-শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
-
----
-
+কোড স্প্লিটিং ও ট্রি-শেকিং TypeScript-এ অ্যাপকে দ্রুত, ছোট ও অপ্টিমাইজড রাখতে সাহায্য করে।

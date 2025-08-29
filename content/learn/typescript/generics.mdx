@@ -1,130 +1,69 @@
 ---
 title: "জেনেরিকস পরিচিতি: কেন ও কিভাবে"
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# জেনেরিকস পরিচিতি: কেন ও কিভাবে
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি ব্যাগ তৈরি করছেন, যেখানে যেকোনো কিছু রাখা যায়—বই, জামা, খাবার, ইত্যাদি। ব্যাগের ডিজাইন এমন, যাতে ভেতরে কী আছে সেটা আগে থেকে জানা যায় না, কিন্তু ব্যাগটি নিরাপদ ও ব্যবহারযোগ্য। TypeScript-এ "জেনেরিকস" ঠিক এমন—একটি ফাংশন, ক্লাস বা ইন্টারফেস, যা বিভিন্ন টাইপের ডাটা নিয়ে কাজ করতে পারে, কিন্তু টাইপ সেফটি বজায় রাখে।
 
-Google, Netflix, Uber—production app-এ reusable, type-safe function/class—scalability, maintainability—essential। TypeScript-এর generics—flexible, reusable code—industry standard।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"ব্যাগের ডিজাইন"—একই ব্যাগ, কিন্তু কখনো বই, কখনো জামা, কখনো খাবার রাখা যায়। জেনেরিকস মানে, একই কোড, কিন্তু বিভিন্ন টাইপের ডাটা নিয়ে কাজ করতে পারে।
 
-- **Reusability:** Generics—একই function/class—multiple type-এ use করা যায়।
-- **Type safety:** Generic type—runtime bug কমায়, compile time-এ error detect।
-- **Maintainability:** Generic code—easy refactor, long-term maintain।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
-
-- **Google:** API response handler—generic function—multiple data type handle।
-- **Netflix:** Data processing—generic class—flexible workflow।
-- **Uber:** Ride calculation—generic function—dynamic input/output।
-
-## মূল ধারণা
-
-### ১. Generics কী?
-
-- **Generics:** Function/class/interface—type parameter—flexible, reusable code।
-- **Usage:**
-  ```typescript
-  function identity<T>(value: T): T {
-    return value;
-  }
-
-  identity<string>("Anis"); // "Anis"
-  identity<number>(25); // 25
-  ```
-
-#### সহজ এনালজি
-
-- "Generics—একটি খালি বাক্স—যে কোনো ধরনের জিনিস রাখা যায়, পরে type অনুযায়ী ব্যবহার করা যায়।"
-
-### ২. Generic Function
-
-- **Type parameter—function signature-এ define।**
-- **Usage:**
-  ```typescript
-  function getFirst<T>(arr: T[]): T {
-    return arr[0];
-  }
-
-  getFirst<number>([1, 2, 3]); // 1
-  getFirst<string>(["a", "b", "c"]); // "a"
-  ```
-
-### ৩. Generic Class
-
-- **Type parameter—class-এ define।**
-- **Usage:**
-  ```typescript
-  class Box<T> {
-    content: T;
-    constructor(value: T) {
-      this.content = value;
+- **জেনেরিকস কী?**
+  - কোডকে flexible ও reusable করার উপায়
+  - টাইপ সেফটি বজায় রেখে বিভিন্ন টাইপে কাজ করা
+  - উদাহরণ:
+    ```typescript
+    function identity<T>(value: T): T {
+      return value;
     }
-  }
+    const num = identity<number>(42); // 42
+    const str = identity<string>("hello"); // "hello"
+    ```
 
-  const numberBox = new Box<number>(99);
-  const stringBox = new Box<string>("Hello");
-  ```
+- **কেন ব্যবহার করবেন?**
+  - কোড পুনঃব্যবহারযোগ্য (reusable) হয়
+  - টাইপ সেফটি বজায় থাকে
+  - API flexible হয়
 
-### ৪. Generic Interface
+- **জেনেরিকস কোথায় ব্যবহার হয়?**
+  - ফাংশন, ক্লাস, ইন্টারফেস
+  - উদাহরণ:
+    ```typescript
+    interface Box<T> {
+      content: T;
+    }
+    const box: Box<string> = { content: "TypeScript" };
+    ```
 
-- **Type parameter—interface-এ define।**
-- **Usage:**
-  ```typescript
-  interface ApiResponse<T> {
-    data: T;
-    error?: string;
-  }
+- **জেনেরিকস-এর নিয়ম**
+  - `<T>` বা অন্য টাইপ প্যারামিটার ব্যবহার
+  - ডিক্লারেশন ও ব্যবহার দুই জায়গায় টাইপ নির্ধারণ
 
-  const userResponse: ApiResponse<{ name: string }> = {
-    data: { name: "Anis" }
-  };
-  ```
+## মূল পয়েন্ট
 
-### ৫. Industry Trends
+- জেনেরিকস: flexible, reusable, type-safe কোড
+- ফাংশন, ক্লাস, ইন্টারফেসে ব্যবহার হয়
+- টাইপ প্যারামিটার দিয়ে ডাটা টাইপ নির্ধারণ
 
-- **Generics—reusable, type-safe code—industry standard।**
-- **Flexible API/class—scalable workflow।**
-- **Type safety—production workflow-এ default।**
+## ব্যবহারিক অনুশীলন
 
-### ৬. Best Practices
+১. **ভাবুন:**
+   - জেনেরিকস ছাড়া কোড লিখলে কী কী সমস্যা হতে পারে?
 
-- **Generic type parameter—clear define করুন।**
-- **Documentation/readme—usage clear রাখুন।**
-- **Team/project standard—maintain করুন।**
+২. **গবেষণা করুন:**
+   - TypeScript-এর জেনেরিকস সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/2/generics.html
 
-### ৭. সাধারণ ভুলত্রুটি
-
-- Type parameter miss—runtime bug আসে।
-- Generic usage unclear—unexpected value/error আসে।
-- Documentation/readme unclear—new developer confused।
-
-### ৮. কখন ব্যবহার করবেন?
-
-- Reusable function/class/interface—multiple type handle করতে।
-- Flexible API/class—dynamic input/output দরকার হলে।
-- Production workflow—bug কমাতে, maintainability বাড়াতে।
-
-## সংক্ষিপ্ত workflow
-
-1. Generic type parameter clear define করুন।
-2. Function/class/interface-এ generic use করুন।
-3. Documentation/readme update করুন।
-4. Team/project standard maintain করুন।
-
-## Quick Checklist
-
-- [x] Generic type parameter clear?
-- [x] Function/class/interface-এ generic used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+৩. **আলোচনা করুন:**
+   - বড় প্রজেক্টে জেনেরিকস ব্যবহার করলে কী সুবিধা?
 
 ---
 
-## উপসংহার
-
-TypeScript-এর generics—reusable, type-safe, scalable code build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [ফাংশন ওভারলোডিং](/typescript/function-overloading)
+- [Generic Constraints ও extends](/typescript/generic-constraints)
+- [ডিফল্ট জেনেরিক টাইপ](/typescript/default-generics)

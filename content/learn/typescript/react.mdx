@@ -1,129 +1,108 @@
 ---
 title: React-এ TypeScript (Hooks, Props, Context API)
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# React-এ TypeScript (Hooks, Props, Context API)
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি গাড়ি চালাচ্ছেন—গাড়ির প্রতিটি যন্ত্রাংশের সঠিক তথ্য জানা থাকলে দুর্ঘটনার ঝুঁকি কমে যায়। React-এ TypeScript ব্যবহার করলে UI ডেভেলপমেন্টে "দুর্ঘটনা" (বাগ, টাইপ mismatch) কমে যায়, কারণ প্রতিটি কম্পোনেন্ট, প্রপস, স্টেট, কনটেক্সট—সবকিছুর টাইপ সেফটি নিশ্চিত হয়।
 
-Google-এর Gmail, Netflix-এর UI, Uber-এর Dashboard—সবখানে scalable, maintainable, এবং bug-free frontend দরকার। React-এ TypeScript—modern web app-এ industry-standard, যা robust, readable, এবং type-safe UI তৈরি করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+React-এ TypeScript ব্যবহারকে ভাবুন "নিরাপদ গাড়ি চালানো" হিসেবে—গাড়ির প্রতিটি যন্ত্রাংশের health report আগে থেকেই জানা, তাই ভুল হলে সঙ্গে সঙ্গে সতর্কতা আসে।
 
-- **Type Safety:** Component, props, state—type-safe, predictable
-- **Developer Experience:** Autocomplete, error checking—productivity boost
-- **Maintainability:** Large-scale app—easy refactor ও extend
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+### ১. কম্পোনেন্ট ও Props টাইপিং
+- প্রতিটি কম্পোনেন্টের Props-এর টাইপ নির্ধারণ করা যায়
+- ভুল টাইপ দিলে কম্পাইল টাইমেই error
 
-- **Google:** Gmail—type-safe React component
-- **Netflix:** UI—typed props ও context
-- **Uber:** Dashboard—typed hooks ও state
-
-## মূল ধারণা
-
-### ১. Typed Props
-
-- **সংজ্ঞা:** Component-এর input (props)—type-safe করা যায়
-- **Usage:**
-  ```typescript
-  type UserProps = {
-    name: string;
-    age?: number;
-  };
-
-  function User({ name, age }: UserProps) {
-    return <div>{name} ({age})</div>;
-  }
-  ```
-
-#### সহজ এনালজি
-
-- "Typed props—একটি contract—component কী data expect করবে, তা স্পষ্ট।"
-
-### ২. Typed State ও Hooks
-
-- **সংজ্ঞা:** State ও hooks—type-safe করা যায়
-- **Usage:**
-  ```typescript
-  import { useState } from 'react';
-
-  const [count, setCount] = useState<number>(0);
-  setCount(5); // OK
-  // setCount('five'); // Error
-  ```
-
-#### Example: Custom Hook
 ```typescript
-function useUser(): [string, (name: string) => void] {
-  const [name, setName] = useState<string>("");
-  return [name, setName];
+interface UserProps {
+  name: string;
+  age: number;
+}
+
+function User({ name, age }: UserProps) {
+  return <div>{name} ({age})</div>;
 }
 ```
 
-### ৩. Context API
+### ২. State ও useState টাইপিং
+- useState-এর initial value থেকে টাইপ ইনফার করা যায়
+- চাইলে টাইপ এক্সপ্লিসিটলি দেওয়া যায়
 
-- **সংজ্ঞা:** Global state—type-safe context দিয়ে manage করা যায়
-- **Usage:**
-  ```typescript
-  import { createContext, useContext } from 'react';
+```typescript
+const [count, setCount] = useState<number>(0);
+```
 
-  type Theme = 'light' | 'dark';
-  const ThemeContext = createContext<Theme>('light');
+### ৩. Custom Hooks টাইপিং
+- Custom hook-এর return ও parameter টাইপ নির্ধারণ করা যায়
 
-  function App() {
-    const theme = useContext(ThemeContext);
-    return <div>{theme}</div>;
-  }
-  ```
+```typescript
+function useToggle(initial: boolean): [boolean, () => void] {
+  const [state, setState] = useState(initial);
+  const toggle = () => setState(s => !s);
+  return [state, toggle];
+}
+```
 
-#### সহজ এনালজি
+### ৪. Context API টাইপিং
+- Context value-এর টাইপ নির্ধারণ করা যায়
+- Consumer/Provider-এ টাইপ mismatch হলে error
 
-- "Context API—একটি global address book—সব component context থেকে data নিতে পারে।"
+```typescript
+interface Theme {
+  color: string;
+}
 
-### ৪. কখন ব্যবহার করবেন?
+const ThemeContext = createContext<Theme | undefined>(undefined);
 
-- Component—type-safe props/state/context handle করতে
-- Large-scale app—easy refactor ও maintain করতে
-- Developer experience—boost করতে
+function App() {
+  return (
+    <ThemeContext.Provider value={{ color: "blue" }}>
+      <Child />
+    </ThemeContext.Provider>
+  );
+}
 
-### ৫. Common Pitfalls
+function Child() {
+  const theme = useContext(ThemeContext);
+  if (!theme) return null;
+  return <div style={{ color: theme.color }}>Hello</div>;
+}
+```
 
-- Wrong type—unexpected bug/error
-- Optional/nullable prop—type miss করলে runtime bug
-- Context value—type mismatch
+## সুবিধা
 
-### ৬. Best Practices
+- টাইপ সেফটি: UI বাগ কমে যায়
+- কোড রিডেবিলিটি ও মেইনটেনেবিলিটি বাড়ে
+- IDE auto-complete ও refactor সহজ হয়
+- বড় প্রজেক্টে স্কেলিং সহজ
 
-- Props/state/context—clear type define করুন
-- Optional/nullable—properly handle করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+## ব্যবহার
 
-### ৭. Industry Trends
+- Props, State, Context, Reducer—সবকিছুর টাইপিং
+- Custom hooks ও HOC-এ টাইপ সেফটি
+- Third-party component integration
 
-- Large-scale app—React + TypeScript—default choice
-- Typed hooks/context—developer productivity
-- Type safety—production workflow-এ default
+## গুরুত্বপূর্ণ পয়েন্ট
 
-## সংক্ষিপ্ত workflow
+- Props ও State-এর টাইপ নির্ধারণ করুন
+- Context API-তে টাইপ সেফটি বজায় রাখুন
+- Custom hook ও reducer-এ টাইপ ব্যবহার করুন
 
-1. Requirement clear করুন
-2. Props/state/context—properly type করুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
+## অনুশীলন
 
-## Quick Checklist
+1. একটি User কম্পোনেন্ট লিখুন, যেখানে Props টাইপিং আছে
+2. একটি Custom hook লিখুন, যেখানে return value টাইপ সেফ
+3. Context API দিয়ে একটি থিম সিস্টেম তৈরি করুন
 
-- [x] Requirement clear?
-- [x] Typed props/state/context used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [Node.js-এ TypeScript](/typescript/node)
+- [Next.js ও API রাউটসের সাথে TypeScript](/typescript/next)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-React-এ TypeScript—type-safe, readable, extensible UI build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready web app তৈরি করা সম্ভব।
-
+React-এ TypeScript ব্যবহার করলে UI ডেভেলপমেন্ট আরও নিরাপদ, স্কেলেবল ও মেইনটেনেবল হয়।

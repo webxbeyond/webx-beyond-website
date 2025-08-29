@@ -1,125 +1,56 @@
 ---
 title: টাইপ অ্যানোটেশন বনাম টাইপ ইনফারেন্স
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# টাইপ অ্যানোটেশন বনাম টাইপ ইনফারেন্স
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি স্কুলে শিক্ষক। প্রতিটি ছাত্রের নাম, বয়স, ক্লাস—সবকিছু আপনি নিজে লিখে রাখেন (অ্যানোটেশন)। আবার কিছু ছাত্রের তথ্য আপনি অনুমান করে নিতে পারেন—যেমন, বয়স দেখে ক্লাস বুঝে নিতে পারেন (ইনফারেন্স)। TypeScript-এ "টাইপ অ্যানোটেশন" মানে আপনি নিজে টাইপ বলে দেন, আর "টাইপ ইনফারেন্স" মানে TypeScript নিজে থেকে টাইপ অনুমান করে নেয়।
 
-Google, Netflix, Uber—production app-এ type safety—bug কমানো, efficient workflow—essential। TypeScript-এর type annotation ও type inference—codebase-এ strong foundation—industry standard।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"শিক্ষকের নোট ও অনুমান"—আপনি ছাত্রের তথ্য নিজে লিখে রাখলে ভুল কম হয় (টাইপ অ্যানোটেশন)। আবার কিছু তথ্য অনুমান করলে (টাইপ ইনফারেন্স) সময় বাঁচে, কিন্তু ভুলের সম্ভাবনা থাকে।
 
-- **Type safety:** Manual annotation/inference—early error detect—bug কমে।
-- **Maintainability:** Clear type—codebase maintain, refactor সহজ।
-- **Productivity:** IntelliSense, auto-complete—fast coding, less boilerplate।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+- **টাইপ অ্যানোটেশন**
+  - আপনি নিজে টাইপ নির্ধারণ করেন
+  - উদাহরণ: `let name: string = "Anis";`
+  - সুবিধা: স্পষ্টতা, ভুল কম
 
-- **Google:** Angular—type annotation/inference—component/model-এ bug কমানো।
-- **Netflix:** Backend—type inference—fast coding, maintainability।
-- **Uber:** Real-time app—type annotation—critical data model-এ type safety।
+- **টাইপ ইনফারেন্স**
+  - TypeScript নিজে থেকে টাইপ অনুমান করে
+  - উদাহরণ: `let age = 25;` (TypeScript বুঝে নেয় age হচ্ছে number)
+  - সুবিধা: কোড ছোট হয়, দ্রুত লেখা যায়
 
-## মূল ধারণা
+- **কখন কোনটা ব্যবহার করবেন?**
+  - জটিল ডাটা, ফাংশন, API—এখানে টাইপ অ্যানোটেশন ভালো
+  - সাধারণ ভ্যারিয়েবল, সহজ ফাংশন—এখানে ইনফারেন্স যথেষ্ট
 
-### ১. টাইপ অ্যানোটেশন (Type Annotation)
+- **ব্যালেন্স**
+  - বড় প্রজেক্টে স্পষ্ট টাইপ অ্যানোটেশন বেশি নিরাপদ
+  - ছোট স্ক্রিপ্টে ইনফারেন্স সময় বাঁচায়
 
-- **Type annotation:** Variable/function/property-এ type manually define করা।
-- **Usage:**
-  ```typescript
-  let username: string = "Anis";
-  function add(a: number, b: number): number {
-    return a + b;
-  }
-  ```
+## মূল পয়েন্ট
 
-#### সহজ এনালজি
+- টাইপ অ্যানোটেশন: নিজে টাইপ নির্ধারণ
+- টাইপ ইনফারেন্স: TypeScript নিজে টাইপ অনুমান
+- স্পষ্টতা ও নিরাপত্তার জন্য অ্যানোটেশন, দ্রুততার জন্য ইনফারেন্স
 
-- "Type annotation—একটি লেবেল, যেখানে স্পষ্টভাবে লেখা থাকে—বাক্সে কী রাখা যাবে।"
+## ব্যবহারিক অনুশীলন
 
-### ২. টাইপ ইনফারেন্স (Type Inference)
+১. **ভাবুন:**
+   - আপনি যদি সবকিছু ইনফারেন্সে ছেড়ে দেন, কী কী সমস্যা হতে পারে?
 
-- **Type inference:** TypeScript—value দেখে—type নিজে নিজে বুঝে নেয়।
-- **Usage:**
-  ```typescript
-  let age = 25; // TypeScript বুঝে নেয়: number
-  const isActive = true; // TypeScript বুঝে নেয়: boolean
-  ```
-- **Function return type:**
-  ```typescript
-  function greet(name = "Guest") {
-    return `Hello, ${name}`;
-  }
-  // TypeScript বুঝে নেয়: string
-  ```
+২. **গবেষণা করুন:**
+   - TypeScript-এর টাইপ ইনফারেন্স সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/type-inference.html
 
-#### সহজ এনালজি
-
-- "Type inference—একটি স্মার্ট বাক্স, যেখানে কী রাখা হয়েছে দেখে বাক্স নিজেই বুঝে নেয়—কী ধরনের জিনিস আছে।"
-
-### ৩. কখন কোনটা ব্যবহার করবেন?
-
-- **Critical data model/function—type annotation করুন।**
-- **Simple variable/obvious value—type inference rely করুন।**
-- **Team/project standard—mixed approach—maintainability, readability বাড়ে।**
-
-### ৪. Industry Trends
-
-- **Type annotation—critical codebase-এ default।**
-- **Type inference—fast coding, less boilerplate—modern workflow।**
-- **Mixed approach—industry standard—maintainability, productivity।**
-
-### ৫. Best Practices
-
-- **Critical variable/function/property—type annotation করুন।**
-- **Simple/obvious value—type inference rely করুন।**
-- **Documentation/readme—type usage clear রাখুন।**
-- **Team/project standard—maintain করুন।**
-
-### ৬. সাধারণ ভুলত্রুটি
-
-- Type annotation miss—critical bug আসে।
-- Type inference miss—unexpected type assign হয়।
-- Documentation/readme unclear—new developer confused।
-
-### ৭. Practical Example
-
-```typescript
-// Type annotation
-let userId: number = 101;
-let userName: string = "Anis";
-
-// Type inference
-let isAdmin = false; // boolean
-let points = 99.5; // number
-
-// Function annotation/inference
-function multiply(a: number, b: number): number {
-  return a * b;
-}
-function getStatus() {
-  return "active"; // TypeScript বুঝে নেয়: string
-}
-```
-
-## সংক্ষিপ্ত workflow
-
-1. Critical variable/function/property-এ type annotation করুন।
-2. Simple/obvious value-এ type inference rely করুন।
-3. Documentation/readme update করুন।
-4. Team/project standard maintain করুন।
-
-## Quick Checklist
-
-- [x] Critical variable/function-এ type annotation আছে?
-- [x] Simple value-এ type inference used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+৩. **আলোচনা করুন:**
+   - বড় টিমে কাজ করলে টাইপ অ্যানোটেশন কতটা গুরুত্বপূর্ণ?
 
 ---
 
-## উপসংহার
-
-Type annotation ও type inference—TypeScript codebase-এ strong foundation—bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)](/typescript/primitives)
+- [অ্যারে, টাপল ও readonly টাইপ](/typescript/arrays-tuples)
+- [অবজেক্ট টাইপ ও টাইপ অ্যালিয়াস](/typescript/type-alias)

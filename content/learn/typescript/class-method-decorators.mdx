@@ -1,133 +1,120 @@
 ---
 title: ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি গাড়ি বানাচ্ছেন—গাড়ির বডি, ইঞ্জিন, চাকা, আর প্রতিটি অংশে আলাদা আলাদা "অ্যাড-অন" বা ফিচার যোগ করছেন। TypeScript-এ ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর ঠিক এমনই—প্রতিটি অংশে আলাদা "ম্যাজিক" যোগ করে, তাদের আচরণ ও ক্ষমতা বাড়িয়ে দেয়।
 
-Google-এর Angular, Netflix-এর Custom Analytics, Uber-এর Permission System—সবখানে class, property, ও method-এর behavior enhance বা modify করার দরকার পড়ে। TypeScript-এর ডেকোরেটর—code-কে expressive, reusable, এবং maintainable করে তোলে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+ডেকোরেটরকে ভাবুন "মোবাইল অ্যাপের থিম" হিসেবে—একই অ্যাপ, কিন্তু থিম বদলালে চেহারা ও ফিচার বদলে যায়। ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর কোডের "থিম" ও "বিহেভিয়ার" বদলে দেয়।
 
-- **Code Enhancement:** Class/property/method—custom logic add/modify করা যায়
-- **Reusability:** Common logic—multiple জায়গায় reuse
-- **Extensibility:** Framework/library—easy extend ও maintain
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+### ক্লাস ডেকোরেটর
+- পুরো ক্লাসকে "র‍্যাপ" করে
+- সাধারণত ক্লাসের কনস্ট্রাক্টর বা প্রোটোটাইপ পরিবর্তন করে
+- Logging, validation, singleton, ইত্যাদি implement করা যায়
 
-- **Google:** Angular—@Component, @Injectable, @Input, @Output
-- **Netflix:** Analytics—method/property-এ custom decorator
-- **Uber:** Permission—class/property-এ dynamic decorator
+### প্রপার্টি ডেকোরেটর
+- ক্লাসের নির্দিষ্ট প্রপার্টিকে "র‍্যাপ" করে
+- প্রপার্টির metadata, validation, default value ইত্যাদি সেট করা যায়
 
-## মূল ধারণা
+### মেথড ডেকোরেটর
+- ক্লাসের নির্দিষ্ট মেথডকে "র‍্যাপ" করে
+- Logging, authorization, caching, ইত্যাদি implement করা যায়
 
-### ১. ক্লাস ডেকোরেটর
+### কোড উদাহরণ
 
-- **সংজ্ঞা:** Class-এর behavior modify/add করা যায়
-- **Usage:**
-  ```typescript
-  function Controller(constructor: Function) {
-    console.log("Controller initialized");
-  }
-
-  @Controller
-  class App {}
-  ```
-
-#### সহজ এনালজি
-
-- "Class decorator—একটি supervisor—class-এর behavior monitor/modify করে।"
-
-### ২. প্রপার্টি ডেকোরেটর
-
-- **সংজ্ঞা:** Property-এর behavior modify/add করা যায়
-- **Usage:**
-  ```typescript
-  function Readonly(target: any, propertyKey: string) {
-    Object.defineProperty(target, propertyKey, {
-      writable: false
-    });
-  }
-
-  class User {
-    @Readonly
-    name = "Anis";
-  }
-  ```
-
-#### সহজ এনালজি
-
-- "Property decorator—একটি lock—property-কে readonly করে দেয়।"
-
-### ৩. মেথড ডেকোরেটর
-
-- **সংজ্ঞা:** Method-এর behavior modify/add করা যায়
-- **Usage:**
-  ```typescript
-  function Log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const original = descriptor.value;
-    descriptor.value = function (...args: any[]) {
-      console.log(`Calling ${propertyKey} with`, args);
-      return original.apply(this, args);
-    };
-  }
-
-  class User {
-    @Log
-    save(data: string) {
-      console.log("Saving", data);
+```typescript
+// ক্লাস ডেকোরেটর
+function Singleton<T extends { new (...args: any[]): {} }>(constructor: T) {
+  return class extends constructor {
+    static instance: any;
+    constructor(...args: any[]) {
+      if (!Singleton.instance) {
+        super(...args);
+        Singleton.instance = this;
+      }
+      return Singleton.instance;
     }
+  };
+}
+
+@Singleton
+class Database {
+  connect() {
+    console.log("Connected");
   }
-  ```
+}
 
-#### সহজ এনালজি
+const db1 = new Database();
+const db2 = new Database();
+console.log(db1 === db2); // true
 
-- "Method decorator—একটি CCTV—method call monitor করে।"
+// প্রপার্টি ডেকোরেটর
+function Readonly(target: any, propertyKey: string) {
+  Object.defineProperty(target, propertyKey, {
+    writable: false,
+  });
+}
 
-### ৪. কখন ব্যবহার করবেন?
+class User {
+  @Readonly
+  name = "Anis";
+}
 
-- Common logic—multiple class/property/method-এ reuse করতে
-- Framework/library—extensible design build করতে
-- Code behavior—dynamic modify/add করতে
+// মেথড ডেকোরেটর
+function Log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+  descriptor.value = function (...args: any[]) {
+    console.log(`Calling ${propertyKey} with`, args);
+    return original.apply(this, args);
+  };
+}
 
-### ৫. Common Pitfalls
+class Calculator {
+  @Log
+  add(a: number, b: number) {
+    return a + b;
+  }
+}
 
-- Decorator—wrong usage—unexpected behavior
-- Multiple decorator—order miss—bug/error
-- Experimental feature—production-এ careful use
+const calc = new Calculator();
+calc.add(5, 7); // Output: Calling add with [5, 7]
+```
 
-### ৬. Best Practices
+## সুবিধা
 
-- Decorator—clear/documented use করুন
-- Multiple decorator—logical order maintain করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+- কোডের behavior সহজে extend/modify করা যায়
+- DRY (Don't Repeat Yourself) principle বজায় রাখা যায়
+- Framework/library-তে powerful API তৈরি করা যায়
 
-### ৭. Industry Trends
+## ব্যবহার
 
-- Large-scale app—decorator—code enhancement
-- Extensible codebase—decorator—future-proof design
-- Type safety—production workflow-এ default
+- Angular, NestJS, MobX ইত্যাদি ফ্রেমওয়ার্কে ডেকোরেটর heavily ব্যবহৃত
+- Custom validation, logging, caching
+- Dependency injection
 
-## সংক্ষিপ্ত workflow
+## গুরুত্বপূর্ণ পয়েন্ট
 
-1. Requirement clear করুন
-2. Decorator—properly design/use করুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
+- ডেকোরেটর experimental, তাই সব ব্রাউজারে/রানটাইমে সাপোর্ট নাও থাকতে পারে
+- `tsconfig.json`-এ `experimentalDecorators: true` লাগবে
+- ডেকোরেটর ফাংশন সাধারণত তিনটি আর্গুমেন্ট নেয়: target, propertyKey, descriptor
 
-## Quick Checklist
+## অনুশীলন
 
-- [x] Requirement clear?
-- [x] Decorator used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+1. একটি ক্লাস ডেকোরেটর লিখুন, যা ক্লাসকে singleton বানায়
+2. একটি প্রপার্টি ডেকোরেটর লিখুন, যা প্রপার্টিকে readonly করে
+3. একটি মেথড ডেকোরেটর লিখুন, যা মেথড কল হলে আর্গুমেন্ট ও রিটার্ন ভ্যালু লগ করে
+
+## আরও জানুন
+- [ডেকোরেটর কী ও কিভাবে কাজ করে](/typescript/decorators)
+- [মেটাডাটা রিফ্লেকশন API](/typescript/reflect-metadata)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-TypeScript-এর ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর—code enhancement, reusability, extensibility-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+ক্লাস, প্রপার্টি ও মেথড ডেকোরেটর TypeScript-এ কোডকে আরও "ম্যাজিক" ও শক্তিশালী করে তোলে, বিশেষ করে বড় ও স্কেলেবল অ্যাপ্লিকেশনে।

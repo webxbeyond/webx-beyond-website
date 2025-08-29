@@ -1,113 +1,92 @@
 ---
 title: নাল সেফটি ও `strictNullChecks`
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# নাল সেফটি ও `strictNullChecks`
+## টাইপস্ক্রিপ্টে "অদৃশ্য বাগ" ধরার কৌশল
 
-## প্রস্তাবনা
+## পরিচিতি
 
-Google-এর Search Engine, Netflix-এর Recommendation System, Uber-এর Ride Calculation—সবখানে null/undefined value নিয়ে bug, crash, বা unpredictable behavior হতে পারে। TypeScript-এর নাল সেফটি ও `strictNullChecks`—industry-standard, যা robust, readable, এবং maintainable app build করতে সাহায্য করে।
+ধরা যাক, আপনি একটি হাসপাতালের ডেটাবেস পরিচালনা করছেন—প্রতিটি রোগীর তথ্য, রিপোর্ট, ওষুধ, সবকিছু সঠিকভাবে রাখতে হয়। কোনো তথ্য "missing" বা "null" থাকলে ভুল চিকিৎসা হতে পারে। TypeScript-এর নাল সেফটি ও `strictNullChecks` ঠিক এমনই—কোডে "অদৃশ্য" বা "missing" ডাটা থাকলে সঙ্গে সঙ্গে error দেখায়, যাতে runtime-এ বাগ না আসে।
 
-## কেন গুরুত্বপূর্ণ?
+## অ্যানালজি
 
-- **Type Safety:** Null/undefined—runtime bug, crash বাড়ায়; strictNullChecks—type error ধরতে সাহায্য করে
-- **Developer Experience:** Early error—fast fix, productivity boost
-- **Maintainability:** Large-scale app—easy refactor ও extend
+নাল সেফটি ও `strictNullChecks`-কে ভাবুন "হাসপাতালের চেকলিস্ট" হিসেবে—প্রতিটি রোগীর রিপোর্টে কোনো ফিল্ড missing থাকলে warning আসে, ভুল চিকিৎসা আটকানো যায়।
 
-## বাস্তব উদাহরণ
+## বিস্তারিত ব্যাখ্যা
 
-- **Google:** Search Engine—strictNullChecks-এ null bug-free algorithm
-- **Netflix:** Recommendation—null safety-এ predictable logic
-- **Uber:** Ride Calculation—strictNullChecks-এ safe workflow
+### ১. নাল সেফটি
+- TypeScript-এ `null` ও `undefined` টাইপ আলাদা
+- টাইপে `null`/`undefined` explicitly না দিলে, সেই value assign করা যাবে না
+- টাইপ সেফটি বজায় থাকে
 
-## মূল ধারণা
+### ২. `strictNullChecks`
+- `tsconfig.json`-এ `strictNullChecks: true` দিলে, টাইপে `null`/`undefined` না থাকলে সেই value assign করলে error
+- Optional chaining, nullish coalescing—সবকিছুতে কড়া চেক
 
-### ১. নাল সেফটি কী?
+### ৩. tsconfig.json সেটআপ
 
-- **সংজ্ঞা:** Null/undefined value—type-level-এ handle করা
-- **Usage:**
-  ```typescript
-  function getName(user?: { name?: string }): string {
-    return user?.name ?? "Unknown";
+```json
+{
+  "compilerOptions": {
+    "strictNullChecks": true
   }
-  ```
-- **Effect:**
-  - Optional chaining (?.)
-  - Nullish coalescing (??)
-
-#### সহজ এনালজি
-
-- "নাল সেফটি—একটি seatbelt—null/undefined value থেকে code-কে safe রাখে।"
-
-### ২. `strictNullChecks` কী?
-
-- **সংজ্ঞা:** TypeScript-এর strictNullChecks—null/undefined value-কে type-level-এ check করে
-- **Usage:**
-  ```json
-  // tsconfig.json
-  {
-    "compilerOptions": {
-      "strictNullChecks": true
-    }
-  }
-  ```
-- **Effect:**
-  - Variable/property—null/undefined assign করলে error
-  - Type-safe codebase
-
-#### Example:
-```typescript
-let name: string;
-name = null; // Error
-name = undefined; // Error
-let name2: string | null = null; // OK
+}
 ```
 
-### ৩. কখন ব্যবহার করবেন?
+### ৪. কোড উদাহরণ
 
-- Large-scale app—null safety বাড়াতে
-- Early error—fast fix করতে
-- Maintainable codebase build করতে
+```typescript
+// strictNullChecks ছাড়া
+let name: string;
+name = null; // কোনো error নেই
 
-### ৪. Common Pitfalls
+// strictNullChecks চালু
+let name: string;
+name = null; // Error: Type 'null' is not assignable to type 'string'
 
-- strictNullChecks—legacy code-এ error বাড়াতে পারে
-- Optional chaining—type miss করলে runtime bug
-- Over-strict—flexibility কমে যায়
+// টাইপে null/undefined দিলে
+let name: string | null;
+name = null; // No error
+```
 
-### ৫. Best Practices
+### ৫. Optional chaining ও Nullish coalescing
 
-- strictNullChecks—new project-এ default রাখুন
-- Legacy code—step-by-step strictNullChecks enable করুন
-- Optional chaining/nullish coalescing—properly use করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+```typescript
+const user = { profile: { name: "Anis" } };
+console.log(user.profile?.name); // Optional chaining
+console.log(user.profile?.age ?? "Not set"); // Nullish coalescing
+```
 
-### ৬. Industry Trends
+## সুবিধা
 
-- Large-scale app—strictNullChecks—default choice
-- Null safety—developer productivity
-- Type safety—production workflow-এ default
+- "অদৃশ্য" বা "missing" ডাটা runtime-এ বাগ আনার আগেই error
+- কোডের reliability ও maintainability বাড়ে
+- বড় প্রজেক্টে data integrity বজায় থাকে
 
-## সংক্ষিপ্ত workflow
+## ব্যবহার
 
-1. tsconfig.json—strictNullChecks enable করুন
-2. Null/undefined—properly handle/type করুন
-3. Optional chaining/nullish coalescing—properly use করুন
-4. Documentation/readme—update করুন
-5. Team/project standard—follow করুন
+- tsconfig.json-এ strictNullChecks চালু করুন
+- টাইপে null/undefined handle করুন
+- Optional chaining ও nullish coalescing ব্যবহার করুন
 
-## Quick Checklist
+## গুরুত্বপূর্ণ পয়েন্ট
 
-- [x] tsconfig.json configured?
-- [x] Null/undefined properly handled?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+- strictNullChecks চালু করলে টাইপে null/undefined না থাকলে assign করা যাবে না
+- Optional chaining ও nullish coalescing modern JS/TS feature
+- Null safety বড় প্রজেক্টে must-have
+
+## অনুশীলন
+
+1. tsconfig.json-এ strictNullChecks চালু করুন
+2. টাইপে null/undefined না দিয়ে assign করে error দেখুন
+3. Optional chaining ও nullish coalescing ব্যবহার করুন
+
+## আরও জানুন
+- [`strict` মোড ও noImplicitAny](/typescript/strict-mode)
+- [Exhaustiveness চেকিং never দিয়ে](/typescript/exhaustiveness)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-TypeScript-এর নাল সেফটি ও strictNullChecks—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready app তৈরি করা সম্ভব।
-
+নাল সেফটি ও `strictNullChecks` TypeScript-এ কোডকে আরও নিরাপদ, নির্ভরযোগ্য ও maintainable করে তোলে।

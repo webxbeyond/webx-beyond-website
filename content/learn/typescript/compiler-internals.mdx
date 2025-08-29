@@ -1,0 +1,81 @@
+---
+title: TypeScript কম্পাইলার ইন্টারনালস
+icon: mdi:engine
+---
+
+## ভূমিকা
+
+TypeScript ব্যবহার করলে আমরা সাধারণত কোড লিখি, কম্পাইল করি, আর রেজাল্ট দেখি। কিন্তু TypeScript কম্পাইলার (tsc) ভিতরে কীভাবে কাজ করে, কীভাবে টাইপ চেকিং, AST, ও কোড জেনারেশন হয়—এটা জানলে আরও গভীরভাবে TypeScript বোঝা যায়।
+
+## অ্যানালজি: "গাড়ির ইঞ্জিন"
+
+ধরা যাক, আপনি গাড়ি চালান। বাইরের দিকটা সহজ—স্টার্ট, গিয়ার, ব্রেক। কিন্তু ইঞ্জিনের ভিতরে কীভাবে ফুয়েল, পিস্টন, গিয়ারবক্স কাজ করে, সেটা জানলে আপনি গাড়ি মেরামত, টিউনিং, ও অপ্টিমাইজ করতে পারবেন। TypeScript কম্পাইলারও ঠিক এমন—ভিতরের মেকানিজম জানলে, কাস্টম টুল, প্লাগিন, ও ডিবাগিং সহজ হয়।
+
+## বিস্তারিত আলোচনা
+
+### TypeScript কম্পাইলার কী?
+- TypeScript কোডকে JavaScript-এ রূপান্তর করে
+- টাইপ চেকিং, সিনট্যাক্স চেকিং, ও কোড জেনারেশন করে
+- AST (Abstract Syntax Tree) তৈরি করে
+- Compiler API দিয়ে কাস্টম টুল/প্লাগিন বানানো যায়
+
+### কম্পাইলার ইন্টারনালস
+- **Parser:** কোডকে টোকেন/নোডে ভাগ করে AST তৈরি করে
+- **Type Checker:** টাইপ চেকিং, টাইপ ইনফারেন্স, ও এরর রিপোর্ট করে
+- **Emitter:** AST থেকে JavaScript কোড জেনারেট করে
+- **Diagnostics:** এরর, ওয়ার্নিং, ও ইনফো রিপোর্ট করে
+- **Compiler API:** কাস্টম AST traversal, কোড analysis, ও ট্রান্সফর্মেশন সম্ভব
+
+### AST (Abstract Syntax Tree)
+- কোডের গঠনগত representation
+- প্রতিটি statement, expression, টাইপ—সবকিছু নোডে ভাগ হয়
+- AST দিয়ে কোড analysis, linting, ও ট্রান্সফর্মেশন করা যায়
+
+### Compiler API
+- `typescript` npm প্যাকেজে Compiler API আছে
+- কাস্টম টুল, লিন্টার, ও ট্রান্সফর্মার বানানো যায়
+- AST traversal, টাইপ চেকিং, ও কোড জেনারেশন সম্ভব
+
+### উদাহরণ
+```typescript
+import ts from 'typescript';
+
+const source = 'let x: number = 5;';
+const sourceFile = ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest);
+
+// AST traversal
+function visit(node: ts.Node) {
+  console.log(ts.SyntaxKind[node.kind]);
+  ts.forEachChild(node, visit);
+}
+visit(sourceFile);
+```
+
+## বুলেট পয়েন্টস
+- TypeScript কম্পাইলার AST, টাইপ চেকিং, ও কোড জেনারেশন করে
+- Compiler API দিয়ে কাস্টম টুল/লিন্টার/ট্রান্সফর্মার বানানো যায়
+- AST traversal ও analysis ডিবাগিং ও অপ্টিমাইজেশনে সাহায্য করে
+- Diagnostics দিয়ে এরর/ওয়ার্নিং রিপোর্ট হয়
+- কম্পাইলার ইন্টারনালস জানলে TypeScript আরও গভীরভাবে বোঝা যায়
+
+## প্র্যাকটিকাল এক্সারসাইজ
+
+1. **AST দেখুন:**
+   - একটি TypeScript কোডের AST তৈরি করুন ও নোডগুলো দেখুন
+
+2. **Compiler API ব্যবহার করুন:**
+   - কাস্টম AST traversal ফাংশন লিখুন
+   - টাইপ চেকিং ও diagnostics রিপোর্ট দেখুন
+
+3. **কাস্টম লিন্টার/টুল বানান:**
+   - Compiler API দিয়ে একটি ছোট লিন্টার বা কোড analysis টুল তৈরি করুন
+
+## সম্পর্কিত পাঠ
+- [AST (Abstract Syntax Tree) ম্যানিপুলেশন](/typescript/ast)
+- [TS Transformers দিয়ে কোড জেনারেশন](/typescript/ts-transformers)
+- [TypeScript-সহ কাস্টম ESLint রুলস](/typescript/eslint-custom)
+
+---
+
+**শেষ কথা:**
+TypeScript কম্পাইলার ইন্টারনালস জানলে, কাস্টম টুল, ডিবাগিং, ও অপ্টিমাইজেশন আরও সহজ হয়। AST, Compiler API, ও ইন্টারনাল মেকানিজম শেখার মাধ্যমে TypeScript-এ এক্সপার্ট লেভেলে পৌঁছানো সম্ভব।

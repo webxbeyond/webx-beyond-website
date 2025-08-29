@@ -1,115 +1,60 @@
 ---
 title: Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript ব্যবহার
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript ব্যবহার
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বড় অফিসে কাজ করছেন, যেখানে সবাই আলাদা আলাদা টুল ব্যবহার করে। আপনি চান, সবাই যেন একই নিয়মে, একই মান বজায় রেখে কাজ করে। TypeScript হচ্ছে সেই "নিয়মের বই"—যা Node.js ও আধুনিক ফ্রেমওয়ার্কে ব্যবহার করলে পুরো টিমের কোড মানসম্মত ও নিরাপদ হয়।
 
-Google, Netflix, Uber—production app-এ Node.js ও TypeScript—codebase maintain, bug কমানো, scalable architecture—industry standard। Modern framework (Express, NestJS, Next.js)—TypeScript integration—developer experience, productivity boost করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"অফিসের নিয়ম ও টুল"—Node.js হচ্ছে অফিসের কম্পিউটার, আর TypeScript হচ্ছে সেই সফটওয়্যার, যা কম্পিউটারকে আরও স্মার্ট, নিরাপদ ও মানসম্মত করে তোলে।
 
-- **Type safety:** Backend/frontend—type system—bug কমানো, codebase maintain।
-- **Scalability:** Large app—TypeScript—easy refactor, feature add, long-term maintain।
-- **Framework integration:** Express, NestJS, Next.js—TypeScript support—modern workflow।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+- **Node.js-এ TypeScript ব্যবহার**
+  - Node.js অ্যাপ্লিকেশনে `.ts` ফাইল লিখুন
+  - `tsc` দিয়ে কম্পাইল করুন
+  - `ts-node` ব্যবহার করলে সরাসরি TypeScript কোড রান করা যায়
+  - Express, Fastify, NestJS—সবকিছুতে TypeScript ব্যবহার করা যায়
 
-- **Google:** Angular (frontend), NestJS (backend)—TypeScript-এ built—enterprise app-এ use।
-- **Netflix:** Node.js microservice—TypeScript—bug কমানো, codebase maintain।
-- **Uber:** Real-time backend—TypeScript—type safety, scalability ensure।
+- **ফ্রেমওয়ার্কে TypeScript ইন্টিগ্রেশন**
+  - React, Angular, Vue—সব ফ্রেমওয়ার্কে TypeScript সাপোর্ট
+  - Next.js, Nuxt.js, SvelteKit—আধুনিক ফ্রেমওয়ার্কে টাইপ সেফটি
+  - API, UI, CLI—সব জায়গায় TypeScript
 
-## মূল ধারণা
+- **কনফিগারেশন টিপস**
+  - `tsconfig.json`-এ `moduleResolution`, `outDir`, `rootDir` ঠিক করুন
+  - Third-party লাইব্রেরির জন্য DefinitelyTyped থেকে টাইপ ডেফিনিশন যোগ করুন (`@types/`)
+  - Development ও Production environment আলাদা করুন
 
-### ১. Node.js-এ TypeScript Integration
+- **TypeScript-এর সুবিধা**
+  - বড় টিমে কোড মান বজায় রাখা সহজ
+  - টাইপ সেফটি, অটো-কমপ্লিশন, রিফ্যাক্টরিং
+  - কোড বেস সহজে maintain ও scale করা যায়
 
-- **Install dependency:**
-  ```bash
-  npm install --save-dev typescript @types/node
-  ```
-- **Basic Express app (TypeScript):**
-  ```typescript
-  import express from 'express';
-  const app = express();
-  app.get('/', (req, res) => {
-    res.send('Hello TypeScript!');
-  });
-  app.listen(3000, () => {
-    console.log('Server running');
-  });
-  ```
-- **Compile/run:**
-  ```bash
-  tsc && node dist/index.js
-  ```
+## মূল পয়েন্ট
 
-### ২. Modern Framework Integration
+- Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript ব্যবহার করলে কোড মানসম্মত ও নিরাপদ হয়
+- Third-party লাইব্রেরির জন্য টাইপ ডেফিনিশন যোগ করুন
+- Development ও Production environment আলাদা করুন
 
-- **NestJS:** TypeScript-first backend framework—OOP, DI, scalable architecture।
-- **Next.js:** React-based full-stack framework—TypeScript support—API route, page, component-এ type safety।
-- **Express:** Popular Node.js framework—TypeScript-এ easy integration—type-safe API build।
+## ব্যবহারিক অনুশীলন
 
-#### সহজ এনালজি
+১. **ভাবুন:**
+   - আপনার টিমে সবাই যদি TypeScript ব্যবহার না করে, কী কী সমস্যা হতে পারে?
 
-- "TypeScript—একটি নিরাপত্তা বেষ্টনী—Node.js/React app-এ ভুল কমায়, maintain সহজ করে।"
+২. **গবেষণা করুন:**
+   - Express, React, Next.js-এ TypeScript ইন্টিগ্রেশন কেমন?
+   - DefinitelyTyped কী এবং কেন দরকার?
 
-### ৩. Common Integration Steps
-
-1. **TypeScript install/config করুন।**
-2. **@types dependency install করুন (Express, Node, React)।**
-3. **tsconfig.json customize করুন—outDir, rootDir, strict mode।**
-4. **Source code লিখুন—type annotation, interface, model use করুন।**
-5. **Compile/run করুন—error fix, build automation।**
-
-### ৪. Industry Trends
-
-- **TypeScript-first framework—NestJS, Next.js—industry standard।**
-- **Monorepo—backend/frontend—single TypeScript codebase।**
-- **CI/CD pipeline—type check, build automation—production workflow।**
-
-### ৫. Best Practices
-
-- **Type annotation/interface/model—clear define করুন।**
-- **Strict mode—enable করুন।**
-- **@types dependency—update রাখুন।**
-- **Documentation/readme—integration steps clear রাখুন।**
-- **Build automation—CI/CD pipeline-এ integrate করুন।**
-
-### ৬. সাধারণ ভুলত্রুটি
-
-- @types dependency miss—type error আসে।
-- Strict mode disable—runtime bug বাড়ে।
-- tsconfig.json unclear—build/config error।
-- Documentation/readme miss—new developer confused।
-
-### ৭. কখন ব্যবহার করবেন?
-
-- Backend/frontend—type safety, scalability দরকার হলে।
-- Modern framework—NestJS, Next.js, Express—TypeScript integration essential।
-- Production workflow—CI/CD pipeline-এ type check/build automation করতে চাইলে।
-
-## সংক্ষিপ্ত workflow
-
-1. TypeScript install/config করুন।
-2. @types dependency install/update করুন।
-3. tsconfig.json customize করুন।
-4. Source code লিখুন—type annotation/interface/model use করুন।
-5. Compile/run/build automation করুন।
-
-## Quick Checklist
-
-- [x] TypeScript install/config হয়েছে?
-- [x] @types dependency installed/updated?
-- [x] Strict mode enabled?
-- [x] tsconfig.json customized?
-- [x] Build automation configured?
-- [x] Documentation/readme clear?
+৩. **আলোচনা করুন:**
+   - বড় প্রজেক্টে TypeScript ব্যবহার করলে কী কী সুবিধা ও চ্যালেঞ্জ?
 
 ---
 
-## উপসংহার
-
-Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript—scalable, maintainable, bug-free app build-এর জন্য essential। Industry-standard integration steps follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [TypeScript কম্পাইলার (tsc) ও বিল্ড প্রক্রিয়া](/typescript/compiler)
+- [TypeScript ইনস্টল ও tsconfig.json কনফিগারেশন](/typescript/setup)
+- [TypeScript কী এবং কেন ব্যবহার করবেন?](/typescript/intro)

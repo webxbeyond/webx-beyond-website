@@ -1,98 +1,63 @@
 ---
 title: Conditional টাইপ ও infer
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Conditional টাইপ ও infer
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি স্কুলে শিক্ষক। ছাত্রের নম্বর দেখে সিদ্ধান্ত নেন—পাস না ফেল। TypeScript-এ "Conditional টাইপ" ঠিক এমন—টাইপের উপর ভিত্তি করে নতুন টাইপ নির্ধারণ। আর "infer" দিয়ে টাইপ থেকে কোনো অংশ বের করে আনা যায়।
 
-Google-এর API, Netflix-এর ডেটা প্রসেসিং, Uber-এর রাইড অপশন—সবখানে dynamic, context-aware type transformation দরকার। TypeScript-এর Conditional টাইপ ও infer—complex, intelligent type workflow—industry-standard solution।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"স্কুলের রেজাল্ট"—নম্বর দেখে সিদ্ধান্ত (পাস/ফেল)। Conditional টাইপ মানে, টাইপের উপর ভিত্তি করে নতুন টাইপ; infer মানে, টাইপ থেকে কোনো অংশ বের করা।
 
-- **Dynamic Type Logic:** Real-world app-এ type conditionally change—conditional type handle করে।
-- **Type Inference:** infer—type extract/derive—complex workflow-এ essential।
-- **Type Safety:** Compile time-এ error detect—runtime bug কমায়।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
-
-- **Google:** API response—conditional type দিয়ে error/success branch।
-- **Netflix:** Video object—property extract—infer দিয়ে handle।
-- **Uber:** Ride option—dynamic type—conditional type দিয়ে manage।
-
-## মূল ধারণা
-
-### ১. Conditional টাইপ (শর্তাধীন টাইপ)
-
-- **সংজ্ঞা:** TypeScript-এ type conditionally change—`extends` ও ternary operator
-- **Usage:**
+### Conditional টাইপ
+- টাইপের উপর ভিত্তি করে নতুন টাইপ নির্ধারণ
+- Syntax: `T extends U ? X : Y`
+- উদাহরণ:
   ```typescript
-  type IsString<T> = T extends string ? true : false;
-  type A = IsString<string>; // true
-  type B = IsString<number>; // false
+  type IsString<T> = T extends string ? "Yes" : "No";
+  type A = IsString<string>; // "Yes"
+  type B = IsString<number>; // "No"
+  ```
+- Generic টাইপের জন্য খুবই গুরুত্বপূর্ণ
+
+### infer কী?
+- টাইপ থেকে কোনো অংশ বের করে আনা
+- সাধারণত Conditional টাইপের সাথে ব্যবহার হয়
+- উদাহরণ:
+  ```typescript
+  type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+  function foo(): number { return 42; }
+  type Result = ReturnType<typeof foo>; // number
   ```
 
-#### সহজ এনালজি
+### কখন ব্যবহার করবেন?
+- যখন টাইপের উপর ভিত্তি করে সিদ্ধান্ত নিতে হবে
+- যখন টাইপ থেকে কোনো অংশ বের করতে হবে
 
-- "Conditional টাইপ—একটি ট্রাফিক সিগনাল—শর্ত অনুযায়ী পথ নির্ধারণ।"
+## মূল পয়েন্ট
 
-### ২. infer কী?
+- Conditional টাইপ: টাইপের উপর ভিত্তি করে নতুন টাইপ
+- infer: টাইপ থেকে কোনো অংশ বের করা
+- Advanced টাইপ ম্যানিপুলেশনের জন্য গুরুত্বপূর্ণ
 
-- **সংজ্ঞা:** TypeScript-এর infer—type extract/derive—conditional type-এর মধ্যে
-- **Usage:**
-  ```typescript
-  type ElementType<T> = T extends (infer U)[] ? U : T;
-  type A = ElementType<string[]>; // string
-  type B = ElementType<number>; // number
-  ```
+## ব্যবহারিক অনুশীলন
 
-#### সহজ এনালজি
+১. **ভাবুন:**
+   - আপনার প্রজেক্টে কোথায় Conditional টাইপ দরকার হতে পারে?
 
-- "infer—একটি ডিটেক্টর—বড় বাক্স থেকে নির্দিষ্ট জিনিস বের করে আনে।"
+২. **গবেষণা করুন:**
+   - TypeScript-এর Conditional টাইপ ও infer সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
 
-### ৩. কখন ব্যবহার করবেন?
-
-- Complex type transformation দরকার হলে
-- Type extract/derive করতে
-- API response/model—dynamic type logic handle করতে
-
-### ৪. Common Pitfalls
-
-- Conditional type—wrong logic—unexpected value
-- infer—type miss করলে—type error
-- Type nesting—complexity বাড়ে
-
-### ৫. Best Practices
-
-- Conditional type—clear logic লিখুন
-- infer—properly use/document করুন
-- Type nesting—simple রাখুন
-- Documentation/readme—clear রাখুন
-
-### ৬. Industry Trends
-
-- API design—conditional type—dynamic response
-- Data processing—infer—property extract
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. Type requirement clear করুন
-2. Conditional type/infer—properly use করুন
-3. Type safety/documentation—maintain করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Type requirement clear?
-- [x] Conditional type/infer used?
-- [x] Type safety/documentation clear?
-- [x] Team/project standard maintained?
+৩. **আলোচনা করুন:**
+   - infer ব্যবহার করলে কী সুবিধা?
 
 ---
 
-## উপসংহার
-
-TypeScript-এর Conditional টাইপ ও infer—dynamic, intelligent, type-safe workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [টাইপ গার্ডস ও typeof / instanceof](/typescript/type-guards)
+- [Template Literal টাইপ](/typescript/template-literal-types)
+- [Mapped টাইপ ও Utility টাইপ](/typescript/utility-types)

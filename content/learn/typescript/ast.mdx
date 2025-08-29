@@ -1,0 +1,75 @@
+---
+title: AST (Abstract Syntax Tree) ম্যানিপুলেশন
+icon: mdi:tree-outline
+---
+
+## ভূমিকা
+
+TypeScript বা JavaScript কোডের ভিতরের গঠন বুঝতে, বিশ্লেষণ করতে, বা পরিবর্তন করতে হলে AST (Abstract Syntax Tree) ম্যানিপুলেশন অপরিহার্য। AST হলো কোডের "গাছ"—যেখানে প্রতিটি শাখা, পাতায় statement, expression, টাইপ, ইত্যাদি থাকে। AST ম্যানিপুলেশন জানলে, কাস্টম লিন্টার, কোড ট্রান্সফর্মার, বা অটোমেটেড রিফ্যাক্টরিং টুল তৈরি করা যায়।
+
+## অ্যানালজি: "গাছের শাখা-পাতা"
+
+ধরা যাক, আপনি একটি গাছের গঠন বিশ্লেষণ করছেন। প্রতিটি শাখা, পাতার অবস্থান, গঠন, ও সম্পর্ক বুঝে, আপনি গাছের স্বাস্থ্য, বৃদ্ধি, বা pruning করতে পারেন। কোডের AST-ও ঠিক তেমন—প্রতিটি statement, expression, টাইপ, ইত্যাদি নোডে ভাগ হয়, যেগুলো বিশ্লেষণ বা পরিবর্তন করা যায়।
+
+## বিস্তারিত আলোচনা
+
+### AST কী?
+- কোডের গঠনগত representation
+- প্রতিটি statement, expression, টাইপ—সবকিছু নোডে ভাগ হয়
+- AST দিয়ে কোড analysis, linting, ও ট্রান্সফর্মেশন করা যায়
+
+### AST ম্যানিপুলেশন কেন?
+- কাস্টম লিন্টার, কোড ফরম্যাটার, বা ট্রান্সফর্মার তৈরি করতে
+- অটোমেটেড রিফ্যাক্টরিং, ডেড কোড রিমুভাল, বা কোড জেনারেশন করতে
+- কোডের গঠন, টাইপ, ও ডিপেন্ডেন্সি বিশ্লেষণ করতে
+
+### TypeScript AST API
+- `typescript` npm প্যাকেজে AST API আছে
+- `ts.createSourceFile`, `ts.forEachChild`, `ts.SyntaxKind` দিয়ে AST traversal ও analysis করা যায়
+- AST নোড পরিবর্তন, যোগ, বা রিমুভ করা যায়
+
+### উদাহরণ
+```typescript
+import ts from 'typescript';
+
+const source = 'let x: number = 5;';
+const sourceFile = ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest);
+
+// AST traversal
+function visit(node: ts.Node) {
+  console.log(ts.SyntaxKind[node.kind]);
+  ts.forEachChild(node, visit);
+}
+visit(sourceFile);
+```
+
+### AST ট্রান্সফর্মেশন
+- AST নোড পরিবর্তন করে নতুন কোড জেনারেট করা যায়
+- কাস্টম ট্রান্সফর্মার দিয়ে কোডে পরিবর্তন, optimization, বা codegen করা যায়
+
+## বুলেট পয়েন্টস
+- AST কোডের "গাছ"—statement, expression, টাইপ নোডে ভাগ হয়
+- AST ম্যানিপুলেশন দিয়ে কাস্টম লিন্টার, ট্রান্সফর্মার, ও টুল বানানো যায়
+- TypeScript AST API দিয়ে traversal, analysis, ও ট্রান্সফর্মেশন সম্ভব
+- AST জানলে কোডের গভীর গঠন ও সম্পর্ক বোঝা যায়
+
+## প্র্যাকটিকাল এক্সারসাইজ
+
+1. **AST traversal করুন:**
+   - একটি TypeScript কোডের AST তৈরি করুন ও নোডগুলো দেখুন
+
+2. **কাস্টম লিন্টার/টুল বানান:**
+   - AST traversal দিয়ে একটি ছোট লিন্টার বা কোড analysis টুল তৈরি করুন
+
+3. **AST ট্রান্সফর্মেশন করুন:**
+   - একটি statement AST নোড পরিবর্তন করে নতুন কোড জেনারেট করুন
+
+## সম্পর্কিত পাঠ
+- [TypeScript কম্পাইলার ইন্টারনালস](/typescript/compiler-internals)
+- [TS Transformers দিয়ে কোড জেনারেশন](/typescript/ts-transformers)
+- [TypeScript-সহ কাস্টম ESLint রুলস](/typescript/eslint-custom)
+
+---
+
+**শেষ কথা:**
+AST ম্যানিপুলেশন জানলে, TypeScript বা JavaScript কোডের গভীর গঠন, বিশ্লেষণ, ও পরিবর্তন করা যায়। কাস্টম টুল, লিন্টার, ও ট্রান্সফর্মার তৈরি করতে AST অপরিহার্য।

@@ -1,127 +1,62 @@
 ---
 title: প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# প্রিমিটিভ টাইপ (string, number, boolean, null, undefined)
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বাক্সে বিভিন্ন ধরনের ফল রাখছেন—আপেল, কলা, আম। প্রতিটি ফলের ধরন আলাদা, তাই বাক্সে রাখার আগে আপনি ঠিক করেন, কোন ফল কোন ঘরে যাবে। TypeScript-এ "প্রিমিটিভ টাইপ" হচ্ছে সেই ফলের ধরন—যা প্রতিটি ডাটা বা ভ্যালুর জন্য নির্ধারিত থাকে।
 
-Google, Netflix, Uber—production app-এ data model—type safety—bug কমানো, efficient workflow—essential। TypeScript-এর প্রিমিটিভ টাইপ—codebase-এ strong foundation—industry standard।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"ফলের বাক্স"—প্রতিটি ঘরে নির্দিষ্ট ধরনের ফল রাখা যায়। ঠিক তেমনি, TypeScript-এ প্রতিটি ভ্যারিয়েবল, ফাংশন, অবজেক্টে নির্দিষ্ট টাইপ (string, number, boolean, null, undefined) নির্ধারণ করা হয়।
 
-- **Type safety:** Data model—type mismatch, bug—early detect।
-- **Maintainability:** Clear type—codebase maintain, refactor সহজ।
-- **Productivity:** IntelliSense, auto-complete—fast coding।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+- **string**
+  - টেক্সট বা অক্ষরের ধারাবাহিকতা
+  - উদাহরণ: `let name: string = "Anis";`
 
-- **Google:** User profile—string, number, boolean—type define—bug কমানো।
-- **Netflix:** Movie rating—number, boolean—type safety—production workflow।
-- **Uber:** Ride status—boolean, null—type mismatch avoid।
+- **number**
+  - সংখ্যা (integer, float, double)
+  - উদাহরণ: `let age: number = 25;`
 
-## মূল ধারণা
+- **boolean**
+  - সত্য/মিথ্যা (true/false)
+  - উদাহরণ: `let isActive: boolean = true;`
 
-### ১. String টাইপ
+- **null**
+  - কোনো ভ্যালু নেই
+  - উদাহরণ: `let data: null = null;`
 
-- **string:** Text data—name, email, message—define করতে।
-- **Usage:**
-  ```typescript
-  let username: string = "Anis";
-  let email: string = "anis@example.com";
-  ```
+- **undefined**
+  - ভ্যারিয়েবল ডিক্লেয়ার হয়েছে, কিন্তু ভ্যালু নেই
+  - উদাহরণ: `let result: undefined = undefined;`
 
-#### সহজ এনালজি
+- **টাইপ চেকিং**
+  - TypeScript কম্পাইলার টাইপ mismatch হলে error দেখায়
+  - টাইপ নির্ধারণ করলে কোড আরও নিরাপদ হয়
 
-- "string—একটি বাক্স, যেখানে শুধু লেখা (text) রাখা যায়।"
+## মূল পয়েন্ট
 
-### ২. Number টাইপ
+- প্রিমিটিভ টাইপ হচ্ছে TypeScript-এর মৌলিক ডাটা টাইপ
+- string, number, boolean, null, undefined—সবকিছু আলাদা
+- টাইপ নির্ধারণ করলে কোড নিরাপদ ও বাগ কমে
 
-- **number:** Numeric data—age, price, rating—define করতে।
-- **Usage:**
-  ```typescript
-  let age: number = 25;
-  let price: number = 99.99;
-  ```
+## ব্যবহারিক অনুশীলন
 
-### ৩. Boolean টাইপ
+১. **ভাবুন:**
+   - আপনি যদি টাইপ নির্ধারণ না করেন, কী কী সমস্যা হতে পারে?
 
-- **boolean:** True/false value—status, flag, condition—define করতে।
-- **Usage:**
-  ```typescript
-  let isActive: boolean = true;
-  let isAdmin: boolean = false;
-  ```
+২. **গবেষণা করুন:**
+   - TypeScript-এর প্রিমিটিভ টাইপ সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/basic-types.html
 
-### ৪. Null ও Undefined টাইপ
-
-- **null:** Value নেই—intentional empty—variable/object property-এ use।
-- **undefined:** Value assign হয়নি—default state—variable/object property-এ use।
-- **Usage:**
-  ```typescript
-  let data: null = null;
-  let result: undefined = undefined;
-  ```
-
-#### সহজ এনালজি
-
-- "null—একটি খালি বাক্স, যেখানে কিছুই নেই। undefined—বাক্স আছে, কিন্তু কিছু রাখা হয়নি।"
-
-### ৫. Practical Example
-
-```typescript
-interface User {
-  name: string;
-  age: number;
-  isActive: boolean;
-  email?: string;
-  lastLogin: null | string;
-}
-```
-
-### ৬. Industry Trends
-
-- **Strongly-typed data model—industry standard।**
-- **Type safety—production workflow-এ default।**
-- **IntelliSense—fast coding, error avoid।**
-
-### ৭. Best Practices
-
-- **Variable/property-এ clear type define করুন।**
-- **Optional property-এ null/undefined handle করুন।**
-- **Type annotation—codebase-এ maintain করুন।**
-- **Documentation/readme—type usage clear রাখুন।**
-
-### ৮. সাধারণ ভুলত্রুটি
-
-- Type annotation miss—type safety কমে।
-- Null/undefined handle না করলে—runtime bug বাড়ে।
-- Documentation/readme unclear—new developer confused।
-
-### ৯. কখন ব্যবহার করবেন?
-
-- Data model—user, product, status—type safety দরকার হলে।
-- Function/variable—clear type define করতে চাইলে।
-- Production workflow—bug কমাতে, maintainability বাড়াতে।
-
-## সংক্ষিপ্ত workflow
-
-1. Variable/property-এ type annotation করুন।
-2. Null/undefined handle করুন।
-3. Data model/interface-এ clear type define করুন।
-4. Documentation/readme update করুন।
-
-## Quick Checklist
-
-- [x] Variable/property-এ type annotation আছে?
-- [x] Null/undefined handle হয়েছে?
-- [x] Data model/interface-এ clear type আছে?
-- [x] Documentation/readme clear?
+৩. **আলোচনা করুন:**
+   - বড় প্রজেক্টে টাইপ নির্ধারণের গুরুত্ব কী?
 
 ---
 
-## উপসংহার
-
-TypeScript-এর প্রিমিটিভ টাইপ—codebase-এ strong foundation—bug-free, maintainable, scalable app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [টাইপ অ্যানোটেশন বনাম টাইপ ইনফারেন্স](/typescript/type-inference)
+- [অ্যারে, টাপল ও readonly টাইপ](/typescript/arrays-tuples)
+- [অবজেক্ট টাইপ ও টাইপ অ্যালিয়াস](/typescript/type-alias)

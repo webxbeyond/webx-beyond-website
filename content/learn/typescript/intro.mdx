@@ -1,101 +1,56 @@
 ---
 title: TypeScript কী এবং কেন ব্যবহার করবেন?
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# TypeScript কী এবং কেন ব্যবহার করবেন?
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বড় বই লিখছেন। বইয়ের প্রতিটি অধ্যায়ে, প্রতিটি চরিত্রের নাম, বয়স, সম্পর্ক—সবকিছু ঠিক রাখতে হবে। যদি ভুল হয়, পুরো গল্প এলোমেলো হয়ে যাবে। ঠিক তেমনি, বড় সফটওয়্যার প্রজেক্টে প্রতিটি ডাটা, ফাংশন, অবজেক্ট—সবকিছুর "টাইপ" ঠিক রাখা জরুরি। এখানে TypeScript আমাদের "বইয়ের সম্পাদক"—যে ভুল ধরিয়ে দেয়, গাইড করে, এবং কোডকে আরও নির্ভরযোগ্য করে তোলে।
 
-Google, Netflix, Uber—বড় স্কেল অ্যাপ্লিকেশন—TypeScript ব্যবহার—codebase maintain, bug কমানো, developer productivity বাড়ানো—industry standard। TypeScript—JavaScript-এর উপর ভিত্তি করে—static type, tooling, modern feature—production workflow-এ impact ফেলে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"বইয়ের সম্পাদক"—TypeScript হচ্ছে এমন এক টুল, যা আপনার JavaScript কোডে টাইপের ভুল, অনিশ্চয়তা, এবং সম্ভাব্য বাগ আগেভাগে ধরিয়ে দেয়। যেমন বইয়ের সম্পাদক ভুল বানান, ভুল তথ্য ঠিক করে দেয়—TypeScript ঠিক তেমনি কোডে ভুল টাইপ, ভুল ফাংশন ব্যবহার, বা ভুল ডাটা ধরিয়ে দেয়।
 
-- **Bug কমানো:** Static type—code লিখার সময়ই error ধরতে সাহায্য করে।
-- **Maintainability:** বড় টিমে codebase—type system—easy refactor, feature add, long-term maintain।
-- **Productivity:** IntelliSense, auto-complete, documentation—developer experience boost করে।
-- **Industry adoption:** Google, Microsoft, Netflix—production app-এ TypeScript use করে।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+- **TypeScript কী?**
+  - TypeScript হচ্ছে JavaScript-এর উপর ভিত্তি করে তৈরি একটি স্ট্যাটিক টাইপড ভাষা।
+  - এটি JavaScript-এর সব ফিচার সমর্থন করে, সাথে টাইপ সেফটি ও উন্নত টুলিং যোগ করে।
 
-- **Google:** Angular framework—TypeScript-এ built—enterprise app-এ use।
-- **Netflix:** Backend/frontend—TypeScript—bug কমানো, codebase maintain।
-- **Uber:** Real-time app—TypeScript—type safety, scalability ensure।
+- **কেন TypeScript ব্যবহার করবেন?**
+  - **টাইপ সেফটি:** কোডে টাইপের ভুল আগেভাগে ধরা যায়।
+  - **বড় প্রজেক্টে স্কেল:** বড় টিমে কাজ করলে, টাইপ সিস্টেম কোডের ভুল কমায়।
+  - **বেটার IDE সাপোর্ট:** অটো-কমপ্লিশন, রিফ্যাক্টরিং, ইন্টেলিসেন্স আরও ভালো হয়।
+  - **ডকুমেন্টেশন:** টাইপ অ্যানোটেশন নিজেই ডকুমেন্টেশন হিসেবে কাজ করে।
 
-## মূল ধারণা
+- **TypeScript ও JavaScript-এর পার্থক্য**
+  - JavaScript: ডায়নামিক, টাইপ চেকিং রানটাইমে হয়।
+  - TypeScript: স্ট্যাটিক, টাইপ চেকিং কম্পাইল টাইমে হয়।
 
-### ১. TypeScript কী?
+- **TypeScript কোথায় ব্যবহার হয়?**
+  - ওয়েব অ্যাপ, Node.js, React, Angular, Vue, API, CLI—সবখানে ব্যবহার করা যায়।
 
-- **TypeScript:** JavaScript-এর superset—static type add করে।
-- **Benefit:** Type error—code লিখার সময়ই detect—runtime bug কমে।
-- **Compatibility:** TypeScript code—JavaScript-এ compile হয়—browser, Node.js-এ run হয়।
+## মূল পয়েন্ট
 
-#### সহজ এনালজি
+- TypeScript হচ্ছে JavaScript-এর টাইপ সেফ সংস্করণ
+- টাইপ সেফটি, স্কেল, IDE সাপোর্ট, ডকুমেন্টেশন—সবকিছুতে সুবিধা
+- বড় প্রজেক্ট ও টিমে TypeScript ব্যবহার করলে ভুল কমে
 
-- "TypeScript—একটি spell checker—code লিখার সময় ভুল ধরিয়ে দেয়, পরে exam-এ (production) ভুল কম হয়।"
+## ব্যবহারিক অনুশীলন
 
-### ২. Static Type System
+১. **ভাবুন:**
+   - আপনি যদি বড় প্রজেক্টে কাজ করেন, টাইপ সেফটি না থাকলে কী কী সমস্যা হতে পারে?
 
-- **Static type:** Variable, function, object—type define—code লিখার সময়ই check হয়।
-- **Benefit:** Type mismatch, undefined/null error—early detect—production bug কমে।
+২. **গবেষণা করুন:**
+   - TypeScript-এর অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/
+   - JavaScript ও TypeScript-এর মধ্যে পার্থক্য কী?
 
-### ৩. Modern JavaScript Feature
-
-- **TypeScript—modern JS feature (ES6+)—early adopt করতে দেয়।**
-- **Benefit:** Arrow function, async/await, class—browser support না থাকলেও TypeScript compile করে দেয়।
-
-### ৪. Tooling ও Developer Experience
-
-- **IntelliSense:** Editor-এ auto-complete, documentation—fast coding।
-- **Refactoring:** Type system—safe code change, feature add।
-- **Integration:** Node.js, React, Angular, Vue—TypeScript support।
-
-### ৫. Industry Trends
-
-- **TypeScript—open source, community-driven—fast evolve।**
-- **Major framework/library—TypeScript-এ built-in support।**
-- **Job market—TypeScript skill—high demand।**
-
-### ৬. Best Practices
-
-- **Type annotation—variable, function, object—clear define করুন।**
-- **Strict mode (`strict` flag)—enable করুন—maximum type safety।**
-- **Codebase-এ TypeScript adopt—step-by-step migration করুন।**
-- **Documentation/readme—type usage, config clear রাখুন।**
-
-### ৭. সাধারণ ভুলত্রুটি
-
-- Type annotation miss—type safety কমে।
-- Strict mode disable—runtime bug বাড়ে।
-- TypeScript config/readme unclear—new developer confused।
-- Only type use—real-world integration/test miss—production issue।
-
-### ৮. কখন ব্যবহার করবেন?
-
-- বড় টিম, বড় codebase—maintainability, scalability দরকার হলে।
-- Bug কমাতে—early error detect করতে চাইলে।
-- Modern JS feature—early adopt করতে চাইলে।
-- Industry-standard workflow—production-ready app build করতে চাইলে।
-
-## সংক্ষিপ্ত workflow
-
-1. TypeScript install/config করুন।
-2. Type annotation—variable, function, object—define করুন।
-3. Strict mode enable করুন।
-4. Codebase-এ TypeScript adopt/migrate করুন।
-5. Documentation/readme update করুন।
-
-## Quick Checklist
-
-- [x] Type annotation clear?
-- [x] Strict mode enabled?
-- [x] Modern JS feature used?
-- [x] Tooling/IntelliSense active?
-- [x] Documentation/readme clear?
+৩. **আলোচনা করুন:**
+   - আপনার টিমে TypeScript ব্যবহার করলে কী কী সুবিধা ও চ্যালেঞ্জ হতে পারে?
 
 ---
 
-## উপসংহার
-
-TypeScript—modern, scalable, maintainable, bug-free app build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [TypeScript ইনস্টল ও `tsconfig.json` কনফিগারেশন](/typescript/setup)
+- [TypeScript কম্পাইলার (tsc) ও বিল্ড প্রক্রিয়া](/typescript/compiler)
+- [Node.js ও আধুনিক ফ্রেমওয়ার্কে TypeScript ব্যবহার](/typescript/node-integration)
