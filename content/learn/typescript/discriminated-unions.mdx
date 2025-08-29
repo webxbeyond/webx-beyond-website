@@ -1,115 +1,72 @@
 ---
 title: Literal টাইপ ও Discriminated Unions
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Literal টাইপ ও Discriminated Unions
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি ট্রাফিক সিগন্যাল দেখছেন—লাল, হলুদ, সবুজ। প্রতিটি রঙের অর্থ আলাদা, এবং সিগন্যাল দেখে আপনি সহজেই বুঝতে পারেন কী করতে হবে। TypeScript-এ "Literal টাইপ" মানে, নির্দিষ্ট মান; আর "Discriminated Unions" মানে, একাধিক টাইপের মধ্যে পার্থক্য করার সহজ উপায়।
 
-Google-এর API response, Netflix-এর ভিডিও স্টেট, Uber-এর রাইড স্ট্যাটাস—সবখানে নির্দিষ্ট মান (literal value) ও type-safe branching দরকার। TypeScript-এর Literal টাইপ ও Discriminated Unions—robust, predictable workflow-এর জন্য industry standard।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"ট্রাফিক সিগন্যাল"—প্রতিটি রঙের নির্দিষ্ট অর্থ (Literal)। সিগন্যালের রঙ দেখে আপনি সিদ্ধান্ত নেন (Discriminated Union)।
 
-- **Predictable Data:** Literal টাইপ—নির্দিষ্ট মান enforce করে—bug কমায়।
-- **Type-safe Branching:** Discriminated Unions—multiple type handle—safe branching নিশ্চিত করে।
-- **Error Handling:** Compile time-এ error detect—runtime bug কমায়।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
-
-- **Google:** API response—success/error—literal টাইপ ও discriminated union দিয়ে handle।
-- **Netflix:** Video state—"playing", "paused", "ended"—literal টাইপে define।
-- **Uber:** Ride status—"pending", "active", "completed"—literal টাইপে manage।
-
-## মূল ধারণা
-
-### ১. Literal টাইপ (নির্দিষ্ট মান টাইপ)
-
-- **সংজ্ঞা:** নির্দিষ্ট মান (value) টাইপ হিসেবে declare—string, number, boolean
-- **Usage:**
+### Literal টাইপ
+- নির্দিষ্ট মানের টাইপ
+- উদাহরণ:
   ```typescript
-  let status: "pending" | "active" | "completed";
-  status = "active";
-  // status = "cancelled"; // Error
+  let direction: "left" | "right";
+  direction = "left"; // ঠিক আছে
+  direction = "up"; // ভুল
   ```
+- সাধারণত enum-এর বিকল্প হিসেবে ব্যবহার হয়
 
-#### সহজ এনালজি
-
-- "Literal টাইপ—একটি তালা—শুধু নির্দিষ্ট চাবি দিয়ে খোলা যায়।"
-
-### ২. Discriminated Unions (ভিন্নকরণযুক্ত সংযুক্ত টাইপ)
-
-- **সংজ্ঞা:** Multiple object type—common property (discriminant)—type-safe branching
-- **Usage:**
+### Discriminated Unions
+- একাধিক টাইপের মধ্যে পার্থক্য করার উপায়
+- সাধারণত একটি "discriminant" property থাকে
+- উদাহরণ:
   ```typescript
-  type Success = {
-    type: "success";
-    data: string;
-  };
-  type Error = {
-    type: "error";
-    message: string;
-  };
-  type ApiResponse = Success | Error;
+  type Circle = { kind: "circle", radius: number };
+  type Square = { kind: "square", side: number };
+  type Shape = Circle | Square;
 
-  function handleResponse(res: ApiResponse) {
-    if (res.type === "success") {
-      console.log("Data:", res.data);
-    } else {
-      console.log("Error:", res.message);
+  function area(shape: Shape): number {
+    switch (shape.kind) {
+      case "circle":
+        return Math.PI * shape.radius * shape.radius;
+      case "square":
+        return shape.side * shape.side;
     }
   }
   ```
+- TypeScript সহজেই বুঝতে পারে কোন টাইপ ব্যবহার হচ্ছে
 
-#### সহজ এনালজি
+### কখন ব্যবহার করবেন?
+- যখন নির্দিষ্ট মান দরকার
+- যখন একাধিক টাইপের মধ্যে পার্থক্য করতে হবে
 
-- "Discriminated Union—একটি ট্রাফিক সিগনাল—রঙ দেখে পথ নির্ধারণ করা যায়।"
+## মূল পয়েন্ট
 
-### ৩. কখন ব্যবহার করবেন?
+- Literal টাইপ: নির্দিষ্ট মান
+- Discriminated Unions: পার্থক্য করার property
+- Type-safe ও readable কোডের জন্য গুরুত্বপূর্ণ
 
-- **Literal টাইপ:**
-  - নির্দিষ্ট মান enforce করতে
-  - State/status/value—predictable রাখতে
-- **Discriminated Unions:**
-  - Multiple object type—safe branching করতে
-  - API response/error/state—handle করতে
+## ব্যবহারিক অনুশীলন
 
-### ৪. Common Pitfalls
+১. **ভাবুন:**
+   - আপনার প্রজেক্টে কোথায় Literal টাইপ বা Discriminated Union দরকার হতে পারে?
 
-- Discriminant property miss—type narrowing fail
-- Exhaustiveness check না করলে—unexpected value
-- Literal টাইপ ভুল declare—runtime bug
+২. **গবেষণা করুন:**
+   - TypeScript-এর Literal টাইপ ও Discriminated Unions সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates
 
-### ৫. Best Practices
-
-- Discriminant property—clear define করুন
-- Exhaustiveness check—`never`—use করুন
-- Literal টাইপ—enum-like constant হিসেবে ব্যবহার করুন
-- Documentation/readme—clear রাখুন
-
-### ৬. Industry Trends
-
-- API design—discriminated union—error/success/state handle
-- State management—literal টাইপ—predictable workflow
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. State/status/value—literal টাইপে declare করুন
-2. Multiple object type—discriminant property define করুন
-3. Type narrowing/exhaustiveness check—implement করুন
-4. Documentation/readme—update করুন
-
-## Quick Checklist
-
-- [x] Literal টাইপ clear?
-- [x] Discriminant property defined?
-- [x] Type narrowing/exhaustiveness check?
-- [x] Documentation/readme clear?
+৩. **আলোচনা করুন:**
+   - Discriminated Union ব্যবহার করলে কী সুবিধা?
 
 ---
 
-## উপসংহার
-
-TypeScript-এর Literal টাইপ ও Discriminated Unions—predictable, type-safe, scalable workflow build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [Union ও Intersection টাইপ বিস্তারিত](/typescript/union-intersection)
+- [Mapped টাইপ ও Utility টাইপ](/typescript/utility-types)
+- [টাইপ গার্ডস ও typeof / instanceof](/typescript/type-guards)

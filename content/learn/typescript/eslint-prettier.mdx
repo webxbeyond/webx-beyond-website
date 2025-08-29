@@ -1,164 +1,85 @@
 ---
 title: লিন্টার ও ফরম্যাটার (ESLint, Prettier)
-icon: solar:alt-arrow-right-bold-duotone
+icon: ph:magic-wand
 ---
 
-# লিন্টার ও ফরম্যাটার (ESLint, Prettier)
+## TypeScript-এ "পরিষ্কার" ও "শৃঙ্খলিত" কোড
 
-## প্রস্তাবনা
+## পরিচিতি
 
-ধরা যাক, Google-এর মতো একটি বড় টিমে কাজ করছেন—প্রতিদিন শত শত ডেভেলপার কোড লিখছেন। যদি সবাই নিজের মতো করে কোড লেখে, তাহলে কোডবেস অগোছালো, ভুলে ভরা এবং রক্ষণাবেক্ষণ কঠিন হয়ে যাবে।
+ধরা যাক, আপনি একটি অফিস পরিচালনা করছেন—সবকিছু পরিষ্কার, সাজানো, নিয়মিত চেক হয়। TypeScript-এ লিন্টার ও ফরম্যাটার ঠিক এমনই—কোডের ভুল, অনিয়ম, স্টাইল mismatch, সবকিছু অটোমেটেডভাবে ঠিক করে, কোডকে "পরিষ্কার" ও "শৃঙ্খলিত" রাখে।
 
-এজন্য **লিন্টার** (Linting) ও **ফরম্যাটার** (Formatting) ব্যবহার করা হয়—যাতে কোড সবসময় পরিষ্কার, একরকম এবং ভুলবিহীন থাকে।
+## অ্যানালজি
 
----
+লিন্টার ও ফরম্যাটার-কে ভাবুন "অফিসের ক্লিনার ও অডিটর" হিসেবে—কোডে কোথাও ধুলো, ভুল, অনিয়ম থাকলে সঙ্গে সঙ্গে পরিষ্কার ও রিপোর্ট আসে।
 
-## কেন গুরুত্বপূর্ণ?
+## বিস্তারিত ব্যাখ্যা
 
-- **Consistency:** সবাই একরকম স্টাইল ও নিয়মে কোড লিখলে কোডবেস পড়া, বুঝা ও রক্ষণাবেক্ষণ সহজ হয়।
-- **Error Prevention:** লিন্টার ছোট ছোট ভুল (যেমন: টাইপো, ভুল টাইপ, অপ্রয়োজনীয় কোড) আগেভাগে ধরতে সাহায্য করে।
-- **Automation:** ফরম্যাটার দিয়ে এক ক্লিকে পুরো কোডবেস সুন্দরভাবে সাজানো যায়।
-- **Collaboration:** বড় টিমে কোড রিভিউ সহজ হয়।
+### ১. লিন্টার (ESLint)
+- কোডের ভুল, টাইপ mismatch, bad practice—সবকিছু চেক
+- Custom rule, plugin, config—সবকিছু কাস্টমাইজ
+- TypeScript integration, auto-fix
 
----
+### ২. ফরম্যাটার (Prettier)
+- কোডের স্টাইল, spacing, indentation—সবকিছু অটোমেটেড
+- Opinionated, zero-config
+- ESLint-এর সাথে integration
 
-## মূল ধারণা
+### ৩. সেটআপ
+- `eslint`, `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, `prettier` npm থেকে ইনস্টল
+- `.eslintrc`, `.prettierrc` দিয়ে কনফিগার
+- VSCode extension দিয়ে auto-format
 
-### ১. লিন্টার (ESLint) কী?
-
-- **লিন্টার:** কোডে ভুল, ইনকনসিস্টেন্সি, বেস্ট প্র্যাকটিস না মানা—এসব ধরার জন্য টুল।
-- **ESLint:** JavaScript/TypeScript-এর জন্য সবচেয়ে জনপ্রিয় লিন্টার।
-- **রুলস:** যেমন—no-unused-vars, no-console, eqeqeq, etc.
-- **Config:** `.eslintrc.json` বা `.eslintrc.js` ফাইলে কনফিগার করা হয়।
-
-#### এনালজি:
-> যেমন, পরীক্ষার খাতায় বানান ভুল, গ্রামার ভুল ধরার জন্য টিচার চেক করেন—তেমনি লিন্টার কোডে ভুল ধরেন।
-
-### ২. ফরম্যাটার (Prettier) কী?
-
-- **ফরম্যাটার:** কোডের স্টাইল (indentation, spacing, quotes, ইত্যাদি) ঠিক রাখে।
-- **Prettier:** সবচেয়ে জনপ্রিয় ফরম্যাটার—JS, TS, CSS, HTML, ইত্যাদি সাপোর্ট করে।
-- **Config:** `.prettierrc` বা `prettier.config.js` ফাইলে কনফিগার করা হয়।
-
-#### এনালজি:
-> যেমন, বইয়ের পৃষ্ঠা সুন্দরভাবে সাজানো থাকলে পড়তে ভালো লাগে—তেমনি ফরম্যাটার কোড সুন্দরভাবে সাজায়।
-
----
-
-## কিভাবে কাজ করে?
-
-### ১. ESLint সেটআপ
-
-```bash
-npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
-npx eslint --init
-```
-
-- `.eslintrc.json` ফাইলে TypeScript-এর জন্য parser ও plugin যোগ করুন:
+### ৪. কোড উদাহরণ
 
 ```json
+// .eslintrc.json
 {
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ]
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"]
+  }
 }
-```
 
-### ২. Prettier সেটআপ
-
-```bash
-npm install --save-dev prettier
-```
-
-- `.prettierrc` ফাইলে কনফিগার করুন:
-
-```json
+// .prettierrc
 {
-  "semi": true,
   "singleQuote": true,
-  "tabWidth": 2
+  "semi": true
 }
 ```
 
-### ৩. ESLint + Prettier ইন্টিগ্রেশন
+## সুবিধা
 
-- দুই টুল একসাথে ব্যবহার করতে চাইলে:
+- কোডের quality, readability, maintainability বাড়ে
+- ভুল, অনিয়ম, bad practice—সবকিছু আগেই ধরা পড়ে
+- বড় টিমে collaboration ও consistency বজায় থাকে
 
-```bash
-npm install --save-dev eslint-config-prettier eslint-plugin-prettier
-```
+## ব্যবহার
 
-- `.eslintrc.json`-এ যোগ করুন:
+- ESLint ও Prettier setup করুন
+- VSCode extension দিয়ে auto-format
+- CI/CD pipeline-এ lint/test automation
 
-```json
-{
-  "extends": ["plugin:prettier/recommended"]
-}
-```
+## গুরুত্বপূর্ণ পয়েন্ট
 
----
+- ESLint ও Prettier integration করুন
+- Custom rule ও config ব্যবহার করুন
+- Auto-fix ও format-on-save চালু করুন
 
-## বাস্তব উদাহরণ
+## অনুশীলন
 
-### উদাহরণ: TypeScript ফাইল লিন্ট ও ফরম্যাট
+1. একটি TypeScript প্রজেক্টে ESLint ও Prettier setup করুন
+2. Custom rule ও config যোগ করুন
+3. Auto-format ও lint automation চালু করুন
 
-```ts
-// ভুল:
-function add(a:number,b:number){return a+b}
-
-// লিন্টার ও ফরম্যাটার চালানোর পর:
-function add(a: number, b: number): number {
-  return a + b;
-}
-```
-
-### VS Code-এ অটো-ফরম্যাট
-
-- VS Code-এ Prettier extension ইনস্টল করুন।
-- "Format on Save" অপশন চালু করুন—ফাইল সেভ করলেই অটো-ফরম্যাট হবে।
+## আরও জানুন
+- [বিল্ড পারফরম্যান্স টিউনিং ও tsc অপশন](/typescript/build-optimization)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
+- [CI/CD-তে টাইপ চেকিং](/typescript/type-checking-ci)
 
 ---
 
-## কখন ব্যবহার করবেন?
-
-- **প্রতিদিন কোড লেখার সময়।**
-- **PR/commit করার আগে।**
-- **CI/CD pipeline-এ:** কোড push/deploy করার আগে লিন্ট ও ফরম্যাট চেক করুন।
-
----
-
-## সাধারণ ভুলত্রুটি
-
-- **লিন্টার/ফরম্যাটার না চালানো:** কোডবেস অগোছালো, ভুলে ভরা হয়ে যায়।
-- **রুলস কনফিগ না করা:** টিমের জন্য উপযুক্ত রুলস না থাকলে ইনকনসিস্টেন্সি হয়।
-- **লিন্ট error ignore করা:** error bypass করলে production-এ সমস্যা হতে পারে।
-
----
-
-## সেরা অনুশীলন (Best Practices)
-
-- **লিন্টার ও ফরম্যাটার বাধ্যতামূলক করুন।**
-- **CI/CD pipeline-এ লিন্ট/ফরম্যাট চেক রাখুন।**
-- **VS Code-এ অটো-ফরম্যাট চালু করুন।**
-- **রুলস টিমের প্রয়োজন অনুযায়ী কাস্টমাইজ করুন।**
-
----
-
-## ইন্ডাস্ট্রি ট্রেন্ড
-
-- **Automated Linting/Formatting:** Google, Netflix, Uber—সব বড় কোম্পানিই অটোমেটেড লিন্ট/ফরম্যাট pipeline-এ চালায়।
-- **Pre-commit Hooks:** Husky, lint-staged দিয়ে commit করার আগেই লিন্ট/ফরম্যাট চেক হয়।
-- **Custom ESLint Rules:** বড় টিমে নিজেদের জন্য কাস্টম রুলস তৈরি করা হয়।
-
----
-
-## উপসংহার
-
-লিন্টার ও ফরম্যাটার TypeScript প্রজেক্টে কোডের গুণগত মান, consistency এবং maintainability নিশ্চিত করে।  
-শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
-
----
-
+লিন্টার ও ফরম্যাটার TypeScript-এ কোডকে আরও পরিষ্কার, শৃঙ্খলিত ও maintainable করে তোলে।

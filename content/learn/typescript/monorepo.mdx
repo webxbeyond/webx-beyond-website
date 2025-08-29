@@ -1,119 +1,89 @@
 ---
 title: Monorepo-এ TypeScript (Nx, Turborepo)
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Monorepo-এ TypeScript (Nx, Turborepo)
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বড় কোম্পানির অফিস পরিচালনা করছেন—একই বিল্ডিংয়ে HR, Accounts, IT, Sales, Marketing—সব ডিপার্টমেন্ট আলাদা, কিন্তু একসাথে কাজ করে। Monorepo-তে TypeScript ব্যবহার করলে অনেকগুলো প্রজেক্ট, লাইব্রেরি, অ্যাপ—সবকিছু একসাথে, টাইপ সেফ ও স্কেলেবলভাবে ম্যানেজ করা যায়।
 
-Google-এর Workspace, Netflix-এর Microservices, Uber-এর Platform—সবখানে multiple project/package একসাথে manage করার দরকার পড়ে। Monorepo-এ TypeScript—industry-standard tools (Nx, Turborepo) দিয়ে scalable, maintainable, এবং type-safe codebase build করা যায়।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Monorepo-কে ভাবুন "বড় অফিস বিল্ডিং" হিসেবে—প্রতিটি ডিপার্টমেন্টের নিজস্ব কাজ, কিন্তু কমন রিসোর্স, কমিউনিকেশন, ও সিকিউরিটি সিস্টেম শেয়ার করা। TypeScript Monorepo-তে প্রতিটি প্যাকেজ/প্রজেক্টের টাইপ সেফটি ও শেয়ারিং সহজ হয়।
 
-- **Scalability:** Multiple app/package—একসাথে manage করা যায়
-- **Type Safety:** Shared code—type-safe, predictable
-- **Developer Experience:** Easy refactor, dependency management
-
-## বাস্তব উদাহরণ
-
-- **Google:** Workspace—monorepo-তে multiple service
-- **Netflix:** Microservices—shared code ও type
-- **Uber:** Platform—Nx/Turborepo দিয়ে scalable monorepo
-
-## মূল ধারণা
+## বিস্তারিত ব্যাখ্যা
 
 ### ১. Monorepo কী?
-
-- **সংজ্ঞা:** একাধিক app/package—একই repo-তে manage করা
-- **Usage:**
-  - Common code—shared package/library
-  - Dependency—easy manage
-
-#### সহজ এনালজি
-
-- "Monorepo—একটি বড় apartment—সব পরিবার একসাথে থাকে, কিন্তু নিজের নিজের ঘর আছে।"
+- একাধিক অ্যাপ/লাইব্রেরি/প্যাকেজ একসাথে একটি রিপোজিটরিতে
+- Dependency, কোড শেয়ারিং, বিল্ড, টেস্ট—সবকিছু সহজ
 
 ### ২. Nx ও Turborepo
+- Nx: Monorepo management tool, TypeScript-friendly
+- Turborepo: High-performance build system, Monorepo-তে স্কেলিং সহজ
+- দুইটাতেই TypeScript integration, lint/test/build automation
 
-- **Nx:** Advanced monorepo tool—TypeScript support, code sharing, caching
-- **Turborepo:** Lightweight monorepo tool—fast build, remote caching
+### ৩. TypeScript Monorepo Structure
+- `packages/` বা `apps/` ফোল্ডারে আলাদা আলাদা প্রজেক্ট
+- Root-level tsconfig, প্রতিটি প্যাকেজে আলাদা tsconfig
+- Dependency graph, type references
 
-#### Example: Nx
-```bash
-npx create-nx-workspace@latest
-# TypeScript, React, Node.js app add করুন
+```text
+monorepo/
+  apps/
+    web/
+    api/
+  packages/
+    ui/
+    utils/
+  tsconfig.json
+  package.json
 ```
 
-#### Example: Turborepo
-```bash
-npx create-turbo@latest
-# TypeScript, React, Node.js app add করুন
+### ৪. TypeScript Project References
+- বড় কোডবেসে টাইপ চেকিং ও বিল্ড টাইম অপ্টিমাইজ
+- প্রতিটি প্যাকেজে `tsconfig.json`-এ `references` ব্যবহার
+
+```json
+// apps/web/tsconfig.json
+{
+  "extends": "../../tsconfig.json",
+  "references": [
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/utils" }
+  ]
+}
 ```
 
-### ৩. TypeScript-এ Monorepo Structure
+## সুবিধা
 
-- **Common Structure:**
-  ```
-  /apps
-    /web
-    /api
-  /packages
-    /ui
-    /utils
-  /tsconfig.base.json
-  ```
-- **Shared tsconfig:** Type reference ও path mapping
+- বড় কোডবেসে স্কেলিং ও মেইনটেনেন্স সহজ
+- টাইপ সেফ শেয়ারড লাইব্রেরি
+- বিল্ড/টেস্ট/লিন্ট অটোমেশন
+- Dependency graph ও impact analysis
 
-### ৪. Dependency Management
+## ব্যবহার
 
-- **Nx/Turborepo:** Dependency graph, affected build/test
-- **Type Safety:** Shared code—type-safe contract
+- Nx/Turborepo দিয়ে Monorepo setup
+- TypeScript references ও shared config
+- Common library/package শেয়ারিং
 
-### ৫. কখন ব্যবহার করবেন?
+## গুরুত্বপূর্ণ পয়েন্ট
 
-- Multiple app/service/package—একসাথে manage করতে
-- Shared code—type-safe রাখতে
-- Large-scale team/project—easy collaboration
+- Root-level tsconfig ও প্রতিটি প্যাকেজে আলাদা tsconfig
+- Dependency graph ও references ঠিকভাবে সেট করুন
+- বিল্ড/লিন্ট/টেস্ট অটোমেশন Nx/Turborepo দিয়ে চালান
 
-### ৬. Common Pitfalls
+## অনুশীলন
 
-- Dependency conflict—version mismatch
-- Improper tsconfig—type error
-- Build/test—slow/complex
+1. একটি Monorepo structure তৈরি করুন, যেখানে apps ও packages আলাদা
+2. প্রতিটি প্যাকেজে tsconfig.json ও references সেট করুন
+3. Nx/Turborepo দিয়ে বিল্ড ও টেস্ট অটোমেশন চালান
 
-### ৭. Best Practices
-
-- tsconfig/base—properly configure করুন
-- Dependency—clear/manage করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
-
-### ৮. Industry Trends
-
-- Large-scale app—monorepo—default choice
-- Nx/Turborepo—developer productivity
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. Requirement clear করুন
-2. Monorepo tool (Nx/Turborepo)—properly setup করুন
-3. tsconfig/base—properly configure করুন
-4. Documentation/readme—update করুন
-5. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Requirement clear?
-- [x] Monorepo tool used?
-- [x] tsconfig/base configured?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [Next.js ও API রাউটসের সাথে TypeScript](/typescript/next)
+- [Node.js-এ TypeScript](/typescript/node)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-Monorepo-এ TypeScript (Nx, Turborepo)—scalable, type-safe, maintainable codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready platform তৈরি করা সম্ভব।
-
+Monorepo-তে TypeScript ব্যবহার করলে বড় কোডবেসে স্কেলিং, টাইপ সেফটি ও মেইনটেনেন্স আরও সহজ হয়।

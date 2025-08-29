@@ -1,143 +1,85 @@
 ---
 title: ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি গাড়ি তৈরি করেছেন—প্রতিটি পার্ট আলাদা টেস্ট করেছেন, এবার সব পার্ট একসাথে লাগিয়ে পুরো গাড়ি চালিয়ে দেখছেন। Integration Testing ঠিক এমনই—সব ফাংশন, ক্লাস, কম্পোনেন্ট একসাথে কাজ করছে কিনা, তা যাচাই করা। TypeScript-এ টাইপ মকস দিয়ে external dependency, API, DB—সবকিছু "নকল" করে টেস্ট করা যায়।
 
-ধরা যাক, Netflix-এর মতো একটি ভিডিও স্ট্রিমিং প্ল্যাটফর্ম তৈরি করছেন। এখানে শুধু একটি ফাংশন ঠিকভাবে কাজ করছে কিনা তা জানলেই হবে না—বিভিন্ন সার্ভিস, ডেটাবেস, API, ইউজার ইন্টারফেস একসাথে ঠিকভাবে কাজ করছে কিনা, সেটাও নিশ্চিত করতে হবে।  
-এটাই **ইন্টিগ্রেশন টেস্টিং**-এর মূল উদ্দেশ্য: আলাদা আলাদা কম্পোনেন্ট/মডিউল একসাথে কাজ করছে কিনা যাচাই করা।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Integration Testing-কে ভাবুন "গাড়ির ফাইনাল টেস্ট ড্রাইভ" হিসেবে—সব পার্ট একসাথে, কোনো সমস্যা থাকলে সঙ্গে সঙ্গে ধরা পড়ে। টাইপ মকস মানে "নকল পার্ট"—আসল পার্টের মতো আচরণ করে, কিন্তু আসল নয়।
 
-- **রিয়েল-ওয়ার্ল্ড সিস্টেমে:** Google-এর সার্চ, Uber-এর রাইড বুকিং, Netflix-এর ভিডিও প্লে—সবই অনেকগুলো সাব-সিস্টেমের সমন্বয়।
-- **ইউনিট টেস্টিং** শুধু ছোট অংশের জন্য, কিন্তু ইন্টিগ্রেশন টেস্টিং নিশ্চিত করে পুরো সিস্টেমের অংশগুলো একসাথে ঠিকভাবে কাজ করছে।
-- **বাগ ধরার সুযোগ:** অনেক সময় আলাদা আলাদা ফাংশন ঠিক থাকে, কিন্তু একসাথে চললে সমস্যা হয়—ইন্টিগ্রেশন টেস্টিং সেই সমস্যা আগেভাগে ধরতে সাহায্য করে।
+## বিস্তারিত ব্যাখ্যা
 
----
+### ১. Integration Testing কী?
+- একাধিক ফাংশন, ক্লাস, কম্পোনেন্ট একসাথে টেস্ট
+- External dependency (API, DB, Service) mock করে টেস্ট
+- End-to-end flow, data passing, error handling—সবকিছু যাচাই
 
-## মূল ধারণা
+### ২. টাইপ মকস
+- TypeScript-এ interface/class-এর "নকল" version তৈরি
+- External dependency, API call, DB—সবকিছু mock করা যায়
+- Mock object/interface দিয়ে টেস্ট environment তৈরি
 
-### ১. ইন্টিগ্রেশন টেস্টিং কী?
+### ৩. কোড উদাহরণ
 
-- **সংজ্ঞা:** একাধিক মডিউল/কম্পোনেন্ট একসাথে কাজ করছে কিনা যাচাই করা।
-- **উদাহরণ:** ইউজার লগইন করলে ডেটাবেসে এন্ট্রি হচ্ছে, API রেসপন্স ঠিক আসছে, UI-তে সঠিকভাবে দেখাচ্ছে—সব একসাথে টেস্ট করা।
-
-### ২. টাইপ মকস (Type Mocks) কী?
-
-- **মক (Mock):** টেস্টের সময় আসল ডেটা বা ফাংশনের বদলে “নকল” (mock) ডেটা/ফাংশন ব্যবহার করা হয়।
-- **টাইপ মকস:** TypeScript-এ মক তৈরি করার সময় টাইপ সেফটি বজায় রাখা—যাতে ভুল টাইপের ডেটা দিয়ে টেস্ট না হয়।
-
-#### এনালজি:
-> যেমন, সিনেমার শুটিংয়ে আসল গাড়ি না এনে “ডামি” গাড়ি ব্যবহার করা হয়, তেমনি টেস্টে আসল ডেটা/ফাংশনের বদলে মক ব্যবহার করা হয়।
-
----
-
-## কিভাবে কাজ করে?
-
-### ১. ইন্টিগ্রেশন টেস্ট লেখার ধাপ
-
-1. **টেস্ট ফ্রেমওয়ার্ক নির্বাচন:** যেমন Jest, Vitest, Mocha।
-2. **টেস্ট কেস তৈরি:** একাধিক কম্পোনেন্ট/মডিউল একসাথে ব্যবহার করে টেস্ট কেস লিখুন।
-3. **মক/স্টাব ব্যবহার:** ডেটাবেস, API, থার্ড-পার্টি সার্ভিসের জন্য মক তৈরি করুন।
-4. **টাইপ সেফটি নিশ্চিত করুন:** মক ডেটা/ফাংশন TypeScript টাইপ অনুযায়ী তৈরি করুন।
-
-### ২. টাইপ মকস ইমপ্লিমেন্টেশন
-
-- **TypeScript Interface/Type** ব্যবহার করে মক অবজেক্ট তৈরি করুন।
-- **`Partial<Type>** বা **Pick<Type, Keys>**` ইউটিলিটি টাইপ ব্যবহার করুন।
-- **Jest.mock** বা **manual mock** ব্যবহার করুন।
-
----
-
-## বাস্তব উদাহরণ
-
-### উদাহরণ ১: ইউজার সার্ভিস ইন্টিগ্রেশন টেস্ট
-
-```ts
+```typescript
 // userService.ts
 export interface User {
   id: string;
   name: string;
 }
-
-export class UserService {
-  constructor(private db: Database) {}
-  async getUser(id: string): Promise<User | null> {
-    return this.db.findUserById(id);
-  }
+export function getUser(id: string): Promise<User> {
+  // ...real API call
 }
 
 // userService.test.ts
-import { UserService, User } from './userService';
+import { getUser, User } from "./userService";
 
-const mockDb = {
-  findUserById: jest.fn((id: string) => ({ id, name: 'Test User' })),
-};
-
-const userService = new UserService(mockDb as any);
-
-test('ইউজার রিটার্ন করে', async () => {
-  const user = await userService.getUser('123');
-  expect(user).toEqual({ id: '123', name: 'Test User' });
+test("getUser returns user", async () => {
+  // Mock API
+  const mockGetUser = jest.fn().mockResolvedValue({ id: "1", name: "Anis" });
+  const user: User = await mockGetUser("1");
+  expect(user.name).toBe("Anis");
 });
 ```
 
-### উদাহরণ ২: টাইপ সেফ মক
+### ৪. Integration Flow
+- Multiple function/class/component একসাথে টেস্ট
+- Mock object/interface দিয়ে external dependency simulate
+- Data flow, error, edge case—সবকিছু যাচাই
 
-```ts
-type ApiResponse = { status: 'success'; data: string } | { status: 'error'; error: string };
+## সুবিধা
 
-const mockApi: () => ApiResponse = () => ({ status: 'success', data: 'Hello' });
+- End-to-end reliability
+- External dependency, API, DB—সবকিছু টেস্ট
+- বড় প্রজেক্টে confidence ও quality বজায় থাকে
 
-// টেস্টে ব্যবহার:
-const response = mockApi();
-if (response.status === 'success') {
-  // টাইপ সেফলি data ব্যবহার
-  console.log(response.data);
-}
-```
+## ব্যবহার
 
----
+- Integration test ফোল্ডার/ফাইল তৈরি করুন
+- Mocking ও assertion ভালোভাবে ব্যবহার করুন
+- Edge case ও error flow টেস্ট করুন
 
-## কখন ব্যবহার করবেন?
+## গুরুত্বপূর্ণ পয়েন্ট
 
-- **ইন্টিগ্রেশন টেস্ট:** যখন একাধিক কম্পোনেন্ট/মডিউল/সার্ভিস একসাথে কাজ করছে কিনা যাচাই করতে চান।
-- **টাইপ মকস:** যখন টেস্টে টাইপ সেফটি বজায় রাখতে চান, যাতে ভুল টাইপের ডেটা দিয়ে টেস্ট না হয়।
+- Integration test ও unit test আলাদা রাখুন
+- Mock object/interface টাইপ সেফ করুন
+- Coverage রিপোর্ট দেখুন
 
----
+## অনুশীলন
 
-## সাধারণ ভুলত্রুটি
+1. একটি integration test লিখুন, যেখানে একাধিক ফাংশন/ক্লাস একসাথে টেস্ট হয়
+2. টাইপ মকস দিয়ে external dependency mock করুন
+3. Edge case ও error flow টেস্ট করুন
 
-- **সবকিছু ইউনিট টেস্টে কভার করার চেষ্টা:** ইন্টিগ্রেশন টেস্ট ছাড়া শুধু ইউনিট টেস্টে সব বাগ ধরা যায় না।
-- **টাইপ সেফটি উপেক্ষা:** মক তৈরি করার সময় টাইপ না মেনে ডেটা দিলে টেস্ট ভুল হতে পারে।
-- **আসল ডেটাবেস/API ব্যবহার:** টেস্টে আসল ডেটাবেস/API ব্যবহার করলে টেস্ট স্লো হয়, ডেটা নষ্ট হতে পারে।
-
----
-
-## সেরা অনুশীলন (Best Practices)
-
-- **মক ও স্টাব ব্যবহার করুন:** টেস্টে আসল সার্ভিসের বদলে মক ব্যবহার করুন।
-- **টাইপ সেফ মক তৈরি করুন:** TypeScript টাইপ অনুযায়ী মক তৈরি করুন।
-- **পর্যাপ্ত কভারেজ নিশ্চিত করুন:** শুধু ইউনিট নয়, ইন্টিগ্রেশন টেস্টও লিখুন।
-- **টেস্ট ডেটা আলাদা রাখুন:** টেস্টের জন্য আলাদা ডেটা/কনফিগ ব্যবহার করুন।
+## আরও জানুন
+- [Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং](/typescript/testing-jest)
+- [CI/CD-তে টাইপ চেকিং](/typescript/type-checking-ci)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## ইন্ডাস্ট্রি ট্রেন্ড
-
-- **Automated Integration Testing:** CI/CD pipeline-এ ইন্টিগ্রেশন টেস্ট অটোমেট করা হচ্ছে।
-- **Type-safe Mocks:** বড় কোম্পানিগুলো টাইপ সেফ মক ব্যবহার করছে—বাগ কমাতে ও রক্ষণাবেক্ষণ সহজ করতে।
-- **Test Containers:** Docker বা cloud-based test environment ব্যবহার হচ্ছে—Netflix, Google, Uber-এর মতো কোম্পানিতে।
-
----
-
-## উপসংহার
-
-ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস TypeScript প্রজেক্টে কোডের গুণগত মান, রক্ষণাবেক্ষণযোগ্যতা এবং স্কেলেবিলিটি নিশ্চিত করে।  
-শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
-
----
-
+ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস TypeScript-এ বড় ও জটিল অ্যাপ্লিকেশনের reliability ও maintainability নিশ্চিত করে।

@@ -1,0 +1,91 @@
+---
+title: TypeScript-সহ কাস্টম ESLint রুলস
+icon: mdi:format-list-checks
+---
+
+## ভূমিকা
+
+TypeScript কোডবেসে কোডের মান, কনসিস্টেন্সি, ও বাগ কমাতে ESLint অপরিহার্য। কিন্তু কখনো কখনো প্রজেক্টের জন্য কাস্টম রুল দরকার হয়—যা শুধু TypeScript-এর জন্যই প্রযোজ্য। কাস্টম ESLint রুল লিখতে পারলে, টিমের কোড স্টাইল, টাইপ সেফটি, ও বেস্ট প্র্যাকটিস enforce করা যায়।
+
+## অ্যানালজি: "স্কুলের নিয়ম"
+
+ধরা যাক, একটি স্কুলে সাধারণ নিয়ম আছে—সময়মতো আসা, ইউনিফর্ম পরা। কিন্তু কোনো ক্লাসের জন্য বিশেষ নিয়ম দরকার—যেমন, বিজ্ঞান ক্লাসে ল্যাব কোট পরা বাধ্যতামূলক। ESLint-এর সাধারণ রুলের বাইরে, TypeScript-সহ কাস্টম রুলও ঠিক তেমন—বিশেষ পরিস্থিতিতে বিশেষ নিয়ম।
+
+## বিস্তারিত আলোচনা
+
+### ESLint কী?
+- JavaScript/TypeScript কোডের জন্য linting টুল
+- কোড স্টাইল, এরর, ও বেস্ট প্র্যাকটিস enforce করে
+- প্লাগিন, কনফিগ, ও কাস্টম রুল সাপোর্ট করে
+
+### TypeScript-সহ ESLint
+- `@typescript-eslint` প্লাগিন দিয়ে TypeScript কোডে linting সম্ভব
+- টাইপ-aware linting, যেমন: no-explicit-any, strict-boolean-expressions
+- কাস্টম রুল লিখে, প্রজেক্টের বিশেষ নিয়ম enforce করা যায়
+
+### কাস্টম ESLint রুল লিখার ধাপ
+1. `@typescript-eslint` প্লাগিন ইনস্টল করুন
+2. কাস্টম রুলের জন্য নতুন npm প্যাকেজ/ফাইল তৈরি করুন
+3. AST traversal ও analysis করে, violation detect করুন
+4. violation হলে error/warning রিপোর্ট করুন
+
+### উদাহরণ
+```typescript
+// কাস্টম রুল: কোনো ফাংশনে 'any' টাইপ ব্যবহার নিষিদ্ধ
+import { TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '@typescript-eslint/utils/dist/eslint-utils';
+
+export default createRule({
+  name: 'no-any-in-function',
+  meta: {
+    type: 'problem',
+    docs: { description: 'Disallow any in function parameters' },
+    messages: { noAny: 'Avoid using any in function parameters.' },
+    schema: [],
+  },
+  defaultOptions: [],
+  create(context) {
+    return {
+      FunctionDeclaration(node: TSESTree.FunctionDeclaration) {
+        node.params.forEach(param => {
+          if (
+            param.typeAnnotation &&
+            param.typeAnnotation.typeAnnotation.type === 'TSAnyKeyword'
+          ) {
+            context.report({ node: param, messageId: 'noAny' });
+          }
+        });
+      },
+    };
+  },
+});
+```
+
+## বুলেট পয়েন্টস
+- ESLint দিয়ে TypeScript কোডে linting, error, ও best practice enforce করুন
+- `@typescript-eslint` প্লাগিন টাইপ-aware linting সাপোর্ট করে
+- কাস্টম রুল লিখে, প্রজেক্টের বিশেষ নিয়ম enforce করা যায়
+- AST traversal ও analysis দিয়ে violation detect করুন
+- কাস্টম রুল টিমের কোড স্টাইল ও সেফটি বজায় রাখে
+
+## প্র্যাকটিকাল এক্সারসাইজ
+
+1. **কাস্টম রুল লিখুন:**
+   - একটি TypeScript-specific কাস্টম ESLint রুল লিখুন (যেমন: no-any-in-function)
+
+2. **প্রজেক্টে প্রয়োগ করুন:**
+   - কাস্টম রুল ESLint config-এ যোগ করুন
+   - কোডে violation থাকলে error/warning দেখুন
+
+3. **ডকুমেন্টেশন লিখুন:**
+   - কাস্টম রুলের উদ্দেশ্য, ব্যবহার, ও উদাহরণ লিখে টিমে শেয়ার করুন
+
+## সম্পর্কিত পাঠ
+- [AST (Abstract Syntax Tree) ম্যানিপুলেশন](/typescript/ast)
+- [TypeScript কম্পাইলার ইন্টারনালস](/typescript/compiler-internals)
+- [TS Transformers দিয়ে কোড জেনারেশন](/typescript/ts-transformers)
+
+---
+
+**শেষ কথা:**
+TypeScript-সহ কাস্টম ESLint রুল লিখলে, কোডবেসে মান, সেফটি, ও কনসিস্টেন্সি বজায় রাখা সহজ হয়। AST traversal, violation detection, ও কনফিগ জানলে, টিমের জন্য পারফেক্ট linting environment তৈরি করা যায়।

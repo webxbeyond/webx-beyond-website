@@ -1,130 +1,87 @@
 ---
-title: বড় রিপোজিটরির জন্য প্রজেক্ট রেফারন্স
-icon: solar:alt-arrow-right-bold-duotone
+title: বড় রিপোজিটরির জন্য প্রজেক্ট রেফারেন্স
+icon: mdi:source-branch
 ---
 
-# বড় রিপোজিটরির জন্য প্রজেক্ট রেফারন্স
+## ভূমিকা
 
-## প্রস্তাবনা
+TypeScript দিয়ে বড় কোডবেস ম্যানেজ করা অনেকটা বিশাল লাইব্রেরি চালানোর মতো—যেখানে হাজারো বই, বিভাগ, এবং রেফারেন্স থাকে। যদি সবকিছু একসাথে রাখেন, খুঁজে পাওয়া, আপডেট করা, এবং রক্ষণাবেক্ষণ কঠিন হয়ে যায়। ঠিক তেমনই, TypeScript-এ "Project References" বড় কোডবেসকে ছোট ছোট অংশে ভাগ করে, সহজে ম্যানেজ করার সুযোগ দেয়।
 
-ধরা যাক, Microsoft-এর মতো একটি organization—যেখানে হাজার হাজার TypeScript ফাইল, অনেকগুলো সাব-প্রজেক্ট, এবং শত শত ডেভেলপার একসাথে কাজ করছেন।
-এখানে সবকিছু একসাথে কম্পাইল করলে বিল্ড টাইম অনেক বেড়ে যায়, dependency management কঠিন হয়।
+## অ্যানালজি: "লাইব্রেরির বিভাগ"
 
-এজন্য TypeScript-এর **Project References** ফিচার ব্যবহার করা হয়—যাতে বড় কোডবেস efficient, scalable এবং maintainable হয়।
+ধরা যাক, আপনি একটি বিশাল লাইব্রেরি চালাচ্ছেন। সেখানে প্রতিটি বিভাগ আলাদা—বিজ্ঞান, সাহিত্য, ইতিহাস। প্রতিটি বিভাগে আলাদা রেফারেন্স, ক্যাটালগ, এবং মেইন লাইব্রেরির সাথে সংযোগ। এতে বই খুঁজে পাওয়া, আপডেট করা, এবং নতুন বিভাগ যোগ করা সহজ হয়। TypeScript-এর Project References ঠিক এই লাইব্রেরির বিভাগগুলোর মতো—প্রতিটি সাব-প্রজেক্ট আলাদা, কিন্তু একসাথে কাজ করে।
 
----
+## বিস্তারিত আলোচনা
 
-## কেন গুরুত্বপূর্ণ?
+### Project References কী?
+- TypeScript-এর একটি ফিচার, যা বড় কোডবেসকে ছোট ছোট সাব-প্রজেক্টে ভাগ করতে দেয়
+- প্রতিটি সাব-প্রজেক্টের আলাদা `tsconfig.json` থাকে
+- একাধিক সাব-প্রজেক্ট একে অপরকে রেফারেন্স করতে পারে
+- বিল্ড টাইমে শুধু পরিবর্তিত অংশগুলো কম্পাইল হয়
 
-- **Scalability:** বড় কোডবেসে সাব-প্রজেক্ট/প্যাকেজ আলাদাভাবে manage করা যায়।
-- **Performance:** শুধু পরিবর্তিত অংশ কম্পাইল হয়—বিল্ড টাইম কমে যায়।
-- **Dependency Management:** এক সাব-প্রজেক্ট অন্যটিকে reference করতে পারে—dependency clear থাকে।
-- **Monorepo Support:** Nx, Turborepo-এর মতো টুলে সহজে integration হয়।
+### সুবিধা
+- **ইনক্রিমেন্টাল বিল্ড:** শুধু পরিবর্তিত সাব-প্রজেক্ট কম্পাইল হয়, পুরো কোডবেস নয়
+- **স্কেলেবিলিটি:** বড় টিমে আলাদা সাব-প্রজেক্টে কাজ করা সহজ
+- **রক্ষণাবেক্ষণ:** কোডবেস ছোট ছোট অংশে ভাগ থাকায় রক্ষণাবেক্ষণ সহজ
+- **ডিপেন্ডেন্সি ম্যানেজমেন্ট:** কোন সাব-প্রজেক্ট কোনটা ব্যবহার করছে, সহজে ট্র্যাক করা যায়
 
----
+### কিভাবে কাজ করে?
+1. প্রতিটি সাব-প্রজেক্টে আলাদা `tsconfig.json` তৈরি করুন
+2. মেইন প্রজেক্টের `tsconfig.json`-এ `references` ফিল্ডে সাব-প্রজেক্টের path দিন
+3. `tsc --build` কমান্ড দিয়ে পুরো কোডবেস বিল্ড করুন
+4. শুধু পরিবর্তিত সাব-প্রজেক্ট বিল্ড হবে, বাকিগুলো স্কিপ হবে
 
-## মূল ধারণা
-
-### ১. Project References কী?
-
-- **সংজ্ঞা:** একাধিক TypeScript প্রজেক্টকে একে অপরের সাথে reference করা—যাতে dependency ও বিল্ড efficient হয়।
-- **tsconfig.json:** প্রতিটি সাব-প্রজেক্টে আলাদা tsconfig, এবং references array থাকে।
-- **composite:** Project References-এ `composite: true` অপশন বাধ্যতামূলক।
-
-#### এনালজি:
-> যেমন, বড় বিল্ডিংয়ে আলাদা আলাদা ফ্লোর—প্রতিটি ফ্লোরের নিজস্ব কাজ, আবার সব মিলিয়ে পুরো বিল্ডিং; তেমনি Project References।
-
----
-
-## কিভাবে কাজ করে?
-
-### ১. Monorepo Structure
-
-```
-my-monorepo/
-  packages/
-    api/
-      tsconfig.json
-    shared/
-      tsconfig.json
-  tsconfig.json
-```
-
-### ২. tsconfig.json-এ Reference
-
+### উদাহরণ
 ```json
-// packages/api/tsconfig.json
+// packages/core/tsconfig.json
 {
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "dist"
-  },
-  "references": [
-    { "path": "../shared" }
-  ]
+  "compilerOptions": { "composite": true },
+  "include": ["src"]
 }
-```
 
-### ৩. Root tsconfig.json
+// packages/utils/tsconfig.json
+{
+  "compilerOptions": { "composite": true },
+  "include": ["src"]
+}
 
-```json
+// tsconfig.json (root)
 {
   "files": [],
   "references": [
-    { "path": "./packages/api" },
-    { "path": "./packages/shared" }
+    { "path": "./packages/core" },
+    { "path": "./packages/utils" }
   ]
 }
 ```
 
-### ৪. বিল্ড কমান্ড
+## বুলেট পয়েন্টস
+- Project References বড় কোডবেসকে ছোট অংশে ভাগ করে
+- ইনক্রিমেন্টাল বিল্ডে সময় ও রিসোর্স বাঁচে
+- প্রতিটি সাব-প্রজেক্টে আলাদা `tsconfig.json`
+- ডিপেন্ডেন্সি ও রেফারেন্স ট্র্যাকিং সহজ
+- Monorepo ও enterprise কোডবেসে অপরিহার্য
 
-```bash
-npx tsc -b
-```
+## প্র্যাকটিকাল এক্সারসাইজ
 
-- `-b` (build mode) দিয়ে সব referenced project একসাথে বিল্ড হয়।
-- শুধু পরিবর্তিত অংশ কম্পাইল হয়—বিল্ড দ্রুত হয়।
+1. **Monorepo তৈরি করুন:**
+   - দুইটি সাব-প্রজেক্ট (core, utils) তৈরি করুন
+   - প্রতিটির জন্য আলাদা `tsconfig.json` লিখুন
+   - রুট `tsconfig.json`-এ references যোগ করুন
+   - `tsc --build` চালিয়ে দেখুন কিভাবে incremental build হয়
 
----
+2. **ডিপেন্ডেন্সি ম্যাপ করুন:**
+   - কোন সাব-প্রজেক্ট কোনটা ব্যবহার করছে, diagram আঁকুন
 
-## কখন ব্যবহার করবেন?
+3. **রিফ্যাক্টরিং:**
+   - একটি সাব-প্রজেক্টে পরিবর্তন করুন, শুধু সেটি বিল্ড হচ্ছে কিনা দেখুন
 
-- **বড় কোডবেসে:** অনেক সাব-প্রজেক্ট, প্যাকেজ, monorepo structure—efficient বিল্ড দরকার।
-- **Dependency Management:** এক সাব-প্রজেক্ট অন্যটিকে reference করলে dependency clear থাকে।
-- **CI/CD pipeline-এ:** দ্রুত বিল্ড ও deploy সম্ভব।
-
----
-
-## সাধারণ ভুলত্রুটি
-
-- **composite: true না দেওয়া:** Project References কাজ করবে না।
-- **references array ভুল:** path ভুল হলে dependency resolve হবে না।
-- **সবকিছু একসাথে কম্পাইল করা:** references না দিলে বিল্ড টাইম বেড়ে যায়।
-
----
-
-## সেরা অনুশীলন (Best Practices)
-
-- **প্রতিটি সাব-প্রজেক্টে আলাদা tsconfig.json রাখুন।**
-- **composite: true ও references ঠিকভাবে কনফিগার করুন।**
-- **Root tsconfig-এ সব reference যোগ করুন।**
-- **npx tsc -b দিয়ে বিল্ড চালান।**
+## সম্পর্কিত পাঠ
+- [বিল্ড পারফরম্যান্স টিউনিং](/typescript/build-optimization)
+- [Monorepo-এ TypeScript](/typescript/monorepo)
+- [অ্যাডভান্সড টাইপ বনাম সরল থাকার ট্রেড-অফ](/typescript/performance)
 
 ---
 
-## ইন্ডাস্ট্রি ট্রেন্ড
-
-- **Monorepo Everywhere:** Google, Microsoft, Uber—সব বড় কোম্পানিই monorepo structure ও Project References ব্যবহার করছে।
-- **Nx, Turborepo Integration:** Modern tooling-এ Project References default হয়ে যাচ্ছে।
-- **Incremental Build:** শুধু পরিবর্তিত অংশ কম্পাইল—speed ও reliability বাড়ে।
-
----
-
-## উপসংহার
-
-বড় রিপোজিটরির জন্য Project References TypeScript প্রজেক্টে scalability, performance ও maintainability নিশ্চিত করে।  
-শিক্ষার্থীরা যেন এই কনসেপ্টটি আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
-
----
-
+**শেষ কথা:**
+বড় কোডবেসে TypeScript Project References ব্যবহার করলে স্কেল, পারফরম্যান্স, এবং রক্ষণাবেক্ষণ অনেক সহজ হয়। enterprise-level প্রজেক্টে এটি অপরিহার্য। ছোট প্রজেক্টে প্রয়োজন না হলেও, বড় টিম ও কোডবেসে অবশ্যই ব্যবহার করুন।

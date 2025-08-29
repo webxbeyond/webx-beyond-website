@@ -1,121 +1,77 @@
 ---
 title: Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং
-icon: solar:alt-arrow-right-bold-duotone
+icon: ph:test-tube
 ---
 
-# Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি গাড়ি তৈরি করছেন—প্রতিটি যন্ত্রাংশ আলাদা আলাদা টেস্ট করে নিশ্চিত হন, সবকিছু ঠিকঠাক আছে। TypeScript-এ Jest দিয়ে ইউনিট টেস্টিং ঠিক এমনই—প্রতিটি ফাংশন, ক্লাস, কম্পোনেন্ট আলাদা করে টেস্ট করে, কোডের গুণগত মান ও reliability নিশ্চিত করা যায়।
 
-Google-এর Search Engine, Netflix-এর Recommendation System, Uber-এর Ride Calculation—সবখানে bug-free, predictable, এবং maintainable codebase দরকার। Jest দিয়ে TypeScript ইউনিট টেস্টিং—industry-standard, যা robust, readable, এবং scalable app build করতে সাহায্য করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Jest দিয়ে ইউনিট টেস্টিং-কে ভাবুন "গাড়ির পার্টস টেস্টিং ল্যাব" হিসেবে—প্রতিটি পার্ট আলাদা করে টেস্ট হয়, কোনো সমস্যা থাকলে সঙ্গে সঙ্গে ধরা পড়ে।
 
-- **Bug Prevention:** Early test—runtime bug কমায়
-- **Confidence:** Refactor/feature add—test coverage থাকলে নিশ্চিন্ত
-- **Maintainability:** Large-scale app—easy update ও extend
-
-## বাস্তব উদাহরণ
-
-- **Google:** Search Engine—Jest-এ type-safe algorithm test
-- **Netflix:** Recommendation—Jest-এ content logic test
-- **Uber:** Ride Calculation—Jest-এ edge case test
-
-## মূল ধারণা
+## বিস্তারিত ব্যাখ্যা
 
 ### ১. Jest কী?
-
-- **সংজ্ঞা:** Jest—popular JavaScript/TypeScript testing framework
-- **Usage:**
-  - Unit test, integration test, snapshot test
-  - TypeScript support—ts-jest
-
-#### সহজ এনালজি
-
-- "Jest—একটি quality inspector—code-এর প্রতিটি অংশ পরীক্ষা করে।"
+- JavaScript/TypeScript-এর জন্য জনপ্রিয় টেস্টিং ফ্রেমওয়ার্ক
+- ফাস্ট, simple, zero-config
+- Assertion, mocking, coverage—all-in-one
 
 ### ২. TypeScript-এ Jest সেটআপ
+- `jest`, `ts-jest`, `@types/jest` npm থেকে ইনস্টল
+- `jest.config.js` বা `jest.config.ts` দিয়ে কনফিগার
+- `tsconfig.json`-এ টেস্ট ফোল্ডার/ফাইল অন্তর্ভুক্ত
 
-- **Step-by-step:**
-  1. Install Jest, ts-jest, @types/jest
-     ```bash
-     npm install --save-dev jest ts-jest @types/jest
-     npx ts-jest config:init
-     ```
-  2. Update package.json
-     ```json
-     "scripts": {
-       "test": "jest"
-     }
-     ```
-  3. Create test file: `sum.test.ts`
-     ```typescript
-     import { sum } from './sum';
-     test('adds 1 + 2 = 3', () => {
-       expect(sum(1, 2)).toBe(3);
-     });
-     ```
+### ৩. কোড উদাহরণ
 
-### ৩. Type-safe টেস্ট লিখুন
+```typescript
+// sum.ts
+export function sum(a: number, b: number): number {
+  return a + b;
+}
 
-- **Usage:**
-  ```typescript
-  function multiply(a: number, b: number): number {
-    return a * b;
-  }
+// sum.test.ts
+import { sum } from "./sum";
 
-  test('multiply two numbers', () => {
-    expect(multiply(2, 3)).toBe(6);
-    // expect(multiply('2', 3)).toBe(6); // Type error
-  });
-  ```
+test("sum adds two numbers", () => {
+  expect(sum(2, 3)).toBe(5);
+});
+```
 
-#### সহজ এনালজি
+### ৪. Mocking ও Coverage
+- Mocking: External dependency, API call, DB—সবকিছু mock করা যায়
+- Coverage: কত শতাংশ কোড টেস্ট হয়েছে, রিপোর্ট পাওয়া যায়
 
-- "Type-safe test—একটি checklist—সব input/output ঠিক আছে কিনা verify করে।"
+## সুবিধা
 
-### ৪. কখন ব্যবহার করবেন?
+- কোডের reliability ও maintainability বাড়ে
+- বাগ, ভুল, regression—সবকিছু আগেই ধরা যায়
+- বড় প্রজেক্টে confidence ও quality বজায় থাকে
 
-- Function/class/module—logic test করতে
-- Refactor/feature add—bug-free রাখতে
-- Maintainable codebase build করতে
+## ব্যবহার
 
-### ৫. Common Pitfalls
+- ফাংশন, ক্লাস, কম্পোনেন্ট—সবকিছুর ইউনিট টেস্ট
+- Mocking ও coverage রিপোর্ট
+- Continuous Integration (CI)-তে অটোমেটেড টেস্ট
 
-- Type mismatch—test fail/error
-- Missing test—runtime bug
-- Over-complex test—readability কমে যায়
+## গুরুত্বপূর্ণ পয়েন্ট
 
-### ৬. Best Practices
+- টেস্ট ফাইলের নাম `.test.ts` বা `.spec.ts` দিন
+- Assertion ও mocking ভালোভাবে ব্যবহার করুন
+- Coverage রিপোর্ট দেখুন
 
-- Test—clear/simple/atomic রাখুন
-- Type-safe input/output test করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+## অনুশীলন
 
-### ৭. Industry Trends
+1. একটি ফাংশনের জন্য Jest টেস্ট লিখুন
+2. Mocking ব্যবহার করে external dependency টেস্ট করুন
+3. Coverage রিপোর্ট জেনারেট করুন
 
-- Large-scale app—Jest + TypeScript—default choice
-- Type-safe test—developer productivity
-- Test coverage—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. Jest/ts-jest—properly setup করুন
-2. Type-safe test—properly লিখুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Jest/ts-jest setup?
-- [x] Type-safe test written?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [ইন্টিগ্রেশন টেস্টিং ও টাইপ মকস](/typescript/testing-integration)
+- [CI/CD-তে টাইপ চেকিং](/typescript/type-checking-ci)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-Jest দিয়ে TypeScript ইউনিট টেস্টিং—type-safe, readable, extensible codebase build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready app তৈরি করা সম্ভব।
-
+Jest দিয়ে টাইপস্ক্রিপ্ট ইউনিট টেস্টিং করলে কোডের গুণগত মান, reliability ও maintainability অনেক বেশি নিশ্চিত হয়।

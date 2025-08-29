@@ -1,117 +1,91 @@
 ---
 title: Next.js ও API রাউটসের সাথে TypeScript
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Next.js ও API রাউটসের সাথে TypeScript
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি রেস্টুরেন্ট চালাচ্ছেন—রান্নাঘর (backend), সার্ভার (API), এবং কাস্টমার (frontend) সবকিছুই সঠিকভাবে পরিচালনা করতে হয়। Next.js-এ TypeScript ব্যবহার করলে পুরো "রেস্টুরেন্ট"—UI, API, ডাটা—সবকিছুর টাইপ সেফটি নিশ্চিত হয়।
 
-Google-এর Search UI, Netflix-এর Streaming Dashboard, Uber-এর Real-time Map—সবখানে scalable, maintainable, এবং type-safe fullstack app দরকার। Next.js ও API routes-এ TypeScript—modern web app-এ industry-standard, যা robust, readable, এবং type-safe UI ও backend তৈরি করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Next.js-এ TypeScript ব্যবহারকে ভাবুন "রেস্টুরেন্টের ম্যানেজমেন্ট সফটওয়্যার" হিসেবে—প্রতিটি অর্ডার, রান্না, ডেলিভারি, বিলিং—সবকিছুর তথ্য ও প্রসেস টাইপ সেফ, তাই ভুল কমে যায়।
 
-- **Type Safety:** Component, API, data—type-safe, predictable
-- **Developer Experience:** Autocomplete, error checking—productivity boost
-- **Maintainability:** Large-scale app—easy refactor ও extend
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
+### ১. Next.js কম্পোনেন্ট টাইপিং
+- পেজ, লেআউট, কম্পোনেন্ট—সবকিছুর Props টাইপ নির্ধারণ
+- Server-side ও Client-side—উভয় জায়গায় টাইপ সেফটি
 
-- **Google:** Search UI—typed Next.js component ও API
-- **Netflix:** Dashboard—typed API routes
-- **Uber:** Real-time map—typed data fetch ও API
+```typescript
+interface ProductProps {
+  id: string;
+  name: string;
+}
 
-## মূল ধারণা
+export default function Product({ id, name }: ProductProps) {
+  return <div>{name} (ID: {id})</div>;
+}
+```
 
-### ১. Next.js-এ TypeScript
+### ২. API Route টাইপিং
+- API route-এর request, response, body—সবকিছুর টাইপ নির্ধারণ
+- Edge API ও Serverless function—সবকিছুর টাইপ সেফটি
 
-- **সংজ্ঞা:** Next.js—React-based framework—type-safe UI ও API build করা যায়
-- **Usage:**
-  ```typescript
-  // pages/index.tsx
-  type Props = { name: string };
-  export default function Home({ name }: Props) {
-    return <div>Hello, {name}</div>;
-  }
-  ```
+```typescript
+import type { NextApiRequest, NextApiResponse } from "next";
 
-#### সহজ এনালজি
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query;
+  res.status(200).json({ id });
+}
+```
 
-- "Next.js-এ TypeScript—একটি traffic controller—UI ও API data type-check করে।"
+### ৩. Data Fetching ও getServerSideProps
+- getServerSideProps, getStaticProps—সবকিছুর return টাইপ নির্ধারণ
+- ডাটা ফেচিং ও পেজ জেনারেশন টাইপ সেফ
 
-### ২. API Routes-এ TypeScript
+```typescript
+import type { GetServerSideProps } from "next";
 
-- **সংজ্ঞা:** API route—type-safe request/response handle করা যায়
-- **Usage:**
-  ```typescript
-  // pages/api/user.ts
-  import type { NextApiRequest, NextApiResponse } from 'next';
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // ...fetch data
+  return {
+    props: { name: "Anis" },
+  };
+};
+```
 
-  export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const id: string = req.query.id as string;
-    res.status(200).json({ id });
-  }
-  ```
+## সুবিধা
 
-#### সহজ এনালজি
+- টাইপ সেফটি: UI ও API বাগ কমে যায়
+- কোড রিডেবিলিটি ও মেইনটেনেবিলিটি বাড়ে
+- IDE auto-complete ও refactor সহজ হয়
+- বড় প্রজেক্টে স্কেলিং সহজ
 
-- "API route—একটি security gate—সব request/response type-check করে।"
+## ব্যবহার
 
-### ৩. Data Fetch ও Type Safety
+- Component, Page, API Route—সবকিছুর টাইপিং
+- Data fetching ও SSR/SSG-তে টাইপ সেফটি
+- Third-party library integration
 
-- **সংজ্ঞা:** Data fetch—type-safe API call করা যায়
-- **Usage:**
-  ```typescript
-  type User = { id: string; name: string };
+## গুরুত্বপূর্ণ পয়েন্ট
 
-  async function fetchUser(id: string): Promise<User> {
-    const res = await fetch(`/api/user?id=${id}`);
-    return res.json();
-  }
-  ```
+- Props, API request/response-এর টাইপ নির্ধারণ করুন
+- Data fetching ও getServerSideProps-এ টাইপ ব্যবহার করুন
+- Error handling ও validation-এ টাইপ ব্যবহার করুন
 
-### ৪. কখন ব্যবহার করবেন?
+## অনুশীলন
 
-- UI/API/data—type-safe handle করতে
-- Large-scale app—easy refactor ও maintain করতে
-- Developer experience—boost করতে
+1. Next.js-এ একটি Product কম্পোনেন্ট লিখুন, যেখানে Props টাইপিং আছে
+2. একটি API route লিখুন, যেখানে request ও response টাইপিং আছে
+3. getServerSideProps-এ টাইপ সেফ ডাটা ফেচিং করুন
 
-### ৫. Common Pitfalls
-
-- Wrong type—unexpected bug/error
-- Optional/nullable param—type miss করলে runtime bug
-- API response—type mismatch
-
-### ৬. Best Practices
-
-- Props/API/data—clear type define করুন
-- Optional/nullable—properly handle করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
-
-### ৭. Industry Trends
-
-- Large-scale app—Next.js + TypeScript—default choice
-- Typed API routes—developer productivity
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. Requirement clear করুন
-2. UI/API/data—properly type করুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Requirement clear?
-- [x] Typed UI/API/data used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [React-এ TypeScript](/typescript/react)
+- [Node.js-এ TypeScript](/typescript/node)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-Next.js ও API routes-এ TypeScript—type-safe, readable, extensible fullstack app build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready web app তৈরি করা সম্ভব।
-
+Next.js ও API রাউটসের সাথে TypeScript ব্যবহার করলে ফুলস্ট্যাক ডেভেলপমেন্ট আরও নিরাপদ, স্কেলেবল ও মেইনটেনেবল হয়।

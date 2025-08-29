@@ -1,96 +1,64 @@
 ---
 title: কাস্টম টাইপ ডেফিনিশন তৈরি করা
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# কাস্টম টাইপ ডেফিনিশন তৈরি করা
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি নতুন যন্ত্র আবিষ্কার করেছেন, কিন্তু তার ব্যবহারবিধি কেউ জানে না। আপনি নিজেই "ম্যানুয়াল" লিখে দিলেন, যাতে সবাই বুঝতে পারে। TypeScript-এ "কাস্টম টাইপ ডেফিনিশন" মানে, নিজের মতো করে `.d.ts` ফাইল লিখে JS লাইব্রেরির জন্য টাইপ তথ্য তৈরি করা।
 
-Google-এর API integration, Netflix-এর custom JS library, Uber-এর payment gateway—সবখানে type-safe integration দরকার। TypeScript-এ কাস্টম টাইপ ডেফিনিশন—robust, scalable, maintainable codebase-এর জন্য industry-standard solution।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+"নতুন যন্ত্রের ম্যানুয়াল"—নিজে লিখে সবাইকে বুঝিয়ে দেওয়া। কাস্টম টাইপ ডেফিনিশন মানে, নিজের মতো করে টাইপ তথ্য তৈরি করা।
 
-- **Type Safety:** Custom JS library—type definition—runtime bug কমায়।
-- **Integration:** Third-party code—type-safe integration—easy debug ও maintain।
-- **Extensibility:** Custom type definition—workflow flexible করে।
+## বিস্তারিত ব্যাখ্যা
 
-## বাস্তব উদাহরণ
-
-- **Google:** External API—custom type definition—type-safe integration।
-- **Netflix:** Custom video library—type definition—safe usage।
-- **Uber:** Payment gateway—custom type definition—type-safe integration।
-
-## মূল ধারণা
-
-### ১. কাস্টম টাইপ ডেফিনিশন (Custom Type Definition)
-
-- **সংজ্ঞা:** JS library/function/object—type definition—TypeScript-এ `.d.ts` file লিখে declare করা হয়।
-- **Usage:**
+### কাস্টম টাইপ ডেফিনিশন কী?
+- JS লাইব্রেরির জন্য নিজে টাইপ তথ্য তৈরি
+- `.d.ts` ফাইল লিখে
+- উদাহরণ:
   ```typescript
-  // my-lib.d.ts
-  declare module "my-lib" {
-    export function greet(name: string): string;
-    export interface User {
-      id: number;
-      name: string;
-    }
+  // awesome-lib.d.ts
+  declare module "awesome-lib" {
+    export function magic(a: string): number;
   }
   ```
-  ```typescript
-  // main.ts
-  import { greet, User } from "my-lib";
-  const user: User = { id: 1, name: "Anis" };
-  greet(user.name); // Type-safe
-  ```
+- TypeScript-এ import করলে টাইপ-সেফ কোড পাওয়া যায়
 
-#### সহজ এনালজি
+### কিভাবে লিখবেন?
+- লাইব্রেরির API দেখে টাইপ ঠিক করুন
+- `declare module`, `declare function`, `declare class` ব্যবহার
+- DefinitelyTyped-এ contribute করতে পারেন
 
-- "কাস্টম টাইপ ডেফিনিশন—একটি অনুবাদক—বাইরের ভাষা বুঝতে সাহায্য করে।"
+### Integration Tips
+- টাইপ চেকিং নিশ্চিত করুন
+- ডকুমেন্টেশন ও usage উদাহরণ দিন
+- Project structure ঠিক রাখুন
 
-### ২. Integration Workflow
+### কখন ব্যবহার করবেন?
+- যখন কোনো লাইব্রেরির টাইপ নেই
+- যখন নিজের JS কোড টাইপ-সেফ করতে চান
 
-1. JS library/function/object—type requirement clear করুন
-2. Proper `.d.ts` file লিখুন
-3. Type definition—property/function/interface/class—declare করুন
-4. Type-safe integration/documentation—maintain করুন
+## মূল পয়েন্ট
 
-### ৩. Common Pitfalls
+- কাস্টম টাইপ ডেফিনিশন: নিজের মতো করে টাইপ তথ্য
+- `.d.ts` ফাইল: JS লাইব্রেরির জন্য
+- Maintainable ও scalable কোডের জন্য গুরুত্বপূর্ণ
 
-- Type definition miss—runtime bug
-- Wrong type definition—unexpected value/error
-- `.d.ts` file—miss করলে—type error
+## ব্যবহারিক অনুশীলন
 
-### ৪. Best Practices
+১. **ভাবুন:**
+   - আপনার প্রজেক্টে কোথায় কাস্টম টাইপ ডেফিনিশন দরকার হতে পারে?
 
-- Custom library—proper `.d.ts` file লিখুন
-- Type definition—clear/property/function/interface/class define করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+২. **গবেষণা করুন:**
+   - TypeScript-এর কাস্টম টাইপ ডেফিনিশন সম্পর্কে অফিসিয়াল ডকুমেন্টেশন দেখুন: https://www.typescriptlang.org/docs/handbook/declaration-files/templates.html
 
-### ৫. Industry Trends
-
-- Large-scale app—custom type definition—type-safe integration
-- Type safety—production workflow-এ default
-- Community-driven—custom type definition share
-
-## সংক্ষিপ্ত workflow
-
-1. Type requirement clear করুন
-2. Proper `.d.ts` file লিখুন
-3. Type-safe integration/documentation—maintain করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Type requirement clear?
-- [x] Proper `.d.ts` file written?
-- [x] Type-safe integration/documentation clear?
-- [x] Team/project standard maintained?
+৩. **আলোচনা করুন:**
+   - কাস্টম টাইপ ডেফিনিশন লিখলে কী সুবিধা?
 
 ---
 
-## উপসংহার
-
-TypeScript-এ কাস্টম টাইপ ডেফিনিশন—type-safe, extensible, maintainable JS integration build-এর জন্য essential। Industry-standard workflow follow করলে—robust, efficient, production-ready codebase তৈরি করা সম্ভব।
-
+## আরও পড়ুন
+- [`.d.ts` ফাইল ব্যবহার এবং Declaration Merging](/typescript/declaration-files)
+- [থার্ড-পার্টি JS লাইব্রেরি কাজে লাগানো](/typescript/js-integration)
+- [TypeScript ও JavaScript ইন্টারঅপেরেবিলিটি](/typescript/js-integration)

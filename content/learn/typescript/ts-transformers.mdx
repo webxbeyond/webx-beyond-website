@@ -1,0 +1,82 @@
+---
+title: TS Transformers দিয়ে কোড জেনারেশন
+icon: mdi:transform
+---
+
+## ভূমিকা
+
+TypeScript কম্পাইলার শুধু কোড চেক করে না—কোডকে পরিবর্তনও করতে পারে। TS Transformers হলো TypeScript কম্পাইলারের এমন এক ফিচার, যা দিয়ে কোড কম্পাইলের সময় কাস্টম ট্রান্সফর্মেশন, কোড জেনারেশন, বা অপ্টিমাইজেশন করা যায়।
+
+## অ্যানালজি: "কারখানার মেশিন"
+
+ধরা যাক, একটি কারখানায় কাঁচামাল ঢুকিয়ে, মেশিনে বিভিন্ন প্রসেসিং হয়—কাটিং, পলিশিং, প্যাকেজিং। শেষে নতুন পণ্য বের হয়। TS Transformers-ও ঠিক তেমন—কোডকে AST-তে ভেঙে, কাস্টম প্রসেসিং করে, নতুন কোড জেনারেট করে।
+
+## বিস্তারিত আলোচনা
+
+### TS Transformers কী?
+- TypeScript কম্পাইলারের প্লাগিন, যা AST-তে কাস্টম ট্রান্সফর্মেশন করে
+- Compile time-এ কোড পরিবর্তন, optimization, বা codegen সম্ভব
+- Custom linting, logging, বা boilerplate code add/remove করা যায়
+
+### Transformers-এর ধাপ
+1. কোড AST-তে ভেঙে যায়
+2. Transformer function AST traversal করে
+3. প্রয়োজনীয় নোড পরিবর্তন, যোগ, বা রিমুভ করে
+4. নতুন কোড জেনারেট হয়
+
+### উদাহরণ
+```typescript
+import ts from 'typescript';
+
+function transformer(context: ts.TransformationContext) {
+  return (rootNode: ts.SourceFile) => {
+    function visit(node: ts.Node): ts.Node {
+      // উদাহরণ: সব identifier "foo" কে "bar" বানানো
+      if (ts.isIdentifier(node) && node.text === 'foo') {
+        return ts.factory.createIdentifier('bar');
+      }
+      return ts.visitEachChild(node, visit, context);
+    }
+    return ts.visitNode(rootNode, visit);
+  };
+}
+
+const source = 'let foo = 1;';
+const result = ts.transform(
+  ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest),
+  [transformer]
+);
+```
+
+### Transformers-এর ব্যবহার
+- Custom logging, debug code add/remove
+- Boilerplate code auto-generate
+- API contract থেকে টাইপ/ইন্টারফেস জেনারেট
+- Optimization (dead code removal, minification)
+
+## বুলেট পয়েন্টস
+- TS Transformers দিয়ে compile time-এ কোড পরিবর্তন/জেনারেশন সম্ভব
+- AST traversal ও manipulation দিয়ে কাস্টম প্রসেসিং
+- Custom linting, logging, বা boilerplate code add/remove করা যায়
+- বড় প্রজেক্টে automation ও optimization সহজ হয়
+
+## প্র্যাকটিকাল এক্সারসাইজ
+
+1. **Transformer function লিখুন:**
+   - একটি AST transformer লিখে, কোডে নির্দিষ্ট identifier পরিবর্তন করুন
+
+2. **Codegen করুন:**
+   - API contract থেকে টাইপ/ইন্টারফেস জেনারেট করুন
+
+3. **Optimization করুন:**
+   - Dead code removal বা minification transformer লিখুন
+
+## সম্পর্কিত পাঠ
+- [TypeScript কম্পাইলার ইন্টারনালস](/typescript/compiler-internals)
+- [AST (Abstract Syntax Tree) ম্যানিপুলেশন](/typescript/ast)
+- [TypeScript-সহ কাস্টম ESLint রুলস](/typescript/eslint-custom)
+
+---
+
+**শেষ কথা:**
+TS Transformers দিয়ে TypeScript কোডে compile time-এ কাস্টম প্রসেসিং, automation, ও optimization সম্ভব। AST traversal, transformer function, ও codegen জানলে, TypeScript-এ এক্সপার্ট লেভেলে পৌঁছানো সহজ।

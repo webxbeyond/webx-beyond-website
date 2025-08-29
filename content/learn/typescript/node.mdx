@@ -1,126 +1,94 @@
 ---
 title: Node.js-এ TypeScript (Express, Fastify)
-icon: solar:alt-arrow-right-bold-duotone
+icon: lineicons:typescript
 ---
 
-# Node.js-এ TypeScript (Express, Fastify)
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি ব্যাংকের সফটওয়্যার বানাচ্ছেন—প্রতিটি ট্রান্সাকশনের তথ্য, অ্যাকাউন্ট নম্বর, ব্যালেন্স, সবকিছু সঠিকভাবে যাচাই করতে হয়। Node.js-এ TypeScript ব্যবহার করলে ব্যাকএন্ড কোডে "ভুল" বা "বাগ" কমে যায়, কারণ প্রতিটি API, ডাটা, কনফিগ—সবকিছুর টাইপ সেফটি নিশ্চিত হয়।
 
-Google-এর API, Netflix-এর Backend, Uber-এর Real-time Service—সবখানে scalable, maintainable, এবং bug-free server দরকার। Node.js-এ TypeScript—modern backend-এ industry-standard, যা robust, readable, এবং type-safe API তৈরি করে।
+## অ্যানালজি
 
-## কেন গুরুত্বপূর্ণ?
+Node.js-এ TypeScript ব্যবহারকে ভাবুন "ডিজিটাল ব্যাংকিং সিস্টেম" হিসেবে—প্রতিটি ফিল্ড, ইনপুট, আউটপুট টাইপ সেফ, তাই ভুল ট্রান্সাকশন বা ডাটা এন্ট্রি কমে যায়।
 
-- **Type Safety:** API, service, middleware—type-safe, predictable
-- **Developer Experience:** Autocomplete, error checking—productivity boost
-- **Maintainability:** Large-scale app—easy refactor ও extend
-
-## বাস্তব উদাহরণ
-
-- **Google:** API—type-safe Express/Fastify server
-- **Netflix:** Backend—typed request/response
-- **Uber:** Real-time service—typed event/data
-
-## মূল ধারণা
+## বিস্তারিত ব্যাখ্যা
 
 ### ১. Express-এ TypeScript
+- API route, request, response—সবকিছুর টাইপ নির্ধারণ করা যায়
+- Middleware, Controller, Service—সবকিছুর টাইপ সেফটি
 
-- **সংজ্ঞা:** Express—popular Node.js framework—type-safe API build করা যায়
-- **Usage:**
-  ```typescript
-  import express, { Request, Response } from 'express';
-  const app = express();
+```typescript
+import express, { Request, Response } from "express";
 
-  app.get('/user/:id', (req: Request, res: Response) => {
-    const id: string = req.params.id;
-    res.json({ id });
-  });
+const app = express();
 
-  app.listen(3000, () => console.log('Server running'));
-  ```
-
-#### সহজ এনালজি
-
-- "Express-এ TypeScript—একটি traffic police—সব request/response type-check করে।"
+app.get("/user/:id", (req: Request, res: Response) => {
+  const id: string = req.params.id;
+  res.json({ id });
+});
+```
 
 ### ২. Fastify-তে TypeScript
+- Fastify-এর Schema ও Plugin—সবকিছুর টাইপ নির্ধারণ করা যায়
+- Validation ও Serialization টাইপ সেফ
 
-- **সংজ্ঞা:** Fastify—high-performance Node.js framework—type-safe API build করা যায়
-- **Usage:**
-  ```typescript
-  import fastify from 'fastify';
-  const app = fastify();
+```typescript
+import fastify from "fastify";
 
-  app.get<{ Params: { id: string } }>('/user/:id', (request, reply) => {
-    const id = request.params.id;
-    reply.send({ id });
-  });
+const app = fastify();
 
-  app.listen({ port: 3000 }, err => {
-    if (err) throw err;
-    console.log('Server running');
-  });
-  ```
+app.get<{ Params: { id: string } }>("/user/:id", (request, reply) => {
+  const { id } = request.params;
+  reply.send({ id });
+});
+```
 
-#### সহজ এনালজি
+### ৩. Service ও Model টাইপিং
+- Database Model, Service Layer—সবকিছুর টাইপ নির্ধারণ
+- ভুল টাইপ দিলে কম্পাইল টাইমেই error
 
-- "Fastify-তে TypeScript—একটি security gate—সব data type-check করে।"
+```typescript
+interface User {
+  id: string;
+  name: string;
+}
 
-### ৩. Typed Middleware
+function getUser(id: string): User {
+  // ...fetch user
+  return { id, name: "Anis" };
+}
+```
 
-- **সংজ্ঞা:** Middleware—type-safe logic add করা যায়
-- **Usage:**
-  ```typescript
-  import { Request, Response, NextFunction } from 'express';
+## সুবিধা
 
-  function logger(req: Request, res: Response, next: NextFunction) {
-    console.log(req.method, req.url);
-    next();
-  }
-  ```
+- টাইপ সেফটি: API ও ব্যাকএন্ড বাগ কমে যায়
+- কোড রিডেবিলিটি ও মেইনটেনেবিলিটি বাড়ে
+- IDE auto-complete ও refactor সহজ হয়
+- বড় প্রজেক্টে স্কেলিং সহজ
 
-### ৪. কখন ব্যবহার করবেন?
+## ব্যবহার
 
-- API/service—type-safe request/response/middleware handle করতে
-- Large-scale app—easy refactor ও maintain করতে
-- Developer experience—boost করতে
+- Express/Fastify-তে route, middleware, service—সবকিছুর টাইপিং
+- Database Model ও DTO-তে টাইপ সেফটি
+- Third-party library integration
 
-### ৫. Common Pitfalls
+## গুরুত্বপূর্ণ পয়েন্ট
 
-- Wrong type—unexpected bug/error
-- Optional/nullable param—type miss করলে runtime bug
-- Middleware—type mismatch
+- Request, Response, Params, Body—সবকিছুর টাইপ নির্ধারণ করুন
+- Service ও Model-এর টাইপ সেফটি বজায় রাখুন
+- Error handling ও validation-এ টাইপ ব্যবহার করুন
 
-### ৬. Best Practices
+## অনুশীলন
 
-- Request/response/middleware—clear type define করুন
-- Optional/nullable—properly handle করুন
-- Documentation/readme—clear রাখুন
-- Team/project standard—follow করুন
+1. Express-এ একটি API route লিখুন, যেখানে request ও response টাইপিং আছে
+2. Fastify-তে একটি route লিখুন, যেখানে Params টাইপিং আছে
+3. Service ও Model-এর টাইপ সেফটি নিশ্চিত করুন
 
-### ৭. Industry Trends
-
-- Large-scale app—Node.js + TypeScript—default choice
-- Typed Express/Fastify—developer productivity
-- Type safety—production workflow-এ default
-
-## সংক্ষিপ্ত workflow
-
-1. Requirement clear করুন
-2. API/service/middleware—properly type করুন
-3. Documentation/readme—update করুন
-4. Team/project standard—follow করুন
-
-## Quick Checklist
-
-- [x] Requirement clear?
-- [x] Typed API/service/middleware used?
-- [x] Documentation/readme clear?
-- [x] Team/project standard maintained?
+## আরও জানুন
+- [React-এ TypeScript](/typescript/react)
+- [Next.js ও API রাউটসের সাথে TypeScript](/typescript/next)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## উপসংহার
-
-Node.js-এ TypeScript—type-safe, readable, extensible backend build-এর জন্য essential। Proper workflow follow করলে—robust, efficient, production-ready server তৈরি করা সম্ভব।
-
+Node.js-এ TypeScript ব্যবহার করলে ব্যাকএন্ড ডেভেলপমেন্ট আরও নিরাপদ, স্কেলেবল ও মেইনটেনেবল হয়।

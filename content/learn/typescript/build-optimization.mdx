@@ -1,129 +1,83 @@
 ---
 title: বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন
-icon: solar:alt-arrow-right-bold-duotone
+icon: ph:rocket
 ---
 
-# বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন
+## পরিচিতি
 
-## প্রস্তাবনা
+ধরা যাক, আপনি একটি বড় ফ্যাক্টরি চালাচ্ছেন—প্রতিটি মেশিন, লাইন, প্রসেস অপ্টিমাইজ করলে উৎপাদন দ্রুত হয়, খরচ কমে। TypeScript-এ বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন ঠিক এমনই—বড় কোডবেস দ্রুত, দক্ষ, ও resource-friendly কম্পাইল হয়।
 
-ধরা যাক, Netflix-এর মতো একটি বড় কোডবেস—হাজার হাজার ফাইল, প্রতিদিন শত শত কোড চেঞ্জ।
-এখানে বিল্ড টাইম যদি বেশি হয়, তাহলে ডেভেলপারদের কাজ ধীর হয়ে যায়, ডিপ্লয় স্লো হয়, এবং overall productivity কমে যায়।
+## অ্যানালজি
 
-এজন্য TypeScript-এ **বিল্ড পারফরম্যান্স টিউনিং** ও `tsc` (TypeScript Compiler) অপশনগুলো জানা জরুরি—যাতে বড় প্রজেক্টেও দ্রুত, efficient বিল্ড করা যায়।
+বিল্ড পারফরম্যান্স টিউনিং-কে ভাবুন "ফ্যাক্টরির মেশিন অপ্টিমাইজেশন" হিসেবে—প্রতিটি মেশিনের speed, efficiency, energy consumption টিউন করলে output বাড়ে, downtime কমে।
 
----
+## বিস্তারিত ব্যাখ্যা
 
-## কেন গুরুত্বপূর্ণ?
+### ১. `tsc` (TypeScript Compiler) কী?
+- TypeScript কোডকে JavaScript-এ রূপান্তর করে
+- টাইপ চেকিং, lint, transpile—all-in-one
 
-- **Speed:** বড় কোডবেসে বিল্ড টাইম কমানো productivity বাড়ায়।
-- **Scalability:** কোডবেস বড় হলে efficient বিল্ড ছাড়া maintain করা কঠিন।
-- **Continuous Integration:** CI/CD pipeline-এ বিল্ড টাইম কম হলে deploy দ্রুত হয়।
-- **Developer Experience:** দ্রুত বিল্ড মানে দ্রুত ফিডব্যাক, কম frustration।
+### ২. বিল্ড পারফরম্যান্স টিউনিং
+- বড় কোডবেসে বিল্ড টাইম, resource usage, efficiency বাড়ানো
+- Incremental build, project references, exclude/include, outDir—সবকিছু optimize
 
----
-
-## মূল ধারণা
-
-### ১. TypeScript Compiler (`tsc`) কী?
-
-- **tsc:** TypeScript কোডকে JavaScript-এ রূপান্তর করার জন্য compiler।
-- **Config:** `tsconfig.json` ফাইলে বিল্ড অপশন কনফিগার করা হয়।
-- **CLI:** `npx tsc` বা `tsc` কমান্ড দিয়ে বিল্ড চালানো হয়।
-
-### ২. বিল্ড পারফরম্যান্স টিউনিং কীভাবে করবেন?
-
-#### এনালজি:
-> যেমন, বড় ফ্যাক্টরিতে efficient মেশিন ব্যবহার করলে উৎপাদন দ্রুত হয়—তেমনি efficient বিল্ড অপশন ব্যবহার করলে কোড দ্রুত কম্পাইল হয়।
-
-#### গুরুত্বপূর্ণ `tsc` অপশনসমূহ:
-
-- **incremental:** আগের বিল্ডের ডেটা রেখে শুধু পরিবর্তিত ফাইল কম্পাইল করে।
-- **composite:** বড়/মাল্টি-প্যাকেজ প্রজেক্টে dependency management সহজ করে।
-- **skipLibCheck:** লাইব্রেরি টাইপ চেকিং স্কিপ করে—বিল্ড দ্রুত হয়।
-- **isolatedModules:** প্রতিটি ফাইল আলাদাভাবে কম্পাইল—বিল্ড দ্রুত হয়, especially bundlers-এর জন্য।
-- **exclude/include:** কোন ফাইল/ফোল্ডার কম্পাইল হবে, সেটি নির্ধারণ করে।
-
----
-
-## বাস্তব উদাহরণ
-
-### উদাহরণ ১: `tsconfig.json`-এ পারফরম্যান্স অপশন
+### ৩. গুরুত্বপূর্ণ `tsc` অপশন
 
 ```json
 {
   "compilerOptions": {
-    "incremental": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "outDir": "dist",
-    "target": "ES2020"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+    "incremental": true, // শুধু পরিবর্তিত ফাইল কম্পাইল
+    "tsBuildInfoFile": "./.tsbuildinfo", // বিল্ড cache
+    "outDir": "./dist", // output directory
+    "rootDir": "./src", // source directory
+    "exclude": ["node_modules", "dist"], // অপ্রয়োজনীয় ফোল্ডার বাদ
+    "composite": true, // project references
+    "declaration": true, // .d.ts ফাইল জেনারেট
+    "sourceMap": true // debug-friendly
+  }
 }
 ```
 
-### উদাহরণ ২: Monorepo-তে `composite` ও Project References
+### ৪. Incremental Build
+- শুধু পরিবর্তিত ফাইল কম্পাইল
+- বিল্ড টাইম অনেক কমে যায়
 
-```json
-{
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true
-  },
-  "references": [
-    { "path": "../shared" },
-    { "path": "../api" }
-  ]
-}
-```
+### ৫. Project References
+- বড় কোডবেসে dependency graph তৈরি
+- একাধিক প্রজেক্ট/প্যাকেজ একসাথে efficiently কম্পাইল
 
-### উদাহরণ ৩: CLI-তে দ্রুত বিল্ড
+### ৬. Exclude/Include
+- অপ্রয়োজনীয় ফাইল/ফোল্ডার বাদ দিলে বিল্ড দ্রুত হয়
 
-```bash
-npx tsc --incremental --skipLibCheck
-```
+## সুবিধা
 
----
+- বড় কোডবেসে বিল্ড টাইম কমে যায়
+- Resource usage ও efficiency বাড়ে
+- Debugging ও deployment সহজ হয়
 
-## কখন ব্যবহার করবেন?
+## ব্যবহার
 
-- **বড় কোডবেসে:** হাজার+ ফাইল, মাল্টি-প্যাকেজ, monorepo—efficient বিল্ড অপরিহার্য।
-- **CI/CD pipeline-এ:** বিল্ড টাইম কমাতে পারফরম্যান্স অপশন ব্যবহার করুন।
-- **Development-এ:** দ্রুত ফিডব্যাক পেতে incremental বিল্ড চালান।
+- tsconfig.json-এ incremental, composite, outDir, exclude অপশন ব্যবহার করুন
+- Project references দিয়ে dependency graph তৈরি করুন
+- Build cache ও source map চালু করুন
 
----
+## গুরুত্বপূর্ণ পয়েন্ট
 
-## সাধারণ ভুলত্রুটি
+- বড় প্রজেক্টে incremental build must-have
+- Project references ও composite অপশন ব্যবহার করুন
+- Debugging-friendly build config রাখুন
 
-- **সব ফাইল একসাথে কম্পাইল করা:** incremental বা exclude ব্যবহার না করলে বিল্ড স্লো হয়।
-- **skipLibCheck না ব্যবহার করা:** third-party লাইব্রেরি টাইপ error-এ বিল্ড fail হতে পারে, অথচ production-এ impact নেই।
-- **outDir না দেওয়া:** compiled JS ফাইল source-এর সাথে মিশে যায়—maintain করা কঠিন।
+## অনুশীলন
 
----
+1. tsconfig.json-এ incremental ও composite অপশন চালু করুন
+2. outDir ও exclude ঠিকভাবে সেট করুন
+3. বড় কোডবেসে বিল্ড টাইম কমাতে project references ব্যবহার করুন
 
-## সেরা অনুশীলন (Best Practices)
-
-- **incremental ও skipLibCheck ব্যবহার করুন।**
-- **outDir ও exclude ঠিকভাবে কনফিগার করুন।**
-- **Monorepo-তে composite ও references ব্যবহার করুন।**
-- **CI/CD pipeline-এ দ্রুত বিল্ডের জন্য পারফরম্যান্স অপশন চালু রাখুন।**
+## আরও জানুন
+- [কোড স্প্লিটিং ও ট্রি-শেকিং সঙ্গে TypeScript](/typescript/tree-shaking)
+- [Monorepo-এ TypeScript](/typescript/monorepo)
+- [TypeScript-এ ক্লাস ও ইন্টারফেস](/typescript/classes)
 
 ---
 
-## ইন্ডাস্ট্রি ট্রেন্ড
-
-- **Monorepo-তে Project References:** Google, Uber, Microsoft—সব বড় কোম্পানিই monorepo-তে efficient বিল্ডের জন্য references ব্যবহার করে।
-- **Incremental Build Everywhere:** CI/CD pipeline-এ incremental বিল্ড default হয়ে যাচ্ছে।
-- **Custom Build Scripts:** বড় টিমে custom build tooling—speed ও reliability বাড়াতে।
-
----
-
-## উপসংহার
-
-বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন TypeScript প্রজেক্টে স্কেল, productivity ও maintainability নিশ্চিত করে।  
-শিক্ষার্থীরা যেন এই কনসেপ্টগুলো আত্মবিশ্বাসের সঙ্গে ব্যবহার করতে পারে—এটাই এই লেসনের উদ্দেশ্য।
-
----
-
+বিল্ড পারফরম্যান্স টিউনিং ও `tsc` অপশন TypeScript-এ বড় কোডবেস efficiently, দ্রুত ও resource-friendly কম্পাইল করতে সাহায্য করে।
