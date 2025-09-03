@@ -1,7 +1,6 @@
 import { source } from "@/lib/source";
 import {
   DocsBody,
-  DocsDescription,
   DocsPage,
   DocsTitle, 
 } from "fumadocs-ui/page";
@@ -32,7 +31,7 @@ export default async function Page(props: PageProps<"/[...slug]">) {
       tableOfContent={{ style: "clerk", single: false }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
+      {/* <DocsDescription>{page.data.description}</DocsDescription> */}
       <DocsBody>
         <div className="flex flex-row gap-2 items-center border-b pt-2 pb-4 mb-4">
           <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
@@ -80,14 +79,14 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
-  const description = page.data.description ?? 'ওয়েবএক্স';
   const slugPath = page.slugs.join('/');
   const canonical = `${baseUrl}/${slugPath}`;
   // Generate topic-specific OG image variant (using metadataImage helper)
   return createMetadata(
     metadataImage.withImage(page.slugs, {
       title: page.data.title,
-      description,
+      description: page.data.description,
+      keywords: page.data.keywords,
       alternates: {
         canonical,
         languages: {
@@ -96,7 +95,10 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
         },
       },
       openGraph: { url: `/${slugPath}` },
-      twitter: { title: page.data.title, description },
+      twitter: { 
+        title: page.data.title, 
+        description: page.data.description,
+      },
     }),
   );
 }

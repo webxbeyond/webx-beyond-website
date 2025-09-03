@@ -22,18 +22,10 @@ export default function Page() {
               <Hero />
             </FadeIn>
           </div>
-          {/* What We Teach (core domains) */}
-          {/* <WhatWeTeach /> */}
-          {/* Expectations / Value Proposition */}
           <Expectations />
-          {/* Learning Path steps */}
           <LearningPath />
-          {/* Curated starting points */}
           <SelectTopics />
-          {/* Full topic catalogue & featured lessons temporarily hidden to reduce visual load */}
-          {/* Why WebX Beyond (benefits) */}
           <WhyWebX />
-          {/* Free CTA */}
           <FreeCTA />
         </div>
       </main>

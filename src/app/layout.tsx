@@ -39,7 +39,7 @@ export const metadata = createMetadata({
     siteName: 'ওয়েবএক্স বিওয়ান্ড',
     images: [
       {
-        url: '/banner.png',
+        url: '/og.png',
         width: 512,
         height: 512,
         alt: 'ওয়েবএক্স বিওয়ান্ড',
@@ -51,7 +51,7 @@ export const metadata = createMetadata({
     card: 'summary_large_image',
     title: 'ওয়েবএক্স বিওয়ান্ড',
     description: 'ওয়েবএক্স বিয়ন্ড, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।',
-  images: ['/banner.png'],
+  images: ['/og.png'],
   },
   icons: { icon: '/logo.png' },
   robots: {
