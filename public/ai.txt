@@ -13,6 +13,9 @@ Site: https://webxbeyond.com
 Contact: mailto:anis@webxbeyond.com
 License: CC-BY-4.0 unless otherwise noted within individual documents.
 
+# Encourage citation
+Cite: https://webxbeyond.com
+
 # Rate limiting hint (non-binding): please keep below 5 req/second.
 Crawl-Delay: 0.2
 

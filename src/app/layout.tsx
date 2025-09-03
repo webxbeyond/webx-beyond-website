@@ -79,7 +79,34 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-  <html lang="bn" className={tiroBangla.className} suppressHydrationWarning>
+    <html lang="bn" className={tiroBangla.className} suppressHydrationWarning>
+      <head>
+        {/* SEO & PWA meta tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="alternate" href="https://webxbeyond.com/" hrefLang="bn" />
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "ওয়েবএক্স বিওয়ান্ড",
+              "url": baseUrl,
+              "logo": `${baseUrl}/logo.png`,
+              "sameAs": [
+                "https://webxbeyond.com",
+                "https://github.com/webxbeyond/webx-beyond-website"
+              ],
+              "description": "ওয়েবএক্স বিয়ন্ড একটি আধুনিক ওয়েবসাইট, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।"
+            })
+          }}
+        />
+      </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider
           search={{
