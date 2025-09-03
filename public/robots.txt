@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Encourage citation
+Cite: https://webxbeyond.com
