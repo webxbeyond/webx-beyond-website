@@ -8,7 +8,6 @@ export default function Layout({ children }: LayoutProps<'/'>) {
     <>
       <DocsLayout
      {...base}
-    //  tabMode="navbar"
       tree={source.pageTree}
       // just icon items
       links={linkItems.filter((item) => item.type === 'icon')}
