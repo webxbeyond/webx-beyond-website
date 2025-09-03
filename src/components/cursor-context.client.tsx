@@ -123,12 +123,6 @@ export default function CursorContext() {
     setOpen(false);
   };
 
-  const askSelection = () => {
-    const sel = window.getSelection()?.toString().trim();
-    const q = sel ? `${sel} — উল্লেখিত অংশ সম্পর্কে আমাকে ব্যাখ্যা করুন।` : `এই পৃষ্ঠাটি: ${window.location.href} — আমি এটা সম্পর্কে প্রশ্ন করতে চাই।`;
-    openAi('https://chatgpt.com/', q);
-  };
-
   if (typeof document === 'undefined') return null;
 
   return createPortal(

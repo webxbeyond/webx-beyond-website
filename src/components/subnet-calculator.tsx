@@ -66,9 +66,6 @@ function isPrivate(ip: string) {
   if (parts[0] === 192 && parts[1] === 168) return true;
   return false;
 }
-function ipv4Mapped(ip: string) {
-  return `::ffff:${ip.split(".").map(x => parseInt(x, 10).toString(16).padStart(2, "0")).join(".")}`;
-}
 
 export default function SubnetCalculator() {
   const [ip, setIp] = useState("10.10.10.10");
