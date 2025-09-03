@@ -1,0 +1,22 @@
+{
+  "name": "ওয়েবএক্স বিওয়ান্ড",
+  "short_name": "WebX Beyond",
+  "description": "ওয়েবএক্স বিয়ন্ড, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "lang": "bn",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
