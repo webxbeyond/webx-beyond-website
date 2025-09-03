@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 import { algoliasearch } from 'algoliasearch';
 import { sync } from 'fumadocs-core/search/algolia';
 import * as fs from 'node:fs';

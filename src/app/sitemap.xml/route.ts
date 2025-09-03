@@ -45,7 +45,7 @@ export async function GET() {
 
   return new NextResponse(xml, {
     headers: {
-      'Content-Type': 'application/xml',
+      'Content-Type': 'text/xml',
     },
   });
 }

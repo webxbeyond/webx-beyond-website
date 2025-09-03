@@ -3,7 +3,7 @@ import type { Metadata } from 'next/types';
 // Determine the canonical base URL for the site (used across SEO helpers)
 export const baseUrl = "https://webxbeyond.com";
 
-const defaultOgImage = './banner.png';
+const defaultOgImage = '/banner.png';
 const siteName = 'ওয়েবএক্স';
 const twitterHandle = '@money_is_shark';
 
