@@ -1,6 +1,5 @@
 import type { BaseLayoutProps, LinkItemType } from "fumadocs-ui/layouts/shared";
 import { Iconify } from "@/components/iconify";
-import { WebX } from "@/components/logo";
 import Image from "next/image";
 
 /**
