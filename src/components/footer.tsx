@@ -11,6 +11,7 @@ export function Footer() {
         { label: 'টেক নিউজ', href: 'https://webxnewz.com', external: true },
         { label: 'AI ডিরেক্টরি', href: 'https://ai.webxbeyond.com/', external: true },
         { label: 'লাইসেন্স (MIT)', href: 'https://github.com/webxbeyond/webx-beyond-website/blob/main/LICENSE', external: true },
+        { label: 'সাইটম্য়াপ', href: '/sitemap.xml' },
         { label: 'প্রাইভেসি (শীঘ্রই)', href: '/#' },
     ];
 

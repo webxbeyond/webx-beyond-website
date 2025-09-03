@@ -13,6 +13,10 @@ import { getMDXComponents } from "@/mdx-components";
 import YouTube from "@/components/youtube";
 import { Iconify } from "@/components/iconify";
 import { LLMCopyButton, ViewOptions } from "@/components/page-actions";
+import { createMetadata } from '@/lib/metadata';
+import { metadataImage } from '@/lib/metadata-image';
+import { baseUrl } from '@/lib/metadata';
+// -------------------------------------------------------------------
 
 export default async function Page(props: PageProps<"/[...slug]">) {
   const params = await props.params;
@@ -72,19 +76,31 @@ export default async function Page(props: PageProps<"/[...slug]">) {
   );
 }
 
-export async function generateStaticParams() {
-  return source.generateParams();
-}
-
-export async function generateMetadata(
-  props: PageProps<"/[...slug]">
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string[] }>; }): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
+  const description = page.data.description ?? 'ওয়েবএক্স';
+  const slugPath = page.slugs.join('/');
+  const canonical = `${baseUrl}/${slugPath}`;
+  // Generate topic-specific OG image variant (using metadataImage helper)
+  return createMetadata(
+    metadataImage.withImage(page.slugs, {
+      title: page.data.title,
+      description,
+      alternates: {
+        canonical,
+        languages: {
+          'en-US': canonical, // placeholder: same URL; adjust when English version exists
+          'bn-BD': canonical,
+        },
+      },
+      openGraph: { url: `/${slugPath}` },
+      twitter: { title: page.data.title, description },
+    }),
+  );
+}
 
-  return {
-    title: page.data.title,
-    description: page.data.description,
-  };
+export function generateStaticParams(): { slug: string[] }[] {
+  return source.generateParams();
 }
