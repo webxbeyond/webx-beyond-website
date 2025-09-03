@@ -89,7 +89,7 @@ function RetryModalButton() {
           else setOpen(true)
         }}
       >
-        Retry
+        রিফ্রেশ
       </button>
 
       {open && typeof document !== 'undefined' &&
@@ -111,19 +111,13 @@ function RetryModalButton() {
               <p className="mb-4 text-sm text-gray-700">মনে হচ্ছে আপনি এখনও অফলাইনে আছেন। আপনার নেটওয়ার্ক সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।</p>
               <div className="flex justify-end gap-2">
                 <button
-                  className="rounded bg-gray-200 px-3 py-1 text-sm"
-                  onClick={close}
-                >
-                  বন্ধ
-                </button>
-                <button
-                  className="rounded bg-blue-600 px-3 py-1 text-sm text-white"
+                  className="rounded bg-blue-600 px-3 py-1 text-sm text-white cursor-pointer"
                   onClick={() => {
                     if (navigator.onLine) window.location.reload()
                     else close()
                   }}
                 >
-                  পুনরায় চেষ্টা
+                  ওকে!
                 </button>
               </div>
             </div>

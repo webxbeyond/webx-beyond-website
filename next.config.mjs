@@ -1,4 +1,7 @@
+
 import { createMDX } from 'fumadocs-mdx/next';
+import withPWA from 'next-pwa';
+import pwaConfig from './next-pwa.config.mjs';
 
 const withMDX = createMDX();
 
@@ -7,4 +10,4 @@ const config = {
   reactStrictMode: true,
 };
 
-export default withMDX(config);
+export default withPWA(pwaConfig)(withMDX(config));

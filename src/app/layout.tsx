@@ -5,7 +5,6 @@ import { Tiro_Bangla } from 'next/font/google';
 import { Viewport } from "next";
 import { baseUrl, createMetadata } from "@/lib/metadata";
 import SearchDialog from '@/components/search';
-import OfflineProvider from '@/components/offline-provider';
 import OfflineToast from '@/components/offline-toast.client';
 import Loader from '@/components/loader.client';
 import CursorContext from '@/components/cursor-context.client';
@@ -102,7 +101,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
                 "https://webxbeyond.com",
                 "https://github.com/webxbeyond/webx-beyond-website"
               ],
-              "description": "ওয়েবএক্স বিয়ন্ড একটি আধুনিক ওয়েবসাইট, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।"
+              "description": "ওয়েবএক্স বিয়ন্ড, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।"
             })
           }}
         />
@@ -121,7 +120,6 @@ export default function Layout({ children }: LayoutProps<'/'>) {
             translations: fdTranslations['bn'],
           }}
         >
-          <OfflineProvider />
           <OfflineToast />
           <Loader />
           <CursorContext />
