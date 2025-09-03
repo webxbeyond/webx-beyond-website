@@ -23,7 +23,6 @@ export default async function Page(props: PageProps<"/[...slug]">) {
   if (!page) notFound();
 
   const MDXContent = page.data.body;
-  console.log(page.url);
   return (
     <DocsPage
       toc={page.data.toc}
@@ -31,15 +30,22 @@ export default async function Page(props: PageProps<"/[...slug]">) {
       tableOfContent={{ style: "clerk", single: false }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
-      {/* <DocsDescription>{page.data.description}</DocsDescription> */}
       <DocsBody>
         <div className="flex flex-row gap-2 items-center border-b pt-2 pb-4 mb-4">
           <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
           <ViewOptions
             markdownUrl={`${page.url}`}
-            githubUrl={`https://github.com/webxbeyond/webx-beyond-website/edit/main/content/learn/${page.slugs.join(
-              "/"
-            )}`}
+            githubUrl={(() => {
+              // If the page is an index page (no slug or last slug is a section), link to index.mdx in the folder
+              if (page.slugs.length === 1) {
+                return `https://github.com/webxbeyond/webx-beyond-website/edit/main/content/learn/${page.slugs
+                  .slice(0, 1)
+                  .join("/")}/index.mdx`;
+              }
+              return `https://github.com/webxbeyond/webx-beyond-website/edit/main/content/learn/${page.slugs.join(
+                "/"
+              )}.mdx`;
+            })()}
           />
         </div>
         <MDXContent

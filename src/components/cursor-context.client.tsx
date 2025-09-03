@@ -116,13 +116,6 @@ export default function CursorContext() {
     setOpen(false);
   };
 
-  const openGitHubIfPossible = () => {
-    const meta = document.querySelector('meta[name="source"]') as HTMLMetaElement | null;
-    const source = meta?.content || (document.body.dataset.source as string | undefined);
-    window.open(source || window.location.href, '_blank', 'noreferrer');
-    setOpen(false);
-  };
-
   if (typeof document === 'undefined') return null;
 
   return createPortal(
@@ -158,11 +151,6 @@ export default function CursorContext() {
 
           <button onClick={() => openAi('https://claude.ai/new', `এই পৃষ্ঠা: ${window.location.href}`)} className={cn(optionClass)}>
             <Iconify icon="mdi:cloud" /> Claude-এ খুলুন
-            <Iconify icon="mdi:open-in-new" className="ms-auto text-fd-muted-foreground" />
-          </button>
-
-          <button onClick={openGitHubIfPossible} className={cn(optionClass)}>
-            <Iconify icon="mdi:github" /> গিটহাব-এ খুলুন
             <Iconify icon="mdi:open-in-new" className="ms-auto text-fd-muted-foreground" />
           </button>
         </div>
