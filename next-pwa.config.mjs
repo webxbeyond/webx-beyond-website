@@ -7,7 +7,7 @@ const pwaConfig = {
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/webxbeyond\.com\/.*$/,
-      handler: 'StaleWhileRevalidate',
+      handler: 'NetworkFirst',
       options: {
         cacheName: 'pages-cache',
         expiration: {
