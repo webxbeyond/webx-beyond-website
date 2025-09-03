@@ -21,7 +21,7 @@ export const metadata = createMetadata({
     template: '%s | ওয়েবএক্স বিওয়ান্ড',
     default: 'ওয়েবএক্স বিওয়ান্ড',
   },
-  description: 'Learn DevOps, Networking, Cloud, AI and more in Bangla with WebX Beyond.',
+  description: 'ওয়েবএক্স বিয়ন্ড একটি আধুনিক ওয়েবসাইট, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন। আমাদের লক্ষ্য প্রযুক্তি শিক্ষাকে সহজ, সবার জন্য উন্মুক্ত এবং ব্যবহারিক করে তোলা।',
   metadataBase: new URL(baseUrl),
   alternates: { canonical: '/' },
   keywords: [
@@ -31,9 +31,43 @@ export const metadata = createMetadata({
   creator: 'WebX Beyond',
   publisher: 'WebX Beyond',
   category: 'technology',
-  openGraph: { locale: 'en_US' },
-  twitter: { site: '@money_is_shark' },
+  openGraph: {
+    locale: 'bn_BD',
+    type: 'website',
+    title: 'ওয়েবএক্স বিওয়ান্ড',
+    description: 'ওয়েবএক্স বিয়ন্ড একটি আধুনিক ওয়েবসাইট, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।',
+    url: baseUrl,
+    siteName: 'ওয়েবএক্স বিওয়ান্ড',
+    images: [
+      {
+        url: '/banner.png',
+        width: 512,
+        height: 512,
+        alt: 'ওয়েবএক্স বিওয়ান্ড',
+      },
+    ],
+  },
+  twitter: {
+    site: '@webxbeyond',
+    card: 'summary_large_image',
+    title: 'ওয়েবএক্স বিওয়ান্ড',
+    description: 'ওয়েবএক্স বিয়ন্ড একটি আধুনিক ওয়েবসাইট, যেখানে আপনি এআই, ডেভ-অপস, প্রোগ্রামিং, ব্লকচেইন, সাইবার নিরাপত্তা, এবং আরও অনেক বিষয়ে শিক্ষামূলক কনটেন্ট পাবেন।',
+  images: ['/banner.png'],
+  },
   icons: { icon: '/logo.png' },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+  'max-snippet': -1,
+  'max-image-preview': 'large',
+  'max-video-preview': -1,
+    },
+  },
 });
 
 export const viewport: Viewport = {
@@ -45,7 +79,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={tiroBangla.className} suppressHydrationWarning>
+  <html lang="bn" className={tiroBangla.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
         <RootProvider
           search={{
