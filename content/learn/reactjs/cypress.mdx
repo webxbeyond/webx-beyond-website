@@ -1,0 +1,254 @@
+---
+title: Cypress দিয়ে E2E টেস্টিং
+icon: mdi:robot
+description: Cypress দিয়ে পুরো ব্রাউজার-ভিত্তিক E2E টেস্ট লেখা — ইনস্টলেশন, বেসিক স্পেস, network stubbing, CI integration ও practical উদাহরণ সহ
+keywords:
+  - cypress
+  - e2e
+  - testing
+  - end-to-end
+  - ci
+---
+
+# Cypress দিয়ে E2E টেস্টিং
+
+এই পাঠে আপনি শিখবেন:
+
+- E2E টেস্টিং কি ও কেন দরকার
+- Cypress কীভাবে ভিন্ন (browser-driven) এবং এর মৌলিক ধারণা
+- দ্রুত সেটআপ ও কনফিগারেশন (TypeScript সহ)
+- common patterns: visit, get, intercept, fixtures, custom commands
+- CI-এ Cypress চালানো ও flakiness কমানো টিপস
+- একটি practical exercise: Login ও Checkout flow E2E স্পেক লিখা
+
+এক লাইন প্ল্যান:
+- analogy দিয়ে E2E-এর প্রয়োজন বোঝানো
+- কনফিগার ও একটি বেসিক spec তৈরি করা (TypeScript উদাহরণ)
+- network stubbing ও fixtures দেখানো (Cypress intercept)
+- CI কনফিগ ও best practices
+- practical exercise ও checklists
+
+চেকলিস্ট (আপনার রিকোয়্যারমেন্ট অনুযায়ী):
+- [ ] MDX frontmatter আছে (`title`,`icon`,`description`,`keywords`)
+- [ ] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও structured
+- [ ] analogy, setup, TypeScript উদাহরণ, CI টিপস আছে
+- [ ] practical exercise ও checklist আছে
+
+---
+
+## পরিচিতি ও analogy
+
+Analogy: E2E টেস্টিংকে ভাবুন একটি রোবট ব্যবহারকারী হিসেবে — তিনি হোম পেজে আসে, ফর্ম পুরা করে, বাটনে ক্লিক করে এবং পুরো ব্যবহারকারী ফ্লো চালায়। Unit টেস্ট আপনার ছোট যন্ত্রাংশ পরীক্ষা করে; E2E বলতে পুরো সিস্টেমের ব্যবহারকারী জার্নি পরীক্ষা করা হয়।
+
+Cypress-এর সুবিধা:
+- বাস্তব ব্রাউজার-ভিত্তিক টেস্ট (Electron/Chrome)
+- snapshot of DOM, screenshots ও ভিডিও নেওয়া সম্ভব
+- network stubbing (intercept) সহজ
+- time-travel debugger (interactive runner)
+
+সীমাবদ্ধতা:
+- E2E ধির গতি এবং বেশি maintenance দরকার — তাই টেস্ট পিরামিডে ছোট সংখ্যা রাখা উচিত
+
+---
+
+## দ্রুত সেটআপ (TypeScript প্রজেক্ট)
+
+ইনস্টল:
+
+```bash
+npm install -D cypress
+# TypeScript support
+npm install -D @types/node
+```
+
+প্রথমবারে cypress init করলে ডিরেক্টরি তৈরি হয়:
+
+```bash
+npx cypress open
+```
+
+TypeScript সাপোর্ট যোগ করতে `tsconfig.json` এ `types` অ্যাড করুন এবং `cypress.config.ts` ব্যবহার করুন।
+
+সাবমিনিমাল `cypress.config.ts`:
+
+```ts
+import { defineConfig } from 'cypress'
+
+export default defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,ts}'
+  }
+})
+```
+
+প্রজেক্টে `package.json` script:
+
+```json
+{
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
+  }
+}
+```
+
+---
+
+## প্রথম বেসিক স্পেক (Login flow) — TypeScript
+
+ফাইল: `cypress/e2e/login.cy.ts`
+
+```ts
+describe('Login flow', () => {
+  it('logs in successfully and redirects to dashboard', () => {
+    cy.visit('/')
+    cy.get('input[name="email"]').type('me@example.com')
+    cy.get('input[name="password"]').type('secret')
+    cy.contains('Login').click()
+    cy.url().should('include', '/dashboard')
+    cy.get('h1').should('contain.text', 'Dashboard')
+  })
+})
+```
+
+ভেতরে `cy.visit` মূল পেজ লোড করে, `cy.get` DOM selector দিয়ে element খুঁজে নেয়, এবং `cy.contains` text match করে।
+
+---
+
+## Network stubbing: `cy.intercept` ও fixtures
+
+E2E টেস্টের সময় সার্ভার-ভিত্তিক অনির্ভরশীলতা কমাতে `cy.intercept` ব্যবহার করে API রেস্পন্স মক করুন।
+
+```ts
+// cypress/e2e/login.cy.ts
+it('shows error on bad credentials', () => {
+  cy.intercept('POST', '/api/login', { statusCode: 401, body: { message: 'invalid' } })
+  cy.visit('/')
+  cy.get('input[name="email"]').type('bad@example.com')
+  cy.get('input[name="password"]').type('wrong')
+  cy.contains('Login').click()
+  cy.get('[role="alert"]').should('contain.text', 'invalid')
+})
+```
+
+Fixtures ব্যবহার করে বড় রেস্পন্স স্টোর করতে পারেন:
+
+```ts
+cy.intercept('GET', '/api/products', { fixture: 'products.json' })
+```
+
+Fixtures ফাইল রাখুন `cypress/fixtures/products.json` এ।
+
+---
+
+## Custom commands ও selectors
+
+Cypress-এ `cypress/support/commands.ts` এ custom commands লিখে common actions পুনঃব্যবহার করুন:
+
+```ts
+// cypress/support/commands.ts
+Cypress.Commands.add('login', (email, password) => {
+  cy.get('input[name="email"]').type(email)
+  cy.get('input[name="password"]').type(password)
+  cy.contains('Login').click()
+})
+
+// ব্যবহার
+cy.login('me@example.com', 'secret')
+```
+
+Custom selectors ব্যবহার করে tests readable রাখুন: `data-cy` বা `data-test` attribute ব্যবহার করুন।
+
+---
+
+## Timeouts, retries ও flakiness কমানো
+
+- Avoid arbitrary sleeps (`cy.wait(1000)`)—ইতিমধ্যে DOM/requests-এর ওপর wait করুন (`cy.get(...).should(...)`)
+- CI-এ flaky tests হলে `retries` সেট করুন `cypress.config.ts` এ:
+
+```ts
+export default defineConfig({
+  e2e: {
+    retries: { runMode: 2, openMode: 0 }
+  }
+})
+```
+
+- network-dependent tests এ intercept/fixtures ব্যবহার করুন
+
+---
+
+## CI-এ Cypress চালানো (GitHub Actions উদাহরণ)
+
+একটি সহজ GitHub Actions workflow:
+
+```yaml
+# .github/workflows/cypress.yml
+name: e2e
+on: [push, pull_request]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run build # যদি প্রয়োজন হয়
+      - run: npm run start & # background server
+      - run: npx wait-on http://localhost:3000
+      - run: npx cypress run
+```
+
+CI-এ server start ও wait-on ব্যবহার করে নিশ্চিত করুন অ্যাপ রান করতেছে।
+
+---
+
+## Screenshots, videos ও debugging
+
+- Cypress run default-এ failure হলে screenshot/video নেয়। `cypress.config.ts`-এ config কাস্টমাইজ করুন।
+- interactive mode (`cypress open`) দিয়ে test-time travel debugger ব্যবহার করুন—DOM snapshots ও command log দেখুন।
+
+---
+
+## Best practices ও anti-patterns
+
+- Test pyramid বজায় রাখুন: বেশি Unit, কম E2E
+- Use `data-*` attributes for stable selectors
+- Prefer `cy.intercept` over full backend reliance in CI
+- Keep E2E tests focused on critical user journeys
+- Write idempotent tests—ability to run multiple times without state leak
+
+---
+
+## Practical exercise — Login ও Checkout flow
+
+লক্ষ্য: একটি E2E test suite লিখুন যা Login ও সরল Checkout flow কভার করে
+
+Steps:
+1. তৈরি করুন fixtures: `cypress/fixtures/products.json` ও `cypress/fixtures/user.json`
+2. Write specs:
+   - `cypress/e2e/login.cy.ts` — success এবং failure flow (use `cy.intercept`)
+   - `cypress/e2e/checkout.cy.ts` — browse products, add to cart, go to checkout, submit order (intercept order API and assert request body)
+3. Add custom command `cy.login()` in `cypress/support/commands.ts`
+4. Run tests locally and in CI
+
+Exercise checklist:
+- [ ] fixtures তৈরি করা হয়েছে
+- [ ] login.cy.ts এ success ও failure scenario আছে
+- [ ] checkout.cy.ts এ order request intercept করে request payload assert করা হয়েছে
+- [ ] CI workflow configured এবং headless run পাস করে
+
+---
+
+## উপসংহার
+
+Cypress একটি শক্তিশালী E2E টেস্টিং টুল যা browser-level ইন্টারঅ্যাকশন পরীক্ষা করে। ঠিকভাবে network stubbing, fixtures ও custom commands ব্যবহার করলে আপনি বিশ্বস্ত ও দ্রুত E2E suite তৈরি করতে পারবেন। E2E tests কে ছোট ও গুরুত্বপূর্ণ user paths-এ সীমাবদ্ধ রাখুন এবং CI-এ run করার জন্য proper intercepts/fixtures যোগ করুন।
+
+আপনি চাইলে আমি এই exercise-এর জন্য runnable scaffold (Vite + React + TS) তৈরি করে Cypress কনফিগ এবং sample specs যোগ করে দিতে পারি — বলুন "scaffold cypress starter" এবং আমি তৈরি করব।
+
+---

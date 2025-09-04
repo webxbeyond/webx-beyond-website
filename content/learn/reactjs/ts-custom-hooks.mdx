@@ -1,0 +1,289 @@
+---
+title: Generics ও Custom Hooks
+icon: logos:typescript-icon
+description: TypeScript Generics ও কাস্টম React Hooks — কিভাবে পুনঃব্যবহারযোগ্য, টাইপ-সেফ hooks বানাবেন, generic constraints, default types ও practical উদাহরণ সহ
+keywords:
+  - typescript
+  - generics
+  - custom-hooks
+  - usefetch
+  - uselocalstorage
+---
+
+# Generics ও Custom Hooks
+
+এই পাঠে আপনি শিখবেন:
+
+- TypeScript Generics কেন দরকার এবং কিভাবে কাজ করে
+- React custom hooks কীভাবে generic করে পুনঃব্যবহারযোগ্য করা যায়
+- generic constraints, default types, এবং Common patterns
+- practical hook উদাহরণ: `useFetch<T>`, `useLocalStorage<T>`, `useDebouncedValue<T>`, `useAsync<T>`
+- নিরাপদ typing, edge-cases ও testing টিপস
+
+এক লাইন প্ল্যান:
+- সরল analogy দিয়ে ধারণা বোঝানো
+- step-by-step TypeScript উদাহরণ (TSX/TS)
+- প্রত্যেক hook-এর ব্যাখ্যা, ইনপুট/আউটপুট contract ও edge-cases
+- একাধিক practical exercise দিয়ে প্র্যাকটিকাল দক্ষতা
+
+চেকলিস্ট (আপনার রিকোয়ারমেন্ট থেকে):
+- [ ] নতুন MDX ফাইল frontmatter সহ (`title`, `icon`, `description`, `keywords`)
+- [ ] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও সুসংগঠিত
+- [ ] analogy দেয়া আছে
+- [ ] TypeScript + React উদাহরণ আছে (generic hooks, constraints, default generics)
+- [ ] practical exercises ও চেকলিস্ট আছে
+
+---
+
+## সহজ analogy — Generics কি?
+
+Generics কে ভাবুন একটি ছাঁচ (mold) হিসেবে। আপনি একই ছাঁচে নানা রকমের কাঁচামাল ঢুকিয়ে বিভিন্ন আউটপুট বানাতে পারেন—ছাঁচটা одинаков, কিন্তু ভেতরের টাইপ বদলায়। কোডে Generics হলো সেই ছাঁচ: একই function/hook/component একাধিক টাইপের সাথে কাজ করবে কিন্তু type-safety রেখে।
+
+Custom hook analogy: ধরুন আপনার কিচেন-এ একটি মাল্টি-ফাংশন ব্লেন্ডার আছে যা বারবার একই কাজ করে—আপনি আলাদা আলাদা জায়গায় না লিখে ব্লেন্ডারকে কল করেন। Custom hooks হলো React-এর ব্লেন্ডার—UI-লজিক reuse করার উপায়।
+
+---
+
+## Contract: ছোট ‘কন্ট্রাক্ট’ — কেন/কি/আউটপুট
+
+- Inputs: Generic parameter T বা configuration object
+- Outputs: Typed state ও handler functions (data: T | undefined, error: Error | null, isLoading: boolean)
+- Error modes: network failure, invalid data shape
+- Success: compile-time টাইপ গ্যারান্টি, runtime behaviour consistent
+
+Edge-cases:
+- Unknown API shape → use generics with `unknown` এবং runtime validation (zod/io-ts)
+- nullable data → union types `T | null`
+
+---
+
+## Example 1 — `useFetch<T> (Generic data-fetching hook)`
+
+উদ্দেশ্য: একটি ছোট, reusable `useFetch` hook বানাবো যা যেকোনো JSON shape (T) নিয়ে কাজ করবে।
+
+```ts
+import { useEffect, useState } from 'react'
+
+type UseFetchResult<T> = {
+  data?: T
+  error?: Error | null
+  isLoading: boolean
+}
+
+export function useFetch<T = unknown>(url: string): UseFetchResult<T> {
+  const [data, setData] = useState<T | undefined>(undefined)
+  const [error, setError] = useState<Error | null>(null)
+  const [isLoading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    setLoading(true)
+    fetch(url)
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Network response was not ok')
+        const json = (await res.json()) as T
+        if (mounted) setData(json)
+      })
+      .catch((err) => mounted && setError(err))
+      .finally(() => mounted && setLoading(false))
+
+    return () => { mounted = false }
+  }, [url])
+
+  return { data, error, isLoading }
+}
+```
+
+ব্যবহার (TypeScript component):
+
+```tsx
+type Product = { id: string; name: string; price: number }
+
+export function ProductList(){
+  const { data: products, isLoading, error } = useFetch<Product[]>('/api/products')
+  // products এ এখন Product[] টাইপ থাকতে পারে
+}
+```
+
+টিপস:
+- Non-known API হলে `T = unknown` রেখে de/serialization validation করুন (zod)
+- Cancelation ও mounted flag use করে memory leaks রোধ করুন
+
+---
+
+## Example 2 — `useLocalStorage<T> (typed persistence)`
+
+LocalStorage সাধারণত string-only—জরুরি হচ্ছে typed wrapper রাখলে আপনি safe ভাবে value get/set করতে পারবেন।
+
+```ts
+import { useState } from 'react'
+
+function useLocalStorage<T>(key: string, initialValue: T) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const raw = localStorage.getItem(key)
+      return raw ? (JSON.parse(raw) as T) : initialValue
+    } catch {
+      return initialValue
+    }
+  })
+
+  function setLocal(value: T) {
+    setState(value)
+    try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
+  }
+
+  return [state, setLocal] as const
+}
+
+// ব্যবহার:
+// const [settings, setSettings] = useLocalStorage<UserSettings>('settings', { theme: 'light' })
+```
+
+Edge-case:
+- SSR এ `localStorage` নাই — guard করুন (`typeof window !== 'undefined'`) বা lazy-init করুন
+
+---
+
+## Example 3 — `useDebouncedValue<T>`
+
+Debounce pattern অনেক UI-এ দরকার, generic করে দিলে আপনি যেকোন টাইপ debounce করতে পারবেন:
+
+```ts
+import { useEffect, useState } from 'react'
+
+export function useDebouncedValue<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState<T>(value)
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(id)
+  }, [value, delay])
+  return debounced
+}
+
+// ব্যবহার: const debouncedQuery = useDebouncedValue<string>(query, 400)
+```
+
+টিপ: generic inference অনেকসময় কাজ করে — সাধারণত explicit generic দিলে readability বাড়ে।
+
+---
+
+## Example 4 — `useAsync<T> (generic async handler with state)`
+
+একটা ভালো pattern যখন API কল বা অন্য async op multiple places-এ ব্যবহার করতে চান।
+
+```ts
+import { useState, useCallback } from 'react'
+
+type AsyncState<T> = {
+  data?: T
+  error?: Error | null
+  isLoading: boolean
+}
+
+export function useAsync<T>() {
+  const [state, setState] = useState<AsyncState<T>>({ isLoading: false })
+
+  const run = useCallback(async (promise: Promise<T>) => {
+    setState({ isLoading: true })
+    try {
+      const data = await promise
+      setState({ data, isLoading: false })
+      return data
+    } catch (error) {
+      setState({ error: error as Error, isLoading: false })
+      throw error
+    }
+  }, [])
+
+  return { ...state, run }
+}
+
+// ব্যবহার:
+// const { data, isLoading, error, run } = useAsync<User>()
+// run(fetchUser())
+```
+
+Security note: promise param approach decouples fetching from hook, testable and flexible.
+
+---
+
+## Generic Constraints, default generics ও keyof ব্যবহার (সংক্ষিপ্ত)
+
+- Constraint: `T extends Record<string, unknown>` — নির্দিষ্ট interface-কে সীমাবদ্ধ করা
+
+```ts
+function pluck<T extends object, K extends keyof T>(obj: T, key: K) {
+  return obj[key]
+}
+```
+
+- Default generic:
+
+```ts
+function identity<T = string>(value: T) { return value }
+```
+
+এগুলো hooks-এও কাজে লাগে — উদাহরণ: `useLocalStorage<T = string>` যাতে ডিফল্ট টাইপ থাকে।
+
+---
+
+## Testing এবং Validation
+
+- Unit test: custom hook-এ logic পরীক্ষা করার জন্য `@testing-library/react-hooks` (বা React Testing Library wrapper) ব্যবহার করুন
+- Network data হলে runtime validation করুন (zod/io-ts) এবং generic `T` কে validate করে cast করুন
+- SSR ক্ষেত্রে: localStorage/Window guards যোগ করুন
+
+---
+
+## Anti-patterns ও best practices
+
+- Avoid over-genericizing: কখনও কখনও plain `useState<MyType>` সহজ ও পরিষ্কার
+- Don’t depend solely on `any` বা `unknown`—runtime validation প্রয়োজনে করুন
+- Keep hook contract-small: input/outputs পরিষ্কার লিখুন (document the generic T meaning)
+- For library code, provide clear generic constraints ও default types
+
+---
+
+## Practical exercises
+
+Exercise 1 — `useFetch<T>` improvement
+
+- কিভাবে: উপরের `useFetch`-কে update করুন—add `options` param (method, headers), add abort signal support, এবং `swr`-style refetch function যোগ করুন।
+- Checklist:
+  - [ ] `useFetch` generic ঠিকভাবে inference করে
+  - [ ] abortable fetch ব্যবহার করে memory leak রোধ করা হয়েছে
+  - [ ] options param-এ TypeScript typing আছে
+
+Exercise 2 — `useLocalStorage<T>` with SSR guard
+
+- কিভাবে: `useLocalStorage`-কে SSR safe করে তুলুন (initial value server-side safe), এবং default generic `T = string` দিন
+- Checklist:
+  - [ ] SSR guard আছে
+  - [ ] initial value lazy-initialized
+  - [ ] unit test আছে (jsdom)
+
+Exercise 3 — Build a `usePagination<T>` hook
+
+- কিভাবে: একটি generic pagination hook বানান যা page number, page size, total, fetcher function নেয় এবং `loadNext`, `reset` exposes করে
+- Checklist:
+  - [ ] Hook generic `T`-এর array result handle করে
+  - [ ] `getNextPageParam` বা page cursor pattern support করে
+  - [ ] error ও loading state হ্যান্ডল করা হয়েছে
+
+Exercise 4 — Library-quality hook
+
+- কিভাবে: `useAsync<T>` কে refine করে proper typing, cancel support, retry logic ও tests যোগ করুন
+- Checklist:
+  - [ ] run 호출ের টাইপ সেট করা আছে
+  - [ ] cancelation support
+  - [ ] test coverage: success, error, cancel
+
+---
+
+## উপসংহার
+
+Generics এবং custom hooks মূলত React-এ reusable এবং type-safe logic লেখার শক্তিশালী উপায়। Generics আপনাকে compile-time contracts দেন, আর custom hooks সেই contracts ব্যবহার করে UI-logic encapsulate করে। ছোট hooks থেকে শুরু করে library-grade hooks পর্যন্ত সময় নিন, runtime validation ও tests কড়া রাখুন।
+
+চাইলে আমি উপরের কোন exercise-টি runnable starter হিসেবে scaffold করে দিতে পারি (Vite + React + TS), অথবা আমি একটি সম্পূর্ণ `useFetch` + tests code এখানে লিখে দিতে পারি — বলুন কোনটা করবেন।
+
+---

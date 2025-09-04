@@ -1,0 +1,265 @@
+---
+title: অ্যাক্সেসিবিলিটি (a11y)
+icon: mdi:accessibility
+description: ওয়েব অ্যাক্সেসিবিলিটি (a11y) এর মূলনীতি, semantic HTML, ARIA, keyboard navigation, focus management, testing এবং Next.js/React এ বাস্তবায়ন (TypeScript উদাহরণসহ)
+keywords:
+  - accessibility
+  - a11y
+  - aria
+  - nextjs
+  - typescript
+---
+
+# অ্যাক্সেসিবিলিটি (a11y)
+
+আমি কি করবো: এই পাঠে আমরা শিখব কীভাবে React/Next.js অ্যাপে অ্যাক্সেসিবিলিটি যোগ করতে হয় — সহজ ভাষায়, বাস্তব উদাহরণ ও টেস্টিং টিপসসহ।
+
+সংক্ষিপ্ত পরিকল্পনা:
+- কেন a11y গুরুত্বপূর্ণ (analogy)
+- semantic HTML ও ARIA এর ভূমিকা
+- keyboard navigation ও focus management (TypeScript উদাহরণ)
+- accessible forms, images ও color contrast
+- automated এবং manual testing টুলস
+- practical exercise: একটি small accessible component তৈরি করা
+
+চেকলিস্ট:
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] Analogy আছে
+- [ ] TypeScript + JSX উদাহরণ আছে
+- [ ] practical exercise ও চেকলিস্ট আছে
+
+---
+
+## পরিচিতি — কেন অ্যাক্সেসিবিলিটি জরুরি?
+
+যারা বিভিন্ন দক্ষতা বা ডিভাইস ব্যবহার করেন—স্ক্রিন রিডার ইউজার, কীবোর্ড-অনলি ইউজার, দর্শন অভিজ্ঞতা সীমিত ব্যবহারকারী—তারাও আপনার সাইট ব্যবহার করতে সক্ষম হওয়া উচিত। অ্যাক্সেসিবিলিটি মানে কেবল আইন অথবা অনুকম্পা নয়; এটা ভালো UX এবং বড় অডিয়েন্সের কাছে পৌঁছানোর উপায়।
+
+Analogy: একটি ভবনের প্রধান দরজা যদি খুব চওড়া ও র‍্যাম্প-বিহীন হয়, অনেক মানুষ সেই ভবনে ঢুকতে পারবে না। ওয়েবসাইটে অ্যাক্সেসিবিলিটি সেই র‍্যাম্প—সব ব্যাবহারকারীর জন্য সহজ প্রবেশযোগ্যতা নিশ্চিত করে।
+
+---
+
+## semantic HTML — ভিত্তি শক্ত করুন
+
+প্রথম ধাপ: সঠিক semantic HTML ব্যবহার করুন। এটি স্ক্রিন রিডার ও ব্রাউজারের জন্য স্বাভাবিক ও বুদ্ধিমান রেঙ্কিং দেয়।
+
+- হেডিংস: `<h1>` থেকে `<h6>` সঠিক অর্ডারে
+- Landmark elements: `<header>`, `<main>`, `<nav>`, `<footer>`, `<aside>`
+- Lists: আপনার নেভিগেশন বা ফিড হলে `<ul>`/`<ol>` ব্যবহার করুন
+- Buttons vs links: clickable UI যদি navigation করে তবে `<a>`; aksiuon-trigger হলে `<button>` ব্যবহার করুন
+
+উদাহরণ (সঠিক):
+
+```tsx
+export function Nav() {
+  return (
+    <nav aria-label="Main navigation">
+      <ul>
+        <li><a href="/">হোম</a></li>
+        <li><a href="/projects">প্রজেক্ট</a></li>
+      </ul>
+    </nav>
+  )
+}
+```
+
+---
+
+## ARIA: কখন এবং কীভাবে ব্যবহার করবেন
+
+ARIA (Accessible Rich Internet Applications) attribute গুলো উপকারী—তবে semantic HTML না থাকলে ARIA দিয়ে সব ঠিক করা যাবে না। নীতিঃ "Use native semantics first, then ARIA where necessary." 
+
+কিছু সাধারণ ARIA attribute:
+- `aria-label`, `aria-labelledby` — নাম/লেবেল প্রদান
+- `aria-hidden="true"` — screen readers থেকে লুকানো
+- `role="dialog"`, `role="status"` — নির্দিষ্ট ভূমিকা নির্ধারণ
+
+উদাহরণ: একটি সংকীর্ণ কাস্টম ট্যাব কম্পোনেন্টে ARIA ব্যবহার:
+
+```tsx
+// src/components/Tabs.tsx
+import React from 'react'
+
+export function Tabs({ tabs }: { tabs: { id: string; title: string; content: React.ReactNode }[] }) {
+  const [active, setActive] = React.useState(tabs[0].id)
+  return (
+    <div>
+      <div role="tablist" aria-label="Sample Tabs">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={t.id === active}
+            aria-controls={`panel-${t.id}`}
+            id={`tab-${t.id}`}
+            onClick={() => setActive(t.id)}
+          >
+            {t.title}
+          </button>
+        ))}
+      </div>
+      {tabs.map(t => (
+        <section
+          key={t.id}
+          id={`panel-${t.id}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${t.id}`}
+          hidden={t.id !== active}
+        >
+          {t.content}
+        </section>
+      ))}
+    </div>
+  )
+}
+```
+
+নোট: `hidden` attribute ব্যবহার করলে screen reader-এ উপাদানটি দেখানো/লুকানো হয়।
+
+---
+
+## Keyboard navigation ও focus management (TypeScript উদাহরণ)
+
+প্রয়োগযোগ্য নিয়ম:
+- সব interactive element (buttons, links, input) কীবোর্ডে পৌঁছ যোগ্য হতে হবে (tabindex)।
+- Custom interactive elements এ key handlers যোগ করুন (`Enter`, `Space`, `Arrow` keys)
+- Modal/dialog কম্পোনেন্টে focus trap ও focus restore করুন
+
+Focus trap উদাহরণ:
+
+```tsx
+// src/components/Modal.tsx
+'use client'
+import React, { useEffect, useRef } from 'react'
+
+export function Modal({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const previous = document.activeElement as HTMLElement | null
+    const focusable = ref.current?.querySelectorAll<HTMLElement>(
+      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    )
+    focusable?.[0]?.focus()
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      previous?.focus()
+    }
+  }, [open, onClose])
+
+  if (!open) return null
+  return (
+    <div role="dialog" aria-modal="true" ref={ref}>
+      <button onClick={onClose}>Close</button>
+      {children}
+    </div>
+  )
+}
+```
+
+নোট: Focus restore করার ফলে modal বন্ধ করলে ব্যবহারকারীর স্থান ফিরে পায়।
+
+---
+
+## Accessible forms
+
+- প্রত্যেক ইনপুটের সাথে `<label>` থাকতে হবে।
+- ভুল ইনপুট দেখাতে `aria-invalid` ও `aria-describedby` ব্যবহার করুন।
+
+উদাহরণ:
+
+```tsx
+function ContactForm() {
+  return (
+    <form onSubmit={e => e.preventDefault()}>
+      <label htmlFor="email">ইমেইল</label>
+      <input id="email" name="email" type="email" aria-required="true" />
+      <button type="submit">Send</button>
+    </form>
+  )
+}
+```
+
+ভুল দেখানো উদাহরণ:
+
+```tsx
+<input id="email" aria-describedby="email-error" aria-invalid={true} />
+<span id="email-error">ইমেইল সঠিক নয়</span>
+```
+
+---
+
+## Images, color contrast ও visual affordances
+
+- প্রতিটি গুরুত্বপূর্ণ image-এ `alt` প্রদান করুন। purely decorative image এ `alt=""` দিন।
+- Color contrast WCAG মান মেনে নিন (minimum 4.5:1 body text)।
+- Visual cues ছাড়া শুধুমাত্র color দিয়ে অর্থ প্রকাশ করবেন না—অর্থ সহ icon বা text দিন।
+
+Test contrast quickly with online tools বা `axe` report এ দেখুন।
+
+---
+
+## Automated ও manual testing
+
+Automated tools:
+- axe-core (browser extension বা jest-axe)
+- Lighthouse (accessibility audit)
+- pa11y
+
+Example: `jest-axe` integration
+
+```ts
+import { render } from '@testing-library/react'
+import { axe } from 'jest-axe'
+import { Nav } from './Nav'
+
+test('Nav should have no a11y violations', async () => {
+  const { container } = render(<Nav />)
+  const results = await axe(container)
+  expect(results).toHaveNoViolations()
+})
+```
+
+Manual testing checklist:
+- Tab through the page, ensure all interactive items reachable
+- Test with a screen reader (VoiceOver, NVDA)
+- Check color contrast with an extension
+- Test on small screens and with zoomed text
+
+---
+
+## Performance considerations
+
+- a11y ও performance বিপরীতপ্রবাহে নয়; semantic HTML ও accessible patterns সাধারণত performance-friendly
+- কিন্তু heavy aria live regions বা frequent DOM updates screen reader-এ noisy হতে পারে—debounce live updates
+
+---
+
+## Practical exercise — Accessible Button & Modal
+
+লক্ষ্য: একটি fully accessible `Dialog` কম্পোনেন্ট তৈরি করুন এবং টেস্ট লিখুন।
+
+Deliverables:
+- [ ] `AccessibleButton` component যা keyboard ও screen reader friendly
+- [ ] `Modal` component (focus trap, ESC to close, aria-modal)
+- [ ] Unit test: `jest-axe` দিয়ে accessibility violations না থাকছে নিশ্চিত করা
+- [ ] Manual checklist সম্পন্ন করা: keyboard, screen reader, contrast
+
+Hints:
+- `AccessibleButton` তৈরি করতে native `<button>` ব্যবহার করুন; avoid clickable `<div>`।
+- Modal-এ `aria-labelledby` ও `aria-describedby` ব্যবহার করে টাইটেল ও বর্ণনা লিংক করুন
+- Tests এ DOM snapshot এর পাশাপাশি `axe` চালান
+
+---
+
+## উপসংহার
+
+অ্যাক্সেসিবিলিটি হচ্ছে ডিজাইন ও ডেভেলপমেন্টের একটি গুরুত্বপূর্ণ দিক—শুরুতে কিছু নিয়ম মানলে পরে বড় পরিবর্তন করতে হয় না। semantic HTML, সঠিক ARIA ব্যবহার, keyboard support এবং automated tests যোগ করলে আপনার অ্যাপ বেশি মানুষকে পৌঁছাবে।
+
+আপনি চাইলে আমি `AccessibleButton` এবং `Modal`-এর runnable implementation + tests scaffold করে দেব—বলুন আমি scaffold চালাই কি না।
+
+---

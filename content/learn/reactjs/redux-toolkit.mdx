@@ -1,0 +1,329 @@
+---
+title: Redux Basics ও Redux Toolkit
+icon: logos:redux
+description: Redux ধারণা, State Management সমস্যা, এবং Redux Toolkit দিয়ে কিভাবে টাইপসেফ ও কম-বয়সী কোডে স্থিতিশীল স্টেট ম্যানেজ করবেন — TypeScript উদাহরণ সহ
+keywords:
+  - redux
+  - redux-toolkit
+  - state-management
+  - react-redux
+  - typescript
+---
+
+# Redux Basics ও Redux Toolkit
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- Redux কেন দরকার সহজ ভাষায় সংজ্ঞা দেবো
+- Redux Toolkit (RTK) কী এবং এটি কিভাবে boilerplate কমায় দেখাবো
+- TypeScript সহ RTK slice, store ও async thunk তৈরি করে উদাহরণ দেখাবো
+- best practices, testing ও performance টিপস দেবো
+- practical exercise: Shopping Cart অ্যাপ বানান (Module 7 প্রজেক্টের অংশ হিসেবে)
+
+চেকলিস্ট (প্রয়োজনীয়তা থেকে নেয়া):
+- [x] নতুন MDX ফাইল সঙ্গে frontmatter (`title`, `icon`, `description`, `keywords`)
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও ধারাবাহিক
+- [x] analogy দিয়ে কঠিন ধারণা সহজ করা হয়েছে
+- [x] React + TypeScript উদাহরণ (store, slice, hooks, thunk) আছে
+- [x] practical exercise ও চেকলিস্ট দেওয়া হয়েছে
+- [x] Index.md-এ থাকা অন্য পাঠের পুনরাবৃত্তি এড়ানো হয়েছে — এখানে State Management ফোকাস
+
+---
+
+## প্রারম্ভিক ধারণা: Redux কেন?
+
+স্টেট ম্যানেজমেন্ট বলতে বোঝায় UI এর বিভিন্ন অংশ কিভাবে একই ডেটা শেয়ার করবে, আপডেট নেবে এবং predictable আচরণ রাখবে। ছোট অ্যাপে `useState` বা `useContext` অনেক সময়ই যথেষ্ট, কিন্তু বড় অ্যাপে স্টেট ছড়িয়ে পড়ে, update logic duplicate হয় এবং debugging কঠিন হয়।
+
+Redux হলো একটি predictable state container। মূল ধারণা তিন শব্দে:
+
+1. Single source of truth — পুরো অ্যাপের state একটি central store-এ থাকে
+2. State immutable হয় — state পরিবর্তনের জন্য actions dispatch করে reducers-এ pure functions চালায়
+3. Changes predictable — actions এবং reducers আকারে সব স্টেট পরিবর্তন explicitভাবে লেখা হয়
+
+Analogy: একটা লাইব্রেরি ভাণ্ডার বলুন — সব বই (state) একটা তালিকায় আছে, এবং বই নেওয়া/দেওয়ার প্রতিটি কাজ (action) রেকর্ড হয়; লাইব্রেরি ম্যানেজার (reducer) ঠিক করে কীভাবে তালিকা আপডেট হবে।
+
+---
+
+## Redux Toolkit (RTK) — সমস্যা ও সমাধান
+
+প্রচলিত Redux boilerplate অনেক ছিল: action types, action creators, switch-case reducers, immutable updates। Redux Toolkit (RTK) এই সমস্যা গুলো সরায় — এটি opinionated utilities দেয়:
+
+- createSlice — reducers + actions এক জায়গায় বানায়
+- configureStore — store সহ middleware ও devtools সহজ যোগ করে
+- createAsyncThunk — async logic (thunks) সহজ করে
+- Immer integration — immutable update code সহজে লিখতে সাহায্য করে (mutating syntax, কিন্তু immutable)
+
+RTK ব্যবহারের ফলে কোড পরিষ্কার, টাইপসেফ আর কম verbose হয়।
+
+---
+
+## দ্রুত সেটআপ
+
+```bash
+npm install @reduxjs/toolkit react-redux
+# TypeScript টিপস:
+npm install --save-dev @types/react-redux
+```
+
+React অ্যাপে store provide করতে `Provider` ব্যবহার করুন:
+
+```tsx
+// src/store/index.ts
+import { configureStore } from '@reduxjs/toolkit'
+import cartReducer from './slices/cartSlice'
+
+export const store = configureStore({
+  reducer: { cart: cartReducer },
+})
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+
+// src/main.tsx (বা index.tsx)
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { store } from './store'
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+)
+```
+
+---
+
+## একটি Slice উদাহরণ (Shopping Cart)
+
+RTK-এর `createSlice` দিয়ে সহজে slice তৈরি করা যায়:
+
+```ts
+// src/store/slices/cartSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+type CartItem = { id: string; name: string; price: number; qty: number }
+
+type CartState = { items: CartItem[] }
+
+const initialState: CartState = { items: [] }
+
+const cartSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    addItem(state, action: PayloadAction<CartItem>) {
+      const existing = state.items.find(i => i.id === action.payload.id)
+      if (existing) {
+        existing.qty += action.payload.qty
+      } else {
+        state.items.push(action.payload)
+      }
+    },
+    removeItem(state, action: PayloadAction<string>) {
+      state.items = state.items.filter(i => i.id !== action.payload)
+    },
+    clearCart(state) {
+      state.items = []
+    }
+  }
+})
+
+export const { addItem, removeItem, clearCart } = cartSlice.actions
+export default cartSlice.reducer
+```
+
+নোট: এখানে আমরা সরাসরি `state.items.push` ব্যবহার করেছি — RTK এর Immer integration-এ এটা নিরাপদ (immutable updates auto-handled)।
+
+---
+
+## Typed hooks (useAppDispatch, useAppSelector)
+
+TypeScript-এ ভাল অভ্যাস হলো typed hooks বানানো:
+
+```ts
+// src/store/hooks.ts
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import type { RootState, AppDispatch } from './index'
+
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+```
+
+এবার component-এ useAppDispatch/useAppSelector ব্যবহার করুন:
+
+```tsx
+import React from 'react'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { addItem } from '../store/slices/cartSlice'
+
+export function AddButton(){
+  const dispatch = useAppDispatch()
+  const onAdd = () => dispatch(addItem({ id: 'p1', name: 'Product', price: 99, qty: 1 }))
+  return <button onClick={onAdd}>Add</button>
+}
+```
+
+---
+
+## Async operations: createAsyncThunk
+
+Server-এ থেকে ডেটা আনতে বা async কাজ করতে `createAsyncThunk` ব্যবহার করা হয়। এটি pending/fulfilled/rejected action lifecycle auto-creates করে এবং extraReducers-এ handle করা যায়।
+
+```ts
+// src/store/slices/productsSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+
+export const fetchProducts = createAsyncThunk('products/fetch', async () => {
+  const res = await fetch('/api/products')
+  if (!res.ok) throw new Error('Network error')
+  return res.json()
+})
+
+type Product = { id: string; name: string; price: number }
+
+const productsSlice = createSlice({
+  name: 'products',
+  initialState: { items: [] as Product[], status: 'idle' as 'idle' | 'loading' | 'failed' },
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(fetchProducts.pending, (state) => { state.status = 'loading' })
+      .addCase(fetchProducts.fulfilled, (state, action) => { state.status = 'idle'; state.items = action.payload })
+      .addCase(fetchProducts.rejected, (state) => { state.status = 'failed' })
+  }
+})
+
+export default productsSlice.reducer
+```
+
+Component-এ:
+
+```tsx
+import React, { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { fetchProducts } from '../store/slices/productsSlice'
+
+export function ProductsPage(){
+  const dispatch = useAppDispatch()
+  const products = useAppSelector(s => s.products.items)
+  const status = useAppSelector(s => s.products.status)
+
+  useEffect(() => { dispatch(fetchProducts()) }, [dispatch])
+
+  if (status === 'loading') return <div>লোড হচ্ছে...</div>
+  return (
+    <div>
+      {products.map(p => <div key={p.id}>{p.name} - ${p.price}</div>)}
+    </div>
+  )
+}
+```
+
+---
+
+## Middleware, DevTools ও serializability
+
+RTK `configureStore` ডিফল্টভাবে `redux-thunk` ও `serializableCheck` middleware যোগ করে।
+
+- middleware: logging, analytics বা custom side-effects যোগ করতে পারবেন
+- serializability: action/payload-এ non-serializable data (functions, DOM nodes) পাঠাবেন না—অন্যথা warning পাবেন
+
+`configureStore` উদাহরণ:
+
+```ts
+import { configureStore } from '@reduxjs/toolkit'
+import cartReducer from './slices/cartSlice'
+
+export const store = configureStore({
+  reducer: { cart: cartReducer },
+  devTools: process.env.NODE_ENV !== 'production',
+})
+```
+
+---
+
+## Testing slices ও async thunks
+
+RTK slices সহজে unit test করা যায়:
+
+```ts
+import cartReducer, { addItem, removeItem } from './cartSlice'
+
+test('addItem increases qty if exists', () => {
+  const state = { items: [{ id: 'p1', name: 'A', price: 1, qty: 1 }] }
+  const next = cartReducer(state, addItem({ id: 'p1', name: 'A', price: 1, qty: 2 }))
+  expect(next.items[0].qty).toBe(3)
+})
+```
+
+Async thunks can be tested using mocking fetch or with `msw` (Mock Service Worker) for integration-style tests.
+
+---
+
+## Best practices
+
+- Keep state normalized (especially lists) — consider `createEntityAdapter` for normalized collections
+- Keep UI state local (component state) when possible — global store for cross-cutting app state
+- Use typed hooks (`useAppDispatch`, `useAppSelector`) for TypeScript safety
+- Prefer thunks or RTK Query for data fetching; RTK Query is recommended for caching & fetching
+- Avoid storing non-serializable values in the store
+- Split slices by feature, not by component
+
+---
+
+## Performance notes
+
+- Avoid over-selecting: prefer small selectors (select only necessary data) to avoid unnecessary re-renders
+- Use `reselect` or memoized selectors for derived data
+- Use `connect` or `useSelector` with shallowEqual where appropriate
+
+---
+
+## Practical exercise — Shopping Cart with Redux Toolkit
+
+লক্ষ্য: একটি ছোট Shopping Cart তৈরি করুন যেখানে:
+- প্রোডাক্ট সার্ভার থেকে fetch করা হবে (simulate API)
+- ব্যবহারকারী কার্টে আইটেম যোগ/বিয়োগ করতে পারবে
+- কার্ট স্টেট Redux Toolkit slice-এ থাকবে
+- একটি async thunk ব্যবহার করে products লোড করবেন
+
+স্টেপস:
+1. নতুন Vite React+TS প্রজেক্ট তৈরি করুন
+
+```bash
+npm create vite@latest shop -- --template react-ts
+cd shop
+npm install
+npm install @reduxjs/toolkit react-redux
+```
+
+2. Store ও slices তৈরি করুন (উপরের উদাহরণগুলো অনুসরণ করুন)
+3. UI বানান: `ProductsPage`, `ProductCard`, `Cart` component।
+4. Add tests for `cartSlice` reducers এবং একটি integration test (mock fetch) for `fetchProducts` thunk
+5. Measure: Profile কিভাবে adding/removing items কাজ করে; selector optimization প্রয়োগ করুন
+
+Exercise checklist:
+- [ ] Products fetch করে display হচ্ছে
+- [ ] Cart add/remove/clear কাজ করে
+- [ ] Thunk error case handle করা হয়েছে
+- [ ] Slice unit tests লেখা হয়েছে
+
+---
+
+## Resources ও পরবর্তী ধাপ
+
+- Redux Toolkit docs: https://redux-toolkit.js.org/
+- RTK Query (advanced): built-in data fetching & caching API
+- CreateEntityAdapter: normalized collection helpers
+
+---
+
+## উপসংহার
+
+Redux Toolkit আপনাকে Redux-এর power দেয় কিন্তু কম boilerplate-এ। বড় অ্যাপের জন্য centralized predictable state সাহায্য করে debugging ও maintainability বাড়াতে। শুরুতে small feature গুলোকে RTK দিয়ে সাজান, measure করুন এবং প্রয়োজন অনুযায়ী RTK Query, entity adapter ইত্যাদি ব্যবহার করে স্কেল করুন।
+
+চাইলে আমি এই exercise-এর জন্য একটি runnable starter (Vite + React + TS) scaffold করে দিতে পারি যেখানে slices, store, UI এবং tests সবই থাকবে — বলুন, scaffold করতে চান? 
+
+---

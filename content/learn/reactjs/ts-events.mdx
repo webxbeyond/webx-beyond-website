@@ -1,0 +1,279 @@
+---
+title: Event টাইপ হ্যান্ডলিং
+icon: ic:baseline-input
+description: React + TypeScript-এ ইভেন্ট টাইপিং- SyntheticEvent, ChangeEvent, FormEvent, MouseEvent, KeyboardEvent, generic handlers, এবং test টিপস সহ প্র্যাকটিকাল উদাহরণ
+keywords:
+  - react
+  - typescript
+  - events
+  - event-typing
+  - forms
+---
+
+# Event টাইপ হ্যান্ডলিং
+
+এই পাঠে আমরা শেখবো কিভাবে React + TypeScript-এ ইভেন্টগুলো নিরাপদভাবে টাইপ করতে হয়। আমরা practical উদাহরণ দেখব — form change, submit, button click, keyboard events, file input এবং কিভাবে handler props টাইপ করবেন।
+
+এক লাইন প্ল্যান:
+- সহজ analogy দিয়ে ধারণা পরিষ্কার করা
+- React-এর common ইভেন্ট টাইপগুলো ব্যাখ্যা করা (ChangeEvent, FormEvent, MouseEvent, KeyboardEvent)
+- TypeScript উদাহরণ (input, checkbox, file, form submit, button click)
+- advanced: generic handlers, currentTarget vs target, useCallback সঙ্গে ইভেন্ট টাইপ
+- testing tips ও practical exercise
+
+চেকলিস্ট:
+- [ ] MDX ফ্রন্টম্যাটার আছে
+- [ ] পুরো আর্টিকেল বাংলা ভাষায় ও beginner-friendly
+- [ ] TypeScript উদাহরণ আছে (multiple event types)
+- [ ] practical exercise ও checklist আছে
+
+---
+
+## পরিচিতি ও analogy
+
+Analogy: ভাবুন আপনার বাড়ির ডোরবেল হলো একটি ইভেন্ট। ডোরবেল বাজলে (click) কেউ জানে যে কারো আগমন ঘটেছে। কিন্তু ডোরবেলের সঙ্গে আরো তথ্য থাকতে পারে — স্ট্যাম্প টাইম, কোথা থেকে বাজল ইত্যাদি। React-এ ইভেন্টও একই রকম: কোন action ঘটেছে তার সঙ্গে একটা object আসে (event) — সেই object-এ থাকা তথ্য ব্যবহার করে আমরা সিদ্ধান্ত নেই।
+
+TypeScript এখানে সাহায্য করে: ইভেন্টের যে ফিল্ডগুলো আপনি ব্যবহার করবেন (যেমন `currentTarget.value`), সেগুলো সঠিক টাইপ হিসেবে ধরলে runtime সমস্যা অনেক কমে যায়।
+
+---
+
+## React-এর common ইভেন্ট টাইপগুলো (সংক্ষিপ্ত পরিচিতি)
+
+- `React.ChangeEvent<HTMLInputElement>` — input/textarea/select-এর change ইভেন্ট
+- `React.FormEvent<HTMLFormElement>` — form submit ইভেন্ট
+- `React.MouseEvent<HTMLButtonElement>` — mouse click ইভেন্ট
+- `React.KeyboardEvent<HTMLInputElement>` — কী-বোর্ড ইভেন্ট
+- React.SyntheticEvent — generic synthetic event base টাইপ
+
+নোট: React-এর ইভেন্টগুলো SyntheticEvent ভিত্তিক; DOM ইভেন্টের wrapper হিসেবে কাজ করে।
+
+---
+
+## সরল উদাহরণ: input change ও form submit
+
+```tsx
+import React from 'react'
+
+export function SearchBox(){
+  const [query, setQuery] = React.useState('')
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>){
+    setQuery(e.target.value)
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault()
+    // সার্চ সাবমিট লজিক
+    console.log('Searching for', query)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={query} onChange={handleChange} />
+      <button type="submit">Search</button>
+    </form>
+  )
+}
+```
+
+কী মনে রাখা উচিত:
+- `e.target` প্রায়ই আপনি চান, কিন্তু টাইপ থেকে নিশ্চিত হওয়া দরকার—`currentTarget` আপনার element টাইপটিকে বেশি নির্ভরযোগ্যভাবে দেয়।
+
+---
+
+## currentTarget vs target
+
+- `e.target`: ইভেন্টের আসল উৎস (DOM node) — bubbling-এর সময় অন্য node-ও হতে পারে
+- `e.currentTarget`: যেই element এ listener সেট করা আছে সেটাই দেয় — সাধারণত safer
+
+```tsx
+function handler(e: React.MouseEvent<HTMLButtonElement>){
+  // safe: e.currentTarget is HTMLButtonElement
+  console.log(e.currentTarget.disabled)
+}
+```
+
+---
+
+## Button click, checkbox, file input
+
+Button click:
+
+```tsx
+function DeleteButton({ onDelete }: { onDelete: () => void }){
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>){
+    e.preventDefault()
+    onDelete()
+  }
+  return <button onClick={handleClick}>Delete</button>
+}
+```
+
+Checkbox:
+
+```tsx
+function Checkbox(){
+  const [checked, setChecked] = React.useState(false)
+  function onChange(e: React.ChangeEvent<HTMLInputElement>){
+    setChecked(e.target.checked)
+  }
+  return <input type="checkbox" checked={checked} onChange={onChange} />
+}
+```
+
+File input (বিশেষ সতর্কতা):
+
+```tsx
+function FileUploader(){
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>){
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    const first = files[0]
+    console.log('selected', first.name)
+  }
+
+  return <input type="file" onChange={onFileChange} />
+}
+```
+
+---
+
+## Keyboard events ও accessibility
+
+Key press ধরতে চাইলেই `React.KeyboardEvent` ব্যবহার করুন:
+
+```tsx
+function SearchInput(){
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>){
+    if (e.key === 'Enter') {
+      // submit বা অন্য অ্যাকশন
+    }
+  }
+  return <input onKeyDown={onKeyDown} />
+}
+```
+
+Accessibility টিপ: keyboard events ব্যবহার করে interactive element-গুলোকে accessible রাখুন; কিন্তু দেখতে হবে button element নয় এমন div/span-এ key handlers দিলে proper role ও tabindex দিন। ভালো practice হল semantic elements (button, a, input) ব্যবহার করা।
+
+---
+
+## Generic handler pattern ও reusability
+
+এগুলোতে generic handler তৈরি করা যায় যাতে একাধিক input field-এর জন্য এক handler কাজ করে:
+
+```tsx
+type FormState = { [key: string]: string }
+
+function useForm(initial: FormState) {
+  const [state, setState] = React.useState<FormState>(initial)
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>){
+    const { name, value } = e.currentTarget
+    setState(prev => ({ ...prev, [name]: value }))
+  }
+  return { state, handleChange }
+}
+
+// ব্যবহার:
+// <input name="email" value={state.email} onChange={handleChange} />
+```
+
+টাইপিং নিয়ম: এখানে `e.currentTarget` ব্যবহার করুন কারণ `name` এবং `value` ঐ element-এ থাকে এবং currentTarget টাইপ নিরাপদ।
+
+---
+
+## Passing event handlers via props — কী টাইপ দেবেন?
+
+কখনো parent থেকে handler পাস করলে দুইটি ধরন দেখা যায়:
+
+1) Parent কে শুধু value পাঠাতে চান (simple callback):
+
+```tsx
+type ItemRowProps = {
+  onAdd: (id: string) => void
+}
+```
+
+2) Parent কে raw event পাঠাবেন:
+
+```tsx
+type RawHandlerProps = {
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
+}
+```
+
+সফল pattern: সাধারণত-domain-specific handler (e.g., `onAdd(id)`) পাঠানো ভাল — এতে কম্পোনেন্ট encapsulation বজায় থাকে এবং আর parent-কে ইভেন্ট-অবজেক্ট বুঝতে হবে না। শুধুমাত্র যদি parent-কে ইভেন্টের প্রতিটি ফিল্ড দরকার হয় তখন raw event পাস করুন।
+
+---
+
+## useCallback সঙ্গে ইভেন্ট টাইপ
+
+`useCallback` ব্যবহার করলে টাইপ একইভাবে খানিকটা কার্যকর হয়:
+
+```tsx
+const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  // ...
+}, [])
+```
+
+TypeScript inference সাধারণত ঠিক করে দেয়, কিন্তু explicit টাইপ দিলে readability বাড়ে।
+
+---
+
+## Common pitfalls ও best practices
+
+- Avoid `any` for event types — এটি safety ভঙ্গ করে।
+- যদি একটি handler বিভিন্ন element থেকে কল হয় (e.g., input ও textarea একই handler), union টাইপ দিন: `React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>`
+- `e.target` ব্যবহার করলে casting লাগতে পারে; prefer `e.currentTarget` যখন সম্ভব
+- Field name-এর ওপর dynamic update করলে `name` attribute রাখুন এবং টাইপস অনুযায়ী state structure বানান
+- For forms, use `FormEvent` ও `preventDefault()` করার সময় event টাইপ দিন
+
+---
+
+## Testing ইভেন্টস (RTL) — দ্রুত টিপস
+
+- `@testing-library/user-event` ব্যাবহার করে ইউজার-লাইক ইন্টারঅ্যাকশন simulate করুন।
+- Example:
+
+```tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+test('search submits', async () => {
+  render(<SearchBox />)
+  await userEvent.type(screen.getByRole('textbox'), 'hello')
+  await userEvent.click(screen.getByRole('button', { name: /search/i }))
+  // assert expected behaviour
+})
+```
+
+Testing টিপ: component tests-এ `QueryClientProvider` বা context wrapper হলে wrap করে দিন, আর যদি event-driven network call থাকে তবে msw দিয়ে mock করুন।
+
+---
+
+## Practical exercise — Typed Contact Form
+
+লক্ষ্য: একটি ছোট Contact form তৈরি করুন যেখানে সব handler এবং state টাইপ থাকবে। ফরমে থাকে: name, email, message (textarea), এবং একটি file attachment (optional)।
+
+Requirements:
+1. प्रत्येक input কে `name` attribute দিন (name, email, message, attachment)
+2. একটি `useForm` hook লিখুন যা generic ভাবে সব input handle করবে (উপরে দেখানো pattern)
+3. Submit হলে `React.FormEvent<HTMLFormElement>` টাইপ ব্যবহার করুন এবং preventDefault চালান
+4. File input-এ `e.currentTarget.files` থেকে প্রথম ফাইল আছে কিনা চেক করুন
+5. Button ক্লিক বা সাবমিট handler TS-সঠিকভাবে টাইপ করুন
+
+Exercise checklist:
+- [ ] `useForm`-এ state টাইপিং আছে `(Record<string, string | File | null>)`
+- [ ] change handlers-এ `React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>` ব্যবহার করা হয়েছে
+- [ ] submit handler-এ `React.FormEvent<HTMLFormElement>` ব্যবহার করা হয়েছে
+- [ ] file handling code null-safe এবং properly guarded
+- [ ] একটুখানি RTL টেস্ট আছে যা form fill ও submit করে
+
+---
+
+## উপসংহার
+
+React + TypeScript-এ ইভেন্ট টাইপিং শিখলে আপনার UI interaction কোড অনেক বেশি predictable এবং robust হয়। প্রথম দিকে কিছু boilerplate লাগতে পারে, কিন্তু সঠিক সংকেত (event) টাইপিং আপনাকে IDE support, safer refactors এবং কম runtime bug দেবে।
+
+আপনি চাইলে আমি এই Contact Form-এর জন্য একটি runnable Vite + React + TS starter scaffold করতে পারি এবং একটি small test যুক্ত করে দেব — বলুন scaffold করতে চান কি? 
+
+---

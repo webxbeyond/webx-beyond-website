@@ -1,0 +1,263 @@
+---
+title: "টেস্টিং পরিচিতি: Unit, Integration, E2E"
+icon: ic:round-verified
+description: React অ্যাপে টেস্টিং পরিচিতি — Unit, Integration ও E2E টেস্টিং-এর উদ্দেশ্য, tooling (Jest, React Testing Library, MSW, Cypress) ও practical উদাহরণ সহ
+keywords:
+  - testing
+  - jest
+  - react-testing-library
+  - cypress
+  - msw
+---
+
+# টেস্টিং পরিচিতি: Unit, Integration, E2E
+
+এই পাঠে আপনি শিখবেন:
+
+- Unit, Integration ও E2E টেস্টিং-এর উদ্দেশ্য এবং পার্থক্য
+- React অ্যাপের জন্য সাধারণ টুলিং: Jest, React Testing Library (RTL), MSW, Cypress
+- একটি ছোট component-এর জন্য Unit/Integration টেস্ট কীভাবে লিখবেন (TypeScript উদাহরণ)
+- E2E টেস্টিং-এর মৌলিক প্রবাহ ও কনফিগারেশন
+- practical exercise: একটি Login বা Todo feature-এর জন্য tests তৈরি করা
+
+এক লাইন প্ল্যান:
+- সরল analogy দিয়ে টেস্টিং-কে বোঝানো
+- টুলিং পরিচিতি ও কমান্ড দেখানো
+- code উদাহরণ: component, RTL test, msw mock, Cypress spec
+- practical exercise ও চেকলিস্ট
+
+চেকলিস্ট (requirements mapping):
+- [x] MDX frontmatter (`title`,`icon`,`description`,`keywords`) যোগ করা
+- [x] সম্পূর্ণ আর্টিকেল বাংলা ভাষায় এবং beginner-friendly
+- [x] analogy ও পরিষ্কার ব্যাখ্যা দেওয়া
+- [x] Jest + RTL + MSW + Cypress উদাহরণ আছে
+- [x] practical exercise এবং checklists রয়েছে
+
+---
+
+## সরল analogy — টেস্টিং কেন?
+
+টেস্টিংকে ভাবুন একটি নিরাপদতার নেট বা জরুরি সিগন্যাল সিস্টেম হিসেবে।
+
+- Unit টেস্ট: প্রতিটি মেশিনের einzelne পার্ট চেক করা — ছোট ও দ্রুত (যেমন একক স্ক্রু ঠিক আছে কিনা)।
+- Integration টেস্ট: মেশিনের দুই-পার্ট একসাথে ঠিক কাজ করছে কি না দেখা—সংযোগ ঠিক আছে কি না (বড় স্ক্রু, বোর্ড) ।
+- E2E টেস্ট: ব্যবহারকারীর দৃষ্টিতে পুরো সিস্টেম কাজ করছে কি না — পুরো যন্ত্রটি চালানো যেমন অফিস চালানো পর্যন্ত পরীক্ষা করা।
+
+Unit টেস্ট দ্রুত, নির্ভরযোগ্য ও সস্তা—E2E ধীর কিন্তু উচ্চ স্তরের নিশ্চয়তা দেয়। ভাল টেস্ট পিরামিড হলো: অনেক Unit, মধ্যম Integration, কিছু E2E।
+
+---
+
+## টুলিং সংক্ষেপে
+
+- Jest: JavaScript/TypeScript testing runtime — test runner ও assertion library
+- React Testing Library (RTL): React component testing-এ user-centric APIs (getByRole, user-event)
+- MSW (Mock Service Worker): network requests mock করার জন্য, unit/integration tests-এ ব্যবহারের জন্য অসাধারণ
+- Cypress: E2E browser testing — অ্যাপ ব্রাউজারে চালিয়ে user-flow পরীক্ষা করে
+
+ইনস্টল (Vite/CRA/Next.js):
+
+```bash
+# core
+npm install -D jest @types/jest ts-jest @testing-library/react @testing-library/jest-dom @testing-library/user-event msw
+# cypress (E2E)
+npm install -D cypress
+```
+
+Next.js প্রজেক্টে testing setup ভিন্ন হতে পারে; docs দেখুন।
+
+---
+
+## ছোট component: উদাহরণ — LoginForm
+
+প্রথমে একটি সরল LoginForm component (TypeScript) দেখি:
+
+```tsx
+// src/components/LoginForm.tsx
+import React from 'react'
+
+type Props = { onSubmit: (data: { email: string; password: string }) => void }
+
+export function LoginForm({ onSubmit }: Props) {
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit({ email, password }) }}>
+      <label>
+        Email
+        <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      </label>
+      <label>
+        Password
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      </label>
+      <button type="submit">Login</button>
+    </form>
+  )
+}
+```
+
+---
+
+## Unit test (Jest) + RTL — interaction-focused
+
+Unit/integration tests for React components প্রায়ই RTL দিয়ে করা হয়। নিচে `LoginForm`-এর জন্য একটি RTL টেস্ট:
+
+```tsx
+// src/components/__tests__/LoginForm.test.tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { LoginForm } from '../LoginForm'
+
+test('submits email and password', async () => {
+  const onSubmit = jest.fn()
+  render(<LoginForm onSubmit={onSubmit} />)
+
+  await userEvent.type(screen.getByLabelText(/email/i), 'me@example.com')
+  await userEvent.type(screen.getByLabelText(/password/i), 'secret')
+  await userEvent.click(screen.getByRole('button', { name: /login/i }))
+
+  expect(onSubmit).toHaveBeenCalledWith({ email: 'me@example.com', password: 'secret' })
+})
+```
+
+কী লক্ষ্য করবেন:
+- DOM-centric queries (`getByLabelText`, `getByRole`) ব্যবহার করুন—এগুলো accessibility-friendly
+- `userEvent` ব্যবহার করে ইউজার-লাইক interaction simulate করুন
+- Jest mock functions দিয়ে callbacks assert করুন
+
+---
+
+## Integration test with network (MSW)
+
+যখন component network call করে, MSW দিয়ে mock করা ভালো। MSW একদম browser-like interception করে, tests-এ fetch/xhr মক করে।
+
+উদাহরণ: ধরা যাক LoginForm উপরের onSubmit ভিতরে API call করে। আমরা MSW দিয়ে server তৈরি করে test এ response control করব।
+
+MSW setup (test-utils):
+
+```ts
+// src/test/setupTests.ts
+import { server } from './mocks/server'
+import '@testing-library/jest-dom'
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+```
+
+`mocks/server.ts`:
+
+```ts
+import { setupServer } from 'msw/node'
+import { rest } from 'msw'
+
+export const server = setupServer(
+  rest.post('/api/login', (req, res, ctx) => {
+    const { email } = req.body as any
+    if (email === 'bad@example.com') {
+      return res(ctx.status(401), ctx.json({ message: 'invalid' }))
+    }
+    return res(ctx.status(200), ctx.json({ token: 'abc' }))
+  })
+)
+```
+
+Test: assert UI reacts to API response (show error message, redirect, etc.)
+
+---
+
+## E2E টেস্টিং (Cypress) — ব্যবহারকারী ফ্লো
+
+Cypress দিয়ে আপনি ব্রাউজার context-এ tests চালাবেন। উদাহরণ একটি login flow:
+
+```js
+// cypress/e2e/login.cy.js
+describe('login flow', () => {
+  it('logs in successfully', () => {
+    cy.visit('/')
+    cy.get('input[name="email"]').type('me@example.com')
+    cy.get('input[name="password"]').type('secret')
+    cy.contains('Login').click()
+    cy.url().should('include', '/dashboard')
+  })
+})
+```
+
+Cypress advantages:
+- Full browser environment (network, cookies, localStorage)
+- Screenshots & video on failures
+
+Cypress setup এবং run:
+
+```bash
+npx cypress open   # interactive
+npx cypress run    # headless CI
+```
+
+---
+
+## Test pyramid ও 전략
+
+- Unit tests: fast, isolated, logic-only
+- Integration tests (RTL + MSW): component interactions + fake network
+- E2E (Cypress): real browser flows
+
+CI recommendation: run unit + integration tests on every PR; run a small set of E2E smoke tests on merge to main or nightly.
+
+---
+
+## Performance, flakiness ও flake-reduction টিপস
+
+- Avoid network-dependencies in unit tests; use MSW
+- Keep E2E focused on critical user journeys, not every edge-case
+- Use stable selectors (`data-testid` or better `getByRole`) to reduce flakiness
+- For async assertions prefer `findBy*` or `waitFor` over fixed timeouts
+
+---
+
+## Practical exercise — Login feature tests
+
+লক্ষ্য: Login feature-এর জন্য Unit, Integration এবং একটি E2E test লিখুন।
+
+Tasks:
+1. Unit test: `LoginForm`-এর onSubmit callback ঠিক কল হচ্ছে কি না (mocked handler) — RTL + Jest
+2. Integration test: সার্ভারে `POST /api/login` mock করে ব্যতিক্রমিক ও সফল response উভয় case assert করা — MSW + RTL
+3. E2E: Cypress দিয়ে একটি success login flow পরীক্ষা করুন (local dev server-এ চালাবেন)
+
+Exercise checklist:
+- [ ] Unit test (Jest + RTL) আছে এবং দ্রুত চলছে
+- [ ] Integration test (MSW) আছে; error ও success case কভার করে
+- [ ] E2E spec (Cypress) আছে এবং headless CI-তে run করার নিয়ম আছে
+
+Helpful commands:
+
+```bash
+# run unit + integration tests (Jest)
+npm test
+
+# run cypress interactively
+npx cypress open
+
+# run cypress headless
+npx cypress run
+```
+
+---
+
+## Quick testing utilities & tips
+
+- Use `@testing-library/jest-dom` matchers (`toBeInTheDocument`, `toHaveTextContent`)
+- Use `jest.useFakeTimers()` sparingly—prefer real timers for integration tests unless you control them
+- For React Query or async data fetching, set `defaultOptions.queries.retry = false` in test QueryClient to avoid long retries
+- Snapshot tests: sparingly; prefer behavior tests over snapshot strings
+
+---
+
+## উপসংহার
+
+টেস্টিং শেখা প্রথমে সময়খাপস্ব করে, কিন্তু একবার প্যাটার্ন গড়া গেলে আপনার confidence ও ডেভেলপমেন্ট speed বাড়ে। স্মার্টভাবে unit/integration/E2E মিলিয়ে একটি টেস্টিং স্ট্র্যাটেজি রাখুন: ছোট দ্রুত unit tests, integration tests with MSW, এবং শুধু critical E2E flows।
+
+আপনি চাইলে আমি এই exercise-টির জন্য runnable starter (Vite + React + TS) scaffold করে দেবো — এতে Jest/RTL/MSW/Cypress কনফিগার থাকবে এবং আমি একটি sample test লিখে runner চালাবো। বলুন "scaffold testing starter" যদি চান।
+
+---

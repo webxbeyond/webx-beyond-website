@@ -1,0 +1,289 @@
+---
+title: Tailwind CSS ইন্টিগ্রেশন
+icon: logos:tailwindcss-icon
+description: Tailwind CSS দিয়ে কীভাবে React প্রোজেক্টে দ্রুত, utility-first স্টাইলিং যোগ করবেন — Vite/CRA/Next.js-এ সেটআপ, কাজের ধারা, এবং TypeScript সহ ব্যবহার
+keywords:
+  - tailwind
+  - tailwindcss
+  - react
+  - utility-first
+  - vite
+---
+
+# Tailwind CSS ইন্টিগ্রেশন
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- Tailwind কী এবং utility-first ধারণা ব্যাখ্যা করব
+- Vite/CRA/Next.js-এ সেটআপ স্টেপ বাই স্টেপ দেখাবো
+- React + TypeScript কম্পোনেন্টে Tailwind ব্যবহার এবং class composition দেখাবো
+- JIT, PurgeCSS (content) ও performance টিপস দেবো
+- একটি practical exercise: Product Card UI বানিয়ে দেখা
+
+চেকলিস্ট (উপরের অনুরোধ থেকে বের করা):
+- [ ] নতুন MDX ফাইল তৈরি `title`, `icon`, `description`, `keywords` সহ
+- [ ] পুরো আর্টিকেল বাংলা ভাষায় এবং beginner-friendly
+- [ ] সংক্ষিপ্ত analogy দিয়ে কঠিন ধারণা সহজ করা
+- [ ] setup কমান্ড ও React+TS উদাহরণ থাকা
+- [ ] practical exercise এবং চেকলিস্ট
+
+---
+
+## পরিচিতি: Tailwind কী, কেন?
+
+Tailwind CSS হলো একটি utility-first CSS framework — মানে আপনি ছোট ছোট CSS utility ক্লাস ব্যবহার করে সরাসরি HTML/JSX-এ স্টাইল লিখে ফেলেন। এটি traditional CSS বা component-scoped টুলগুলোর বিকল্প, দ্রুত প্রোটোটাইপিং ও consistent UI তৈরিতে সাহায্য করে।
+
+সহজ একটি analogy: ধরুন আপনার কাছে পেরিছিন্ন টুকরো কাগজের স্টিকার আছে — প্রতিটি স্টিকার এক ধরণের কাজ করে (m-2 মিনে margin, text-sm ফন্ট সাইজ)। প্রজেক্টে আপনি ওই স্টিকারগুলো কন্টেইনারে লাগিয়ে দ্রুত লেআউট বানাতে পারেন। Tailwind-এ প্রতিটি utility-ক্লাস ঠিক সেই স্টিকারের মতো।
+
+কখন Tailwind ব্যবহার করবেন:
+- দ্রুত প্রোটোটাইপ দরকার হলে
+- consistent spacing ও typography scale থাকতে চাইলে
+- design system না থাকলে utility-first দিয়ে সহজে consistency enforce করতে পারবেন
+
+কবে না ব্যবহার করবেন:
+- যদি আপনি খুব কাস্টম, এক্সট্রিম ডিজাইন বা বিশাল global CSS legacy কোডবেইজে কাজ করেন
+
+---
+
+## মূল ধারণা: utility-first, atomic classes ও composition
+
+- Utility-first: স্টাইলগুলো ছোট ছোট ক্লাস হিসেবে দেওয়া হয় (e.g., px-4, text-gray-700)
+- Atomic classes: প্রতিটি ক্লাস একটি নির্দিষ্ট CSS property-ই পরিবর্তন করে
+- Composition: একাধিক ক্লাস মিলিয়ে একটি component-এ স্টাইল তৈরি করা হয়
+
+অবশ্যই, বড় প্রজেক্টে class list অনেক বড় হতে পারে — এজন্য composition patterns (ক্লাস নাম একত্রিত করা), `@apply` directive, এবং Tailwind-এর config-এ custom utilities রাখতে হয়।
+
+---
+
+## দ্রুত সেটআপ — Vite (React + TypeScript)
+
+সর্বপ্রাথমিকভাবে Vite প্রজেক্ট তৈরি করুন (নিচের কমান্ড কপি-পেস্ট করুন):
+
+```bash
+# Vite + React + TS
+npm create vite@latest my-app -- --template react-ts
+cd my-app
+npm install
+
+# Tailwind ইন্সটল
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+`tailwind.config.cjs`-এ content সেট করুন:
+
+```js
+module.exports = {
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx,mdx}'
+  ],
+  theme: { extend: {} },
+  plugins: [],
+}
+```
+
+`src/index.css` (বা আপনার global css) এ Tailwind ডিরেকটিভ যোগ করুন:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+`main.tsx` এ import করুন:
+
+```ts
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+```
+
+এভাবে Vite-এ Tailwind কাজ করবে। Next.js বা CRA-তে কনফিগ ভিন্ন হবে (নীচে দেখানো আছে)।
+
+---
+
+## Next.js এ integration (সংক্ষেপে, SSR-সহ)
+
+Next.js-এ Tailwind সেটআপ Vite-এর মতোই, কিন্তু আপনি `postcss.config.js` এবং `tailwind.config.js` ঠিক রাখবেন এবং `globals.css`-এ Tailwind ডিরেকটিভ যোগ করবেন।
+
+Next.js + Tailwind Quick steps:
+
+```bash
+# Next.js প্রজেক্ট থাকলে
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+# তারপর tailwind.config.js এর content-এ pages, components, app (Next 13) যোগ করুন
+```
+
+SSR-এ কিছু extra বিবেচ্য নেই কারণ Tailwind শুধু CSS জেনারেট করে—hydration mismatch সাধারণত হয় না যতক্ষণ আপনি runtime-এ ক্লাস বদলান না। তবে dynamic কন্ডিশনাল ক্লাসে server/client mismatch সতর্কতার বিষয়।
+
+---
+
+## Create React App (CRA) উল্লিখিত
+
+CRA তেও একই প্যাটার্ন (postcss + tailwind directives) কাজ করে; শুধু tooling আর config সরাসরি কনফিগার করতে হবে না যদি আপনি `craco` বা `customize-cra` ব্যবহার করেন।
+
+---
+
+## React + TypeScript component উদাহরণ
+
+একটি ছোট ProductCard কম্পোনেন্ট লিখি:
+
+```tsx
+// src/components/ProductCard.tsx
+import React from 'react'
+
+type Props = {
+  title: string
+  price: number
+  desc?: string
+}
+
+export default function ProductCard({ title, price, desc }: Props) {
+  return (
+    <article className="max-w-sm bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="mt-2 text-sm text-gray-600">{desc}</p>
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-xl font-bold text-indigo-600">${price.toFixed(2)}</span>
+          <button className="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">Add</button>
+        </div>
+      </div>
+    </article>
+  )
+}
+```
+
+এখানে আপনি দেখতে পাচ্ছেন ক্লাস তালিকা utility-first স্টাইলে লেখা — সহজে responsive, hover ইত্যাদি যোগ করা যায়: `sm:text-base md:text-lg` ইত্যাদি।
+
+---
+
+## class composition: clsx ও টিউনিং
+
+যদি className গুলো dynamic হয়, ক্লাস কম্পোজিশন সহজ করার জন্য `clsx` বা `classnames` ব্যবহার করুন:
+
+```bash
+npm install clsx
+```
+
+```tsx
+import clsx from 'clsx'
+
+function Button({ variant = 'primary' }: { variant?: 'primary' | 'ghost' }){
+  const classes = clsx(
+    'px-3 py-1 rounded font-semibold',
+    variant === 'primary' ? 'bg-indigo-600 text-white' : 'bg-transparent border border-gray-200'
+  )
+  return <button className={classes}>Click</button>
+}
+```
+
+আরও structured approach চাইলে আপনি small style helpers লিখে `const btn = 'px-3 py-1 rounded'` এবং তারপর ইনপুট হিসেবে reuse করতে পারেন।
+
+---
+
+## @apply এবং component-level CSS
+
+Tailwind-এর `@apply` directive দিয়ে আপনি utility ক্লাসগুলোকে একটি CSS ক্লাসে একত্র করে নিতে পারেন—এটা ভাল যখন অনেকবার একই class set reuse করতে চান:
+
+```css
+/* src/styles/components.css */
+.btn-primary {
+  @apply px-3 py-1 rounded bg-indigo-600 text-white;
+}
+```
+
+তারপর JSX:
+
+```tsx
+<button className="btn-primary">Save</button>
+```
+
+TypeScript বা bundler-এ ensure করুন আপনি ওই CSS ফাইল import করছেন।
+
+---
+
+## JIT mode, Purge (content) ও bundle size
+
+Tailwind JIT (যদি আপনি Tailwind v2.1+ বা v3 ব্যবহার করেন এটি default) তখনই CSS জেনারেট করে যখন আপনি ক্লাস ব্যবহার করেন। production build-এ `content` (আগে purge) সেট করা থাকলে unused CSS বাদ পড়ে।
+
+`tailwind.config.js`-এ নিশ্চিত করুন আপনি সমস্ত JSX/TSX/MDX ফাইল path দিয়েছেন, না হলে এমন ক্লাসগুলো বাদ পড়তে পারে যা runtime-এ তৈরি হয় (e.g., dynamic class names)।
+
+মনোযোগের পয়েন্ট: runtime string concatenation দিয়ে dynamic class বানালে build-time purge সেটিং ভুল হলে ক্লাস না জেনারেট হওয়ার ঝুঁকি থাকে।
+
+---
+
+## Accessibility ও responsive design
+
+- Tailwind utility-তে focus এবং aria-state অনুবর্তী ক্লাস রয়েছে (e.g., focus:outline-none, focus:ring-2)
+- Responsive utilities small-to-large prefix ব্যবহার করে (`sm:`, `md:`, `lg:`)
+- Semantic HTML ব্যবহার করুন (button, article, nav) — কেবল visual utility দিয়ে accessibility পূরণ হবে না
+
+---
+
+## Common pitfalls ও debugging
+
+- Purge config ভুল হলে CSS বাদ পড়বে — dev/prod পার্থক্য হলে প্রথম সন্দেহ এখানে রাখবেন
+- Dynamic class names (template strings) purge থেকে বাদ পড়তে পারে — solution: safelist বা explicit mapping
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [ './src/**/*.{js,ts,jsx,tsx,mdx}' ],
+  safelist: [ 'bg-red-500', /^text-/ ]
+}
+```
+
+- যদি Tailwind ক্লাস বেশি হয়ে যায় এবং readability কমে, consider using small helper constants or `@apply`-based components.
+
+---
+
+## Performance tips
+
+- Enable JIT (Tailwind v3 default)
+- Ensure `content` globs cover all source files
+- Use `@apply` for heavy reuse
+- Tree-shake unused components and avoid runtime-generated random class names unless safelisted
+
+---
+
+## Practical exercise — Product Card UI (Module 5 project)
+
+লক্ষ্য: একটি responsive Product Card তৈরি করুন যা Tailwind ব্যবহার করে styling পায়।
+
+স্টেপস:
+1. একটি নতুন Vite React+TS প্রজেক্ট বানান (উপরের নির্দেশ অনুসরণ করুন)।
+2. Tailwind ইনস্টল ও কনফিগার করুন।
+3. `src/components/ProductCard.tsx` তৈরি করুন (উপরের উদাহরণ বেস হিসেবে নিন)।
+4. Card-এ responsive ইমেজ, title, description, price, এবং একটি Add-to-Cart বাটন যোগ করুন।
+5. ছোট breakpoint-এ layout vertical হবে, বড় স্ক্রিনে horizontal card ব্যবহার করুন (use `sm:flex-row` ইত্যাদি)
+6. Accessibility: বাটনে `aria-label` দিন এবং semantics ঠিক রাখুন।
+
+চেকলিস্ট (exercise):
+- [ ] responsive behaviour সঠিক (mobile-first approach)
+- [ ] Purge/Content config ঠিক আছে (production build-এ style থাকবে)
+- [ ] accessibility attributes যোগ করা আছে
+- [ ] TypeScript-এ কোন টাইপ এরর নেই
+
+অতিরিক্ত চ্যালেঞ্জ (ঐচ্ছিক):
+- theme color variables Tailwind config-এ যোগ করুন এবং প্রাইমারি কালার পরিবর্তন করে দেখুন
+- একটি small animation যোগ করুন (hover ripple যেভাবে Tailwind-transition দিয়ে করা যায়)
+
+---
+
+## উপসংহার
+
+Tailwind React-এ দ্রুত UI তৈরি করার খুব শক্তিশালী উপায়। এটি utility-first হওয়ায় initial learning curve থাকতে পারে — কিন্তু একবার workflow আয়ত্তে এলে consistency, speed এবং small CSS output পেয়ে যান।
+
+আপনি চাইলে আমি এই exercise-এর জন্য একটি runnable Vite + React + TypeScript starter প্রজেক্ট তৈরি করে দিতে পারি (সাথে complete `package.json`, `tailwind.config`, sample components)। অনুমোদন দিলে আমি ফাইলগুলো তৈরি করব।
+
+---

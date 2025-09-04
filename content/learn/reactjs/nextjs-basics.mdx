@@ -1,0 +1,307 @@
+---
+title: Next.js Basics ও Routing
+icon: logos:nextjs-icon
+description: Next.js-এ বেসিক ধারণা ও রাউটিং — Pages vs App Router, dynamic routes, getStaticProps/getServerSideProps, ISR, API routes, এবং TypeScript উদাহরণসহ
+keywords:
+  - nextjs
+  - routing
+  - ssr
+  - ssg
+  - isr
+  - api-routes
+---
+
+# Next.js Basics ও Routing
+
+এই পাঠে আপনি শিখবেন:
+
+- Next.js কি এবং কেন ব্যবহার করবেন
+- রাউটিং কিভাবে কাজ করে: Pages Router ও App Router-এর মৌলিক পার্থক্য
+- ডাইনামিক রুট, কিভাবে প্যারামস ধরবেন ও কীভাবে pre-render করবেন (SSG/SSR/ISR)
+- API Routes, public assets, পরবর্তী ধাপ হিসেবে ডেপ্লয়মেন্ট ও প্রোডাকশন টিপস
+- TypeScript উদাহরণ এবং practical exercise
+
+এক লাইন পরিকল্পনা:
+- সরল analogy দিয়ে routing স্পষ্ট করব
+- কোর কনসেপ্টগুলো step-by-step TypeScript কোড উদাহরণ সহ দেখাবো
+- practical exercise দিয়ে একটি ব্লগ পেজ তৈরি করতে বলব
+
+চেকলিস্ট (আপনি চেয়েছিলেন):
+- [ ] MDX frontmatter আছে (`title`, `icon`, `description`, `keywords`)
+- [ ] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও সুসংগঠিত
+- [ ] Routing, dynamic routes, SSR/SSG/ISR, API routes কভার করা হয়েছে
+- [ ] TypeScript উদাহরণ ও practical exercise আছে
+
+---
+
+## পরিচিতি: Next.js কেন?
+
+Next.js হলো React-ভিত্তিক একটি ফ্রেমওয়ার্ক যা server-side rendering (SSR), static site generation (SSG), এবং routing, API routes ইত্যাদি এক জায়গায় এনে দেয়। এটি production-ready features (image optimization, code-splitting, fast refresh, deployment integration) সহ আসে, তাই প্রফেশনাল ওয়েব অ্যাপের জন্য প্রচলিত পছন্দ।
+
+Analogy: ভাবুন একটি শহর বানাতে চাইছেন। React হলো বাড়ি বানানোর কাঁচামাল (ইট, প্লাস্টার)। Next.js হলো সেই শহরের planner ও রাস্তা-ব্যবস্থা — কোণায় কোন রাস্তা যাবে, কোন জায়গায় সার্ভিস থাকবে, কোথায় পাবলিক পার্ক থাকবে—সব আগে থেকেই ঠিক করে দিলে শহর দ্রুত ও ভালোভাবে কাজ করে।
+
+---
+
+## Routing концепт — Filesystem-based routing
+
+Next.js routing সাধারণত filesystem-ভিত্তিক: `pages/` বা `app/` ডিরেক্টরি অনুযায়ী URL গঠন হয়।
+
+- Pages Router (older, অনেক প্রজেক্টে বহুল ব্যবহৃত): `pages/index.tsx` → `/`
+- App Router (Next.js 13+): `app/page.tsx`, nested folders এবং layout-first approach — কোড ভাগ করা সহজ
+
+উভয়েই file-to-route mapping ব্যবহার করে, কিন্তু app-router nested layouts ও server components ভালোভাবে হ্যান্ডল করে।
+
+---
+
+## Pages Router উদাহরণ (TypeScript)
+
+```
+/pages
+  /index.tsx         -> /
+  /about.tsx         -> /about
+  /posts/[id].tsx    -> /posts/:id
+```
+
+Dynamic route (`/pages/posts/[id].tsx`):
+
+```tsx
+// pages/posts/[id].tsx
+import { GetStaticPaths, GetStaticProps } from 'next'
+import React from 'react'
+
+type Props = { id: string; title: string }
+
+export default function Post({ id, title }: Props) {
+  return (
+    <article>
+      <h1>{title}</h1>
+      <p>Post id: {id}</p>
+    </article>
+  )
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // উদাহরণ: build-time এ কোন id গুলো generate করা হবে
+  const paths = [{ params: { id: '1' } }, { params: { id: '2' } }]
+  return { paths, fallback: 'blocking' }
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const id = context.params?.id as string
+  // fetch বা local data
+  return { props: { id, title: `Post ${id}` } }
+}
+```
+
+টাইপিং নোট: `GetStaticProps` ও `GetStaticPaths` দিয়ে আপনি props ও params টাইপ করে নিতে পারেন।
+
+---
+
+## App Router ধারণা (Next.js 13+) — layouts ও server components
+
+App Router-এ `app` ডিরেক্টরি ব্যবহার করা হয়। প্রতিটি `folder` নিজস্ব `page.tsx` রাখতে পারে আর `layout.tsx` দিয়ে nested layout define করা যায়। এছাড়া `server components` ও `client components` পার্থক্য আছে (server components default)।
+
+ফোল্ডার স্ট্রাকচার উদাহরণ:
+
+```
+/app
+  /layout.tsx       -> shared layout
+  /page.tsx         -> /
+  /products
+    /page.tsx       -> /products
+    /[id]
+      /page.tsx     -> /products/:id
+```
+
+App Router-এ data fetching সাধারণত `fetch()` ব্রাউজার-স্টাইল ব্যবহার করে server-side এ করা হয় এবং component-এ সরাসরি await করা যায় (server component)।
+
+Client component হলে `use client` টপ লাইনে দিতে হয় এবং client-side hooks (useState, useEffect) ব্যবহার করা যায়।
+
+---
+
+## Pre-rendering: SSG (getStaticProps), SSR (getServerSideProps) ও ISR
+
+- SSG (Static Site Generation): `getStaticProps` দিয়ে build-time এ HTML তৈরি করে রাখা হয় — দ্রুত এবং CDN-ভিত্তিক ক্যাশিং সুবিধা
+- SSR (Server Side Rendering): `getServerSideProps` প্রতি অনুরোধে সার্ভারে HTML তৈরি করে পাঠায় — ডাটা নির্ভরশীল, fresh
+- ISR (Incremental Static Regeneration): `revalidate` ব্যবহার করে static পেজ regeneration করে interval-এ (pages router) — static performance + periodic updates
+
+Pages Router উদাহরণ (ISR):
+
+```ts
+export const getStaticProps: GetStaticProps = async () => {
+  const data = await fetch('https://api.example.com/posts').then(r => r.json())
+  return { props: { posts: data }, revalidate: 60 } // 60s পর regenerate
+}
+```
+
+App Router-এ আপনি `fetch`-এ `next: { revalidate: 60 }` option দিতে পারেন:
+
+```ts
+const res = await fetch('https://api.example.com/posts', { next: { revalidate: 60 } })
+```
+
+---
+
+## Client-side navigation ও Link
+
+Next.js `Link` কম্পোনেন্ট ব্যবহার করলে ক্লায়েন্ট-সাইড নেভিগেশন দ্রুত হয় এবং prefetching সুবিধা পাওয়া যায়:
+
+```tsx
+import Link from 'next/link'
+
+export default function Nav(){
+  return (
+    <nav>
+      <Link href="/">Home</Link>
+      <Link href="/about">About</Link>
+    </nav>
+  )
+}
+```
+
+App Router-এও `next/link` একইভাবে কাজ করে।
+
+---
+
+## API Routes
+
+Pages Router-এ `pages/api/*` ডিরেক্টরিতে API endpoints তৈরি করা যায় — এগুলো serverless functions হিসেবে কাজ করে।
+
+```ts
+// pages/api/hello.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  res.status(200).json({ message: 'Hello from API' })
+}
+```
+
+App Router-এও `app/api/.../route.ts` ফাইল ব্যবহার করে route handlers তৈরি করা হয় (Route Handlers) এবং নতুন request/response API ব্যবহার করে লেখা হয়।
+
+Route handler (app router) উদাহরণ:
+
+```ts
+// app/api/hello/route.ts
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  return NextResponse.json({ message: 'Hello from app route' })
+}
+```
+
+---
+
+## Static assets, public folder ও image optimization
+
+- `public/` ফোল্ডারে রাখলে ফাইল সরাসরি `/favicon.ico` ইত্যাদি URL-এ সার্ভ হয়
+- `next/image` (Image) কম্পোনেন্ট ব্যবহার করলে built-in optimization, lazy-loading ও responsive srcset সুবিধা পাওয়া যায়
+
+```tsx
+import Image from 'next/image'
+
+<Image src="/images/photo.jpg" width={800} height={600} alt="Photo" />
+```
+
+---
+
+## Middleware, headers ও redirects
+
+Next.js middleware দিয়ে request-level interception করা যায় (edge functions)। আপনি auth redirect, rewrites, headers ইত্যাদি middleware-এ করে দিতে পারেন।
+
+`next.config.js`-এ redirects ও rewrites ডিফাইন করা যায়:
+
+```js
+module.exports = {
+  async redirects() {
+    return [{ source: '/old', destination: '/new', permanent: true }]
+  }
+}
+```
+
+---
+
+## Error handling ও fallback behavior
+
+- Pages Router: `fallback: true | blocking | false` দিয়ে dynamic paths-এর fallback কন্ট্রোল করা যায়
+- App Router: `not-found.tsx` ও `error.tsx` ব্যবহার করে custom 404 এবং error UI প্রদান করা হয়
+
+---
+
+## Deployment ও Production tips
+
+- Vercel হলো Next.js-এর নির্মাতাদের deployment প্ল্যাটফর্ম; সহজ integration এবং Edge functions/Serverless support আছে
+- অন্য প্ল্যাটফর্মেও deploy করা যায় (Netlify, AWS, Render) — server-side rendering/edge-fns কনফিগ ভিন্ন হতে পারে
+
+Performance tips:
+- Use `next/image` ও prioritize LCP images
+- Prefetch important pages via Link prefetching
+- Keep server-side logic minimal and cache responses
+
+---
+
+## TypeScript integration quicknotes
+
+- `npx create-next-app@latest --ts` দিয়ে টেমপ্লেট বানালে TypeScript-ready প্রজেক্ট মিলে যায়
+- `next` types: `NextPage`, `GetStaticProps`, `GetServerSideProps` (pages router) ইত্যাদি import করে টাইপ দিন
+
+Example: typed getStaticProps
+
+```ts
+import { GetStaticProps, NextPage } from 'next'
+
+type Props = { posts: { id: string; title: string }[] }
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const posts = await fetch('https://...').then(r => r.json())
+  return { props: { posts } }
+}
+
+const HomePage: NextPage<Props> = ({ posts }) => {
+  return <div>{posts.map(p => <div key={p.id}>{p.title}</div>)}</div>
+}
+
+export default HomePage
+```
+
+---
+
+## Practical exercise — ছোট ব্লগ: Static pages + dynamic post pages
+
+লক্ষ্য: একটি ছোট ব্লগ প্রজেক্ট তৈরি করুন যা:
+
+1. Home page (`/`) static site generation ব্যবহার করে সব পোস্টের তালিকা দেখাবে
+2. প্রতিটি post-এর জন্য dynamic page (`/posts/[id]`) `getStaticPaths` ও `getStaticProps` ব্যবহার করে build-time generate করবে
+3. `fallback: 'blocking'` বা `false` ব্যবহার করে behavior দেখুন
+4. একবারে deploy করে দেখুন build-time output
+
+Step-by-step:
+- `npx create-next-app@latest blog --ts`
+- Under `pages/` (বা `app/`) create:
+  - `pages/index.tsx` — fetch posts in `getStaticProps`
+  - `pages/posts/[id].tsx` — implement `getStaticPaths` and `getStaticProps`
+- Test locally: `npm run dev` এবং build: `npm run build && npm run start`
+
+Exercise checklist:
+- [ ] Home page build-time data fetching (SSG) করা হয়েছে
+- [ ] Dynamic routes build-time create হয়েছে (`getStaticPaths`)
+- [ ] `fallback` মোড পরীক্ষা করা হয়েছে (blocking vs false)
+- [ ] Simple API route (`pages/api/posts.ts`) দিয়ে local mock API রাখা হয়েছে (optional)
+- [ ] Deploy to Vercel and verify pages are served statically
+
+---
+
+## Quick reference ও anti-patterns
+
+- Avoid heavy data-fetching in `getServerSideProps` যদি static generation পারেন — SSG scales better
+- Don’t put sensitive secrets in client code — use server-side env + API routes
+- For app router server components, prefer `fetch` on server side and keep client components light
+
+---
+
+## উপসংহার
+
+Next.js আপনার React অ্যাপকে production-ready করে তুলতে অনেক দরকারী building blocks দেয়—filesystem routing, pre-rendering strategies (SSG/SSR/ISR), API routes, এবং ভালো deployment workflow। প্রথমে routing ও data-fetching patterns বুঝে নিন; তারপর practical blog বা e-commerce পেজ বানিয়ে পরীক্ষা করুন।
+
+আপনি চাইলে আমি এই exercise-এর জন্য runnable starter (Pages Router বা App Router, Vite নয়) scaffold করে দেবো—with TypeScript, example posts, and a Vercel-ready config. বলুন "scaffold nextjs starter" এবং আমি তৈরি করব।
+
+---

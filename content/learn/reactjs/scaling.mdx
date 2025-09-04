@@ -1,0 +1,267 @@
+---
+title: স্কেলিং React অ্যাপ (Monorepo, Micro-frontend)
+icon: mdi:cloud-sync-outline
+description: বড় প্রোডাক্টে React অ্যাপ স্কেল করার কৌশল — Monorepo, Micro-frontend প্যাটার্ন, কোড শেয়ারিং, CI/CD ও deployment কনসিডারেশন (TypeScript উদাহরণসহ)
+keywords:
+  - monorepo
+  - micro-frontend
+  - turborepo
+  - pnpm
+  - typescript
+---
+
+# স্কেলিং React অ্যাপ (Monorepo, Micro-frontend)
+
+আমি কি করবো: এই পাঠে আমরা বড় স্কেলে React অ্যাপ কিভাবে সংগঠিত ও ডেলিভার্যাবল রাখবেন সেটা দেখব—monorepo ব্যবস্থাপনা, shared UI/libs, micro-frontend স্ট্র্যাটেজি, TypeScript কনফিগ এবং practical deployment টিপস সহ।
+
+ছোট পরিকল্পনা:
+- Monorepo কী ও কখন ব্যবহার করবেন
+- Micro-frontend কি, কখন দরকার (analogy সহ)
+- TypeScript + pnpm workspace / Turborepo উদাহরণ
+- Shared UI লাইব্রেরি ও টাইপিং কৌশল
+- CI/CD, caching, releases ও deployment কনসিডারেশন
+- Practical exercise: ছোট monorepo scaffold করে shared Button component বানানো
+
+চেকলিস্ট:
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] Analogy আছে
+- [ ] TypeScript উদাহরণ আছে
+- [ ] Practical exercise ও deliverables আছে
+
+---
+
+## ১) Monorepo — সংক্ষিপ্ত পরিচয়
+
+Monorepo মানে একটিই রেপোজিটরিতে একাধিক প্যাকেজ/প্রোজেক্ট রাখা। উদাহরণ: `apps/web`, `apps/admin`, `packages/ui`, `packages/utils`।
+
+কখন ব্যবহার করবেন:
+- যখন ভাগ করা কোড (UI components, hooks, utils) অনেক অ্যাপে reuse হবে
+- mono-repo আপনাকে atomic changes (একই commit-এ UI ও consumer দুটো ঠিক করা) করতে দেয়
+- বড় দল হলে dependency synch, shared linting এবং centralized CI সুবিধা দেয়
+
+সামান্য অসুবিধেঃ toolchain complexity (workspace manager, build orchestration) বাড়ে—কিন্তু স্বচ্ছ benefits থাকে।
+
+---
+
+## ২) Micro-frontend — কি ও কেন
+
+Analogy: বড় শহরকে ভাবুন—প্রতিটি জেলা (district) নিজের মত কাজ করে: স্কুল, বাজার, পার্ক। Micro-frontend হলে প্রতিটি জেলা নিজের অ্যাপ চালায়, কিন্তু দর্শক (user) পুরো শহরটি একসঙ্গে অনুভব করে।
+
+Micro-frontend কবে দরকার:
+- বিভিন্ন টিম একেকটি বড় সাবঅ্যাপ নির্মাণ করে এবং স্বাধীন ডিপ্লয় চান
+- আলাদা প্রযুক্তি স্ট্যাক বা বাজেট সীমা থাকলে
+- রিলিজ সাইকেল আলাদা হলে (একটা টিম বারবার release করে, অন্যরা না)
+
+স্ট্র্যাটেজি:
+- Client-side integration (Module Federation, runtime composition)
+- Server-side composition (Edge or server render combining fragments)
+- IFrame-based isolation (simple কিন্তু UX/SEO সীমাবদ্ধতা)
+
+পছন্দ নির্ভর করে latency, SEO ও team autonomy-এর উপর। সাধারণ ওয়েব অ্যাপে server-side composition বা Module Federation জনপ্রিয় অপশন।
+
+---
+
+## ৩) Tooling: pnpm workspaces + Turborepo + TypeScript উদাহরণ
+
+সহজ monorepo scaffold উদাহরণ:
+
+package.json (root)
+
+```json
+{
+  "name": "my-monorepo",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "devDependencies": {
+    "turbo": "^1.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev"
+  }
+}
+```
+
+`tsconfig.base.json` (root)
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@ui/*": ["packages/ui/src/*"],
+      "@lib/*": ["packages/lib/src/*"]
+    },
+    "composite": true,
+    "incremental": true
+  }
+}
+```
+
+`packages/ui/package.json` ছোট উদাহরণ:
+
+```json
+{
+  "name": "@ui/button",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": { "build": "tsc -b" }
+}
+```
+
+Shared Button component (TypeScript, React):
+
+```tsx
+// packages/ui/src/Button.tsx
+import React from 'react'
+
+export type ButtonProps = { children: React.ReactNode; onClick?: () => void }
+
+export function Button({ children, onClick }: ButtonProps) {
+  return (
+    <button onClick={onClick} className="px-4 py-2 rounded bg-blue-600 text-white">
+      {children}
+    </button>
+  )
+}
+
+export default Button
+```
+
+আর `apps/web`-এ import করা হবে:
+
+```tsx
+import { Button } from '@ui/button'
+
+export default function Home() {
+  return <Button onClick={() => alert('hello')}>Click</Button>
+}
+```
+
+নোট: `pnpm` workspace links করে local packages-কে development-এ সরাসরি ব্যবহার করে; `pnpm install` করলে symlink তৈরি হয়।
+
+---
+
+## ৪) TypeScript টাইপ শেয়ারিং ও declaration
+
+- Use `tsc --build` (`composite: true`) in packages to generate `.d.ts` files
+- Ensure single source of truth types (avoid duplicate types across packages)
+- Consider `path` mapping for local dev; when publishing, ensure `types` points to built declaration files
+
+Example `packages/ui/tsconfig.json`:
+
+```json
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "outDir": "dist", "rootDir": "src" },
+  "include": ["src"]
+}
+```
+
+CI টিপস: build order মেনে `turbo` বা `pnpm -w -r` দিয়ে root থেকে build orchestration করুন।
+
+---
+
+## ৫) Micro-frontend integration: Module Federation সংক্ষেপ
+
+Module Federation (Webpack) দিয়ে runtime-এ অন্য অ্যাপ থেকে কম্পোনেন্ট লোড করা যায়। সংক্ষেপেঃ
+
+- Host app exposes a shell and remotes export components
+- Runtime fetches remote bundle and mounts component
+
+Module Federation সুবিধা: team autonomy; অসুবিধা: runtime version mismatch, shared dependencies alignment প্রয়োজন
+
+নিরাপত্তা/compatibility টিপস:
+- share React, ReactDOM singleton
+- agree on shared library versions
+- use semantic versioning ও CI checks
+
+একটি ছোট pattern (conceptual): host লোড করে remote সঞ্চিত component:
+
+```ts
+// host bootstrap (pseudocode)
+const RemoteButton = await loadRemote('http://remote.app/remoteEntry.js', 'Button')
+mount(RemoteButton, { el: document.getElementById('root') })
+```
+
+Micro-frontend বাস্তবে জটিল; ছোট প্রজেক্টে আগে monorepo + shared package approach বেছে নিন।
+
+---
+
+## ৬) CI/CD, caching ও releases
+
+- Use pipeline caching (pnpm store, node_modules cache, turbo cache) to speed up builds
+- Run tests and lint per package or use selective pipelines (only changed packages)
+- Releases: independent versioning (per-package) or single-version monorepo — pick one strategy
+- Use package managers that support workspaces well (pnpm recommended for performance)
+
+GitHub Actions snippet idea (conceptual):
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+```
+
+---
+
+## ৭) Deployment কনসিডারেশন
+
+- Apps in monorepo can be deployed separately (apps/web, apps/admin) to Vercel projects
+- Shared package changes should trigger rebuilds of dependents (Turbo handles this)
+- Micro-frontend remotes need stable CDN hosting and cache invalidation strategy
+
+Practical tips:
+- Use content-hash filenames for remote bundles
+- Set proper CORS & CSP for remote-loading
+- Monitor bundle sizes and shared dependency versions
+
+---
+
+## ৮) Common pitfalls ও mitigation
+
+- Duplicate React versions → ensure single React (peerDependencies + share)
+- Circular dependencies across packages → avoid by clear domain boundaries
+- Type drift (types mismatch) → centralize types or use internal packages for shared types
+- Slow CI due to full builds → use incremental builds & selective pipelines
+
+---
+
+## Practical exercise — Monorepo scaffold with shared Button
+
+লক্ষ্য: একটি ছোট monorepo তৈরি করুন যেখানে `apps/web` একটি Next.js অ্যাপ এবং `packages/ui` একটি পুনঃব্যবহারযোগ্য Button কম্পোনেন্ট থাকবে।
+
+Deliverables:
+- [ ] রুট `package.json` ও `pnpm-workspace.yaml` সেটআপ
+- [ ] `packages/ui`-এ TypeScript React Button বানানো ও `build` script
+- [ ] `apps/web`-এ Button ব্যবহার করে একটি পেজ দেখান
+- [ ] CI concept: একটি small `github/workflows/ci.yml` উদাহরণ
+- [ ] README.md এ local dev ও build ধাপ লিখুন
+
+Quick steps (high-level):
+1. root তৈরি: `pnpm init -w` → `pnpm add -w turbo typescript -D`
+2. create folders: `apps/web`, `packages/ui`
+3. `pnpm install`
+4. develop: `pnpm dev` (turbo runs dev scripts for each app)
+
+Hints:
+- Start with small scope—shared Button, shared CSS variables
+- Add `tsconfig.base.json` ও path mapping early
+- Use `pnpm -w -r` অথবা `turbo` এ build orchestration
+
+---
+
+## উপসংহার
+
+Monorepo ও micro-frontend হলো বড় টিম ও বড় প্রোডাক্টে স্কেল করার শক্তিশালী কৌশল; কিন্তু এগুলো শূন্যে শুরু করার আগেই ছোট apps-এ complexity যোগ করে। প্রথমে monorepo + shared packages করে শুরু করুন, পরে team autonomy ও release needs বেড়ে গেলে micro-frontend কৌশল বিবেচনা করুন।
+
+চাইলে আমি এই exercise অনুযায়ী runnable scaffold (pnpm + turbo + Next.js app + packages/ui) তৈরি করে local smoke test চালিয়ে দিতে পারি—বলুন চান কি না।
+
+---

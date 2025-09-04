@@ -1,0 +1,291 @@
+---
+title: CSS ও CSS Modules
+icon: logos:css-3
+description: রিঅ্যাক্ট কম্পোনেন্টে স্টাইল প্রয়োগের পার্থক্য- Global CSS ও CSS Modules; কিভাবে সেটআপ, ব্যবহার এবং TypeScript-এ টাইপ সেফটি নিশ্চিত করবেন
+keywords:
+  - CSS
+  - CSS Modules
+  - React
+  - styling
+  - component styles
+---
+
+# CSS ও CSS Modules
+
+## কাজ শুরু করার রোডম্যাপ
+
+চলুন শুরু করার আগে আমি যা করব তার ছোট্ট চেকলিস্ট দিলাম — যাতে আপনি জানেন আমি কি কি কভার করব:
+
+- পরিচিতি ও প্রয়োজনীয়তা
+- Global CSS vs Component-scoped CSS (CSS Modules)
+- সেটআপ (Vite/CRA) এবং ফাইল স্ট্রাকচার
+- CSS Modules ব্যবহার করে রিয়াল কোড উদাহরণ (React + TypeScript সমেত)
+- Dynamic classes, composition ও classname utilities
+- TypeScript-এ টাইপ সেফটি (declaration files) ও IDE সুবিধা
+- সাধারন ভুলত্রুটি ও ডিবাগিং টিপস
+- বেস্ট প্র্যাকটিস এবং ছোট practical exercise
+
+---
+
+## প্রস্তাবনা — কেন CSS Modules দরকার?
+
+একটি ওয়েব অ্যাপ বানান যেখানে কয়েক শতিলাইন CSS, বহু কম্পোনেন্ট এবং একাধিক ডেভেলপার আছে।
+
+- যদি সবাই `button` ক্লাস ব্যবহার করে, কনফ্লিক্ট হবে।
+- আপনি কোনো কম্পোনেন্ট রিইউজ করবেন, কিন্তু অপ্রত্যাশিত স্টাইল বাইরে অন্য জায়গায় প্রভাব ফেলবে।
+
+Google, Netflix বা Uber-এর মতো বড় প্রোডাকশন অ্যাপে স্টাইল কনফ্লিক্ট খুবই সাধারণ—এটা ডিবাগ করতে সময় খায় এবং রিফ্যাক্টরিং অনেক ঝুঁকিপূর্ণ হয়।
+
+CSS Modules কম্পোনেন্ট-স্কোপড স্টাইল দেয়—অর্থাৎ প্রতিটি CSS ক্লাস ডিফল্টভাবে লোকাল হবে, কনফ্লিক্ট কমে এবং রিইউজ সহজ হয়।
+
+---
+
+## মূল ধারণা
+
+### ১) Global CSS (সাধারণ CSS)
+
+- এক বা একাধিক `.css` ফাইল যেটা পুরো অ্যাপের জন্য লোড হয়।
+- ক্লাস নামগুলো global namespace-এ চলে আসে।
+- সহজ প্রজেক্টে দ্রুত কাজ দেয় কিন্তু বড় প্রজেক্টে রিস্ক বাড়ে।
+
+উদাহরণ:
+
+```css
+/* styles/global.css */
+body { margin: 0; font-family: Inter, system-ui; }
+.button { background: blue; color: white; }
+```
+
+ফায়দা:
+- দ্রুত সেটআপ, কম boilerplate
+
+অসুবিধা:
+- নাম কনফ্লিক্ট, রিনেমিং ঝামেলা, অতিরিক্ত specificity সমস্যা
+
+---
+
+### ২) CSS Modules — কী এবং কিভাবে কাজ করে?
+
+- প্রতিটি `.module.css` ফাইল ইমপোর্ট করলে bundler (Vite/CRA/webpack) সেই CSS-কে একটি JS অবজেক্টে রূপান্তর করে।
+- প্রত্যেক ক্লাসের নাম একটি unique hashed name-এ বদলে যায় — ফলে লোকাল স্কোপ হয়।
+- React কম্পোনেন্টে সরাসরি `import styles from './Button.module.css'` করে ব্যবহার করা যায়।
+
+উদাহরণ:
+
+```css
+/* components/Button.module.css */
+.root {
+  background: #0070f3;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.primary {
+  background: #0050c3;
+}
+```
+
+```tsx
+// components/Button.tsx
+import React from 'react';
+import styles from './Button.module.css';
+
+type Props = {
+  children: React.ReactNode;
+  variant?: 'default' | 'primary';
+};
+
+export default function Button({ children, variant = 'default' }: Props) {
+  const className = [styles.root, variant === 'primary' ? styles.primary : '']
+    .filter(Boolean)
+    .join(' ');
+
+  return <button className={className}>{children}</button>;
+}
+```
+
+এইভাবে আপনি `.root` ও `.primary` নাম ব্যবহার করলেও bundler আখেরে `Button_root__a1b2c`-এর মতো অনন্য নাম তৈরি করবে—বহিরাগত কোডে কনফ্লিক্ট হবে না।
+
+---
+
+## সেটআপ: Create React App (CRA) ও Vite-এ CSS Modules
+
+- Create React App (CRA) ও Vite—দুইটিতেই CSS Modules ডিফল্ট সাপোর্ট আছে যদি ফাইল নাম `.module.css` হয়।
+
+Quick steps (Vite):
+
+1. প্রজেক্ট তৈরি
+
+```bash
+npm create vite@latest my-app --template react-ts
+cd my-app
+npm install
+```
+
+2. একটি `Button.module.css` তৈরি করে উপরের উদাহরণটি রাখুন ও `Button.tsx` ইমপোর্ট করুন।
+3. dev server চালান: `npm run dev`।
+
+CRA-এ:
+
+```bash
+npx create-react-app my-app --template typescript
+cd my-app
+npm start
+```
+
+---
+
+## Dynamic classes, composition ও classname utilities
+
+কখনো ক্লাস নাম conditional হওয়া দরকার—উদাহরণ: `active`, `disabled` ইত্যাদি। এখানে `classnames` প্যাকেজ খুব উপযোগী।
+
+```bash
+npm install classnames
+```
+
+```tsx
+import cn from 'classnames';
+import styles from './Card.module.css';
+
+<div className={cn(styles.root, { [styles.active]: isActive })}>...</div>
+```
+
+CSS Modules-এ composition (এক ক্লাস অন্য ক্লাসে ব্যবহার) করাও সম্ভব:
+
+```css
+/* styles.module.css */
+.base { padding: 8px; border-radius: 6px; }
+.warn { composes: base; background: #f7c6c6; }
+```
+
+নোট: `composes` সব bundler-এ support নাও করতে পারে—সাবধানে ব্যবহার করুন বা PostCSS plugin লাগতে পারে।
+
+---
+
+## TypeScript-এ ব্যবহার: টাইপ ডিক্লারেশন (d.ts)
+
+TypeScript প্রজেক্টে `.module.css` ইমপোর্ট করলে IDE/কম্পাইলার কিছুক্ষেত্রে জানে না কি টাইপ রিটার্ন করে। সেটা ঠিক করতে আপনি একটি declaration ফাইল যোগ করবেন:
+
+`src/custom.d.ts`:
+
+```ts
+declare module '*.module.css' {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+```
+
+এখন `import styles from './Button.module.css'` টাইপ সেফ হবে—IDE auto-complete ও আনোটেশন কাজ করবে।
+
+---
+
+## Accessibility (A11y) ও CSS Modules
+
+স্টাইলিং করলেও accessibility-র বিষয়গুলো মাথায় রাখুন:
+
+- Buttons: semantic element ব্যবহার করুন (`<button>`), `aria-*` প্রয়োজন অনুযায়ী যোগ করুন
+- Focus styles: keyboard navigation-এর জন্য `:focus-visible` এ স্পষ্ট স্টাইল রাখুন
+
+```css
+.root:focus-visible { outline: 3px solid rgba(0, 112, 243, 0.4); }
+```
+
+---
+
+## সাধারণ ভুলত্রুটি ও ডিবাগ টিপস
+
+- `import styles from './file.css'` করলে CSS Modules কাজ করবে না—নাম `.module.css` রাখতে হবে।
+- যদি class name undefined দেখায় — চেক করুন ফাইলপাথ সঠিক কিনা এবং declaration (`.d.ts`) আছে কিনা।
+- Composition (`composes`) কাজ না করলে bundler/plugin compatibility চেক করুন।
+- Dev build-এ hashed name আর production build-এ আলাদা হতে পারে—DOM-এ generated classname দেখলে চিন্তিত হবেন না।
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- কম্পোনেন্ট-নেম অনুযায়ী CSS Module নামকরণ করুন: `Button.module.css`, `Card.module.css`।
+- ছোট, single-responsibility ক্লাস রাখুন—utility class আলাদা রাখুন (যেমন spacing.module.css)।
+- global styles আলাদা ফাইলে রাখুন (fonts, reset, typography) এবং component-level styles সেগুলোকে import করবেন না।
+- `classnames` প্যাকেজ ব্যবহার করে conditional classes পরিষ্কার রাখুন।
+- TypeScript project-এ declaration ফাইল রাখুন—IDE experience অনেক উন্নত হয়।
+
+---
+
+## Practical exercise — ছোট হ্যান্ডস-অন প্রজেক্ট
+
+উদ্দেশ্য: একটি `ProfileCard` কম্পোনেন্ট বানান যেটা CSS Modules ব্যবহার করে স্টাইলেড হবে।
+
+ধাপসমূহ:
+
+1. `src/components/ProfileCard.module.css` তৈরি করুনঃ
+
+```css
+.card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.info { display: flex; flex-direction: column; justify-content: center; }
+.name { font-weight: 600; }
+.role { font-size: 0.9rem; color: #666; }
+```
+
+2. `src/components/ProfileCard.tsx` লিখুনঃ
+
+```tsx
+import React from 'react';
+import styles from './ProfileCard.module.css';
+
+type Props = { name: string; role?: string; avatarUrl?: string };
+
+export default function ProfileCard({ name, role = 'Member', avatarUrl }: Props) {
+  return (
+    <div className={styles.card}>
+      <img src={avatarUrl} alt={`${name} avatar`} className={styles.avatar} />
+      <div className={styles.info}>
+        <div className={styles.name}>{name}</div>
+        <div className={styles.role}>{role}</div>
+      </div>
+    </div>
+  );
+}
+```
+
+3. App-এ ব্যবহার করে দেখুন:
+
+```tsx
+import ProfileCard from './components/ProfileCard';
+
+function App() {
+  return (
+    <div style={{ padding: 20 }}>
+      <ProfileCard name="নীল" role="Developer" avatarUrl="/avatar.png" />
+    </div>
+  );
+}
+```
+
+চেকলিস্ট (হ্যান্ডস-অন):
+- [ ] CSS Module ইমপোর্ট ঠিক আছে কিনা
+- [ ] `custom.d.ts` আছে কি না (TypeScript-এর জন্য)
+- [ ] component-level styles কনফ্লিক্ট করছে কি না (অন্য global style-এর সাথে)
+
+---
+
+## উপসংহার
+
+CSS Modules আপনাকে React অ্যাপের স্টাইলিংকে predictable, scalable ও maintainable করে। ছোট প্রজেক্টে global CSS দ্রুত কাজ দেয়, কিন্তু যখন প্রজেক্ট বড় হয়—CSS Modules-এর scoped approach সমস্যা অনেক কমিয়ে দেয়।
+
+এই লেসনের শেষে আপনারা:
+
+- বুঝতে পারবেন global CSS ও CSS Modules-এর পার্থক্য
+- React + TypeScript প্রজেক্টে CSS Modules ঠিকভাবে সেটআপ ও ব্যবহার করতে পারবেন
+- dynamic classes, composition ও TypeScript declaration নিয়ে আত্মবিশ্বাসী হবেন
+
+আপনি চাইলে আমি এখনই `ProfileCard` কম্পোনেন্টের সম্পূর্ণ runnable example (সোর্স, ছোট README, ও package.json টেস্ট স্ক্রিপ্টসহ) তৈরি করে দিতে পারি — বলুন, কি করবেন? 
+
+---

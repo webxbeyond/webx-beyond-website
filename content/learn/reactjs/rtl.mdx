@@ -1,0 +1,274 @@
+---
+title: React Testing Library (RTL)
+icon: mdi:test-tube
+description: React Testing Library দিয়ে component-centric টেস্টিং — queries, user-event, async testing, custom render wrappers ও best-practices (TypeScript উদাহরণসহ)
+keywords:
+  - testing
+  - react-testing-library
+  - rtl
+  - user-event
+  - typescript
+---
+
+# React Testing Library (RTL)
+
+এই পাঠে আপনি শিখবেন:
+
+- React Testing Library (RTL) কেন ব্যবহার করবেন এবং এর মূল ধারণা
+- DOM-centric queries (getBy, findBy, queryBy) ও user-event ব্যবহার
+- async component testing, mock network (MSW) ও custom render wrapper তৈরি করা
+- TypeScript-এর সঙ্গে integration টিপস ও common anti-patterns
+
+এক লাইন পরিকল্পনা:
+- analogy দিয়ে ধারণা স্পষ্ট করা
+- queries ও user-event-এর ব্যবহার TypeScript উদাহরণ সহ দেখানো
+- custom render (context / provider wrappers) ও async tests কভার করা
+- একটি practical exercise দেয়া হবে যাতে Login বা ProductList কভার করা যায়
+
+চেকলিস্ট (user requirements mapping):
+- [ ] নতুন MDX ফাইল frontmatter আছে (`title`, `icon`, `description`, `keywords`)
+- [ ] বাংলা ভাষায়, beginner-friendly, structured এবং analogy আছে
+- [ ] TypeScript + RTL উদাহরণ আছে (queries, async, custom render)
+- [ ] practical exercise ও checklist আছে
+
+---
+
+## পরিচিতি: RTL-এর ফোকাস কি?
+
+React Testing Library-এর মূল ধারণা—"test implementation from user's perspective"। এটা UI কে DOM হিসেবে দেখে এবং user-centric query ব্যবহার করে আপনার টেস্টগুলো লিখতে সাহায্য করে। ফলে tests বেশি resilient ও accessibility-friendly হয়।
+
+Analogy: RTL-কে ভাবুন একজন পরীক্ষক হিসেবে যিনি UI-কে ব্যবহারকারীর চোখে দেখেন — তিনি class বা internal state দেখে না, তিনি বোঝে কি ব্যবহারকারী দেখতে ও চাপতে পাবে।
+
+---
+
+## দ্রুত ভূমিকা: ইনস্টল ও import
+
+প্যাকেজ:
+
+```bash
+npm install -D @testing-library/react @testing-library/jest-dom @testing-library/user-event
+```
+
+টাইপস্ক্রিপ্টে সাধারণ imports:
+
+```ts
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
+```
+
+`render` একটি component DOM তৈরি করে এবং `screen` global queries প্রদান করে — `screen` ব্যবহার করলে পুনরায় রেন্ডার/cleanup আরও পরিষ্কার হয়।
+
+---
+
+## Queries: getBy / queryBy / findBy — কবে কোনটি?
+
+- getBy*: synchronous; element না থাকলে তৎক্ষণাৎ exception দেয়
+- queryBy*: synchronous; element না থাকলে null returns — negative assertions-এ ব্যবহার
+- findBy*: async; promise হিসেবে element সার্চ করে (use when waiting for async UI)
+
+উদাহরণ:
+
+```tsx
+// synchronous
+expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument()
+
+// negative
+expect(screen.queryByText(/error/i)).not.toBeInTheDocument()
+
+// async
+const greeting = await screen.findByText(/welcome back/i)
+expect(greeting).toBeVisible()
+```
+
+সাধারণ rule: prefer `getByRole`, `getByLabelText`, `getByText` in that priority — role-based queries improve accessibility and stability.
+
+---
+
+## user-event vs fireEvent
+
+`user-event` simulates real user interactions (typing, tabbing, clicking) and handles more browser-like behavior (e.g., value change sequence). `fireEvent` দ্রুত low-level events generate করে, কিন্তু user-focused tests-এ `user-event` বেশি উপযোগী।
+
+```ts
+await userEvent.type(screen.getByRole('textbox'), 'hello')
+await userEvent.click(screen.getByRole('button', { name: /search/i }))
+```
+
+Nota bene: user-event functions are async in modern versions — await করুন।
+
+---
+
+## Simple RTL example (TypeScript) — LoginForm
+
+একটি component এবং তার টেস্ট (previously used LoginForm shape):
+
+```tsx
+// src/components/LoginForm.tsx
+import React from 'react'
+
+type Props = { onSubmit: (data: { email: string; password: string }) => void }
+export function LoginForm({ onSubmit }: Props) {
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit({ email, password }) }}>
+      <label>
+        Email
+        <input aria-label="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      </label>
+      <label>
+        Password
+        <input type="password" aria-label="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      </label>
+      <button type="submit">Login</button>
+    </form>
+  )
+}
+```
+
+টেস্ট:
+
+```ts
+// src/components/__tests__/LoginForm.test.tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { LoginForm } from '../LoginForm'
+
+test('submits credentials', async () => {
+  const onSubmit = jest.fn()
+  render(<LoginForm onSubmit={onSubmit} />)
+
+  await userEvent.type(screen.getByLabelText(/email/i), 'me@example.com')
+  await userEvent.type(screen.getByLabelText(/password/i), 'secret')
+  await userEvent.click(screen.getByRole('button', { name: /login/i }))
+
+  expect(onSubmit).toHaveBeenCalledWith({ email: 'me@example.com', password: 'secret' })
+})
+```
+
+টিপ: `getByLabelText` বা `getByRole` ব্যবহার করলে accessibility বাড়ে।
+
+---
+
+## Async components: waiting for networked UI
+
+যখন component fetch করে এবং UI পরে আপডেট হয়, `findBy*` বা `waitFor` ব্যবহার করুন। MSW দিয়ে network মক করলে আপনার tests-browser-like হবে।
+
+```ts
+// inside test
+render(<ProductList />)
+expect(screen.getByText(/loading/i)).toBeInTheDocument()
+const item = await screen.findByText('Product name')
+expect(item).toBeInTheDocument()
+```
+
+বা, custom wait:
+
+```ts
+await waitFor(() => expect(screen.getByText('loaded')).toBeInTheDocument())
+```
+
+`findBy` internally waits up to testing-library default timeout (usually 1000ms) — adjust with `waitFor` timeout when needed.
+
+---
+
+## Custom render / wrapper for providers (React Query, Router, Redux)
+
+বহু component context/providers থাকলে test- এ বারবার wrapper লিখা tiresome। `test-utils`-এ custom `render` বানান:
+
+```ts
+// src/test/test-utils.tsx
+import { render } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter } from 'react-router-dom'
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
+function AllProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>{children}</BrowserRouter>
+    </QueryClientProvider>
+  )
+}
+
+export function customRender(ui: React.ReactElement, options = {}) {
+  return render(ui, { wrapper: AllProviders, ...options })
+}
+
+export * from '@testing-library/react'
+export { customRender as render }
+```
+
+টেস্টে ব্যবহার:
+
+```ts
+import { render, screen } from '../test/test-utils'
+render(<MyComponent />)
+```
+
+এভাবে provider setup centralize করলে tests পরিষ্কার ও সহজ হয়।
+
+---
+
+## Tips for TypeScript users
+
+- Keep test files `.test.tsx` / `.test.ts` so ts-jest or your runner handles them
+- If you use `jest.mock()` with ESM modules, check ts-jest or Babel compatibility
+- For `user-event`, function signatures are async — use `await`
+- Provide typed `customRender` signature when needed (generics) to preserve props/types
+
+---
+
+## Accessibility & selectors
+
+- Prefer `getByRole`, `getByLabelText`, `getByPlaceholderText` over class/id selectors
+- Use `aria-*` attributes intentionally to expose semantics for tests and screen-readers
+- Example: `getByRole('button', { name: /submit/i })` mirrors how user finds a button
+
+---
+
+## Common anti-patterns to avoid
+
+- Querying by implementation details: `container.querySelector('.my-class')`
+- Over-mocking internals instead of testing behavior
+- Relying on timeouts instead of `findBy`/`waitFor`
+
+---
+
+## Practical exercise — ProductList test
+
+লক্ষ্য: একটি `ProductList` component লিখুন যা API থেকে products ফেচ করে এবং list দেখায়; tests লিখুন covering loading, success এবং error states (MSW recommended)
+
+Tasks:
+1. Implement `ProductList` with `fetch('/api/products')` এবং show loading → list → error UI
+2. Write tests:
+   - Unit/integration: mock `/api/products` success response and assert items render
+   - Negative: mock server error and assert error message
+   - Use `findBy`/`waitFor` for async assertions
+3. Use `customRender` if component requires providers
+
+Checklist:
+- [ ] ProductList shows loading state initially
+- [ ] On success, product items render and are accessible via role/text
+- [ ] On failure, error message shows
+- [ ] Tests use RTL queries (`getByRole`, `findByText`) and user-event where required
+
+Helpful commands:
+
+```bash
+npm test
+# run single test file via jest pattern
+npm test -- src/components/__tests__/ProductList.test.tsx
+```
+
+---
+
+## উপসংহার
+
+React Testing Library আপনাকে user-centric tests লেখার শক্তি দেয়। Accessibility-friendly queries, `user-event` এবং proper async waiting combined করলে tests দ্রুত, নির্ভরযোগ্য ও মানসম্পন্ন হয়। ছোট hooks/component থেকে শুরু করে provider-wrapped integration tests পর্যন্ত, একটি consistent testing pattern গড়ে নিন।
+
+চাইলে আমি এই exercise-টির জন্য runnable starter (Vite + React + TS) scaffold করে দিতে পারি—MSW, RTL ও example tests সহ। বলুন "scaffold rtl starter" যদি চান।
+
+---

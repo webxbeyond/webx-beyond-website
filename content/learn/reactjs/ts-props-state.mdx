@@ -1,0 +1,299 @@
+---
+title: Props ও State টাইপিং
+icon: logos:typescript-icon
+description: React + TypeScript-এ Props ও State কিভাবে টাইপ করবেন — ধরন, ইভেন্ট টাইপিং, Generic কম্পোনেন্ট ও useReducer সহ বাস্তব উদাহরণ
+keywords:
+  - react
+  - typescript
+  - props
+  - state
+  - typing
+---
+
+# Props ও State টাইপিং
+
+এই পাঠে আপনি শিখবেন:
+
+- React কম্পোনেন্টে Props কীভাবে টাইপ করবেন
+- useState, useReducer, useRef ও ইভেন্ট হ্যান্ডলার টাইপ করার নিয়ম
+- Generic কম্পোনেন্ট ও optional/default props-এর সঠিক প্যাটার্ন
+- কয়েকটি common anti-pattern ও best-practice
+
+এক লাইন প্ল্যান:
+- সহজ analogy ও ধারণা থেকে শুরু করে সরল উদাহরণ
+- TypeScript code উদাহরণ (TSX) দিয়ে ধাপে ধাপে প্রয়োগ
+- practical exercise দিয়ে আত্মপ্রকাশ
+
+চেকলিস্ট:
+- [ ] MDX ফাইল ফ্রন্টম্যাটার আছে (`title`, `icon`, `description`, `keywords`)
+- [ ] পুরো আর্টিকেল বাংলা ভাষায় ও beginner-friendly
+- [ ] TypeScript + React উদাহরণ আছে (props, state, events, reducer, generics)
+- [ ] practical exercises ও চেকলিস্ট আছে
+
+---
+
+## পরিচিতি: Props vs State — সরল ভাষায়
+
+Props এবং State দুইটি আলাদা জিনিস:
+
+- Props: পিতামাতার (parent) থেকে কম্পোনেন্টে পাঠানো input — component immutable হিসেবে বিবেচনা করে।
+- State: কম্পোনেন্টের নিজস্ব mutable তথ্য — UI যা বদলে যায় তা state-এ থাকে।
+
+Analogy: ভাবুন একটি রেস্টুরেন্ট কিচেন —
+- Props হচ্ছে অর্ডার টিকিট (customer/দোকান থেকে আসা ইনফরমেশন)। কিচেন ওই টিকিট অনুযায়ী রান্না করে, কিচেন টিকিট বদলাতে পারে না।
+- State হচ্ছে চুলার আগুন বা রান্নার অবস্থান (local)। কিচেন রান্না চলাকালীন আগুন বাড়ায়/কমায় — এটা কিচেনের নিজের আন্তরিক অবস্থা।
+
+TypeScript কেন দরকার? ছোট কম্পোনেন্টে টাইপ্স optional মনে হতে পারে, কিন্তু বড় অ্যাপে টাইপস ভুল দ্রুত বাগ আনতে পারে। Props ও state টাইপ করলে IDE auto-complete, দ্রুত refactor ও নিরাপদ রিফ্রেশ পাওয়া যায়।
+
+---
+
+## সরল Props টাইপিং (Functional Components)
+
+সাধারণত `type` বা `interface` দিয়ে props নির্ধারণ করা হয়। React.FC ব্যবহার করা যেতে পারে, কিন্তু community-তে অনেকেই plain function signature পছন্দ করে কারণ তা children-এর implicit typing এড়ায়।
+
+উদাহরণ:
+
+```tsx
+// src/components/Greeting.tsx
+type GreetingProps = {
+  name: string
+  age?: number // optional prop
+}
+
+export function Greeting({ name, age }: GreetingProps) {
+  return (
+    <div>
+      <h2>স্বাগত, {name}!</h2>
+      {age && <p>বয়স: {age}</p>}
+    </div>
+  )
+}
+```
+
+- এখানে `age` optional — runtime-এ `age` না থাকলে UI ক্র্যাশ করবে না।
+- যদি আপনি `children` চান, স্পষ্টভাবে টাইপ দিন:
+
+```tsx
+type CardProps = {
+  title: string
+  children?: React.ReactNode
+}
+export function Card({ title, children }: CardProps) {
+  return (
+    <section>
+      <h3>{title}</h3>
+      <div>{children}</div>
+    </section>
+  )
+}
+```
+
+---
+
+## useState টাইপিং
+
+`useState` সাধারণত generic ব্যবহার করে টাইপ করা যায়। কখন টাইপ লিখবেন?
+- যদি initial value দিয়ে TypeScript স্পষ্টভাবে ইনফার করতে পারে, আলাদা টাইপ দেওয়ার দরকার নেই।
+- তবে যেটা আগাম `null` বা `undefined` পাবার সম্ভাবনা আছে বা union type হলে generic ভাল।
+
+উদাহরণ:
+
+```tsx
+import { useState } from 'react'
+
+// Inferred from initial value
+const [count, setCount] = useState(0) // number inferred
+
+// When null possible
+type User = { id: string; name: string }
+const [user, setUser] = useState<User | null>(null)
+
+// Array of typed items
+const [todos, setTodos] = useState<Todo[]>([])
+```
+
+useState-এর generic দিলে আপনি strict mode-এও টাইপ সেফটি পাবেন।
+
+---
+
+## ইভেন্ট টাইপিং (Forms, Buttons)
+
+React ইভেন্ট টাইপ অনেক ক্ষেত্রে generic হয়। কয়েকটি সাধারণ উদাহরণ:
+
+```tsx
+import React from 'react'
+
+function SearchBox(){
+  const [query, setQuery] = React.useState('')
+
+  function onChange(e: React.ChangeEvent<HTMLInputElement>){
+    setQuery(e.target.value)
+  }
+
+  function onSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault()
+    // submit logic
+  }
+
+  return (
+    <form onSubmit={onSubmit}>
+      <input value={query} onChange={onChange} />
+      <button type="submit">Search</button>
+    </form>
+  )
+}
+```
+
+Button click ইভেন্ট:
+
+```tsx
+function Clicker(){
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>){
+    console.log('clicked')
+  }
+  return <button onClick={handleClick}>Click</button>
+}
+```
+
+Tip: Generic HTMLElements ব্যবহার করুন — যদি আপনি custom element pass করেন, সঠিক element টাইপ ব্যবহার করুন (e.g., HTMLTextAreaElement)।
+
+---
+
+## useRef টাইপিং
+
+Ref-এ সাধারণত DOM টাইপ বা কম্পোনেন্ট টাইপ থাকে।
+
+```tsx
+import { useRef, useEffect } from 'react'
+
+function TextInputFocus(){
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  useEffect(() => { inputRef.current?.focus() }, [])
+  return <input ref={inputRef} />
+}
+```
+
+যদি আপনি ref-forwarded কম্পোনেন্ট করেন তখন `forwardRef` ও `React.Ref` টাইপ ব্যবহার করবেন।
+
+---
+
+## useReducer + Discriminated Unions (State machine style)
+
+বড় state লজিক থাকলে `useReducer` ভাল। TypeScript-এ discriminated union ব্যবহার করে state ও actions টাইপ করা সহজ এবং বাগ কমে।
+
+```tsx
+type State = { count: number }
+type Action =
+  | { type: 'increment' }
+  | { type: 'decrement' }
+  | { type: 'reset'; payload: number }
+
+function reducer(state: State, action: Action): State {
+  switch(action.type){
+    case 'increment': return { count: state.count + 1 }
+    case 'decrement': return { count: state.count - 1 }
+    case 'reset': return { count: action.payload }
+    default: return state
+  }
+}
+
+export function Counter(){
+  const [state, dispatch] = React.useReducer(reducer, { count: 0 })
+  return (
+    <div>
+      <p>{state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+    </div>
+  )
+}
+```
+
+Discriminated union-এর মাধ্যমে `action.payload` টিকে নিরাপদে টাইপ করা যায়।
+
+---
+
+## Generic কম্পোনেন্ট তৈরি করা
+
+কখন দরকার? যখন component বিভিন্ন টাইপের ডাটা নেবে, যেমন একটি `List` কম্পোনেন্ট।
+
+```tsx
+type ListProps<T> = {
+  items: T[]
+  renderItem: (item: T) => React.ReactNode
+}
+
+export function List<T>({ items, renderItem }: ListProps<T>){
+  return <ul>{items.map((it, i) => <li key={i}>{renderItem(it)}</li>)}</ul>
+}
+
+// ব্যবহার:
+// <List items={users} renderItem={(u) => <UserRow user={u} />} />
+```
+
+Generic component-এর সময় উপভোগ্য শর্ত: একেবারে স্পষ্ট generic parameter inference-এর কাঠামো রাখুন, এবং props-এ `key`/identity কিভাবে হ্যান্ডল করবেন তা নথিভুক্ত করুন।
+
+---
+
+## Common pitfalls ও best practices
+
+- Avoid `any` যতটা সম্ভব — সহজে bug ঢুকতে পারে।
+- যদি third-party লাইব্রেরি থেকে data আসে, সে data-র আকৃতি `type` বা `zod/schema` দিয়ে verify করুন।
+- Optional props দিলে default values assign করুন অথবা null check ব্যবহার করুন।
+- Component API design এ পরিষ্কারভাবে props নামকরণ রাখুন (e.g., `onChange` ফাংশনকে `onChangeValue` দিয়ে বিভ্রান্তি কমান)।
+
+---
+
+## Quick migration checklist (JS → TS)
+
+1. প্রাথমিক সেটআপ: `npm install --save-dev typescript @types/react @types/react-dom`
+2. Rename `.jsx` → `.tsx` এবং `React` import ঠিক আছে কিনা দেখুন
+3. ছোট অংশে conversion করুন — প্রতিবার কম্পাইল করে ত্রুটি ঠিক করুন
+4. Props টাইপ লিখে component শুরু করুন
+5. useState/useRef/useReducer-এ টাইপস যোগ করুন
+6. ইভেন্ট handler-এ DOM টাইপ ব্যবহার করুন
+
+---
+
+## Practical exercises
+
+Exercise A — Typed Counter (Beginner)
+
+- তৈরি করুন `Counter.tsx` যেখানে:
+  - props: `initial?: number`, `step?: number`
+  - internal state হিসেবে count রাখবেন (`useState<number>`)
+  - একটি button দিয়ে increase/decrease করুন
+- চেকলিস্ট:
+  - [ ] `initial` ও `step` optional হিসেবে টাইপ করা আছে
+  - [ ] state টাইপ দেয়া আছে (`number`)
+  - [ ] button events সঠিকভাবে টাইপ করা আছে
+
+Exercise B — Todo List with Form (Intermediate)
+
+- তৈরি করুন `TodoApp.tsx`:
+  - `Todo` টাইপ: `{ id: string; text: string; done: boolean }`
+  - `useState<Todo[]>` দিয়ে todos রাখুন
+  - একটি form থেকে নতুন todo add করুন (input event টাইপিং করা হবে)
+  - toggle done করার জন্য একটি typed handler ব্যবহার করুন
+- চেকলিস্ট:
+  - [ ] form handlers-এ `React.FormEvent`/`React.ChangeEvent` ব্যবহার করা আছে
+  - [ ] todos array টাইপ সঠিক
+  - [ ] key prop হিসেবে `id` ব্যবহার করা হয়েছে
+
+Exercise C — Generic List (Advanced)
+
+- `List.tsx` (উপরের generic উদাহরণ) বাস্তবায়ন করুন এবং `UserCard` ও `ProductCard` দিয়ে reuse দেখান
+- চেকলিস্ট:
+  - [ ] Generic inference ঠিকভাবে হচ্ছে
+  - [ ] renderItem টু কাজে লাগছে
+
+Bonus: convert একটি ছোট JS component file থেকে `.jsx` → `.tsx` এবং রিপোর্ট করুন কোন typing গুলো যোগ করতে হয়েছে।
+
+---
+
+## সংক্ষিপ্ত উপসংহার
+
+Props ও State টাইপিং React অ্যাপে নিরাপত্তা, প্রেডিক্টিবিলিটি ও developer ergonomics বাড়ায়। ছোট ছোট কম্পোনেন্ট থেকে শুরু করে generics ও reducer পর্যন্ত TypeScript আপনাকে compile-time safety দেয়। প্রথম দিকে কিছু টাইপিং কষ্ট লাগতে পারে—কিন্তু একবার প্যাটার্নগুলো চেনে নিলে কাজ দ্রুত ও নির্ভরযোগ্য হয়।
+
+আপনি চাইলে আমি এই exercises-গুলোর জন্য runnable starter (Vite + React + TS) scaffold করে দিতে পারি, অথবা আমি `TodoApp.tsx`-এর সম্পূর্ণ code এখানে লিখে দিতে পারি — কোনটা করবেন? 
+
+---

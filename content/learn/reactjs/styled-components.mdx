@@ -1,0 +1,298 @@
+---
+title: Styled Components ও Emotion
+icon: logos:styled-components
+description: React-এ CSS-in-JS প্যাটার্ন — Styled Components ও Emotion ব্যবহার করে কিভাবে কম্পোনেন্ট-স্তরে স্টাইল লিখবেন, থিমিং করবেন ও TypeScript-এ টাইপ সেফটি নিশ্চিত করবেন
+keywords:
+  - styled-components
+  - emotion
+  - css-in-js
+  - react-styling
+  - theme
+---
+
+# Styled Components ও Emotion
+
+আমি যা করব — তাড়াতাড়ি প্ল্যান:
+
+- মূল ধারণা ও কেন CSS-in-JS দরকার এমনটা ব্যাখ্যা করব
+- Styled Components ও Emotion এর মধ্যে পার্থক্য দেখাবো
+- ভেতরে সেটআপ, বানানো এবং TypeScript-এ ব্যবহার দেখাবো
+- থিমিং, props-ভিত্তিক স্টাইলিং, composition ও SSR নিয়ে টিপস দেবো
+- শেষে একটি practical exercise দেবো যাতে আপনি নিজে হাতে অনুশীলন করতে পারেন
+
+চেকলিস্ট (আপনার অনুরোধের প্রত্যেকটা শর্ত):
+- [x] নতুন MDX ফাইল `title`, `icon`, `description`, `keywords` সহ
+- [x] বাংলা ভাষায় বিস্তারিত পাঠ (শুরু থেকে মধ্যম স্তর)
+- [x] ইংরাজি জটো− পরিভাষা সংক্ষেপে ব্র্যাকেটে দিলাম যেখানে প্রয়োজন
+- [x] উদাহরণসমূহ React + TypeScript সহ
+- [x] সেটআপ কমান্ড কোড ব্লকে দিলাম
+- [x] practical exercise ও চেকলিস্ট দিলাম
+
+---
+
+## প্রস্তাবনা — কেন CSS-in-JS?
+
+বড় অ্যাপে stylesheet আলাদা ফাইলে রাখলে নাম কনফ্লিক্ট, specificity সমস্যা, এবং runtime-এ স্টাইল কন্ডিশনাল করা জটিল হয়ে পড়ে।
+
+CSS-in-JS (যেমন Styled Components ও Emotion) একটি ভিন্ন দৃষ্টিভঙ্গি দেয়:
+
+- স্টাইলগুলো সরাসরি কম্পোনেন্টের পাশে লেখা যায় — readability বাড়ে
+- থিমিং এবং dynamic props সহজ হয়
+- scope-by-default: স্টাইল লোকাল হয়, কনফ্লিক্ট কমে
+
+এখানে একটি ছোট এনালজি: একটি দোকানে যদি ব্ল্যাঙ্কেট সব জিনিসের সাথে এলোমেলোভাবে মিশে থাকে, খুঁজে পেতে অসুবিধা হবে—কিন্তু যদি প্রতিটি পণ্যের কাছে তার নিজস্ব ট্যাগ থাকে, খুঁজে পাওয়া ও ঝামেলা কমে। CSS-in-JS-এ প্রতিটি কম্পোনেন্টের স্টাইলের ট্যাগ আছে—এই ট্যাগগুলো runtime-এ জেনারেট হয় এবং অন্যায়ের সাথে মিশে না।
+
+---
+
+## Styled Components vs Emotion — সংক্ষেপে পার্থক্য
+
+- API খুব কাছাকাছি — দুটোই styled API ও css helper দেয়।
+- Emotion একটু ছোট ও flexible; runtime/sourcemap/SSR কনফিগে ভিন্নতা থাকতে পারে।
+- Styled Components community ও ecosystem বড় এবং বিশিষ্ট tooling আছে।
+
+প্রতিটি টুলের পক্ষে/বিপক্ষে সিদ্ধান্ত নির্ভর করে প্রজেক্ট চাহিদার উপর।
+
+---
+
+## দ্রুত সেটআপ (Vite / CRA / Next.js)
+
+Basic install (Styled Components + TypeScript):
+
+```bash
+# Styled Components
+npm install styled-components
+npm install --save-dev @types/styled-components
+
+# অথবা Emotion (optionally)
+npm install @emotion/react @emotion/styled
+```
+
+Next.js-এ SSR ভাল রাখতে `babel-plugin-styled-components` বা Emotion-এর `@emotion/server` কনফিগ যোগ করা দরকার—নিচে SSR অধ্যায়ে বলব।
+
+---
+
+## সহজ উদাহরণ: Styled Components (React + TypeScript)
+
+```tsx
+// src/components/Button.tsx
+import styled from 'styled-components';
+import React from 'react';
+
+type Props = { variant?: 'default' | 'primary'; children: React.ReactNode };
+
+const StyledButton = styled.button<{ variant?: 'default' | 'primary' }>`
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: ${props => (props.variant === 'primary' ? '#0050c3' : '#eaeaea')};
+  color: ${props => (props.variant === 'primary' ? 'white' : '#111')};
+
+  &:hover {
+    opacity: 0.95;
+  }
+`;
+
+export default function Button({ variant = 'default', children }: Props) {
+  return <StyledButton variant={variant}>{children}</StyledButton>;
+}
+```
+
+এই কোডে আমরা TypeScript generic props দিয়ে `styled.button`-কে টাইপ করেছি। `props`-ভিত্তিক dynamic স্টাইল সহজেই লেখা যায়।
+
+---
+
+## একই উদাহরণ Emotion দিয়ে
+
+```tsx
+// src/components/ButtonEmotion.tsx
+import styled from '@emotion/styled';
+import React from 'react';
+
+const Button = styled.button<{ variant?: 'default' | 'primary' }>(({ variant }) => ({
+  padding: '8px 12px',
+  borderRadius: 6,
+  border: 'none',
+  cursor: 'pointer',
+  fontWeight: 600,
+  background: variant === 'primary' ? '#0050c3' : '#eaeaea',
+  color: variant === 'primary' ? 'white' : '#111',
+  '&:hover': { opacity: 0.95 },
+}));
+
+export default function ButtonEmotion({ variant = 'default', children }: Props) {
+  return <Button variant={variant}>{children}</Button>;
+}
+```
+
+Emotion-এ আপনি CSS-in-JS অবজেক্ট notation ব্যবহার করতে পারবেন — এটি JS অপটিমাইজেশন ও টুলিংয়ে সুবিধা দিতে পারে।
+
+---
+
+## থিমিং (Theme) — global colours ও spacing centralize করা
+
+প্রায় সব UI-তে থিম দরকার: primary color, spacing scale, typography ইত্যাদি।
+
+Styled Components থিম প্রদান করে `ThemeProvider` দিয়ে:
+
+```tsx
+// src/theme.ts
+export const light = { colors: { primary: '#0050c3', bg: '#fff' }, spacing: (n: number) => `${n * 4}px` };
+export type Theme = typeof light;
+
+// src/App.tsx
+import { ThemeProvider } from 'styled-components';
+import { light } from './theme';
+
+function App() {
+  return (
+    <ThemeProvider theme={light}>
+      <YourApp />
+    </ThemeProvider>
+  );
+}
+```
+
+Component-এ থিম ব্যবহার:
+
+```tsx
+const ThemedBox = styled.div`
+  background: ${p => p.theme.colors.bg};
+  padding: ${p => p.theme.spacing(2)};
+`;
+```
+
+TypeScript-এ `DefaultTheme` augment করার জন্য `styled-components`-এর typing augment করতে হবে (একটা `styled.d.ts` ফাইল):
+
+```ts
+// styled.d.ts
+import 'styled-components';
+import { Theme } from './theme';
+
+declare module 'styled-components' {
+  export interface DefaultTheme extends Theme {}
+}
+```
+
+এভাবে আপনি `p.theme`-এ autocomplete ও টাইপ সেফটি পাবেন।
+
+---
+
+## Polymorphic components ও as prop
+
+অনেকসময় একই স্টাইলকে ভিন্ন হট-এ ব্যবহার করতে চান (যেমন `a` অথবা `button`)—`as` প্রপ ব্যবহার করে এটা সম্ভব:
+
+```tsx
+const LinkButton = styled(StyledButton).attrs({ as: 'a' })`
+  text-decoration: none;
+`;
+
+// ব্যবহার:
+<LinkButton href="#">Open</LinkButton>
+```
+
+Note: TypeScript-এ `as` ব্যবহার করলে prop typing একটু জটিল হতে পারে—রিসোর্স-ভিত্তিক টাইপিং লাগাতে হতে পারে।
+
+---
+
+## SSR (Server-side Rendering) এবং styled-components / Emotion
+
+Next.js-এর মতো SSR পরিবেশে styled-components বা Emotion ঠিকভাবে server-side render করতে হলে extra setup দরকার:
+
+- styled-components: `babel-plugin-styled-components` ও custom _document.js দিয়ে styles collect করা হয়
+- Emotion: `@emotion/server` দিয়ে extractCritical এবং proper hydration করা প্রয়োজন
+
+Next.js ডকুমেন্টেশনে step-by-step setup আছে—production-ready SSRের জন্য এই গাইডলাইন অনুসরণ করুন।
+
+---
+
+## পারফরম্যান্স ও bundle size দিক
+
+- runtime styled-components বা Emotion-এর কিছু runtime cost থাকে (classname generation ইত্যাদি)।
+- Emotion-এ babel-plugin ব্যবহার করলে compile-time optimizations পাওয়া যায় ও bundle ছোট থাকে।
+- যত জায়গায় possible, shared styles / primitives বানিয়ে reuse করুন—duplicate CSS কমবে।
+
+---
+
+## ডিবাগিং টিপস
+
+- Devtools-এ generated classname দেখতে পাবেন; component name যোগ করতে `displayName` বা Babel plugin ব্যবহার করুন।
+- CSS not applying হলে নিশ্চিত করুন component scope/stylesheet loaded আছে কি না।
+- Throttled re-rendering ঘটলে styled-component-এ inline arrow functions ব্যবহার করা হলে new object constantly তৈরি হতে পারে—memoize করুন।
+
+---
+
+## সাধারণ ভুলত্রুটি
+
+- global CSS ও CSS-in-JS একই স্টাইলে মিলিয়ে নিতে চেষ্টা করলে unpredictability বাড়ে।
+- থিম টাইপ augment না করলে `p.theme`-এ টাইপ সমস্যা হবে।
+- SSR setup না করলে flicker বা mismatch দেখা যায় (hydration mismatch)
+
+---
+
+## সেরা অনুশীলন (Best Practices)
+
+- থিম ব্যবহার করুন, কিন্তু থিমে শুধুমাত্র shared tokens রাখুন (colors, spacing, fonts)
+- small reusable primitives (Box, Text) তৈরি করুন যাতে consistency আসে
+- avoid inline styled objects inside render—নীচে utils বা styled component বানান
+- Production-এ Emotion/Styled-Components-এর babel/plugin চালু করুন bundle ও dev experience ভালো করার জন্য
+
+---
+
+## Practical exercise — একটি Themeable Card বানান
+
+উদ্দেশ্য: `ThemeableCard` কম্পোনেন্ট তৈরি করুন যা light/dark থিম সাপোর্ট করবে, এবং TypeScript-এ টাইপ সেফ থাকবে।
+
+স্টেপস:
+
+1. `npm install styled-components @types/styled-components` করুন (বা Emotion ব্যবহার করলে যথাযথ প্যাকেজ)
+2. `src/theme.ts` এ light ও dark থিম define করুন (উপরের মতো)
+3. `src/components/ThemeableCard.module.tsx` তৈরি করুন:
+
+```tsx
+import styled from 'styled-components';
+import React from 'react';
+
+type Props = { title: string; children?: React.ReactNode };
+
+const Card = styled.div`
+  background: ${p => p.theme.colors.bg};
+  color: ${p => p.theme.colors.text};
+  padding: ${p => p.theme.spacing(3)};
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+`;
+
+export default function ThemeableCard({ title, children }: Props) {
+  return (
+    <Card>
+      <h3>{title}</h3>
+      <div>{children}</div>
+    </Card>
+  );
+}
+```
+
+4. App-এ `ThemeProvider` দিয়ে থিম provide করুন এবং একটা toggle বাটন রাখুন যা light/dark Swiches করে।
+5. TypeScript-এ `styled.d.ts` যোগ করে `DefaultTheme` augment করুন যাতে `p.theme` টাইপ সেফ থাকে।
+
+চেকলিস্ট (exercise):
+- [ ] light/dark থিম আলাদাভাবে কাজ করে কি না
+- [ ] Typography ও spacing থিম থেকে আসছে কি না
+- [ ] TypeScript ত্রুটি নেই
+
+---
+
+## উপসংহার
+
+Styled Components ও Emotion React-এ powerful toolset দেয়, বিশেষ করে medium-to-large সাইজ অ্যাপের জন্য।
+
+- আপনি যদি component-scoped, themeable system চান — CSS-in-JS ভাল অপশন
+- সহজ প্রজেক্টে global CSS দ্রুত কাজ দেয়, কিন্তু যখন scale বাড়ে CSS-in-JS maintainability দেয়
+
+এই লেসনে আমরা covered: setup, examples (TS), theming, SSR considerations, best practices এবং practice exercise।
+
+আপনি চাইলে আমি এই exercise-এর জন্য একটি runnable example প্রজেক্ট (নির্দিষ্ট `package.json`, small README এবং সম্পূর্ণ সোর্স) তৈরি করে দিতে পারি — বলুন, চান কি? 
+
+---

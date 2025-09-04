@@ -1,0 +1,223 @@
+---
+title: React Profiler ও Performance টুলস
+icon: mdi:timer-sand
+description: React DevTools Profiler, Chrome DevTools, Lighthouse, web-vitals ব্যবহার করে কিভাবে পারফরম্যান্স মাপবেন, বোঝবেন এবং অপটিমাইজ করবেন — প্র্যাকটিক্যাল ফ্লো ও টিপস
+keywords:
+  - profiler
+  - performance
+  - react-devtools
+  - lighthouse
+  - web-vitals
+---
+
+# React Profiler ও Performance টুলস
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- React DevTools Profiler ও ব্রাউজারের Performance ট্যাব কীভাবে ব্যবহার করবেন দেখাবো
+- Flamegraph, commit trace ও wasted renders কিভাবে পড়বেন তা ব্যাখ্যা করব
+- Lighthouse, web-vitals, এবং real-user metrics সংগ্রহের সহজ পদ্ধতি দেখাবো
+- ছোট একটি practical exercise দেবো: Product List প্রোফাইল করে wasted render কমানো
+
+চেকলিস্ট (আপনার অনুরোধ থেকে নেয়া):
+- [x] নতুন MDX ফাইল, YAML frontmatter সহ
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও শিক্ষনীয়
+- [x] analogy ব্যবহার করা হয়েছে কঠিন বিষয় বোঝাতে
+- [x] React DevTools, Chrome Performance, Lighthouse, web-vitals কভার করা হয়েছে
+- [x] practical exercise ও চেকলিস্ট দেয়া হয়েছে
+
+---
+
+## প্রারম্ভিক ধারণা — কেন মাপা জরুরি?
+
+কোনো UI ধীরগতিতে কাজ করছে কি না জানার সবচেয়ে গুরুতর ভুল হলো অনুমান করা। ঠিকসঠিক পরিমাপ (profiling) না করলে আমরা অপ্রাসঙ্গিক জায়গায় অপ্টিমাইজেসন করবো — ফলত সময় নষ্ট হবে এবং সমস্যার সমাধান হবে না।
+
+একটি analogy: আপনার বাড়ির রাস্তা যদি মোতায়েন হয় এবং গাড়ি জ্যাম হয়, আপনি প্রথমে গাড়ির সংখ্যা কমাবেন না—আপনি দেখতে চাইবেন কোথায় জ্যাম হচ্ছে (ব্রিজে, চেকপয়েন্টে, বা সংকীর্ণ সেকশনে)। Profiling হলো সেই ট্রাফিক ক্যামেরা।
+
+---
+
+## React DevTools Profiler — কী দেখায় ও কিভাবে পড়তে হবে
+
+React DevTools-এ Profiler ট্যাব একটি timeline দেয় যেখানে আপনি কম্পোনেন্টগুলো কতবার render হয়েছে, কত সময় নিয়ে commit হয়েছে, এবং কোন কাজগুলো expensive ছিল সেটা দেখেন।
+
+প্রাথমিক ফলো-থ্রু:
+
+1. DevTools খুলুন → Profiler ট্যাব নির্বাচন করুন
+2. "Record" বাটনে ক্লিক করে UI-তে সেই একশনগুলো করুন যেগুলো performance সমস্যা করছে (navigation, hover, list scroll ইত্যাদি)
+3. রেকর্ড বন্ধ করুন এবং timeline দেখুন
+
+Key terms:
+- Commit: React যখন DOM-এ পরিবর্তন প্রয়োগ করে সে সময়ের একক।
+- Render time: কিভাবে component subtree render হতে সময় নিচ্ছে।
+- Wasted renders: এমন renders যা DOM-এ কোন পরিবর্তন করেনি — অর্থাৎ ব্যর্থ render
+
+Flamegraph পড়ে কিভাবে সমস্যা চিনবেন:
+- বড় লেয়ার গুলোই বেশি সময় নিচ্ছে — সেই অংশে focus করুন
+- যদি ছোট কম্পোনেন্ট চারপাশে বারবার render হয় কিন্তু না বদলে থাকে, সেটা wasted render ইঙ্গিত
+
+Quick hint: Profiler-এ আপনি "Why did this render?" বোতাম চাপলে React DevTools বলে দেয় কোন props/state পরিবর্তন ওই রেন্ডার ট্রিগার করেছে — খুবই উপকারী।
+
+---
+
+## Chrome DevTools Performance (CPU profile, Flame Chart)
+
+React DevTools ভালো হলেও browser-level instrumentation দরকার হলে Chrome DevTools এর Performance ট্যাব ব্যবহার করুন। এখানে আপনি scripting, rendering, painting, এবং long tasks দেখতে পারবেন।
+
+প্রাথমিক workflow:
+
+1. Chrome DevTools → Performance
+2. Record start → ইউজার ইন্টারঅ্যাকশন করুন → Record stop
+3. ফলাফল বিশ্লেষণ করুন: Main thread activity, Long Tasks (>50ms), Layout & Paint
+
+Useful view:
+- Bottom-up view: কোন function/handler বেশি সময় নিচ্ছে তা দেখতে
+- Call tree / Flame chart: কোথায় JS সময় যাচ্ছে
+
+Memory: যদি memory leak সন্দেহ থাকে, Memory tab-এ snapshot নিন এবং comparison করুন।
+
+---
+
+## Lighthouse ও Core Web Vitals
+
+Lighthouse আপনাকে page-level performance রিপোর্ট দেয়: LCP (Largest Contentful Paint), FID/INP (First Input Delay / Interaction to Next Paint), CLS (Cumulative Layout Shift) ইত্যাদি। প্রোডাকশনে রিয়েল ইউজারের experience জানতে web-vitals সংগ্রহ করা জরুরি।
+
+Chrome → Lighthouse বা `npx lighthouse` CLI দিয়ে সার্ভারাইজড রিপোর্ট নিন।
+
+Core Web Vitals কীভাবে ট্র্যাক করবেন:
+- `web-vitals` প্যাকেজ ইনস্টল করে client-side report collection করুন
+
+```bash
+npm install web-vitals
+```
+
+`src/reportWebVitals.ts` (Next.js/Vite) উদাহরণ:
+
+```ts
+import { getCLS, getFID, getLCP } from 'web-vitals'
+
+export function sendToAnalytics(metric: any) {
+  // আপনার analytics end-point এ পাঠান
+  console.log(metric)
+}
+
+export function registerVitals() {
+  getCLS(sendToAnalytics)
+  getFID(sendToAnalytics)
+  getLCP(sendToAnalytics)
+}
+```
+
+এভাবে production-এ metrics পাঠিয়ে আপনি সত্যিকারের ইউজার পারফরম্যান্স পেতে পারবেন।
+
+---
+
+## Instrumentation: marking long tasks ও custom metrics
+
+HTML5 Performance API ব্যবহার করে custom marks/measurements নেওয়া যায়:
+
+```ts
+performance.mark('fetch-start')
+await fetch('/api/data')
+performance.mark('fetch-end')
+performance.measure('data-fetch', 'fetch-start', 'fetch-end')
+```
+
+Chrome DevTools → Performance ট্যাবে আপনি এই measure দেখতে পাবেন। এই পদ্ধতি বড় komponent lifecycle অথবা network-heavy কাজ পরিমাপ করার জন্য কাজে লাগে।
+
+---
+
+## ছোট utility: render count hook (ডায়াগনসটিকস)
+
+Render count দ্রুত জানতে নিচের হুক ব্যবহার করুন — এটি debugging-only helper, production-এ remove করুন:
+
+```tsx
+import { useRef, useEffect } from 'react'
+
+export function useRenderCount(name = 'comp') {
+  const ref = useRef(0)
+  ref.current++
+  useEffect(() => {
+    if (ref.current > 1) console.debug(`${name} render count:`, ref.current)
+  })
+}
+```
+
+কম্পোনেন্টে:
+
+```tsx
+function ProductCard(props){
+  useRenderCount('ProductCard')
+  return <div>...</div>
+}
+```
+
+এটি করে আপনি কোন কম্পোনেন্ট বারবার render হচ্ছে তা সহজে ধরতে পারেন।
+
+---
+
+## Wasted renders: সনাক্ত ও ঠিক করার কৌশল (সংক্ষিপ্ত)
+
+(মনে রাখবেন: মেমোইজেশন বিষয়টি module 6-এর অন্য পাঠে বিস্তারিত আছে; এখানে আমরা ডায়াগনসটিক-ফোকাস রাখছি)
+
+- Profiler-এ দেখুন কোন কম্পোনেন্ট frequent render করছে
+- "Why did this render?" টুল চালিয়ে দেখুন কোন props/state পরিবর্তন হয়েছে
+- সাধারণ কারণ: non-memoized function props, new object/array props every render, improper key usage in lists
+- Quick fixes:
+  - Avoid creating inline objects/functions in render (move outside or use useCallback/useMemo)
+  - Ensure proper `key` in lists (stable ids)
+  - Use React.memo for pure presentational components (but measure benefit first)
+
+---
+
+## Real-user measurement (RUM) ও synthetic testing
+
+- Synthetic (Lighthouse, lab) ভালো যখন আপনি consistent baseline চান
+- RUM (web-vitals) দিয়ে আপনি প্রকৃত ইউজারদের experience জানতে পারবেন
+- উভয় approach একসঙ্গে ব্যবহার করুন: synthetic regression catch করে, RUM confirms field impact
+
+---
+
+## Practical exercise — Product List profiling ও অপটিমাইজেশন
+
+লক্ষ্য: একটি Product List (100 item) অ্যাপ profle করে wasted render শনাক্ত ও কমানো।
+
+স্টেপস:
+1. সম্ভব হলে আপনার Module 5 ProductCard প্রজেক্ট ব্যবহার করুন বা ছোট করে তৈরি করুন একটি list view যেখানে 100টা ProductCard রেন্ডার হয়।
+2. React DevTools Profiler চালান এবং স্ক্রল/hover/ক্লিক ইন্টারঅ্যাকশন করুন যেগুলো slow। রেকর্ড করুন
+3. দেখুন কোন কম্পোনেন্ট সবচেয়ে বেশি সময় নিচ্ছে এবং কোনগুলোর render count বেশি
+4. প্রয়োজনে `useRenderCount` হুক যোগ করুন প্রতিটি ProductCard-এ
+5. সম্ভাব্য fixes (Try one at a time):
+   - Ensure `key` uses stable id
+   - Move non-critical props out or memoize callbacks used by ProductCard
+   - Wrap pure presentational ProductCard with `React.memo`
+6. প্রতিটি পরিবর্তনের পরে পুনরায় profile করুন — measure before/after
+
+Exercise checklist:
+- [ ] Profiler দিয়ে performance bottleneck সনাক্ত করা হয়েছে
+- [ ] Render counts কমাতে একটি বা একাধিক fix প্রয়োগ করা হয়েছে
+- [ ] Before/After timing compararison টেস্ট রিপোর্ট করা হয়েছে (console বা screenshot)
+- [ ] Production-like build (minified) তে একই test চালানো হয়েছে
+
+Hints:
+- Apply one change at a time — যেকোন optimizations একসাথে করলে effect attribution কঠিন হয়
+- Focus on expensive commits (কালো বা বড় লেয়ার) — small baseline micro-optimizations অনেক ক্ষেত্রেই negligible
+
+---
+
+## Quick checklist for routine performance review
+
+- [ ] Run Lighthouse (desktop and mobile)
+- [ ] Profile with React DevTools for specific interactions
+- [ ] Use Chrome Performance to find long tasks and layout thrash
+- [ ] Collect web-vitals from real users
+- [ ] Add automated performance budget checks in CI (optional)
+
+---
+
+## উপসংহার
+
+Performance diagnosis হলো "কোথায় সমস্যা" খুঁজে বের করার কাজ — এবং সেটা ছাড়া optimization করা অপ্রয়োজনীয় বা ক্ষতিকর হতে পারে। React DevTools Profiler, Chrome DevTools, Lighthouse ও web-vitals একসাথে ব্যবহার করলে আপনি দ্রুত সঠিক ধারায় পৌঁছান।
+
+আমি চাইলে এই exercise-এর জন্য একটি runnable small app scaffold করে দিতে পারি (Vite + React + TS) যা Product List, Profiler-ready hooks, এবং before/after tests আছে — বলুন, scaffold করতে চাইলে কোন স্টার্টার চান (Vite/Next.js)?
+
+---

@@ -1,0 +1,254 @@
+---
+title: Authentication (NextAuth.js)
+icon: mdi:lock-outline
+description: NextAuth.js দিয়ে Next.js অ্যাপে Authentication সেটআপ — providers, sessions, callbacks, ও role-based access (TypeScript উদাহরণসহ)
+keywords:
+  - nextauth
+  - authentication
+  - nextjs
+  - typescript
+  - oauth
+---
+
+# Authentication (NextAuth.js)
+
+আমি কি করবো: এই পাঠে আমরা NextAuth.js ব্যবহার করে Next.js অ্যাপে authentication কিভাবে যোগ করা যায় সেটা শিখব — সহজ ভাষায়, TypeScript উদাহরণসহ।
+
+ছোট পরিকল্পনা:
+- NextAuth.js কী এবং কখন ব্যবহার করবেন
+- Providers (GitHub, Google, Email) সেটআপ করা
+- Session, JWT ও callbacks এর ধারা বুঝানো (analogy সহ)
+- App Router ও Pages Router-এ ব্যবহার করার উদাহরণ (TypeScript)
+- Security ও deployment টিপস
+- প্র্যাকটিক্যাল এক্সারসাইজ: GitHub provider দিয়ে লগইন, রোল-বেইজড পেজ পার্মিশন
+
+চেকলিস্ট:
+- [ ] আর্টিকেলটা সম্পূর্ণভাবে বাংলা
+- [ ] TypeScript কোড উদাহরণ আছে
+- [ ] ব্যবহারকারীকে runnable exercise দেওয়া আছে
+
+---
+
+## পরিচিতি: NextAuth.js কী?
+
+NextAuth.js হচ্ছে একটি প্রিসেট authentication লাইব্রেরি যা Next.js অ্যাপে সহজে OAuth, Email, Credentials ইত্যাদি যোগ করতে সাহায্য করে। এটি session ও token handling, provider integration, এবং callback/hooks দিয়ে আপনাকে দ্রুত সরবরাহ করে।
+
+Analogy (খুব সহজ): ভাবুন আপনি একটা বড় পার্টি আয়োজন করছেন। দরজায় যদি প্রত্যেকজনের নাম যাচাই করতে চান, আপনি নিজে প্রত্যেককে দেখতে দেখতে ক্লান্ত হবেন। NextAuth.js হল সেই নিরাপত্তার দরজা যাকে বসিয়ে দিলে নিয়মিত অতিথিরা কাগজ দেখালে দরজা নিজে খুলে দেয় — আপনি শুধু দরজার নিয়মগুলো (providers, callbacks) ঠিক করে রাখবেন।
+
+---
+
+## কবে NextAuth ব্যবহার করবেন — সরল নিয়ম
+
+- আপনি যদি দ্রুত OAuth প্রোভাইডার (GitHub/Google) বা Email লিঙ্ক লগইন চান
+- Session management সার্ভার-সাইডে রাখতে চান
+- Next.js-এ built-in API routes বা App Router route handlers ব্যবহার করতে চান
+
+নোট: বড়, কাস্টম অ্যাটহেন্টিকেশন সিস্টেম বা অত্যন্ত কাস্টমাইজড auth logic চাইলে dedicated auth সার্ভারও বিবেচনা করুন।
+
+---
+
+## ইন্সটল ও বেসিক কনফিগারেশন (TypeScript)
+
+প্যাকেজ ইনস্টল করুন:
+
+```bash
+pnpm add next-auth
+# অথবা
+npm install next-auth
+```
+
+Pages Router (pages/api/auth/[...nextauth].ts) - উদাহরণ:
+
+```ts
+// pages/api/auth/[...nextauth].ts
+import NextAuth from 'next-auth'
+import GitHubProvider from 'next-auth/providers/github'
+import type { NextAuthOptions } from 'next-auth'
+
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID ?? '',
+      clientSecret: process.env.GITHUB_SECRET ?? '',
+    }),
+  ],
+  session: { strategy: 'jwt' },
+}
+
+export default NextAuth(authOptions)
+```
+
+App Router (app/api/auth/[...nextauth]/route.ts) — route handler wrapper:
+
+```ts
+// app/api/auth/[...nextauth]/route.ts
+import NextAuth from 'next-auth'
+import { authOptions } from '@/lib/auth' // central config
+
+export { authOptions }
+
+export default NextAuth(authOptions as any)
+```
+
+উপরোক্ত ক্ষেত্রে `authOptions` আলাদা ফাইল থেকে export করা ভালো যাতে App ও Pages দুটোই reuse করতে পারে।
+
+---
+
+## Providers: GitHub, Google, Email ইত্যাদি
+
+- GitHub/Google: OAuth client id/secret লাগবে
+- Email: একটি SMTP সার্ভার দরকার (SendGrid, Mailgun ইত্যাদি)
+
+প্রতিটি provider সেটআপ করতে environment variables রাখুন এবং hosting secret management ব্যবহার করুন (Vercel, Netlify)।
+
+---
+
+## Session ও JWT: দুইটি ধারণা ও analogy
+
+- Session (database-backed): server-side session table/adapter এ store করা হয় — server এ control থাকে।
+- JWT (stateless): token-এ সব তথ্য থাকে; server প্রতিবার token verify করে।
+
+Analogy: session = আপনার পার্টির অতিথিদের একটি তালিকা যা দরজার কাছে রাখা আছে; JWT = প্রত্যেক অতিথির হাতে একটি পাস যা তারা নিজে দেখায়।
+
+NextAuth এ আপনি `session.strategy = 'jwt'` বা `'database'` নির্বাচন করতে পারেন। বড় সিস্টেমে RBAC ও সেশন রিভোকেশন সহজ করতে database-backed session সুবিধাজনক।
+
+---
+
+## Callbacks: token ও session কাস্টমাইজ করা
+
+Callbacks দিয়ে আপনি JWT বা session payload কাস্টমাইজ করতে পারবেন। উদাহরণঃ রোল যোগ করা:
+
+```ts
+// lib/auth.ts
+import { NextAuthOptions } from 'next-auth'
+import GitHubProvider from 'next-auth/providers/github'
+
+export const authOptions: NextAuthOptions = {
+  providers: [GitHubProvider({ clientId: process.env.GITHUB_ID ?? '', clientSecret: process.env.GITHUB_SECRET ?? '' })],
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      // প্রথম লগইনের সময় প্রোফাইল থেকে role সেট করতে পারেন
+      if (account && profile) {
+        token.role = profile.email?.endsWith('@yourcompany.com') ? 'admin' : 'user'
+      }
+      return token
+    },
+    async session({ session, token }) {
+      // ক্লায়েন্ট সাইডে session.user.role দেখা যাবে
+      (session as any).user.role = (token as any).role
+      return session
+    },
+  },
+}
+```
+
+নোট: TypeScript ব্যবহার করলে token এবং session এর টাইপ ডিক্লেয়ার করুন অথবা `any` ব্যবহার করে শুরু করুন এবং পরে refine করুন।
+
+---
+
+## RBAC (Role-Based Access Control) — সহজ উদাহরণ
+
+- রোলস session এ যোগ করা হল
+- পেজ প্রোটেকশন করতে server-side বা client-side check করবেন
+
+Pages Router server-side protection (getServerSideProps):
+
+```ts
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+
+export async function getServerSideProps(context) {
+  const session = await getServerSession(context.req, context.res, authOptions)
+  if (!session || (session as any).user.role !== 'admin') {
+    return { redirect: { destination: '/login', permanent: false } }
+  }
+  return { props: {} }
+}
+```
+
+App Router protection (server component):
+
+```ts
+// app/admin/page.tsx (server component)
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+export default async function AdminPage() {
+  const session = await getServerSession(authOptions)
+  if (!session || (session as any).user.role !== 'admin') {
+    // client-side redirect or render not-authorized
+    return <p>Access denied</p>
+  }
+  return <div>Admin content</div>
+}
+```
+
+---
+
+## Client-side: useSession ও protected UI
+
+```tsx
+'use client'
+import { signIn, signOut, useSession } from 'next-auth/react'
+
+export default function AuthButton() {
+  const { data: session } = useSession()
+  if (!session) return <button onClick={() => signIn()}>Login</button>
+  return (
+    <div>
+      <span>{session.user?.email}</span>
+      <button onClick={() => signOut()}>Logout</button>
+    </div>
+  )
+}
+```
+
+নোট: `useSession` SSR-friendly নয়; server-side session চাইলে `getServerSession` ব্যবহার করুন।
+
+---
+
+## Security টিপস
+
+- Always store secrets in env vars and hosting secret stores
+- Use HTTPS in production
+- Validate and sanitize any data coming from OAuth callbacks
+- Consider using database adapter for sessions if you need revoke or long-term sessions
+- Limit scope and permissions requested from OAuth providers
+
+---
+
+## Deployment ও বাস্তবে মাথায় রাখতে হবে
+
+- Vercel এ NextAuth সাধারণত ভালো কাজ করে; environment variables সেট করুন
+- Serverless cold-start থেকে বাঁচতে heavy init কাজ আলাদা করুন
+- Adapter (Prisma, TypeORM ইত্যাদি) ব্যবহার করলে database migration ও connection pooling ঠিকঠাক করতে হবে
+
+---
+
+## Practical exercise: GitHub লগইন ও রোল-বেইজড পেজ
+
+লক্ষ্য: Next.js অ্যাপে NextAuth.js ইন্টেগ্রেট করে GitHub দিয়ে লগইন করুন এবং admin-only পেজ তৈরি করুন।
+
+ধাপগুলো (ছোট চেকলিস্ট):
+
+1. [ ] `pnpm add next-auth` ইনস্টল করুন
+2. [ ] GitHub OAuth app তৈরি করে `GITHUB_ID` ও `GITHUB_SECRET` environment variable হিসেবে যোগ করুন
+3. [ ] `lib/auth.ts` বানিয়ে `authOptions` export করুন (উপরের callbacks সহ)
+4. [ ] App Router বা Pages Router-এ auth route যোগ করুন (`app/api/auth/...` অথবা `pages/api/auth/...`)
+5. [ ] একটি `/admin` পেজ বানান যা server-side session দেখে রোল চেক করবে (উপরের getServerSideProps বা server component ব্যবহার করুন)
+6. [ ] হোম পেজে `AuthButton` যোগ করুন যা `useSession` ব্যবহার করবে
+7. [ ] লোকালভাবে লগইন করে admin পেজে access ও redirect যাচাই করুন
+
+Extra:
+- Database adapter যোগ করলে users টেবিল দেখুন
+- Email provider যোগ করলে magic-link login চেষ্টা করুন
+
+---
+
+## উপসংহার
+
+NextAuth.js Next.js অ্যাপে দ্রুত এবং নিরাপদ authentication যোগ করার সহজ উপায়। শুরুতে OAuth providers দিয়ে prototyping দ্রুত হবে, পরে আপনি প্রয়োজন মতো adapters ও টোকেন নীতিমালা কাস্টমাইজ করতে পারবেন।
+
+চাইলে এই exercise-এর জন্য runnable starter (Next.js App Router + TypeScript + Prisma adapter + GitHub provider) scaffold করে দিতে পারি — বলুন কোন টুলস চান (Pages Router / App Router) এবং আমি সেটআপ করে টেস্ট চালিয়ে দেখাব।
+
+---

@@ -1,0 +1,223 @@
+---
+title: ক্লিন কোড ও ফোল্ডার স্ট্রাকচার
+icon: mdi:code-tags
+description: ক্লিন কোড নীতিমালা, রিয়ডেবল ও মেইনটেনেবল ফাইল-স্ট্রাকচার, TypeScript ভালো অভ্যাস ও কোড রিফ্যাক্টরিং কৌশল
+keywords:
+  - clean-code
+  - architecture
+  - folder-structure
+  - typescript
+  - refactor
+---
+
+# ক্লিন কোড ও ফোল্ডার স্ট্রাকচার
+
+আমি কি করবো: এই পাঠে আমরা শেখব কীভাবে পরিষ্কার, পাঠযোগ্য ও মেইনটেনেবল কোড লিখতে হয় এবং একটি বাস্তবসম্মত ফোল্ডার স্ট্রাকচার ডিজাইন করতে হয়—সবকিছু TypeScript/React প্রজেক্টের প্রেক্ষাপটে।
+
+সংক্ষিপ্ত পরিকল্পনা:
+- ক্লিন কোডের মৌলিক নীতিসমূহ (সোজা ভাষায়)
+- নামকরণ, ফাংশন সাইজ, single responsibility ইত্যাদি (analogy সহ)
+- recommended ফোল্ডার স্ট্রাকচার উদাহরণ (Next.js/React)
+- ছোট TypeScript উদাহরণ: টাইপ করা কম্পোনেন্ট, পরিষ্কার hooks এবং ইউটিল ফাংশন
+- টেস্টিং, লিন্টিং, প্রি-কমিট hooks ও CI টিপস
+- practical exercise: রিফ্যাক্টরিং টাস্ক ও চেকলিস্ট
+
+চেকলিস্ট:
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] Analogy দিয়ে কঠিন ধারণা বোঝানো
+- [ ] TypeScript উদাহরণ আছে
+- [ ] Recommended folder structure ও practical exercise আছে
+
+---
+
+## কেন ক্লিন কোড?
+
+ক্লিন কোড লেখার উদ্দেশ্য: ভবিষ্যৎ আপনার (বা দলের) জন্য সহজে বুঝতে ও বদলাতে যোগ্য কোড রাখা। ক্লিন কোড দ্রুত feature যোগ, bug বের করা ও রিফ্যাক্টরিংকে কম ঝামেলার করে।
+
+Analogy: ধারণা করুন একটি শহর তৈরির সময় সড়কগুলো সঠিকভাবে পরিকল্পনা না করলে পরবর্তী সময়ে যানজট, পরিষেবা পৌঁছাতে সমস্যা ও রিকনস্ট্রাকশন কঠিন হবে—একইভাবে কোডবেইজও যদি প্রথম থেকে পরিষ্কার না করা হয়, পরে কাজ ধীর ও ব্যয়বহুল হয়।
+
+---
+
+## মৌলিক নীতিসমূহ (Small & Concrete)
+
+- নামগুলো পরিষ্কার রাখুন: `fetchUsers` ভালো, `doStuff` খারাপ।
+- এক ফাংশন, এক কাজ (SRP): একটি ফাংশন অনেক কাজ করলে সেটাকে ভাঙুন।
+- কম্পোনেন্ট ছোট রাখুন: UI ও logic আলাদা করুন (presentational vs container pattern)।
+- Magic numbers/strings এড়িয়ে চলুন: constant গুলো নাম দিয়ে রাখুন।
+- Side-effects স্পষ্ট রাখুন: I/O / network / localStorage স্পষ্ট ফাইলে রাখুন।
+- Tests first mindset: নতুন ফিচারে ছোট টেস্ট লিখুন—bug ফিরে আসে কম হবে।
+
+---
+
+## নামকরণ কৌশল (Naming)
+
+- Verb for functions: `getUser`, `saveOrder`
+- Noun for types/objects: `User`, `Order`
+- Boolean হার্ড নাম দেওয়া উচিত নয়: `isValid` ভাল; `flag` ঠিক না
+- Context দিন: `useUser` better than `useData`
+
+উদাহরণ: ভাল নামকরণ কোডকে self-documenting করে।
+
+---
+
+## ফোল্ডার স্ট্রাকচার — Recommended (Next.js / React)
+
+নিচে একটি practical এবং scalable স্ট্রাকচার উদাহরণ—অফিসিয়াল বিশ্বাসযোগ্যতা না থাকলেও বাস্তবে খুব কাজে লাগে:
+
+```
+src/
+  app/                # Next.js app-router pages (optional)
+  pages/              # Pages router (if used)
+  components/         # Reusable presentational components
+    Button/
+      Button.tsx
+      Button.test.tsx
+      Button.module.css
+  features/           # Domain folders (feature-driven)
+    cart/
+      ui/
+      hooks/
+      api.ts
+      types.ts
+  lib/                # small utilities, clients (api client, stripe)
+  hooks/              # shared hooks
+  styles/             # global styles, tokens
+  types/              # global TS types
+  pages/api/          # API routes (Next.js)
+  prisma/             # prisma schema / migrations (if used)
+  tests/              # e2e tests or test fixtures
+
+public/
+content/              # MDX or content files
+```
+
+কেন feature-driven? কারণ নতুন ফিচার যোগ করলে সম্পর্কিত কোড এক জায়গায় থাকে—scale এ সুবিধা।
+
+---
+
+## TypeScript উদাহরণ — পরিষ্কার কম্পোনেন্ট ও টাইপিং
+
+1) ছোট টাইপ ও props
+
+```tsx
+// src/components/ProductCard/ProductCard.tsx
+import React from 'react'
+import type { Product } from '@/types'
+
+type Props = { product: Product; onAddToCart?: (id: string) => void }
+
+export function ProductCard({ product, onAddToCart }: Props) {
+  return (
+    <article>
+      <h3>{product.title}</h3>
+      <p>{product.price / 100} USD</p>
+      <button onClick={() => onAddToCart?.(product.id)}>Add</button>
+    </article>
+  )
+}
+```
+
+নির্দেশনা:
+- অবজেক্ট টাইপ `Product` আলাদা ফাইল `src/types/index.ts`-এ রাখুন
+- অপশনাল কলব্যাক `onAddToCart?` ব্যবহার করে কনজুমারকে সুবিধা দিন
+
+2) পরিষ্কার custom hook
+
+```ts
+// src/hooks/useLocalStorage.ts
+import { useState, useEffect } from 'react'
+
+export function useLocalStorage<T>(key: string, initial: T) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const raw = localStorage.getItem(key)
+      return raw ? (JSON.parse(raw) as T) : initial
+    } catch {
+      return initial
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(state))
+    } catch {}
+  }, [key, state])
+
+  return [state, setState] as const
+}
+```
+
+নীচে ভালো অভ্যাস:
+- Generic hook হিসাবে `T` ব্যবহার করলে পুনঃব্যবহার হয়
+- Error handling minimalist রাখুন কিন্তু suppress না করে logging রাখুন (development-only)
+
+---
+
+## ছোট কোড-স্মেলস ও কিভাবে ঠিক করবেন
+
+1) Duplicate code — extract function
+2) Large component — split into smaller presentational components
+3) Deep props drilling — use context or colocate logic in feature folder
+4) Long switch/case — use strategy pattern বা map of handlers
+
+---
+
+## টেস্টিং, লিন্টিং ও প্রি-কমিট হুক
+
+- ESLint + TypeScript rules চালান: `eslint --ext .ts,.tsx src/`
+- Prettier for formatting; combine with ESLint rules
+- Husky + lint-staged: pre-commit এ changed files-এ lint ও tests চালান
+
+package.json snippets (reference only):
+
+```json
+{
+  "scripts": {
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "format": "prettier --write .",
+    "test": "vitest"
+  }
+}
+```
+
+Husky setup (idea):
+- pre-commit: `lint-staged`
+- pre-push: run `pnpm test --changed` অথবা `pnpm build`
+
+---
+
+## CI ও quality gates
+
+- GitHub Actions যে-কোনো PR-এ build, lint, test চালুক।
+- Protect main branch with status checks (lint + tests)
+- Coverage threshold নির্ধারণ করুন (example: 80%)
+
+---
+
+## Practical exercise — ছোট রিফ্যাক্টর টাস্ক
+
+লক্ষ্য: একটি ছোট legacy কম্পোনেন্ট/ফাইল রিফ্যাক্টর করে ক্লিন কোড প্যাটার্ন প্রয়োগ করা।
+
+Step-by-step:
+1. একটি বড় `ProductList.tsx` খুঁজে বের করুন যেখানে presentation ও data-fetching একসাথে আছে
+2. আলাদা করে `ProductList` -> `ProductListContainer` (data-fetching) ও `ProductListView` (presentational) বানান
+3. `useProducts` হুক তৈরি করে fetch logic সরান (React Query বা fetch)
+4. টাইপস `src/types`-এ আনুন এবং props-typing যোগ করুন
+5. ছোট unit test লিখুন `ProductCard`-এর জন্য (Jest/RTL বা Vitest)
+
+Deliverables checklist:
+- [ ] `ProductListView` কম্পোনেন্ট
+- [ ] `useProducts` custom hook
+- [ ] `src/types/index.ts`-এ টাইপস
+- [ ] একটি unit test পাস
+- [ ] lint ও format চালিয়ে clean commit
+
+---
+
+## উপসংহার
+
+ক্লিন কোড মানে perfection নয়—এটা ধারাবাহিক প্রচেষ্টা। ছোট ছোট নিয়ম মানলে (নামকরণ, ছোট ফাংশন, টাইপস, টেস্ট) প্রজেক্ট বড় হলে রাখা সহজ হয়। শুরু করতে একটা ছোট রিফ্যাক্টর টাস্ক নিন এবং ধাপে ধাপে কোড ক্লিন করুন।
+
+আপনি চাইলে আমি আপনার রেপো থেকে একটি বৃহৎ ফাইল বা কম্পোনেন্ট খুঁজে নিয়ে রিফ্যাক্টরিংয়ের একটি PR তৈরি করে দেখাতে পারি—বলুন কোন ফাইল/ফিচার নিয়ে কাজ করি।
+
+---
