@@ -1,0 +1,252 @@
+---
+title: SSR ও SSG
+icon: mdi:cloud-sync
+description: Server-side Rendering (SSR) ও Static Site Generation (SSG) — পার্থক্য, ব্যবহার ক্ষেত্র, Next.js-এ কিভাবে কাজ করে, TypeScript উদাহরণ এবং practical exercise
+keywords:
+  - ssr
+  - ssg
+  - nextjs
+  - isr
+  - pre-rendering
+---
+
+এই পাঠে আপনি শিখবেন:
+
+- SSR (Server-side Rendering) ও SSG (Static Site Generation) কী ও কখন ব্যবহার করবেন
+- Next.js-এ `getServerSideProps`, `getStaticProps`, ISR এবং App Router-এর নতুন প্যাটার্নগুলো কিভাবে কাজ করে (TypeScript উদাহরণসহ)
+- hydration, caching, revalidate, fallback, ও common pitfalls
+- একটি practical exercise: ব্লগ পোজেটিং করে SSG ও ISR প্রয়োগ করা
+
+এক লাইন পরিকল্পনা:
+- analogy দিয়ে ধারণা সহজ করে বলব
+- Next.js কোর APIs দেখাবো TypeScript দিয়ে
+- SSR vs SSG tradeoffs ব্যাখ্যা করব
+- practical exercise ও checklist দেবো
+
+চেকলিস্ট (user requirements):
+- [ ] MDX frontmatter আছে (`title`, `icon`, `description`, `keywords`)
+- [ ] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly
+- [ ] analogy দেয়া আছে
+- [ ] TypeScript উদাহরণ (getStaticProps, getServerSideProps, ISR, App Router fetch with revalidate) আছে
+- [ ] practical exercise ও checklist আছে
+
+---
+
+## সরল analogy: রান্নাঘরের উপমা
+
+ধরুন আপনার রেস্টুরেন্টে প্রতিদিন একই মেনু বিক্রি হয়:
+
+- SSG হলো আগেই সকালেই প্রস্তুত করা কুড়ি খাবারের প্লেটগুলো — আপনি এগুলো শেলে রেখে দিচ্ছেন, গ্রাহক আসলেই তুলে নিয়ে যাবে (fast, CDN থেকে সার্ভ)।
+- SSR হলো গ্রাহক অর্ডার দিলেই শেফ বাসন ধরিয়ে রান্না করা (fresh কিন্তু সময় লাগতে পারে)।
+
+ISR (Incremental Static Regeneration) হলো হাইব্রিড: কিছু প্লেট আগেই রাখছেন, কিন্তু প্রয়োজন হলে শেফও রিক্রি করে নতুন করে প্লেট বাড়িয়ে দেন—ফাস্ট ও প্রায়-সতত্ অক্ষর।
+
+এই analogy-এ লক্ষ্য রাখবেন: স্ট্যাটিক আগে থেকে প্রস্তুত করলে delivery দ্রুত হয়; কিন্তু যদি ডেটা বারবার বদলে তাহলে SSR প্রয়োজন হতে পারে।
+
+---
+
+## Pre-rendering ধরনা — কেন প্রয়োজন?
+
+Pre-rendering মানে page-এর HTML আগে থেকেই তৈরি করা। এটি SEO, initial load time, এবং predictable performance বাড়ায়। দুই ভাইভাগে আসে:
+
+- SSG (build-time): পেজগুলো build-এর সময় তৈরি হয়।
+- SSR (request-time): প্রতিটি অনুরোধে server HTML তৈরী করে পাঠায়।
+
+Next.js এ এই দুইটি সহজ পদ্ধতিতে ব্যবহার করা যায় এবং App Router এ server components-সহ আরও স্বচ্ছভাবে ডেটা ফেচ করা যায়।
+
+---
+
+## Pages Router: `getStaticProps` (SSG) — TypeScript উদাহরণ
+
+```ts
+// pages/index.tsx
+import { GetStaticProps, NextPage } from 'next'
+
+type Post = { id: string; title: string }
+
+type Props = { posts: Post[] }
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const res = await fetch('https://api.example.com/posts')
+  const posts: Post[] = await res.json()
+  return { props: { posts } }
+}
+
+const HomePage: NextPage<Props> = ({ posts }) => {
+  return (
+    <div>
+      <h1>ব্লগ</h1>
+      <ul>
+        {posts.map(p => <li key={p.id}>{p.title}</li>)}
+      </ul>
+    </div>
+  )
+}
+
+export default HomePage
+```
+
+এখানে `getStaticProps` build-time এ রান করে এবং `posts` প্রি-রেন্ডার করা HTML-এর সাথে ইনলাইন করা হয় (dehydrated)।
+
+---
+
+## Pages Router: `getServerSideProps` (SSR) — TypeScript উদাহরণ
+
+```ts
+// pages/profile.tsx
+import { GetServerSideProps, NextPage } from 'next'
+
+type Props = { user: { id: string; name: string } }
+
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  // এখানে context.req/cookies দেখতে পারেন — auth-required page এর জন্য উপযোগী
+  const res = await fetch('https://api.example.com/me', { headers: { cookie: context.req.headers.cookie || '' }})
+  const user = await res.json()
+  return { props: { user } }
+}
+
+const ProfilePage: NextPage<Props> = ({ user }) => (
+  <div>
+    <h1>Welcome {user.name}</h1>
+  </div>
+)
+
+export default ProfilePage
+```
+
+`getServerSideProps` প্রতিটি request-এ রান করবে — personal/fresh data এর জন্য দরকার।
+
+---
+
+## ISR (Incremental Static Regeneration)
+
+SSG এর সুবিধা বজায় রেখে আপনি `revalidate` দিয়ে পেজকে interval-ভিত্তিক রিজেনারেট করতে পারেন:
+
+```ts
+export const getStaticProps: GetStaticProps = async () => {
+  const res = await fetch('https://api.example.com/posts')
+  const posts = await res.json()
+  return { props: { posts }, revalidate: 60 } // 60 seconds
+}
+```
+
+এখানে প্রথম request-এ static page serve হলেও posibly background এ 60 সেকেন্ড পর re-generate হবে। App Router-এ একই ধারণা `fetch` option দিয়ে দেওয়া হয়: `{ next: { revalidate: 60 } }`।
+
+---
+
+## App Router (Next 13+) — server components ও `fetch(..., { next: { revalidate } })`
+
+App Router-এ আমরা সাধারণত server components ব্যবহার করে data fetch করি:
+
+```tsx
+// app/page.tsx (server component)
+export default async function HomePage() {
+  const res = await fetch('https://api.example.com/posts', { next: { revalidate: 60 } })
+  const posts = await res.json()
+  return (
+    <main>
+      <h1>Blog</h1>
+      <ul>{posts.map((p: any) => <li key={p.id}>{p.title}</li>)}</ul>
+    </main>
+  )
+}
+```
+
+Server components-এ আপনি `useEffect` ব্যবহার করতে পারবেন না; Client-side interactivity প্রয়োজন হলে child-কে client component হিসেবে ডিক্লেয়ার করবেন (`'use client'`).
+
+---
+
+## Hydration & client-side behavior
+
+SSG বা SSR-এর পরে browser page-টি React দিয়ে hydrate করে এবং client-side interactivity কাজ করে। কিছু বিষয় দেখবেন:
+
+- Hydration mismatch: server-rendered HTML ও client-rendered UI একেবারে মিললে mismatch হয় না; কিন্তু runtime-only values (Date.now(), Math.random(), window-dependent values) server এ একইভাবে থাকা উচিত নয়।
+- Avoid rendering browser-only data on server without guards
+
+উদাহরণ: localStorage-dependent UI server-side render এ সরাসরি ব্যবহার করলে mismatch হতে পারে — guard করুন `typeof window !== 'undefined'` বা client-only কম্পোনেন্ট ব্যবহার করুন।
+
+---
+
+## Caching & Cache-Control headers
+
+SSG assets সাধারণত CDN-এ cache হয়; SSR pages আপনি HTTP headers দিয়ে cache control করতে পারেন। Next.js hosting (Vercel) এ edge caching rules ও headers কনফিগার করা যায়।
+
+যদি আপনি API route দিয়ে সার্ভার রেন্ডার করেন, response header-এ caching set করতে পারেন:
+
+```ts
+// pages/api/posts.ts
+export default async function handler(req, res) {
+  const data = await fetchExternal()
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30')
+  res.json(data)
+}
+```
+
+`stale-while-revalidate` pattern দ্রুত ট্র্যাফিক সার্ভ করে এবং ব্যাকগ্রাউন্ডে নতুন ডেটা নিয়ে আসে।
+
+---
+
+## Fallback modes (`getStaticPaths`) ও behavior
+
+Dynamic routes সাথে `getStaticPaths` ব্যবহার করে আপনি build-time কি generate করবেন তা নির্ধারণ করতে পারবেন:
+
+- `fallback: false`: শুধুমাত্র paths রেন্ডার করা হবে; অন্য সব 404 হবে
+- `fallback: true`: অনুরোধ এলে সার্ভার browser-এ loading state দেখিয়ে পরে page generate করা হবে (client-side rendering until hydrated)
+- `fallback: 'blocking'`: server request-এ blocking করে full HTML generate করে পাঠাবে (user sees final page)
+
+`blocking` অনেক সময় user experience ভাল করে কারণ loading UI কম লাগে; কিন্তু সময় লাগে সার্ভার-এ।
+
+---
+
+## Preview mode ও הפרוטেক্টেড content
+
+Next.js preview mode দিয়ে আপনি draft content serve করতে পারেন build-time static site-এর উপর। সাধারণত CMS-এর সাথে integrate করে ব্যবহার হয়। Preview mode কিভাবে enable করবেন docs দেখুন, security রুলস মেনে কাজ করুন (token guards)।
+
+---
+
+## Common pitfalls ও recommendations
+
+- Don’t fetch browser-only APIs in server code (window, localStorage)
+- For high-traffic frequently-changing pages prefer SSR or API caching patterns rather than full rebuilds
+- Use ISR for content sites where freshness is needed but full rebuilds are expensive
+- Keep heavy compute out of `getServerSideProps` to avoid high-latency responses
+
+---
+
+## Practical exercise — ব্লগ পেজে SSG + ISR প্রয়োগ
+
+লক্ষ্য: একটি ছোট ব্লগ প্রজেক্ট যেখানে:
+
+1. Home page SSG-এ build-time generate হবে (posts list)
+2. প্রতিটি post page dynamic route-এ SSG ও `fallback: 'blocking'` ব্যবহার করবে
+3. `getStaticProps`-এ `revalidate: 30` যোগ করে ISR enable করুন
+4. একটি API route (`pages/api/posts.ts`) বানিয়ে local mock data serve করুন
+
+Step-by-step:
+- `npx create-next-app@latest blog --ts`
+- তৈরি করুন `pages/index.tsx`, `pages/posts/[id].tsx`, `pages/api/posts.ts`
+- `getStaticProps` এ local fetch থেকে data নিন এবং `revalidate` সেট করুন
+- Build ও dev test চালান:
+
+```bash
+npm run dev
+npm run build
+npm run start
+```
+
+Exercise checklist:
+- [ ] Home page SSG (getStaticProps) কাজ করে
+- [ ] Dynamic post pages `getStaticPaths` সহ কাজ করে
+- [ ] `fallback: 'blocking'` কনফিগার করা আছে এবং behavior দেখা হয়েছে
+- [ ] ISR `revalidate` কাজ করছে (post update করে revalidate-পর পুনরায় দেখুন)
+- [ ] API route রয়েছে mock data-serving এর জন্য
+
+---
+
+## উপসংহার
+
+SSR ও SSG দুটোই valuable tools—SSG দ্রুত লোডিং দেয় ও CDN সুবিধা নেয়, SSR fresh ও personalized content দেয়। Next.js আপনাকে উভয়ের সুবিধা দেয় এবং ISR-এর মাধ্যমে একটি কার্যকর compromise দেয়। শুরুতে একটি content-heavy ব্লগ বা marketing সাইট SSG+ISR দিয়ে বানান; যখন personalization দরকার হবে তখন SSR ব্যবহার করুন।
+
+চাইলে আমি এই exercise-এর জন্য runnable Next.js starter scaffold করে দিতে পারি (Pages Router বা App Router নির্বাচন করে) — বলুন "scaffold nextjs ssr-ssg starter" এবং আমি সেটআপ করে local smoke test চালিয়ে দেখাবো।
+
+---

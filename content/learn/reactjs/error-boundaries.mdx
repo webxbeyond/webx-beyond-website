@@ -1,0 +1,253 @@
+---
+title: Error Boundaries
+icon: mdi:alert-circle-outline
+description: React-এ Error Boundaries কিসের জন্য এবং কিভাবে ব্যবহার করবেন — fallback UI, logging, reset এবং TypeScript উদাহরণসহ
+keywords:
+  - error-boundaries
+  - react
+  - fallback-ui
+  - error-handling
+  - typescript
+---
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- Error Boundary কী ও কেন দরকার সহজভাবে বোঝাবো
+- Class-based Error Boundary কীভাবে লিখবেন (TypeScript সহ)
+- কোথায় সেট করবেন, কী ধরণের এরর ধরা যায় না, এবং logging/telemetry নির্দেশ করব
+- Reset ও recovery pattern দেখাবো এবং একটি practical exercise দিয়ে দেবো
+
+চেকলিস্ট (আপনার অনুরোধ থেকে নেওয়া):
+- [x] নতুন MDX ফাইল frontmatter সহ (`title`, `icon`, `description`, `keywords`)
+- [x] সম্পূর্ণ আর্টিকেল বাংলা ভাষায়, beginner-friendly, বিশদ ও ধারাবাহিক
+- [x] কঠিন ধারণার জন্য analogue ব্যবহার করা হয়েছে
+- [x] React + TypeScript উদাহরণ ও practical exercise আছে
+- [x] Index.md-এ থাকা বিষয়াবলীর সাথে পুনরাবৃত্তি এড়ানো হয়েছে (এখানে focus: error handling ও recovery)
+
+---
+
+## পরিচিতি — Error Boundary কি?
+
+Error Boundary হলো একটি React কম্পোনেন্ট যা তার subtree-তে ঘটে এমন JavaScript error ধরে ফেলে এবং পুরো অ্যাপ ক্র্যাশ হওয়া রোধ করে। এটি একটি safety-net যা UI-ভাঙচুর (broken UI) থেকে ব্যবহারকারীকে gracefully recover করতে সাহায্য করে।
+
+Analogy: ভাবুন আপনার ওয়েবপেজ একটা গাড়ি। Error Boundary হলো সেই সেফটি বেল্ট — যদি গাড়িতে হঠাৎ কোনো সমস্যা হয়, বেল্ট ব্যবহারকারীর ওপর বড়ো প্রভাব কমায় এবং গাড়িতে থাকা সকলকে একসাথে crash করে না।
+
+মনে রাখবেন: Error Boundaries runtime error আটকায়, টি.এস. টাইপিং সমস্যা বা ব্যাকএন্ড-এরর (API failures) সরাসরি ধরে না — সেগুলো আলাদা ভাবে handle করতে হয় (try/catch, promise catch, বা UI-level error states)।
+
+---
+
+## কী ধরণের এরর ধরবে (আর কী নয়)
+
+What Error Boundaries catch:
+- Render phase errors in descendant components
+- Lifecycle method errors (componentDidMount, componentDidUpdate ইত্যাদি) in descendants
+- Constructor errors of descendant components
+
+What Error Boundaries do NOT catch:
+- Event handler errors (event handlers run outside render, use try/catch inside handler)
+- Errors thrown in asynchronous callbacks (setTimeout, fetch promises) unless explicitly caught
+- Server-side rendering (SSR) errors — server-side rendering context ভিন্ন; Next.js-এ SSR time errors আলাদাভাবে handle করতে হবে
+
+Quick rule: Error Boundaries catch synchronous render/lifecycle errors inside their client-side React tree.
+
+---
+
+## Class-based Error Boundary (TypeScript উদাহরণ)
+
+React এর built-in Error Boundary API এখনো class component এ নির্ভরশীল। নিচে একটি বেসিক, কিন্তু production-ready pattern দেখানো হলঃ
+
+```tsx
+// src/components/ErrorBoundary.tsx
+import React from 'react'
+
+type Props = { children: React.ReactNode; fallback?: React.ReactNode }
+type State = { hasError: boolean; error?: Error }
+
+export class ErrorBoundary extends React.Component<Props, State> {
+  state: State = { hasError: false }
+
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    // UI-level fallback দেখানোর জন্য state update
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    // Logging / telemetry এখানে পাঠান
+    // Example: window.__SENTRY__?.captureException(error, { extra: info })
+    console.error('Captured error in ErrorBoundary:', error, info)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // custom fallback UI
+      return (
+        <div role="alert" style={{ padding: 20, background: '#fff4f4', color: '#611' }}>
+          {this.props.fallback ?? (
+            <div>
+              <h2>কিছু একটা ভুল হয়েছে।</h2>
+              <p>আপনি পেজ রিলোড করে দেখতে পারেন, অথবা আমাদেরকে রিপোর্ট করুন।</p>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+```
+
+ব্যবহার:
+
+```tsx
+export default function App(){
+  return (
+    <ErrorBoundary fallback={<div>অপস! কিছু গড়মিল হয়েছে।</div>}>
+      <MainApp />
+    </ErrorBoundary>
+  )
+}
+```
+
+এখানে `componentDidCatch`-এ আপনি Sentry, LogRocket বা অন্য কোনো error tracking সার্ভিসে error পাঠাতে পারেন।
+
+---
+
+## Fallback UI ও UX নির্দেশিকা
+
+- Fallback UI কে সহজ ও সরল রাখুন—ব্যবহারকারী কী করতে পারে তা বলুন (reload, retry, contact support)
+- Avoid showing low-level technical stack traces to end-users; লগে stack trace রাখুন কিন্তু UI-তে friendly message দেখান
+- For isolated errors, boundary-কে component-level করুন (একটা sidebar crash করলে পুরো app না ভেঙে sidebar-এর জায়গায় fallback দেখান)
+- Provide recovery action: retry button, go-back link, or reset boundary
+
+---
+
+## Resetting an Error Boundary
+
+একটি সাধারণ pattern হলো boundary-কে reset করার উপায় দেওয়া—উদাহরণ: একটি Retry বাটন যাতে user আবার চেষ্টা করতে পারে।
+
+```tsx
+// ErrorBoundary with reset
+type Props2 = { children: React.ReactNode }
+
+export class ResettableBoundary extends React.Component<Props2, State> {
+  state: State = { hasError: false }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error(error, info)
+  }
+
+  reset = () => this.setState({ hasError: false, error: undefined })
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <p>কিছু সমস্যা হয়েছে।</p>
+          <button onClick={this.reset}>Try again</button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+```
+
+Reset করার অন্য উপায় হলো `key` প্রপ ব্যবহার করে child subtree re-mount করা:
+
+```tsx
+<ErrorBoundary key={boundaryKey}>{children}</ErrorBoundary>
+// boundaryKey state থেকে পরিবর্তন করলে subtree নতুন করে mount হবে
+```
+
+---
+
+## Scoping: কোথায় Error Boundaries রাখবেন?
+
+- App-level boundary: গ্রেট কিন্তু generic fallback দেয় — ব্যবহার করুন top-level last-resort fallback হিসেবে
+- Feature-level boundary: প্রতিটি মাসুল/প্যানেল/Widget-এ আলাদা boundary দিন যাতে ক্ষুদ্র অংশ ক্র্যাশ করলে পুরো পেজ না ভাঙে
+- Route-level boundary: route-specific boundary ব্যবহার করলে এক route error-এ সেখানকার UI পড়ে যাবে কিন্তু navbar/footer থাকবে
+
+মোটকথা: যতটা সম্ভব ছোট scope দিন—কম্পোনেন্টকে retry করতে দিন কিন্তু পুরো অ্যাপ না রিলোড করতে বলুন।
+
+---
+
+## Logging ও Observability
+
+- পাঠানো তথ্য: error object, component stack (`info.componentStack`), user context (user id, current route)
+- Rate-limit logging (একই exception বারবার পাঠালে logging bill বাড়তে পারে)
+- Distinguish between expected and unexpected errors (HTTP 404 vs unexpected exception)
+
+Example: Sentry-like pseudo-code
+
+```ts
+componentDidCatch(error, info) {
+  sendToSentry({ error, info, user: window.__USER__?.id })
+}
+```
+
+---
+
+## Integration: async errors ও event handlers
+
+Error Boundaries ধরবে না এমন async errors handle করতে:
+
+- API errors: catch in fetch call and render an error state in UI
+- Event handlers: wrap try/catch inside handler or use error boundary library that supports handlers
+
+```tsx
+async function loadData(){
+  try {
+    const res = await fetch('/api/data')
+    if (!res.ok) throw new Error('Network')
+    const data = await res.json()
+  } catch (e) {
+    // setErrorState -> render friendly error in component
+  }
+}
+```
+
+---
+
+## SSR ও Error Boundaries
+
+- Server-side rendering context আলাদা; client-side ErrorBoundary শুধুমাত্র client-side rendering-এ কাজ করে
+- Next.js-এ page-level errors SSR-এর time এ handle করা উচিত—`getServerSideProps`/`getStaticProps` এ try/catch করুন
+- React 18 ও server components পরিবেশে সার্ভার-সাইড Suspense ও error handling উন্নত হচ্ছে—framework docs দেখুন
+
+---
+
+## Practical exercise — ProductDetails error handling (Module 6 project)
+
+লক্ষ্য: `ProductDetails` কম্পোনেন্টে ব্যর্থতা (simulate render-time error বা data fetch error) আনুন এবং একটি Error Boundary দিয়ে graceful fallback ও retry বাস্তবায়ন করুন।
+
+স্টেপস:
+1. একটি Vite React+TS প্রজেক্ট নিন বা আপনার course প্রজেক্ট ব্যবহার করুন
+2. `ProductDetails.tsx` লিখে একটি অনিবার্য error যোগ করুন conditionally (e.g., `if (!product) throw new Error('No product')`)
+3. App-এ `ResettableBoundary` (উপরের উদাহরণ) wrap করুন সেই অংশের চারপাশে
+4. Fallback UI-এ একটি "Retry" বাটন দিন যা boundary.reset() কল করে অথবা parent থেকে `boundaryKey` পরিবর্তন করে re-mount করে
+5. `componentDidCatch`-এ console logging রাখুন এবং optional সরল fake logging function লিখে দেখুন
+
+Exercise checklist:
+- [ ] ProductDetails error সঠিকভাবে ErrorBoundary-এ ধরা হচ্ছে
+- [ ] Fallback UI user-friendly এবং retry path আছে
+- [ ] Logging দেখেছে (console বা fake analytics)
+- [ ] Event-handler/async errors আলাদা করে handle করা হয়েছে
+
+Bonus:
+- Integrate a lightweight error-tracking mock that stores errors in `localStorage` for manual inspection
+- Add a Storybook story demonstrating boundary behaviour with a broken child component
+
+---
+
+## শেষ কথা
+
+Error Boundaries হলো React-এর robust UI-এর একটি গুরুত্বপূর্ণ অংশ: তারা unexpected crashes-কে user-facing disaster থেকে রক্ষা করে, এবং আপনাকে graceful recovery ও better observability দেয়।
+
+আপনি চাইলে আমি exercise-এর জন্য একটি runnable Vite + React + TypeScript starter scaffold করে দিতে পারি যেখানে `ProductDetails`, `ErrorBoundary` এবং retry flow বাস্তবায়িত থাকবে — বলুন, scaffold করতে চান কি? 
+
+---

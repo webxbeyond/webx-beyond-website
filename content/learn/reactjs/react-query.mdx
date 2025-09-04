@@ -1,0 +1,306 @@
+---
+title: React Query দিয়ে সার্ভার স্টেট ম্যানেজমেন্ট
+icon: ri:reactjs-line
+description: React Query (TanStack Query) ব্যবহার করে সার্ভার-সাইড ডেটা কিভাবে ফেচ, ক্যাশ, ইনফ্যালিডেট এবং মিউটেট করবেন — TypeScript উদাহরণ, SSR ও optimistic updates সহ
+keywords:
+  - react-query
+  - tanstack-query
+  - data-fetching
+  - caching
+  - optimistic-update
+---
+
+আমি যা করব — এক লাইন প্ল্যান:
+
+- React Query কী, কেন দরকার তা সহজ করে বলব
+- সেটআপ ও মূল API (`QueryClient`, `useQuery`, `useMutation`) TypeScript-সহ দেখাবো
+- ক্যান্চিং, ইনভ্যালিডেশন, রিফ্রেশ প্যাটার্ন ও optimistic updates কিভাবে করবেন দেখাবো
+- SSR/SSG ইন্টিগ্রেশন, DevTools ও testing টিপস দেবো
+- practical exercise: Products তালিকায় caching ও optimistic add-to-cart বাস্তবায়ন করবেন
+
+চেকলিস্ট (আপনি যা চেয়েছেন):
+- [x] নতুন MDX ফাইল frontmatter সহ (`title`, `icon`, `description`, `keywords`)
+- [x] সম্পূর্ণ আর্টিকেল বাংলা ভাষায়, beginner-friendly ও সুসংগঠিত
+- [x] ব্যাখ্যার জন্য সরল analogy দেয়া হয়েছে
+- [x] React + TypeScript উদাহরণ, SSR ও testing টিপস আছে
+- [x] practical exercise ও চেকলিস্ট আছে
+
+---
+
+## পরিচিতি — React Query কী এবং কেন?
+
+React Query (বর্তমানে TanStack Query নামেও পরিচিত) হলো একটি library যা সার্ভার-সাইড ডেটা ফেচিং, ক্যাশিং ও synchronization-কে সহজ করে। এটি `useQuery` ও `useMutation` hooks দেয়—আপনি fetch logic লিখবেন, বাকিটা লাইব্রেরি ম্যানেজ করবে: caching, background re-fetch, retries, stale/garbage collection ইত্যাদি।
+
+Analogy: ভাবুন আপনার অ্যাপ একটি লাইব্রেরি রুম—প্রতিবার যখন কোনো বই লাগবে, আপনি লাইব্রেরিকারের কাছে না গিয়ে আগে লাইব্রেরির ক্যাটালগ চেক করেন (cache), যদি না থাকে তখনই লাইব্রেরিকারের কাছে অনুরোধ করেন (network fetch)। React Query হলো সেই স্মার্ট ক্যাটালগ ও fetch-অটোমেশন।
+
+কখন React Query ব্যবহার করবেন:
+- সার্ভারের ওপর নির্ভর করা ডেটা frequent fetch/refresh হয়
+- caching, background refetch, pagination, infinite scroll দরকার
+- optimistic updates বা offline support দরকার
+
+প্রতিদিনের local UI state (modal open, small form inputs) React Query-এ রাখবেন না—এগুলো component state বা local store-এ ভালো থাকে।
+
+---
+
+## দ্রুত সেটআপ (Vite / CRA / Next.js)
+
+প্যাকেজ ইনস্টল করুন:
+
+```bash
+npm install @tanstack/react-query
+# devtools optional
+npm install @tanstack/react-query-devtools
+```
+
+অ্যাক্টিভ কোড (TypeScript):
+
+```tsx
+// src/queryClient.ts
+import { QueryClient } from '@tanstack/react-query'
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 1000 * 60 * 2, // 2 minutes
+    }
+  }
+})
+
+// src/main.tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './queryClient'
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </React.StrictMode>
+)
+```
+
+আপনি চাইলে `ReactQueryDevtools` যোগ করতে পারেন ডেভে debugging সহজ করার জন্য।
+
+---
+
+## useQuery — data fetching hook (TypeScript উদাহরণ)
+
+`useQuery` ব্যবহার করে আপনি keyed query তৈরি করেন। key হলো query identity; cache ও invalidation এই key-এর ওপর কাজ করে।
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+
+async function fetchProducts() {
+  const res = await fetch('/api/products')
+  if (!res.ok) throw new Error('Failed to fetch')
+  return res.json() as Promise<Product[]>
+}
+
+export function useProducts(){
+  return useQuery(['products'], fetchProducts)
+}
+
+// component
+export default function Products(){
+  const { data, isLoading, error } = useProducts()
+  if (isLoading) return <div>লোড হচ্ছে...</div>
+  if (error) return <div>ত্রুটি: {(error as Error).message}</div>
+  return <ul>{data!.map(p => <li key={p.id}>{p.name}</li>)}</ul>
+}
+```
+
+কিছু গুরুত্বপূর্ণ props:
+- staleTime: কতক্ষণ পর্যন্ত ডেটা fresh গণ্য করা হবে
+- cacheTime: unused cache ছাড়ার আগে কতক্ষণ রাখব
+- refetchOnWindowFocus/refetchInterval ইত্যাদি background behaviour নিয়ন্ত্রণ করে
+
+---
+
+## useMutation — বাইন্ডারি বদলানো (create/update/delete)
+
+`useMutation` মিউটেশন হুক যা চেঞ্জ পাঠায় এবং সফল হলে কাস্টম invalidation বা optimistic update করে।
+
+সাধারণ উদাহরণ (add product to cart):
+
+```tsx
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+function addToCartApi(item: CartItem) {
+  return fetch('/api/cart', { method: 'POST', body: JSON.stringify(item) })
+}
+
+export function useAddToCart(){
+  const qc = useQueryClient()
+  return useMutation(addToCartApi, {
+    onSuccess() {
+      qc.invalidateQueries(['cart'])
+    }
+  })
+}
+```
+
+---
+
+## Optimistic updates (ব্যবহারিক কৌশল)
+
+Optimistic updates UX তরতাজা রাখে—কল করার আগেই ইউআই আপডেট হয়, এবং নেটওয়ার্ক ব্যর্থ হলে revert করা হয়।
+
+উদাহরণ (optimistic add to cart):
+
+```tsx
+export function useAddToCartOptimistic(){
+  const qc = useQueryClient()
+  return useMutation(addToCartApi, {
+    onMutate: async (newItem: CartItem) => {
+      await qc.cancelQueries(['cart'])
+      const previous = qc.getQueryData<CartItem[]>(['cart'])
+      qc.setQueryData(['cart'], (old = []) => [...old, newItem])
+      return { previous }
+    },
+    onError: (err, newItem, context) => {
+      qc.setQueryData(['cart'], context?.previous)
+    },
+    onSettled: () => {
+      qc.invalidateQueries(['cart'])
+    }
+  })
+}
+```
+
+Tip: optimistic updates দরকার হলে careful rollback logic দেয়া গুরুত্বপূর্ণ।
+
+---
+
+## Caching ও Invalidation প্যাটার্ন
+
+- Cache key design গুরুত্বপূর্ণ: `['products']`, `['product', id]` ইত্যাদি
+- After mutation always invalidate affected queries (e.g., invalidate `['products']` or update `['product', id]` directly)
+- For paginated/infinite lists use `getNextPageParam` এবং useInfiniteQuery
+
+Example: updating single product cache after patch response:
+
+```ts
+qc.setQueryData(['product', id], (old) => ({ ...old, ...updated }))
+```
+
+---
+
+## Pagination ও Infinite Queries
+
+React Query ইনবিল্ট helpers দেয় pagination ও infinite scroll-এর জন্য:
+
+- `useInfiniteQuery` — pages fetch করে, `fetchNextPage` দিয়ে load more
+- `getNextPageParam` নির্ধারণ করে কিভাবে পরবর্তী পেজের token বের হবে
+
+---
+
+## SSR / SSG ও React Query
+
+Next.js বা অন্য SSR সাইডে React Query use করলে আপনাকে server-side prefetching ও hydration করতে হবে। মূল flow:
+
+1. Server-side এ `queryClient.prefetchQuery(['products'], fetchProducts)` চালান
+2. `dehydrate(queryClient)` করে state serialize করে HTML-এ পাঠান
+3. Client-side এ `hydrate` করে `QueryClient`-এ load করে দিন
+
+Next.js example (getServerSideProps):
+
+```ts
+import { dehydrate, QueryClient } from '@tanstack/react-query'
+
+export async function getServerSideProps(){
+  const qc = new QueryClient()
+  await qc.prefetchQuery(['products'], fetchProducts)
+  return { props: { dehydratedState: dehydrate(qc) } }
+}
+```
+
+Client-side আপনার `QueryClientProvider`-এ `Hydrate` ব্যবহার করুন।
+
+---
+
+## DevTools, retries ও error handling
+
+- React Query Devtools (`@tanstack/react-query-devtools`) debug করার জন্য দরকারি—query keys, cache state, timings সব দেখায়।
+- Retries: default retry behaviour network glitches সহ উপকারী, কিন্তু idempotent না এমন requests এ caution রাখুন
+- Error boundaries vs query errors: query errors সহজে component-level UI error state-এ handle করুন (useQuery returns `error`)—app-wide uncaught errors আলাদা handle করুন
+
+---
+
+## Testing React Query logic
+
+- Unit test: mock fetch (msw) করে useQuery/useMutation behaviour পরীক্ষা করুন
+- For components: wrap tests with `QueryClientProvider` এবং `QueryClient` টেস্ট সেটআপ করে `setQueryData` দিয়ে fixture data দিন
+
+Example (RTL + msw):
+
+```tsx
+// test render with provider
+const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+render(
+  <QueryClientProvider client={qc}>
+    <Products />
+  </QueryClientProvider>
+)
+```
+
+---
+
+## React Query vs RTK Query — কখন কোনটা?
+
+- React Query focused on fetching/caching & client-side sync; RTK Query RTK-কে extend করে server state handling ও caching support দেয় যা Redux store-এ tightly couple করে
+- If you already use Redux heavily and want server state integrated with global store & serialization, RTK Query ভাল
+- If you prefer a dedicated, flexible data-fetching toolkit with broad ecosystem features, React Query উপযুক্ত
+
+সংক্ষেপে: project context ও team familiarity-এ নির্ভর করে সিদ্ধান্ত নিন
+
+---
+
+## Practical exercise — Product List এবং optimistic Add-to-Cart
+
+লক্ষ্য: একটি Product List বানান যেখানে products cached থাকবে, এবং "Add to Cart" বোতামে optimistic update-সহ cart আপডেট হবে।
+
+স্টেপস:
+1. Vite React+TS প্রজেক্ট বানান এবং React Query ইনস্টল করুন
+
+```bash
+npm create vite@latest react-query-shop -- --template react-ts
+cd react-query-shop
+npm install
+npm install @tanstack/react-query @tanstack/react-query-devtools msw
+```
+
+2. `QueryClient` ও `QueryClientProvider` সেটআপ করুন (উপরের কোড অনুসরণ করুন)
+3. `useProducts` hook তৈরি করুন (useQuery) এবং `Products` component বানান
+4. `useAddToCartOptimistic` mutation তৈরি করুন (উপরের optimistic উদাহরণ) এবং UI-এ apply করুন
+5. MSW দিয়ে local fake API তৈরি করুন যাতে network latency simulate করা যায়
+6. Measure: DevTools ও Network tab ব্যবহার করে দেখুন কিভাবে optimistic update কাজ করে এবং rollback হয় যদি API fail করে
+
+Exercise checklist:
+- [ ] Products কম্পোনেন্ট useQuery থেকে ডেটা দেখায়
+- [ ] Add-to-cart optimistic update UI তৎক্ষণাত পরিবর্তন করে
+- [ ] Failure case-এ rollback ঠিকভাবে হয়
+- [ ] SSR/SSG integration (optional): prefetchQuery দিয়ে server-side hydration পরীক্ষা করা হয়েছে
+
+---
+
+## Quick tips এবং anti-patterns
+
+- Key design: consistent key structure (`['products']`, `['product', id]`)
+- Avoid storing large blobs in query cache if not needed—query cache is for remote data
+- Don’t use React Query for local ephemeral UI state
+- Use `enabled` option to control conditional fetching
+
+---
+
+## উপসংহার
+
+React Query আপনার সার্ভার-ফেড ডেটা নিয়ে কাজকে দ্রুত ও predictable করে। এটি caching, background refetch, optimistic updates, pagination ও SSR-সহ বহু প্রয়োজনীয় feature দেয়। একবার key-design ও invalidation patterns আয়ত্তে এলে আপনি দ্রুত responsive এবং resilient UI বানাতে পারবেন।
+
+আপনি চাইলে আমি এই exercise-এর জন্য runnable starter প্রজেক্ট (Vite + React + TS) তৈরি করে দিতে পারি যেখানে Products, optimistic add-to-cart, msw mocks ও testing setup থাকবে—বলুন scaffold করতে চান কি? 
+
+---

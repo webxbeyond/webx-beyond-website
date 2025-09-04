@@ -1,0 +1,215 @@
+---
+title: HOC ও Render Props
+icon: mdi:code-brackets
+description: Higher-Order Components (HOC) ও Render Props প্যাটার্ন কী এবং কিভাবে React + TypeScript-এ এগুলো ব্যবহার করবেন — ব্যবহারিক উদাহরণ, ছোট কাজ ও আধুনিক বিকল্প (hooks)
+keywords:
+  - hoc
+  - render-props
+  - higher-order-component
+  - react-patterns
+  - typescript
+---
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- HOC ও Render Props এর ধারণা সহজভাবে বোঝাবো
+- React + TypeScript উদাহরণ দেবো: একটি `withLoading` HOC, এবং একটি `DataProvider` render-props কম্পোনেন্ট
+- কখন কোন প্যাটার্ন ব্যবহার করবেন, common pitfalls ও modern alternative (hooks) বলব
+- একটি ছোট practical exercise দিবো যাতে আপনি নিজে হাতে একই কাজ HOC, render-props ও hook দিয়ে করে দেখবেন
+
+চেকলিস্ট (আপনার অনুরোধ থেকে নেওয়া):
+- [x] নতুন MDX ফাইল `title`, `icon`, `description`, `keywords` সহ
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও পরিষ্কার স্টেপে লেখা
+- [x] কঠিন ধারণার জন্য analogy আছে
+- [x] React + TypeScript উদাহরণ আর practical exercise দেয়া হয়েছে
+- [x] index এ থাকা অন্যান্য পাঠের পুনরাবৃত্তি এড়ানো হয়েছে — ফোকাস ডিজাইন প্যাটার্ন ও প্র্যাকটিক্যাল ট্রান্সফর্ম
+
+---
+
+## সংক্ষিপ্ত analogy — HOC ও Render Props কাকে স্মরণ করায়?
+
+- HOC: ভাবুন একজন কাপড়ের আচ্ছাদন (cover) — আপনি একটি সাধারণ টি-শার্টে (component) ওভার-শার্ট (HOC) পরে নতুন সক্ষমতা যোগ করলেন, কিন্তু আসল টি-শার্ট অপরিবর্তিত। HOC হল সেই wrapper যে কম্পোনেন্টকে নতুন props বা behaviour দেয়।
+
+- Render Props: এটা একটু প্ল্যাট-টেবিলের মত — আপনি টেবিলকে বলেন কী ভাবে content render করবে (you pass a function) এবং টেবিল আপনার function-কে data দেয়। Render Prop হলো একটি ফাংশন prop যা UI কাস্টমাইজ করে।
+
+এই দুটি প্যাটার্নের উদ্দেশ্য একই: কম্পোজেবল reusable logic ভাগ করা।
+
+---
+
+## Higher-Order Component (HOC) — ধারণা ও উদাহরণ
+
+HOC হলো একটি function যা একটি component নেবে এবং enhanced component ফিরিয়ে দেবে। সাধারণত cross-cutting concerns (logging, loading, auth) ভাগ করতে HOC ব্যবহার করা হয়।
+
+TypeScript-এ একটি সহজ `withLoading` HOC:
+
+```tsx
+// src/hocs/withLoading.tsx
+import React from 'react'
+
+type WithLoadingProps = { isLoading?: boolean }
+
+export function withLoading<P extends object>(WrappedComponent: React.ComponentType<P>) {
+  return function WithLoading(props: P & WithLoadingProps) {
+    const { isLoading, ...rest } = props as WithLoadingProps & P
+    if (isLoading) return <div>লোড হচ্ছে...</div>
+    return <WrappedComponent {...(rest as P)} />
+  }
+}
+```
+
+ব্যবহার:
+
+```tsx
+const ProductListWithLoading = withLoading(ProductList)
+
+// তারপর ব্যবহার করা হয়:
+<ProductListWithLoading isLoading={loading} products={products} />
+```
+
+নোট: TypeScript generic `P extends object` দিয়ে আমরা WrappedComponent-এর props capture করছি। সাবধান থাকুন যে HOC-এর মাধ্যমে props clash বা name collision হতে পারে — সুস্পষ্ট prop নাম ব্যবহার করুন বা হাই-লেভেল API ডকুমেন্ট করুন।
+
+---
+
+## Render Props — ধারণা ও উদাহরণ
+
+Render Props হচ্ছে এমন একটি prop (সাধারণত `children` বা `render`) যা একটি ফাংশন নেয় এবং সেই ফাংশনকে data বা helpers পাঠায়।
+
+`DataProvider` render-props উদাহরণ:
+
+```tsx
+// src/components/DataProvider.tsx
+import React, { useEffect, useState } from 'react'
+
+type Props<T> = { url: string; children: (state: { loading: boolean; data?: T; error?: Error | null }) => React.ReactNode }
+
+export function DataProvider<T>({ url, children }: Props<T>){
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<T | undefined>(undefined)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    setLoading(true)
+    fetch(url)
+      .then(r => r.json())
+      .then((d) => { if (mounted) { setData(d); setLoading(false) } })
+      .catch(e => { if (mounted) { setError(e); setLoading(false) } })
+    return () => { mounted = false }
+  }, [url])
+
+  return <>{children({ loading, data, error })}</>
+}
+```
+
+ব্যবহার:
+
+```tsx
+<DataProvider url="/api/products">
+  {({ loading, data }) => (
+    loading ? <div>লোড হচ্ছে...</div> : <ProductList products={data} />
+  )}
+</DataProvider>
+```
+
+Render Props সুবিধা: আপনি UI কাস্টমাইজ করতে পারেন যেভাবে চান — কিন্তু দীর্ঘতর JSX nesting তৈরি করতে পারে।
+
+---
+
+## কখন HOC, কখন Render Props, কখন Hook?
+
+- HOC ভালো যখন আপনি component-level behaviour বাড়াতে চান এবং API সহজ রাখতে চান — তবে HOC nesting বেশি হলে debugging কঠিন হতে পারে।
+- Render Props ভালো যখন UI-টোট্যাল কাস্টমাইজেশন লাগবে এবং আপনি child-কে data সরাসরি দিতে চান।
+- Hooks (useData, useLoading) আধুনিক ও সাধারণত সহজ — অধিকাংশ HOC/Render Props use-cases এখন hook দিয়ে সমাধান করা হয়, কিন্তু HOC/Render Props backward-compatible এবং library API তৈরিতে এখনও দরকারি হতে পারে।
+
+সংক্ষিপ্ত নিয়ম:
+- ছোট reusable logic → Hook
+- UI customization + passing render function → Render Props
+- Wrapper-style enhancement → HOC (প্রব্লেমatic হলে বিবেচনা করুন)
+
+---
+
+## Common pitfalls ও টিপস
+
+- Props collision: HOC-এ পাস করা props-এর নাম clash হলে সমস্যা হবে — prefix বা distinct prop নাম ব্যবহার করুন
+- Wrapper refs: HOC default behaviour component refs সরাসরি ফরওয়ার্ড করে না — `React.forwardRef` ব্যবহার করুন যদি প্রয়োজন
+- Performance: বহু HOC বা render props nesting অনেক re-render ঘটাতে পারে; measure করুন এবং memoize বা hooks ব্যবহার করে সমস্যা কমান
+- Readability: Too many HOC layers یا nested render-props make component trees hard to read — document the composition and prefer hooks for small logic
+
+---
+
+## Advanced HOC: forwardRef ও displayName
+
+একটি production-ready HOC সাধারণত `forwardRef` এবং `displayName` সেট করবে:
+
+```tsx
+export function withLogging<P extends object>(WrappedComponent: React.ComponentType<P>) {
+  const WithLogging = React.forwardRef<any, P>((props, ref) => {
+    useEffect(() => { console.log('mounted') }, [])
+    return <WrappedComponent ref={ref} {...props} />
+  })
+  WithLogging.displayName = `WithLogging(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`
+  return WithLogging
+}
+```
+
+এটি devtools-এ readable নাম দেয় এবং refs ঠিকভাবে ফরওয়ার্ড করে।
+
+---
+
+## Transition example: HOC → Hook
+
+একই `withLoading` behaviour hook-এ রূপান্তর করলে code becomes simpler:
+
+```tsx
+function useLoading<T>(fetcher: () => Promise<T>){
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<T | undefined>()
+  useEffect(() => { let mounted = true; fetcher().then(d => mounted && setData(d)).finally(() => mounted && setLoading(false)); return () => { mounted = false } }, [fetcher])
+  return { loading, data }
+}
+```
+
+পরে component-এ:
+
+```tsx
+function ProductListContainer(){
+  const { loading, data } = useLoading(() => fetch('/api/products').then(r => r.json()))
+  if (loading) return <div>লোড হচ্ছে...</div>
+  return <ProductList products={data} />
+}
+```
+
+Hook পথটি readable এবং composition-friendly।
+
+---
+
+## Practical exercise — একই কাজ তিনভাবে: HOC, Render Props ও Hook
+
+লক্ষ্য: একটি simple data-fetch+display flow তিনভাবে имплемент করে তুলনা করা
+
+স্টেপস:
+1. একটি Vite React+TS প্রজেক্ট খুলুন বা course repo ব্যবহার করুন
+2. Implement `withLoading` HOC (উপরের কোড) এবং use it around a `ProductList`
+3. Implement `DataProvider` render-props component এবং use it to render `ProductList`
+4. Implement `useLoading` hook এবং use it inside a `ProductListContainer`
+5. Compare readability, prop passing, reusability এবং React DevTools tree-র differences
+
+Exercise checklist:
+- [ ] HOC implementation working and ProductList wrapped successfully
+- [ ] Render Props implementation working and ProductList rendered by children function
+- [ ] Hook implementation working with same behaviour
+- [ ] Notes on which approach felt simpler and why
+
+Bonus:
+- Implement `forwardRef` and `displayName` for HOC
+- Add TypeScript typings to DataProvider to ensure `data` type is preserved
+
+---
+
+## উপসংহার
+
+HOC ও Render Props—এগুলো React-এর পুরোনো কিন্তু শক্তিশালী প্যাটার্ন; তবে আধুনিক React-এ hooks সবচেয়ে প্রিয় ও সাধারণ উপায়। আপনি যদি লাইব্রেরি-লেভেল API বানান বা backward-compatible component wrapper লাগান, HOC ও Render Props এখনও কাজে লাগবে। প্রতিটি প্যাটার্নের trade-offs বুঝে প্রয়োগ করুন এবং যতটা সম্ভব measure করে সিদ্ধান্ত নিন।
+
+চাইলে আমি এই exercise-এর জন্য একটি runnable starter (Vite + React + TS) তৈরি করে দিতে পারি যেখানে HOC, render-props ও hook তিনটি বাস্তব উদাহরণ থাকবে—বলুন scaffold করতে চান কি? 
+
+---

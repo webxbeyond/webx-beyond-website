@@ -1,0 +1,215 @@
+---
+title: স্টাইলিং বেস্ট প্র্যাকটিস
+icon: mdi:brush
+description: রিঅ্যাক্ট কম্পোনেন্টে স্থিতিশীল, রক্ষণযোগ্য ও অ্যাক্সেসিবল স্টাইল লিখার ভালো অভ্যাস ও স্থাপত্য (CSS, CSS Modules, CSS-in-JS, Tailwind সম্মিলিত নির্দেশিকা)
+keywords:
+  - styling
+  - best-practices
+  - css
+  - css-modules
+  - tailwind
+  - accessibility
+---
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- স্টাইলিং-এ সাধারণ ভুল ও তাদের সমাধান ব্যাখ্যা করব
+- architecture ও patterns (components, tokens, utilities) আলোচনা করব
+- accessibility, performance ও maintainability কিভাবে নিশ্চিত করবেন দেখাবো
+- practical উদাহরণ ও refactor exercise দেবো
+
+চেকলিস্ট (আপনার অনুরোধ থেকে নেওয়া):
+- [x] নতুন MDX ফাইল (frontmatter: `title`, `icon`, `description`, `keywords`)
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও দীর্ঘ রূপ
+- [x] কঠিন ধারণা বোঝাতে analogy ব্যবহার করা হয়েছে
+- [x] উদাহরণ ও practical exercise দেওয়া হয়েছে
+- [x] Index (মডিউল ৫) থাকা পাঠগুলোর সাথে অপর্যাপ্ত পুনরাবৃত্তি এড়ানো হয়েছে — এখানে প্র্যাকটিস ও আর্কিটেকচার ফোকাস করা হয়েছে
+
+---
+
+## প্রারম্ভিক কথা: কেন স্টাইলিং-এর ভালো অভ্যাস জরুরি?
+
+কম্পোনেন্টগুলোর স্টাইল দ্রুত লিখে ফেলা যায়, কিন্তু সময় গেলে স্টাইল জঙ্গল হয়ে যায় — override, duplicate, inconsistency এবং accessibility-সমস্যা দেখা দেয়। একটি পরিষ্কার স্টাইলিং প্যাটার্ন কোডবেসকে readable, predictable ও দ্রুত পরিবর্তনযোগ্য করে।
+
+এখানে একটা সহজ analogy: Imagine একটি রান্নাঘর যেখানে প্রত্যেক বস্তু আলাদা আলাদা প্লাস্টিক বাক্সে ঠিকই রাখা আছে — যদি প্রতিটি আইটেমের জন্য একই রঙের বাক্স ব্যবহার না করা হয়, খুঁজে পাওয়া কঠিন হবে। স্টাইলিং-এও design tokens (colors, spacing, font scale) ঠিকভাবে সংরক্ষণ করলে প্রতিটি UI অংশ খুঁজে পাওয়া ও রিইউজ করা সহজ হয়।
+
+---
+
+## ১) সরল নিয়মাবলি — ছোট, নির্দিষ্ট, পুনঃব্যবহারযোগ্য
+
+- প্রতিটি স্টাইলিং ইউনিটকে ছোট রাখুন: একটি কম্পোনেন্টের জন্য একাধিক কাজ করা class/selector না করে, ছোট পুনরায় ব্যবহারযোগ্য primitives (Box, Text, Button) বানান।
+- Single Responsibility: কম্পোনেন্ট-কোডে logic, markup ও presentational styling আলাদা রাখুন (পর্যাপ্ত abstraction) — টাইপড props দিয়ে যেসব styling কন্ডিশন আছে সেগুলো props-ভিত্তিক করুন।
+- Avoid deep selector chains: `.card .body .title h1` এর বদলে কম্পোনেন্ট-লেভেল স্টাইল ব্যবহার করুন বা CSS Modules / CSS-in-JS ব্যবহার করুন যাতে scope পরিষ্কার থাকে।
+
+ইঙ্গিত: ছোট helpers ও primitives বানালে design changes দ্রুত করা যায় (যেমন spacing scale বদললে সব জায়গায় পরিবর্তন)।
+
+---
+
+## ২) Design tokens (colors, spacing, radii, typography)
+
+- সব গুরুত্বপূর্ণ design value (colors, spacing, border-radius, font-size scale) centralize করুন।
+- Tailwind ব্যবহার করলে `tailwind.config`-এ token সংরক্ষণ করুন; CSS-in-JS বা CSS Variables ব্যবহার করলে একটি `theme` ফাইল রাখুন।
+
+উদাহরণ — CSS Variables:
+
+```css
+:root{
+  --color-primary: #0f62fe;
+  --color-text: #111827;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+}
+```
+
+React-এ `ThemeProvider` বা Tailwind config-এ centralized tokens দিয়ে consistency পাওয়া যায়।
+
+---
+
+## ৩) Component API ডিজাইন (props-ভিত্তিক styling)
+
+কম্পোনেন্ট বানানোর সময় props-ভিত্তিক API পরিকল্পনা করুন — উদাহরণ:
+
+```tsx
+type ButtonProps = {
+  variant?: 'primary' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+}
+```
+
+কম্পোনেন্ট ভিতরে চতুরভাবে ক্লাস বা styled props map করুন—এটা application-level consistency দেয়।
+
+কিছু নিয়ম:
+- Avoid boolean props proliferation (অনেক boolean prop পড়লে API জটিল হয়)
+- Prefer enums (variant, size) over many booleans
+- Keep default sensible
+
+---
+
+## ৪) CSS organization ও folder structure
+
+প্রস্তাবিত সরল স্ট্রাকচার:
+
+- src/components/* — small presentational components (Button, Card, Badge)
+- src/primitives/* (Box, Text) — reuseable low-level layout primitives
+- src/theme/* — tokens, styled/theme files, Tailwind config
+- src/pages/* — page-level composition
+
+ফাইল ধরন বিরতিতে চিন্তা করুন:
+- For CSS Modules: `Component.module.css` পাশে `Component.tsx`
+- For Styled Components/Emotion: keep styled definitions at top of component file or in `styles.tsx` for very large components
+- For Tailwind: keep component markup focused; move repetitive class sets to `@apply` classes in a CSS file or to small helper functions
+
+---
+
+## ৫) Class composition patterns (Tailwind) ও utility helpers
+
+Tailwind-এ className গুলো বড় হলে readability কমে — composition pattern দরকার:
+
+- clsx/cls function ব্যবহার করুন
+- constant-based composition: `const btnPrimary = 'px-4 py-2 rounded bg-indigo-600 text-white'`
+- `@apply` দিয়ে common utility sets CSS-এ একত্র করুন
+
+উদাহরণ:
+
+```tsx
+import clsx from 'clsx'
+
+function Button({ variant = 'primary' }){
+  const base = 'px-4 py-2 rounded font-medium'
+  const variantClass = variant === 'primary' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800'
+  return <button className={clsx(base, variantClass)}>Save</button>
+}
+```
+
+---
+
+## ৬) Theming ও dark mode
+
+- Theme tokens ব্যবহার করুন।
+- CSS Variables (custom properties) dark-mode switching-এ দ্রুত কাজ করে:
+
+```css
+:root { --bg: #fff; --text: #111 }
+[data-theme='dark'] { --bg: #0b1220; --text: #edf2f7 }
+```
+
+React-এ আপনি একটি simple context/hooks দিয়ে theme toggle করতে পারেন; Tailwind ব্যবহার করলে `dark:` variants বা `class` strategy ব্যবহার করুন।
+
+---
+
+## ৭) Accessibility (a11y) — স্টাইলিং-এরও দায়িত্ব আছে
+
+- Ensure focus styles are visible: `:focus` কে remove না করুন। যদি default outline সরান, পরিবর্তে alternative focus-ring দিন।
+- Color contrast: token নির্বাচন করার সময় contrast চেক করুন (WCAG AA)।
+- Use semantic elements (button, nav, main, article) এবং visually-hidden techniques প্রয়োজন হলে যোগ করুন।
+
+উদাহরণ — accessible focus style:
+
+```css
+.btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.4); }
+```
+
+---
+
+## ৮) Performance ও bundle size
+
+- Tailwind ব্যবহার করলে `content` (purge) সঠিক রাখুন—unused CSS বাদ যাবে
+- CSS-in-JS: production build-এ babel/plugin ব্যবহার করে classname compression ও dead-css elimination করুন
+- Avoid inline style objects in render that create new objects every render (memoize style objects or use styled primitives)
+
+---
+
+## ৯) Testing styles ও visual regression
+
+- Unit test-এ className presence টেস্ট করুন না হলে brittle হবে
+- Visual regression tools (Chromatic, Percy) ব্যবহার করলে UI regressions early ধরা পড়ে
+- Storybook-এ components আলাদা করে স্থাপন করুন এবং stories-এ accessibility-addon চালিয়ে রাখুন
+
+---
+
+## ১০) Refactoring: common anti-patterns ও কিভাবে ঠিক করবেন
+
+Anti-pattern: অনেক যেই লোকাল চেঞ্জ করার সময় প্রতিটি কম্পোনেন্টে manual style replace করা হয়।
+
+Fix: centralized token/primitive বানিয়ে ধাপে ধাপে migrate করুন।
+
+Anti-pattern: global CSS overrides everywhere
+Fix: move to component-scoped or apply-specific utility sets and remove global overrides gradually
+
+---
+
+## Practical exercise — Product Card Refactor (Module 5 project follow-up)
+
+লক্ষ্য: আগের Product Card-কে (Module 5) best-practices অনুসারে refactor করা।
+
+Steps:
+1. আপনার repo-তে `src/primitives/Box.tsx` ও `src/primitives/Text.tsx` তৈরি করুন — ছোট layout primitives।
+2. `src/components/ProductCard.tsx` থেকে inline styling / repeated class sets সরিয়ে `primitives` ও theme tokens ব্যবহার করুন।
+3. Add accessibility attributes: `aria-label` বা semantic element (e.g., `article`, `header`) ব্যবহার করুন।
+4. Ensure theming: color tokens `--color-primary` ব্যবহার করুন অথবা Tailwind config-এ primary color সেট করুন।
+5. Add a Storybook story (optional) এবং run visual snapshot check (optionally Chromatic/Percy)
+
+Exercise checklist:
+- [ ] ProductCard এখন `Box` ও `Text` ব্যবহার করছে
+- [ ] design tokens থিম থেকে আসছে
+- [ ] focus styles আছে এবং color contrast ঠিক আছে
+- [ ] production build-এ CSS purge/optimizations ঠিক আছে
+
+Hints:
+- Start with small commits: প্রথমে `Box` ও `Text` যোগ করুন, পরে ProductCard migrate করুন
+- Test visually at each step
+
+---
+
+## কনক্লুশন
+
+স্টাইলিং শুধু সুন্দর দেখানো নয়—এটি maintainability, accessibility ও performance-এর বিষয়ও। ভালো স্টাইলিং প্যাটার্ন গঠনে আপনি:
+
+- centralized tokens ও small primitives ব্যবহার করবেন
+- component-level scope বজায় রাখবেন
+- accessibility ও performance কে সর্বোচ্চ গুরুত্ব দেবেন
+
+এই লেসনে আমরা practical patterns, structuring, accessibility, performance ও একটি refactor exercise কভার করলাম। চাইলে আমি আপনার `ProductCard` exercise-এর জন্য একটি runnable starter projecte scaffold করে দিতে পারি (Vite or Next.js) — বলুন কোনটা চান।
+
+---

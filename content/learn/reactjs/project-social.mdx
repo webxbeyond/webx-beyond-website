@@ -1,0 +1,207 @@
+---
+title: সোশ্যাল মিডিয়া ড্যাশবোর্ড
+icon: mdi:account-group-outline
+description: সোশ্যাল মিডিয়া ড্যাশবোর্ড তৈরি করার ধাপ—ফিড, পোস্ট, রিয়েলটাইম আপডেট, টাইপস্ক্রিপ্ট API ও স্কেলিং কৌশল সহ
+keywords:
+  - social
+  - dashboard
+  - realtime
+  - nextjs
+  - typescript
+---
+
+আমি কি করবো: এই পাঠে আমরা একটি রিয়েল-ওয়ার্ল্ড সোশ্যাল মিডিয়া ড্যাশবোর্ড কীভাবে ডিজাইন ও স্টেপ-বাই-স্টেপ বানাবো তা দেখব — ফিচার তালিকা, ডেটা ফ্লো, রিয়েল-টাইম আপডেট, টাইপস্ক্রিপ্ট উদাহরণ এবং প্র্যাকটিক্যাল ডেলিভারেবল সহ।
+
+ছোট প্ল্যান:
+- উচ্চস্তরের আর্কিটেকচার ও নির্দেশিকা
+- ফিড র‍্যাঙ্কিং ও রিয়েলটাইম (analogy সহ)
+- API রুট ও টাইপস্ক্রিপ্ট সংজ্ঞা
+- রিয়েলটাইম (WebSocket/PubSub/Server-Sent Events) কৌশল
+- স্কেলিং, ক্যাশিং ও নিরাপত্তা
+- প্র্যাকটিক্যাল এক্সারসাইজ ও চেকলিস্ট
+
+চেকলিস্ট:
+- [ ] সম্পূর্ণ বাংলা আর্টিকেল
+- [ ] TypeScript উদাহরণ আছে
+- [ ] রিয়েলটাইম ও স্কেলিং বিষয়ে স্পষ্ট নির্দেশনা
+- [ ] একটি practical project checklist আছে
+
+---
+
+## 1) উচ্চস্তরের আর্কিটেকচার
+
+প্রস্তাবিত স্ট্যাক:
+- Frontend: Next.js + React (TypeScript), Tailwind CSS
+- Server/API: Next.js API Routes বা আলাদা Node/Express + GraphQL/REST
+- Database: PostgreSQL (Prisma) বা MongoDB
+- Cache & Queue: Redis (cache + pub/sub) + BullMQ/Sidekiq for background jobs
+- Realtime: WebSocket via Socket.IO, Pusher, Ably অথবা Redis Pub/Sub + edge workers
+- Search/Feed ranking: Elasticsearch বা Algolia (optional)
+
+প্রাথমিক ফিচার:
+- ইউজার প্রোফাইল, ফলো/আনফলো
+- পোস্ট তৈরি/এডিট/ডিলিট (টেক্সট, ছবি)
+- লাইক/কমেন্ট/শেয়ার
+- হোম ফিড — ফলো করা ইউজারের পোস্ট + রেকমেন্ডেশন
+- নোটিফিকেশন (রিয়েলটাইম)
+- অ্যাডমিন ড্যাশবোর্ড (রিপোর্টিং, মডারেশন)
+
+---
+
+## 2) ফিড র‌্যাঙ্কিং ও রিয়েলটাইম — analogy
+
+Analogy: ফিড হলো একটি নিউজবোর্ড যেখানে প্রতিটি পোস্ট একটি নোট; কিন্তু কোন নোট আগে পেস্ট করবেন সেটি নির্ভর করে—সর্বশেষ, জনপ্রিয়তা, অথবা আপনার পছন্দের ওয়েটেজ। র‍্যাঙ্কিং হলো সেই নিয়ম যা নির্ধারণ করে কোন নোট উপরে থাকবে।
+
+সরল র‌্যাঙ্কিং ফরমুলা:
+- score = (likes * 2) + (comments * 3) - age_in_hours
+
+রিয়েলটাইম অংশে নতুন লাইক বা কমেন্ট আসলে score আপডেট করে push করা হয়। ছোট সিস্টেমে Redis pub/sub দিয়ে ফিডকে আপডেট করে ক্লায়েন্টে push করা সম্ভব; বড় সিস্টেমে stream processing (Kafka / Kinesis) ও background jobs ব্যবহার করে batch আপডেট দিন।
+
+---
+
+## 3) টাইপস্ক্রিপ্ট টাইপস ও API রুট (উদাহরণ)
+
+সহজ `types.ts`:
+
+```ts
+// lib/types.ts
+export type User = { id: string; name: string; avatar?: string }
+export type Post = { id: string; authorId: string; content: string; createdAt: string; likes: number }
+export type Comment = { id: string; postId: string; authorId: string; content: string; createdAt: string }
+```
+
+API রুট উদাহরণ (App Router):
+
+```ts
+// app/api/posts/route.ts
+import { NextResponse } from 'next/server'
+import type { Post } from '@/lib/types'
+
+export async function GET() {
+  const posts: Post[] = await getFeedFromDb()
+  return NextResponse.json(posts)
+}
+```
+
+POST লাইক হ্যান্ডলার (pages API style):
+
+```ts
+// pages/api/posts/[id]/like.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query
+  if (req.method !== 'POST') return res.status(405).end()
+  await incrementLike(id as string)
+  // publish to redis channel for realtime
+  await redis.publish(`post:${id}:likes`, JSON.stringify({ postId: id }))
+  res.status(200).json({ ok: true })
+}
+```
+
+---
+
+## 4) রিয়েলটাইম কৌশল
+
+ছোট ও মাঝারি প্রজেক্টের অপশন:
+- Socket.IO / WebSocket: full-duplex, low-latency, প্রাইভেট চ্যানেল দরকার হলে ভাল
+- Server-Sent Events (SSE): server → client একদিকে push; সহজ ও HTTP-friendly
+- Hosted Realtime (Pusher, Ably, Supabase Realtime): দ্রুত সেটআপ
+- Redis Pub/Sub: backend মধ্যে message passing, edge nodes এ push করতে use করা
+
+উদাহরণ: Socket.IO server (Node):
+
+```ts
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+
+const httpServer = createServer()
+const io = new Server(httpServer)
+
+io.on('connection', socket => {
+  socket.on('join', (userId) => socket.join(`user:${userId}`))
+})
+
+// When a post gets a new like
+async function onLike(postId) {
+  const post = await getPost(postId)
+  io.to(`followers:${post.authorId}`).emit('post:liked', { postId, likes: post.likes })
+}
+```
+
+Client-side (React + socket.io-client):
+
+```tsx
+import { useEffect } from 'react'
+import io from 'socket.io-client'
+
+export default function useRealtime(userId: string) {
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_WS_URL!)
+    socket.emit('join', userId)
+    socket.on('post:liked', data => { /* update cache e.g. with React Query */ })
+    return () => socket.disconnect()
+  }, [userId])
+}
+```
+
+---
+
+## 5) ক্যাশিং, consistency ও স্কেলিং
+
+- Use React Query for client caching and background revalidation
+- Server-side: Redis cache for hot data (user profile, trending posts)
+- For feed generation, precompute home feeds (fan-out on write) for active users vs fan-out on read for low-traffic
+- Background jobs: process heavy tasks (image processing, notifications) with BullMQ or managed queues
+
+Consistency note: লাইক দ্রুত আপডেট দেখাতে optimistic updates ব্যবহার করুন কিন্তু server-এর truth অবশ্যই verify করুন।
+
+---
+
+## 6) নিরাপত্তা ও rate-limiting
+
+- Authentication: NextAuth / JWT
+- Rate-limit endpoints (likes, comments) with middleware বা API gateway
+- Input validation: zod / yup
+- Protect uploads: signed URLs for S3-compatible storage
+
+---
+
+## 7) টেস্টিং ও observability
+
+- Unit tests: components (Jest + RTL)
+- Integration: API handlers (MSW to mock external services)
+- E2E: Cypress for posting/liking flow
+- Logging: structured logs, Sentry for errors, Prometheus/Datadog for metrics
+
+---
+
+## 8) Practical exercise — Social Dashboard (MVP)
+
+লক্ষ্য: একটি ছোট MVP ড্যাশবোর্ড বানান যেখানে ইউজার পোস্ট দেখবে, পোস্ট করতে পারবে, লাইক ও কমেন্ট করতে পারবে ও নোটিফিকেশন পাবে (রিয়েলটাইম)।
+
+Minimum deliverables:
+- [ ] User signup/login (NextAuth) ও profile page
+- [ ] Create post (text + image upload) পেজ
+- [ ] Home feed page — paginated list of posts
+- [ ] Like ও comment API ও UI (optimistic update)
+- [ ] Real-time notifications (Socket.IO বা Pusher) যখন কেউ আপনার পোস্টে ইন্টারঅ্যাক্ট করে
+- [ ] Admin page — reported posts list
+- [ ] Tests: component tests + one E2E checkout of create → like → notification
+- [ ] Deploy to Vercel (env.example included)
+
+Hints:
+- শুরুতেই simple JSON-backed or SQLite DB দিয়ে কাজ করুন
+- Use React Query for fetching & cache updates
+- Protect media uploads with signed S3 URLs
+- Implement rate-limiting for public endpoints
+
+---
+
+## উপসংহার
+
+সোশ্যাল মিডিয়া ড্যাশবোর্ড বানানো বড় কাজ হলেও modular ভাবে ভাগ করলে সহজ হয়: শুরুর দিকে ফিচারগুলো ছোট রাখুন, পরে background processing ও stream processing যোগ করে স্কেল করুন। রিয়েলটাইম, ক্যাশিং ও ফিড র‌্যাঙ্কিং নিয়ে প্রথম রিলিজে খুব জটিলতা যোগ না করাই ভালো—MVP আগে লঞ্চ করুন, পরে অপ্টিমাইজ করুন।
+
+বলবেন যদি চান আমি এই MVP-এর জন্য runnable starter scaffold করে দিব (Next.js + TypeScript + Socket.IO বা Pusher + Prisma/SQLite + basic tests) — কোন realtime provider পছন্দ করবেন? (Socket.IO / Pusher / Supabase)
+
+---

@@ -1,0 +1,247 @@
+---
+title: "সিকিউরিটি: XSS ও CSRF প্রতিরোধ"
+icon: mdi:shield-lock-outline
+description: XSS (Cross-Site Scripting) ও CSRF (Cross-Site Request Forgery) কী, কীভাবে কাজ করে এবং Next.js/React অ্যাপে TypeScript উদাহরণসহ কিভাবে প্রতিরোধ করবেন
+keywords:
+  - security
+  - xss
+  - csrf
+  - nextjs
+  - typescript
+---
+
+এই পাঠে আমরা শিখব XSS ও CSRF আক্রমণ কীভাবে ঘটে, কেন এগুলো ভয়ঙ্কর, এবং React/Next.js অ্যাপে কিভাবে সহজ ও কার্যকর উপায়ে প্রতিরোধ করা যায়। উদাহরণ Code TypeScript/Next.js ভিত্তিক দেওয়া আছে, এবং practical exercise থাকবে যাতে আপনি নিজে করে দেখাতে পারবেন।
+
+ছোট পরিকল্পনা:
+- XSS ও CSRF সংজ্ঞা ও সহজ analogy
+- XSS: ধরনের, উৎস, এবং প্রতিরোধের কৌশল (escape, sanitize, Content Security Policy)
+- CSRf: কিভাবে কাজ করে, anti-CSRF token, SameSite cookie কনফিগারেশন
+- Next.js + TypeScript উদাহরণ: স্যানিটাইজড comment API, CSRF token validation
+- ডেপ্লয়/production টিপস ও টেস্টিং
+- practical exercise: একটি নিরাপদ comment ফর্ম বানানো
+
+চেকলিস্ট (রিপ্লিকেট না করে index-এ থাকা বিষয়গুলো মাথায় রেখে):
+- [ ] আর্টিকেলটি সম্পূর্ণ বাংলা
+- [ ] Analogy দিয়ে ঝুঁকি বুঝানো
+- [ ] TypeScript/Next.js code উদাহরণ আছে
+- [ ] Practical exercise ও deliverables আছে
+
+---
+
+## পরিচিতি: XSS ও CSRF — সংক্ষিপ্ত সংজ্ঞা ও analogy
+
+- XSS (Cross-Site Scripting): হামলাকারী আপনার সাইটে ম্যালিশিয়াস জাভাস্ক্রিপ্ট ইনজেক্ট করে, যাতে ব্যবহারকারীর ব্রাউজারে অপ্রত্যাশিত কাজ ঘটে — যেমন cookie চুর করা, UI ভিজ্যুয়াল বদলে দেওয়া বা ফরম সাবমিশন করা।
+- CSRF (Cross-Site Request Forgery): ব্যবহারকারীর ব্রাউজার দিয়ে অননুমোদিত অনুরোধ করা—যদি ব্যবহারকারী ইতিমধ্যেই আপনার সাইটে authenticated থাকে, তাহলে আক্রমণকারী অন্য সাইট থেকে বদমাশ অনুরোধ চালাতে পারে।
+
+Analogy: XSS হলো আপনার ওয়েবপেজে অচেনা লোকের লেখা পোস্ট পেস্ট হয়ে যাওয়া — যে কেউ সেখানে লেখে এবং ভিজিটরদের কাছে ভুল তথ‌্য বা ম্যালওয়্যার ছড়িয়ে দেয়। CSRF হলো একজন অতিথি আপনার বাড়ির দরজায় চাবি পেয়ে জিনিস-পত্র বদলে দেওয়ার মত—অতিথি বৈধ অবস্থায় কাজ করছে বলে আপনি বুঝেই উঠবেন না।
+
+---
+
+## XSS — ধরন ও প্রতিরোধ
+
+XSS-র প্রধান তিনটি ধরন:
+- Stored XSS: ম্যালিশিয়াস পে-লোড সার্ভারের ডাটাবেসে সেভ হয়ে পরে সব ভিজিটরে সার্ভ হয়
+- Reflected XSS: অনুরোধে অবাঞ্ছিত স্ক্রিপ্ট প্রত্যক্ষভাবে ফেরত আসে (e.g., search?q=)
+- DOM-based XSS: ক্লায়েন্ট সাইডে DOM ম্যানিপুলেশন হয় এবং ইনজেক্ট করা স্ক্রিপ্ট চলতে পারে
+
+প্রতিরোধের মূল কৌশল:
+1. Escape output — যেখানে ইউজার-জেনারেটেড কন্টেন্ট HTML-এ ইনসার্ট হয় সেখানে নির্ভরযোগ্য escaping করুন।
+2. Sanitize input — যদি আপনি HTML বা rich text (WYSIWYG) accept করবেন, sanitize করে শুধুমাত্র অনুমোদিত ট্যাগ/attribute রাখুন। উদাহরণ: DOMPurify বা sanitize-html
+3. Content Security Policy (CSP) — inline script/unsafe eval নিষিদ্ধ করে ব্রাউজার লেভেলে রোধ করে
+4. Avoid dangerouslySetInnerHTML — React-এ `dangerouslySetInnerHTML` ব্যবহার করলে নিশ্চিতভাবে sanitize করুন
+
+উদাহরণ: React-এ পুরনো comment HTML render করা হলে sanitize করে দেখান
+
+```tsx
+// components/SafeHtml.tsx
+import DOMPurify from 'dompurify'
+
+export function SafeHtml({ html }: { html: string }) {
+  const clean = DOMPurify.sanitize(html)
+  return <div dangerouslySetInnerHTML={{ __html: clean }} />
+}
+```
+
+TypeScript টীকা: DOMPurify টাইপস ইনস্টল করে ব্যবহার করুন (ইনসটলের নির্দেশনা লাইব্রেরি ডকসে আছে)।
+
+নোট: sanitize করা মানে সব JavaScript-এফেক্টিভ attribute ও ইভেন্ট হটা বাদ দেওয়া হয়; শুধুমাত্র পরিচ্ছন্ন markup রেখে দিন।
+
+---
+
+## Content Security Policy (CSP)
+
+CSP হলো ব্রাউজার-লেভেলে পলিসি যা নির্দিষ্ট করে কোন সোর্স থেকে স্ক্রিপ্ট, স্টাইল বা ইমেজ লোড করা যাবে। উদাহরণ কন্টেন্ট–সিকিউরিটি-পলিসি হেডার:
+
+```
+Content-Security-Policy: default-src 'self'; script-src 'self' https://apis.example.com; object-src 'none';
+```
+
+Next.js-এ আপনি `next.config.js` অথবা hosting edge/CDN (Vercel) pozi করে header যোগ করতে পারেন। CSP সেটআপ করা হলে inline scripts ও unsafe-eval এড়ানো দরকার; এর জন্য আপনার bundler বা code কে আপডেট করতে হতে পারে (example: nonce বা strict-dynamic কৌশল)।
+
+---
+
+## CSRF — কিভাবে কাজ করে এবং প্রতিরোধ
+
+CSRF আক্রমণ তখনই সফল হয় যখন:
+1) ব্যবহারকারী ব্রাউজারে আপনার সাইটে authenticated থাকে (cookie বা Authorization header থাকে) এবং
+2) ব্রাউজার অরিজিন-ভিত্তিক ক্রস-সাইট রিকোয়েস্ট করে (e.g., malicious form বা img src) এবং সেই রিকোয়েস্টটি সার্ভার side effect করে (order create, change password)
+
+প্রতিরোধের মূল কৌশল:
+- Anti-CSRF token: প্রতিটি state-changing ফর্ম/রিকোয়েস্টে server-generated token যোগ করুন এবং server এ validate করুন
+- SameSite cookies: `SameSite=Lax` বা `Strict` সেট করলে cross-site cookie পাঠানো বন্ধ হবে (modern browsers)
+- Use Same-origin or CORS checks for sensitive endpoints
+- For APIs used by SPA, prefer Authorization headers (Bearer token) instead of cookie-auth where feasible
+
+নিচে Next.js pages API উদাহরণ দিয়ে anti-CSRF token workflow দেখানো হলো (সবকিছু simplified):
+
+```ts
+// lib/csrf.ts (very small helper, production use vetted library like 'csrf')
+import { randomBytes } from 'crypto'
+
+export function generateCsrfToken() {
+  return randomBytes(24).toString('base64')
+}
+
+export function verifyCsrfToken(cookieToken?: string, bodyToken?: string) {
+  if (!cookieToken || !bodyToken) return false
+  return cookieToken === bodyToken
+}
+```
+
+Server-side: set token cookie এবং inject token into page
+
+```ts
+// pages/api/session.ts
+import { generateCsrfToken } from '@/lib/csrf'
+
+export default function handler(req, res) {
+  const token = generateCsrfToken()
+  res.setHeader('Set-Cookie', `csrf=${token}; HttpOnly; SameSite=Lax; Path=/; Secure`)
+  res.status(200).json({ ok: true })
+}
+```
+
+Client-side form: include token from cookie as hidden field বা send in header
+
+```tsx
+// components/SecureForm.tsx
+'use client'
+import { useState, useEffect } from 'react'
+
+export function SecureForm() {
+  const [token, setToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    // read cookie (or get from server-rendered prop)
+    const match = document.cookie.match(/(^|;)\s*csrf=([^;]+)/)
+    setToken(match ? match[2] : null)
+  }, [])
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const res = await fetch('/api/comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': token ?? '' },
+      body: JSON.stringify({ text: 'hello' })
+    })
+  }
+
+  return (
+    <form onSubmit={onSubmit}>
+      <button type="submit">Send</button>
+    </form>
+  )
+}
+```
+
+Server-side validation:
+
+```ts
+// pages/api/comment.ts
+import { NextApiRequest, NextApiResponse } from 'next'
+import { verifyCsrfToken } from '@/lib/csrf'
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const cookieToken = req.cookies.csrf
+  const headerToken = req.headers['x-csrf-token'] as string | undefined
+  if (!verifyCsrfToken(cookieToken, headerToken)) return res.status(403).json({ error: 'invalid csrf' })
+
+  // proceed to create comment
+  res.status(201).json({ ok: true })
+}
+```
+
+নোট: production-ready সিস্টেমে vetted libraries like `csurf` বা framework-adapters ব্যবহার করুন; উপরের কোড শিখনজন্য সরলীকৃত।
+
+---
+
+## Cookies ও SameSite কনফিগারেশন
+
+- `HttpOnly` cookie: JavaScript থেকে cookie অ্যাক্সেস করা যাবে না (XSS থেকে cookie চুরির ঝুঁকি কমে)
+- `Secure` cookie: শুধুমাত্র HTTPS-এ পাঠানো হবে
+- `SameSite=Lax` বা `Strict` cookies cross-site requests-এ cookie পাঠ বন্ধ করে (CSRF প্রতিরোধে সহায়ক)
+
+Example (Set-Cookie header):
+
+```
+Set-Cookie: session=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600
+```
+
+---
+
+## Testing security — ভুলে যাবেন না
+
+- Unit tests ও integration tests: CSRF token validated, APIs reject invalid tokens
+- Automated scanners: OWASP ZAP, Snyk for dependency vulnerabilities
+- Manual checks: try injecting `<script>alert(1)</script>` into comment fields and ensure it does not run
+
+Jest + RTL example to assert sanitized output (jest-axe also helps for accessibility):
+
+```ts
+import { render } from '@testing-library/react'
+import { SafeHtml } from '@/components/SafeHtml'
+
+test('sanitizes script tags', () => {
+  const { container } = render(<SafeHtml html={'<img src=x onerror="alert(1)" /><script>alert(1)</script>'} />)
+  expect(container.querySelector('script')).toBeNull()
+  expect(container.querySelector('img')?.getAttribute('onerror')).toBeNull()
+})
+```
+
+---
+
+## Deployment ও production টিপস
+
+- Enable HTTPS everywhere (Vercel, Netlify auto-HTTPS)
+- Strict CSP দিয়ে inline-scripts বাদ দিন
+- Keep dependencies আপডেট—use dependabot বা similar
+- Secrets in environment variables; never check into git
+- Consider adding a Web Application Firewall (WAF) for extra protection
+
+---
+
+## Practical exercise — নিরাপদ comment ফিচার বানানো
+
+লক্ষ্য: একটি ছোট comment ফর্ম ও API বানান যা XSS ও CSRF থেকে সুরক্ষিত।
+
+Deliverables:
+- [ ] `components/SecureForm.tsx` — client-side form যা server-set CSRF cookie পাঠায়
+- [ ] `lib/csrf.ts` — token generation ও verification helper
+- [ ] `pages/api/comment.ts` — server-side validation (cookie vs header/token) ও sanitize (DOMPurify) করে comment সেভ করে (in-memory বা JSON file ok)
+- [ ] Unit tests: sanitized output ও invalid csrf rejected
+- [ ] Manual test: try stored XSS payload and verify it doesn't execute
+
+Hints:
+- Use `DOMPurify` (server/browser) অথবা trusted sanitize library
+- For cookie handling Next.js API routes expose `req.cookies`
+- Prefer SameSite cookie + custom header token combination for safety
+
+---
+
+## উপসংহার
+
+XSS ও CSRF দুটি ভিন্ন নিছে হলেও দুটোর প্রতিরোধই প্রয়োজন। সারসংক্ষেপে: output escape/sanitize করুন, inline JS এড়ান, CSP প্রয়োগ করুন, এবং state-changing endpoints-এ CSRF token বা secure cookie কনফিগার করুন।
+
+আমি runnable starter (Next.js + TypeScript + DOMPurify + CSRF helper + tests) scaffold করে local smoke test চালিয়ে দিতে পারি—বলুন চান কি না।
+
+---

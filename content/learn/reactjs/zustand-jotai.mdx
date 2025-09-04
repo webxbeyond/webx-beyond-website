@@ -1,0 +1,270 @@
+---
+title: Zustand ও Jotai পরিচিতি
+icon: mdi:database
+description: হালকা ও আধুনিক React state libraries — Zustand ও Jotai কী, কখন ব্যবহার করবেন, TypeScript-এ কীভাবে লিখবেন এবং common patterns ও testing কভার করা আছে
+keywords:
+  - zustand
+  - jotai
+  - state-management
+  - react
+  - typescript
+---
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- Zustand ও Jotai কেন দরকার তা সহজভাবে বলব
+- প্রতিটি লাইব্রেরির মৌলিক ধারণা ও setup দেখাবো (TypeScript সহ)
+- যখন কোনটা বেছে নেবেন তার guideline দেবো
+- middleware, persistence, derived state ও testing কিভাবে করবেন তা দেখাবো
+- শেষে একটি practical exercise দেবো যাতে আপনি নিজে হাতে চেষ্টা করতে পারেন
+
+চেকলিস্ট (আপনার অনুরোধ থেকে নেয়া):
+- [x] নতুন MDX ফাইল frontmatter সহ (`title`, `icon`, `description`, `keywords`)
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও স্পষ্ট
+- [x] কঠিন ধারণার জন্য analogies আছে
+- [x] React + TypeScript উদাহরণ এবং practical exercise দেয়া হয়েছে
+- [x] Module 7-এর স্টেট ম্যানেজমেন্ট context ধরে লেখা হয়েছে, অপ্রয়োজনীয় পুনরাবৃত্তি এড়ানো হয়েছে
+
+---
+
+## কেন নতুন ছোট লাইব্রেরি? (সংক্ষেপ)
+
+বড় লাইব্রেরি যেমন Redux শক্তিশালী, কিন্তু কখনো কখনো খুবই verbose ও boilerplate-উপভোগ্য। আধুনিক অ্যাপের জন্য হালকা, সহজ ও টাইপসেফ state libraries দরকার: দ্রুত শেখা, কম কোড ও কম mental overhead।
+
+Analogy: আপনার গাড়ির জন্য একটি ভারী ট্রাক না চাইলে ছোট সিটি কার অনেক সুবিধা দেয় — কম খরচ, সহজ চালানো। Zustand ও Jotai সেই ছোট সিটি কারগুলো।
+
+---
+
+## Zustand — একটি minimal, flux-like store
+
+Zustand হলো একটি lightweight state management library যা hooks API দিয়ে global store তৈরি করে। এটি বাহ্যিক boilerplate কমায় এবং immutable update/selector patterns সহজ করে।
+
+ক্লাসিক ফিচার:
+- simple create API
+- selectors to pick slices of state (re-render minimization)
+- middleware support (persist, devtools)
+- immer optional via `set((state) => { state.count++ })` style
+
+### দ্রুত সেটআপ (Vite + TS)
+
+```bash
+npm install zustand
+# dev tools (optional)
+npm install zustand-middleware
+```
+
+### সহজ উদাহরণ (TypeScript)
+
+```ts
+// src/store/useStore.ts
+import create from 'zustand'
+import { devtools, persist } from 'zustand/middleware'
+
+type CartItem = { id: string; name: string; qty: number }
+
+type State = {
+  items: CartItem[]
+  add: (item: CartItem) => void
+  remove: (id: string) => void
+}
+
+export const useStore = create<State>()(
+  devtools((set) => ({
+    items: [],
+    add: (item) => set((state) => ({ items: [...state.items, item] })),
+    remove: (id) => set((state) => ({ items: state.items.filter(i => i.id !== id) })),
+  }))
+)
+```
+
+কম্পোনেন্টে ব্যবহার:
+
+```tsx
+import React from 'react'
+import { useStore } from '../store/useStore'
+
+export function Cart(){
+  const items = useStore(state => state.items)
+  const remove = useStore(state => state.remove)
+  return (
+    <ul>
+      {items.map(i => (
+        <li key={i.id}>{i.name} x{i.qty} <button onClick={() => remove(i.id)}>Remove</button></li>
+      ))}
+    </ul>
+  )
+}
+```
+
+উপরের pattern-এ selector (`state => state.items`) ব্যবহার করলে শুধুমাত্র সেই অংশ বদলালে কম্পোনেন্ট রেন্ডার হবে — এটি performance-friendly।
+
+### persist ও middleware
+
+Zustand middleware দিয়ে সহজে localStorage persistence যোগ করা যায়:
+
+```ts
+export const useStore = create<State>()(
+  persist(devtools((set) => ({ /* ... */ })), { name: 'my-app' })
+)
+```
+
+---
+
+## Jotai — atom-based, minimal reactivity
+
+Jotai একটি atom-based state library — প্রতিটি atom independent reactive unit। প্রত্যেক atom-এ value ও setter থাকে, এবং component কেবল সেই atom সাবস্ক্রাইব করলে তা রেন্ডার হবে। Jotai খুব modular ও fine-grained re-render control দেয়।
+
+ক্লাসিক ফিচার:
+- atoms ও derived atoms (computed state)
+- useAtom hook
+- async atoms (read/write) সহজ
+- React Suspense/Concurrent features-সাথেও ভালো ইন্টিগ্রেট
+
+### দ্রুত সেটআপ
+
+```bash
+npm install jotai
+```
+
+### সহজ উদাহরণ (TypeScript)
+
+```ts
+// src/atoms/cart.ts
+import { atom } from 'jotai'
+
+type CartItem = { id: string; name: string; qty: number }
+
+export const cartAtom = atom<CartItem[]>([])
+export const cartCountAtom = atom((get) => get(cartAtom).reduce((s, i) => s + i.qty, 0))
+```
+
+কম্পোনেন্টে ব্যবহার:
+
+```tsx
+import React from 'react'
+import { useAtom } from 'jotai'
+import { cartAtom, cartCountAtom } from '../atoms/cart'
+
+export function Cart(){
+  const [items, setItems] = useAtom(cartAtom)
+  const [count] = useAtom(cartCountAtom)
+
+  const remove = (id: string) => setItems(prev => prev.filter(p => p.id !== id))
+
+  return (
+    <div>
+      <div>Items: {count}</div>
+      <ul>
+        {items.map(i => (
+          <li key={i.id}>{i.name} x{i.qty} <button onClick={() => remove(i.id)}>Remove</button></li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+```
+
+এখানে `cartCountAtom` একটি derived atom — এটি শুধুমাত্র cart atom বদলে গেলে recompute হবে। Jotai-র strength হলো fine-grained updates ও সহজ composition।
+
+---
+
+## তুলনা: কখন কোনটি ব্যবহার করবেন?
+
+- যদি আপনার লক্ষ্য simple global store, selectors ও middleware সহ compact API চান → Zustand ভাল
+- যদি আপনি atom-based fine-grained reactivity, derived state ও Suspense-friendly async চান → Jotai উপযুক্ত
+- প্রজেক্ট সাইজ ও team familiarity বিবেচনা করুন: ছোট প্রজেক্টে Jotai দ্রুত শুরু করা যায়; medium apps-এ Zustand structure সহজ রাখতে পারে
+
+সারাংশ টেবিল:
+- Zustand: centralized store, selectors, middleware, simple
+- Jotai: atom-based, composable atoms, derived state, Suspense-compatible
+
+---
+
+## TypeScript tips ও patterns
+
+- Zustand: declare store types (State) এবং export hooks (`useStore`) যাতে selectors-এ type inference চলে
+- Jotai: atoms typed (e.g., `atom<CartItem[]>([])`) এবং derived atoms-এ TypeScript inference ব্যবহার করুন
+- Keep types small and focused; avoid storing functions in store (non-serializable) unless necessary
+
+---
+
+## Middleware, persistence ও server-side considerations
+
+- Zustand persistence গ্রাহ্য; কিন্তু server-side rendering-এ initial state hydration পরিকল্পনা করা দরকার (use `getServerState` patterns বা serialize/rehydrate)
+- Jotai-র atom hydration ও SSR support আছে কিন্তু একটু বেশি setup লাগতে পারে ( providers ও initialValues )
+
+---
+
+## Testing strategies
+
+Zustand:
+- Unit test store reducers by calling set/get or by using `act()` in React testing library
+- Reset store between tests: call `useStore.setState(initial)` অথবা recreate store factory in tests
+
+Jotai:
+- Use `Provider` with initialValues to test atoms
+- `renderHook` বা `render` with `Provider` to inspect atom values
+
+উদাহরণ (Zustand test reset):
+
+```ts
+import { useStore } from './useStore'
+
+afterEach(() => {
+  useStore.setState({ items: [] })
+})
+
+test('add item', () => {
+  useStore.getState().add({ id: '1', name: 'A', qty: 1 })
+  expect(useStore.getState().items.length).toBe(1)
+})
+```
+
+---
+
+## Common pitfalls ও রিকোমেন্ডেশন
+
+- Avoid mixing too many global stores — keep a small number of concerns global
+- Beware non-serializable values (DOM nodes, functions) in global state
+- For heavy derived computations use memoization inside selectors/derived atoms
+- Keep UI state local (modal open, input values) and global only cross-cutting data (auth, cart, cache)
+
+---
+
+## Practical exercise — Mini Cart: Zustand vs Jotai
+
+লক্ষ্য: একই Mini Cart feature দুইভাবে বানান — একবার Zustand ব্যবহার করে, আরেকবার Jotai ব্যবহার করে — পরে compare করবেন performance, code size ও developer ergonomics
+
+স্টেপস:
+1. নতুন Vite React+TS প্রজেক্ট বানান বা course repo ব্যবহার করুন
+
+```bash
+npm create vite@latest mini-cart -- --template react-ts
+cd mini-cart
+npm install
+npm install zustand jotai
+```
+
+2. Implement Zustand store (`src/store/useStore.ts`) with `items`, `add`, `remove` functions এবং একটি persisted middleware (optional)
+3. Implement Jotai atoms (`src/atoms/cart.ts`) with base atom ও derived `cartCountAtom`
+4. Create shared UI components: `ProductList`, `ProductCard`, `Cart` — এবং দুটি container (ZustandCartContainer, JotaiCartContainer) যাতে একই UI পৃথক state backend ব্যবহার করে
+5. Measure: React DevTools profiler দিয়ে দেখুন re-renders; compare console bundle size `npm run build` এবং developer experience (which code felt easier?)
+
+Exercise checklist:
+- [ ] Zustand implementation working (add/remove items)
+- [ ] Jotai implementation working (add/remove items & derived count)
+- [ ] Persistence works for Zustand (optional)
+- [ ] Profile comparison documented
+
+Bonus:
+- Add a small test for Zustand store and a test for Jotai atoms using `@testing-library/react` and `@testing-library/react-hooks` or `render` with providers
+
+---
+
+## উপসংহার
+
+Zustand ও Jotai আধুনিক, হালকা ও শক্তিশালী বিকল্প হিসেবে উঠে এসেছে—প্রতিটি লাইব্রেরির শক্তি ভিন্ন ধরণের অ্যাপের জন্য উপযোগী। ছোট project-এ দ্রুত prototyping করতে Jotai ভালো; medium-sized apps-এ centralized selector-based Zustand বেশি সুবিধা দিতে পারে।
+
+আপনি চাইলে আমি এই exercise-এর জন্য runnable starter scaffold করে দিতে পারি (Zustand এবং Jotai দুইটি উদাহরণসহ) — বলুন, scaffold করতে চান কি? 
+
+---

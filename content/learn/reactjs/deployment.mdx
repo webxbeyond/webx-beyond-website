@@ -1,0 +1,218 @@
+---
+title: Deployment (Vercel/Netlify)
+icon: mdi:cloud-upload-outline
+description: Next.js অ্যাপ প্রোডাকশনে ডেপ্লয় করা — Vercel ও Netlify এর মধ্যে পার্থক্য, environment variables, serverless vs static, এবং ডিপ্লয়মেন্ট বেস্ট প্র্যাকটিস
+keywords:
+  - deployment
+  - vercel
+  - netlify
+  - nextjs
+  - production
+---
+
+আমি কি করবো: এই পাঠে আমরা শিখব কিভাবে Next.js অ্যাপ প্রোডাকশনে ডেপ্লয় করতে হয়। Vercel ও Netlify-এর মধ্যে প্রধান পার্থক্য, environment variables, build output, serverless ও edge runtime বিবেচনা, caching এবং monitor/rollback টিপস কভার করা হবে।
+
+ছোট পরিকল্পনা:
+- ডিপ্লয়মেন্টের মৌলিক ধারণা ও analogy
+- Vercel বনাম Netlify (কোথায় কী ভালো)
+- Build output ও runtime নির্বাচন (Static, Serverless, Edge)
+- Environment variables, secrets ও preview/deploy branches
+- CDN, caching, image optimization ও headers
+- Rollback, logging, এবং monitoring
+- Practical exercise: একটি ব্লগ অ্যাপ Vercel-এ ডিপ্লয় করা
+
+চেকলিস্ট (আপনার নির্দেশ অনুযায়ী):
+- [ ] YAML frontmatter আছে
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] বিস্তারিত ধাপে ধাপে নির্দেশ ও উদাহরণ আছে
+- [ ] practical exercise ও checklist আছে
+
+---
+
+## পরিচিতি — কবে কি ডিপ্লয় করবেন?
+
+Deployment হলো আপনার লোকাল কোডকে publically চালু করার প্রক্রিয়া। সহজ analogy: আপনার ওয়েবসাইট হলো একটি রেস্তোরাঁ; আপনি কিচেন-এ রান্না করেছেন (development), এখন খাবার গ্রাহকের সামনে পরিবেশন করতে হলে dining hall প্রস্তুত করতে হবে (deployment), এবং সেখানে সার্ভার, CDN ও নিরাপত্তা সবগুলোই ঠিকঠাক থাকতে হবে।
+
+ছোট প্রকল্পে Vercel বা Netlify দ্রুত ও সহজ। বড় অ্যাপে infrastructure, observability ও scaling কনসিডার করতে হবে।
+
+---
+
+## Vercel vs Netlify — কোনটা কখন ভালো?
+
+উভয় প্ল্যাটফর্ম static ও serverless / edge ফাংশন সাপোর্ট করে, কিন্তু পার্থক্যগুলো জানা প্রয়োজন:
+
+- Vercel
+  - বিশেষভাবে Next.js-কে উৎসাহ দেয় এবং newest Next.js features (App Router, ISR, Edge Functions) দ্রুত সমর্থন করে
+  - Auto static optimization, image optimization ও edge caching ভালো
+  - Zero-config ডিপ্লয় অনেক ক্ষেত্রে কাজ করে
+- Netlify
+  - সাধারণত Jamstack ও static সাইটে শক্তিশালী
+  - Build plugins ও large ecosystem আছে
+  - Netlify Functions (Lambda) দিয়ে serverless endpoint চালাতে পারবেন
+
+নির্বাচনটি project requirements-এ নির্ভর করবে: যদি আপনি Next.js-এর full feature-set (ISR, middleware, edge runtime) ব্যবহার করেন, Vercel বেশি seamless হতে পারে।
+
+---
+
+## Build Output ও রানের ধরন
+
+Next.js build-এর পরে বিভিন্ন ধরনের আউটপুট হয় — আপনার runtime সিদ্ধান্ত তা নির্ধারণ করে:
+
+- Static HTML (SSG): পরবর্তী রিকোয়েস্টে CDN থেকে সরাসরি সার্ভ করা হয় — দ্রুত
+- Server-side (SSR): প্রতিটি অনুরোধে Node/Server logic চালাবে — dynamic content দরকার হলে
+- Incremental Static Regeneration (ISR): static + periodic regeneration
+- Edge runtime: নিকটতম CDN edge-node-এ দ্রুত কাস্টম logic চালায়, latency কম
+
+next.config.js-এ আপনি runtime, output ও image config সেট করতে পারেন:
+
+```js
+// next.config.js
+module.exports = {
+  experimental: { appDir: true },
+  output: 'standalone',
+  images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },
+}
+```
+
+Vercel-এ `output: 'standalone'` বা serverless অপশন অনুযায়ী behavior পরিবর্তিত হবে; Netlify-তে adapter/adapter-build প্রয়োজন হতে পারে (একটু বেশি কনফিগ)।
+
+---
+
+## Environment variables ও secrets
+
+- কখনো ক্লায়েন্ট-এ সরাসরি production secrets যোগ করবেন না।
+- Vercel/Netlify দুইটাই UI/CLI দিয়ে secrets যোগ করে—লুকানোভাবে পরিবেশে inject করে।
+- Local testing-এ `.env.local` ব্যবহার করুন (.gitignore এ রাখুন)।
+
+উদাহরণ (Vercel CLI-তে secret যোগ):
+
+```bash
+vercel env add NEXT_PUBLIC_API_URL production
+# অথবা
+netlify env:set NEXT_PUBLIC_API_URL https://api.example.com
+```
+
+নোট: `NEXT_PUBLIC_` দিয়ে শুরু করলে ভেতরকার ভ্যারিয়েবল ক্লায়েন্ট-সাইডে এক্সপোজ হবে; তাই শুধুমাত্র non-sensitive ভ্যারিয়েবলগুলিই PUBLIC বানান।
+
+---
+
+## Preview Deployments ও Branch Workflow
+
+- Vercel ও Netlify উভয়ই Pull Request/Branch-এর জন্য preview deployments তৈরি করে। এটি QA ও stakeholder review সহজ করে।
+- Workflow recommendation:
+  - main branch → production
+  - develop / feature branches → preview deployments
+  - protected main with PRs, review apps
+
+---
+
+## CDN, Caching ও Cache-Control
+
+- Static ফাইল CDN-এ সার্ভ করুন (Vercel/Netlify auto CDN)।
+- API বা SSR responses-এ `Cache-Control` হেডার যোগ করে CDN behavior কন্ট্রোল করুন:
+
+```js
+// app/api/posts/route.ts
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const data = await getPosts()
+  return NextResponse.json(data, {
+    headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' }
+  })
+}
+```
+
+- Image optimization: Next.js `next/image` ব্যবহার করলে Vercel এর সাথে ভালো ইন্টিগ্রেশন থাকে; অন্য প্ল্যাটফর্মে external loader কনফিগ করতে হতে পারে।
+
+---
+
+## Serverless limits ও cold-starts
+
+- Serverless functions-এ memory, execution time ও ephemeral filesystem সীমা থাকে। heavy initialization প্রত্যেক request-এ করলেই cold-start দাঁড়াবে।
+- স্টেটফুল কাজ বা heavy CPU tasks থাকলে dedicated server/managed backend বিবেচনা করুন।
+
+Optimization tips:
+- lazy-init resources only when needed
+- keep handlers small
+- connection pooling (DB) সতর্কভাবে পরিচালনা—Prisma ইত্যাদি ব্যবহার করলে connection issues এড়াতে pool/driver config ঠিক রাখুন
+
+---
+
+## Redirects, rewrites ও custom headers
+
+Vercel ও Netlify-উভয়ে custom redirects/rewrite রুল সমর্থন করে। Next.js `next.config.js`-এও রাইট করতে পারবেন:
+
+```js
+// next.config.js
+module.exports = {
+  async redirects() {
+    return [ { source: '/old', destination: '/new', permanent: true } ]
+  },
+}
+```
+
+প্রোডাকশনে বিভিন্ন security headers (CSP, HSTS) যোগ করা প্রয়োজন—deploy platform বা CDN edge থেকে handle করুন।
+
+---
+
+## Observability: logging, metrics ও error tracking
+
+- Vercel & Netlify UI তে basic function logs থাকে।
+- Production-grade trace/alerting এর জন্য Sentry, Datadog, Logflare ইত্যাদি integrate করুন।
+- Build-time ও runtime error আলাদা: build errors CI/PR-এ দেখান; runtime errors runtime logging এ ধরুন।
+
+---
+
+## Rollbacks ও atomic deploys
+
+- Vercel deploys সাধারণত atomic—নতুন ডেপ্লয় হয়ে গেলে পুরোনো ট্র্যাফিক নতুনটি নিতে পারে, এবং অ্যাক্সেস করা যায় previous deployments।
+- Netlify ও Vercel– দুটোই deploy history রাখে এবং আপনি পুরোনো ভার্সনে ফিরতে পারবেন।
+- Release notes ও changelog maintain করুন এবং DB migrations atomic ভাবে করুন।
+
+---
+
+## Practical exercise — ব্লগ অ্যাপ Vercel-এ ডিপ্লয় করা
+
+লক্ষ্য: আপনার Next.js ব্লগ অ্যাপকে Vercel-এ ডিপ্লয় করুন এবং preview deployments ও environment variables পরীক্ষা করুন।
+
+প্রয়োজনীয়তা:
+- একটি GitHub repo (public/private)
+- Vercel account
+- লোকাল Next.js প্রজেক্ট (App Router or Pages Router)
+
+ধাপ:
+1. [ ] কোড GitHub এ push করুন
+2. [ ] Vercel এ সাইন ইন করে নতুন প্রজেক্ট তৈরি করুন (Import from GitHub)
+3. [ ] Build command নিশ্চিত করুন (Next.js default: `next build`) এবং Output directory (Next sets automatically)
+4. [ ] Environment variables যোগ করুন (`VERCEL_URL`, API keys ইত্যাদি)
+5. [ ] Deploy করুন এবং Preview URL দেখুন
+6. [ ] একটি feature branch তৈরি করে PR খুলুন — Vercel preview deploy আসবে
+7. [ ] Production deploy এর পরে লগ চালান ও page speed/TTFB পরীক্ষা করুন (Lighthouse)
+
+Optional follow-ups:
+- Enable analytics (Vercel Analytics)
+- Configure custom domain ও HTTPS
+- Add Sentry বা Logflare integration
+
+---
+
+## Quick local checks ও dev tools
+
+- Vercel CLI: `vercel dev` দিয়ে local preview চালান
+- Netlify CLI: `netlify dev` দিয়ে local functions ও redirects চেক করুন
+
+```bash
+pnpm add -D vercel
+npx vercel dev
+```
+
+---
+
+## উপসংহার
+
+Deployment হল development এর গুরুত্বপূর্ণ ধাপ — সঠিক runtime, secrets management, caching ও observability ছাড়া কোনো অ্যাপ প্রোডাকশনে পাকা হয় না। ছোট প্রজেক্টে Vercel দ্রুত শুরু করতে সহায়ক; বড় সিস্টেমে infra ও monitoring এ বেশি মনোযোগ দিন।
+
+প্রস্তুত হলে আমি আপনার ব্লগের জন্য runnable deploy scaffold (GitHub Actions workflow, Vercel settings, env.example) তৈরি করে দিতে পারি — বলুন চান কি না।
+
+---

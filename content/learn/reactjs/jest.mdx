@@ -1,0 +1,278 @@
+---
+title: Jest Basics
+icon: logos:jest
+description: Jest দিয়ে unit এবং async টেস্ট লিখা — TypeScript কনফিগারেশন, mocks, spies, snapshot ও coverage টিপসসহ
+keywords:
+  - jest
+  - testing
+  - unit-tests
+  - typescript
+  - mocks
+---
+
+এই পাঠে আপনি শিখবেন:
+
+- Jest কী ও কেন ব্যবহার করবেন
+- TypeScript প্রজেক্টে Jest সেটআপ (ts-jest / vitest উল্লেখ) ও দ্রুত কনফিগারেশন
+- unit test, mocks ও spies, async test, snapshot এবং coverage কিভাবে লিখবেন
+- testing anti-patterns ও practical exercise
+
+এক লাইন প্ল্যান:
+- সরল analogy দিয়ে Jest-কে বোঝানো
+- দ্রুত সেটআপ (TypeScript) দেখানো
+- উদাহরণ সহ unit tests, mocks, async tests ও snapshots কভার করা
+- practical exercise ও checklists রাখা
+
+চেকলিস্ট (requirements):
+- [ ] MDX frontmatter আছে
+- [ ] আর্টিকেল বাংলা ভাষায় ও beginner-friendly
+- [ ] TypeScript উদাহরণ আছে
+- [ ] mocks, async, snapshot ও coverage কভার করা আছে
+- [ ] practical exercise ও চেকলিস্ট আছে
+
+---
+
+## সংক্ষিপ্ত পরিচিতি — Jest কি?
+
+Jest হলো একটি JavaScript/TypeScript testing framework যা Facebook দ্বারা শুরু করা। এটি একটি test runner, assertion library এবং mocking utility সব মিলিয়ে দেয়। Jest-speed, snapshot testing এবং zero-config অভিজ্ঞতার জন্য জনপ্রিয়।
+
+Analogy: Jest-কে ভাবুন একটি গোয়েন্দা টিম হিসেবে — তারা আপনার কোড পরীক্ষা করে বলে দেয় কোথায় সমস্যা আছে, রিপোর্ট করে কতোটা কভারেজ আছে এবং প্রয়োজনে কাহিনী (snapshot) ধরে রাখে যেন ভবিষ্যতে বোঝা যায় UI বদলেছে কি না।
+
+---
+
+## কেন Jest + TypeScript?
+
+- Type safety: টেস্টও টাইপ সেফ হলে compile-time ভুল ধরা পড়ে
+- জাস্ট-ওয়াচ মোড: ফাইল বদলালে দ্রুত টেস্ট আবার চালায়
+- Built-in mocking ও snapshot support
+
+প্রতিযোগী বিকল্প: Vitest — Vite-based projects-এ দ্রুত এবং Jest-API-compatible। কিন্তু এখানে আমরা Jest ভিত্তিক কনফিগারেশন দেখাবো।
+
+---
+
+## দ্রুত সেটআপ (TypeScript প্রজেক্ট)
+
+প্যাকেজ ইনস্টল করুন:
+
+```bash
+npm install -D jest ts-jest @types/jest @testing-library/react @testing-library/jest-dom @testing-library/user-event
+```
+
+ts-jest ব্যবহার করলে TypeScript ফাইল সরাসরি Jest দিয়ে রান করাতে পারবেন। `package.json`-এ script যোগ করুন:
+
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  }
+}
+```
+
+একটি সহজ `jest.config.ts`:
+
+```ts
+// jest.config.ts
+import type { Config } from '@jest/types'
+
+const config: Config.InitialOptions = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],
+  moduleNameMapper: {
+    '\\.(css|less|scss)$': 'identity-obj-proxy'
+  }
+}
+
+export default config
+```
+
+`setupTests.ts`-এ আপনি `@testing-library/jest-dom` ইমপোর্ট করবেন:
+
+```ts
+// src/test/setupTests.ts
+import '@testing-library/jest-dom'
+```
+
+---
+
+## প্রথম Unit test — একটি utility function
+
+Pure function টেস্ট করা সবচেয়ে সহজ এবং দ্রুত।
+
+অনুমান: একটি ছোট utility `sum` আছে।
+
+```ts
+// src/lib/sum.ts
+export function sum(a: number, b: number) { return a + b }
+```
+
+টেস্ট:
+
+```ts
+// src/lib/__tests__/sum.test.ts
+import { sum } from '../sum'
+
+test('adds two numbers', () => {
+  expect(sum(1, 2)).toBe(3)
+})
+```
+
+কী লক্ষ্য করবেন:
+- ছোট, deterministic test লেখা
+- external dependencies নেই, দ্রুত চলবে
+
+---
+
+## Async tests — Promise এবং async/await
+
+Jest-এ async টেস্ট লিখতে পারেন `async/await` অথবা `resolves/rejects` ব্যবহার করে।
+
+```ts
+// src/lib/fetchUser.ts
+export async function fetchUser(id: string) {
+  const res = await fetch(`/api/users/${id}`)
+  if (!res.ok) throw new Error('not found')
+  return res.json()
+}
+```
+
+Mock করা যাবে `global.fetch` দিয়ে বা MSW ব্যবহার করে। সহজ `fetch` mock উদাহরণ:
+
+```ts
+// src/lib/__tests__/fetchUser.test.ts
+import { fetchUser } from '../fetchUser'
+
+beforeEach(() => {
+  global.fetch = jest.fn()
+})
+
+test('fetches user data', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ id: '1', name: 'Aya' }) })
+  const user = await fetchUser('1')
+  expect(user.name).toBe('Aya')
+})
+```
+
+Tip: MSW দিয়ে network mocking করলে tests-browser-like ও more robust হবে; direct `global.fetch` mock কিছু ক্ষেত্রে fragile হয়।
+
+---
+
+## Mocks ও Spies
+
+- `jest.fn()` — একটি mock function তৈরি করে
+- `jest.spyOn(object, 'method')` — একটি method spy করে, তখন আপনি call history inspect করতে পারেন
+- Module mocks: `jest.mock('./myModule')` দিয়ে পুরো module mock করা যায়
+
+উদাহরণঃ
+
+```ts
+const doThing = jest.fn()
+doThing('a')
+expect(doThing).toHaveBeenCalledWith('a')
+```
+
+Module mocking (ESM/TS লাগলে config দেখুন):
+
+```ts
+// utils.ts
+export function fetchData() { return fetch('/data') }
+
+// in test
+jest.mock('../utils', () => ({ fetchData: jest.fn(() => Promise.resolve({ ok: true })) }))
+```
+
+注意: ES Module এবং Jest mocking মাঝে compatibility issues থাকতে পারে; `ts-jest` বা Babel config দেখে adjust করুন।
+
+---
+
+## Snapshot testing
+
+Snapshot testing UI-র দ্রুত পরিবর্তন ধরতে ভাল। তবে overuse করলে brittle হয়।
+
+```tsx
+// src/components/Greeting.tsx
+export function Greeting({ name }: { name: string }) {
+  return <div>Hello {name}</div>
+}
+
+// src/components/__tests__/Greeting.test.tsx
+import { render } from '@testing-library/react'
+import { Greeting } from '../Greeting'
+
+test('matches snapshot', () => {
+  const { container } = render(<Greeting name="Aya" />)
+  expect(container.firstChild).toMatchSnapshot()
+})
+```
+
+Jest প্রথমবার snapshot ফাইল তৈরি করবে, পরে পরিবর্তন হলে test fail করে আপনাকে দেখাবে। পরিবর্তন স্বীকার করতে `-u` ফ্ল্যাগ ব্যবহার করুন, কিন্তু সবসময় সতর্ক হোন।
+
+---
+
+## Coverage রিপোর্ট
+
+Jest দিয়ে coverage চালাতে পারেন:
+
+```bash
+npm run test:coverage
+```
+
+`coverage/lcov-report/index.html` খুলে দেখে নিন কোন্ ফাইলগুলো কভার হচ্ছে না। লক্ষ্য: 100% নয়, কিন্তু গুরুত্বপূর্ণ লজিক কভার করে রাখুন।
+
+---
+
+## Integration with React Testing Library (RTL)
+
+Jest unit tests-এর সঙ্গে RTL ব্যবহার করলে component behavior-centric tests লেখা সুবিধা দেয়। উপরের `testing-intro` পাঠে RTL উদাহরণ দেওয়া আছে। এখানে টুকরো টিপস:
+
+- DOM selectors: `getByRole`, `getByLabelText` ব্যবহার করুন
+- Avoid querying by implementation details (class names)
+
+---
+
+## Common pitfalls ও best practices
+
+- Avoid over-mocking: খুব বেশি mock করলে test বাস্তব জীবন থেকে দুরে চলে যায়
+- Keep tests small & deterministic
+- Use MSW for network mocks instead of mocking `fetch` directly
+- Run tests in CI with `--runInBand` বা proper parallelism to avoid flakiness
+- For flaky tests, add reproducible steps and fix root cause rather than adding timeouts
+
+---
+
+## Practical exercise — Jest test suite তৈরি করুন
+
+লক্ষ্য: একটি ছোট utility library এবং একটি কম্পোনেন্টের জন্য Jest tests লিখুন
+
+Requirements:
+1. Add tests for `sum(a,b)` — simple unit test
+2. Add async test for `fetchUser(id)` — mock network (prefer MSW, otherwise `global.fetch`)
+3. Add a snapshot test for `Greeting` component
+4. Configure `package.json` scripts: `test`, `test:watch`, `test:coverage`
+5. Run coverage and fix any missing critical tests
+
+Exercise checklist:
+- [ ] Unit test(s) for pure functions
+- [ ] Async test with mocked network
+- [ ] Snapshot test for a small component
+- [ ] `npm run test:coverage` produces a report
+
+Helpful commands:
+
+```bash
+npm test
+npm run test:watch
+npm run test:coverage
+```
+
+---
+
+## উপসংহার
+
+Jest হলো production-ready একটি testing framework। TypeScript-এ Jest ব্যবহার করলে আপনার tests ও code—দুইটাই type-safe হয়। ছোট, দ্রুত unit tests, robust integration tests (MSW ব্যবহার করে) এবং selective E2E tests-—একমাত্র তিনটি স্তরে ভাল টেস্টিং স্ট্র্যাটেজি গড়ে তুলুন।
+
+আপনি চাইলে আমি একটি runnable testing starter (Vite/React/TS) scaffold করে দেবো যেখানে Jest, RTL ও MSW কনফিগার থাকবে এবং উপরের exercise গুলো automated করা থাকবে — বলুন "scaffold jest starter" যদি চান।
+
+---

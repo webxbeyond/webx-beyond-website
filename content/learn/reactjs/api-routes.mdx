@@ -1,0 +1,192 @@
+---
+title: API Routes
+icon: mdi:api
+description: Next.js API Routes ও App Router Route Handlers — কিভাবে API endpoints বানাবেন, TypeScript দিয়ে লিখবেন, caching, authentication ও deployment টিপস
+keywords:
+  - nextjs
+  - api
+  - route-handlers
+  - typescript
+  - serverless
+---
+
+এই পাঠে আপনি শিখবেন:
+
+- Next.js-এ API Routes কি এবং কখন ব্যবহার করবেন
+- Pages Router (`pages/api/*`) ও App Router (`app/api/*/route.ts`) এ ফাংশনাল পার্থক্য
+- TypeScript দিয়ে API handlers লেখা, request validation, caching ও auth কৌশল
+- practical exercise: একটি সরল CRUD API বানানো ও client থেকে consume করা
+
+এক লাইন পরিকল্পনা:
+- analogy দিয়ে serverless functions বোঝানো
+- pages/api ও app/api route handler উদাহরণ (TypeScript)
+- security, caching, response headers ও deployment tips
+- practical exercise ও checklists
+
+চেকলিস্ট:
+- [ ] MDX frontmatter আছে
+- [ ] বাংলা ভাষায় বিস্তারিত explanation
+- [ ] TypeScript code examples আছে
+- [ ] practical CRUD exercise আছে
+
+---
+
+## পরিচিতি: API Routes কী?
+
+Next.js API Routes হলো built-in serverless endpoints যা আপনার অ্যাপে সার্ভার-সাইড লজিক রাখতে দেয়—আপনি আলাদা backend না লিখেও small APIs বানাতে পারবেন। এগুলো সাধারণত authentication, webhooks, server-side processing বা simple data proxy করার জন্য ব্যবহার হয়।
+
+Analogy: API routes-কে ভাবুন আপনার বাড়ির পেছনের রান্নাঘর—public অংশ (frontend) এবং private kitchen (API) একসাথে আছে; আপনি চাইলেই হাতের কাছেই দ্রুত কিছু রান্না করে বাইরে পাঠাতে পারবেন।
+
+---
+
+## Pages Router: `pages/api/hello.ts` (TypeScript)
+
+```ts
+// pages/api/hello.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'GET') {
+    res.status(200).json({ message: 'Hello from pages API' })
+  } else {
+    res.setHeader('Allow', ['GET'])
+    res.status(405).end('Method Not Allowed')
+  }
+}
+```
+
+Pages API-তে আপনি `req` ও `res` অবজেক্ট ব্যবহার করে express-like handler লিখতে পারবেন।
+
+---
+
+## App Router: Route Handlers (`app/api/.../route.ts`) — TypeScript
+
+App Router এ নতুন Request/Response API ব্যাবহার করা হয়:
+
+```ts
+// app/api/hello/route.ts
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  return NextResponse.json({ message: 'Hello from app route' })
+}
+
+export async function POST(req: Request) {
+  const body = await req.json()
+  return NextResponse.json({ body }, { status: 201 })
+}
+```
+
+Route Handlers serverless-friendly এবং edge-runtime support করে। এখানে `Request` Web API ইনটারফেস ব্যবহার হয় (not NextApiRequest).
+
+---
+
+## TypeScript typing ও validation
+
+- For simple handlers use `await req.json()` ও local `type` interfaces
+- For robust validation use `zod` বা `io-ts` to validate incoming body
+
+Example with zod:
+
+```ts
+import { z } from 'zod'
+
+const createUserSchema = z.object({ name: z.string(), email: z.string().email() })
+
+export async function POST(req: Request) {
+  const body = await req.json()
+  const parse = createUserSchema.safeParse(body)
+  if (!parse.success) return NextResponse.json({ error: parse.error.format() }, { status: 400 })
+  const user = parse.data
+  // create user logic
+  return NextResponse.json({ user }, { status: 201 })
+}
+```
+
+Validation সবচেয়ে আগে করুন—invalid data server resources নষ্ট করে ও security risk বাড়ায়।
+
+---
+
+## Caching ও headers
+
+API responses-এ caching header দিন যাতে CDN/edge caching কাজ করে:
+
+```ts
+return NextResponse.json(data, { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=30' } })
+```
+
+Edge runtime ও serverless-এর জন্য caching কৌশল আলাদা হতে পারে—hosting provider doc দেখুন।
+
+---
+
+## Authentication এবং secrets
+
+- Sensitive secrets environment variables-এ রাখুন (`process.env.MY_SECRET`) এবং server-side only code এ ব্যবহার করুন
+- For authentication, use signed cookies, JWT verification, NextAuth বা custom middleware
+- App Router middleware বা pages API middleware দিয়ে requests guard করুন
+
+Example: simple token guard
+
+```ts
+export async function POST(req: Request) {
+  const token = req.headers.get('authorization')?.replace('Bearer ', '')
+  if (token !== process.env.API_KEY) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+}
+```
+
+---
+
+## Streaming response ও server-sent events (SSE)
+
+App Router route handlers allow streaming responses in Node 18+ or edge runtimes—useful for large payloads বা incremental data। এর advanced বিষয়, docs দেখুন প্রয়োজন অনুযায়ী।
+
+---
+
+## Deployment considerations
+
+- On Vercel, pages/api routes become serverless functions; app router route handlers behave similarly depending on runtime
+- Cold start: serverless functions may have cold starts; avoid heavy init work per request
+- Scale: for high-throughput endpoints consider separate backend or edge functions
+
+---
+
+## Practical exercise — Simple CRUD API for Todos
+
+লক্ষ্য: একটি ছোট Todos API বানান।
+
+Endpoints:
+- GET `/api/todos` — list todos
+- POST `/api/todos` — create todo `{ text: string }`
+- PUT `/api/todos/:id` — toggle/ update
+- DELETE `/api/todos/:id` — delete
+
+Implementation notes:
+- Use in-memory array for storage (exercise only) or a JSON file
+- Use TypeScript `type Todo = { id: string; text: string; done: boolean }`
+- Add validation (zod) on POST/PUT
+- Client-side: build a small page that fetches `/api/todos` and can create/delete todos
+
+Checklist:
+- [ ] `pages/api/todos.ts` (or `app/api/todos/route.ts`) CRUD endpoints আছে
+- [ ] POST/PUT validated by zod
+- [ ] Client page fetches & displays todos and can create/delete
+- [ ] Basic tests (optional): test API handlers via node test or integration tests
+
+---
+
+## Security tips
+
+- Rate limit expensive endpoints (middleware or hosting provider features)
+- Sanitize inputs and validate strictly
+- Don’t expose secrets in client bundle
+- Use HTTPS in production and secure cookies
+
+---
+
+## উপসংহার
+
+Next.js API Routes দ্রুত ও সুবিধাজনক ভাবে small server-side logic অ্যাপ এ যোগ করে। Pages API ও App Router route handlers উভয়ই শক্তিশালী; project needs অনুযায়ী নির্বাচন করুন। production-এ security, caching ও performance ভাবুন এবং বড় লোড হলে dedicated backend বিবেচনা করুন।
+
+বলে দিন যদি চান আমি `todos` CRUD API সহ runnable starter scaffold করে দেব (TypeScript, zod validation, client page)।
+
+---

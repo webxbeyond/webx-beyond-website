@@ -1,0 +1,186 @@
+---
+title: ইন্টারভিউ প্রস্তুতি
+icon: mdi:account-tie-outline
+description: রিঅ্যাক্ট প্রোগ্রামারদের জন্য ইন্টারভিউ প্রস্তুতি — কৌশল, সাধারণ প্রশ্ন, প্রেকটিস টাস্ক ও টাইপস্ক্রিপ্ট উদাহরণসহ উত্তর লেখার টিপস
+keywords:
+  - interview
+  - react
+  - frontend
+  - typescript
+  - preparation
+---
+
+আমি কি করবো: এই পাঠে আমি আপনাকে রিঅ্যাক্ট (React) ডেভেলপার ইন্টারভিউ জন্য কিভাবে প্রস্তুতি নেবেন তা দেখাবো — কভার করবে কৌশল, সাধারণ প্রশ্নগুলো, লাইভ কোডিং টাস্কের জন্য প্রস্তুতি, সিভি/পোর্টফোলিও টিপস এবং একটি practical mock-interview এক্সারসাইজ।
+
+সংক্ষিপ্ত পরিকল্পনা:
+- ইন্টারভিউ টাইপ ও রাউন্ডস বোঝা (হায়ারিং ফ্লো)
+- behavioral vs technical প্রশ্নে কিভাবে উত্তর দেবেন
+- লাইভ কোডিং টাস্ক: common problems ও TypeScript উদাহরণ
+- system-design ও architecture প্রশ্নের জন্য দ্রুত প্রস্তুতি
+- প্রশ্নের উত্তর লিখার concise প্যাটার্ন (STAR)
+- practical mock-interview exercise এবং чекলিস্ট
+
+চেকলিস্ট:
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] Analogy দিয়ে কঠিন ধারণা ব্যাখ্যা করা
+- [ ] TypeScript উদাহরণ আছে (small coding tasks)
+- [ ] practical mock-interview exercise ও deliverables আছে
+
+---
+
+## 1) ইন্টারভিউ টাইপ ও রাউন্ডস
+
+সামরিকভাবে ইন্টারভিউ সাধারণত এই রকম ধাপে হয়:
+- Recruiter/HR screen — cultural fit ও basic background
+- Technical screen (phone / video) — সাধারণ প্রশ্ন ও quick coding
+- Live coding / take-home assignment — coding skill দেখানো
+- System design / architecture (senior roles)
+- Final onsite / panel — mix of behavior, deep technical ও pair programming
+
+Analogy: ইন্টারভিউ হ’ল ফুটবল ট্রায়াল — প্রথমে কোচ দেখে আপনার বেসিক ফিটনেস, পরে কৌশল পরীক্ষা করে, পরে মাঠে খেলানো হয় এবং শেষে টিম কিভাবে মিশবে তাও দেখা হয়। প্রতিটি ধাপে আলাদা লক্ষ্য থাকে, তাই প্রতিটি ধাপেই আলাদা প্রস্তুতি প্রয়োজন।
+
+---
+
+## 2) behavioral প্রশ্নের কৌশল (STAR)
+
+Behavioral প্রশ্নে STAR প্যাটার্ন ব্যবহার করুন:
+- Situation — পটভূমি বর্ণনা করুন
+- Task — আপনি কী চাইলেন/জবাবদিহি কী ছিল
+- Action — আপনি কী করলেন (সবচেয়ে গুরুত্বপূর্ণ)
+- Result — ফলাফল ও শেখা
+
+উদাহরণ:
+- প্রশ্ন: "একটা কঠিন বাগ কিভাবে হ্যান্ডেল করেছেন?"
+- উত্তর (সংক্ষেপ): Situation... Task... Action... Result...
+
+---
+
+## 3) লাইভ কোডিং টাস্ক — প্রস্তুতি ও টিপস
+
+Common problem types:
+- Array / string manipulation (two-pointer, sliding window)
+- Tree/graph basics (BFS/DFS) — আপনি প্রজেক্টে ব্যবহার করেছেন কি না তা বলুন
+- Algorithms for UI: debounce, throttle, pagination, infinite scroll
+- Small DOM/React tasks: implement a Tabs, Modal, or sortable list
+
+টিপস:
+- Read problem carefully; clarify edge-cases
+- Think aloud — interviewer বুঝবে আপনার reasoning
+- Start with a simple brute-force, then optimize
+- Write tests or examples inline
+- Use TypeScript types for clarity (small type aliases ajudam interviewer)
+
+### উদাহরণ: Debounce hook (TypeScript)
+
+```ts
+import { useRef, useEffect } from 'react'
+
+export function useDebounce<T extends (...args: any[]) => void>(fn: T, delay = 300) {
+  const timer = useRef<number | null>(null)
+
+  return (...args: Parameters<T>) => {
+    if (timer.current) window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => fn(...args), delay)
+  }
+}
+```
+
+এই উদাহরণটি বোঝায় কিভাবে small, testable utility দ্রুত লিখে দেখাবেন। interviewer দেখতে পায় আপনি টাইপ ব্যবহার করেন এবং browser APIs (setTimeout) সঠিকভাবে handle করেন।
+
+---
+
+## 4) ছোট React challenge — Controlled input with validation
+
+Problem: একটি controlled input কম্পোনেন্ট লিখুন যা শুধু নাম্বার (0-100) নেয় এবং invalid হলে error message দেখায়।
+
+Hints: use `useState`, `onChange` validation, TypeScript props typing।
+
+Sample solution (concise):
+
+```tsx
+import React, { useState } from 'react'
+
+type Props = { initial?: number }
+
+export function BoundedNumber({ initial = 0 }: Props) {
+  const [value, setValue] = useState<string>(String(initial))
+  const num = Number(value)
+  const invalid = Number.isNaN(num) || num < 0 || num > 100
+
+  return (
+    <div>
+      <input value={value} onChange={e => setValue(e.target.value)} />
+      {invalid ? <p role="alert">সংখ্যা 0-100 এর মধ্যে দিন</p> : <p>OK</p>}
+    </div>
+  )
+}
+```
+
+Practical interview approach: implement minimal working component first, then add validation and accessibility.
+
+---
+
+## 5) System design ও architecture প্রশ্নের দ্রুত প্রস্তুতি
+
+Senior roles-এ system design এ দক্ষতা চাই। প্রস্তুতির কৌশল:
+- Start with requirements: throughput, latency, availability
+- Draw high-level components: CDN, API layer, DB, cache, background jobs
+- Discuss trade-offs (consistency vs availability, SQL vs NoSQL)
+- Bring prior experience: say when you used caching, queue, or denormalization
+
+Analogy: System design হচ্ছে একটি শহরের প্ল্যানিং—কতটা ট্র্যাফিক সামলাবে, কোথায় পাম্প (cache), কোথায় ফায়ারস্টেশন (monitoring) লাগবে তা বুঝে নকশা করতে হয়।
+
+---
+
+## 6) সিভি, পোর্টফোলিও ও কমিউনিকেশন
+
+- সিভিতে প্রকল্পগুলো clearly উল্লেখ করুন — link to deployed demo, short bullet points about your role and tech stack
+- GitHub repos: README, small setup steps এবং demo snapshot রাখুন
+- During interview be concise; if you don't know, say clearly আপনি চেষ্টা করবেন বা পরে follow-up দেবেন
+
+---
+
+## 7) mock-interview practical exercise
+
+লক্ষ্য: ৩৫-৪৫ মিনিট mock technical interview simulation করুন: 15 মিনিট quick questions + 20-25 minutes coding + 5 minutes wrap-up.
+
+Structure:
+1. Quick warm-up (5–10 min): simple JS/TS questions (array/map/filter, promise basics)
+2. Main coding (20–25 min): implement `useDebounce` or `BoundedNumber` or `mergeIntervals` — think aloud
+3. Edge cases & tests (5–10 min): add a simple test or explain complexity
+4. Wrap-up: summarize approach & improvements
+
+Deliverables (practice checklist):
+- [ ] Pick a coding problem and set a 25-minute timer
+- [ ] Share your solution on GitHub Gist or repo
+- [ ] Write at least one small test (Jest / Vitest) for the core logic
+- [ ] Do a 15-minute post-mortem: what went well, what to improve
+
+---
+
+## 8) interviewer Q&A cheat-sheet (common questions)
+
+- React specific:
+  - Explain reconciliation and virtual DOM
+  - When to use context vs prop drilling vs state library
+  - How does useEffect dependency array work?
+  - Performance: memoization, useMemo, useCallback trade-offs
+- JavaScript & TypeScript:
+  - Event loop, microtasks vs macrotasks
+  - Prototype vs class
+  - Utility types in TypeScript (Partial, Pick, Record)
+- System & architecture:
+  - CDN, caching, read-replica pattern
+  - How to handle heavy background jobs
+
+Short answers ready in your notes help during live interviews.
+
+---
+
+## উপসংহার
+
+ইন্টারভিউ প্রস্তুতি ধারাবাহিক কাজ—দিনের আগের রাতেই পুরোভাবে প্রস্তুত হওয়ার চেষ্টা করবেন না। ছোট ছোট practice sessions দিন এবং mock interviews করুন। coding problems-এ clear communication ও stepwise refinement দেখান।
+
+চাইলে আমি একটি runnable mock-interview scaffold (small repo with a few problems, test setup, and CI) তৈরি করে দিতে পারি—বলুন চান কি না এবং আপনি কোন মাস্টারি লেভেলে (junior / mid / senior) প্র্যাকটিস করতে চান।
+
+---

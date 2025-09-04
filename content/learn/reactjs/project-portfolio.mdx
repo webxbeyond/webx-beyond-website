@@ -1,0 +1,157 @@
+---
+title: Next.js দিয়ে পোর্টফোলিও ওয়েবসাইট
+icon: mdi:briefcase-outline
+description: একটি আধুনিক পোর্টফোলিও ওয়েবসাইট Next.js ও TypeScript দিয়ে তৈরি করার গাইড — ব্লগ ইন্টিগ্রেশন, SEO, deployment ও design tips সহ
+keywords:
+  - portfolio
+  - nextjs
+  - typescript
+  - seo
+  - deployment
+---
+
+আমি কি করবো: এই পাঠে আমরা একটি প্রফেশনাল পোর্টফোলিও সাইট বানানোর পুরো plan দেখাব — কিভাবে Next.js + TypeScript ব্যবহার করে প্রজেক্ট পেজ, ব্লগ, SEO, ডিজাইন এবং deployment করবেন।
+
+ছোট পরিকল্পনা:
+- কিভাবে পোর্টফোলিও structure করবেন
+- ব্লগ ইন্টিগ্রেশন (MDX) ও স্বয়ংক্রিয় সাইট-ম্যাপ
+- SEO ও metadata best practices
+- ডিজাইন ও accessibility টিপস
+- Deployment ও CI tips
+- practical exercise: runnable portfolio scaffold
+
+চেকলিস্ট:
+- [ ] আর্টিকেল সম্পূর্ণ বাংলা
+- [ ] TypeScript উদাহরণ আছে
+- [ ] practical scaffold instructions আছে
+
+---
+
+## 1) উচ্চস্তরের ধারণা ও analogy
+
+Analogy: আপনার পোর্টফোলিও হচ্ছে একটি ডিজিটাল business card ও showroom একসাথে — এখানে আপনি নিজের কাজ, সক্ষমতা ও কন্টাক্ট খাতে সুন্দরভাবে প্রদর্শন করবেন। ঠিকমত সাজালে নিয়োগকর্তা বা ক্লায়েন্ট আপনার কাছে পৌঁছায়।
+
+মূল কম্পোনেন্টস:
+- হোম পেজ — হাইলাইট, কনট্যাক্ট CTA
+- প্রজেক্ট পেজ — প্রতিটি প্রজেক্টের বিস্তারিত ও লিঙ্ক
+- ব্লগ (MDX) — টেক আর্টিকেল ও টিউটোরিয়াল
+- অ্যাবাউট/রিজিউম — skills, experience
+- কনট্যাক্ট ফর্ম — email বা form handling (Netlify Forms / serverless)
+
+---
+
+## 2) ব্লগ ও MDX ইন্টিগ্রেশন
+
+- MDX দিয়ে আপনার টিউটোরিয়াল/কেস স্টাডি লিখুন — code blocks, components embed সহজ হয়
+- Directory structure: `content/blog/*.mdx`
+- Use `next-mdx-remote` অথবা Next.js built-in MDX support via `@next/mdx` to render MDX
+
+MDX frontmatter উদাহরণ:
+
+```md
+---
+title: 'How I built X'
+date: '2025-01-01'
+---
+
+Content here...
+```
+
+Auto sitemap: Next.js app-এ `sitemap.ts` বানিয়ে dynamic routes include করুন।
+
+---
+
+## 3) SEO ও metadata (TypeScript example)
+
+Next.js 13+ App Router এ metadata component ব্যবহার করুন:
+
+```tsx
+// app/head.tsx
+export default function Head() {
+  return (
+    <>
+      <title>My Portfolio — Name</title>
+      <meta name="description" content="Frontend developer portfolio" />
+      <meta property="og:title" content="My Portfolio" />
+    </>
+  )
+}
+```
+
+Dynamic metadata (per project):
+
+```tsx
+// app/projects/[slug]/page.tsx
+export async function generateMetadata({ params }) {
+  const project = await getProject(params.slug)
+  return { title: project.title, description: project.summary }
+}
+```
+
+---
+
+## 4) Design ও Accessibility টিপস
+
+- Use semantic HTML (`<header>`, `<main>`, `<article>`, `<footer>`)
+- Color contrast, keyboard navigation ও aria labels নিশ্চিত করুন
+- Images: `next/image` ব্যবহার করে responsive images দিন
+- Performance: prefetch important resources, lazy-load offscreen images
+
+---
+
+## 5) Contact ও forms
+
+- Simple option: mailto link
+- Serverless contact: use Next.js API route to send email via SendGrid/EmailJS
+- Spam protection: honeypot বা reCAPTCHA
+
+Example API route:
+
+```ts
+// pages/api/contact.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+import sendMail from '@/lib/sendMail'
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') return res.status(405).end()
+  const { name, email, message } = req.body
+  await sendMail({ to: process.env.MY_EMAIL!, subject: `Contact from ${name}`, text: message })
+  res.status(200).json({ ok: true })
+}
+```
+
+---
+
+## 6) Deployment ও preview
+
+- Vercel is recommended for Next.js (preview deploys for PRs)
+- Configure SEO, analytics, and preview content
+
+---
+
+## 7) Practical exercise — runnable portfolio scaffold
+
+লক্ষ্য: একটি runnable portfolio scaffold বানান (Next.js + TypeScript + MDX + deployment-ready)
+
+Deliverables:
+- [ ] Next.js project with `app/` structure
+- [ ] `content/blog` MDX ফাইল ২টি
+- [ ] project list page ও project detail page
+- [ ] contact API route (serverless) ও `env.example`
+- [ ] sitemap generation ও robots config
+- [ ] deploy-ready (Vercel) ও README with setup steps
+
+Quick local setup:
+
+```bash
+pnpm i
+pnpm dev
+```
+
+---
+
+## উপসংহার
+
+পোর্টফোলিও হলো আপনার প্রথম impression। Next.js ও MDX দিয়ে আপনি দ্রুত একটি SEO‑friendly, fast এবং maintainable সাইট বানাতে পারেন। চাইলে আমি এই scaffold runnableভাবে তৈরি করে দিয়ে local smoke test চালিয়ে দেখাতে পারি — বলুন চান কি না এবং App Router নাকি Pages Router পছন্দ করবেন।
+
+---

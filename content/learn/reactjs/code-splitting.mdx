@@ -1,0 +1,263 @@
+---
+title: Code Splitting ও Lazy Loading
+icon: mdi:folder-multiple
+description: React-এ কিভাবে কোড স্প্লিটিং ও লেইজি লোডিং ব্যবহার করে অ্যাপের আনপ্যাক টাইম কমাবেন ও UX দ্রুত করবেন — React.lazy, dynamic import, route-splitting, prefetching ও SSR নোটসহ
+keywords:
+  - code-splitting
+  - lazy-loading
+  - react.lazy
+  - dynamic-import
+  - route-splitting
+---
+
+আমি যা করব — সংক্ষিপ্ত পরিকল্পনা:
+
+- কোড স্প্লিটিং কেন দরকার তা সহজ ভাষায় বলব
+- React-এ practical টেকনিকগুলো (dynamic import, React.lazy, Suspense) দেখাবো
+- Route-based এবং component-based splitting ব্যাখ্যা করব
+- bundler (Vite/webpack) ও SSR (Next.js)-এর বিবেচ্যতার কথা বলব
+- prefetching, preload ও performance trade-offs ব্যাখ্যা করব
+- একটি practical exercise দেবো যাতে আপনি নিজে হাতে implement ও measure করতে পারেন
+
+চেকলিস্ট (আপনার অনুরোধ অনুসারে):
+- [x] নতুন MDX ফাইল frontmatter সহ (`title`, `icon`, `description`, `keywords`)
+- [x] পুরো আর্টিকেল বাংলা ভাষায়, beginner-friendly ও বিশদ
+- [x] কঠিন ধারণার জন্য analogy দেয়া হয়েছে
+- [x] React + TypeScript কোড উদাহরণ আছে
+- [x] SSR, prefetching ও bundler টিপস আছে
+- [x] practical exercise ও চেকলিস্ট দেয়া হয়েছে
+
+---
+
+## পরিচিতি: কেন Code Splitting?
+
+আপনার ওয়েব অ্যাপ বড় হওয়া মাত্রই হঠাৎ করে প্রথম লোড স্লো হতে পারে — কারণ ব্রাউজারকে পুরো জাভাস্ক্রিপ্ট বান্ডল ডাউনলোড, parse ও execute করতে হয়। Code splitting হল সেই সমস্যার চিকিৎসা: বড় বান্ডলকে ছোট-ছোট টুকরো ভাগ করে দরকারি অংশই প্রথমে লোড করা।
+
+সহজ analogy: আপনি যদি ঘরে কখনোই পুরো বইয়ের সংগ্রহ সঙ্গে না করে শুধু প্রয়োজনীয় বই নিয়ে বের হন, ব্যাগ হালকা থাকবে এবং আপনাকে দ্রুত কোথাও পৌঁছানো যাবে। কোড স্প্লিটিং ঠিক সেই কাজ করে — page-specific code পরে লোড করা হয়।
+
+---
+
+## React-এ Dynamic import ও React.lazy (মূলত)
+
+ES modules-এর dynamic import syntax (`import('./MyComp')`) ব্যবহার করে আপনি runtime-এ একটি মোডিউল লোড করতে পারেন। React এর জন্য এটা সরাসরি সুবিধা দেয় `React.lazy` এর মাধ্যমে।
+
+Component-level lazy loading (TypeScript উদাহরণ):
+
+```tsx
+// src/components/Profile.tsx
+import React from 'react'
+
+export default function Profile(){
+  return <div>Profile content...</div>
+}
+
+// src/App.tsx
+import React, { Suspense } from 'react'
+const Profile = React.lazy(() => import('./components/Profile'))
+
+export default function App(){
+  return (
+    <div>
+      <h1>অ্যাপ</h1>
+      <Suspense fallback={<div>লোডিং...</div>}>
+        <Profile />
+      </Suspense>
+    </div>
+  )
+}
+```
+
+নোট: `React.lazy` শুধুমাত্র default export সাপোর্ট করে; named exports চাইলে wrapper ব্যবহার করতে হবে।
+
+Named export wrapper উদাহরণ:
+
+```ts
+const LazyComp = React.lazy(() => import('./comp').then(mod => ({ default: mod.Named })))
+```
+
+---
+
+## Suspense fallback এবং UX বিবেচনা
+
+Suspense-এ `fallback` UI সরবরাহ করুন — ছোট, সিনটেটিক লোডার অথবা skeleton ব্যবহার করুন। বড় fallback দিলে user experience খারাপ হতে পারে।
+
+Best practice:
+- Critical content-inline রাখুন
+- Non-critical or below-the-fold content lazy-load করুন
+- Skeleton loaders দিন যাতে layout shift কমে (CLS কমানো যায়)
+
+---
+
+## Route-based splitting (React Router, Next.js)
+
+Route splitting হল সবচেয়ে সাধারণ প্যাটার্ন: প্রতিটি route-এ আলাদা বান্ডল। React Router + React.lazy উদাহরণ:
+
+```tsx
+// src/App.tsx (React Router v6)
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import React, { Suspense } from 'react'
+
+const Home = React.lazy(() => import('./pages/Home'))
+const Shop = React.lazy(() => import('./pages/Shop'))
+
+export default function App(){
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div>লোড হচ্ছে...</div>}>
+        <Routes>
+          <Route path="/" element={<Home/>} />
+          <Route path="/shop" element={<Shop/>} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+}
+```
+
+Next.js-এ route-based splitting automatic — প্রতিটি page একটি আলাদা chunk হয়। যদি আপনি dynamic import ব্যবহার করেন, Next.js additional control দেয় (`ssr: false`, loading component, etc.)
+
+---
+
+## Component-level splitting ও granular imports
+
+কখনও কখনও একটি বড় component এর কিছু অংশ খুবই selten ব্যবহার হয় (উদাহরণ modal, editor)। সেসব অংশ আলাদা chunk-এ রাখতে পারেন:
+
+```tsx
+const RichEditor = React.lazy(() => import('./RichEditor'))
+
+function PostEditor(){
+  const [open, setOpen] = useState(false)
+  return (
+    <div>
+      <button onClick={() => setOpen(true)}>Open Editor</button>
+      {open && (
+        <Suspense fallback={<div>Editor লোড হচ্ছে...</div>}>
+          <RichEditor />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+```
+
+এই ভাবে editor কেবল তখনি লোড হবে যখন ব্যবহারকারী চান।
+
+---
+
+## Prefetching, preload ও resource hints
+
+Lazy loading ভালো, কিন্তু মাঝে মাঝে আপনি আগাম জানেন যে user সম্ভবত পরবর্তী পেজে যাবে — তখন prefetch করা ভালো। ব্রাউজার resource hints (rel=prefetch یا rel=preload) সহ bundlers এবং frameworks prefetching support করে।
+
+- prefetch: low-priority background fetch for likely-needed resources
+- preload: high-priority fetch for critical resource
+
+Webpack এবং Vite উভয়ই dynamic import ব্যবহার করে প্রিফেচিং hints সমর্থন করে (বিল্ট-ইন বা প্লাগইন দিয়ে)। উদাহরণ: Next.js automatically prefetches linked pages in production when `<Link>` is in viewport.
+
+---
+
+## Bundler বিবেচ্যতা (Vite vs Webpack)
+
+- Webpack: code splitting খুব mature; dynamic import chunk naming, magic comments (`/* webpackChunkName: "name" */`) সহ fine-grained control দেয়।
+- Vite (esbuild/rollup under the hood): simple config, fast dev server; dynamic import কাজ করে ও chunking passive করে; but chunk naming conventions differ.
+
+Magic comment উদাহরণ (webpack-only):
+
+```ts
+const Comp = React.lazy(() => import(/* webpackChunkName: "profile" */ './Profile'))
+```
+
+প্রজেক্টে যদি আপনাকে chunk naming বা advanced prefetch control করতে হয়, webpack configuration বা Rollup plugin পরীক্ষা করুন।
+
+---
+
+## SSR considerations (Next.js এবং hydration)
+
+- Next.js page-level splitting automatic; but dynamic import with `ssr: false` প্রয়োজনে client-only component বানায়:
+
+```tsx
+import dynamic from 'next/dynamic'
+const ClientOnly = dynamic(() => import('../components/ClientOnly'), { ssr: false })
+```
+
+- Suspense server-side support সচরাচর experimental (React Server Components ও React 18+ সঙ্গে উন্নত হচ্ছে)। Next.js App Router এ Suspense server-side support আছে, কিন্তু পরিবেশভিত্তিক সাবধানতা নেয়া প্রয়োজন।
+
+- Watch out for hydration mismatches: server-rendered markup vs client-rendered lazy-loaded parts. Use placeholders/skeletons to reduce shift.
+
+---
+
+## Performance trade-offs ও measurement
+
+- Splitting বাড়ালে network requests বাড়ে (HTTP/2 সহested) — কিছু ক্ষেত্রে many small requests slow হতে পারে।
+- Prefetching মেইন থ্রেডে background bandwidth খায় — বাজেট সেট করুন
+- Measure: Lighthouse, DevTools network panel, DevTools performance, and real-user metrics (web-vitals) ব্যবহার করে before/after তুলুন
+
+---
+
+## Common pitfalls
+
+- Over-splitting: ছোট ছোট chunks অনেক HTTP requests-এ পরিণত হলে latency বাড়তে পারে
+- Dynamic class name or CSS-in-JS tied to chunk identity—ensure styles load when component loads
+- SSR + client-only code mismatch → hydration warnings
+
+---
+
+## Practical exercise — Lazy-load Product Details ও Prefetch
+
+লক্ষ্য: প্রোডাক্ট লিস্টে ক্লিক করলে একটি ProductDetails কম্পোনেন্ট lazy-load হবে; hover করলে prefetch করা হবে। পরিমাপ: network requests ও load time compare করুন।
+
+স্টেপস:
+1. একটি ছোট Vite React+TS প্রজেক্ট বানান বা বর্তমানটি ব্যবহার করুন
+2. `ProductDetails.tsx` তৈরি করুন যেটা কিছু heavy কাজ করে (imagine a charts library import)
+
+```tsx
+// src/components/ProductDetails.tsx
+import React from 'react'
+export default function ProductDetails({ id }: { id: string }){
+  // imagine heavy chart lib imported here
+  return <div>Details for {id}</div>
+}
+```
+
+3. App এ lazy import করুন:
+
+```tsx
+const ProductDetails = React.lazy(() => import('./components/ProductDetails'))
+
+// render
+{showDetails && (
+  <Suspense fallback={<div>লোড হচ্ছে...</div>}>
+    <ProductDetails id={selectedId} />
+  </Suspense>
+)}
+```
+
+4. Prefetch on hover (basic approach): যদি আপনাকে manual prefetch করতে হয়, ব্যবহার করুন dynamic import call in event handler:
+
+```ts
+function handleMouseEnter(){
+  import('./components/ProductDetails')
+}
+
+<button onMouseEnter={handleMouseEnter}>Preview</button>
+```
+
+এটি browser background-এ ওই chunk prefetch করার মত কাজ করবে।
+
+5. Measure: DevTools → Network tab দিয়ে দেখুন কবে chunk আসে এবং কত বড়
+6. Optionally, add magic comments or bundler-specific hints to name chunks for easier tracking
+
+Exercise checklist:
+- [ ] ProductDetails lazy-load হচ্ছে
+- [ ] Hover prefetch chunk background-এ হয়
+- [ ] Network timing before/after documented
+- [ ] Skeleton/fallback UI দিয়ে CLS কমানো হয়েছে
+
+---
+
+## উপসংহার
+
+Code splitting ও lazy loading-পূর্বশর্ত হলো ধারাবাহিকতা এবং মাপা (measure) — সঠিক জায়গায় স্প্লিট করলে অ্যাপের perceived performance ব্যাপকভাবে বাড়ে।
+
+আপনি চাইলে আমি এই exercise-এর জন্য একটি runnable Vite + React + TypeScript starter scaffold করে দিতে পারি যেখানে ProductList, lazy-loaded ProductDetails, prefetch-on-hover এবং simple measurement steps থাকবে — বলুন, scaffold করতে চান কি? 
+
+---
