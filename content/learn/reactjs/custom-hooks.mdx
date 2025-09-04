@@ -1,0 +1,378 @@
+---
+title: কাস্টম হুক তৈরি
+icon: ri:tools-line
+description: রিঅ্যাক্টে কাস্টম হুক তৈরি করে কোড পুনঃব্যবহার এবং লজিক আলাদা করার পদ্ধতি।
+keywords:
+  - Custom Hooks
+  - Code Reuse
+  - React Hooks
+  - Logic Separation
+  - Hook Rules
+---
+
+## ভূমিকা
+
+কাস্টম হুক হলো রিঅ্যাক্টের একটি শক্তিশালী ফিচার যা আপনাকে কম্পোনেন্টের লজিক পুনঃব্যবহার করতে সাহায্য করে।
+
+### একটি সহজ উপমা
+কল্পনা করুন একটি রান্নাঘর:
+- **বিল্ট-ইন হুক** = রান্নার মৌলিক জিনিস (চুলা, ওভেন)
+- **কাস্টম হুক** = আপনার নিজের তৈরি রেসিপি
+- **পুনঃব্যবহার** = একই রেসিপি বিভিন্ন খাবারে ব্যবহার
+
+## কাস্টম হুক তৈরির নিয়মাবলী
+
+১. নাম `use` দিয়ে শুরু হতে হবে
+২. অন্য হুক ব্যবহার করতে পারে
+৩. কম্পোনেন্টের মতো হুক রুলস মেনে চলতে হবে
+
+## সহজ কাস্টম হুক উদাহরণ
+
+### ১. useToggle হুক
+```jsx
+function useToggle(initialValue = false) {
+  const [value, setValue] = useState(initialValue);
+
+  const toggle = useCallback(() => {
+    setValue(v => !v);
+  }, []);
+
+  return [value, toggle];
+}
+
+// ব্যবহার
+function MenuButton() {
+  const [isOpen, toggleMenu] = useToggle();
+
+  return (
+    <button onClick={toggleMenu}>
+      {isOpen ? 'মেনু বন্ধ করুন' : 'মেনু খুলুন'}
+    </button>
+  );
+}
+```
+
+### ২. useLocalStorage হুক
+```jsx
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = useCallback((value) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [key, storedValue]);
+
+  return [storedValue, setValue];
+}
+
+// ব্যবহার
+function SettingsPage() {
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
+
+  return (
+    <select value={theme} onChange={e => setTheme(e.target.value)}>
+      <option value="light">লাইট</option>
+      <option value="dark">ডার্ক</option>
+    </select>
+  );
+}
+```
+
+## জটিল কাস্টম হুক
+
+### ১. useFetch হুক
+```jsx
+function useFetch(url, options = {}) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(url, {
+          ...options,
+          signal: abortController.signal
+        });
+        
+        if (!response.ok) {
+          throw new Error('নেটওয়ার্ক রেসপন্স ঠিক নেই');
+        }
+
+        const json = await response.json();
+        setData(json);
+        setError(null);
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          return;
+        }
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [url]);
+
+  return { data, loading, error };
+}
+
+// ব্যবহার
+function UserProfile({ userId }) {
+  const { data, loading, error } = useFetch(`/api/users/${userId}`);
+
+  if (loading) return <div>লোড হচ্ছে...</div>;
+  if (error) return <div>এরর: {error}</div>;
+
+  return <div>{data.name}</div>;
+}
+```
+
+### ২. useForm হুক
+```jsx
+function useForm(initialValues = {}) {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
+
+  const handleBlur = useCallback((e) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+  }, []);
+
+  const reset = useCallback(() => {
+    setValues(initialValues);
+    setErrors({});
+    setTouched({});
+  }, [initialValues]);
+
+  return {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    reset
+  };
+}
+
+// ব্যবহার
+function SignupForm() {
+  const { values, handleChange, handleBlur } = useForm({
+    username: '',
+    email: '',
+    password: ''
+  });
+
+  return (
+    <form>
+      <input
+        name="username"
+        value={values.username}
+        onChange={handleChange}
+        onBlur={handleBlur}
+      />
+      {/* অন্যান্য ফিল্ড */}
+    </form>
+  );
+}
+```
+
+## উন্নত প্যাটার্ন
+
+### ১. কম্পোজিট হুক
+```jsx
+function useAuthenticatedApi() {
+  const { token } = useAuth();
+  const { data, loading } = useFetch('/api/data', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return { data, loading };
+}
+```
+
+### ২. কন্ডিশনাল হুক
+```jsx
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    setMatches(media.matches);
+
+    const listener = (e) => setMatches(e.matches);
+    media.addListener(listener);
+
+    return () => media.removeListener(listener);
+  }, [query]);
+
+  return matches;
+}
+
+// ব্যবহার
+function ResponsiveLayout() {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  return isMobile ? <MobileView /> : <DesktopView />;
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. সঠিক নামকরণ
+```jsx
+// ভাল
+useWindowSize()
+useOnlineStatus()
+useScrollPosition()
+
+// খারাপ
+windowSize()  // use দিয়ে শুরু হয়নি
+useHandleClick()  // ইভেন্ট হ্যান্ডলার মনে হচ্ছে
+```
+
+### ২. একক দায়িত্ব
+```jsx
+// ভাল
+function useWindowSize() {
+  // শুধু window size ট্র্যাক করে
+}
+
+// খারাপ
+function useWindowFeatures() {
+  // window size, scroll, resize সব একসাথে
+}
+```
+
+### ৩. টাইপ চেকিং
+```jsx
+function useCounter(initialValue) {
+  if (typeof initialValue !== 'number') {
+    throw new Error('initialValue অবশ্যই নাম্বার হতে হবে');
+  }
+  // ...
+}
+```
+
+## অনুশীলনী
+
+### ১. useDebounce হুক
+সার্চ ইনপুট বা অন্য ইভেন্টের জন্য ডিবাউন্স হুক তৈরি করুন:
+
+```jsx
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// ব্যবহার
+function SearchInput() {
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    // API কল
+  }, [debouncedSearch]);
+
+  return (
+    <input
+      value={search}
+      onChange={e => setSearch(e.target.value)}
+      placeholder="সার্চ করুন..."
+    />
+  );
+}
+```
+
+### ২. useAsync হুক
+অ্যাসিঙ্ক অপারেশন হ্যান্ডেল করার জন্য একটি হুক তৈরি করুন:
+
+```jsx
+function useAsync(asyncFunction) {
+  const [status, setStatus] = useState('idle');
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const execute = useCallback(async () => {
+    setStatus('pending');
+    try {
+      const response = await asyncFunction();
+      setData(response);
+      setStatus('success');
+    } catch (err) {
+      setError(err);
+      setStatus('error');
+    }
+  }, [asyncFunction]);
+
+  return { execute, status, data, error };
+}
+```
+
+## সতর্কতা
+
+১. **হুক রুলস মেনে চলুন**
+- শর্ত সাপেক্ষে হুক কল করবেন না
+- লুপের মধ্যে হুক ব্যবহার করবেন না
+- রেগুলার ফাংশনে হুক কল করবেন না
+
+২. **সাইড ইফেক্ট সামলান**
+- ক্লিনআপ ফাংশন রিটার্ন করুন
+- মেমোরি লিক এড়িয়ে চলুন
+
+৩. **পারফরম্যান্স বিবেচনা**
+- অপ্রয়োজনীয় রি-রেন্ডার এড়ান
+- ভারী কম্পিউটেশন মেমোইজ করুন
+
+## উপসংহার
+
+কাস্টম হুক তৈরি করে আপনি:
+- কোড পুনঃব্যবহার করতে পারবেন
+- লজিক আলাদা করতে পারবেন
+- টেস্টিং সহজ করতে পারবেন
+- কোড অর্গানাইজড রাখতে পারবেন
+
+পরবর্তী পাঠে আমরা শিখব কীভাবে ফর্ম ম্যানেজমেন্ট করতে হয়।

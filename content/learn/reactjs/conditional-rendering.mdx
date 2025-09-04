@@ -1,0 +1,273 @@
+---
+title: কন্ডিশনাল রেন্ডারিং
+icon: ri:git-branch-line
+description: রিঅ্যাক্টে কন্ডিশনাল রেন্ডারিং, বিভিন্ন পদ্ধতি এবং বেস্ট প্র্যাকটিস।
+keywords:
+  - Conditional Rendering
+  - React Conditions
+  - রিঅ্যাক্ট
+  - কন্ডিশন
+  - রেন্ডারিং
+---
+
+## পরিচিতি
+
+রিঅ্যাক্টে কন্ডিশনাল রেন্ডারিং মানে হল শর্তসাপেক্ষে UI এর বিভিন্ন অংশ দেখানো বা লুকানো। এটি আপনার অ্যাপ্লিকেশনকে ডাইনামিক এবং ইন্টারঅ্যাক্টিভ করে তোলে।
+
+এই পাঠে আমরা শিখব কীভাবে বিভিন্ন শর্তের উপর ভিত্তি করে UI রেন্ডার করতে হয়।
+
+## কন্ডিশনাল রেন্ডারিং কী?
+
+### সহজ ভাষায়—একটি উপমা
+
+ধরা যাক, আপনি একটি ট্রাফিক সিগন্যাল সিস্টেম বানাচ্ছেন।
+- **লাল বাতি** জ্বললে "থামুন" দেখাবে
+- **সবুজ বাতি** জ্বললে "যান" দেখাবে
+- **হলুদ বাতি** জ্বললে "সতর্ক" দেখাবে
+
+এখানে বাতির রঙের উপর নির্ভর করে আলাদা আলাদা মেসেজ দেখানো হচ্ছে—এটাই কন্ডিশনাল রেন্ডারিং।
+
+## কন্ডিশনাল রেন্ডারিং এর পদ্ধতিসমূহ
+
+### ১. if স্টেটমেন্ট দিয়ে
+```jsx
+function Greeting({ isLoggedIn }) {
+  if (isLoggedIn) {
+    return <h1>স্বাগতম!</h1>;
+  }
+  return <h1>অনুগ্রহ করে লগইন করুন।</h1>;
+}
+```
+
+### ২. টার্নারি অপারেটর দিয়ে
+```jsx
+function Greeting({ isLoggedIn }) {
+  return (
+    <div>
+      {isLoggedIn ? <h1>স্বাগতম!</h1> : <h1>অনুগ্রহ করে লগইন করুন।</h1>}
+    </div>
+  );
+}
+```
+
+### ৩. লজিক্যাল && অপারেটর দিয়ে
+```jsx
+function Notification({ message }) {
+  return (
+    <div>
+      {message && <div>{message}</div>}
+    </div>
+  );
+}
+```
+
+### ৪. স্বতন্ত্র কম্পোনেন্ট দিয়ে
+```jsx
+function LoginButton() {
+  return <button>লগইন</button>;
+}
+
+function LogoutButton() {
+  return <button>লগআউট</button>;
+}
+
+function LoginControl({ isLoggedIn }) {
+  return (
+    <div>
+      {isLoggedIn ? <LogoutButton /> : <LoginButton />}
+    </div>
+  );
+}
+```
+
+## বিভিন্ন পরিস্থিতিতে কন্ডিশনাল রেন্ডারিং
+
+### ১. লোডিং স্টেট
+```jsx
+function DataList({ isLoading, data }) {
+  if (isLoading) {
+    return <div>লোড হচ্ছে...</div>;
+  }
+  
+  if (!data) {
+    return <div>কোনো ডেটা পাওয়া যায়নি।</div>;
+  }
+
+  return (
+    <ul>
+      {data.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### ২. এরর হ্যান্ডলিং
+```jsx
+function UserProfile({ user, error }) {
+  if (error) {
+    return <div>ত্রুটি: {error.message}</div>;
+  }
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+### ৩. অনুমতি ভিত্তিক
+```jsx
+function AdminPanel({ isAdmin }) {
+  return (
+    <div>
+      <h1>ড্যাশবোর্ড</h1>
+      {isAdmin && (
+        <div>
+          <h2>অ্যাডমিন কন্ট্রোল</h2>
+          <button>ইউজার ম্যানেজ</button>
+          <button>সেটিংস</button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. সহজ কন্ডিশন রাখুন
+```jsx
+// ভাল
+{isLoggedIn && <UserDashboard />}
+
+// খারাপ
+{isLoggedIn && isAdmin && !isLoading && <UserDashboard />}
+```
+
+### ২. স্বতন্ত্র কম্পোনেন্ট ব্যবহার করুন
+```jsx
+// ভাল
+function LoadingSpinner() {
+  return <div>লোড হচ্ছে...</div>;
+}
+
+function ErrorMessage({ error }) {
+  return <div>ত্রুটি: {error}</div>;
+}
+
+function Content({ data }) {
+  return <div>{data}</div>;
+}
+
+// মূল কম্পোনেন্ট
+function DataDisplay({ isLoading, error, data }) {
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <Content data={data} />;
+}
+```
+
+### ৩. নেস্টেড কন্ডিশন এড়িয়ে চলুন
+```jsx
+// খারাপ
+function Component({ a, b, c }) {
+  return (
+    <div>
+      {a ? (
+        b ? (
+          <div>A এবং B সত্য</div>
+        ) : (
+          <div>শুধু A সত্য</div>
+        )
+      ) : (
+        <div>কিছুই সত্য নয়</div>
+      )}
+    </div>
+  );
+}
+
+// ভাল
+function Component({ a, b, c }) {
+  if (a && b) return <div>A এবং B সত্য</div>;
+  if (a) return <div>শুধু A সত্য</div>;
+  return <div>কিছুই সত্য নয়</div>;
+}
+```
+
+## অনুশীলন
+
+### কাজ:
+
+১. একটি টগল বাটন তৈরি করুন যা ক্লিক করলে টেক্সট পরিবর্তন হবে।
+
+২. একটি ফর্ম তৈরি করুন যেখানে:
+   - লোডিং স্টেট দেখাবে
+   - এরর মেসেজ দেখাবে
+   - সাফল্যের মেসেজ দেখাবে
+
+৩. একটি ইউজার লিস্ট তৈরি করুন:
+   - অ্যাডমিন/সাধারণ ইউজার ভিত্তিক আলাদা বিকল্প দেখাবে
+   - লোডিং স্টেট দেখাবে
+   - ডেটা না থাকলে উপযুক্ত মেসেজ দেখাবে
+
+### বাস্তব উদাহরণ:
+
+```jsx
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetchUsers()
+      .then(data => {
+        setUsers(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) {
+    return <div>ইউজার তালিকা লোড হচ্ছে...</div>;
+  }
+
+  if (error) {
+    return <div>ত্রুটি: {error}</div>;
+  }
+
+  if (users.length === 0) {
+    return <div>কোনো ইউজার নেই।</div>;
+  }
+
+  return (
+    <div>
+      <h1>ইউজার তালিকা</h1>
+      {isAdmin && <button>নতুন ইউজার যোগ করুন</button>}
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            {user.name}
+            {isAdmin && <button>সম্পাদনা করুন</button>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+---
+
+## উপসংহার
+
+কন্ডিশনাল রেন্ডারিং রিঅ্যাক্টে UI লজিক তৈরির একটি শক্তিশালী টুল। এটি সঠিকভাবে ব্যবহার করে আপনি ডাইনামিক এবং ইউজার-ফ্রেন্ডলি ইন্টারফেস তৈরি করতে পারবেন। পরবর্তী পাঠে আমরা শিখব লিস্ট এবং Keys নিয়ে।
+
+শুভকামনা!

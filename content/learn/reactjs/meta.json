@@ -1,0 +1,9 @@
+{
+  "title": "ট্র্যাফিক (Traefik)",
+  "description": "শূন্য থেকে মাস্টারি পর্যন্ত Traefik শেখার পূর্ণাঙ্গ বাংলা সিলেবাস",
+  "icon": "ri:reactjs-line",
+  "root": true,
+  "pages": [
+    "index"
+  ]
+}

@@ -1,0 +1,340 @@
+---
+title: useContext দিয়ে গ্লোবাল স্টেট ম্যানেজমেন্ট
+icon: ri:global-line
+description: রিঅ্যাক্টে useContext হুক ব্যবহার করে গ্লোবাল স্টেট ম্যানেজমেন্ট, কনটেক্সট API, এবং প্রপস ড্রিলিং সমস্যার সমাধান।
+keywords:
+  - useContext
+  - Context API
+  - Global State
+  - Props Drilling
+  - State Management
+  - React Context
+---
+
+## ভূমিকা
+
+আমরা ইতিমধ্যে `useState` এবং প্রপস সম্পর্কে জেনেছি। কিন্তু যখন অ্যাপ্লিকেশন বড় হয়, তখন শুধু প্রপস দিয়ে ডেটা পাস করা জটিল হয়ে যায়। এখানে আসে `useContext` এর ভূমিকা।
+
+### একটি সহজ উপমা
+কল্পনা করুন একটি বড় কোম্পানি:
+- **প্রপস পাসিং** = প্রতিটি কর্মচারীর মাধ্যমে বার্তা পাঠানো
+- **কনটেক্সট** = কোম্পানির ইন্টারকম সিস্টেম (সরাসরি যে কাউকে বার্তা দেওয়া যায়)
+
+## প্রপস ড্রিলিং সমস্যা
+
+### সমস্যার উদাহরণ
+```jsx
+// প্রপস ড্রিলিং
+function GrandParent({ data }) {
+  return <Parent data={data} />;
+}
+
+function Parent({ data }) {
+  return <Child data={data} />;
+}
+
+function Child({ data }) {
+  return <GrandChild data={data} />;
+}
+
+function GrandChild({ data }) {
+  return <div>{data}</div>;
+}
+```
+
+## Context API এর পরিচয়
+
+### ১. কনটেক্সট তৈরি
+```jsx
+import { createContext } from 'react';
+
+// থিম কনটেক্সট তৈরি
+export const ThemeContext = createContext('light');
+```
+
+### ২. প্রোভাইডার সেটআপ
+```jsx
+function App() {
+  const [theme, setTheme] = useState('light');
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <MainContent />
+    </ThemeContext.Provider>
+  );
+}
+```
+
+### ৩. কনটেক্সট ব্যবহার
+```jsx
+function ThemeButton() {
+  const { theme, setTheme } = useContext(ThemeContext);
+
+  return (
+    <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+      {theme === 'light' ? 'ডার্ক মোড' : 'লাইট মোড'}
+    </button>
+  );
+}
+```
+
+## বাস্তব উদাহরণ
+
+### ১. ইউজার অথেনটিকেশন কনটেক্সট
+```jsx
+// AuthContext.js
+import { createContext, useContext, useState } from 'react';
+
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+
+  const login = (userData) => {
+    setUser(userData);
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+// App.js
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <NavBar />
+        <Routes />
+      </Router>
+    </AuthProvider>
+  );
+}
+
+// NavBar.js
+function NavBar() {
+  const { user, logout } = useAuth();
+
+  return (
+    <nav>
+      {user ? (
+        <>
+          <span>স্বাগতম, {user.name}</span>
+          <button onClick={logout}>লগআউট</button>
+        </>
+      ) : (
+        <Link to="/login">লগইন</Link>
+      )}
+    </nav>
+  );
+}
+```
+
+### ২. শপিং কার্ট কনটেক্সট
+```jsx
+// CartContext.js
+const CartContext = createContext(null);
+
+export function CartProvider({ children }) {
+  const [items, setItems] = useState([]);
+
+  const addItem = (product) => {
+    setItems([...items, product]);
+  };
+
+  const removeItem = (productId) => {
+    setItems(items.filter(item => item.id !== productId));
+  };
+
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+
+  return (
+    <CartContext.Provider value={{ items, addItem, removeItem, total }}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+// ProductCard.js
+function ProductCard({ product }) {
+  const { addItem } = useContext(CartContext);
+
+  return (
+    <div className="product-card">
+      <h3>{product.name}</h3>
+      <p>মূল্য: ৳{product.price}</p>
+      <button onClick={() => addItem(product)}>
+        কার্টে যোগ করুন
+      </button>
+    </div>
+  );
+}
+```
+
+## উন্নত প্যাটার্ন
+
+### ১. মাল্টিপল কনটেক্সট
+```jsx
+function App() {
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <CartProvider>
+          <MainContent />
+        </CartProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+```
+
+### ২. কনটেক্সট সেলেক্টর
+```jsx
+function useCartItem(productId) {
+  const { items } = useContext(CartContext);
+  return items.find(item => item.id === productId);
+}
+```
+
+### ৩. কনটেক্সট + রিডিউসার
+```jsx
+const initialState = { count: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+function CountProvider({ children }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <CountContext.Provider value={{ state, dispatch }}>
+      {children}
+    </CountContext.Provider>
+  );
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. কনটেক্সট সেপারেশন
+প্রতিটি কনটেক্সট আলাদা ফাইলে রাখুন:
+```jsx
+// থিম কনটেক্সট
+export const ThemeContext = createContext();
+
+// ইউজার কনটেক্সট
+export const UserContext = createContext();
+
+// কার্ট কনটেক্সট
+export const CartContext = createContext();
+```
+
+### ২. কাস্টম হুক
+```jsx
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context;
+}
+```
+
+### ৩. মেমোইজেশন
+```jsx
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  
+  const value = useMemo(() => ({
+    theme,
+    setTheme
+  }), [theme]);
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+```
+
+## অনুশীলনী
+
+### ১. ভাষা পরিবর্তনকারী অ্যাপ
+একটি মাল্টি-ল্যাঙ্গুয়েজ সাপোর্ট সিস্টেম তৈরি করুন:
+- ভাষা পরিবর্তন করার অপশন থাকবে
+- সব টেক্সট অনুবাদ হবে
+- ভাষা সেটিং স্টোর হবে
+
+```jsx
+const translations = {
+  bn: {
+    greeting: 'স্বাগতম',
+    button: 'ভাষা পরিবর্তন করুন'
+  },
+  en: {
+    greeting: 'Welcome',
+    button: 'Change Language'
+  }
+};
+
+function LanguageProvider({ children }) {
+  const [language, setLanguage] = useState('bn');
+
+  const value = {
+    language,
+    setLanguage,
+    t: (key) => translations[language][key]
+  };
+
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+```
+
+### ২. টুডু অ্যাপ উন্নতকরণ
+আপনার টুডু অ্যাপে কনটেক্সট যোগ করুন:
+- টাস্ক ফিল্টারিং
+- টাস্ক সর্টিং
+- টাস্ক ক্যাটাগরি
+
+## সতর্কতা
+
+১. **পারফরম্যান্স বিবেচনা**
+- অতিরিক্ত রি-রেন্ডার এড়াতে মেমোইজেশন ব্যবহার করুন
+- ছোট ছোট কনটেক্সট ভাগ করে নিন
+
+২. **কখন কনটেক্সট ব্যবহার করবেন**
+- প্রপস ড্রিলিং এড়াতে
+- গ্লোবাল স্টেট শেয়ার করতে
+- থিম, ভাষা, অথেনটিকেশন ইত্যাদির জন্য
+
+৩. **কখন অন্য সল্যুশন বিবেচনা করবেন**
+- খুব ঘন ঘন আপডেট হলে Redux/Zustand
+- সার্ভার স্টেট ম্যানেজমেন্টের জন্য React Query
+- লোকাল স্টেট ম্যানেজমেন্টের জন্য useState
+
+## উপসংহার
+
+Context API এবং `useContext` হুক রিঅ্যাক্টে গ্লোবাল স্টেট ম্যানেজমেন্টের একটি শক্তিশালী সমাধান। এটি প্রপস ড্রিলিং এড়াতে এবং অ্যাপ্লিকেশনের বিভিন্ন অংশে ডেটা শেয়ার করতে সাহায্য করে। পরবর্তী পাঠে আমরা শিখব কীভাবে কাস্টম হুক তৈরি করতে হয়।

@@ -1,0 +1,321 @@
+---
+title: ডাইনামিক ও নেস্টেড রুট
+icon: ri:git-branch-line
+description: রিঅ্যাক্ট রাউটারে ডাইনামিক এবং নেস্টেড রাউটস ব্যবহার করে জটিল রাউটিং সিস্টেম তৈরি করার বিস্তারিত আলোচনা।
+keywords:
+  - Dynamic Routes
+  - Nested Routes
+  - URL Parameters
+  - Route Nesting
+  - Complex Routing
+  - Route Organization
+---
+
+## ভূমিকা
+
+জটিল ওয়েব অ্যাপ্লিকেশনে ডাইনামিক এবং নেস্টেড রাউটিং অত্যন্ত গুরুত্বপূর্ণ। আসুন একটি সহজ উপমার মাধ্যমে এটি বুঝি।
+
+### লাইব্রেরির উপমা
+কল্পনা করুন একটি বড় লাইব্রেরি:
+- **মূল হল** = রুট রাউট (`/`)
+- **বিভাগ** = নেস্টেড রাউট (`/science`, `/literature`)
+- **বইয়ের তাক** = সাব-রাউট (`/science/physics`, `/science/chemistry`)
+- **বইয়ের আইডি** = ডাইনামিক রাউট (`/books/123`, `/books/456`)
+
+## ডাইনামিক রাউটিং
+
+### ১. URL প্যারামিটার
+```jsx
+import { useParams } from 'react-router-dom';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/products/:category" element={<ProductList />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
+    </Routes>
+  );
+}
+
+function ProductDetails() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    // প্রোডাক্ট ডেটা লোড
+    fetchProduct(id).then(setProduct);
+  }, [id]);
+
+  if (!product) return <div>লোড হচ্ছে...</div>;
+
+  return (
+    <div>
+      <h1>{product.name}</h1>
+      <p>মূল্য: ৳{product.price}</p>
+    </div>
+  );
+}
+```
+
+### ২. অপশনাল প্যারামিটার
+```jsx
+// Route path="/shop/:category?/*"
+function ShopPage() {
+  const { category } = useParams();
+  
+  return (
+    <div>
+      {category ? (
+        <h1>{category} পণ্যসমূহ</h1>
+      ) : (
+        <h1>সকল পণ্য</h1>
+      )}
+    </div>
+  );
+}
+```
+
+## নেস্টেড রাউটিং
+
+### ১. বেসিক নেস্টিং
+```jsx
+function App() {
+  return (
+    <Routes>
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<Overview />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+    </Routes>
+  );
+}
+
+function DashboardLayout() {
+  return (
+    <div className="dashboard">
+      <nav className="sidebar">
+        <Link to="/dashboard">ওভারভিউ</Link>
+        <Link to="/dashboard/profile">প্রোফাইল</Link>
+        <Link to="/dashboard/settings">সেটিংস</Link>
+      </nav>
+      
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+```
+
+### ২. গভীর নেস্টিং
+```jsx
+function App() {
+  return (
+    <Routes>
+      <Route path="/courses" element={<CoursesLayout />}>
+        <Route index element={<CoursesList />} />
+        <Route path=":courseId" element={<CourseLayout />}>
+          <Route index element={<CourseOverview />} />
+          <Route path="lessons" element={<LessonList />} />
+          <Route path="lessons/:lessonId" element={<LessonDetails />} />
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
+```
+
+## উন্নত প্যাটার্ন
+
+### ১. ডাইনামিক নেস্টিং
+```jsx
+const routes = {
+  admin: {
+    path: 'admin',
+    children: {
+      users: {
+        path: 'users',
+        children: {
+          user: {
+            path: ':userId',
+            children: {
+              edit: { path: 'edit' },
+              delete: { path: 'delete' }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+function generateRoutes(routeObj, parentPath = '') {
+  return Object.entries(routeObj).map(([key, config]) => {
+    const path = `${parentPath}/${config.path}`;
+    
+    return (
+      <Route key={path} path={path} element={config.element}>
+        {config.children && generateRoutes(config.children, path)}
+      </Route>
+    );
+  });
+}
+```
+
+### ২. রাউট ম্যাচিং
+```jsx
+function RouteWithSubRoutes(route) {
+  return (
+    <Route
+      path={route.path}
+      element={
+        route.protected ? (
+          <ProtectedRoute>
+            <route.element />
+          </ProtectedRoute>
+        ) : (
+          <route.element />
+        )
+      }
+    >
+      {route.routes?.map((subRoute, i) => (
+        <RouteWithSubRoutes key={i} {...subRoute} />
+      ))}
+    </Route>
+  );
+}
+```
+
+## প্র্যাকটিক্যাল উদাহরণ
+
+### ১. ই-কমার্স রাউটিং সিস্টেম
+```jsx
+function EcommerceRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        {/* প্রোডাক্ট রাউটস */}
+        <Route path="products" element={<ProductLayout />}>
+          <Route index element={<ProductList />} />
+          <Route path=":category" element={<CategoryProducts />} />
+          <Route path=":category/:id" element={<ProductDetails />} />
+        </Route>
+
+        {/* অর্ডার রাউটস */}
+        <Route path="orders" element={<ProtectedRoute />}>
+          <Route index element={<OrderList />} />
+          <Route path=":orderId" element={<OrderDetails />} />
+          <Route path=":orderId/track" element={<TrackOrder />} />
+        </Route>
+
+        {/* ইউজার রাউটস */}
+        <Route path="account" element={<ProtectedRoute />}>
+          <Route index element={<AccountOverview />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="addresses" element={<AddressList />} />
+          <Route path="addresses/new" element={<AddAddress />} />
+          <Route path="addresses/:id/edit" element={<EditAddress />} />
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
+```
+
+### ২. কনটেন্ট ম্যানেজমেন্ট সিস্টেম
+```jsx
+function CMSRoutes() {
+  return (
+    <Routes>
+      <Route path="/admin" element={<AdminLayout />}>
+        {/* কনটেন্ট ম্যানেজমেন্ট */}
+        <Route path="content">
+          <Route index element={<ContentDashboard />} />
+          <Route path="posts">
+            <Route index element={<PostList />} />
+            <Route path="new" element={<CreatePost />} />
+            <Route path=":id">
+              <Route index element={<PostDetails />} />
+              <Route path="edit" element={<EditPost />} />
+              <Route path="settings" element={<PostSettings />} />
+            </Route>
+          </Route>
+        </Route>
+
+        {/* ইউজার ম্যানেজমেন্ট */}
+        <Route path="users">
+          <Route index element={<UserList />} />
+          <Route path=":id">
+            <Route index element={<UserProfile />} />
+            <Route path="permissions" element={<UserPermissions />} />
+          </Route>
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
+```
+
+## অনুশীলনী
+
+### ১. ব্লগ অ্যাপ্লিকেশন
+একটি ব্লগ অ্যাপ তৈরি করুন যেখানে থাকবে:
+- ক্যাটাগরি অনুযায়ী পোস্ট ফিল্টারিং
+- লেখক পেজ
+- পোস্ট ডিটেইলস
+- কমেন্ট সেকশন
+
+```jsx
+function BlogRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<BlogLayout />}>
+        <Route index element={<Home />} />
+        <Route path="category/:slug" element={<CategoryPosts />} />
+        <Route path="author/:username" element={<AuthorProfile />} />
+        <Route path="post/:slug" element={<PostDetails />} />
+      </Route>
+    </Routes>
+  );
+}
+```
+
+### ২. লার্নিং ম্যানেজমেন্ট সিস্টেম
+একটি LMS তৈরি করুন:
+- কোর্স স্ট্রাকচার
+- লেসন ন্যাভিগেশন
+- কুইজ সিস্টেম
+
+## বেস্ট প্র্যাকটিস
+
+১. **রাউট অর্গানাইজেশন**
+- লজিক্যাল গ্রুপিং করুন
+- রাউট কনস্ট্যান্ট ব্যবহার করুন
+- কোড স্প্লিটিং করুন
+
+২. **পারফরম্যান্স**
+- লেজি লোডিং ব্যবহার করুন
+- রাউট প্রি-ফেচিং
+- অপ্টিমাইজড কম্পোনেন্ট লোডিং
+
+৩. **মেইনটেইনেবিলিটি**
+- মডুলার রাউট ফাইল
+- ডকুমেন্টেশন
+- টাইপ চেকিং
+
+## সতর্কতা
+
+১. **রাউট প্যারামিটার**
+- ভ্যালিড প্যারামিটার চেক করুন
+- XSS প্রতিরোধ করুন
+- এরর হ্যান্ডলিং করুন
+
+২. **নেস্টিং ডেপথ**
+- অতিরিক্ত নেস্টিং এড়িয়ে চলুন
+- পারফরম্যান্স বিবেচনা করুন
+- ইউজার এক্সপেরিয়েন্স মাথায় রাখুন
+
+## উপসংহার
+
+ডাইনামিক এবং নেস্টেড রাউটিং আপনার অ্যাপ্লিকেশনকে আরও শক্তিশালী ও সুসংগঠিত করে। সঠিক প্যাটার্ন অনুসরণ করে আপনি জটিল রাউটিং স্ট্রাকচারও সহজে পরিচালনা করতে পারবেন। পরবর্তী পাঠে আমরা শিখব কীভাবে লিঙ্ক এবং ন্যাভিগেশন ব্যবহার করতে হয়।
