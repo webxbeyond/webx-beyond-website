@@ -1,0 +1,365 @@
+---
+title: React Router সেটআপ
+icon: ri:route-line
+description: রিঅ্যাক্ট রাউটার সেটআপ, বেসিক রাউটিং, এবং মাল্টি-পেজ অ্যাপ্লিকেশন তৈরির মৌলিক বিষয়সমূহ।
+keywords:
+  - React Router
+  - SPA Routing
+  - Browser Router
+  - Route Setup
+  - Client Side Routing
+  - Navigation
+---
+
+## ভূমিকা
+
+আধুনিক ওয়েব অ্যাপ্লিকেশনে পেজ ন্যাভিগেশন একটি গুরুত্বপূর্ণ বিষয়। React Router এই কাজটি সহজ করে দেয়।
+
+### সহজ উপমা
+কল্পনা করুন একটি বড় শপিং মল:
+- **মলের লেআউট** = রাউটার লেআউট
+- **দোকানের ঠিকানা** = URL/Route
+- **দোকানে যাওয়া** = ন্যাভিগেশন
+- **মলের ডিরেক্টরি** = রাউট ম্যাপিং
+
+## React Router ইনস্টলেশন
+
+### ১. প্যাকেজ ইনস্টল
+```bash
+npm install react-router-dom
+# বা
+yarn add react-router-dom
+# বা
+pnpm add react-router-dom
+```
+
+### ২. বেসিক সেটআপ
+```jsx
+import { BrowserRouter } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      {/* আপনার অ্যাপের কন্টেন্ট */}
+    </BrowserRouter>
+  );
+}
+```
+
+## মৌলিক রাউটিং
+
+### ১. সাধারণ রাউট সেটআপ
+```jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### ২. লেআউট সেটআপ
+```jsx
+function Layout() {
+  return (
+    <div>
+      <nav>
+        {/* ন্যাভিগেশন মেনু */}
+      </nav>
+      
+      <main>
+        <Outlet />
+      </main>
+      
+      <footer>
+        {/* ফুটার কন্টেন্ট */}
+      </footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+## ন্যাভিগেশন কম্পোনেন্টস
+
+### ১. Link কম্পোনেন্ট
+```jsx
+import { Link } from 'react-router-dom';
+
+function Navigation() {
+  return (
+    <nav>
+      <ul>
+        <li>
+          <Link to="/">হোম</Link>
+        </li>
+        <li>
+          <Link to="/about">আমাদের সম্পর্কে</Link>
+        </li>
+        <li>
+          <Link to="/contact">যোগাযোগ</Link>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+```
+
+### ২. NavLink কম্পোনেন্ট
+```jsx
+import { NavLink } from 'react-router-dom';
+
+function Navigation() {
+  return (
+    <nav>
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          isActive ? 'active-link' : 'normal-link'
+        }
+      >
+        হোম
+      </NavLink>
+    </nav>
+  );
+}
+```
+
+## রাউট প্যারামিটার
+
+### ১. URL প্যারামিটার
+```jsx
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/product/:id" element={<ProductDetails />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function ProductDetails() {
+  const { id } = useParams();
+  return <div>প্রোডাক্ট আইডি: {id}</div>;
+}
+```
+
+### ২. কোয়েরি প্যারামিটার
+```jsx
+function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('q');
+  
+  return (
+    <div>
+      <input
+        value={query || ''}
+        onChange={(e) => {
+          setSearchParams({ q: e.target.value });
+        }}
+      />
+    </div>
+  );
+}
+```
+
+## প্রোগ্রামেটিক ন্যাভিগেশন
+
+### ১. useNavigate হুক
+```jsx
+function LoginForm() {
+  const navigate = useNavigate();
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // লগইন লজিক
+    const success = await loginUser();
+    
+    if (success) {
+      navigate('/dashboard');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* ফর্ম ফিল্ড */}
+    </form>
+  );
+}
+```
+
+### ২. রিডাইরেক্ট কম্পোনেন্ট
+```jsx
+function PrivateRoute() {
+  const isAuthenticated = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <Outlet />;
+}
+```
+
+## উন্নত কনফিগারেশন
+
+### ১. রাউট কনফিগ অবজেক্ট
+```jsx
+const routes = [
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'about', element: <About /> },
+      { path: 'contact', element: <Contact /> }
+    ]
+  }
+];
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {useRoutes(routes)}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### ২. কাস্টম রাউটার হুক
+```jsx
+function useRouter() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+
+  return {
+    pathname: location.pathname,
+    query: Object.fromEntries(searchParams),
+    params,
+    navigate,
+    push: navigate
+  };
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. লেজি লোডিং
+```jsx
+import { lazy, Suspense } from 'react';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+### ২. রাউট গ্রুপিং
+```jsx
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* পাবলিক রাউট */}
+        <Route path="/" element={<PublicLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+        </Route>
+
+        {/* অ্যাডমিন রাউট */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+## অনুশীলনী
+
+### ১. ব্লগ অ্যাপ্লিকেশন
+একটি সিম্পল ব্লগ অ্যাপ তৈরি করুন:
+- হোম পেজে পোস্ট লিস্ট
+- ডাইনামিক পোস্ট পেজ
+- ক্যাটাগরি পেজ
+- সার্চ ফাংশনালিটি
+
+```jsx
+function BlogApp() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<PostList />} />
+          <Route path="post/:id" element={<PostDetails />} />
+          <Route path="category/:slug" element={<CategoryPosts />} />
+          <Route path="search" element={<SearchResults />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### ২. অথেনটিকেশন সিস্টেম
+প্রাইভেট রাউট সহ একটি অথেনটিকেশন সিস্টেম:
+- লগইন/রেজিস্ট্রেশন
+- প্রাইভেট রাউট প্রটেকশন
+- রিডাইরেকশন লজিক
+
+## সতর্কতা
+
+১. **পারফরম্যান্স**
+- রাউট স্প্লিটিং ব্যবহার করুন
+- অপ্রয়োজনীয় রি-রেন্ডার এড়ান
+- প্রয়োজনে প্রিফেচিং করুন
+
+২. **SEO**
+- মেটা ট্যাগ আপডেট করুন
+- টাইটেল পরিবর্তন করুন
+- সার্চ ইঞ্জিন ফ্রেন্ডলি URL
+
+৩. **অ্যাক্সেসিবিলিটি**
+- স্ক্রিন রিডার সাপোর্ট
+- কীবোর্ড ন্যাভিগেশন
+- ARIA লেবেল
+
+## উপসংহার
+
+React Router একটি শক্তিশালী টুল যা আপনার SPA কে MPA এর মতো আচরণ করতে সাহায্য করে। এটি ব্যবহার করে আপনি ইউজার-ফ্রেন্ডলি ন্যাভিগেশন সিস্টেম তৈরি করতে পারেন। পরবর্তী পাঠে আমরা শিখব কীভাবে ডাইনামিক ও নেস্টেড রুট হ্যান্ডেল করতে হয়।

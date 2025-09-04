@@ -1,0 +1,216 @@
+---
+title: লিস্ট ও Keys
+icon: ri:list-check
+description: রিঅ্যাক্টে লিস্ট রেন্ডারিং, Keys এর গুরুত্ব এবং তাদের সঠিক ব্যবহার।
+keywords:
+  - Lists
+  - Keys
+  - React Lists
+  - Array Rendering
+  - রিঅ্যাক্ট
+  - অ্যারে
+---
+
+## পরিচিতি
+
+রিঅ্যাক্টে অনেক সময়ই আমাদের একটি তালিকা বা লিস্ট রেন্ডার করতে হয়। এটি হতে পারে প্রোডাক্টের তালিকা, কমেন্টের তালিকা বা ইউজারের তালিকা। এই তালিকাগুলো সঠিকভাবে রেন্ডার করার জন্য Keys একটি গুরুত্বপূর্ণ ভূমিকা পালন করে।
+
+এই পাঠে আমরা শিখব কীভাবে লিস্ট রেন্ডার করতে হয় এবং Keys কেন গুরুত্বপূর্ণ।
+
+## লিস্ট রেন্ডারিং কী?
+
+### সহজ ভাষায়—একটি উপমা
+
+ধরা যাক, আপনি একটি লাইব্রেরির বইয়ের তাক সাজাচ্ছেন।
+- **বইগুলো** হলো আপনার ডেটা অ্যারে।
+- **প্রতিটি বইয়ের আইডি** হলো Key।
+- **তাকে সাজানো** হলো রেন্ডারিং।
+
+আপনি প্রতিটি বই আলাদাভাবে চিনতে পারেন তার আইডি দিয়ে—ঠিক যেমন রিঅ্যাক্ট Keys ব্যবহার করে প্রতিটি আইটেম চিনে।
+
+## map() মেথড দিয়ে লিস্ট রেন্ডারিং
+
+### বেসিক উদাহরণ:
+```jsx
+function BookList() {
+  const books = ['হ্যারি পটার', 'লর্ড অফ দ্য রিংস', 'গেম অফ থ্রোনস'];
+  
+  return (
+    <ul>
+      {books.map((book, index) => (
+        <li key={index}>{book}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### জটিল অবজেক্ট লিস্ট:
+```jsx
+function ProductList() {
+  const products = [
+    { id: 1, name: 'ল্যাপটপ', price: 50000 },
+    { id: 2, name: 'মোবাইল', price: 25000 },
+    { id: 3, name: 'হেডফোন', price: 2000 }
+  ];
+
+  return (
+    <div>
+      {products.map(product => (
+        <div key={product.id}>
+          <h3>{product.name}</h3>
+          <p>মূল্য: {product.price} টাকা</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Keys কী এবং কেন গুরুত্বপূর্ণ?
+
+Keys হলো একটি বিশেষ অ্যাট্রিবিউট যা রিঅ্যাক্ট লিস্টের প্রতিটি আইটেম চিনতে ব্যবহার করে।
+
+### Keys এর গুরুত্ব:
+1. **পারফরম্যান্স:** রিঅ্যাক্ট Keys ব্যবহার করে কোন আইটেম পরিবর্তন হয়েছে বুঝতে পারে।
+2. **আইটেম ট্র্যাকিং:** প্রতিটি আইটেম আলাদাভাবে চিহ্নিত করতে পারে।
+3. **রি-রেন্ডারিং:** শুধুমাত্র পরিবর্তিত আইটেম আপডেট করে।
+
+## Keys এর নিয়মাবলি
+
+### ১. ইউনিক হতে হবে:
+```jsx
+// ভাল
+<li key={user.id}>{user.name}</li>
+
+// খারাপ (ডুপ্লিকেট হতে পারে)
+<li key={user.name}>{user.name}</li>
+```
+
+### ২. স্থির হতে হবে:
+```jsx
+// ভাল
+<li key={item.id}>{item.name}</li>
+
+// খারাপ (প্রতিবার পরিবর্তন হয়)
+<li key={Math.random()}>{item.name}</li>
+```
+
+### ৩. ইনডেক্স এড়িয়ে চলুন:
+```jsx
+// এড়িয়ে চলুন
+{items.map((item, index) => (
+  <li key={index}>{item.name}</li>
+))}
+
+// ভাল
+{items.map(item => (
+  <li key={item.id}>{item.name}</li>
+))}
+```
+
+## জটিল লিস্ট রেন্ডারিং
+
+### নেস্টেড লিস্ট:
+```jsx
+function NestedList() {
+  const categories = [
+    {
+      id: 1,
+      name: 'ফল',
+      items: [
+        { id: 'f1', name: 'আম' },
+        { id: 'f2', name: 'কলা' }
+      ]
+    },
+    {
+      id: 2,
+      name: 'শাকসবজি',
+      items: [
+        { id: 'v1', name: 'গাজর' },
+        { id: 'v2', name: 'পালংশাক' }
+      ]
+    }
+  ];
+
+  return (
+    <div>
+      {categories.map(category => (
+        <div key={category.id}>
+          <h2>{category.name}</h2>
+          <ul>
+            {category.items.map(item => (
+              <li key={item.id}>{item.name}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## অনুশীলন
+
+### কাজ:
+
+১. একটি টু-ডু লিস্ট তৈরি করুন:
+   - প্রতিটি টাস্কের একটি ইউনিক আইডি থাকবে
+   - টাস্ক যোগ করা যাবে
+   - টাস্ক ডিলিট করা যাবে
+
+২. একটি শপিং কার্ট তৈরি করুন:
+   - প্রোডাক্ট লিস্ট থাকবে
+   - পরিমাণ বাড়ানো/কমানো যাবে
+   - মোট মূল্য হিসাব করবে
+
+### বাস্তব উদাহরণ:
+
+```jsx
+function ShoppingCart() {
+  const [items, setItems] = useState([
+    { id: 1, name: 'শার্ট', price: 1000, quantity: 1 },
+    { id: 2, name: 'প্যান্ট', price: 1500, quantity: 1 },
+    { id: 3, name: 'জুতা', price: 2000, quantity: 1 }
+  ]);
+
+  const updateQuantity = (id, change) => {
+    setItems(items.map(item =>
+      item.id === id
+        ? { ...item, quantity: Math.max(0, item.quantity + change) }
+        : item
+    ));
+  };
+
+  const getTotal = () => {
+    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  return (
+    <div>
+      <h1>শপিং কার্ট</h1>
+      {items.map(item => (
+        <div key={item.id} className="cart-item">
+          <h3>{item.name}</h3>
+          <p>মূল্য: {item.price} টাকা</p>
+          <div>
+            <button onClick={() => updateQuantity(item.id, -1)}>-</button>
+            <span>{item.quantity}</span>
+            <button onClick={() => updateQuantity(item.id, 1)}>+</button>
+          </div>
+          <p>মোট: {item.price * item.quantity} টাকা</p>
+        </div>
+      ))}
+      <h2>সর্বমোট: {getTotal()} টাকা</h2>
+    </div>
+  );
+}
+```
+
+---
+
+## উপসংহার
+
+লিস্ট রেন্ডারিং এবং Keys রিঅ্যাক্টের মৌলিক বিষয়গুলোর মধ্যে একটি। সঠিক Keys ব্যবহার করে আপনি আপনার অ্যাপ্লিকেশনের পারফরম্যান্স বাড়াতে পারেন এবং বাগ এড়াতে পারেন। পরবর্তী পাঠে আমরা শিখব React DevTools সম্পর্কে।
+
+শুভকামনা!

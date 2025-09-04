@@ -1,0 +1,236 @@
+---
+title: ইভেন্ট হ্যান্ডলিং
+icon: ri:cursor-fill
+description: রিঅ্যাক্টে ইভেন্ট হ্যান্ডলিং, ইভেন্ট অবজেক্ট এবং ইভেন্ট হ্যান্ডলার ব্যবহার করার পদ্ধতি।
+keywords:
+  - Event Handling
+  - React Events
+  - Event Handler
+  - ইভেন্ট
+  - রিঅ্যাক্ট
+---
+
+## পরিচিতি
+
+ওয়েব অ্যাপ্লিকেশনে ব্যবহারকারীর ক্রিয়াকলাপ (যেমন: ক্লিক, টাইপ, স্ক্রল) হ্যান্ডল করার জন্য ইভেন্ট হ্যান্ডলিং অত্যন্ত গুরুত্বপূর্ণ। রিঅ্যাক্টে ইভেন্ট হ্যান্ডলিং HTML-এর মতোই, তবে কিছু পার্থক্য রয়েছে।
+
+এই পাঠে আমরা শিখব রিঅ্যাক্টে কীভাবে ইভেন্ট হ্যান্ডল করতে হয়, ইভেন্ট অবজেক্ট কী, এবং বিভিন্ন ধরনের ইভেন্ট হ্যান্ডলার।
+
+## ইভেন্ট কী?
+
+### সহজ ভাষায়—একটি উপমা
+
+ধরা যাক, আপনি একটি দরজার কলিং বেল সিস্টেম বানাচ্ছেন।
+- **বেল বোতাম টিপা** হলো ইভেন্ট।
+- **বেল বাজানো** হলো ইভেন্ট হ্যান্ডলার।
+- **বেল বাজার শব্দ** হলো রেসপন্স।
+
+ইভেন্ট হলো ব্যবহারকারীর কোনো ক্রিয়াকলাপ, যেমন বাটন ক্লিক, ইনপুট ফিল্ডে টাইপ করা, মাউস মুভ করা ইত্যাদি।
+
+## রিঅ্যাক্টে ইভেন্ট হ্যান্ডলিং
+
+### HTML vs রিঅ্যাক্ট ইভেন্ট
+
+HTML:
+```html
+<button onclick="handleClick()">
+  ক্লিক করুন
+</button>
+```
+
+রিঅ্যাক্ট:
+```jsx
+<button onClick={handleClick}>
+  ক্লিক করুন
+</button>
+```
+
+পার্থক্য:
+1. রিঅ্যাক্টে ইভেন্ট নাম camelCase-এ লিখতে হয় (onClick, onChange)
+2. JSX-এ ইভেন্ট হ্যান্ডলার করলি ব্রেসের ({}) মধ্যে লিখতে হয়
+
+## সাধারণ ইভেন্টসমূহ
+
+### ক্লিক ইভেন্ট
+```jsx
+function ClickButton() {
+  const handleClick = () => {
+    alert('বাটন ক্লিক করা হয়েছে!');
+  };
+
+  return (
+    <button onClick={handleClick}>
+      ক্লিক করুন
+    </button>
+  );
+}
+```
+
+### ইনপুট ইভেন্ট
+```jsx
+function InputField() {
+  const handleChange = (event) => {
+    console.log('নতুন মান:', event.target.value);
+  };
+
+  return (
+    <input
+      type="text"
+      onChange={handleChange}
+      placeholder="কিছু লিখুন"
+    />
+  );
+}
+```
+
+### ফর্ম সাবমিট
+```jsx
+function SimpleForm() {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert('ফর্ম সাবমিট করা হয়েছে!');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button type="submit">সাবমিট</button>
+    </form>
+  );
+}
+```
+
+## ইভেন্ট অবজেক্ট
+
+ইভেন্ট অবজেক্ট হলো একটি বিশেষ অবজেক্ট, যা ইভেন্ট সম্পর্কে তথ্য ধারণ করে।
+
+### মূল প্রপার্টিসমূহ:
+- **event.target:** ইভেন্ট যে এলিমেন্টে ঘটেছে
+- **event.preventDefault():** ডিফল্ট আচরণ বন্ধ করা
+- **event.stopPropagation():** ইভেন্ট বাবল আপ বন্ধ করা
+
+### উদাহরণ:
+```jsx
+function EventObject() {
+  const handleClick = (event) => {
+    console.log('ইভেন্টের ধরন:', event.type);
+    console.log('টার্গেট এলিমেন্ট:', event.target);
+    console.log('মাউসের পজিশন:', event.clientX, event.clientY);
+  };
+
+  return (
+    <button onClick={handleClick}>
+      ক্লিক করুন
+    </button>
+  );
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. ইভেন্ট হ্যান্ডলার নামকরণ
+```jsx
+// ভাল
+const handleClick = () => {};
+const handleSubmit = () => {};
+
+// খারাপ
+const click = () => {};
+const submitForm = () => {};
+```
+
+### ২. ইভেন্ট বাইন্ডিং
+```jsx
+// ভাল
+<button onClick={handleClick}>
+
+// খারাপ (প্রতিবার রি-রেন্ডারে নতুন ফাংশন)
+<button onClick={() => handleClick()}>
+```
+
+### ৩. ইভেন্ট ডেলিগেশন
+```jsx
+function TodoList() {
+  const handleClick = (id) => {
+    console.log('ক্লিক করা আইটেম:', id);
+  };
+
+  return (
+    <ul onClick={(e) => {
+      if (e.target.tagName === 'LI') {
+        handleClick(e.target.dataset.id);
+      }
+    }}>
+      <li data-id="1">আইটেম ১</li>
+      <li data-id="2">আইটেম ২</li>
+    </ul>
+  );
+}
+```
+
+## অনুশীলন
+
+### কাজ:
+
+১. একটি বাটন তৈরি করুন যা ক্লিক করলে মেসেজ দেখাবে।
+
+২. একটি ফর্ম তৈরি করুন যাতে:
+   - ইনপুট ফিল্ড থাকবে
+   - টাইপ করলে কনসোলে মান দেখাবে
+   - সাবমিট করলে ফর্মের ডেটা দেখাবে
+
+৩. একটি টু-ডু লিস্ট তৈরি করুন:
+   - আইটেম যোগ করা যাবে
+   - আইটেম ডিলিট করা যাবে
+   - আইটেম এডিট করা যাবে
+
+### বাস্তব উদাহরণ:
+
+```jsx
+function TodoApp() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (input.trim()) {
+      setTodos([...todos, { id: Date.now(), text: input }]);
+      setInput('');
+    }
+  };
+
+  const handleDelete = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="নতুন টাস্ক লিখুন"
+        />
+        <button type="submit">যোগ করুন</button>
+      </form>
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}>
+            {todo.text}
+            <button onClick={() => handleDelete(todo.id)}>
+              ডিলিট
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+---
+
+## উপসংহার
+
+ইভেন্ট হ্যান্ডলিং রিঅ্যাক্টে ইন্টারঅ্যাক্টিভ UI তৈরি করার একটি মৌলিক বিষয়। সঠিক ইভেন্ট হ্যান্ডলিং এবং বেস্ট প্র্যাকটিস অনুসরণ করে আপনি আরও ভালো ইউজার এক্সপেরিয়েন্স তৈরি করতে পারবেন। পরবর্তী পাঠে আমরা শিখব কন্ডিশনাল রেন্ডারিং সম্পর্কে।
+
+শুভকামনা!

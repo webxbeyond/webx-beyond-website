@@ -1,0 +1,237 @@
+---
+title: React DevTools পরিচিতি
+icon: ri:tools-fill
+description: React DevTools এর ব্যবহার, ডিবাগিং টেকনিক এবং অ্যাপ্লিকেশন অপটিমাইজেশন।
+keywords:
+  - React DevTools
+  - Debugging
+  - Performance
+  - Development
+  - রিঅ্যাক্ট
+---
+
+## পরিচিতি
+
+React DevTools হলো একটি ব্রাউজার এক্সটেনশন যা রিঅ্যাক্ট অ্যাপ্লিকেশন ডেভেলপ এবং ডিবাগ করার জন্য অত্যন্ত উপযোগী। এটি আপনাকে কম্পোনেন্ট হায়ারার্কি দেখতে, Props এবং State পরিবর্তন করতে এবং পারফরম্যান্স মনিটর করতে সাহায্য করে।
+
+## React DevTools কী?
+
+### সহজ ভাষায়—একটি উপমা
+
+ধরা যাক, আপনি একটি জটিল যন্ত্র মেরামত করছেন।
+- **স্ক্রুড্রাইভার** হলো সাধারণ ব্রাউজার DevTools
+- **স্পেশাল ডায়াগনস্টিক টুল** হলো React DevTools
+- **যন্ত্রের ভেতরের অংশ** হলো আপনার রিঅ্যাক্ট অ্যাপের কম্পোনেন্ট
+
+React DevTools আপনাকে অ্যাপের ভেতরের কাজকর্ম দেখতে এবং পরিবর্তন করতে সাহায্য করে।
+
+## ইনস্টলেশন
+
+### ক্রোম এক্সটেনশন
+1. Chrome Web Store এ যান
+2. "React Developer Tools" সার্চ করুন
+3. "Add to Chrome" ক্লিক করুন
+
+### ফায়ারফক্স এক্সটেনশন
+1. Firefox Add-ons এ যান
+2. "React Developer Tools" সার্চ করুন
+3. "Add to Firefox" ক্লিক করুন
+
+## React DevTools এর মূল ফিচারসমূহ
+
+### ১. Components ট্যাব
+```jsx
+function UserProfile({ name, email }) {
+  const [isEditing, setIsEditing] = useState(false);
+  
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>{email}</p>
+    </div>
+  );
+}
+```
+
+এই কম্পোনেন্টে DevTools দেখাবে:
+- Props: `name`, `email`
+- State: `isEditing`
+- কম্পোনেন্ট হায়ারার্কি
+
+### ২. Profiler ট্যাব
+রেন্ডার টাইম এবং পারফরম্যান্স মনিটর করতে:
+```jsx
+function SlowComponent() {
+  // রেন্ডার টাইম দেখা যাবে
+  const items = new Array(1000).fill(0);
+  
+  return (
+    <div>
+      {items.map((_, i) => (
+        <div key={i}>আইটেম {i}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+## মূল ফাংশনালিটি
+
+### ১. কম্পোনেন্ট ইন্সপেকশন
+
+#### Props দেখা এবং এডিট করা:
+```jsx
+<Button
+  text="ক্লিক করুন"
+  onClick={() => console.log('clicked')}
+/>
+```
+
+DevTools এ:
+- Props এর মান দেখা যাবে
+- Props এডিট করা যাবে
+- Props এর পরিবর্তন লাইভ দেখা যাবে
+
+#### State মনিটরিং:
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      {count}
+    </button>
+  );
+}
+```
+
+### ২. পারফরম্যান্স প্রোফাইলিং
+
+#### রেন্ডার টাইম মাপা:
+```jsx
+function ExpensiveList({ items }) {
+  return (
+    <div>
+      {items.map(item => (
+        <ExpensiveItem key={item.id} {...item} />
+      ))}
+    </div>
+  );
+}
+```
+
+#### রি-রেন্ডার ট্র্যাকিং:
+```jsx
+function OptimizedComponent({ data }) {
+  return (
+    <div>
+      {/* Profiler দেখাবে কখন রি-রেন্ডার হচ্ছে */}
+      <ExpensiveCalculation data={data} />
+    </div>
+  );
+}
+```
+
+## ডিবাগিং টেকনিক
+
+### ১. কম্পোনেন্ট ট্রি নেভিগেশন
+```jsx
+<App>
+  <Header />
+  <Main>
+    <Sidebar />
+    <Content />
+  </Main>
+  <Footer />
+</App>
+```
+
+### ২. Props/State পরিবর্তন ট্র্যাকিং
+```jsx
+function Form() {
+  const [values, setValues] = useState({
+    name: '',
+    email: ''
+  });
+  
+  // DevTools এ values অবজেক্ট মনিটর করা যাবে
+}
+```
+
+### ৩. পারফরম্যান্স মনিটরিং
+```jsx
+function HighlightedText({ text, highlight }) {
+  // Profiler দেখাবে কত সময় নিচ্ছে
+  return (
+    <div>
+      {text.split(highlight).map((part, i) => (
+        <span key={i}>{part}</span>
+      ))}
+    </div>
+  );
+}
+```
+
+## অনুশীলন
+
+### কাজ:
+
+১. React DevTools ইনস্টল করুন এবং একটি রিঅ্যাক্ট অ্যাপে:
+   - কম্পোনেন্ট ট্রি এক্সপ্লোর করুন
+   - Props এবং State দেখুন
+   - কম্পোনেন্টের রেন্ডার টাইম মাপুন
+
+২. একটি ফর্ম কম্পোনেন্ট তৈরি করুন:
+   - DevTools ব্যবহার করে State পরিবর্তন ট্র্যাক করুন
+   - পারফরম্যান্স অপটিমাইজ করুন
+
+৩. Profiler ব্যবহার করে:
+   - স্লো কম্পোনেন্ট খুঁজুন
+   - রি-রেন্ডার অপটিমাইজ করুন
+
+### বাস্তব উদাহরণ:
+
+```jsx
+function UserDashboard() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchUsers()
+      .then(data => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  // DevTools এ এই কম্পোনেন্টের:
+  // - State পরিবর্তন
+  // - রেন্ডার টাইম
+  // - Props ফ্লো
+  // দেখা যাবে
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return (
+    <div>
+      <h1>ইউজার ড্যাশবোর্ড</h1>
+      <UserList users={users} />
+      <UserStats users={users} />
+    </div>
+  );
+}
+```
+
+---
+
+## উপসংহার
+
+React DevTools রিঅ্যাক্ট ডেভেলপমেন্টের একটি অপরিহার্য টুল। এটি ব্যবহার করে আপনি আপনার অ্যাপ্লিকেশন ডিবাগ করতে, পারফরম্যান্স অপটিমাইজ করতে এবং কোড কোয়ালিটি উন্নত করতে পারবেন। নিয়মিত অনুশীলন করে React DevTools এর সাথে পরিচিত হোন।
+
+শুভকামনা!

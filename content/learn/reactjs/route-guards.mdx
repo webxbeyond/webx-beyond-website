@@ -1,0 +1,273 @@
+---
+title: Route Guards ও 404 পেজ
+icon: ri:shield-keyhole-line
+description: রিঅ্যাক্ট রাউটারে রাউট গার্ড ব্যবহার করে নিরাপদ রাউটিং এবং এরর হ্যান্ডলিং।
+keywords:
+  - Route Guards
+  - Protected Routes
+  - Authentication
+  - 404 Pages
+  - Error Pages
+  - Route Protection
+---
+
+## ভূমিকা
+
+রাউট গার্ডস এবং এরর পেজ একটি অ্যাপ্লিকেশনকে নিরাপদ এবং ইউজার-ফ্রেন্ডলি করে তোলে। আসুন একটি সহজ উপমার মাধ্যমে এটি বুঝি।
+
+### সিকিউরিটি গার্ডের উপমা
+কল্পনা করুন একটি বড় অফিস বিল্ডিং:
+- **রাউট গার্ড** = সিকিউরিটি গার্ড (অনুমতি চেক)
+- **প্রাইভেট রুট** = রেস্ট্রিক্টেড এরিয়া
+- **রিডাইরেকশন** = অনুমতিহীন ব্যক্তিকে লবিতে ফেরত পাঠানো
+- **404 পেজ** = ভুল ঠিকানায় যাওয়ার তথ্য ডেস্ক
+
+## রাউট গার্ডস
+
+### ১. বেসিক প্রাইভেট রাউট
+```jsx
+function PrivateRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+  );
+}
+```
+
+### ২. রোল-বেসড গার্ড
+```jsx
+function RoleGuard({ children, requiredRole }) {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (user.role !== requiredRole) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+}
+
+function AdminRoute({ children }) {
+  return (
+    <RoleGuard requiredRole="admin">
+      {children}
+    </RoleGuard>
+  );
+}
+
+// ব্যবহার
+<Route
+  path="/admin"
+  element={
+    <AdminRoute>
+      <AdminDashboard />
+    </AdminRoute>
+  }
+/>
+```
+
+## 404 এবং এরর পেজ
+
+### ১. বেসিক 404 পেজ
+```jsx
+function NotFound() {
+  return (
+    <div className="not-found">
+      <h1>404</h1>
+      <h2>পেজটি খুঁজে পাওয়া যায়নি</h2>
+      <p>
+        দুঃখিত, আপনি যে পেজটি খুঁজছেন তা এই ঠিকানায় নেই।
+      </p>
+      <Link to="/">হোম পেজে ফিরে যান</Link>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      {/* অন্যান্য রাউট */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+```
+
+### ২. কাস্টম এরর পেজ
+```jsx
+function ErrorBoundary() {
+  const error = useRouteError();
+
+  return (
+    <div className="error-page">
+      <h1>উফফ! কিছু একটা ভুল হয়েছে</h1>
+      <p>{error.message}</p>
+      <button onClick={() => window.location.reload()}>
+        পুনরায় চেষ্টা করুন
+      </button>
+    </div>
+  );
+}
+```
+
+## উন্নত প্যাটার্ন
+
+### ১. অথেনটিকেশন হুক
+```jsx
+function useAuth() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuthStatus()
+      .then(user => setUser(user))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const login = async (credentials) => {
+    // লগইন লজিক
+  };
+
+  const logout = async () => {
+    // লগআউট লজিক
+  };
+
+  return {
+    user,
+    loading,
+    login,
+    logout,
+    isAuthenticated: !!user
+  };
+}
+```
+
+### ২. রাউট প্রটেকশন ম্যানেজার
+```jsx
+const protectedRoutes = {
+  admin: {
+    paths: ['/admin', '/settings'],
+    role: 'admin'
+  },
+  user: {
+    paths: ['/profile', '/orders'],
+    role: 'user'
+  }
+};
+
+function RouteProtectionManager({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  const checkAccess = () => {
+    for (const [key, config] of Object.entries(protectedRoutes)) {
+      if (config.paths.includes(location.pathname)) {
+        return user?.role === config.role;
+      }
+    }
+    return true;
+  };
+
+  if (!checkAccess()) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+}
+```
+
+## অনুশীলনী
+
+### ১. মাল্টি-রোল অ্যাডমিন প্যানেল
+একটি অ্যাডমিন প্যানেল তৈরি করুন:
+- সুপার অ্যাডমিন
+- কনটেন্ট মডারেটর
+- সাধারণ অ্যাডমিন
+
+```jsx
+const roleHierarchy = {
+  superAdmin: ['admin', 'moderator', 'user'],
+  admin: ['moderator', 'user'],
+  moderator: ['user'],
+  user: []
+};
+
+function hasAccess(userRole, requiredRole) {
+  return roleHierarchy[userRole]?.includes(requiredRole) || userRole === requiredRole;
+}
+
+function RoleBasedRoute({ requiredRole, children }) {
+  const { user } = useAuth();
+
+  if (!hasAccess(user?.role, requiredRole)) {
+    return <Navigate to="/unauthorized" />;
+  }
+
+  return children;
+}
+```
+
+### ২. ইউজার ফ্রেন্ডলি এরর পেজ
+একটি এরর পেজ সিস্টেম তৈরি করুন:
+- বিভিন্ন এরর কোড
+- হেল্পফুল মেসেজ
+- রিকাভারি অপশন
+
+## বেস্ট প্র্যাকটিস
+
+১. **সিকিউরিটি**
+- JWT টোকেন ভ্যালিডেশন
+- রোল-বেসড অ্যাক্সেস কন্ট্রোল
+- সেশন ম্যানেজমেন্ট
+
+২. **ইউজার এক্সপেরিয়েন্স**
+- লোডিং স্টেট
+- ইনফরমেটিভ এরর মেসেজ
+- রিডাইরেকশন হিস্টরি
+
+৩. **পারফরম্যান্স**
+- লেজি লোডিং
+- রাউট প্রি-ফেচিং
+- কোড স্প্লিটিং
+
+## সতর্কতা
+
+১. **সিকিউরিটি রিস্ক**
+- ক্লায়েন্ট-সাইড চেক যথেষ্ট নয়
+- সার্ভার-সাইড ভ্যালিডেশন প্রয়োজন
+- টোকেন সিকিউরিটি
+
+২. **এরর হ্যান্ডলিং**
+- সব এরর ধরা
+- ইউজার ফ্রেন্ডলি মেসেজ
+- ফলব্যাক UI
+
+## উপসংহার
+
+রাউট গার্ডস এবং এরর পেজ আপনার অ্যাপ্লিকেশনকে নিরাপদ এবং ইউজার-ফ্রেন্ডলি করে তোলে। সঠিক ইমপ্লিমেন্টেশন অ্যাপ্লিকেশনের সিকিউরিটি এবং ইউজার এক্সপেরিয়েন্স উন্নত করে।
+
+এই মডিউলে আমরা রাউটিং এবং ন্যাভিগেশন সম্পর্কে বিস্তারিত শিখেছি। পরবর্তী মডিউলে আমরা রিঅ্যাক্টে স্টাইলিং নিয়ে আলোচনা করব।

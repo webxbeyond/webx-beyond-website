@@ -1,0 +1,293 @@
+---
+title: useEffect, useRef ও লাইফসাইকেল ধারণা
+icon: ri:refresh-line
+description: রিঅ্যাক্টে useEffect এবং useRef হুকস এবং কম্পোনেন্ট লাইফসাইকেল সম্পর্কে বিস্তারিত আলোচনা।
+keywords:
+  - useEffect
+  - useRef
+  - React Lifecycle
+  - Side Effects
+  - রিঅ্যাক্ট হুকস
+---
+
+## পরিচিতি
+
+রিঅ্যাক্টে কম্পোনেন্টের জীবনচক্র (লাইফসাইকেল) এবং সাইড ইফেক্টস ম্যানেজ করার জন্য `useEffect` এবং `useRef` দুটি অত্যন্ত গুরুত্বপূর্ণ হুক। এই পাঠে আমরা এই হুকগুলো সম্পর্কে বিস্তারিত জানব।
+
+## লাইফসাইকেল কী?
+
+### সহজ ভাষায়—একটি উপমা
+
+ধরা যাক, আপনি একটি রেস্তোরাঁ চালাচ্ছেন।
+- **রেস্তোরাঁ খোলা** = কম্পোনেন্ট মাউন্ট
+- **অর্ডার পরিবর্তন** = কম্পোনেন্ট আপডেট
+- **রেস্তোরাঁ বন্ধ** = কম্পোনেন্ট আনমাউন্ট
+
+প্রতিটি ধাপে আলাদা আলাদা কাজ করতে হয়, ঠিক যেমন রিঅ্যাক্ট কম্পোনেন্টের জীবনচক্রে বিভিন্ন কাজ করতে হয়।
+
+## useEffect কী?
+
+`useEffect` হলো একটি হুক যা কম্পোনেন্টের সাইড ইফেক্টস (যেমন: API কল, ইভেন্ট লিসেনার, টাইমার) ম্যানেজ করে।
+
+### বেসিক ব্যবহার:
+```jsx
+function ExampleComponent() {
+  useEffect(() => {
+    console.log('কম্পোনেন্ট মাউন্ট হয়েছে');
+
+    return () => {
+      console.log('কম্পোনেন্ট আনমাউন্ট হচ্ছে');
+    };
+  }, []); // খালি ডিপেন্ডেন্সি অ্যারে
+
+  return <div>হ্যালো</div>;
+}
+```
+
+### ডিপেন্ডেন্সি অ্যারে:
+
+1. **খালি অ্যারে ([]):**
+```jsx
+useEffect(() => {
+  // শুধুমাত্র প্রথমবার (মাউন্ট) চলবে
+}, []);
+```
+
+2. **ডিপেন্ডেন্সি সহ:**
+```jsx
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  // count পরিবর্তন হলে চলবে
+  document.title = `আপনি ${count} বার ক্লিক করেছেন`;
+}, [count]);
+```
+
+3. **ডিপেন্ডেন্সি ছাড়া:**
+```jsx
+useEffect(() => {
+  // প্রতি রেন্ডারে চলবে
+});
+```
+
+## useRef কী?
+
+`useRef` হলো একটি হুক যা রি-রেন্ডার হলেও মান ধরে রাখে এবং DOM এলিমেন্ট রেফারেন্স স্টোর করে।
+
+### DOM রেফারেন্স:
+```jsx
+function TextInput() {
+  const inputRef = useRef(null);
+
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputRef} type="text" />
+      <button onClick={focusInput}>ফোকাস করুন</button>
+    </>
+  );
+}
+```
+
+### মান স্টোর করা:
+```jsx
+function Timer() {
+  const [count, setCount] = useState(0);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setCount(c => c + 1);
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  return <div>টাইমার: {count}</div>;
+}
+```
+
+## সাধারণ ব্যবহার ক্ষেত্র
+
+### ১. API কল:
+```jsx
+function UserData({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`/api/users/${userId}`);
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  if (loading) return <div>লোড হচ্ছে...</div>;
+  if (!user) return <div>ইউজার পাওয়া যায়নি</div>;
+
+  return <div>{user.name}</div>;
+}
+```
+
+### ২. ইভেন্ট লিসেনার:
+```jsx
+function ScrollTracker() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return <div>স্ক্রল পজিশন: {scrollY}px</div>;
+}
+```
+
+### ৩. লোকাল স্টোরেজ:
+```jsx
+function ThemeToggle() {
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.body.className = isDark ? 'dark' : 'light';
+  }, [isDark]);
+
+  return (
+    <button onClick={() => setIsDark(!isDark)}>
+      {isDark ? 'লাইট মোড' : 'ডার্ক মোড'}
+    </button>
+  );
+}
+```
+
+## বেস্ট প্র্যাকটিস
+
+### ১. ক্লিনআপ ফাংশন ব্যবহার:
+```jsx
+useEffect(() => {
+  const subscription = someAPI.subscribe();
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
+```
+
+### ২. সঠিক ডিপেন্ডেন্সি ব্যবহার:
+```jsx
+// ভাল
+useEffect(() => {
+  document.title = `${name}'s প্রোফাইল`;
+}, [name]);
+
+// খারাপ
+useEffect(() => {
+  document.title = `${name}'s প্রোফাইল`;
+}, []); // name ডিপেন্ডেন্সি missing
+```
+
+### ৩. অ্যাসিঙ্ক ফাংশন:
+```jsx
+// ভাল
+useEffect(() => {
+  const fetchData = async () => {
+    const result = await api.getData();
+    setData(result);
+  };
+
+  fetchData();
+}, []);
+
+// খারাপ
+useEffect(async () => { // useEffect কলব্যাক async হতে পারে না
+  const result = await api.getData();
+  setData(result);
+}, []);
+```
+
+## অনুশীলন
+
+### কাজ:
+
+১. একটি টাইমার কম্পোনেন্ট তৈরি করুন:
+   - স্টার্ট/স্টপ বাটন থাকবে
+   - কম্পোনেন্ট আনমাউন্ট হলে টাইমার বন্ধ হবে
+
+২. একটি অটো-সেভ ফর্ম তৈরি করুন:
+   - ইউজার টাইপ করা বন্ধ করার ৫০০ms পর ডেটা সেভ হবে
+   - লোকাল স্টোরেজে ডেটা সেভ হবে
+
+৩. একটি ইনফিনিট স্ক্রল কম্পোনেন্ট তৈরি করুন:
+   - স্ক্রল পজিশন ট্র্যাক করবে
+   - বটমে পৌঁছালে নতুন ডেটা লোড করবে
+
+### বাস্তব উদাহরণ:
+
+```jsx
+function AutoSaveForm() {
+  const [text, setText] = useState('');
+  const timeoutRef = useRef();
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleChange = (e) => {
+    setText(e.target.value);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      localStorage.setItem('draftText', e.target.value);
+      console.log('সেভ করা হয়েছে!');
+    }, 500);
+  };
+
+  return (
+    <div>
+      <textarea
+        value={text}
+        onChange={handleChange}
+        placeholder="লিখুন..."
+      />
+      <p>অটো-সেভ হবে...</p>
+    </div>
+  );
+}
+```
+
+---
+
+## উপসংহার
+
+`useEffect` এবং `useRef` রিঅ্যাক্টে সাইড ইফেক্টস এবং রেফারেন্স ম্যানেজ করার জন্য অপরিহার্য হুক। এগুলো সঠিকভাবে ব্যবহার করে আপনি জটিল ফাংশনালিটি সহজে বাস্তবায়ন করতে পারবেন। পরবর্তী পাঠে আমরা শিখব কীভাবে API থেকে ডেটা ফেচ করতে হয়।
+
+শুভকামনা!

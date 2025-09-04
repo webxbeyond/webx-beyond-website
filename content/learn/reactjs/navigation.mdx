@@ -1,0 +1,327 @@
+---
+title: লিঙ্ক ও ন্যাভিগেশন
+icon: ri:compass-line
+description: রিঅ্যাক্ট রাউটারে লিঙ্ক এবং ন্যাভিগেশন ব্যবহার করে ইউজার ফ্রেন্ডলি ন্যাভিগেশন সিস্টেম তৈরি।
+keywords:
+  - Link Component
+  - NavLink
+  - Navigation
+  - History API
+  - useNavigate
+  - Navigation Guards
+---
+
+## ভূমিকা
+
+মডার্ন ওয়েব অ্যাপ্লিকেশনে সুন্দর ও কার্যকর ন্যাভিগেশন সিস্টেম অত্যন্ত গুরুত্বপূর্ণ। আসুন একটি সহজ উপমার মাধ্যমে এটি বুঝি।
+
+### টিভি রিমোটের উপমা
+কল্পনা করুন একটি স্মার্ট টিভির রিমোট কন্ট্রোল:
+- **লিঙ্ক** = চ্যানেল বাটন (সরাসরি যাওয়া)
+- **ন্যাভিগেট** = মেনু বাটন (প্রোগ্রামেটিক্যালি যাওয়া)
+- **ব্যাক বাটন** = আগের চ্যানেলে ফিরে যাওয়া
+- **হিস্টরি** = দেখা চ্যানেলের তালিকা
+
+## লিঙ্ক কম্পোনেন্টস
+
+### ১. বেসিক Link
+```jsx
+import { Link } from 'react-router-dom';
+
+function Navigation() {
+  return (
+    <nav>
+      <Link to="/">হোম</Link>
+      <Link to="/products">পণ্যসমূহ</Link>
+      <Link to="/about">আমাদের সম্পর্কে</Link>
+    </nav>
+  );
+}
+```
+
+### ২. NavLink (অ্যাক্টিভ স্টাইলিং সহ)
+```jsx
+import { NavLink } from 'react-router-dom';
+
+function Navigation() {
+  return (
+    <nav>
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          isActive ? 'nav-link active' : 'nav-link'
+        }
+      >
+        হোম
+      </NavLink>
+      
+      <NavLink
+        to="/products"
+        style={({ isActive }) => ({
+          fontWeight: isActive ? 'bold' : 'normal',
+          color: isActive ? '#007bff' : '#333'
+        })}
+      >
+        পণ্যসমূহ
+      </NavLink>
+    </nav>
+  );
+}
+```
+
+## প্রোগ্রামেটিক ন্যাভিগেশন
+
+### ১. useNavigate হুক
+```jsx
+import { useNavigate } from 'react-router-dom';
+
+function LoginForm() {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const success = await loginUser();
+    
+    if (success) {
+      navigate('/dashboard', {
+        replace: true, // হিস্টরি রিপ্লেস করে
+        state: { from: 'login' } // অতিরিক্ত ডেটা পাস করে
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* ফর্ম ফিল্ড */}
+    </form>
+  );
+}
+```
+
+### ২. হিস্টরি ম্যানিপুলেশন
+```jsx
+function NavigationControls() {
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <button onClick={() => navigate(-1)}>
+        পিছনে যান
+      </button>
+      
+      <button onClick={() => navigate(-2)}>
+        দুই পেজ পিছনে
+      </button>
+      
+      <button onClick={() => navigate(1)}>
+        সামনে যান
+      </button>
+    </div>
+  );
+}
+```
+
+## উন্নত ন্যাভিগেশন প্যাটার্ন
+
+### ১. কনডিশনাল ন্যাভিগেশন
+```jsx
+function CheckoutButton({ cart }) {
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (cart.items.length === 0) {
+      alert('আপনার কার্ট খালি!');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: { returnTo: '/checkout' }
+      });
+      return;
+    }
+
+    navigate('/checkout');
+  };
+
+  return (
+    <button onClick={handleCheckout}>
+      চেকআউট করুন
+    </button>
+  );
+}
+```
+
+### ২. কাস্টম ন্যাভিগেশন হুক
+```jsx
+function useCustomNavigation() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  return {
+    goToHome: () => navigate('/'),
+    goToLogin: (returnTo = location.pathname) =>
+      navigate('/login', { state: { returnTo } }),
+    goBack: () => navigate(-1),
+    goToProduct: (id) => navigate(`/product/${id}`),
+  };
+}
+
+// ব্যবহার
+function ProductCard({ product }) {
+  const navigation = useCustomNavigation();
+
+  return (
+    <div>
+      <h2>{product.name}</h2>
+      <button onClick={() => navigation.goToProduct(product.id)}>
+        বিস্তারিত দেখুন
+      </button>
+    </div>
+  );
+}
+```
+
+## ব্রেডক্রাম্ব ন্যাভিগেশন
+
+### ১. বেসিক ব্রেডক্রাম্ব
+```jsx
+function Breadcrumbs() {
+  const location = useLocation();
+  const paths = location.pathname.split('/')
+    .filter(path => path);
+
+  return (
+    <div className="breadcrumbs">
+      <Link to="/">হোম</Link>
+      {paths.map((path, index) => {
+        const url = `/${paths.slice(0, index + 1).join('/')}`;
+        return (
+          <span key={url}>
+            {' > '}
+            <Link to={url}>
+              {path}
+            </Link>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+```
+
+### ২. ডাইনামিক ব্রেডক্রাম্ব
+```jsx
+const routeLabels = {
+  products: 'পণ্যসমূহ',
+  categories: 'ক্যাটাগরি',
+  cart: 'কার্ট',
+  checkout: 'চেকআউট'
+};
+
+function DynamicBreadcrumbs() {
+  const location = useLocation();
+  const paths = location.pathname.split('/')
+    .filter(path => path);
+
+  return (
+    <nav aria-label="breadcrumb">
+      <ol className="breadcrumb">
+        <li className="breadcrumb-item">
+          <Link to="/">হোম</Link>
+        </li>
+        {paths.map((path, index) => {
+          const url = `/${paths.slice(0, index + 1).join('/')}`;
+          const label = routeLabels[path] || path;
+          
+          return (
+            <li
+              key={url}
+              className={`breadcrumb-item ${
+                index === paths.length - 1 ? 'active' : ''
+              }`}
+            >
+              {index === paths.length - 1 ? (
+                label
+              ) : (
+                <Link to={url}>{label}</Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+```
+
+## অনুশীলনী
+
+### ১. মেগা মেনু
+একটি মেগা মেনু তৈরি করুন:
+- মাল্টিপল লেভেল
+- ড্রপডাউন
+- হোভার ইফেক্ট
+
+```jsx
+function MegaMenu() {
+  return (
+    <nav className="mega-menu">
+      <NavLink to="/electronics">
+        ইলেকট্রনিক্স
+        <div className="submenu">
+          <Link to="/electronics/phones">মোবাইল</Link>
+          <Link to="/electronics/laptops">ল্যাপটপ</Link>
+        </div>
+      </NavLink>
+      
+      <NavLink to="/clothing">
+        পোশাক
+        <div className="submenu">
+          <Link to="/clothing/men">পুরুষ</Link>
+          <Link to="/clothing/women">নারী</Link>
+        </div>
+      </NavLink>
+    </nav>
+  );
+}
+```
+
+### ২. ট্যাব ন্যাভিগেশন
+একটি ট্যাব-বেসড ন্যাভিগেশন সিস্টেম:
+- অ্যাক্টিভ ট্যাব ট্র্যাকিং
+- ট্যাব কনটেন্ট
+- অ্যানিমেশন
+
+## বেস্ট প্র্যাকটিস
+
+১. **অ্যাক্সেসিবিলিটি**
+- ARIA লেবেল ব্যবহার করুন
+- কীবোর্ড ন্যাভিগেশন
+- স্ক্রিন রিডার সাপোর্ট
+
+২. **পারফরম্যান্স**
+- রাউট প্রি-ফেচিং
+- লেজি লোডিং
+- মেমোইজেশন
+
+৩. **ইউজার এক্সপেরিয়েন্স**
+- লোডিং স্টেট
+- এরর হ্যান্ডলিং
+- ফিডব্যাক
+
+## সতর্কতা
+
+১. **সিকিউরিটি**
+- অথেনটিকেশন চেক
+- অথরাইজেশন
+- ডেটা ভ্যালিডেশন
+
+২. **পারফরম্যান্স**
+- অতিরিক্ত রি-রেন্ডার এড়ান
+- অপ্রয়োজনীয় ন্যাভিগেশন এড়ান
+- স্টেট আপডেট অপ্টিমাইজ করুন
+
+## উপসংহার
+
+রিঅ্যাক্ট রাউটারের লিঙ্ক এবং ন্যাভিগেশন ফিচার ব্যবহার করে আপনি একটি ইউজার-ফ্রেন্ডলি এবং ইন্টুইটিভ ন্যাভিগেশন সিস্টেম তৈরি করতে পারেন। পরবর্তী পাঠে আমরা শিখব কীভাবে Route Guards এবং 404 পেজ সেটআপ করতে হয়।

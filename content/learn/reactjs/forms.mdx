@@ -1,0 +1,413 @@
+---
+title: ফর্ম ম্যানেজমেন্ট
+icon: ri:file-list-3-line
+description: রিঅ্যাক্টে ফর্ম হ্যান্ডলিং, ভ্যালিডেশন, এরর হ্যান্ডলিং এবং ফর্ম স্টেট ম্যানেজমেন্ট সম্পর্কে বিস্তারিত আলোচনা।
+keywords:
+  - Form Handling
+  - Form Validation
+  - Controlled Components
+  - Uncontrolled Components
+  - Form Libraries
+  - React Hook Form
+  - Formik
+---
+
+## ভূমিকা
+
+ফর্ম হ্যান্ডলিং ওয়েব অ্যাপ্লিকেশনের একটি গুরুত্বপূর্ণ অংশ। আসুন একটি সহজ উপমার মাধ্যমে এটি বুঝি।
+
+### রেস্টুরেন্ট অর্ডার ফর্মের উপমা
+কল্পনা করুন একটি রেস্টুরেন্টের অর্ডার ফর্ম:
+- **ফর্ম ফিল্ড** = মেনু আইটেম সিলেক্ট
+- **ভ্যালিডেশন** = অর্ডার সঠিক কি না চেক
+- **সাবমিশন** = অর্ডার কনফার্ম
+- **এরর হ্যান্ডলিং** = ভুল অর্ডার ঠিক করা
+
+## কন্ট্রোলড কম্পোনেন্টস
+
+### বেসিক ফর্ম
+```jsx
+function SimpleForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('ফর্ম ডেটা:', { name, email });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="name">নাম:</label>
+        <input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="email">ইমেইল:</label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <button type="submit">সাবমিট</button>
+    </form>
+  );
+}
+```
+
+### মাল্টিপল ফিল্ড হ্যান্ডলিং
+```jsx
+function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  return (
+    <form>
+      <input
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+      />
+      {/* অন্যান্য ইনপুট ফিল্ড */}
+    </form>
+  );
+}
+```
+
+## আনকন্ট্রোলড কম্পোনেন্টস
+
+### useRef দিয়ে ফর্ম
+```jsx
+function UncontrolledForm() {
+  const nameRef = useRef();
+  const emailRef = useRef();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      name: nameRef.current.value,
+      email: emailRef.current.value
+    };
+    console.log('ফর্ম ডেটা:', formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input ref={nameRef} defaultValue="" />
+      <input ref={emailRef} type="email" defaultValue="" />
+      <button type="submit">সাবমিট</button>
+    </form>
+  );
+}
+```
+
+## ফর্ম ভ্যালিডেশন
+
+### ১. বেসিক ভ্যালিডেশন
+```jsx
+function ValidatedForm() {
+  const [values, setValues] = useState({
+    username: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!values.username) {
+      newErrors.username = 'ইউজারনেম প্রয়োজন';
+    }
+    
+    if (!values.password) {
+      newErrors.password = 'পাসওয়ার্ড প্রয়োজন';
+    } else if (values.password.length < 6) {
+      newErrors.password = 'পাসওয়ার্ড ন্যূনতম ৬ অক্ষরের হতে হবে';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    
+    if (Object.keys(validationErrors).length === 0) {
+      // ফর্ম সাবমিট লজিক
+      console.log('ফর্ম ভ্যালিড');
+    } else {
+      setErrors(validationErrors);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input
+          name="username"
+          value={values.username}
+          onChange={/* ... */}
+        />
+        {errors.username && (
+          <span className="error">{errors.username}</span>
+        )}
+      </div>
+      {/* অন্যান্য ফিল্ড */}
+    </form>
+  );
+}
+```
+
+### ২. কাস্টম ভ্যালিডেশন হুক
+```jsx
+function useFormValidation(initialValues, validate) {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+
+    const validationErrors = validate(values);
+    setErrors(validationErrors);
+  };
+
+  return {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur
+  };
+}
+```
+
+## ফর্ম লাইব্রেরি
+
+### ১. React Hook Form
+```jsx
+import { useForm } from 'react-hook-form';
+
+function HookForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register('username', {
+          required: 'ইউজারনেম প্রয়োজন',
+          minLength: {
+            value: 3,
+            message: 'ন্যূনতম ৩ অক্ষর'
+          }
+        })}
+      />
+      {errors.username && (
+        <span>{errors.username.message}</span>
+      )}
+      {/* অন্যান্য ফিল্ড */}
+    </form>
+  );
+}
+```
+
+### ২. Formik
+```jsx
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+
+function FormikForm() {
+  return (
+    <Formik
+      initialValues={{ email: '', password: '' }}
+      validate={values => {
+        const errors = {};
+        if (!values.email) {
+          errors.email = 'ইমেইল প্রয়োজন';
+        }
+        return errors;
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          alert(JSON.stringify(values, null, 2));
+          setSubmitting(false);
+        }, 400);
+      }}
+    >
+      {({ isSubmitting }) => (
+        <Form>
+          <Field type="email" name="email" />
+          <ErrorMessage name="email" component="div" />
+          <button type="submit" disabled={isSubmitting}>
+            সাবমিট
+          </button>
+        </Form>
+      )}
+    </Formik>
+  );
+}
+```
+
+## উন্নত ফর্ম প্যাটার্ন
+
+### ১. ডাইনামিক ফর্ম ফিল্ড
+```jsx
+function DynamicForm() {
+  const [fields, setFields] = useState([{ value: '' }]);
+
+  const addField = () => {
+    setFields([...fields, { value: '' }]);
+  };
+
+  const removeField = (index) => {
+    const newFields = fields.filter((_, i) => i !== index);
+    setFields(newFields);
+  };
+
+  return (
+    <form>
+      {fields.map((field, index) => (
+        <div key={index}>
+          <input
+            value={field.value}
+            onChange={(e) => {
+              const newFields = [...fields];
+              newFields[index].value = e.target.value;
+              setFields(newFields);
+            }}
+          />
+          <button type="button" onClick={() => removeField(index)}>
+            মুছুন
+          </button>
+        </div>
+      ))}
+      <button type="button" onClick={addField}>
+        নতুন ফিল্ড যোগ করুন
+      </button>
+    </form>
+  );
+}
+```
+
+### ২. মাল্টি-স্টেপ ফর্ম
+```jsx
+function MultiStepForm() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    personal: {},
+    address: {},
+    payment: {}
+  });
+
+  const nextStep = () => setStep(s => s + 1);
+  const prevStep = () => setStep(s => s - 1);
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <PersonalInfo next={nextStep} />;
+      case 2:
+        return <AddressInfo next={nextStep} prev={prevStep} />;
+      case 3:
+        return <PaymentInfo submit={handleSubmit} prev={prevStep} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div className="progress-bar">
+        স্টেপ {step} / 3
+      </div>
+      {renderStep()}
+    </div>
+  );
+}
+```
+
+## অনুশীলনী
+
+### ১. রেজিস্ট্রেশন ফর্ম
+একটি সম্পূর্ণ রেজিস্ট্রেশন ফর্ম তৈরি করুন:
+- ইউজারনেম, ইমেইল, পাসওয়ার্ড ভ্যালিডেশন
+- পাসওয়ার্ড স্ট্রেংথ চেকার
+- রিয়াল-টাইম ভ্যালিডেশন
+- এরর মেসেজ
+
+### ২. জব অ্যাপ্লিকেশন ফর্ম
+একটি মাল্টি-স্টেপ জব অ্যাপ্লিকেশন ফর্ম:
+- ব্যক্তিগত তথ্য
+- শিক্ষাগত যোগ্যতা (ডাইনামিক ফিল্ড)
+- কাজের অভিজ্ঞতা
+- ফাইল আপলোড
+
+## বেস্ট প্র্যাকটিস
+
+১. **ফর্ম অর্গানাইজেশন**
+- ছোট ছোট কম্পোনেন্টে ভাগ করুন
+- লজিক আলাদা করুন
+- রিইউজেবল ভ্যালিডেশন
+
+২. **ইউজার এক্সপেরিয়েন্স**
+- রিয়াল-টাইম ভ্যালিডেশন
+- স্পষ্ট এরর মেসেজ
+- লোডিং স্টেট
+
+৩. **পারফরম্যান্স**
+- অপ্টিমাইজড রি-রেন্ডার
+- ডেবাউন্সিং/থ্রটলিং
+- মেমোইজেশন
+
+## সতর্কতা
+
+১. **সিকিউরিটি**
+- XSS প্রতিরোধ
+- CSRF প্রতিরোধ
+- ইনপুট স্যানিটাইজেশন
+
+২. **অ্যাক্সেসিবিলিটি**
+- লেবেল ব্যবহার
+- ARIA অ্যাট্রিবিউট
+- কীবোর্ড ন্যাভিগেশন
+
+## উপসংহার
+
+ফর্ম ম্যানেজমেন্ট রিঅ্যাক্টে একটি গুরুত্বপূর্ণ দক্ষতা। সঠিক প্যাটার্ন ও টুল ব্যবহার করে আপনি জটিল ফর্মও সহজে হ্যান্ডেল করতে পারবেন। এই মডিউলে আমরা হুকস ও স্টেট ম্যানেজমেন্ট সম্পর্কে বিস্তারিত শিখেছি। পরবর্তী মডিউলে আমরা রাউটিং ও ন্যাভিগেশন নিয়ে আলোচনা করব।
