@@ -1,0 +1,128 @@
+---
+title: "ডুপলিক্যাটি (Duplicati)"
+icon: "mdi:server"
+description: "Duplicati স্ব-হোস্টিং গাইড: ব্যাকআপ সেটআপ, Docker ইনস্টলেশন এবং কনফিগারেশন।"
+keywords: 
+ - Duplicati
+ - Self-hosting
+ - Backup
+ - Docker
+ - Encrypted backups
+---
+
+# ভূমিকা (Introduction)
+
+**Duplicati** একটি ওপেন-সোর্স ব্যাকআপ সফটওয়্যার যা ক্লাউড এবং লোকাল স্টোরেজে **ইনক্রিপ্টেড ব্যাকআপ** সংরক্ষণ করতে ব্যবহৃত হয়। এটি সহজে ব্যবহারযোগ্য, ক্রস-প্ল্যাটফর্ম এবং অনেক ধরনের স্টোরেজ সাপোর্ট করে।  
+
+**কেন নিজে হোস্ট করা উচিত:**  
+- ব্যাকআপ ডেটা সম্পূর্ণ আপনার নিয়ন্ত্রণে থাকে।  
+- ক্লাউড প্রাইভেসি ও সিকিউরিটি নিশ্চিত করা যায়।  
+- ব্যাকআপ ও রিস্টোর প্রক্রিয়া সম্পূর্ণ নিজের সার্ভারে পরিচালনা করা যায়।  
+
+**প্রধান ব্যবহার ক্ষেত্রসমূহ:**  
+- ফাইল, ডিরেক্টরি বা সার্ভার ব্যাকআপ।  
+- ডেটা রিমোট ক্লাউড (S3, Google Drive, OneDrive) বা লোকাল NAS এ সংরক্ষণ।  
+- স্বয়ংক্রিয় ক্রোন ভিত্তিক ব্যাকআপ।  
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+## ১. Docker ভিত্তিক ইনস্টলেশন (Dockerized Setup)
+
+### ধাপ ১: ডিরেক্টরি তৈরি করুন
+```bash
+mkdir -p ~/duplicati
+cd ~/duplicati
+````
+
+### ধাপ ২: `.env` ফাইল তৈরি করুন
+
+```bash
+touch .env
+```
+
+`.env` ফাইলে সংবেদনশীল ডেটা রাখুন:
+
+```bash
+SETTINGS_ENCRYPTION_KEY=SETTINGS_ENCRYPTION_KEY
+DUPLICATI__WEBSERVICE_PASSWORD=DUPLICATI__WEBSERVICE_PASSWORD
+DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES
+```
+
+### ধাপ ৩: `docker-compose.yml` তৈরি করুন
+
+```yaml title="docker-compose.yml"
+services:
+  duplicati:
+    image: duplicati/duplicati:latest
+    container_name: duplicati
+    # ports:
+    #   - "8200:8200" # Web UI
+    volumes:
+      - ./data:/data
+      - /root/auriga/docker:/backup:ro
+    environment:
+      SETTINGS_ENCRYPTION_KEY: "${SETTINGS_ENCRYPTION_KEY}"
+      DUPLICATI__WEBSERVICE_PASSWORD: "${DUPLICATI__WEBSERVICE_PASSWORD}"
+      DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: "${DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES}"
+```
+
+### ধাপ ৪: Docker কনটেইনার চালু করুন
+
+```bash
+docker-compose up -d
+```
+
+**নোট:**
+
+* আপনার ব্যাকআপ ডেটা `DUPLICATI_DATA` ডিরেক্টরিতে থাকবে।
+* ব্যাকআপ সোর্স ফোল্ডার `/path/to/backups` আপনার সার্ভারের যে কোনো ফোল্ডার হতে পারে।
+
+# ২. ব্রাউজার থেকে অ্যাক্সেস
+
+আপনার ব্রাউজারে যান:
+
+```
+http://YOUR_SERVER_IP:8200
+```
+
+এবং Duplicati ওয়েব ইন্টারফেস থেকে ব্যাকআপ টাস্ক তৈরি করুন।
+
+# ৩. অতিরিক্ত কনফিগারেশন (Optional Configurations)
+
+* **ক্রোন ব্যাকআপ সেটআপ:**
+  Duplicati ক্রোন জবের মাধ্যমে স্বয়ংক্রিয় ব্যাকআপ করতে পারে।
+  উদাহরণ:
+
+```bash
+0 2 * * * docker exec duplicati duplicati-cli backup "file:///backups" "/data/to/backup" --encryption-module=aes --passphrase="yourpassword"
+```
+
+* **SSL/HTTPS সেটআপ:**
+  Nginx বা Traefik রিভার্স প্রোক্সি ব্যবহার করে HTTPS সক্ষম করুন।
+
+# ৪. সমস্যা সমাধান (Troubleshooting)
+
+* কনটেইনার লগ চেক:
+
+```bash
+docker logs -f duplicati
+```
+
+* কনটেইনার রিস্টার্ট:
+
+```bash
+docker-compose restart
+```
+
+* ভলিউম ও পারমিশন চেক:
+
+```bash
+docker inspect duplicati -f '{{ .Mounts }}'
+```
+
+# ৫. টিপস ও পরামর্শ
+
+* `.env` ফাইল পাবলিক রেপোতে আপলোড করবেন না।
+* ব্যাকআপ রিস্টোর করার আগে সব ফাইল চেক করুন।
+* প্রোডাকশন পরিবেশে HTTPS ব্যবহার করা বাধ্যতামূলক।
+* বড় ব্যাকআপের জন্য ইনক্রিমেন্টাল ব্যাকআপ ব্যবহার করুন।
