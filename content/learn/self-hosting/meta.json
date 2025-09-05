@@ -23,14 +23,19 @@
     "---",
     "portainer",
     "nginx-proxy-manager",
+    "n8n",
     "nextcloud",
     "fail2ban",
     "outline",
     "vaultwarden",
+    "bitwarden",
     "jellyfin",
     "directus",
-    "bitwarden",
     "freshrss",
-    "netdata"
+    "netdata",
+    "uptime-kuma",
+    "pi-hole",
+    "adguard-home",
+    "umami"
   ]
 }
