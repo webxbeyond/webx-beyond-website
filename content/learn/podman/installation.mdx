@@ -1,0 +1,214 @@
+---
+title: "পডম্যান ইন্সটলেশন (Linux, macOS, Windows WSL)"
+icon: "logos:podman"
+description: "Linux, macOS এবং Windows WSL-এ Podman কীভাবে ইনস্টল করবেন — rootless সেটআপ, Podman Machine ও Podman Desktop সংক্ষেপে।"
+keywords:
+  - পডম্যান
+  - ইনস্টলেশন
+  - Podman
+  - macOS
+  - Windows
+  - WSL
+  - Linux
+---
+
+## ভূমিকা
+
+এই লেসনে আমরা ধাপে ধাপে দেখব কিভাবে পডম্যান ইনস্টল করতে হয় বিভিন্ন অপারেটিং সিস্টেমে — লিনাক্স, macOS এবং Windows (WSL)। লক্ষ্য হলো আপনাকে একটি কাজ করা সেটআপ দিয়ে দেওয়া যাতে পরবর্তী লেসনে সহজে কনটেইনার চালিয়ে প্র্যাকটিস করা যায়।
+
+লেসনের কাঠামো:
+
+- ইনস্টলেশন পূর্ব শর্তসমূহ ও সিদ্ধান্ত-চেকলিস্ট
+- লিনাক্সে ইনস্টলেশন (ডিস্ট্রো অনুসারে) + rootless সেটআপ টিপস
+- macOS-এ Podman Machine ও Podman Desktop
+- Windows WSL-এ Podman সেটআপ
+- ইনস্টলেশন পরবর্তী যাচাইকরণ (smoke tests)
+- প্র্যাকটিক্যাল এক্সারসাইজ
+
+নোট: এই লেসনটি কনসেপ্ট-ওরিয়েন্টেড; নির্দিষ্ট প্যাকেজ ভার্সন বা পরিবর্তিত রেপো লিংক হলে অফিসিয়াল ডকুমেন্টেশন চেক করুন।
+
+---
+
+## সিদ্ধান্ত-চেকলিস্ট (Installation decision checklist)
+
+ইনস্টল শুরু করার আগে নিজের পরিবেশ যাচাই করুন:
+
+- কিসে কাজ করবেন? (Local laptop বা production server)
+- আপনার OS কি লিনাক্স, macOS নাকি Windows WSL?
+- কি আপনি rootless রান করতে চান? (সিকিউরিটি কে প্রাধান্য দেবেন)
+- আপনার টিম কি Docker Desktop-ভিত্তিক workflow ব্যবহার করে? (compatibility বিবেচনা)
+
+এই প্রশ্নগুলো আপনাকে সঠিক ইনস্টলেশন পথ বেছে নিতে সাহায্য করবে।
+
+---
+
+## ১) লিনাক্সে ইনস্টলেশন (সংক্ষেপে)
+
+নোট: লিনাক্সে Podman সাধারণত ডিস্ট্রো-এর অফিশিয়াল রিপোজিটর থেকেই পাওয়া যায়। নিচে জনপ্রিয় ডিস্ট্রোগুলোর সাধারণ নির্দেশ দেয়া হলো।
+
+Ubuntu / Debian (উদাহরণ):
+
+```bash
+# প্যাকেজ লিস্ট আপডেট
+sudo apt update
+
+# Podman ইনস্টল
+sudo apt install -y podman
+
+# rootless চালানোর জন্য সাব-ইউজার আইডি/গ্রুপ নিশ্চিত করুন
+sudo apt install -y uidmap
+```
+
+Fedora / CentOS / RHEL:
+
+```bash
+# Fedora
+sudo dnf install -y podman
+
+# RHEL/CentOS (প্রক্রিয়া ভিন্ন হতে পারে — অফিসিয়াল গাইড দেখুন)
+sudo yum install -y podman
+```
+
+Arch Linux:
+
+```bash
+sudo pacman -Syu podman
+```
+
+Rootless সেটআপের টিপস:
+
+- নিশ্চিত করুন `/etc/subuid` এবং `/etc/subgid` ফাইলগুলোতে আপনার ব্যবহারকারীর জন্য যথাযথ এন্ট্রি আছে (উদাহরণ: `username:100000:65536`)।
+- যদি প্রয়োজন হয়, `loginctl enable-linger $USER` দিয়ে linger সক্রিয় করুন যাতে ব্যাকগ্রাউন্ড সার্ভিস রুটলেস প্রসেস চালুর পরে মাঝেমাঝে বন্ধ না হয়।
+
+কারণ: rootless mode চালাতে হলে ব্যবহারকারীর জন্য উপযুক্ত UID/GID ম্যাপিং থাকা জরুরি।
+
+---
+
+## ২) macOS-এ ইনস্টলেশন (Podman Machine ও Podman Desktop)
+
+macOS-এ Podman সরাসরি নেটিভভাবে কাজ করে না — Podman Machine বা Podman Desktop ব্যবহার করে একটি ভিএমে চালানো হয়।
+
+Homebrew দিয়ে দ্রুত শুরু করতে পারেন:
+
+```bash
+# Homebrew থাকলে
+brew install podman podman-machine
+
+# Podman Machine init
+podman machine init
+podman machine start
+
+# Podman Desktop (GUI) ইনস্টল করতে চাইলে
+brew install --cask podman
+```
+
+টিপস:
+
+- `podman machine` একটি লাইটওয়েট VM তৈরি করে যা macOS-এ কনটেইনার চালায়।
+- Podman Desktop GUI টুল হিসেবে সহজ; ডেভেলপমেন্টে দ্রুত পরিদর্শন ও কনটেইনার ম্যানেজ করা যায়।
+
+নির্দেশনা: Podman Desktop ইনস্টল করলে অনেক ব্যবহারকারী Docker Desktop-এর মত গ্রাফিক্যাল অভিজ্ঞতা পায়, কিন্তু আর্কিটেকচার ভিন্ন।
+
+---
+
+## ৩) Windows (WSL) এ ইনস্টলেশন
+
+Windows-এ সরাসরি Windows-native Podman চলে না; WSL2-এ Linux environment ব্যবহার করে সেটাপ করা হয়। সহজ পদ্ধতি:
+
+1. WSL2 ইনস্টল ও একটি লিনাক্স ডিস্ট্রো (Ubuntu) সেটআপ করুন।
+2. WSL শেল এ উপরের লিনাক্স ইনস্ট্রাকশন অনুসরণ করে Podman ইনস্টল করুন।
+
+নমুনা ধাপ (PowerShell থেকে):
+
+```powershell
+# WSL ইন্সটল (PowerShell as admin)
+wsl --install -d ubuntu
+
+# এরপর Ubuntu WSL খুলে
+sudo apt update && sudo apt install -y podman
+
+# WSL থেকে podman run করে কনটেইনার চালান
+podman run --rm hello-world
+```
+
+টিপ: Windows-এ GUI চান? Podman Desktop Windows কভারেজ দিতে পারে; নতুবা WSL টার্মিনাল থেকেই কাজ করুন।
+
+---
+
+## ইনস্টলেশন যাচাইকরণ (Smoke tests)
+
+ইনস্টল শেষে দ্রুত যাচাই করার জন্য কয়েকটি কমান্ড চালান:
+
+```bash
+podman --version
+podman info
+podman run --rm alpine echo "hello from podman"
+podman images
+podman ps -a
+```
+
+যদি `podman run` এ Permission বা network ইস্যু দেখায়, সেটিংস (rootless/config) চেক করুন।
+
+---
+
+## কঠিন বিষয়: Rootless ও ভিএম (Analogy সহ)
+
+উপমা: ভাবুন আপনার সিস্টেম একটি বাড়ি; রুট (root) হলো বাড়ির প্রধান চাবি — যদি সবাই সেই চাবি নিয়ে ঘুরে বেড়ায় তাহলে দুর্ঘটনা ঘটতে পারে। Rootless হলো প্রত্যেক সদস্যকে নিজের অপ্রচলিত চাবি দেয়া, যাতে তারা নিজেদের রুমে ঢুকতে পারে কিন্তু পুরো বাড়িতে যাতে ক্ষতি করতে না পারে।
+
+macOS বা Windows-এ Podman Machine যে ভিএম চালায়, সেটা এভাবে ভাবুন—একটি ছোট, আলাদা বাড়ি (VM) যেখানে কনটেইনার নিরাপদে চলে, মূল হোস্টের বড় চাবি ব্যবহার না করে।
+
+এই উপমা থেকে বোঝা যায়:
+
+- Rootless নিরাপত্তা বাড়ায়, কিন্তু কিছু কাজ (নেটওয়ার্কিং, হোস্ট-ফাইল পারমিশন) সেটআপে অতিরিক্ত কাজ লাগতে পারে।
+- VM-ভিত্তিক ব্যবহারে (macOS/Windows) ভেতরের পরিবেশ লিনাক্স সমান পরিবেশ দেয়, তবে আরেকটি abstraction লেয়ার থাকে।
+
+---
+
+## সাধারণ সমস্যাসমূহ ও সমাধান (Quick troubleshooting)
+
+- Permission / UID mapping সমস্যা: `/etc/subuid` ও `/etc/subgid` চেক করুন এবং প্রয়োজনমত এন্ট্রি যোগ করুন।
+- Podman Machine স্টার্ট না হলে: `podman machine stop` এবং `podman machine start` পুনরায় চালান; লোগস দেখুন।
+- WSL-এ নেটওয়ার্কিং ইস্যু: WSL2 network adapter রিস্টার্ট বা WSL রিবুট করলেই অনেক সময় সমাধান হয় (`wsl --shutdown`)।
+
+---
+
+## প্র্যাকটিক্যাল এক্সারসাইজ (স্টেপ-বাই-স্টেপ)
+
+উদ্দেশ্য: ইনস্টলেশন সফলভাবে সম্পন্ন করা এবং কিছুমাত্রা পরীক্ষা চালানো।
+
+ধাপ ১: আপনার অপারেটিং সিস্টেম বেছে নিন (Linux/macOS/Windows WSL) এবং সংশ্লিষ্ট ইনস্টলেশন ধাপ অনুসরণ করুন।
+
+ধাপ ২: ইনস্টলেশনের পরে নিচের কমান্ডগুলো চালান ও আউটপুট নোট করুন:
+
+```bash
+podman --version
+podman info --format json | jq '.host'
+podman run --rm alpine echo "hello from podman"
+```
+
+ধাপ ৩: Rootless চালিয়ে পরীক্ষা করতে (Linux):
+
+```bash
+# নিশ্চিত করুন subuid/subgid এন্ট্রি আছে
+cat /etc/subuid | grep $(whoami)
+cat /etc/subgid | grep $(whoami)
+
+# একটি কনটেইনার রান করে দেখুন
+podman run --rm --userns=keep-id alpine id
+```
+
+ধাপ ৪: রিফ্লেকশন লিখুন
+
+- ৫-৮ বাক্যে লিখুন: ইনস্টলেশনে আপনার কোন অংশটা সবচেয়ে চ্যালেঞ্জিং ছিল, এবং পরবর্তীতে কোন লেসনে আপনি হাতে-কলমে কাজ করতে চান।
+
+---
+
+## কোথায় আরো দেখবেন
+
+- Podman অফিসিয়াল ডকুমেন্টেশন (ইনস্টল গাইড)
+- Podman Desktop ডকুমেন্টেশন
+- আপনার ডিস্ট্রোর অফিসিয়াল প্যাকেজ নির্দেশিকা (উদাহরণ: Ubuntu, Fedora)
+
+---
+
+সংক্ষেপে: এই লেসনে আপনি Podman ইনস্টলেশনের প্রধান পথগুলো পেয়েছেন — পরের লেসনে আমরা Hello World কনটেইনার চালিয়ে CLI ও রান-ফ্লো হাতে-কলমে দেখব।
