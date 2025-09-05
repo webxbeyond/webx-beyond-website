@@ -1,0 +1,130 @@
+---
+title: "রেপলিক্যাট (Repliqate)"
+icon: "mdi:server"
+description: "Repliqate স্ব-হোস্টিং গাইড, সহজ ধাপে ধাপে ইনস্টলেশন ও কনফিগারেশন।"
+keywords: 
+ - Repliqate
+ - Self-hosting
+ - Docker
+ - Synced databases
+ - Data replication
+---
+
+# ভূমিকা (Introduction)
+
+**Repliqate** হল একটি ডিস্ট্রিবিউটেড ডেটাবেস রিপ্লিকেশন টুল যা সহজে ডেটা সিঙ্ক্রোনাইজ করতে ব্যবহার করা হয়। এটি মূলত ব্যাকআপ, ডেটা মিররিং এবং রিয়েল-টাইম ডেটা সিঙ্কের জন্য আদর্শ।  
+
+**কেন নিজে হোস্ট করা উচিত:**  
+- ডেটা সম্পূর্ণ নিজের কন্ট্রোলের অধীনে থাকে।  
+- কোনো থার্ড-পার্টি সার্ভিসের উপর নির্ভরশীলতা কমে।  
+- ডেটা সিকিউরিটি এবং প্রাইভেসি নিশ্চিত করা যায়।  
+
+**প্রধান ব্যবহার ক্ষেত্রসমূহ:**  
+- রিয়েল-টাইম ডেটা সিঙ্ক্রোনাইজেশন।  
+- মাল্টিপল সার্ভারের মধ্যে ডেটা মিরর করা।  
+- ব্যাকআপ এবং রিস্টোর প্রক্রিয়া সহজ করা।  
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+## ১. Docker ভিত্তিক ইনস্টলেশন (Dockerized Setup)
+
+Docker ব্যবহার করে ইনস্টলেশন অনেক সহজ এবং সহজেই আপডেট করা যায়।  
+
+### ধাপ ১: ডিরেক্টরি তৈরি করুন
+```bash
+mkdir -p ~/repliqate
+cd ~/repliqate
+```
+
+### ধাপ ২: `.env` ফাইল তৈরি করুন
+
+```bash
+touch .env
+```
+
+`.env` ফাইলে সংবেদনশীল ডেটা রাখুন:
+
+```bash
+REPLIQATE_PORT=8080
+REPLIQATE_ADMIN_USER=admin
+REPLIQATE_ADMIN_PASSWORD=securepassword
+DATA_DIR=/data/repliqate
+```
+
+### ধাপ ৩: `docker-compose.yml` তৈরি করুন
+
+```yaml title="docker-compose.yml"
+version: '3.8'
+
+services:
+  repliqate:
+    image: repliqate/repliqate:latest
+    container_name: repliqate
+    restart: unless-stopped
+    ports:
+      - "${REPLIQATE_PORT}:8080"
+    environment:
+      - ADMIN_USER=${REPLIQATE_ADMIN_USER}
+      - ADMIN_PASSWORD=${REPLIQATE_ADMIN_PASSWORD}
+    volumes:
+      - ${DATA_DIR}:/app/data
+```
+
+### ধাপ ৪: Docker কনটেইনার চালু করুন
+
+```bash
+docker-compose up -d
+```
+
+**নোট:**
+
+* আপনার ডেটা `DATA_DIR` এ থাকবে, তাই ব্যাকআপ নেওয়া সহজ।
+* পোর্ট পরিবর্তন করতে `.env` ফাইলের `REPLIQATE_PORT` পরিবর্তন করুন।
+
+# ২. ব্রাউজার থেকে অ্যাক্সেস
+
+আপনার ব্রাউজারে যান:
+
+```
+http://YOUR_SERVER_IP:8080
+```
+
+এবং `.env` ফাইলে দেওয়া অ্যাডমিন ইউজারনেম ও পাসওয়ার্ড দিয়ে লগইন করুন।
+
+# ৩. অতিরিক্ত কনফিগারেশন (Optional Configurations)
+
+* **একাধিক হোস্ট সংযুক্ত করা:**
+  `.env` ফাইলে অতিরিক্ত হোস্ট যোগ করুন:
+
+  ```bash
+  DOCKER_HOST_1_URL=tcp://host1:2375
+  DOCKER_HOST_2_URL=tcp://host2:2375
+  ```
+* **SSL/HTTPS সেটআপ:**
+  Nginx বা Caddy এর মাধ্যমে রিভার্স প্রোক্সি ব্যবহার করতে পারেন।
+
+# ৪. সমস্যা সমাধান (Troubleshooting)
+
+* কনটেইনার লগ চেক:
+
+```bash
+docker logs -f repliqate
+```
+
+* কনটেইনার রিস্টার্ট:
+
+```bash
+docker-compose restart
+```
+
+* ডেটা ভলিউম চেক:
+
+```bash
+docker inspect repliqate -f '{{ .Mounts }}'
+```
+
+# ৫. টিপস ও পরামর্শ
+
+* `.env` ফাইল Git বা পাবলিক রেপোতে আপলোড করবেন না।
+* ডেটা ব্যাকআপের জন্য নিয়মিত ভলিউম ব্যাকআপ রাখুন।
+* প্রোডাকশন পরিবেশে অবশ্যই SSL/HTTPS ব্যবহার করুন।
