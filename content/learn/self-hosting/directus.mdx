@@ -1,0 +1,131 @@
+---
+title: "ডাইরেক্টাস (Directus)"
+icon: "mdi:server"
+description: "Directus হোস্টিং গাইড: নিজের সার্ভারে সহজেই Directus ডিপ্লয় এবং কনফিগার করার সম্পূর্ণ নির্দেশিকা।"
+keywords: 
+ - Directus হোস্টিং
+ - Directus Docker
+ - নিজস্ব CMS
+ - API ম্যানেজমেন্ট
+ - ডাটাবেস ইন্টিগ্রেশন
+---
+
+## ভূমিকা (Introduction)
+
+**Directus** হলো একটি ওপেন সোর্স **ডাটাবেস হেডলেস CMS**, যা আপনাকে SQL ডাটাবেসের উপরে দ্রুত REST এবং GraphQL API তৈরি করার সুবিধা দেয়। এটি মূলত ডেভেলপার এবং কনটেন্ট ম্যানেজারদের জন্য তৈরি, যাতে তারা সহজে ডাটার CRUD অপারেশন করতে পারে।  
+
+### কেন নিজে হোস্ট করা উচিত
+- **ডেটা কন্ট্রোল:** আপনার ডাটাবেস সম্পূর্ণ আপনার নিয়ন্ত্রণে থাকবে।  
+- **প্রাইভেসি:** তৃতীয় পক্ষের সার্ভিসের উপর নির্ভর করতে হবে না।  
+- **কাস্টমাইজেশন:** Directus কাস্টম ফিল্ড, রোল এবং পারমিশন অনুযায়ী কনফিগার করা যায়।  
+
+### প্রধান ব্যবহার ক্ষেত্রসমূহ
+- কাস্টম API নির্মাণ।  
+- ওয়েব এবং মোবাইল অ্যাপের ব্যাকএন্ড।  
+- ডাটাবেস ড্রাইভেন কন্টেন্ট ম্যানেজমেন্ট।  
+- হেডলেস CMS হিসেবে ব্যবহার।  
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+## ১. প্রয়োজনীয়তা
+- Docker & Docker Compose ইনস্টল করা থাকা।  
+- MySQL বা PostgreSQL ডাটাবেস সার্ভার।  
+- সার্ভার বা লোকাল মেশিনে কমপক্ষে ১ GB RAM।  
+
+## ২. Dockerized Setup
+
+### ধাপ ১: প্রজেক্ট ফোল্ডার তৈরি
+
+```bash
+mkdir directus-project
+cd directus-project
+```
+
+### ধাপ ২: `.env` ফাইল তৈরি
+
+**নোট:** এখানে সেনসিটিভ ডেটা সংরক্ষণ করা হয়।
+
+```bash title=".env"
+DB_CLIENT=postgres
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=directus_db
+DB_USER=directus_user
+DB_PASSWORD=supersecretpassword
+```
+
+### ধাপ ৩: `docker-compose.yml` তৈরি
+
+```yaml title="docker-compose.yml"
+services:
+  directus:
+    image: directus/directus:latest
+    container_name: directus_app
+    ports:
+      - "8055:8055"
+    environment:
+      - DB_CLIENT=${DB_CLIENT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: directus_db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  db_data:
+```
+
+### ধাপ ৪: Docker Compose চালানো
+
+```bash
+docker-compose up -d
+```
+
+### ধাপ ৫: Directus অ্যাক্সেস করা
+
+* ব্রাউজারে যান: `http://localhost:8055`
+* অ্যাডমিন ইউজার তৈরি করুন এবং লগইন করুন।
+
+## ৩. সাধারণ কমান্ড এবং সমস্যার সমাধান
+
+* **লগ দেখার জন্য:**
+
+```bash
+docker-compose logs -f directus
+```
+
+* **কনটেইনার রিস্টার্ট করতে:**
+
+```bash
+docker-compose restart directus
+```
+
+* **ডাটাবেস ব্যাকআপ:**
+
+```bash
+docker exec directus_db pg_dump -U directus_user directus_db > backup.sql
+```
+
+# টিপস ও নোট
+
+* `.env` ফাইলকে কখনো পাবলিক রিপোজিটরিতে আপলোড করবেন না।
+* প্রোডাকশনে SSL সেটআপ করা অত্যন্ত গুরুত্বপূর্ণ।
+* Directus কাস্টমাইজেশন যেমন ফিল্ড টাইপ এবং রোল ডিফাইন করতে অ্যাডমিন UI ব্যবহার করুন।
+
+# উপসংহার
+
+Directus দিয়ে আপনি সহজেই নিজস্ব হেডলেস CMS সেটআপ করতে পারেন। Docker ব্যবহার করলে সেটআপ, আপডেট এবং ব্যাকআপ প্রক্রিয়া অনেক সহজ হয়ে যায়।

@@ -1,0 +1,137 @@
+---
+title: "বিটওয়ার্ডেন (Bitwarden)"
+icon: "mdi:server"
+description: "পাসওয়ার্ড ম্যানেজার Bitwarden (Vaultwarden) সেল্ফ-হোস্টিং গাইড।"
+keywords: 
+ - Bitwarden
+ - Vaultwarden
+ - পাসওয়ার্ড ম্যানেজার
+ - সেল্ফ হোস্টিং
+ - ডকার সেটআপ
+---
+
+## ভূমিকা
+**Bitwarden** একটি জনপ্রিয় ওপেন-সোর্স **পাসওয়ার্ড ম্যানেজার**। তবে অফিসিয়াল সার্ভার সেটআপ অনেক বেশি রিসোর্স-হেভি হওয়ায় কমিউনিটি-ডেভেলপড **Vaultwarden** (হালকা Bitwarden সার্ভার ইমপ্লিমেন্টেশন) সেল্ফ-হোস্টিংয়ের জন্য সবচেয়ে জনপ্রিয় সমাধান।  
+
+### কেন Bitwarden/Vaultwarden নিজে হোস্ট করবেন?
+- নিজের সব পাসওয়ার্ড ও সিক্রেটস **নিজের সার্ভারে নিরাপদে সংরক্ষণ** করতে পারবেন।
+- ফ্রি ও সীমাহীন ব্যবহার।
+- ব্রাউজার এক্সটেনশন, মোবাইল অ্যাপ ও ডেস্কটপ ক্লায়েন্ট সাপোর্ট।
+- **TOTP (2FA), অটো-ফিল, শেয়ারিং** ইত্যাদি সুবিধা।
+- কম রিসোর্সে চলে (Raspberry Pi তেও চালানো যায়)।
+
+---
+
+## ইনস্টলেশন পদ্ধতি
+
+আমরা এখানে **Docker Compose** ব্যবহার করব Vaultwarden চালানোর জন্য।
+
+### ধাপ ১: প্রয়োজনীয় সফটওয়্যার ইন্সটল
+```bash
+sudo apt update
+sudo apt install docker.io docker-compose -y
+```
+
+---
+
+### ধাপ ২: প্রোজেক্ট ফোল্ডার তৈরি
+
+```bash
+mkdir ~/vaultwarden
+cd ~/vaultwarden
+```
+
+---
+
+### ধাপ ৩: `.env` ফাইল তৈরি
+
+```bash title=".env"
+# Vaultwarden config
+ADMIN_TOKEN=changeme_admin_token
+DOMAIN=https://vault.example.com
+SIGNUPS_ALLOWED=false
+TZ=Asia/Dhaka
+```
+
+---
+
+### ধাপ ৪: `docker-compose.yml` ফাইল তৈরি
+
+```yaml title="docker-compose.yml"
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    environment:
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - SIGNUPS_ALLOWED=${SIGNUPS_ALLOWED}
+      - DOMAIN=${DOMAIN}
+      - TZ=${TZ}
+    ports:
+      - "8080:80"
+```
+
+---
+
+### ধাপ ৫: কন্টেইনার চালু করা
+
+```bash
+docker-compose up -d
+```
+
+সব ঠিক আছে কিনা যাচাই করতে:
+
+```bash
+docker ps
+```
+
+---
+
+## Vaultwarden এ প্রবেশ
+
+* ব্রাউজার খুলুন → `http://your-server-ip:8080`
+* অথবা Proxy Manager দিয়ে ডোমেইন ব্যবহার করলে `https://vault.example.com`
+
+**অ্যাডমিন প্যানেল:**
+
+* URL: `https://vault.example.com/admin`
+* অ্যাক্সেস টোকেন: `.env` এ দেওয়া `ADMIN_TOKEN`
+
+---
+
+## Nginx Proxy Manager এর সাথে ব্যবহার
+
+Vaultwarden কে নিরাপদ SSL সহ ইন্টারনেটে চালাতে চাইলে:
+
+1. NPM ড্যাশবোর্ড → **Proxy Hosts** → **Add Proxy Host**
+2. ডোমেইন লিখুন: `vault.example.com`
+3. Forward Hostname/IP দিন: `vaultwarden` (অথবা সার্ভারের লোকাল আইপি)
+4. Forward Port দিন: `8080`
+5. SSL ট্যাবে গিয়ে Let's Encrypt সার্টিফিকেট সিলেক্ট করুন
+
+---
+
+## টিপস ও সমস্যা সমাধান
+
+* **সাইনআপ চালু/বন্ধ করতে** `.env` ফাইলে `SIGNUPS_ALLOWED=true/false` দিন।
+* **ডেটা ব্যাকআপ নিতে**:
+
+  ```bash
+  tar -czvf vaultwarden-backup.tar.gz data
+  ```
+* **আপডেট করতে**:
+
+  ```bash
+  docker-compose pull
+  docker-compose up -d
+  ```
+* **অ্যাডমিন প্যানেল নিরাপদ রাখতে**: শক্তিশালী `ADMIN_TOKEN` ব্যবহার করুন।
+
+---
+
+## উপসংহার
+
+Vaultwarden আপনাকে একটি লাইটওয়েট, নিরাপদ ও ফ্রি Bitwarden সার্ভার প্রদান করে। এটি আপনার টিম বা ব্যক্তিগত ব্যবহারের জন্য পারফেক্ট সেল্ফ-হোস্টিং সমাধান।

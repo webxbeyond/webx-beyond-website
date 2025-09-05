@@ -1,0 +1,115 @@
+---
+title: "Portainer (পোর্টেইনার)"
+icon: "mdi:server"
+description: "ডকার ও কন্টেইনার ম্যানেজমেন্ট সহজ করতে Portainer সেল্ফ-হোস্টিং গাইড।"
+keywords: 
+ - Portainer
+ - ডকার ম্যানেজমেন্ট
+ - কন্টেইনার GUI
+ - সেল্ফ হোস্টিং
+ - Docker Dashboard
+---
+
+## ভূমিকা
+**Portainer** হলো একটি লাইটওয়েট ম্যানেজমেন্ট UI যা দিয়ে সহজে **Docker, Docker Swarm এবং Kubernetes** ম্যানেজ করা যায়।  
+
+### কেন Portainer ব্যবহার করবেন?
+- Docker কন্টেইনার সহজে **স্টার্ট/স্টপ/রিমুভ** করা।
+- ভিজ্যুয়াল ড্যাশবোর্ডে সব সার্ভিস ম্যানেজ করা।
+- ভলিউম, নেটওয়ার্ক ও ইমেজ কন্ট্রোল।
+- CLI এর পরিবর্তে সহজ **GUI অভিজ্ঞতা**।
+- টিম ম্যানেজমেন্ট ও RBAC (Role-Based Access Control)।
+
+---
+
+## ইনস্টলেশন পদ্ধতি
+
+### ধাপ ১: প্রয়োজনীয় সফটওয়্যার ইন্সটল
+```bash
+sudo apt update
+sudo apt install docker.io docker-compose -y
+```
+
+---
+
+### ধাপ ২: প্রোজেক্ট ফোল্ডার তৈরি
+
+```bash
+mkdir ~/portainer
+cd ~/portainer
+```
+
+---
+
+### ধাপ ৩: `docker-compose.yml` ফাইল তৈরি
+
+```yaml title="docker-compose.yml"
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/data
+```
+
+---
+
+### ধাপ ৪: কন্টেইনার চালু করা
+
+```bash
+docker-compose up -d
+```
+
+সবকিছু ঠিক আছে কিনা দেখতে:
+
+```bash
+docker ps
+```
+
+---
+
+## Portainer এ প্রবেশ
+
+* ব্রাউজার খুলুন → `http://your-server-ip:9000`
+* প্রথমবার এডমিন ইউজার তৈরি করতে হবে।
+* ডকার এনভায়রনমেন্ট সিলেক্ট করুন এবং Portainer ড্যাশবোর্ডে প্রবেশ করুন।
+
+---
+
+## Nginx Proxy Manager এর সাথে ব্যবহার
+
+Portainer কে সহজে **SSL ও কাস্টম ডোমেইন** দিয়ে ব্যবহার করতে চাইলে:
+
+1. NPM ড্যাশবোর্ডে যান → **Proxy Hosts** → **Add Proxy Host**।
+2. ডোমেইন লিখুন (যেমন: `docker.example.com`)।
+3. Forward Hostname/IP দিন: `portainer` অথবা সার্ভারের লোকাল আইপি।
+4. Forward Port দিন: `9000` অথবা `9443` (HTTPS)।
+5. SSL ট্যাবে গিয়ে **Request a new SSL Certificate** নির্বাচন করুন।
+
+---
+
+## টিপস ও সমস্যা সমাধান
+
+* **ডেটা ব্যাকআপ**:
+
+  ```bash
+  tar -czvf portainer-backup.tar.gz data
+  ```
+* **আপডেট করতে**:
+
+  ```bash
+  docker-compose pull
+  docker-compose up -d
+  ```
+* **Docker API অ্যাক্সেস সমস্যা** হলে `/var/run/docker.sock` ভলিউম সঠিকভাবে মাউন্ট করা হয়েছে কিনা চেক করুন।
+
+---
+
+## উপসংহার
+
+Portainer ব্যবহার করলে Docker ম্যানেজমেন্ট অনেক সহজ হয়ে যায়। CLI এর জটিল কমান্ড মনে না রেখেও ভিজ্যুয়ালি সব কন্টেইনার, নেটওয়ার্ক, ইমেজ ও ভলিউম নিয়ন্ত্রণ করা যায়।

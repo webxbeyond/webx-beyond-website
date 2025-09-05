@@ -20,10 +20,17 @@
     "maintenance-checklist",
     "---সেলফ হোস্টিঅ্যাবল অ্যাপস---",
     "index-self-hosted-apps",
-    "...",
+    "---",
+    "portainer",
     "nginx-proxy-manager",
     "nextcloud",
     "fail2ban",
-    "outline"
+    "outline",
+    "vaultwarden",
+    "jellyfin",
+    "directus",
+    "bitwarden",
+    "freshrss",
+    "netdata"
   ]
 }

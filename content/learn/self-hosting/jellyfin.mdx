@@ -1,0 +1,129 @@
+---
+title: "জেলিফিন (Jellyfin)"
+icon: "mdi:server"
+description: "Jellyfin স্ব-হোস্টিং গাইড: সহজভাবে আপনার মিডিয়া সার্ভার নিজে হোস্ট করুন।"
+keywords: 
+ - Jellyfin
+ - মিডিয়া সার্ভার
+ - স্ব-হোস্টিং
+ - Docker
+---
+
+# ভূমিকা (Introduction)
+
+**Jellyfin** হলো একটি সম্পূর্ণ ফ্রি ও ওপেন-সোর্স মিডিয়া সার্ভার, যা আপনাকে আপনার ভিডিও, মিউজিক, এবং ছবি নিজের সার্ভারে হোস্ট করতে দেয়। এটি **Plex** বা **Emby** এর মতো কাজ করে, কিন্তু কোনো সাবস্ক্রিপশন বা প্রাইভেট ক্লাউডের প্রয়োজন নেই।  
+
+**কেন নিজে হোস্ট করবেন:**
+- আপনার ডেটা সম্পূর্ণ নিজের নিয়ন্ত্রণে থাকবে।
+- কোনো সাবস্ক্রিপশন ফি নেই।
+- যেকোনো ডিভাইস থেকে স্ট্রিম করা যাবে (Smart TV, Mobile, Web)।
+- প্লাগইন ও থিম কাস্টমাইজ করা সম্ভব।
+
+**প্রধান ব্যবহার ক্ষেত্রসমূহ:**
+- ঘরোয়া মিডিয়া স্ট্রিমিং
+- মিউজিক লাইব্রেরি
+- ভিডিও লাইব্রেরি (Movie/TV)
+- পডকাস্ট ও লাইভ টিভি স্ট্রিমিং
+
+# প্রয়োজনীয়তা (Requirements)
+
+**Hardware:**
+- CPU: x86_64 বা ARM64 (Intel/AMD/ARM)
+- RAM: কমপক্ষে 2GB
+- Storage: আপনার মিডিয়া ফাইলের সাইজ অনুযায়ী
+
+**Software:**
+- OS: Linux (Ubuntu/Debian), Windows, macOS বা Docker সমর্থিত প্ল্যাটফর্ম
+- Docker & Docker Compose (Docker পদ্ধতিতে ইনস্টলেশন সহজ)
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+## Dockerized Setup
+
+**ধাপ ১:** Docker এবং Docker Compose ইনস্টল করুন  
+
+```bash
+# Ubuntu/Debian এর জন্য
+sudo apt update
+sudo apt install docker.io docker-compose -y
+sudo systemctl enable --now docker
+````
+
+**ধাপ ২:** Jellyfin এর জন্য একটি ফোল্ডার তৈরি করুন
+
+```bash
+mkdir -p ~/jellyfin/config
+mkdir -p ~/jellyfin/cache
+mkdir -p ~/jellyfin/media
+```
+
+**ধাপ ৩:** `docker-compose.yml` ফাইল তৈরি করুন
+
+```yaml title="docker-compose.yml"
+version: "3.8"
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    network_mode: "bridge"
+    ports:
+      - "8096:8096"     # Web UI
+      - "8920:8920"     # HTTPS (optional)
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ./media:/media
+    restart: unless-stopped
+```
+
+**ধাপ ৪:** Docker Compose ব্যবহার করে সার্ভার চালু করুন
+
+```bash
+cd ~/jellyfin
+docker-compose up -d
+```
+
+# কনফিগারেশন (Configuration)
+
+**সার্ভার কনফিগারেশন:**
+
+* Web UI: `http://<আপনার_সার্ভারের_IP>:8096`
+* প্রথমবার লগইন করার পর অ্যাডমিন ইউজার তৈরি করুন
+* লাইব্রেরি ফোল্ডার পাথ যুক্ত করুন (উদাঃ `/media/Movies`, `/media/TV`)
+
+**ক্লায়েন্ট কনফিগারেশন:**
+
+* Smart TV, Mobile বা Web ব্রাউজার থেকে `http://<IP>:8096` এ লগইন করুন
+* স্ট্রিমিং কোয়ালিটি ও সাবটাইটেল সেটিং কাস্টমাইজ করুন
+
+# পরীক্ষা ও যাচাই (Testing & Verification)
+
+**ধাপ ১:** সার্ভিস স্ট্যাটাস চেক করুন
+
+```bash
+docker ps | grep jellyfin
+```
+
+**ধাপ ২:** লগ চেক করুন
+
+```bash
+docker logs -f jellyfin
+```
+
+**ধাপ ৩:** ব্রাউজার থেকে সংযোগ যাচাই
+
+* URL: `http://<আপনার_সার্ভারের_IP>:8096`
+* লগইন ও মিডিয়া ব্রাউজ করুন
+
+**ধাপ ৪:** সমস্যার সমাধান (Optional Tips)
+
+* পোর্ট সমস্যা: নিশ্চিত করুন পোর্ট 8096/8920 ফায়ারওয়ালে খোলা আছে
+* পারফরম্যান্স: ট্রান্সকোডিং এর জন্য CPU ভালো হলে HD ভিডিও সহজে চলবে
+* ডেটা পারমিশন: `chmod -R 775 ~/jellyfin` করে চেক করুন
+
+# টিপস ও নোট
+
+* Backup রাখার জন্য `config` ফোল্ডার আলাদা ব্যাকআপ করুন
+* HTTPS চালু করতে হলে reverse proxy (NGINX বা Caddy) ব্যবহার করতে পারেন
+* Docker ব্যবহার করলে আপডেট সহজ: `docker-compose pull && docker-compose up -d`

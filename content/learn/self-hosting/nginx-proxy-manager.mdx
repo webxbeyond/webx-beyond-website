@@ -1,237 +1,137 @@
 ---
-title: Nginx Proxy Manager
-icon: ph:cloud
+title: "এনজিনএক্স প্রক্সি ম্যানেজার (Nginx Proxy Manager)"
+icon: "mdi:server"
+description: "সহজভাবে রিভার্স প্রক্সি ও SSL ম্যানেজ করার জন্য Nginx Proxy Manager সেল্ফ-হোস্টিং গাইড।"
+keywords: 
+ - Nginx Proxy Manager
+ - রিভার্স প্রক্সি
+ - Docker Proxy Manager
+ - SSL Automation
+ - সেল্ফ হোস্টিং
 ---
 
 ## ভূমিকা
+**Nginx Proxy Manager (NPM)** একটি জনপ্রিয় টুল যা দিয়ে সহজেই ওয়েবসাইট বা ওয়েবঅ্যাপের জন্য **Reverse Proxy** কনফিগার করা যায়। এটি ব্যবহার করে আপনি খুব সহজেই:
 
-### Nginx Proxy Manager কী এবং কেন এটি স্বয়ংহোস্ট করবেন?
-Nginx Proxy Manager হলো একটি ওপেন-সোর্স ওয়েব ইন্টারফেস যা Nginx সার্ভারের জন্য ব্যবহার করা হয়। এটি আপনার সার্ভারে চলমান অ্যাপ্লিকেশনগুলোকে ইন্টারনেটের মাধ্যমে সহজে অ্যাক্সেস করতে সাহায্য করে। এর মাধ্যমে আপনি প্রক্সি হোস্ট তৈরি করতে পারেন, SSL সার্টিফিকেট (যেমন Let’s Encrypt) যোগ করতে পারেন এবং ট্রাফিক রাউটিং ম্যানেজ করতে পারেন—সবকিছু একটি সহজ গ্রাফিক্যাল ইউজার ইন্টারফেস (GUI) দিয়ে। 
+- SSL সার্টিফিকেট (Let's Encrypt) সেটআপ করতে পারবেন।
+- ডোমেইন/সাবডোমেইন রাউট করতে পারবেন।
+- ওয়েব সার্ভিসগুলোকে নিরাপদভাবে এক্সপোজ করতে পারবেন।
+- একটি সুন্দর ওয়েব ইন্টারফেস থেকে সবকিছু ম্যানেজ করতে পারবেন।
 
-স্বয়ংহোস্ট করার কারণ: এটি আপনার নিজের সার্ভারে চালানোর জন্য ডিজাইন করা, যা আপনাকে সম্পূর্ণ নিয়ন্ত্রণ দেয়। ক্লাউড সার্ভিসের উপর নির্ভর না করে, আপনি প্রাইভেসি বজায় রাখতে পারেন, খরচ কমাতে পারেন এবং কাস্টমাইজ করতে পারেন। এটি বিশেষ করে হোম ল্যাব, ছোট ব্যবসা বা ডেভেলপারদের জন্য উপযোগী যারা একাধিক সার্ভিস (যেমন Nextcloud, Home Assistant) একসাথে ম্যানেজ করতে চান।
+### কেন নিজে হোস্ট করবেন?
+- তৃতীয় পক্ষের উপর নির্ভরতা কমানো।
+- ফ্রি SSL সার্টিফিকেট (Let's Encrypt) স্বয়ংক্রিয়ভাবে নবায়ন।
+- এক জায়গা থেকে সব ওয়েব সার্ভিস ম্যানেজ করার সুবিধা।
+- সেল্ফ-হোস্টিং প্রোজেক্টগুলো (যেমন Vaultwarden, Nextcloud ইত্যাদি) সহজে ইন্টারনেটে এক্সপোজ করা।
 
-### মূল ব্যবহারের ক্ষেত্রসমূহ
-- **রিভার্স প্রক্সি**: একাধিক ওয়েব অ্যাপকে একই ডোমেইনে আলাদা সাবডোমেইনে রাউট করা (যেমন app1.example.com এবং app2.example.com)।
-- **SSL/TLS সার্টিফিকেট ম্যানেজমেন্ট**: স্বয়ংক্রিয়ভাবে Let’s Encrypt সার্টিফিকেট ইস্যু এবং রিনিউ করা।
-- **লোড ব্যালেন্সিং এবং অ্যাক্সেস কন্ট্রোল**: ট্রাফিক বিতরণ এবং বেসিক অথেনটিকেশন যোগ করা।
-- **হোম সার্ভার অ্যাক্সেস**: রিমোটলি আপনার লোকাল অ্যাপগুলো অ্যাক্সেস করা, যেমন স্মার্ট হোম ডিভাইস বা ফাইল শেয়ারিং।
-
-## প্রয়োজনীয়তা
-
-### হার্ডওয়্যার এবং সফটওয়্যার প্রয়োজনীয়তা
-- **হার্ডওয়্যার**:
-  - CPU: কমপক্ষে 1 GHz ডুয়াল-কোর প্রসেসর (Raspberry Pi 4 বা ভালো)।
-  - RAM: 512 MB (প্রোডাকশনের জন্য 1 GB+ সাজেস্টেড)।
-  - স্টোরেজ: 5 GB ফ্রি স্পেস (SSD প্রেফারেবল)।
-  - নেটওয়ার্ক: স্থিতিশীল ইন্টারনেট কানেকশন (আপলোড স্পিড 5 Mbps+)।
-- **সফটওয়্যার**:
-  - অপারেটিং সিস্টেম: Ubuntu 20.04 LTS বা Debian 11+ (Linux রেকমেন্ডেড; Windows/Mac সমর্থিত কিন্তু কম্প্লেক্স)।
-  - Docker: সংস্করণ 20.10+ (Docker Compose 2.0+ সাথে)।
-  - অন্যান্য: Git (ক্লোন করার জন্য), Portainer বা অন্য টুল (অপশনাল)।
-
-**টিপ**: যদি আপনার সার্ভার ভার্চুয়াল মেশিনে চালান, তাহলে KVM বা VirtualBox ব্যবহার করুন।
-
-### নেটওয়ার্ক বিবেচনা (পোর্ট, স্ট্যাটিক IP, DDNS)
-- **পোর্ট**: 
-  - HTTP: 80 (প্রক্সি এবং সার্টিফিকেট চ্যালেঞ্জের জন্য)।
-  - HTTPS: 443 (সিকিউর কানেকশনের জন্য)।
-  - অ্যাডমিন ইন্টারফেস: 81 (ডিফল্ট; পরিবর্তনযোগ্য)।
-- **স্ট্যাটিক IP**: আপনার সার্ভারকে লোকাল নেটওয়ার্কে স্ট্যাটিক IP দিন (যেমন 192.168.1.100) রাউটারের DHCP সেটিংস থেকে।
-- **DDNS**: যদি আপনার পাবলিক IP ডায়নামিক হয়, তাহলে DuckDNS বা No-IP এর মতো DDNS সার্ভিস ব্যবহার করুন। এটি আপনার ডোমেইন (যেমন myhome.duckdns.org) কে আপনার বর্তমান IP-এর সাথে লিঙ্ক রাখে।
-  
-**নোট**: রাউটারে পোর্ট ফরওয়ার্ডিং সেট করুন (80 এবং 443 কে আপনার সার্ভারের IP-এ ফরওয়ার্ড করুন)। ফায়ারওয়াল (ufw) চেক করুন যাতে এই পোর্টগুলো ওপেন থাকে।
+---
 
 ## ইনস্টলেশন পদ্ধতি
 
-### Dockerized সেটআপ সাথে `docker-compose.yml` উদাহরণ
-Docker সবচেয়ে সহজ পদ্ধতি। প্রথমে Docker ইনস্টল করুন:
+Nginx Proxy Manager সাধারণত Docker ব্যবহার করে সবচেয়ে সহজে সেটআপ করা যায়।
 
-1. Ubuntu/Debian-এ চালান:
-   ```
-   sudo apt update
-   sudo apt install docker.io docker-compose
-   sudo systemctl start docker
-   sudo usermod -aG docker $USER
-   ```
-   (লগআউট করে লগইন করুন।)
+### ধাপ ১: প্রয়োজনীয় সফটওয়্যার ইন্সটল
+- **Docker** এবং **Docker Compose** ইনস্টল করতে হবে।
 
-2. একটি ডিরেক্টরি তৈরি করুন এবং `docker-compose.yml` ফাইল তৈরি করুন:
-   ```
-   mkdir nginx-proxy-manager
-   cd nginx-proxy-manager
-   ```
+Ubuntu/Debian এ:
+```bash
+sudo apt update
+sudo apt install docker.io docker-compose -y
+```
 
-3. `docker-compose.yml` ফাইল এডিট করুন (nano বা vim ব্যবহার করুন):
-   ```yaml title="docker-compose.yml"
-   services:
-     app:
-       image: 'jc21/nginx-proxy-manager:latest'
-       restart: unless-stopped
-       ports:
-         - '80:80'  # HTTP
-         - '443:443'  # HTTPS
-         - '81:81'  # অ্যাডমিন ইন্টারফেস
-       volumes:
-         - ./data:/data
-         - ./letsencrypt:/etc/letsencrypt
-       environment:
-         DB_MYSQL_HOST: "db"
-         DB_MYSQL_PORT: 3306
-         DB_MYSQL_USER: "npm"
-         DB_MYSQL_PASSWORD: "your_secure_password"
-         DB_MYSQL_NAME: "npm"
-   
-     db:
-       image: 'mariadb:latest'
-       restart: unless-stopped
-       environment:
-         MYSQL_ROOT_PASSWORD: "your_root_password"
-         MYSQL_DATABASE: "npm"
-         MYSQL_USER: "npm"
-         MYSQL_PASSWORD: "your_secure_password"
-       volumes:
-         - ./mysql:/var/lib/mysql
-   ```
+---
 
-4. চালু করুন:
-   ```
-   docker-compose up -d
-   ```
+### ধাপ ২: প্রোজেক্ট ফোল্ডার তৈরি
 
-**টিপ**: পাসওয়ার্ডগুলো শক্তিশালী করুন এবং ভলিউমগুলো ব্যাকআপ নিন। অ্যাক্সেস করার জন্য http://your-server-ip:81 যান (ডিফল্ট লগইন: admin@example.com / changeme)।
+```bash
+mkdir ~/nginx-proxy-manager
+cd ~/nginx-proxy-manager
+```
 
-### বেয়ার মেটাল (Linux)
-Docker ছাড়া ইনস্টল করতে:
+---
 
-1. প্রয়োজনীয় প্যাকেজ ইনস্টল করুন:
-   ```
-   sudo apt update
-   sudo apt install nginx mariadb-server php-fpm
-   ```
+### ধাপ ৩: `.env` ফাইল তৈরি করুন
 
-2. Nginx Proxy Manager রিপোজিটরি ক্লোন করুন (অফিসিয়াল GitHub থেকে):
-   ```
-   git clone https://github.com/NginxProxyManager/nginx-proxy-manager.git
-   cd nginx-proxy-manager
-   ```
+```bash title=".env"
+DB_SQLITE_FILE=/data/database.sqlite
+TZ=Asia/Dhaka
+```
 
-3. ডাটাবেস সেটআপ:
-   ```
-   sudo mysql_secure_installation
-   sudo mysql -u root -p
-   CREATE DATABASE npm;
-   CREATE USER 'npm'@'localhost' IDENTIFIED BY 'your_secure_password';
-   GRANT ALL PRIVILEGES ON npm.* TO 'npm'@'localhost';
-   FLUSH PRIVILEGES;
-   EXIT;
-   ```
+> **নোট:** চাইলে MariaDB বা MySQL ব্যবহার করতে পারেন, তবে সহজতার জন্য SQLite যথেষ্ট।
 
-4. অ্যাপ ইনস্টল এবং কনফিগার করুন (স্ক্রিপ্ট অনুসরণ করুন; বিস্তারিত GitHub README দেখুন)।
+---
 
-**নোট**: এই পদ্ধতি আরও কম্প্লেক্স; Docker প্রেফার করুন নতুনদের জন্য।
+### ধাপ ৪: `docker-compose.yml` ফাইল তৈরি
 
-### অপশনাল: সহজ সেটআপের টুলস
-- **Portainer**: Docker ম্যানেজ করার জন্য GUI (docker run -d -p 9000:9000 portainer/portainer-ce)।
-- **Watchtower**: অটো-আপডেটের জন্য (docker-compose.yml-এ যোগ করুন)।
-- **YunoHost বা CasaOS**: সম্পূর্ণ হোম সার্ভার ডিস্ট্রো যাতে NPM সহজে ইনস্টল হয়।
+```yaml title="docker-compose.yml"
+services:
+  app:
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    environment:
+      - DB_SQLITE_FILE=${DB_SQLITE_FILE}
+      - TZ=${TZ}
+```
 
-## কনফিগারেশন
+---
 
-### সার্ভার কনফিগারেশন (কী জেনারেশন, মেইন কনফিগ ফাইল)
-1. অ্যাডমিন প্যানেলে লগইন করুন (http://your-ip:81) এবং পাসওয়ার্ড চেঞ্জ করুন।
-2. **হোস্টস** সেকশনে নতুন প্রক্সি হোস্ট যোগ করুন:
-   - ডোমেইন: yourdomain.com
-   - ফরওয়ার্ড হোস্ট: লোকাল IP (যেমন 192.168.1.50)
-   - ফরওয়ার্ড পোর্ট: 80 বা 3000 (আপনার অ্যাপের উপর নির্ভর করে)
-3. SSL যোগ করুন: **SSL Certificates** > Request a New Certificate > Let’s Encrypt ব্যবহার করুন (ইমেইল এবং টার্মস অ্যাকসেপ্ট করুন)।
-4. মেইন কনফিগ ফাইল: Docker-এ `/data/nginx/custom/`-এ কাস্টম .conf ফাইল যোগ করুন, যেমন:
-   ```
-   server {
-       listen 443 ssl http2;
-       server_name example.com;
-       ssl_certificate /path/to/fullchain.pem;
-       ssl_certificate_key /path/to/privkey.pem;
-       location / {
-           proxy_pass http://backend:8080;
-           proxy_set_header Host $host;
-       }
-   }
-   ```
-   তারপর কনটেইনার রিস্টার্ট করুন।
+### ধাপ ৫: কন্টেইনার চালু করা
 
-**টিপ**: কী জেনারেশনের জন্য OpenSSL ব্যবহার করুন: `openssl genrsa -out privkey.pem 2048`।
+```bash
+docker-compose up -d
+```
 
-### ক্লায়েন্ট কনফিগারেশন (পিয়ার্স, QR কোডস)
-NPM-এ ক্লায়েন্ট বলতে প্রক্সি হোস্টের ক্লায়েন্ট-সাইড কনফিগ বোঝায়:
-1. প্রক্সি হোস্ট তৈরি করার পর, QR কোড জেনারেট করুন (অ্যাডভান্সড অপশনে) যাতে মোবাইল অ্যাপ (যেমন WireGuard যদি VPN-এর জন্য) স্ক্যান করতে পারে।
-2. পিয়ার্স: অ্যাক্সেস লিস্টে নির্দিষ্ট IP বা ইউজার যোগ করুন (Access List > Add Proxy Host)।
-3. ক্লায়েন্টে (ব্রাউজার বা অ্যাপে) শুধু ডোমেইন URL ব্যবহার করুন; NPM বাকিটা হ্যান্ডেল করবে।
+কয়েক মিনিট সময় লাগতে পারে। সবকিছু সঠিকভাবে চলছে কিনা দেখতে:
 
-**উদাহরণ**: Nextcloud-এর জন্য ফরওয়ার্ড: `proxy_pass http://192.168.1.100:8080;` এবং `proxy_set_header X-Real-IP $remote_addr;` যোগ করুন।
+```bash
+docker ps
+```
 
-### রাউটিং এবং NAT
-- **রাউটিং**: NPM-এ সাবডোমেইন রাউট করুন (যেমন blog.example.com → পোর্ট 3000)।
-- **NAT**: রাউটারে UPnP এনাবল করুন বা ম্যানুয়ালি পোর্ট ফরওয়ার্ড করুন। Docker-এ NAT অটোম্যাটিক, কিন্তু বেয়ার মেটালে iptables ব্যবহার করুন:
-  ```
-  sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 80
-  sudo iptables-save > /etc/iptables.rules
+---
+
+## লগইন তথ্য
+
+প্রথমবার ওয়েব ইন্টারফেস অ্যাক্সেস করতে:
+
+* URL: `http://your-server-ip:81`
+* **ডিফল্ট ইউজারনেম:** `admin@example.com`
+* **ডিফল্ট পাসওয়ার্ড:** `changeme`
+
+প্রথমবার লগইন করার পর পাসওয়ার্ড পরিবর্তন করা জরুরি।
+
+---
+
+## ব্যবহার
+
+### নতুন Proxy Host যোগ করা
+
+1. ড্যাশবোর্ডে যান → **Hosts** → **Proxy Hosts** → **Add Proxy Host**
+2. **Domain Names** এ আপনার ডোমেইন/সাবডোমেইন লিখুন (যেমন: `app.example.com`)
+3. **Forward Hostname/IP** এ সার্ভিসের লোকাল আইপি দিন (যেমন: `172.20.0.5`)
+4. **Forward Port** দিন (যেমন: `8080`)
+5. **SSL** ট্যাবে গিয়ে **Request a new SSL Certificate** নির্বাচন করুন।
+
+---
+
+## টিপস ও সমস্যা সমাধান
+
+* **পোর্ট কনফ্লিক্ট হলে:** নিশ্চিত হোন সার্ভারে আরেকটি সার্ভিস (যেমন Apache/Nginx) 80/443 পোর্ট ব্যবহার করছে না।
+* **SSL সার্টিফিকেট ব্যর্থ হলে:** ডোমেইনটি আপনার সার্ভারের পাবলিক আইপিতে পয়েন্ট করা আছে কিনা চেক করুন।
+* **ডেটা ব্যাকআপ:**
+
+  ```bash
+  tar -czvf npm-backup.tar.gz data letsencrypt
   ```
 
-**নোট**: IPv6 সমর্থনের জন্য কনফিগে `listen [::]:443 ssl;` যোগ করুন।
+---
 
-## নিরাপত্তা সেরা অনুশীলন
+## উপসংহার
 
-### SSH হার্ডেনিং, ফায়ারওয়াল সেটআপ, Fail2ban, DNS লিক প্রটেকশন
-- **SSH হার্ডেনিং**:
-  1. `/etc/ssh/sshd_config` এডিট: `PermitRootLogin no`, `PasswordAuthentication no` (কী-ভিত্তিক লগইন), `Port 2222` (ডিফল্ট 22 থেকে চেঞ্জ)।
-  2. রিস্টার্ট: `sudo systemctl restart ssh`।
-- **ফায়ারওয়াল সেটআপ** (UFW):
-  ```
-  sudo ufw allow 22/tcp  # SSH
-  sudo ufw allow 80/tcp  # HTTP
-  sudo ufw allow 443/tcp  # HTTPS
-  sudo ufw allow 81/tcp  # অ্যাডমিন (লোকাল নেটওয়ার্ক থেকে শুধু)
-  sudo ufw enable
-  ```
-- **Fail2ban**: ইনস্টল এবং কনফিগার:
-  ```
-  sudo apt install fail2ban
-  sudo nano /etc/fail2ban/jail.local
-  ```
-  যোগ করুন:
-  ```
-  [sshd]
-  enabled = true
-  port = 2222
-  maxretry = 3
-  ```
-  রিস্টার্ট: `sudo systemctl restart fail2ban`।
-- **DNS লিক প্রটেকশন**: Cloudflare বা NextDNS ব্যবহার করুন। NPM-এ DNS চ্যালেঞ্জের জন্য Let’s Encrypt কনফিগার করুন। VPN (যেমন WireGuard) যোগ করুন পুরো ট্রাফিক রাউট করার জন্য।
-  
-**টিপ**: নিয়মিত আপডেট করুন (`docker-compose pull && docker-compose up -d`) এবং 2FA অ্যাডমিন প্যানেলে যোগ করুন। সার্টিফিকেট রিনিউ অটোম্যাটিক, কিন্তু মনিটর করুন।
-
-## টেস্টিং এবং যাচাইকরণ
-
-### স্ট্যাটাস চেক করার কমান্ডস
-- Docker স্ট্যাটাস:
-  ```
-  docker-compose ps
-  docker logs nginx-proxy-manager_app-1  # লগ চেক
-  ```
-- Nginx স্ট্যাটাস (বেয়ার মেটাল):
-  ```
-  sudo systemctl status nginx
-  sudo nginx -t  # কনফিগ টেস্ট
-  ```
-- ডাটাবেস চেক:
-  ```
-  docker exec -it nginx-proxy-manager_db-1 mysql -u npm -p npm -e "SHOW TABLES;"
-  ```
-
-### কানেকটিভিটি চেকস
-1. লোকাল টেস্ট: `curl http://localhost:81` (অ্যাডমিন প্যানেল)।
-2. রিমোট টেস্ট: ব্রাউজারে https://yourdomain.com যান; SSL চেকের জন্য `openssl s_client -connect yourdomain.com:443`।
-3. প্রক্সি চেক: `curl -I http://yourdomain.com` (200 OK দেখুন)।
-4. ট্রাবলশুটিং: যদি না কাজ করে, `docker-compose down && docker-compose up -d` বা লগ চেক করুন। পোর্ট ওপেন চেক: `nmap -p 80,443 your-ip`।
-  
-**নোট**: SSL Labs (ssllabs.com) দিয়ে সার্টিফিকেট টেস্ট করুন। সমস্যা হলে, ডোমেইন প্রোপাগেশন (48 ঘণ্টা পর্যন্ত) অপেক্ষা করুন।
+Nginx Proxy Manager সেল্ফ-হোস্টিং করলে আপনি সহজে ওয়েব অ্যাপস এবং সার্ভিসগুলো নিরাপদভাবে এক্সপোজ করতে পারবেন। Docker-এর মাধ্যমে এটি খুব সহজে সেটআপ ও ম্যানেজ করা যায়।

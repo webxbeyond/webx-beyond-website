@@ -1,0 +1,111 @@
+---
+title: "ভল্টওয়ার্ডেন (Vaultwarden)"
+icon: "mdi:server"
+description: "Vaultwarden হোস্টিং গাইড: নিজের সার্ভারে সহজে Bitwarden compatible পাসওয়ার্ড ম্যানেজার ডিপ্লয় করার পূর্ণাঙ্গ নির্দেশিকা।"
+keywords: 
+ - Vaultwarden হোস্টিং
+ - Bitwarden বিকল্প
+ - পাসওয়ার্ড ম্যানেজার
+ - Docker Vaultwarden
+ - সেল্ফ-হোস্টেড সিকিউরিটি
+---
+
+# ভূমিকা (Introduction)
+
+**Vaultwarden** হলো একটি লাইটওয়েট এবং ওপেন সোর্স **Bitwarden compatible পাসওয়ার্ড ম্যানেজার সার্ভার**। এটি মূলত Rust দিয়ে লেখা, যা দ্রুত, নিরাপদ এবং কম রিসোর্স ব্যবহার করে চলে।  
+
+### কেন নিজে হোস্ট করা উচিত
+- **সম্পূর্ণ নিয়ন্ত্রণ:** আপনার সব পাসওয়ার্ড ও ডেটা নিজের সার্ভারে থাকবে।  
+- **গোপনীয়তা:** কোনো তৃতীয় পক্ষ আপনার ডেটাতে প্রবেশ করতে পারবে না।  
+- **খরচ বাঁচানো:** অফিসিয়াল Bitwarden হোস্টিং সাবস্ক্রিপশনের বিকল্প হিসেবে বিনামূল্যে ব্যবহার করা যায়।  
+
+### প্রধান ব্যবহার ক্ষেত্রসমূহ
+- ব্যক্তিগত পাসওয়ার্ড ম্যানেজমেন্ট।  
+- টিম/অর্গানাইজেশনের জন্য নিরাপদ পাসওয়ার্ড শেয়ারিং।  
+- ব্রাউজার এক্সটেনশন ও মোবাইল অ্যাপের সাথে ইন্টিগ্রেশন।  
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+## ১. প্রয়োজনীয়তা
+- Docker & Docker Compose ইনস্টল থাকতে হবে।  
+- সার্ভার বা লোকাল মেশিনে ন্যূনতম 512 MB RAM।  
+- ডোমেইন এবং SSL (প্রোডাকশনের জন্য সুপারিশকৃত)।  
+
+## ২. Dockerized Setup
+
+### ধাপ ১: প্রজেক্ট ফোল্ডার তৈরি
+
+```bash
+mkdir vaultwarden
+cd vaultwarden
+```
+
+### ধাপ ২: `.env` ফাইল তৈরি
+
+```bash title=".env"
+# Vaultwarden configuration
+ADMIN_TOKEN=supersecrettoken
+SIGNUPS_ALLOWED=false
+DOMAIN=https://vault.example.com
+```
+
+### ধাপ ৩: `docker-compose.yml` তৈরি
+
+```yaml title="docker-compose.yml"
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    environment:
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - SIGNUPS_ALLOWED=${SIGNUPS_ALLOWED}
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./vw-data:/data
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+```
+
+### ধাপ ৪: কনটেইনার চালানো
+
+```bash
+docker-compose up -d
+```
+
+### ধাপ ৫: ওয়েব ইন্টারফেস অ্যাক্সেস
+
+* ব্রাউজারে যান: `http://localhost:8080`
+* নতুন অ্যাকাউন্ট তৈরি করুন বা অ্যাডমিন প্যানেল খুলুন:
+  `http://localhost:8080/admin`
+* লগইন করতে `.env` ফাইলে থাকা `ADMIN_TOKEN` ব্যবহার করুন।
+
+## ৩. সাধারণ কমান্ড এবং সমস্যার সমাধান
+
+* **লগ দেখার জন্য:**
+
+```bash
+docker-compose logs -f vaultwarden
+```
+
+* **রিস্টার্ট করার জন্য:**
+
+```bash
+docker-compose restart vaultwarden
+```
+
+* **ডাটাবেস ও ডেটা ব্যাকআপ:**
+
+```bash
+tar -czvf vw-backup.tar.gz vw-data/
+```
+
+# টিপস ও নোট
+
+* **SSL ব্যবহার করা আবশ্যক** যদি ইন্টারনেটে সার্ভার এক্সপোজ করা হয়।
+* সাইনআপ বন্ধ করতে `SIGNUPS_ALLOWED=false` রাখা গুরুত্বপূর্ণ, যাতে যে কেউ অ্যাকাউন্ট তৈরি করতে না পারে।
+* `ADMIN_TOKEN` কখনো পাবলিক রিপোজিটরিতে আপলোড করবেন না।
+
+# উপসংহার
+
+Vaultwarden একটি লাইটওয়েট এবং নিরাপদ পাসওয়ার্ড ম্যানেজার, যা অফিসিয়াল Bitwarden-এর বিকল্প হিসেবে অসাধারণ। Docker এর মাধ্যমে সেটআপ করা সহজ এবং দ্রুত, তাই নিজের সার্ভারে নিরাপদভাবে পাসওয়ার্ড ম্যানেজমেন্ট করা সম্ভব।
