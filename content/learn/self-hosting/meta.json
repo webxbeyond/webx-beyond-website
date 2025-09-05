@@ -36,6 +36,8 @@
     "uptime-kuma",
     "pi-hole",
     "adguard-home",
-    "umami"
+    "umami",
+    "home-assistant",
+    "cronicle"
   ]
 }

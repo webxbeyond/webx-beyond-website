@@ -1,0 +1,120 @@
+---
+title: "ক্রনিকল (Cronicle)"
+icon: "mdi:server"
+description: "Cronicle স্ব-হোস্টিং গাইড: Docker ব্যবহার করে সহজ এবং কার্যকর ইনস্টলেশন"
+keywords: 
+  - Cronicle
+  - ক্রনিকল
+  - Job Scheduler
+  - স্ব-হোস্টিং
+  - Docker Compose
+---
+
+# ভূমিকা (Introduction)
+
+**Cronicle** একটি ওপেন সোর্স, রিয়েল টাইম, স্কেলেবল জব শেডিউলার যা ব্যাকগ্রাউন্ড টাস্ক এবং ক্রোন জবগুলো পরিচালনা করতে ব্যবহৃত হয়। এটি নিজে হোস্ট করলে আপনি:
+
+- **ডেটার সম্পূর্ণ নিয়ন্ত্রণ** পাবেন
+- ক্লাউড সেবা থেকে স্বাধীনভাবে জব শিডিউল করতে পারবেন
+- স্কেলেবল এবং রিয়েল টাইম জব ম্যানেজমেন্ট পাবেন
+
+**প্রধান ব্যবহার ক্ষেত্রসমূহ:**
+
+- ব্যাকগ্রাউন্ড স্ক্রিপ্ট এবং টাস্ক চালানো
+- ডেটা প্রসেসিং ও ব্যাচ জব শিডিউল
+- রিয়েল টাইম মেইনটেন্যান্স এবং নোটিফিকেশন
+- ক্লাস্টারেড বা একাধিক নোডে জব শিডিউল
+
+# ইনস্টলেশন পদ্ধতি (Installation Methods)
+
+Cronicle সহজে Docker এর মাধ্যমে হোস্ট করা যায়। নিচে ধাপে ধাপে নির্দেশনা দেওয়া হলো।
+
+## প্রয়োজনীয়তা
+
+- একটি লিনাক্স সার্ভার (Ubuntu/Debian)
+- Docker & Docker Compose ইনস্টল করা
+- একটি `.env` ফাইল ব্যবহারের জন্য (সেন্সিটিভ ডেটা সংরক্ষণের জন্য)
+
+### ধাপ ১: Docker ও Docker Compose ইনস্টল
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable docker --now
+sudo systemctl status docker
+```
+
+### ধাপ ২: প্রজেক্ট ডিরেক্টরি তৈরি
+
+```bash
+mkdir -p ~/cronicle
+cd ~/cronicle
+```
+
+### ধাপ ৩: `.env` ফাইল তৈরি
+
+```bash title=".env"
+CRONICLE_HTTP_PORT=3012
+CRONICLE_NODE_NAME=cronicle_node
+CRONICLE_CLUSTER_SECRET=my_secret_key
+```
+
+> **নোট:** `CRONICLE_CLUSTER_SECRET` একটি শক্তিশালী পাসওয়ার্ড দিয়ে পরিবর্তন করুন।
+
+### ধাপ ৪: Docker Compose ফাইল তৈরি
+
+```yml title="docker-compose.yml"
+services:
+  cronicle:
+    container_name: cronicle
+    image: jhuckaby/cronicle:latest
+    environment:
+      - CRONICLE_HTTP_PORT=${CRONICLE_HTTP_PORT}
+      - CRONICLE_NODE_NAME=${CRONICLE_NODE_NAME}
+      - CRONICLE_CLUSTER_SECRET=${CRONICLE_CLUSTER_SECRET}
+    ports:
+      - "${CRONICLE_HTTP_PORT}:${CRONICLE_HTTP_PORT}"
+    volumes:
+      - ./data:/opt/cronicle/data
+      - ./logs:/opt/cronicle/logs
+    restart: unless-stopped
+```
+
+### ধাপ ৫: ডিরেক্টরি তৈরি
+
+```bash
+mkdir -p ~/cronicle/data
+mkdir -p ~/cronicle/logs
+```
+
+### ধাপ ৬: Docker Compose দিয়ে Cronicle চালানো
+
+```bash
+docker-compose up -d
+```
+
+> **নোট:** প্রথমবার চালালে Cronicle ডাটাবেস তৈরি করবে এবং নোড শুরু হবে।
+
+### ধাপ ৭: Web UI তে এক্সেস করা
+
+* ব্রাউজারে যান: `http://YOUR_SERVER_IP:3012`
+* লগইন করুন এবং নোড কনফিগারেশন সম্পন্ন করুন
+
+# সাধারণ সমস্যা ও সমাধান (Troubleshooting)
+
+* **কনটেইনার শুরু হচ্ছে না:**
+
+  ```bash
+  docker logs cronicle
+  ```
+
+  লগ চেক করুন এবং ডিরেক্টরি পারমিশন ঠিক করুন
+
+* **পোর্ট কনফ্লিক্ট:** নিশ্চিত করুন অন্য কোনো সার্ভিস একই পোর্ট ব্যবহার করছে না
+
+# টিপস ও পরবর্তী ধাপ
+
+* Cronicle Cluster ব্যবহার করে একাধিক নোডে জব শিডিউল করুন
+* ব্যাকআপ রাখুন এবং ডাটাবেস মেইনটেন্যান্স করুন
+* Web UI থেকে অটোমেশন এবং নোটিফিকেশন সেটআপ করুন
+* Cronicle API ব্যবহার করে কাস্টম স্ক্রিপ্ট ইন্টিগ্রেশন করুন
