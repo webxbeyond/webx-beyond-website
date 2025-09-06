@@ -1,0 +1,42 @@
+# Node modules (we install them in Docker)
+node_modules
+.pnp
+.pnpm-store
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files (optional if you pass them explicitly)
+.env
+.env.local
+.env.development
+.env.test
+.env.sample
+
+# Next.js output (for clean rebuilds)
+.next/cache
+.next/build
+.next/static
+
+# Git files
+.git
+.gitignore
+
+# Docker files (optional)
+Dockerfile*
+docker-compose*.yml
+
+# Editor folders
+.vscode
+.idea
+
+# Other
+dist
+coverage
