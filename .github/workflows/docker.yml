@@ -41,7 +41,7 @@ jobs:
             --build-arg NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=${{ env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY }} \
             --build-arg NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY=${{ env.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY }} \
             --build-arg NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${{ env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME }} \
-            -t ghcr.io/${{ github.repository }}/webx-beyond:${{ github.sha }} .
+            -t ghcr.io/${{ github.repository_owner }}/webx-beyond:${{ github.sha }} .
       
       - name: Push Docker image
         run: |
