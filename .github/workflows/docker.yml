@@ -12,6 +12,12 @@ jobs:
   docker:
     runs-on: ubuntu-latest
 
+    env:
+      NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
+      NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY }}
+      NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY }}
+      NEXT_PUBLIC_ALGOLIA_INDEX_NAME: ${{ secrets.NEXT_PUBLIC_ALGOLIA_INDEX_NAME }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -28,9 +34,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build Docker image
+      - name: Build Docker image with build args
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/webx-beyond:${{ github.sha }} .
+          docker build \
+            --build-arg NEXT_PUBLIC_ALGOLIA_APP_ID=${{ env.NEXT_PUBLIC_ALGOLIA_APP_ID }} \
+            --build-arg NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=${{ env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY }} \
+            --build-arg NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY=${{ env.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY }} \
+            --build-arg NEXT_PUBLIC_ALGOLIA_INDEX_NAME=${{ env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME }} \
+            -t ghcr.io/${{ github.repository }}/webx-beyond:latest .
       
       - name: Push Docker image
         run: |
