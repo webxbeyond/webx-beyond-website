@@ -1,19 +1,20 @@
-# ============================
-# 1️⃣ Dependencies Stage
-# ============================
-FROM node:20-alpine AS deps
+# ---- builder ----
+FROM node:20-alpine AS builder
 WORKDIR /webx-beyond
 
-RUN npm install -g pnpm
-COPY package.json pnpm-lock.yaml source.config.ts ./
+# Install build dependencies (for native modules)
+RUN apk add --no-cache --virtual .build-deps python3 make g++
+
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy manifest files first for caching
+COPY package.json pnpm-lock.yaml source.config.ts next-pwa.config.mjs ./
+
+# Install all dependencies (including dev) for build
 RUN pnpm install --frozen-lockfile
 
-# ============================
-# 2️⃣ Build Stage
-# ============================
-FROM deps AS builder
-WORKDIR /webx-beyond
-
+# Copy the entire project
 COPY . .
 
 # Pass build args
@@ -31,34 +32,41 @@ ENV NEXT_PUBLIC_ALGOLIA_INDEX_NAME=$NEXT_PUBLIC_ALGOLIA_INDEX_NAME
 
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
-# Build standalone app
+
+# Build Next.js app
 RUN pnpm build
 
-# ============================
-# 3️⃣ Production Stage
-# ============================
+# Prune dev dependencies for production
+RUN pnpm prune --prod
+
+# Remove build deps
+RUN apk del .build-deps
+
+
+# ---- runtime ----
 FROM node:20-alpine AS runner
+ENV NODE_ENV=production
 WORKDIR /webx-beyond
 
-ENV NODE_ENV=production
-
-# Copy standalone output and node_modules
-COPY --from=builder /webx-beyond/.next/standalone ./
-COPY --from=builder /webx-beyond/.next/static ./.next/static
-COPY --from=builder /webx-beyond/public ./public
+# Copy only what's needed to run
 COPY --from=builder /webx-beyond/node_modules ./node_modules
+COPY --from=builder /webx-beyond/.next ./.next
+COPY --from=builder /webx-beyond/public ./public
+COPY --from=builder /webx-beyond/package.json ./package.json
+COPY --from=builder /webx-beyond/next.config.mjs ./next.config.mjs
+COPY --from=builder /webx-beyond/next-pwa.config.mjs ./next-pwa.config.mjs
 
 EXPOSE 7020
 ENV PORT=7020
 
-CMD ["node", "server.js"]
+# Start Next.js app
+CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "7020"]
 
 
-# how to build
 
-# docker build \
-#   --build-arg NEXT_PUBLIC_ALGOLIA_APP_ID=yourAppId \
-#   --build-arg NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=yourSearchKey \
-#   --build-arg NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY=yourWriteKey \
-#   --build-arg NEXT_PUBLIC_ALGOLIA_INDEX_NAME=yourIndexName \
-#   -t webx-beyond .
+# # docker build \
+# #   --build-arg NEXT_PUBLIC_ALGOLIA_APP_ID=yourAppId \
+# #   --build-arg NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=yourSearchKey \
+# #   --build-arg NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY=yourWriteKey \
+# #   --build-arg NEXT_PUBLIC_ALGOLIA_INDEX_NAME=yourIndexName \
+# #   -t webx-beyond .

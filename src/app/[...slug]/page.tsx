@@ -17,6 +17,8 @@ import { metadataImage } from '@/lib/metadata-image';
 import { baseUrl } from '@/lib/metadata';
 // -------------------------------------------------------------------
 
+// export const revalidate = 60 * 60;
+
 export default async function Page(props: PageProps<"/[...slug]">) {
   const params = await props.params;
   const page = source.getPage(params.slug);
@@ -109,6 +111,6 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   );
 }
 
-export function generateStaticParams(): { slug: string[] }[] {
-  return source.generateParams();
-}
+// export function generateStaticParams(): { slug: string[] }[] {
+//   return source.generateParams();
+// }

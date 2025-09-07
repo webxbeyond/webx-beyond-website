@@ -8,7 +8,6 @@ const withMDX = createMDX();
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
-  output: "standalone",
 };
 
 export default withPWA(pwaConfig)(withMDX(config));
