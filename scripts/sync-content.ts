@@ -17,7 +17,7 @@ const records = JSON.parse(content.toString());
 
 const appId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID;
 
-const apiKey = process.env.NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY;
+const apiKey = process.env.ALGOLIA_WRITE_API_KEY;
 const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME;
 
 // console.log('ALGOLIA ENV:', { appId, apiKey, indexName });
