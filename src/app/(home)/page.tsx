@@ -356,7 +356,7 @@ function SelectTopics() {
             {categories.map(cat => (
               <button
                 key={cat}
-                className={cn('px-3 py-1 rounded-full text-sm font-medium', selectedCategory === cat ? 'bg-fd-primary text-white' : 'bg-fd-background border border-fd-foreground/10')}
+                className={cn('px-3 py-1 rounded-full text-sm font-medium cursor-pointer', selectedCategory === cat ? 'bg-fd-primary text-white' : 'bg-fd-background border border-fd-foreground/10')}
                 onClick={() => setSelectedCategory(prev => prev === cat ? 'all' : cat)}
               >
                 {cat}
