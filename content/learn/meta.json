@@ -25,6 +25,7 @@
 
     "ai",
     "pytorch",
+    "prompt-engineering",
 
     "aws",
     "vault",
