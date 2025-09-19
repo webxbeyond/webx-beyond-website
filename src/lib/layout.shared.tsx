@@ -43,7 +43,7 @@ export const linkItems: LinkItemType[] = [
   },
   {
     text: "এআই ডিরেক্টরি",
-    url: "https://ai.webxbeyond.com/",
+    url: "https://aitalika.com/",
     active: "url",
     external: true,
     icon: <Iconify icon="eos-icons:ai" />,
